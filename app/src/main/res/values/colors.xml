@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#C5C5C5</color>
+    <color name="colorLightSurface">#FFFFFF</color>
+    <color name="colorAccent">#007FDF</color>
+    <color name="colorNormalIconTint">#263238</color>
+    <color name="colorItemNotSelected">#464646</color>
+
+    <color name="colorDarkPrimary">#1F1F1F</color>
+    <color name="colorDarkPrimaryDark">#000000</color>
+    <color name="colorDarkWindowBackground">#121212</color>
+    <color name="colorDarkAccent">#03DAC5</color>
+    <color name="colorDarkSurface">#1D1D1D</color>
+    <color name="colorDarkTextColor">#C5C5C5</color>
+    <color name="colorDarkIconTint">#838383</color>
+</resources>
