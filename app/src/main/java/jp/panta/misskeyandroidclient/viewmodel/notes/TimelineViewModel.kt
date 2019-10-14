@@ -3,16 +3,21 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.ViewModel
+import android.databinding.ObservableArrayList
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.LiveNotePagingStore
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.TimelineRequest
 import okhttp3.OkHttpClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 
-class TimelineViewModel(type: Type) : ViewModel(){
+class TimelineViewModel(type: Type, private val baseTimelineRequest: TimelineRequest) : ViewModel(){
     enum class Type{
         HOME,
         LOCAL,
@@ -20,7 +25,7 @@ class TimelineViewModel(type: Type) : ViewModel(){
         GLOBAL
     }
 
-    val timeline: LiveData<List<PlaneNoteViewData>>
+    val observableTimelineList: ObservableArrayList<PlaneNoteViewData> = ObservableArrayList()
 
     val isLoading = MediatorLiveData<Boolean>()
 
@@ -31,44 +36,103 @@ class TimelineViewModel(type: Type) : ViewModel(){
     private val misskeyAPI = MisskeyAPIServiceBuilder.build(baseUrl)
     val i = ""
 
-    private val pagingCallBack = object : LiveNotePagingStore.CallBack{
-        override fun onLoad() {
-            isLoading.postValue(false)
-        }
-        override fun onError(t: Throwable) {
-            isLoading.postValue(false)
-            errorState.postValue("通信エラー")
-        }
-    }
 
-    private val mLivePagingStore = when(type){
-        Type.HOME -> LiveNotePagingStore(i, misskeyAPI::homeTimeline, pagingCallBack)
-        Type.LOCAL -> LiveNotePagingStore(i, misskeyAPI::localTimeline, pagingCallBack)
-        Type.SOCIAL -> LiveNotePagingStore(i, misskeyAPI::hybridTimeline, pagingCallBack)
-        Type.GLOBAL -> LiveNotePagingStore(i, misskeyAPI::globalTimeline, pagingCallBack)
+
+    private val timelineStore = when(type){
+        Type.HOME -> misskeyAPI::homeTimeline
+        Type.LOCAL -> misskeyAPI::localTimeline
+        Type.SOCIAL -> misskeyAPI::hybridTimeline
+        Type.GLOBAL -> misskeyAPI::globalTimeline
 
     }
 
-    init{
-        val liveData = MediatorLiveData<List<PlaneNoteViewData>>()
-        mLivePagingStore.setLiveData(liveData)
-        timeline = liveData
-
-    }
-
+    private var isLoadingFlag = false
 
     fun loadNew(){
         this.isLoading.postValue(true)
-        this.mLivePagingStore.loadNew()
+        if( ! isLoadingFlag ){
+            isLoadingFlag = true
+            val sinceId = observableTimelineList.firstOrNull()?.id
+            if(sinceId == null){
+                isLoadingFlag = false
+                //初期化処理 or 何もしない
+            }else{
+
+                timelineStore(baseTimelineRequest.makeSinceId(sinceId)).enqueue(object : Callback<List<Note>?>{
+                    override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
+                        val newNotes = response.body()?.asReversed()
+                        isLoadingFlag = false
+                        val planeNotes = newNotes?.map{ it -> PlaneNoteViewData(it) }
+                            ?: return
+
+
+                        observableTimelineList.addAll(0, planeNotes)
+                        isLoading.postValue(false)
+
+                    }
+
+                    override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
+                        isLoadingFlag = false
+                        isLoading.postValue(false)
+                    }
+                })
+            }
+
+        }
     }
 
     fun loadOld(){
-        this.mLivePagingStore.loadOld()
+        val untilId = observableTimelineList.lastOrNull()?.id
+        if(  isLoadingFlag || untilId == null){
+            //何もしない
+        }else{
+            isLoadingFlag = true
+            timelineStore(baseTimelineRequest.makeUntilId(untilId)).enqueue(object : Callback<List<Note>?>{
+                override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
+                    val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
+
+                    if(list == null){
+                        isLoadingFlag = false
+                        return
+                    }
+
+                    observableTimelineList.addAll(list)
+                    isLoadingFlag = false
+
+                }
+                override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
+                    isLoadingFlag = false
+                }
+            })
+
+        }
     }
 
     fun loadInit(){
         this.isLoading.postValue(true)
-        this.mLivePagingStore.loadInit()
+
+        if( ! isLoadingFlag ){
+
+            isLoadingFlag = true
+
+            timelineStore(baseTimelineRequest).enqueue( object : Callback<List<Note>?>{
+                override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
+                    val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
+                    if(list == null){
+                        isLoadingFlag = false
+                        return
+                    }
+
+                    observableTimelineList.clear()
+                    observableTimelineList.addAll(list)
+                    isLoadingFlag = false
+                }
+
+                override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
+                    isLoadingFlag = false
+                }
+            })
+        }
     }
 
 

@@ -12,6 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.SecretConstant
+import jp.panta.misskeyandroidclient.model.notes.TimelineRequest
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
@@ -31,23 +33,26 @@ class TimelineFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = TimelineListAdapter(diffUtilCallBack)
-        list_view.adapter = adapter
+        //val adapter = TimelineListAdapter(diffUtilCallBack)
+        //list_view.adapter = adapter
         mLinearLayoutManager = LinearLayoutManager(this.context!!)
         list_view.layoutManager = mLinearLayoutManager
-        mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(TimelineViewModel.Type.SOCIAL)).get(TimelineViewModel::class.java)
 
+        val baseTimelineRequest = TimelineRequest(i = SecretConstant.i())
 
+        mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(TimelineViewModel.Type.SOCIAL, baseTimelineRequest)).get(TimelineViewModel::class.java)
+
+        list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList)
         list_view.addOnScrollListener(mScrollListener)
 
         refresh.setOnRefreshListener {
             mViewModel.loadNew()
         }
 
-        mViewModel.timeline.observe(viewLifecycleOwner, Observer {
+        /*mViewModel.timeline.observe(viewLifecycleOwner, Observer {
             Log.d("", it.toString())
             adapter.submitList(it)
-        })
+        })*/
 
         mViewModel.isLoading.observe(viewLifecycleOwner, Observer<Boolean> {
             if(it != null && !it){
