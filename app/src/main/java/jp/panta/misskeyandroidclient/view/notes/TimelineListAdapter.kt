@@ -18,7 +18,9 @@ class TimelineListAdapter(private val observableList: ObservableArrayList<PlaneN
     }
 
     override fun onBindViewHolder(p0: NoteViewHolder, p1: Int) {
+        //p0.binding.note = observableList[p1]
         p0.binding.note = observableList[p1]
+        p0.binding.executePendingBindings()
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): NoteViewHolder {

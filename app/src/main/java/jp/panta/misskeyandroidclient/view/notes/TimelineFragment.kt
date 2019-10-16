@@ -40,7 +40,7 @@ class TimelineFragment : Fragment(){
 
         val baseTimelineRequest = TimelineRequest(i = SecretConstant.i())
 
-        mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(TimelineViewModel.Type.SOCIAL, baseTimelineRequest)).get(TimelineViewModel::class.java)
+        mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(TimelineViewModel.Type.GLOBAL, baseTimelineRequest)).get(TimelineViewModel::class.java)
 
         list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList)
         list_view.addOnScrollListener(mScrollListener)
