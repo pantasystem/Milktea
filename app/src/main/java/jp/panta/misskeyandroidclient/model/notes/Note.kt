@@ -25,7 +25,7 @@ data class Note(
 
     val url: String?,
     @SerializedName("renoteCount") val reNoteCount: Int,
-    @SerializedName("reactions") val reactionCounts: Map<String, Int>?,
+    @SerializedName("reactions") val reactionCounts: LinkedHashMap<String, Int>?,
     //@JsonProperty("emojis") val emojis: List<EmojiProperty>?,
     @SerializedName("repliesCount") val replyCount: Int,
     @SerializedName("user") val user: User,

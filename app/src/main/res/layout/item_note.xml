@@ -179,9 +179,9 @@
                             android:scaleType="centerCrop"
                     />
                     <TextView
-                            android:text='@{note.reactionCount}'
+                            android:text='@{note.reactionCount.toString()}'
 
-                            android:visibility="@{note.reactionCount == null ? View.INVISIBLE : View.VISIBLE}"
+                            android:visibility="@{note.reactionCount == 0 ? View.INVISIBLE : View.VISIBLE}"
 
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"

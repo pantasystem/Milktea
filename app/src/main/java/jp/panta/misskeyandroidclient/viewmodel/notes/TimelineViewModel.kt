@@ -130,7 +130,7 @@ class TimelineViewModel(type: Type, private val baseTimelineRequest: TimelineReq
                     observableTimelineList.addAll(list)
                     isLoadingFlag = false
 
-                    test()
+                    //test()
                 }
 
                 override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
@@ -144,7 +144,8 @@ class TimelineViewModel(type: Type, private val baseTimelineRequest: TimelineReq
         val first = observableTimelineList.firstOrNull()
         GlobalScope.launch{
             for(n in 0.until(100)){
-                first?.replyCount = n.toString()
+                //first?.replyCount = n.toString()
+                first?.addReaction("")
 
                 delay(100)
             }

@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+import android.arch.lifecycle.MediatorLiveData
+import android.databinding.ObservableField
 import jp.panta.misskeyandroidclient.model.notes.Note
 
 class PlaneNoteViewData (private val note: Note){
@@ -58,7 +60,18 @@ class PlaneNoteViewData (private val note: Note){
     val reNoteCount: String?
         get() = if(toShowNote.reNoteCount > 0) toShowNote.reNoteCount.toString() else null
 
-    val reactionCount: String? = if(toShowNote.reactionCounts?.isNullOrEmpty() == false) toShowNote.reactionCounts?.size.toString() else null
+    //val reactionCount: String? = if(toShowNote.reactionCounts?.isNullOrEmpty() == false) toShowNote.reactionCounts?.size.toString() else null
+    val reactionCounts = toShowNote.reactionCounts
+
+    val reactionCount = ObservableField<Int>().apply{
+        var sum = 0
+        reactionCounts?.forEach{
+            sum += it.value
+        }
+        this.set(sum)
+    }
+
+
 
     //reNote先
     val subNote: Note? = toShowNote.reNote
@@ -67,6 +80,16 @@ class PlaneNoteViewData (private val note: Note){
     val subNoteName = subNote?.user?.name
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteText = subNote?.text
+
+    fun addReaction(reaction: String){
+        var count = reactionCount.get()
+        if(count == null) count = 1 else count++
+        reactionCount.set(count)
+    }
+
+    fun takeReaction(reaction: String){
+
+    }
 
 
 
