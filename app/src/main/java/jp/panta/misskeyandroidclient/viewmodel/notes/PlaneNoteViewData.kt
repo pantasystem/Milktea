@@ -55,6 +55,8 @@ class PlaneNoteViewData (private val note: Note){
 
     val text = toShowNote.text
 
+    val files = toShowNote.files
+
     var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
 
     val reNoteCount: String?
