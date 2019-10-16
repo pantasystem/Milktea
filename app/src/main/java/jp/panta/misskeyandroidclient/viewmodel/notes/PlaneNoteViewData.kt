@@ -53,7 +53,7 @@ class PlaneNoteViewData (private val note: Note){
 
     val text = toShowNote.text
 
-    val replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
+    var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
 
     val reNoteCount: String?
         get() = if(toShowNote.reNoteCount > 0) toShowNote.reNoteCount.toString() else null

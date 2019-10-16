@@ -9,6 +9,9 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.LiveNotePagingStore
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.TimelineRequest
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -126,12 +129,25 @@ class TimelineViewModel(type: Type, private val baseTimelineRequest: TimelineReq
                     observableTimelineList.clear()
                     observableTimelineList.addAll(list)
                     isLoadingFlag = false
+
+                    test()
                 }
 
                 override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
                     isLoadingFlag = false
                 }
             })
+        }
+    }
+
+    private fun test(){
+        val first = observableTimelineList.firstOrNull()
+        GlobalScope.launch{
+            for(n in 0.until(100)){
+                first?.replyCount = n.toString()
+
+                delay(100)
+            }
         }
     }
 
