@@ -11,7 +11,11 @@ import android.support.design.widget.NavigationView
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
+import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import kotlinx.android.synthetic.main.app_bar_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -41,11 +45,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.setNavigationItemSelectedListener(this)
 
         replaceTimelineFragment()
+        toolbar.title ="unti"
     }
+
+    fun changeTitle(title: String?){
+        toolbar.title = title
+    }
+
 
     private fun replaceTimelineFragment(){
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.content_main, TimelineFragment())
+        //val t = TimelineFragment.newInstance(NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SOCIAL))
+        ft.replace(R.id.content_main, TabFragment())
         ft.commit()
     }
 

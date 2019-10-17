@@ -6,6 +6,7 @@ import android.databinding.ObservableArrayList
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteType
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -13,13 +14,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class TimelineViewModel(type: Type, private val baseTimelineRequest: NoteRequest) : ViewModel(){
-    enum class Type{
-        HOME,
-        LOCAL,
-        SOCIAL,
-        GLOBAL
-    }
+class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel(){
+
 
     val observableTimelineList: ObservableArrayList<PlaneNoteViewData> = ObservableArrayList()
 
@@ -30,15 +26,15 @@ class TimelineViewModel(type: Type, private val baseTimelineRequest: NoteRequest
     private val baseUrl = "https://misskey.io/"
 
     private val misskeyAPI = MisskeyAPIServiceBuilder.build(baseUrl)
-    val i = ""
 
-
-
-    private val timelineStore = when(type){
-        Type.HOME -> misskeyAPI::homeTimeline
-        Type.LOCAL -> misskeyAPI::localTimeline
-        Type.SOCIAL -> misskeyAPI::hybridTimeline
-        Type.GLOBAL -> misskeyAPI::globalTimeline
+    private val timelineStore = when(requestBaseSetting.type){
+        NoteType.HOME -> misskeyAPI::homeTimeline
+        NoteType.LOCAL -> misskeyAPI::localTimeline
+        NoteType.SOCIAL -> misskeyAPI::hybridTimeline
+        NoteType.GLOBAL -> misskeyAPI::globalTimeline
+        NoteType.SEARCH -> misskeyAPI::searchNote
+        NoteType.SEARCH_HASH -> misskeyAPI::searchByTag
+        NoteType.USER -> misskeyAPI::userNotes
 
     }
 
@@ -54,7 +50,8 @@ class TimelineViewModel(type: Type, private val baseTimelineRequest: NoteRequest
                 //初期化処理 or 何もしない
             }else{
 
-                timelineStore(baseTimelineRequest.makeSinceId(sinceId)).enqueue(object : Callback<List<Note>?>{
+                val req = requestBaseSetting.buildRequest(NoteRequest.Conditions(sinceId = sinceId))
+                timelineStore(req).enqueue(object : Callback<List<Note>?>{
                     override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
                         val newNotes = response.body()?.asReversed()
                         isLoadingFlag = false
@@ -83,7 +80,8 @@ class TimelineViewModel(type: Type, private val baseTimelineRequest: NoteRequest
             //何もしない
         }else{
             isLoadingFlag = true
-            timelineStore(baseTimelineRequest.makeUntilId(untilId)).enqueue(object : Callback<List<Note>?>{
+            val req = requestBaseSetting.buildRequest(NoteRequest.Conditions(untilId = untilId))
+            timelineStore(req).enqueue(object : Callback<List<Note>?>{
                 override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
                     val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
 
@@ -111,7 +109,7 @@ class TimelineViewModel(type: Type, private val baseTimelineRequest: NoteRequest
 
             isLoadingFlag = true
 
-            timelineStore(baseTimelineRequest).enqueue( object : Callback<List<Note>?>{
+            timelineStore(requestBaseSetting.buildRequest(NoteRequest.Conditions())).enqueue( object : Callback<List<Note>?>{
                 override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
                     val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
                     if(list == null){

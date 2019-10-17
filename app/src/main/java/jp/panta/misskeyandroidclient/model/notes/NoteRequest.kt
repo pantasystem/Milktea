@@ -21,17 +21,19 @@ data class NoteRequest(
 
     @Entity
     data class Setting(
+        val i: String,
+        val type: NoteType,
         val userId: String? = null,
         val limit: Int? = null,
         val withFiles: Boolean? = null,
         val fileType: String? = null,
         val excludeNsfw: Boolean? = null,
         val query: String? = null
-    ){
+    ): Serializable{
         @PrimaryKey(autoGenerate = true)
         val id: Long? = null
 
-        fun buildRequest(i: String, conditions: Conditions): NoteRequest{
+        fun buildRequest(conditions: Conditions): NoteRequest{
             return NoteRequest(
                 i = i,
                 userId = userId,

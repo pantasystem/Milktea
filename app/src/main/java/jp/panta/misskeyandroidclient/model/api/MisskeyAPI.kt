@@ -30,21 +30,28 @@ interface MisskeyAPI {
     fun deleteReaction(@Body deleteNote: DeleteNote)
 
     @POST("api/notes/search")
-    fun searchNote(@Body timelineRequest: NoteRequest): Call<List<Note>?>
+    fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
     //timeline
     @POST("api/notes/timeline")
-    fun homeTimeline(@Body timelineRequest: NoteRequest): Call<List<Note>?>
+    fun homeTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
 
     @POST("api/notes/hybrid-timeline")
-    fun hybridTimeline(@Body timelineRequest: NoteRequest): Call<List<Note>?>
+    fun hybridTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
     @POST("api/notes/local-timeline")
-    fun localTimeline(@Body timelineRequest: NoteRequest): Call<List<Note>?>
+    fun localTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
     @POST("api/notes/global-timeline")
-    fun globalTimeline(@Body timelineRequest: NoteRequest): Call<List<Note>?>
+    fun globalTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+
+    @POST("api/notes/search_by_tag")
+    fun searchByTag(@Body noteRequest: NoteRequest): Call<List<Note>?>
+
+    //user
+    @POST("api/users/notes")
+    fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
 
 

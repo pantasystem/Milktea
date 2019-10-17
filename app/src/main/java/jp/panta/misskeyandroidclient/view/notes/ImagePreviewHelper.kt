@@ -18,7 +18,7 @@ object ImagePreviewHelper {
         /*if(imagePreviewTopLeft != null){
             Log.d("ImagePreview", "${imagePreviewTopLeft::class.java}")
         }*/
-        Log.d("ImagePreview", "画面サイズ ${this.width}")
+        //Log.d("ImagePreview", "画面サイズ ${this.width}")
         //this.parent
         val a = this.parent
 

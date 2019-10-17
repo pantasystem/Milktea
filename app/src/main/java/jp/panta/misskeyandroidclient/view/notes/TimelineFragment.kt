@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.view.notes
 
+import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -11,9 +12,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
@@ -21,10 +24,24 @@ import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 
 class TimelineFragment : Fragment(){
 
-
+    companion object{
+        private const val EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.setting"
+        fun newInstance(setting: NoteRequest.Setting): TimelineFragment{
+            return TimelineFragment().apply{
+                arguments = Bundle().apply{
+                    this.putSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING, setting)
+                }
+            }
+        }
+    }
 
     private lateinit var mLinearLayoutManager: LinearLayoutManager
     private lateinit var mViewModel: TimelineViewModel
+
+    private var isViewCreated: Boolean = false
+    private var isLoadInited: Boolean = false
+
+    private var mSetting: NoteRequest.Setting? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_swipe_refresh_recycler_view, container, false)
@@ -32,15 +49,20 @@ class TimelineFragment : Fragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         //val adapter = TimelineListAdapter(diffUtilCallBack)
         //list_view.adapter = adapter
         mLinearLayoutManager = LinearLayoutManager(this.context!!)
         list_view.layoutManager = mLinearLayoutManager
 
-        val baseTimelineRequest = NoteRequest(i = SecretConstant.i())
+        //データ受け取り
 
-        mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(TimelineViewModel.Type.GLOBAL, baseTimelineRequest)).get(TimelineViewModel::class.java)
+        mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting?
+
+
+
+        //val requestSetting = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SOCIAL)
+
+        mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(mSetting)).get(TimelineViewModel::class.java)
 
         list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList)
         list_view.addOnScrollListener(mScrollListener)
@@ -49,31 +71,38 @@ class TimelineFragment : Fragment(){
             mViewModel.loadNew()
         }
 
-        /*mViewModel.timeline.observe(viewLifecycleOwner, Observer {
-            Log.d("", it.toString())
-            adapter.submitList(it)
-        })*/
-
         mViewModel.isLoading.observe(viewLifecycleOwner, Observer<Boolean> {
             if(it != null && !it){
                 refresh?.isRefreshing = false
             }
         })
 
-        mViewModel.loadInit()
+        if(userVisibleHint && !isLoadInited){
+            mViewModel.loadInit()
+            isLoadInited = true
+
+            Log.d("", "title変更中")
+            (activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
+
+
+        }
+        isViewCreated = true
 
     }
 
 
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
 
-
-    private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
-        override fun areContentsTheSame(p0: PlaneNoteViewData, p1: PlaneNoteViewData): Boolean {
-            return p0.id == p1.id
+        val setting = mSetting
+        if(isVisibleToUser && setting != null){
+            //activity?.title = TabFragment.localizationTitle(setting)
+            (activity as MainActivity).changeTitle(TabFragment.localizationTitle(setting))
         }
-
-        override fun areItemsTheSame(p0: PlaneNoteViewData, p1: PlaneNoteViewData): Boolean {
-            return p0 == p1
+        //表示中
+        if(isVisibleToUser && isViewCreated && !isLoadInited){
+            mViewModel.loadInit()
+            isLoadInited = true
         }
     }
 
