@@ -72,4 +72,8 @@ dependencies {
     //CardView
     implementation "com.android.support:cardview-v7:28.0.0"
 
+    implementation "android.arch.navigation:navigation-fragment-ktx:1.0.0"
+    implementation "android.arch.navigation:navigation-ui-ktx:1.0.0"
+    implementation 'com.google.android.material:material:1.0.0'
+
 }
