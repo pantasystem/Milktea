@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import android.arch.lifecycle.MediatorLiveData
-import android.databinding.ObservableField
+import androidx.databinding.ObservableField
 import jp.panta.misskeyandroidclient.model.notes.Note
 
 class PlaneNoteViewData (private val note: Note){

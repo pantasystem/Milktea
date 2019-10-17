@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

@@ -1,12 +1,13 @@
 package jp.panta.misskeyandroidclient.util
 
-import android.databinding.ObservableArrayList
-import android.databinding.ObservableList
+
 import android.os.Handler
 import android.os.Looper
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.ViewGroup
+import androidx.databinding.ObservableArrayList
+import androidx.databinding.ObservableList
+import androidx.recyclerview.widget.RecyclerView
 
 abstract class ObservableArrayListAdapter<T, VH: RecyclerView.ViewHolder>(private val observableArrayList: ObservableArrayList<T>) : RecyclerView.Adapter<VH>(){
 

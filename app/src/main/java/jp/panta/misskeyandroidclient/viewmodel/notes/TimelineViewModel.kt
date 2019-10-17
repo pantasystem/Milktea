@@ -1,8 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.ViewModel
-import android.databinding.ObservableArrayList
+
+import androidx.databinding.ObservableArrayList
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest

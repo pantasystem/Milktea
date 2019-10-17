@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.view.notes
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.PagerAdapter
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -53,7 +53,7 @@ class TabFragment : Fragment(){
 
     }
 
-    class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, val requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager){
+    class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, val requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!){
         override fun getCount(): Int {
             return requestBaseList.size
         }

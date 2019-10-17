@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.view.text
 
-import android.databinding.BindingAdapter
 import android.widget.TextView
+import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 
 object DecoratTextHelper {

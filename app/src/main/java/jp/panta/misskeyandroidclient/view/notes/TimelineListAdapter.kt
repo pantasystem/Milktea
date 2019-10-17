@@ -1,10 +1,11 @@
 package jp.panta.misskeyandroidclient.view.notes
 
-import android.databinding.DataBindingUtil
-import android.databinding.ObservableArrayList
-import android.support.v7.widget.RecyclerView
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ObservableArrayList
+import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.util.ObservableArrayListAdapter

@@ -1,17 +1,16 @@
 package jp.panta.misskeyandroidclient.view.notes
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
@@ -62,7 +61,7 @@ class TimelineFragment : Fragment(){
 
         //val requestSetting = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SOCIAL)
 
-        mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(mSetting)).get(TimelineViewModel::class.java)
+        mViewModel = ViewModelProviders.of(activity!!, TimelineViewModelFactory(mSetting)).get(TimelineViewModel::class.java)
 
         list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList)
         list_view.addOnScrollListener(mScrollListener)

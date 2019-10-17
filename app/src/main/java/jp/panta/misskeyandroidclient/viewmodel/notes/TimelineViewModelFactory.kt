@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import java.lang.IllegalArgumentException
 

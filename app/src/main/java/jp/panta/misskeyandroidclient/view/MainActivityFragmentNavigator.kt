@@ -1,12 +1,12 @@
 package jp.panta.misskeyandroidclient.view
-
+/*
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.FragmentManager
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
-import androidx.navigation.fragment.FragmentNavigator
+import androidx.navigation.fragment.FragmentNavigator*/
 
 /*class MainActivityFragmentNavigator(private val context: Context, private val manager: FragmentManager, private val containerId: Int) : FragmentNavigator(context,manager, containerId){
     override fun navigate(
