@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 
+import android.util.Log
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
@@ -104,6 +105,7 @@ class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel
     }
 
     fun loadInit(){
+        Log.d("#####################", "${requestBaseSetting.type}")
         this.isLoading.postValue(true)
 
         if( ! isLoadingFlag ){

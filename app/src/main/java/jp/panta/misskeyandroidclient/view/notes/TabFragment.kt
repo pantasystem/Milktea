@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.view.notes
 
 import android.os.Bundle
+import android.util.Log
 
 import android.view.LayoutInflater
 import android.view.View
@@ -53,12 +54,13 @@ class TabFragment : Fragment(){
 
     }
 
-    class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, val requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!){
+    class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, val requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         override fun getCount(): Int {
             return requestBaseList.size
         }
 
         override fun getItem(p0: Int): Fragment {
+            Log.d("getItem", "$p0, ${requestBaseList[p0].type}")
             return TimelineFragment.newInstance(requestBaseList[p0])
         }
 

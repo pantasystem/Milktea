@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,8 +38,8 @@ class TimelineFragment : Fragment(){
     private lateinit var mLinearLayoutManager: LinearLayoutManager
     private lateinit var mViewModel: TimelineViewModel
 
-    private var isViewCreated: Boolean = false
-    private var isLoadInited: Boolean = false
+    //private var isViewCreated: Boolean = false
+    //private var isLoadInited: Boolean = false
 
     private var mSetting: NoteRequest.Setting? = null
 
@@ -57,11 +58,13 @@ class TimelineFragment : Fragment(){
 
         mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting?
 
-
+        Log.d("TimelineFragment", "${mSetting?.type}")
 
         //val requestSetting = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SOCIAL)
 
-        mViewModel = ViewModelProviders.of(activity!!, TimelineViewModelFactory(mSetting)).get(TimelineViewModel::class.java)
+        //mViewModel = ViewModelProviders.of(activity!!, TimelineViewModelFactory(mSetting)).get(TimelineViewModel::class.java)
+        val a = TimelineViewModelFactory(mSetting)
+        mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
         list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList)
         list_view.addOnScrollListener(mScrollListener)
@@ -76,7 +79,7 @@ class TimelineFragment : Fragment(){
             }
         })
 
-        if(userVisibleHint && !isLoadInited){
+        /*if(userVisibleHint && !isLoadInited){
             mViewModel.loadInit()
             isLoadInited = true
 
@@ -84,13 +87,14 @@ class TimelineFragment : Fragment(){
             (activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
 
 
-        }
-        isViewCreated = true
+        }*/
+        mViewModel.loadInit()
+        //isViewCreated = true
 
     }
 
 
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+    /*override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
 
         val setting = mSetting
@@ -103,7 +107,7 @@ class TimelineFragment : Fragment(){
             mViewModel.loadInit()
             isLoadInited = true
         }
-    }
+    }*/
 
     private val mScrollListener = object : RecyclerView.OnScrollListener(){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
