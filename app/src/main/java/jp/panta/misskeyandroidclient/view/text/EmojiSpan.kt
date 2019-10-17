@@ -20,7 +20,15 @@ class EmojiSpan(view: View) : ReplacementSpan(){
 
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
-        return paint.measureText(text, start, end).toInt()
+        //return paint.measureText(text, start, end).toInt()
+        val metrics = paint.fontMetricsInt
+        if(fm != null){
+            fm.top = metrics.top
+            fm.ascent = metrics.ascent
+            fm.descent = metrics.descent
+            fm.bottom = metrics.bottom
+        }
+        return (paint.textSize * 1.2).toInt()
     }
 
     override fun draw(

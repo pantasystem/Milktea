@@ -13,7 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
-import jp.panta.misskeyandroidclient.model.notes.TimelineRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
@@ -38,7 +38,7 @@ class TimelineFragment : Fragment(){
         mLinearLayoutManager = LinearLayoutManager(this.context!!)
         list_view.layoutManager = mLinearLayoutManager
 
-        val baseTimelineRequest = TimelineRequest(i = SecretConstant.i())
+        val baseTimelineRequest = NoteRequest(i = SecretConstant.i())
 
         mViewModel = ViewModelProviders.of(this, TimelineViewModelFactory(TimelineViewModel.Type.GLOBAL, baseTimelineRequest)).get(TimelineViewModel::class.java)
 

@@ -1,26 +1,19 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.ViewModel
 import android.databinding.ObservableArrayList
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.notes.LiveNotePagingStore
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.TimelineRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.lang.Exception
 
-class TimelineViewModel(type: Type, private val baseTimelineRequest: TimelineRequest) : ViewModel(){
+class TimelineViewModel(type: Type, private val baseTimelineRequest: NoteRequest) : ViewModel(){
     enum class Type{
         HOME,
         LOCAL,

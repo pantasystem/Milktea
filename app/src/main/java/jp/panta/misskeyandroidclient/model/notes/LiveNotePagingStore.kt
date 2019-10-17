@@ -11,11 +11,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
 import java.lang.IllegalArgumentException
-import java.util.*
-import java.util.Collections.addAll
 import kotlin.collections.ArrayList
 
-class LiveNotePagingStore(private val i: String?, private val timeline:(TimelineRequest) -> Call<List<Note>?>, private val callBack: CallBack) {
+class LiveNotePagingStore(private val i: String?, private val timeline:(NoteRequest) -> Call<List<Note>?>, private val callBack: CallBack) {
 
     private var mLiveData: MediatorLiveData<List<PlaneNoteViewData>> = MediatorLiveData()
 
@@ -69,7 +67,7 @@ class LiveNotePagingStore(private val i: String?, private val timeline:(Timeline
             try{
 
                 val tmp = timeline(
-                    TimelineRequest(i = i, limit = 30)
+                    NoteRequest(i = i, limit = 30)
                 ).execute()
                 val list = tmp.body()
                 val code = tmp.code()
@@ -115,7 +113,7 @@ class LiveNotePagingStore(private val i: String?, private val timeline:(Timeline
 
         val version = mVersion.version
 
-        timeline(TimelineRequest(i = i, sinceId = sinceId)).enqueue(object  : Callback<List<Note>?>{
+        timeline(NoteRequest(i = i, sinceId = sinceId)).enqueue(object  : Callback<List<Note>?>{
             override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
 
                 val list = response.body()?.asReversed()
@@ -176,7 +174,7 @@ class LiveNotePagingStore(private val i: String?, private val timeline:(Timeline
 
         val version = mVersion.version
 
-        timeline(TimelineRequest(i = i, untilId = untilId))
+        timeline(NoteRequest(i = i, untilId = untilId))
             .enqueue(object : Callback<List<Note>?>{
                 override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
                     if(version != mVersion.version){
