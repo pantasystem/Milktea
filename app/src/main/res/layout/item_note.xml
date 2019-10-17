@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable name="note" type="jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData"/>
         <import type="android.view.View"/>
@@ -79,7 +80,9 @@
                         android:layout_below="@+id/userName"
                         android:layout_toEndOf="@id/avatarIcon"
                         android:textSize="15sp"
-                        android:text='@{note.text, default="awoihefowaihfoawejfoiawejfiowahefiowahiofehjaiowefjaio;wefjioawefhjioawhefoawheofwjhieo;fjwao;efjo;aahwoiefhaoiwefio;awefioa"}'
+                        app:text='@{note.text}'
+                        app:emojis='@{note.emojis}'
+                        tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                 />
 
@@ -88,6 +91,7 @@
                         android:layout_width="160dp" android:layout_height="90dp"
                         android:layout_toEndOf="@id/avatarIcon"
                         android:layout_below="@id/text"
+
 
                 />
                 <ImageView
@@ -157,7 +161,9 @@
                             android:layout_below="@+id/subNoteName"
                             android:textSize="15sp"
                             android:id="@+id/subNoteText"
-                            android:text='@{note.subNoteText, default="aowefoiawheofahwofiwaoiefjiowaefawoiefhowaifhoewafoewawaieofhawoef"}'
+                            tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
+                            app:text='@{note.subNoteText}'
+                            app:emojis='@{note.subNoteEmojis}'
                     />
 
 
@@ -174,9 +180,9 @@
                 >
 
                     <ImageButton
-                            android:layout_width="35dp"
+                            android:layout_width="38dp"
                             android:layout_height="35dp" app:srcCompat="@drawable/ic_reply_black_24dp"
-                            android:id="@+id/imageButton" android:layout_weight="1"
+                            android:id="@+id/imageButton"
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="5dp"
                             android:scaleType="centerCrop"
@@ -190,9 +196,9 @@
                             android:visibility='@{note.replyCount == null ? View.INVISIBLE : View.VISIBLE}'
                     />
                     <ImageButton
-                            android:layout_width="35dp"
+                            android:layout_width="38dp"
                             android:layout_height="35dp" app:srcCompat="@drawable/ic_re_note"
-                            android:id="@+id/imageButton2" android:layout_weight="1"
+                            android:id="@+id/imageButton2"
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="7dp"
                             android:scaleType="centerCrop"
@@ -208,9 +214,9 @@
 
                     />
                     <ImageButton
-                            android:layout_width="35dp"
+                            android:layout_width="38dp"
                             android:layout_height="35dp" app:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
-                            android:id="@+id/imageButton3" android:layout_weight="1"
+                            android:id="@+id/imageButton3"
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="5dp"
                             android:scaleType="centerCrop"
@@ -227,9 +233,9 @@
 
                     />
                     <ImageButton
-                            android:layout_width="35dp"
+                            android:layout_width="38dp"
                             android:layout_height="35dp" app:srcCompat="@drawable/ic_menu_share"
-                            android:id="@+id/imageButton4" android:layout_weight="1"
+                            android:id="@+id/imageButton4"
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="8dp"
                             android:scaleType="centerCrop"

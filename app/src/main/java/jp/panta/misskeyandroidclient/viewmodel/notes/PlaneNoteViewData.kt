@@ -55,6 +55,8 @@ class PlaneNoteViewData (private val note: Note){
 
     val text = toShowNote.text
 
+    val emojis = toShowNote.emojis
+
     val files = toShowNote.files
 
     var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
@@ -82,6 +84,8 @@ class PlaneNoteViewData (private val note: Note){
     val subNoteName = subNote?.user?.name
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteText = subNote?.text
+    val subNoteEmojis = subNote?.emojis
+
 
     fun addReaction(reaction: String){
         var count = reactionCount.get()

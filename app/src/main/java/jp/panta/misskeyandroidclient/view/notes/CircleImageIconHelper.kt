@@ -15,8 +15,8 @@ object CircleImageIconHelper {
         val imageView = this
         Glide
             .with(this.context)
-            .load(url)
             .asBitmap()
+            .load(url)
             .centerCrop()
             .into(object : BitmapImageViewTarget(this){
                 override fun setResource(resource: Bitmap?) {

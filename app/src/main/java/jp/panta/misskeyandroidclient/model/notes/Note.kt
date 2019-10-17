@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.files.FileProperty
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
@@ -26,7 +27,7 @@ data class Note(
     val url: String?,
     @SerializedName("renoteCount") val reNoteCount: Int,
     @SerializedName("reactions") val reactionCounts: LinkedHashMap<String, Int>?,
-    //@JsonProperty("emojis") val emojis: List<EmojiProperty>?,
+    @SerializedName("emojis") val emojis: List<Emoji>?,
     @SerializedName("repliesCount") val replyCount: Int,
     @SerializedName("user") val user: User,
     @SerializedName("files") val files: List<FileProperty>?,
