@@ -105,7 +105,6 @@ class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel
     }
 
     fun loadInit(){
-        Log.d("#####################", "${requestBaseSetting.type}")
         this.isLoading.postValue(true)
 
         if( ! isLoadingFlag ){

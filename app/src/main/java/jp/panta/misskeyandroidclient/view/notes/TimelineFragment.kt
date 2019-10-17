@@ -40,6 +40,7 @@ class TimelineFragment : Fragment(){
 
     //private var isViewCreated: Boolean = false
     //private var isLoadInited: Boolean = false
+    private var isLoadInit: Boolean = false
 
     private var mSetting: NoteRequest.Setting? = null
 
@@ -58,11 +59,8 @@ class TimelineFragment : Fragment(){
 
         mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting?
 
-        Log.d("TimelineFragment", "${mSetting?.type}")
 
-        //val requestSetting = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SOCIAL)
 
-        //mViewModel = ViewModelProviders.of(activity!!, TimelineViewModelFactory(mSetting)).get(TimelineViewModel::class.java)
         val a = TimelineViewModelFactory(mSetting)
         mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
@@ -79,35 +77,23 @@ class TimelineFragment : Fragment(){
             }
         })
 
-        /*if(userVisibleHint && !isLoadInited){
-            mViewModel.loadInit()
-            isLoadInited = true
-
-            Log.d("", "title変更中")
-            (activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
-
-
-        }*/
-        mViewModel.loadInit()
-        //isViewCreated = true
 
     }
 
+    override fun onResume() {
+        super.onResume()
 
-    /*override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
+        if(isLoadInit){
 
-        val setting = mSetting
-        if(isVisibleToUser && setting != null){
-            //activity?.title = TabFragment.localizationTitle(setting)
-            (activity as MainActivity).changeTitle(TabFragment.localizationTitle(setting))
-        }
-        //表示中
-        if(isVisibleToUser && isViewCreated && !isLoadInited){
+        }else{
             mViewModel.loadInit()
-            isLoadInited = true
+            isLoadInit = true
         }
-    }*/
+
+        (activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
+    }
+
+
 
     private val mScrollListener = object : RecyclerView.OnScrollListener(){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
