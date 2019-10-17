@@ -45,7 +45,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.setNavigationItemSelectedListener(this)
 
         replaceTimelineFragment()
-        toolbar.title ="unti"
     }
 
     fun changeTitle(title: String?){
