@@ -9,6 +9,8 @@
         <item name="colorOnError" format="color"/>
         <item name="colorOnSurface" format="color"/>
         <item name="scrimBackground" format="color"/>-->
+        <attr name="colorNormalReactionCounterBackground" format="color"/>
+        <attr name="colorSelectedReactionCounterBackground" format="color" />
 
 
     </declare-styleable>

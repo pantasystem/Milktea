@@ -4,6 +4,10 @@
     <data>
         <variable name="note" type="jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData"/>
         <import type="android.view.View"/>
+
+        <variable
+                name="reactionAdapter"
+                type="jp.panta.misskeyandroidclient.view.notes.reaction.ReactionAdapter" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -171,10 +175,21 @@
 
                 </RelativeLayout>
 
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/reaction_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/avatarIcon"
+                        android:layout_below="@id/subNote"
+                        android:layout_marginTop="8dp"
+                        tools:visibility="visible"
+                        android:visibility='@{note.reactionCounts.values().empty ? View.GONE : View.VISIBLE }'
+
+                        />
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                               android:orientation="horizontal"
-                              android:layout_below="@+id/subNote"
+                              android:layout_below="@+id/reaction_view"
                               android:layout_toEndOf="@+id/avatarIcon"
                               android:layout_marginTop="8dp"
                 >

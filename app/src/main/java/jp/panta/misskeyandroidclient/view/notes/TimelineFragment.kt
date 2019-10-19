@@ -64,7 +64,7 @@ class TimelineFragment : Fragment(){
         val a = TimelineViewModelFactory(mSetting)
         mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
-        list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList)
+        list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList, viewLifecycleOwner)
         list_view.addOnScrollListener(mScrollListener)
 
         refresh.setOnRefreshListener {

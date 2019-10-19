@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+import android.util.Log
 import androidx.databinding.ObservableField
+import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.notes.Note
 
 class PlaneNoteViewData (private val note: Note){
@@ -64,14 +66,18 @@ class PlaneNoteViewData (private val note: Note){
         get() = if(toShowNote.reNoteCount > 0) toShowNote.reNoteCount.toString() else null
 
     //val reactionCount: String? = if(toShowNote.reactionCounts?.isNullOrEmpty() == false) toShowNote.reactionCounts?.size.toString() else null
-    val reactionCounts = toShowNote.reactionCounts
+    //val reactionCounts = toShowNote.reactionCounts
+    val reactionCounts = MutableLiveData<LinkedHashMap<String, Int>>(toShowNote.reactionCounts)
 
     val reactionCount = ObservableField<Int>().apply{
-        var sum = 0
+        /*var sum = 0
         reactionCounts?.forEach{
             sum += it.value
         }
-        this.set(sum)
+        this.set(sum)*/
+        reactionCounts.value?.forEach{
+
+        }
     }
 
 
@@ -96,6 +102,8 @@ class PlaneNoteViewData (private val note: Note){
 
     }
 
-
+    init{
+        Log.d("PlaneNoteViewData", "reactions: ${toShowNote.reactionCounts}")
+    }
 
 }
