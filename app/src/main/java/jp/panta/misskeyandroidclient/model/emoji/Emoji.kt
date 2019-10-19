@@ -11,4 +11,10 @@ data class Emoji(
     val type: String?
     //val aliases: List<String>
 
-): Serializable
+): Serializable{
+    fun isSvg(): Boolean{
+        return uri?.contains("svg") == true
+                || url?.contains("svg") == true
+                || type?.contains("svg") == true
+    }
+}

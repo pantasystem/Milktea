@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.view.notes.reaction
 
+import android.graphics.Bitmap
 import android.graphics.drawable.PictureDrawable
 import android.net.Uri
 import android.util.Log
@@ -38,12 +39,18 @@ object ReactionViewHelper {
             if(emoji != null){
                 Log.d("ReactionViewHelper", "カスタム絵文字を発見した: ${emoji}")
                 if(emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true|| emoji.uri?.contains("svg") == true){
-                    GlideApp.with(this.context)
+                    /*GlideApp.with(this.context)
                         .`as`(PictureDrawable::class.java)
                         .listener(SvgSoftwareLayerSetter())
                         .load(emoji.url?: emoji.uri)
                         .centerCrop()
                         .transition(withCrossFade())
+                        .into(reactionImageView)*/
+                    GlideApp.with(this.context)
+                        .`as`(Bitmap::class.java)
+                        //.listener(SvgSoftwareLayerSetter())
+                        //.transition(withCrossFade())
+                        .load(emoji.url?: emoji.url)
                         .into(reactionImageView)
 
 

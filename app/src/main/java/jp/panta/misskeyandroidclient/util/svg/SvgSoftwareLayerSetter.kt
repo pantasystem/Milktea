@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.util.svg
 
+import android.graphics.Bitmap
 import android.graphics.drawable.PictureDrawable
 import android.widget.ImageView
 import com.bumptech.glide.load.DataSource
@@ -29,6 +30,27 @@ class SvgSoftwareLayerSetter : RequestListener<PictureDrawable>{
     ): Boolean {
         val view = (target as ImageViewTarget<*>).view
         view.setLayerType(ImageView.LAYER_TYPE_SOFTWARE, null)
+        return false
+    }
+}
+
+class SvgSoftwareLayerBitmapSetter : RequestListener<Bitmap>{
+    override fun onLoadFailed(
+        e: GlideException?,
+        model: Any?,
+        target: Target<Bitmap>?,
+        isFirstResource: Boolean
+    ): Boolean {
+        return false
+    }
+
+    override fun onResourceReady(
+        resource: Bitmap?,
+        model: Any?,
+        target: Target<Bitmap>?,
+        dataSource: DataSource?,
+        isFirstResource: Boolean
+    ): Boolean {
         return false
     }
 }
