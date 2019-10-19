@@ -5,10 +5,16 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.request.RequestOptions
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.emoji.ConstantEmoji
+import kotlinx.android.synthetic.main.item_reaction.view.*
+
 
 object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")
@@ -34,16 +40,23 @@ object ReactionViewHelper {
                 Log.d("ReactionViewHelper", "emoji not found")
             }
 
-            reactionImageView.visibility = View.GONE
-            reactionStringView.visibility = View.VISIBLE
-            if(ConstantEmoji.emojis.contains(reaction.first)){
-                reactionStringView.text = ConstantEmoji.textCodeMap[reaction.first]
-            }else{
-                reactionStringView.text = reaction.first
-            }
-
         }
 
+        val reactionResourceId = ReactionResourceMap.reactionDrawableMap[reaction.first]
+        if(reactionResourceId != null){
+
+            Glide.with(reactionImageView)
+                .load(reactionResourceId)
+                .centerCrop()
+                .into(reactionImageView)
+            reactionImageView.visibility = View.VISIBLE
+            reactionStringView.visibility = View.GONE
+        }else{
+            Log.d("ReactionViewHelper", "どれにも当てはまらなかった")
+            reactionStringView.text = reaction.first
+            reactionImageView.visibility = View.GONE
+            reactionStringView.visibility = View.VISIBLE
+        }
 
     }
 }

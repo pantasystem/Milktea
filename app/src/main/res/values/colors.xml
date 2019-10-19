@@ -7,6 +7,8 @@
     <color name="colorNormalIconTint">#263238</color>
     <color name="colorItemNotSelected">#464646</color>
 
+    <color name="colorNormalReaction">#A7A6A6</color>
+
     <color name="colorDarkPrimary">#1F1F1F</color>
     <color name="colorDarkPrimaryDark">#000000</color>
     <color name="colorDarkWindowBackground">#121212</color>

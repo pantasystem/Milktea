@@ -24,6 +24,8 @@
 
         <item name="actionBarSize">50dp</item>
 
+        <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
+
     </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
