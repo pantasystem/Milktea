@@ -5,8 +5,18 @@
 >
 
 
-    <item android:title="@string/menu_home" android:icon="@drawable/ic_home_black_24dp"/>
-    <item android:title="@string/seach" android:icon="@drawable/ic_search_black_24dp"/>
-    <item android:title="@string/notification" android:icon="@drawable/ic_notifications_black_24dp"/>
-    <item android:title="@string/message" android:icon="@drawable/ic_message_black_24dp"/>
+    <item
+            android:id="@+id/navigation_home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/menu_home" />
+    <item
+            android:id="@+id/navigation_search"
+            android:title="@string/seach"
+            android:icon="@drawable/ic_search_black_24dp"/>
+    <item
+            android:id="@+id/navigation_notification"
+            android:title="@string/notification" android:icon="@drawable/ic_notifications_black_24dp"/>
+    <item
+            android:id="@+id/navigation_message_list"
+            android:title="@string/message" android:icon="@drawable/ic_message_black_24dp"/>
 </menu>

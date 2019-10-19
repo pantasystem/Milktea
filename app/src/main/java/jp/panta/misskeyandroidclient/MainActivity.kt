@@ -9,13 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.view.message.MessageListFragment
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
+import jp.panta.misskeyandroidclient.view.search.SearchFragment
 import kotlinx.android.synthetic.main.app_bar_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -45,7 +49,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navView.setNavigationItemSelectedListener(this)
 
-        replaceTimelineFragment()
+        //replaceTimelineFragment()
+        setFragment("home")
+
+        bottom_navigation.setOnNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.navigation_home ->{
+                    setFragment("home")
+                    true
+                }
+                R.id.navigation_search ->{
+                    setFragment("search")
+                    true
+                }
+                R.id.navigation_notification ->{
+                    setFragment("notification")
+                    true
+                }
+                R.id.navigation_message_list ->{
+                    setFragment("message")
+                    true
+                }
+                else -> false
+            }
+
+
+        }
     }
 
     fun changeTitle(title: String?){
@@ -53,14 +82,60 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    private fun replaceTimelineFragment(){
+
+
+    //default "home"
+    private var currentFragmentTag = "home"
+    private fun setFragment(tag: String){
         val ft = supportFragmentManager.beginTransaction()
-        //val t = TimelineFragment.newInstance(NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SOCIAL))
-        ft.replace(R.id.content_main, TabFragment())
-        ft.commit()
+
+        val targetFragment = supportFragmentManager.findFragmentByTag(tag)
+        val currentFragment = supportFragmentManager.findFragmentByTag(currentFragmentTag)
+
+        //表示しようとしているFragmentが表示(add)したことがない場合
+        if(targetFragment == null){
+            //supportFragmentManager.
+            if(currentFragment != null){
+                //currentをhideする
+                ft.hide(currentFragment)
+            }
+            ft.add(R.id.content_main, newFragmentByTag(tag), tag)
+            currentFragmentTag = tag
+            ft.commit()
+            return
+        }
+
+        //表示しているFragmentと表示しようとしているFragmentが同じ場合
+        if(currentFragmentTag == tag && currentFragment != null){
+            ft.commit()
+            return
+        }
+
+        //表示しているFragmentと表示しようとしているFragmentが別でさらに既に存在している場合
+        if(currentFragmentTag != tag && currentFragment != null){
+            ft.hide(currentFragment)
+            ft.show(targetFragment)
+            currentFragmentTag = tag
+            ft.commit()
+            return
+        }
+
+    }
+
+    private fun newFragmentByTag(tag: String): Fragment{
+        return when(tag){
+            "home" -> TabFragment()
+            "search" -> SearchFragment()
+            "notification" -> NotificationFragment()
+            "message" -> MessageListFragment()
+            else -> throw IllegalArgumentException("サポートしていないタグです")
+        }
     }
 
 
+    private fun getCurrentFragment(tag: String): Fragment?{
+        return supportFragmentManager.findFragmentByTag(tag)
+    }
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
