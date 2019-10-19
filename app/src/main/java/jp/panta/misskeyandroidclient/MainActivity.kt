@@ -87,10 +87,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //default "home"
     private var currentFragmentTag = "home"
     private fun setFragment(tag: String){
+        setBottomNavigationSelectState(tag)
+
         val ft = supportFragmentManager.beginTransaction()
 
         val targetFragment = supportFragmentManager.findFragmentByTag(tag)
         val currentFragment = supportFragmentManager.findFragmentByTag(currentFragmentTag)
+
 
         //表示しようとしているFragmentが表示(add)したことがない場合
         if(targetFragment == null){
@@ -122,6 +125,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    private fun setBottomNavigationSelectState(tag: String){
+        when(tag){
+            "home" -> bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
+            "search" -> bottom_navigation.menu.findItem(R.id.navigation_search).isChecked = true
+            "notification" -> bottom_navigation.menu.findItem(R.id.navigation_notification).isChecked = true
+            "message" -> bottom_navigation.menu.findItem(R.id.navigation_message_list).isChecked = true
+        }
+    }
+
     private fun newFragmentByTag(tag: String): Fragment{
         return when(tag){
             "home" -> TabFragment()
@@ -141,6 +153,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
+        }else if(currentFragmentTag != "home"){
+            setFragment("home")
         } else {
             super.onBackPressed()
         }
