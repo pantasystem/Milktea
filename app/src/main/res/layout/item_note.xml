@@ -8,6 +8,7 @@
         <variable
                 name="reactionAdapter"
                 type="jp.panta.misskeyandroidclient.view.notes.reaction.ReactionAdapter" />
+        <import type="jp.panta.misskeyandroidclient.R"/>
     </data>
 
     <androidx.cardview.widget.CardView
@@ -230,7 +231,9 @@
                     />
                     <ImageButton
                             android:layout_width="38dp"
-                            android:layout_height="35dp" app:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
+                            android:layout_height="35dp"
+                            app:srcCompat="@{note.myReaction != null ? R.drawable.ic_remove_circle_outline_black_24dp : R.drawable.ic_add_circle_outline_black_24dp}"
+                            tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                             android:id="@+id/imageButton3"
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="5dp"

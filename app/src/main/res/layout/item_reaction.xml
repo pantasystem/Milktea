@@ -9,6 +9,9 @@
         <variable
                 name="reaction"
                 type="kotlin.Pair&lt;java.lang.String, java.lang.Integer>" />
+        <variable
+                name="note"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData" />
     </data>
     <LinearLayout
             android:layout_width="wrap_content"
@@ -18,8 +21,11 @@
             app:reactionImageView="@{reactionImage}"
             app:reactionStringView="@{reactionText}"
             app:reaction="@{reaction}"
-            android:background="@drawable/shape_normal_reaction_backgruond"
             android:layout_marginEnd="5dp"
+            tools:background="@drawable/shape_normal_reaction_backgruond"
+
+            android:background='@{note.myReaction == reaction.first ? @drawable/shape_selected_reaction_background : @drawable/shape_normal_reaction_backgruond }'
+
 
             >
         <ImageView

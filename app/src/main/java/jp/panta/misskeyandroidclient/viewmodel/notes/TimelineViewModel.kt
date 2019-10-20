@@ -138,9 +138,15 @@ class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel
         GlobalScope.launch{
             for(n in 0.until(100)){
                 //first?.replyCount = n.toString()
-                first?.addReaction("")
+                first?.addReaction("like", n == 0)
 
-                delay(100)
+                delay(50)
+            }
+
+            for(n in 0.until(100)){
+                first?.takeReaction("like", n == 50)
+
+                delay(50)
             }
         }
     }

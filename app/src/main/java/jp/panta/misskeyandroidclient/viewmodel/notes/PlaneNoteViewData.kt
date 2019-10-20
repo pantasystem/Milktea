@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
-import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.notes.Note
 
 class PlaneNoteViewData (private val note: Note){
@@ -69,18 +69,15 @@ class PlaneNoteViewData (private val note: Note){
     //val reactionCounts = toShowNote.reactionCounts
     val reactionCounts = MutableLiveData<LinkedHashMap<String, Int>>(toShowNote.reactionCounts)
 
-    val reactionCount = ObservableField<Int>().apply{
-        /*var sum = 0
-        reactionCounts?.forEach{
-            sum += it.value
+    val reactionCount = Transformations.map(reactionCounts){
+        var sum = 0
+        it.forEach{ map ->
+            sum += map.value
         }
-        this.set(sum)*/
-        reactionCounts.value?.forEach{
-
-        }
+        return@map sum
     }
 
-
+    val myReaction = MutableLiveData<String>(toShowNote.myReaction)
 
     //reNote先
     val subNote: Note? = toShowNote.reNote
@@ -92,18 +89,45 @@ class PlaneNoteViewData (private val note: Note){
     val subNoteEmojis = subNote?.emojis
 
 
-    fun addReaction(reaction: String){
-        var count = reactionCount.get()
-        if(count == null) count = 1 else count++
-        reactionCount.set(count)
+    fun addReaction(reaction: String, isMyReaction: Boolean = false){
+        val reactions = reactionCounts.value?: LinkedHashMap()
+        val existingReactionCount = reactions[reaction]
+        if(existingReactionCount == null){
+            reactions[reaction] = 1
+        }else{
+            reactions[reaction] = existingReactionCount + 1
+        }
+
+        if(isMyReaction){
+            myReaction.postValue(reaction)
+            Log.d("PlaneNoteViewData", "リアクションをしました:${reactions[reaction]}, $reaction")
+        }
+        reactionCounts.postValue(LinkedHashMap(reactions))
+
     }
 
-    fun takeReaction(reaction: String){
+    fun takeReaction(reaction: String, isMyReaction: Boolean = false){
+        val reactions = reactionCounts.value
+            ?: return
+
+        val count = reactions[reaction]
+
+        if(count == null || count < 1){
+            return
+        }else{
+            reactions[reaction] = count - 1
+        }
+
+        reactionCounts.postValue(LinkedHashMap(reactions))
+        if(isMyReaction){
+            myReaction.postValue(null)
+            //Log.d("PlaneNoteViewData", "リアクションを解除しました")
+        }
 
     }
 
     init{
-        Log.d("PlaneNoteViewData", "reactions: ${toShowNote.reactionCounts}")
+        Log.d("PlaneNoteViewData", "reactions: ${toShowNote.reactionCounts}, myReaction: ${this.myReaction.value}")
     }
 
 }

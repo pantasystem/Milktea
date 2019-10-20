@@ -42,7 +42,7 @@ class TimelineListAdapter(private val observableList: ObservableArrayList<PlaneN
                     return oldItem.first == newItem.first
                 }
             }
-        )
+        , observableList[p1])
         adapter.submitList(observableList[p1].reactionCounts.value?.toList())
         observableList[p1].reactionCounts.observe(lifecycleOwner, Observer {
             adapter.submitList(it.toList())
