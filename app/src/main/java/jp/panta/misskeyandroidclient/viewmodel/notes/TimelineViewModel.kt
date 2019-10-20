@@ -3,12 +3,15 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.databinding.ObservableArrayList
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -19,9 +22,8 @@ import retrofit2.Response
 class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel(){
 
 
-    val observableTimelineList: ObservableArrayList<PlaneNoteViewData> = ObservableArrayList()
+    //val observableTimelineList: ObservableArrayList<PlaneNoteViewData> = ObservableArrayList()
 
-    val isLoading = MediatorLiveData<Boolean>()
 
     val errorState = MediatorLiveData<String>()
 
@@ -29,127 +31,30 @@ class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel
 
     private val misskeyAPI = MisskeyAPIServiceBuilder.build(baseUrl)
 
-    private val timelineStore = when(requestBaseSetting.type){
-        NoteType.HOME -> misskeyAPI::homeTimeline
-        NoteType.LOCAL -> misskeyAPI::localTimeline
-        NoteType.SOCIAL -> misskeyAPI::hybridTimeline
-        NoteType.GLOBAL -> misskeyAPI::globalTimeline
-        NoteType.SEARCH -> misskeyAPI::searchNote
-        NoteType.SEARCH_HASH -> misskeyAPI::searchByTag
-        NoteType.USER -> misskeyAPI::userNotes
+    private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
 
+    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting)
+
+    val isLoading = timelineLiveData.isLoading
+
+
+    fun getTimelineLiveData() : LiveData<TimelineState>{
+        return timelineLiveData
     }
 
-    private var isLoadingFlag = false
-
     fun loadNew(){
-        this.isLoading.postValue(true)
-        if( ! isLoadingFlag ){
-            isLoadingFlag = true
-            val sinceId = observableTimelineList.firstOrNull()?.id
-            if(sinceId == null){
-                isLoadingFlag = false
-                //初期化処理 or 何もしない
-            }else{
-
-                val req = requestBaseSetting.buildRequest(NoteRequest.Conditions(sinceId = sinceId))
-                timelineStore(req).enqueue(object : Callback<List<Note>?>{
-                    override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
-                        val newNotes = response.body()?.asReversed()
-                        isLoadingFlag = false
-                        val planeNotes = newNotes?.map{ it -> PlaneNoteViewData(it) }
-                            ?: return
-
-
-                        observableTimelineList.addAll(0, planeNotes)
-                        isLoading.postValue(false)
-
-                    }
-
-                    override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
-                        isLoadingFlag = false
-                        isLoading.postValue(false)
-                    }
-                })
-            }
-
-        }
+        timelineLiveData.loadNew()
     }
 
     fun loadOld(){
-        val untilId = observableTimelineList.lastOrNull()?.id
-        if(  isLoadingFlag || untilId == null){
-            //何もしない
-        }else{
-            isLoadingFlag = true
-            val req = requestBaseSetting.buildRequest(NoteRequest.Conditions(untilId = untilId))
-            timelineStore(req).enqueue(object : Callback<List<Note>?>{
-                override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
-                    val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
-
-                    if(list == null){
-                        isLoadingFlag = false
-                        return
-                    }
-
-                    observableTimelineList.addAll(list)
-                    isLoadingFlag = false
-
-                }
-                override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
-                    isLoadingFlag = false
-                }
-            })
-
-        }
+        timelineLiveData.loadOld()
     }
 
     fun loadInit(){
-        this.isLoading.postValue(true)
-
-        if( ! isLoadingFlag ){
-
-            isLoadingFlag = true
-
-            timelineStore(requestBaseSetting.buildRequest(NoteRequest.Conditions())).enqueue( object : Callback<List<Note>?>{
-                override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
-                    val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
-                    if(list == null){
-                        isLoadingFlag = false
-                        return
-                    }
-
-                    observableTimelineList.clear()
-                    observableTimelineList.addAll(list)
-                    isLoadingFlag = false
-
-                    //test()
-                }
-
-                override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
-                    isLoadingFlag = false
-                }
-            })
-        }
+        timelineLiveData.loadInit()
     }
 
-    private fun test(){
-        val first = observableTimelineList.firstOrNull()
-        GlobalScope.launch{
-            for(n in 0.until(100)){
-                //first?.replyCount = n.toString()
-                first?.addReaction("like", n == 0)
 
-                delay(50)
-            }
-
-            for(n in 0.until(100)){
-                first?.takeReaction("like", n == 50)
-
-                delay(50)
-            }
-        }
-    }
 
 
 }

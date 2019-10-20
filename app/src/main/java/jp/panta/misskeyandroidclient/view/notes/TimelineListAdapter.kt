@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
@@ -16,16 +17,14 @@ import jp.panta.misskeyandroidclient.util.ObservableArrayListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
-class TimelineListAdapter(private val observableList: ObservableArrayList<PlaneNoteViewData>, private val lifecycleOwner: LifecycleOwner) : ObservableArrayListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolder>(observableList){
+class TimelineListAdapter(diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>, private val lifecycleOwner: LifecycleOwner) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolder>(diffUtilCallBack){
 
     class NoteViewHolder(val binding: ItemNoteBinding): RecyclerView.ViewHolder(binding.root)
-    override fun getItemCount(): Int {
-        return observableList.size
-    }
+
 
     override fun onBindViewHolder(p0: NoteViewHolder, p1: Int) {
         //p0.binding.note = observableList[p1]
-        p0.binding.note = observableList[p1]
+        p0.binding.note = getItem(p1)
         val adapter =ReactionAdapter(
             object : DiffUtil.ItemCallback<Pair<String, Int>>(){
                 override fun areContentsTheSame(
@@ -42,9 +41,9 @@ class TimelineListAdapter(private val observableList: ObservableArrayList<PlaneN
                     return oldItem.first == newItem.first
                 }
             }
-        , observableList[p1])
-        adapter.submitList(observableList[p1].reactionCounts.value?.toList())
-        observableList[p1].reactionCounts.observe(lifecycleOwner, Observer {
+        , getItem(p1))
+        adapter.submitList(getItem(p1).reactionCounts.value?.toList())
+        getItem(p1).reactionCounts.observe(lifecycleOwner, Observer {
             adapter.submitList(it.toList())
         })
         p0.binding.reactionView.adapter = adapter

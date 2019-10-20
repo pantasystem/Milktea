@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MainActivity
@@ -64,8 +65,15 @@ class TimelineFragment : Fragment(){
         val a = TimelineViewModelFactory(mSetting)
         mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
-        list_view.adapter = TimelineListAdapter(mViewModel.observableTimelineList, viewLifecycleOwner)
+        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner)
+        list_view.adapter = adapter
         list_view.addOnScrollListener(mScrollListener)
+
+        mViewModel.getTimelineLiveData().observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it.notes)
+        })
+
+
 
         refresh.setOnRefreshListener {
             mViewModel.loadNew()
@@ -94,6 +102,21 @@ class TimelineFragment : Fragment(){
     }
 
 
+    private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
+        override fun areContentsTheSame(
+            oldItem: PlaneNoteViewData,
+            newItem: PlaneNoteViewData
+        ): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areItemsTheSame(
+            oldItem: PlaneNoteViewData,
+            newItem: PlaneNoteViewData
+        ): Boolean {
+            return oldItem.id == newItem.id
+        }
+    }
 
     private val mScrollListener = object : RecyclerView.OnScrollListener(){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
