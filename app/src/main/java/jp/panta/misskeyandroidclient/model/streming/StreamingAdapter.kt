@@ -47,7 +47,7 @@ class StreamingAdapter(
 
         override fun onMessage(webSocket: WebSocket, text: String) {
 
-            Log.d(TAG, "onMessage: $text")
+            //Log.d(TAG, "onMessage: $text")
 
             if (text.isNotBlank()) {
                 observers.forEach {

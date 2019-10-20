@@ -84,7 +84,7 @@ class TimelineCapture : Observer{
     override fun onReceived(msg: String) {
         try{
             val res = gson.fromJson(msg, Response::class.java)
-            Log.d("TimelineCapture", "onReceived: $msg")
+            //Log.d("TimelineCapture", "onReceived: $msg")
             val note = res.body.body
             val id = res.body.id
             if(note != null){
@@ -98,7 +98,7 @@ class TimelineCapture : Observer{
 
     fun addChannelObserver(observer: TimelineObserver){
         observerMap[observer.body.id] = observer
-        Log.d("TimelineCapture", "登録しました: ${gson.toJson(observer)}")
+        //Log.d("TimelineCapture", "登録しました: ${gson.toJson(observer)}")
         streamingAdapter?.send(gson.toJson(observer))
     }
 }

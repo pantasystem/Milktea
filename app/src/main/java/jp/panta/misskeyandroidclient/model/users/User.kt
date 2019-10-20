@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.users
 
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import java.io.Serializable
 
@@ -30,9 +31,9 @@ data class User(
     //erty("twoFactorEnabled") val twoFactorEnabled: Any?,
     @SerializedName("isAdmin") val isAdmin: Boolean,
     @SerializedName("avatarUrl") val avatarUrl: String?,
-    @SerializedName("bannerUrl") val bannerUrl: String?
+    @SerializedName("bannerUrl") val bannerUrl: String?,
     //@SerializedName("avatarColor") val avatarColor: Any?,
-    //@JsonProperty("emojis") val emojis: List<EmojiProperty>?,
+    @SerializedName("emojis") val emojis: List<Emoji>?
     //JsonProperty("isVerified") val isVerified: Boolean,
     //@JsonProperty("isLocked") val isLocked: Boolean
 ): Serializable

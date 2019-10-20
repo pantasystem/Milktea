@@ -75,6 +75,8 @@
                         android:singleLine="true"
                         android:ellipsize="end"
                         android:textSize="15sp"
+                        app:text='@{note.name}'
+                        app:emojis='@{note.toShowNote.user.emojis}'
 
                 />
 

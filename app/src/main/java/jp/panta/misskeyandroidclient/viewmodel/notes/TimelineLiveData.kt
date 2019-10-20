@@ -190,6 +190,7 @@ class TimelineLiveData(
 
     private val timelineObserver = object : TimelineCapture.Observer{
         override fun onReceived(note: PlaneNoteViewData) {
+            noteCapture.add(note)
             val notes = value?.notes
             val list = if(notes == null){
                 arrayListOf(note)

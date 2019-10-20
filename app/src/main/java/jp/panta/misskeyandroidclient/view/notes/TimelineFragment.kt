@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.view.notes
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,10 +21,14 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TimelineFragment : Fragment(){
 
@@ -45,6 +51,7 @@ class TimelineFragment : Fragment(){
     private var isLoadInit: Boolean = false
 
     private var mSetting: NoteRequest.Setting? = null
+    private var isShowing: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_swipe_refresh_recycler_view, container, false)
@@ -79,8 +86,25 @@ class TimelineFragment : Fragment(){
         list_view.adapter = adapter
         list_view.addOnScrollListener(mScrollListener)
 
+        var isMoveFirst = false
         mViewModel.getTimelineLiveData().observe(viewLifecycleOwner, Observer {
+            //adapter.submitList(it.notes)
+            val firstVisiblePosition = mLinearLayoutManager.findFirstVisibleItemPosition()
             adapter.submitList(it.notes)
+            isMoveFirst = it.state ==  TimelineState.State.RECEIVED_NEW && firstVisiblePosition == 0
+
+        })
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                super.onItemRangeChanged(positionStart, itemCount)
+
+                if(isMoveFirst){
+                    Handler(Looper.getMainLooper()).post{
+                        mLinearLayoutManager.scrollToPosition(0)
+                    }
+                }
+            }
         })
 
 
@@ -101,6 +125,8 @@ class TimelineFragment : Fragment(){
     override fun onResume() {
         super.onResume()
 
+        isShowing = true
+
         if(isLoadInit){
 
         }else{
@@ -109,6 +135,12 @@ class TimelineFragment : Fragment(){
         }
 
         (activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        isShowing = false
     }
 
 

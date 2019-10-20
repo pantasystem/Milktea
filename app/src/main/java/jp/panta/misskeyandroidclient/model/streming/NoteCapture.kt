@@ -75,10 +75,10 @@ class NoteCapture(
                 }
                 receivedObject.body.type == "reacted" -> addReaction(id, reaction!!, isMyReaction)
                 receivedObject.body.type == "unreacted" -> removeReaction(id, reaction!!, isMyReaction)
-                else -> Log.d("NoteCapture", "不明なイベント")
+                //else -> Log.d("NoteCapture", "不明なイベント")
             }
 
-            Log.d("NoteCapture", "onReceived: $receivedObject")
+            //Log.d("NoteCapture", "onReceived: $receivedObject")
         }catch(e: JsonSyntaxException){
             //他のイベントが流れてくるので回避する
         }
