@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MainActivity
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -60,9 +61,12 @@ class TimelineFragment : Fragment(){
 
         mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting?
 
+        val miApplication = context?.applicationContext as MiApplication
+        val nowConnectionInstance = miApplication.getConnectionInstance()
+        val noteCapture = miApplication.noteCapture
 
 
-        val a = TimelineViewModelFactory(mSetting)
+        val a = TimelineViewModelFactory(nowConnectionInstance, mSetting, noteCapture)
         mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner)

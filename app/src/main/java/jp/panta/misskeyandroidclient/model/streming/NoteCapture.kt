@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.streming
 
+import android.util.Log
 import androidx.databinding.ObservableArrayList
 import androidx.databinding.ObservableList
 import com.google.gson.Gson
@@ -11,17 +12,14 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class ObservableArrayListNoteCapture(
-    var myUserId: String,
-    var isRemoveNote: Boolean
+class NoteCapture(
+    var myUserId: String
 ) : Observer{
 
 
-    /*
-    {
-    body: {id: "7z28k1rj2p", type: "reacted", body: {reaction: "🤯", userId: "7roinhytrr"},
-    type: "noteUpdated"}
-     */
+    interface NoteRemoveListener{
+        fun onRemoved(id: String)
+    }
 
     //toShowNoteのIDを登録する
     private class NoteEvent{
@@ -41,36 +39,48 @@ class ObservableArrayListNoteCapture(
     //noteId : NoteEvent
     private val observeNoteMap = HashMap<String, NoteEvent>()
 
-    //接続失敗時、切断時にここに監視中のノート、監視しようとしていたノートがプッシュされる
-    private val unObserveQueue = ArrayDeque<NoteEvent>()
+    private var noteRemoved: (id: String)->Unit = {}
 
     override var streamingAdapter: StreamingAdapter? = null
 
     private val gson = Gson()
 
+    private val noteRemovedListeners = ArrayList<NoteRemoveListener>()
+
     override fun onConnect() {
+        observeNoteMap.forEach{
+            streamingAdapter?.send(gson.toJson(createCaptureRequest(it.key)))
+        }
     }
 
     override fun onDissconnect() {
 
     }
+
     override fun onReceived(msg: String) {
         val receivedObject = gson.fromJson(msg, NoteUpdated::class.java)
         val id = receivedObject.body.id
         val userId = receivedObject.body.body?.userId
-        val isMyReaction = myUserId == receivedObject.body.body?.userId
+        val isMyReaction = myUserId == userId
         val reaction = receivedObject.body.body?.reaction
+        //val isRemoved = receivedObject.body.body?.deletedAt != null
+
+
+        when {
+            receivedObject.body.type == "deleted" -> noteRemovedListeners.forEach{
+                it.onRemoved(id)
+            }
+            receivedObject.body.type == "reacted" -> addReaction(id, reaction!!, isMyReaction)
+            receivedObject.body.type == "unreacted" -> removeReaction(id, reaction!!, isMyReaction)
+            else -> Log.d("NoteCapture", "不明なイベント")
+        }
+
+        Log.d("NoteCapture", "onReceived: $receivedObject")
 
 
     }
 
-    fun addObservableArrayList(tag: String, list: ObservableArrayList<PlaneNoteViewData>, scope: CoroutineScope){
-        list.addOnListChangedCallback(observableArrayListListener)
-    }
-
-
-
-    private fun add(planeNoteViewData: PlaneNoteViewData){
+    fun add(planeNoteViewData: PlaneNoteViewData){
         val key = planeNoteViewData.toShowNote.id
         synchronized(observeNoteMap){
             val noteEvent = observeNoteMap[key]
@@ -85,10 +95,14 @@ class ObservableArrayListNoteCapture(
 
     }
 
-    private fun addAll(planeNoteViewDataList: List<PlaneNoteViewData>){
+    fun addAll(planeNoteViewDataList: List<PlaneNoteViewData>){
         planeNoteViewDataList.forEach{
             add(it)
         }
+    }
+
+    fun addNoteRemoveListener(listener: NoteRemoveListener){
+        noteRemovedListeners.add(listener)
     }
 
     private fun createCaptureRequest(noteId: String): CaptureRequest{
@@ -108,53 +122,6 @@ class ObservableArrayListNoteCapture(
             observeNoteMap[noteId]?.notes?.forEach {
                 it.takeReaction(reaction, isMyReaction)
             }
-        }
-    }
-
-    private fun removeNote(noteId: String){
-        if(isRemoveNote){
-            GlobalScope.launch{
-
-            }
-        }
-    }
-
-
-    private val observableArrayListListener = object : ObservableList.OnListChangedCallback<ObservableArrayList<PlaneNoteViewData>>(){
-        override fun onItemRangeInserted(
-            sender: ObservableArrayList<PlaneNoteViewData>?,
-            positionStart: Int,
-            itemCount: Int
-        ) {
-            if(sender != null){
-                addAll(sender.toList())
-            }
-        }
-
-        override fun onChanged(sender: ObservableArrayList<PlaneNoteViewData>?) {
-        }
-
-        override fun onItemRangeChanged(
-            sender: ObservableArrayList<PlaneNoteViewData>?,
-            positionStart: Int,
-            itemCount: Int
-        ) {
-        }
-
-        override fun onItemRangeMoved(
-            sender: ObservableArrayList<PlaneNoteViewData>?,
-            fromPosition: Int,
-            toPosition: Int,
-            itemCount: Int
-        ) {
-        }
-
-        override fun onItemRangeRemoved(
-            sender: ObservableArrayList<PlaneNoteViewData>?,
-            positionStart: Int,
-            itemCount: Int
-        ) {
-
         }
     }
 

@@ -3,8 +3,11 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
+import jp.panta.misskeyandroidclient.model.streming.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,9 +20,20 @@ class MiApplication : Application(){
 
     var nowInstanceMeta: Meta? = null
 
+    val noteCapture: NoteCapture = NoteCapture(getConnectionInstance().userId)
+    val streamingAdapter: StreamingAdapter = StreamingAdapter(getConnectionInstance())
+
+    fun getConnectionInstance(): ConnectionInstance{
+        return ConnectionInstance(instanceBaseUrl = nowInstance, userId = "7roinhytrr", userToken = "")
+    }
+
+    //var noteCapture: NoteCapture = NoteCapture()
+
     override fun onCreate() {
         super.onCreate()
 
+        streamingAdapter.connect()
+        streamingAdapter.addObserver(noteCapture)
         setMeta()
     }
 

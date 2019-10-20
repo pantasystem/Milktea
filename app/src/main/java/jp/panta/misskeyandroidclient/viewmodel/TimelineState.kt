@@ -10,7 +10,8 @@ data class TimelineState(
         INIT,
         LOAD_NEW,
         LOAD_OLD,
-        RECEIVED_NEW
+        RECEIVED_NEW,
+        REMOVED
     }
 
     fun getSinceId(): String?{

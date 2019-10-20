@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import retrofit2.Call
 import retrofit2.Callback
@@ -13,7 +14,8 @@ import retrofit2.Response
 
 class TimelineLiveData(
     private val connectionInstance: ConnectionInstance,
-    private val requestBase: NoteRequest.Setting
+    private val requestBase: NoteRequest.Setting,
+    private val noteCapture: NoteCapture
 ) : MutableLiveData<TimelineState>(){
 
     var isLoading =  MutableLiveData<Boolean>()
@@ -34,6 +36,25 @@ class TimelineLiveData(
     private var isLoadingFlag = false
 
     //private var timelineState: TimelineState? = null
+    init{
+        noteCapture.addNoteRemoveListener(object : NoteCapture.NoteRemoveListener{
+            override fun onRemoved(id: String) {
+                val list = value?.notes
+                if(list == null){
+                    return
+                }else{
+                    val timeline = ArrayList<PlaneNoteViewData>(list)
+                    timeline.filter{
+                        it.toShowNote.id == id
+                    }.forEach{
+                        timeline.remove(it)
+                    }
+                    postValue(TimelineState(timeline, TimelineState.State.REMOVED))
+                }
+
+            }
+        })
+    }
 
     fun loadInit(){
         this.isLoading.postValue(true)
@@ -52,6 +73,7 @@ class TimelineLiveData(
 
                     //observableTimelineList.clear()
                     //observableTimelineList.addAll(list)
+                    noteCapture.addAll(list)
                     val state = TimelineState(list, TimelineState.State.INIT)
                     postValue(state)
                     isLoadingFlag = false
@@ -84,7 +106,7 @@ class TimelineLiveData(
                         val planeNotes = newNotes?.map{ it -> PlaneNoteViewData(it) }
                             ?: return
 
-
+                        noteCapture.addAll(planeNotes)
                         //observableTimelineList.addAll(0, planeNotes)
                         var state = value
                         state = if(state == null){
@@ -126,6 +148,7 @@ class TimelineLiveData(
                         return
                     }
 
+                    noteCapture.addAll(list)
                     //observableTimelineList.addAll(list)
                     var state = value
                     state = if(state == null){

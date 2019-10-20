@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -19,7 +20,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel(){
+class TimelineViewModel(
+    private val connectionInstance: ConnectionInstance,
+    private val requestBaseSetting: NoteRequest.Setting,
+    private val noteCapture: NoteCapture
+) : ViewModel(){
 
 
     //val observableTimelineList: ObservableArrayList<PlaneNoteViewData> = ObservableArrayList()
@@ -31,9 +36,9 @@ class TimelineViewModel(val requestBaseSetting: NoteRequest.Setting) : ViewModel
 
     private val misskeyAPI = MisskeyAPIServiceBuilder.build(baseUrl)
 
-    private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
+    //private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
 
-    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting)
+    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting, noteCapture)
 
     val isLoading = timelineLiveData.isLoading
 
