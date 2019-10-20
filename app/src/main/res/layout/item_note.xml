@@ -184,7 +184,6 @@
                         android:layout_below="@id/subNote"
                         android:layout_marginTop="8dp"
                         tools:visibility="visible"
-                        android:visibility='@{note.reactionCounts.values().empty ? View.GONE : View.VISIBLE }'
 
                         />
 

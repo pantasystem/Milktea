@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,6 +22,7 @@ class MiApplication : Application(){
     var nowInstanceMeta: Meta? = null
 
     val noteCapture: NoteCapture = NoteCapture(getConnectionInstance().userId)
+    val timelineCapture = TimelineCapture()
     val streamingAdapter: StreamingAdapter = StreamingAdapter(getConnectionInstance())
 
     fun getConnectionInstance(): ConnectionInstance{
@@ -34,6 +36,7 @@ class MiApplication : Application(){
 
         streamingAdapter.connect()
         streamingAdapter.addObserver(noteCapture)
+        streamingAdapter.addObserver(timelineCapture)
         setMeta()
     }
 

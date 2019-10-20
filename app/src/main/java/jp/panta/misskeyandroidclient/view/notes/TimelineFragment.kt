@@ -65,8 +65,14 @@ class TimelineFragment : Fragment(){
         val nowConnectionInstance = miApplication.getConnectionInstance()
         val noteCapture = miApplication.noteCapture
 
+        val isAutoStream = true
+        val timelineCapture = if(isAutoStream){
+            miApplication.timelineCapture
+        }else{
+            null
+        }
 
-        val a = TimelineViewModelFactory(nowConnectionInstance, mSetting, noteCapture)
+        val a = TimelineViewModelFactory(nowConnectionInstance, mSetting, noteCapture, timelineCapture)
         mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner)

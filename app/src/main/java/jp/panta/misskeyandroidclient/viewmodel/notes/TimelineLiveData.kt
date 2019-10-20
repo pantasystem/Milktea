@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import retrofit2.Call
 import retrofit2.Callback
@@ -15,7 +16,8 @@ import retrofit2.Response
 class TimelineLiveData(
     private val connectionInstance: ConnectionInstance,
     private val requestBase: NoteRequest.Setting,
-    private val noteCapture: NoteCapture
+    private val noteCapture: NoteCapture,
+    private val timelineCapture: TimelineCapture?
 ) : MutableLiveData<TimelineState>(){
 
     var isLoading =  MutableLiveData<Boolean>()
@@ -34,6 +36,8 @@ class TimelineLiveData(
     }
 
     private var isLoadingFlag = false
+
+
 
     //private var timelineState: TimelineState? = null
     init{
@@ -54,7 +58,20 @@ class TimelineLiveData(
 
             }
         })
+
+
     }
+
+    override fun onActive() {
+        super.onActive()
+
+        if(timelineCapture != null){
+            val observer = TimelineCapture.TimelineObserver.create(requestBase.type, timelineObserver)
+            if(observer != null) timelineCapture.addChannelObserver(observer)
+
+        }
+    }
+
 
     fun loadInit(){
         this.isLoading.postValue(true)
@@ -168,6 +185,20 @@ class TimelineLiveData(
                 }
             })
 
+        }
+    }
+
+    private val timelineObserver = object : TimelineCapture.Observer{
+        override fun onReceived(note: PlaneNoteViewData) {
+            val notes = value?.notes
+            val list = if(notes == null){
+                arrayListOf(note)
+            }else{
+                ArrayList<PlaneNoteViewData>(notes).apply{
+                    add(0, note)
+                }
+            }
+            postValue(TimelineState(list, TimelineState.State.RECEIVED_NEW))
         }
     }
 }

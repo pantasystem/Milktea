@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.databinding.ObservableArrayList
 import androidx.databinding.ObservableList
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -58,24 +59,30 @@ class NoteCapture(
     }
 
     override fun onReceived(msg: String) {
-        val receivedObject = gson.fromJson(msg, NoteUpdated::class.java)
-        val id = receivedObject.body.id
-        val userId = receivedObject.body.body?.userId
-        val isMyReaction = myUserId == userId
-        val reaction = receivedObject.body.body?.reaction
-        //val isRemoved = receivedObject.body.body?.deletedAt != null
+
+        try{
+            val receivedObject = gson.fromJson(msg, NoteUpdated::class.java)
+            val id = receivedObject.body.id
+            val userId = receivedObject.body.body?.userId
+            val isMyReaction = myUserId == userId
+            val reaction = receivedObject.body.body?.reaction
+            //val isRemoved = receivedObject.body.body?.deletedAt != null
 
 
-        when {
-            receivedObject.body.type == "deleted" -> noteRemovedListeners.forEach{
-                it.onRemoved(id)
+            when {
+                receivedObject.body.type == "deleted" -> noteRemovedListeners.forEach{
+                    it.onRemoved(id)
+                }
+                receivedObject.body.type == "reacted" -> addReaction(id, reaction!!, isMyReaction)
+                receivedObject.body.type == "unreacted" -> removeReaction(id, reaction!!, isMyReaction)
+                else -> Log.d("NoteCapture", "不明なイベント")
             }
-            receivedObject.body.type == "reacted" -> addReaction(id, reaction!!, isMyReaction)
-            receivedObject.body.type == "unreacted" -> removeReaction(id, reaction!!, isMyReaction)
-            else -> Log.d("NoteCapture", "不明なイベント")
+
+            Log.d("NoteCapture", "onReceived: $receivedObject")
+        }catch(e: JsonSyntaxException){
+            //他のイベントが流れてくるので回避する
         }
 
-        Log.d("NoteCapture", "onReceived: $receivedObject")
 
 
     }

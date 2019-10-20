@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -23,7 +24,8 @@ import retrofit2.Response
 class TimelineViewModel(
     private val connectionInstance: ConnectionInstance,
     private val requestBaseSetting: NoteRequest.Setting,
-    private val noteCapture: NoteCapture
+    private val noteCapture: NoteCapture,
+    private val timelineCapture: TimelineCapture?
 ) : ViewModel(){
 
 
@@ -38,7 +40,7 @@ class TimelineViewModel(
 
     //private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
 
-    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting, noteCapture)
+    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting, noteCapture, timelineCapture)
 
     val isLoading = timelineLiveData.isLoading
 
