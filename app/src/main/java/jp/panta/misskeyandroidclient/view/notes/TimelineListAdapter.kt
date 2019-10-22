@@ -41,7 +41,7 @@ class TimelineListAdapter(diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewD
                     return oldItem.first == newItem.first
                 }
             }
-        , getItem(p1))
+        , getItem(p1), lifecycleOwner)
         adapter.submitList(getItem(p1).reactionCounts.value?.toList())
         getItem(p1).reactionCounts.observe(lifecycleOwner, Observer {
             adapter.submitList(it.toList())

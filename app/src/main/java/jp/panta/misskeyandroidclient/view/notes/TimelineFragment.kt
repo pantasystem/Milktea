@@ -53,6 +53,8 @@ class TimelineFragment : Fragment(){
     private var mSetting: NoteRequest.Setting? = null
     private var isShowing: Boolean = false
 
+    private var mFirstVisibleItemPosition: Int? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_swipe_refresh_recycler_view, container, false)
     }
@@ -86,24 +88,23 @@ class TimelineFragment : Fragment(){
         list_view.adapter = adapter
         list_view.addOnScrollListener(mScrollListener)
 
-        var isMoveFirst = false
+        var timelineState: TimelineState.State? = null
         mViewModel.getTimelineLiveData().observe(viewLifecycleOwner, Observer {
-            //adapter.submitList(it.notes)
-            val firstVisiblePosition = mLinearLayoutManager.findFirstVisibleItemPosition()
+
             adapter.submitList(it.notes)
-            isMoveFirst = it.state ==  TimelineState.State.RECEIVED_NEW && firstVisiblePosition == 0
+            timelineState = it.state
 
         })
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                super.onItemRangeChanged(positionStart, itemCount)
 
-                if(isMoveFirst){
-                    Handler(Looper.getMainLooper()).post{
-                        mLinearLayoutManager.scrollToPosition(0)
-                    }
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+
+                if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing){
+                    mLinearLayoutManager.scrollToPosition(0)
                 }
+                //Log.d("onItemRangeInserted", "positionStart: $positionStart")
             }
         })
 
@@ -141,6 +142,7 @@ class TimelineFragment : Fragment(){
         super.onPause()
 
         isShowing = false
+        Log.d("TimelineFragment", "onPause")
     }
 
 
@@ -167,6 +169,8 @@ class TimelineFragment : Fragment(){
             val firstVisibleItemPosition = mLinearLayoutManager?.findFirstVisibleItemPosition()?: -1
             val endVisibleItemPosition = mLinearLayoutManager?.findLastVisibleItemPosition()?: -1
             val itemCount = mLinearLayoutManager?.itemCount?: -1
+
+            mFirstVisibleItemPosition = firstVisibleItemPosition
             //val childCount = recyclerView.childCount
             //Log.d("", "firstVisibleItem: $firstVisibleItemPosition, itemCount: $itemCount, childCount: $childCount")
             //Log.d("", "first:$firstVisibleItemPosition, end:$endVisibleItemPosition, itemCount:$itemCount")
