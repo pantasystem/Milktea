@@ -119,7 +119,7 @@ class TimelineFragment : Fragment(){
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
 
-                if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing){
+                if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
                     mLinearLayoutManager.scrollToPosition(0)
                 }
                 //Log.d("onItemRangeInserted", "positionStart: $positionStart")

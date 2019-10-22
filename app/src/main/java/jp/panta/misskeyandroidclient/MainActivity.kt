@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 
 import android.view.Menu
 import android.view.MenuItem
@@ -9,20 +10,31 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
+import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
+import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.message.MessageListFragment
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchFragment
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -32,6 +44,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //setTheme(R.style.AppThemeDark)
 
         setContentView(R.layout.activity_main)
+
+        val mainBinding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -62,7 +76,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         miApplication.isSuccessLoadConnectionInstance.observe(this, Observer {
             if(!it){
                 startActivity(Intent(this, AuthActivity::class.java))
-                finish()
+                //finish()
             }
         })
 
@@ -95,23 +109,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun init(){
         val ci = (application as MiApplication).currentConnectionInstanceLiveData.value
-        if(ci == null){
-
-        }else{
+        if(ci != null){
             setFragment("home")
+            setHeaderProfile(ci)
         }
-    }
 
-    private fun test(){
-        //startActivity(Intent(this, AuthActivity::class.java))
     }
 
     fun changeTitle(title: String?){
         toolbar.title = title
     }
 
-
-
+    private fun test(){
+        //startActivity(Intent(this, AuthActivity::class.java))
+    }
 
     //default "home"
     private var currentFragmentTag = "home"
@@ -173,9 +184,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun setHeaderProfile(ci: ConnectionInstance){
+        //val binding: NavHeaderMainBinding = DataBindingUtil.inflate(layoutInflater, R.layout.nav_header_main, nav_view, false)
+        //val binding: NavHeaderMainBinding = DataBindingUtil.bind(nav_view.getHeaderView(0))
+        //DataBindingUtil()
 
-    private fun getCurrentFragment(tag: String): Fragment?{
-        return supportFragmentManager.findFragmentByTag(tag)
+        runOnUiThread {
+            //nav_view.name.text = "namenamename"
+
+        }
+        val i = ci.getI()
+        if(i != null){
+            (application as MiApplication).misskeyAPIService?.i(I(i))?.enqueue( object: Callback<User>{
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    Log.d("MainActivity", "i: ${response.body()}")
+                    //binding.user = response.body()
+
+                }
+
+                override fun onFailure(call: Call<User>, t: Throwable) {
+
+                }
+            })
+        }
     }
 
     override fun onBackPressed() {

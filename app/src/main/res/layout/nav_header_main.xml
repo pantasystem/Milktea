@@ -1,37 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/nav_header_height"
-        android:background="@drawable/side_nav_bar"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
-        android:orientation="vertical"
-        android:gravity="bottom">
-
-    <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
-            app:srcCompat="@mipmap/ic_launcher_round"
-            android:contentDescription="@string/nav_header_desc"
-            android:id="@+id/imageView"/>
-
-    <TextView
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="user"
+                type="jp.panta.misskeyandroidclient.model.users.User" />
+    </data>
+    <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:text="@string/nav_header_title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+            android:layout_height="@dimen/nav_header_height"
+            android:background="@drawable/side_nav_bar"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            >
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_header_subtitle"
-            android:id="@+id/textView"/>
 
-</LinearLayout>
+
+        <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                tools:srcCompat="@mipmap/ic_launcher_round"
+                android:id="@+id/imageView"
+                app:circleIcon="@{user.avatarUrl}"
+                android:layout_gravity="start"
+                />
+
+        <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                app:srcCompat="@drawable/ic_menu_black_24dp" />
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{user.name}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:layout_below="@id/imageView"
+                android:id="@+id/name"
+                tools:text="name"
+                />
+
+        <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{user.userName}"
+                android:layout_below="@id/name"
+                tools:text="userName"
+                />
+
+        <TextView
+                android:id="@+id/following_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/userName"
+                android:text="@{user.followingCount}"
+                tools:text="114"
+                android:layout_marginEnd="3dp"
+                />
+
+        <TextView
+                android:id="@+id/following"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/following_count"
+                android:text="@string/following"
+                android:layout_below="@id/userName"
+                android:layout_marginEnd="12dp"
+            />
+        <TextView
+                android:id="@+id/follower_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/userName"
+                android:layout_toEndOf="@id/following"
+                android:text="@{user.followersCount}"
+                tools:text="514"
+                android:layout_marginEnd="3dp"
+            />
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/follower_count"
+                android:layout_below="@id/userName"
+                android:text="@string/follower"
+            />
+
+    </RelativeLayout>
+</layout>
+

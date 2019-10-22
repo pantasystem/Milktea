@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 
-@Database(entities = [ConnectionInstance::class], version = 3)
+@Database(entities = [ConnectionInstance::class], version = 2)
 abstract class DataBase : RoomDatabase(){
     abstract fun connectionInstanceDao(): ConnectionInstanceDao
 }

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.api
 
+import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.AppSecret
 import jp.panta.misskeyandroidclient.model.auth.Session
@@ -7,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.auth.UserKey
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.users.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -14,6 +16,8 @@ import retrofit2.http.POST
 interface MisskeyAPI {
 
 
+    @POST("api/i")
+    fun i(@Body i: I): Call<User>
 
     @POST("api/notes/create")
     fun create(@Body createNote: CreateNote): Call<Note?>

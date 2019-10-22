@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import jp.panta.misskeyandroidclient.databinding.ActivityAuthBinding
+import jp.panta.misskeyandroidclient.databinding.ActivityAuthCallBackBinding
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.AuthStorage
@@ -23,6 +26,8 @@ class AuthCallBackActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth_call_back)
+
+        val binding: ActivityAuthCallBackBinding = DataBindingUtil.setContentView(this, R.layout.activity_auth_call_back)
 
         val authStorage = AuthStorage(PreferenceManager.getDefaultSharedPreferences(this))
 
@@ -45,6 +50,7 @@ class AuthCallBackActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<AccessToken>, response: Response<AccessToken>) {
                     Log.d("AuthCallBackActivity", "response: $response")
                     accessToken = response.body()
+                    binding.user = response.body()?.user
                 }
 
                 override fun onFailure(call: Call<AccessToken>, t: Throwable) {
@@ -62,7 +68,7 @@ class AuthCallBackActivity : AppCompatActivity() {
                         try{
                             (application as MiApplication).connectionInstanceDao?.insert(ci)
                             runOnUiThread {
-                                startActivity(Intent(this@AuthCallBackActivity, MainActivity::class.java))
+                                //startActivity(Intent(this@AuthCallBackActivity, MainActivity::class.java))
                                 finish()
                             }
                         }catch(e: Exception){

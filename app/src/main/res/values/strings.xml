@@ -20,4 +20,6 @@
     <string name="selecting_instance">選択中のインスタンス</string>
     <string name="welcome">ようこそ</string>
     <string name="san">さん</string>
+    <string name="following">フォロー</string>
+    <string name="follower">フォロワー</string>
 </resources>

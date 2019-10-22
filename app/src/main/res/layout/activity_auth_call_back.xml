@@ -53,5 +53,52 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@+id/button_ok"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView8"
+                android:padding="8dp"
+                app:layout_constraintVertical_bias="0.547">
+
+            <ImageView
+                    android:id="@+id/avatarIcon"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    app:circleIcon="@{user.avatarUrl}"
+                />
+            <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/avatarIcon"
+                    tools:text="UserName"
+                    android:textSize="20sp"
+                    android:text="@{user.name}"
+                />
+            <TextView
+                    android:id="@+id/userName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/name"
+                    tools:text="userName"
+                    android:text="@{user.userName}"
+
+                />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{user.description}"
+                    android:layout_below="@id/userName"
+                    tools:text="awoiefhwaioejfawoefjawoiefawhfoaweifaw"
+                    android:layout_marginTop="8dp"
+                />
+
+
+        </RelativeLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
