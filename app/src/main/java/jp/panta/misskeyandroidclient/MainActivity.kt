@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Intent
 import android.os.Bundle
 
 import android.view.Menu
@@ -10,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -50,7 +52,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.setNavigationItemSelectedListener(this)
 
         //replaceTimelineFragment()
-        setFragment("home")
+        init()
+
+        val miApplication = application as MiApplication
+        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
+            init()
+        })
+
+        miApplication.isSuccessLoadConnectionInstance.observe(this, Observer {
+            if(!it){
+                startActivity(Intent(this, AuthActivity::class.java))
+                finish()
+            }
+        })
 
         bottom_navigation.setOnNavigationItemSelectedListener {
             when(it.itemId){
@@ -75,6 +89,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         }
+        test()
+
+    }
+
+    private fun init(){
+        val ci = (application as MiApplication).currentConnectionInstanceLiveData.value
+        if(ci == null){
+
+        }else{
+            setFragment("home")
+        }
+    }
+
+    private fun test(){
+        //startActivity(Intent(this, AuthActivity::class.java))
     }
 
     fun changeTitle(title: String?){

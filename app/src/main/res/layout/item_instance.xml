@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="instance"
+                type="jp.panta.misskeyandroidclient.model.auth.Instance" />
+        <variable
+                name="authViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel" />
+    </data>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="?attr/colorSurface"
+            android:layout_margin="4dp"
+            android:onClick="@{()-> authViewModel.selectInstance(instance) }"
+
+            >
+
+        <TextView
+                android:id="@+id/host_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="host name"
+                android:textSize="30sp"
+                android:text='@{instance.host}' />
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="https://misskey.io"
+                android:text="@{instance.domain}"
+
+            />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="詳細"
+                android:textSize="18sp"
+                android:padding="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="end"
+                android:textStyle="bold"
+            />
+
+    </LinearLayout>
+</layout>
+

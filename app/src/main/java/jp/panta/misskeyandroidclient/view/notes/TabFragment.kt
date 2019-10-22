@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -39,17 +40,24 @@ class TabFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val testData1 = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.HOME)
-        val testData2 = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SOCIAL)
-        val testData3 = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.GLOBAL)
-        val testData4 = NoteRequest.Setting(i = SecretConstant.i(), type = NoteType.SEARCH, query = "おはよう")
-        val testDataList = listOf(testData1, testData2, testData3, testData4)
-        if(testDataList.size <= 1){
-            tabLayout.visibility = View.GONE
+        val miApp = context?.applicationContext as MiApplication
+        val connectionInstance = miApp.currentConnectionInstanceLiveData.value
+        val i = connectionInstance?.getI()
+        if(i != null){
+
+            val testData1 = NoteRequest.Setting(connectionInstance.getI()!!, type = NoteType.HOME)
+            val testData2 = NoteRequest.Setting(i = i, type = NoteType.SOCIAL)
+            val testData3 = NoteRequest.Setting(i = i, type = NoteType.GLOBAL)
+            val testData4 = NoteRequest.Setting(i = i, type = NoteType.SEARCH, query = "おはよう")
+            val testDataList = listOf(testData1, testData2, testData3, testData4)
+            if(testDataList.size <= 1){
+                tabLayout.visibility = View.GONE
+            }
+            val adapter = TimelinePagerAdapter(activity?.supportFragmentManager, testDataList)
+            viewPager.adapter = adapter
+            tabLayout.setupWithViewPager(viewPager)
         }
-        val adapter = TimelinePagerAdapter(activity?.supportFragmentManager, testDataList)
-        viewPager.adapter = adapter
-        tabLayout.setupWithViewPager(viewPager)
+
 
 
     }

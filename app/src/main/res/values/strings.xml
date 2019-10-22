@@ -16,4 +16,8 @@
     <string name="seach">Seach</string>
     <string name="notification">Notification</string>
     <string name="message">Message</string>
+    <string name="start_auth">認証する</string>
+    <string name="selecting_instance">選択中のインスタンス</string>
+    <string name="welcome">ようこそ</string>
+    <string name="san">さん</string>
 </resources>

@@ -13,12 +13,7 @@ import retrofit2.http.POST
 
 interface MisskeyAPI {
 
-    //auth
-    @POST("api/auth/session/generate")
-    fun generateSession(@Body appSecret: AppSecret): Call<Session>
 
-    @POST("api/auth/userkey")
-    fun getAccessToken(@Body userKey: UserKey): Call<AccessToken>
 
     @POST("api/notes/create")
     fun create(@Body createNote: CreateNote): Call<Note?>

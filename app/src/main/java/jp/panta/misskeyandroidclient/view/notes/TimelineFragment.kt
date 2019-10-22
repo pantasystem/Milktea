@@ -19,8 +19,11 @@ import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.streming.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
@@ -44,7 +47,7 @@ class TimelineFragment : Fragment(){
     }
 
     private lateinit var mLinearLayoutManager: LinearLayoutManager
-    private lateinit var mViewModel: TimelineViewModel
+    private var mViewModel: TimelineViewModel? = null
 
     //private var isViewCreated: Boolean = false
     //private var isLoadInited: Boolean = false
@@ -71,7 +74,7 @@ class TimelineFragment : Fragment(){
         mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting?
 
         val miApplication = context?.applicationContext as MiApplication
-        val nowConnectionInstance = miApplication.getConnectionInstance()
+        val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
         val noteCapture = miApplication.noteCapture
 
         val isAutoStream = true
@@ -81,6 +84,21 @@ class TimelineFragment : Fragment(){
             null
         }
 
+
+        if(nowConnectionInstance != null && noteCapture != null){
+            init(nowConnectionInstance, noteCapture, timelineCapture)
+
+        }
+
+        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
+            if(mViewModel != null && nowConnectionInstance != null && noteCapture != null){
+                init(nowConnectionInstance, noteCapture, timelineCapture)
+            }
+        })
+
+    }
+
+    private fun init(nowConnectionInstance: ConnectionInstance, noteCapture: NoteCapture, timelineCapture: TimelineCapture?){
         val a = TimelineViewModelFactory(nowConnectionInstance, mSetting, noteCapture, timelineCapture)
         mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
@@ -89,7 +107,7 @@ class TimelineFragment : Fragment(){
         list_view.addOnScrollListener(mScrollListener)
 
         var timelineState: TimelineState.State? = null
-        mViewModel.getTimelineLiveData().observe(viewLifecycleOwner, Observer {
+        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
 
             adapter.submitList(it.notes)
             timelineState = it.state
@@ -111,16 +129,14 @@ class TimelineFragment : Fragment(){
 
 
         refresh.setOnRefreshListener {
-            mViewModel.loadNew()
+            mViewModel?.loadNew()
         }
 
-        mViewModel.isLoading.observe(viewLifecycleOwner, Observer<Boolean> {
+        mViewModel?.isLoading?.observe(viewLifecycleOwner, Observer<Boolean> {
             if(it != null && !it){
                 refresh?.isRefreshing = false
             }
         })
-
-
     }
 
     override fun onResume() {
@@ -131,7 +147,7 @@ class TimelineFragment : Fragment(){
         if(isLoadInit){
 
         }else{
-            mViewModel.loadInit()
+            mViewModel?.loadInit()
             isLoadInit = true
         }
 
@@ -181,7 +197,7 @@ class TimelineFragment : Fragment(){
             if(endVisibleItemPosition == (itemCount - 1)){
                 Log.d("", "後ろ")
                 //mTimelineViewModel?.getOldTimeline()
-                mViewModel.loadOld()
+                mViewModel?.loadOld()
 
             }
 
