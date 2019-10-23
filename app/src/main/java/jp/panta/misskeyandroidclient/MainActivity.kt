@@ -71,6 +71,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val miApplication = application as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             init()
+            setHeaderProfile(it, mainBinding)
+
         })
 
         miApplication.isSuccessLoadConnectionInstance.observe(this, Observer {
@@ -111,7 +113,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val ci = (application as MiApplication).currentConnectionInstanceLiveData.value
         if(ci != null){
             setFragment("home")
-            setHeaderProfile(ci)
+            //setHeaderProfile(ci)
         }
 
     }
@@ -184,10 +186,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun setHeaderProfile(ci: ConnectionInstance){
-        //val binding: NavHeaderMainBinding = DataBindingUtil.inflate(layoutInflater, R.layout.nav_header_main, nav_view, false)
-        //val binding: NavHeaderMainBinding = DataBindingUtil.bind(nav_view.getHeaderView(0))
-        //DataBindingUtil()
+    private fun setHeaderProfile(ci: ConnectionInstance, activityMainBinding: ActivityMainBinding){
+
+
+        DataBindingUtil.bind<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
+        val headerBinding = DataBindingUtil.getBinding<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
 
         runOnUiThread {
             //nav_view.name.text = "namenamename"
@@ -199,7 +202,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 override fun onResponse(call: Call<User>, response: Response<User>) {
                     Log.d("MainActivity", "i: ${response.body()}")
                     //binding.user = response.body()
-
+                    headerBinding?.user = response.body()
                 }
 
                 override fun onFailure(call: Call<User>, t: Throwable) {

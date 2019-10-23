@@ -27,12 +27,15 @@
                 android:id="@+id/imageView"
                 app:circleIcon="@{user.avatarUrl}"
                 android:layout_gravity="start"
+                android:paddingTop="@dimen/nav_header_vertical_spacing"
+                android:layout_marginTop="20dp"
                 />
 
         <ImageButton
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
+                android:layout_marginTop="30dp"
                 app:srcCompat="@drawable/ic_menu_black_24dp" />
         <TextView
                 android:layout_width="match_parent"
@@ -58,8 +61,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/userName"
-                android:text="@{user.followingCount}"
                 tools:text="114"
+                android:text="@{ Integer.toString(user.followingCount) }"
                 android:layout_marginEnd="3dp"
                 />
 
@@ -71,24 +74,24 @@
                 android:text="@string/following"
                 android:layout_below="@id/userName"
                 android:layout_marginEnd="12dp"
-            />
+                />
         <TextView
                 android:id="@+id/follower_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/userName"
                 android:layout_toEndOf="@id/following"
-                android:text="@{user.followersCount}"
                 tools:text="514"
                 android:layout_marginEnd="3dp"
-            />
+                android:text="@{ Integer.toString(user.followersCount) }"
+                />
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/follower_count"
                 android:layout_below="@id/userName"
                 android:text="@string/follower"
-            />
+                />
 
     </RelativeLayout>
 </layout>
