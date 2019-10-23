@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient.view.notes
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,17 +9,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
@@ -29,9 +24,6 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class TimelineFragment : Fragment(){
 
@@ -86,23 +78,24 @@ class TimelineFragment : Fragment(){
 
 
         if(nowConnectionInstance != null && noteCapture != null){
-            init(nowConnectionInstance, noteCapture, timelineCapture)
+            initTimeline(nowConnectionInstance, noteCapture, timelineCapture)
 
         }
 
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
             if(mViewModel != null && nowConnectionInstance != null && noteCapture != null){
-                init(nowConnectionInstance, noteCapture, timelineCapture)
+                initTimeline(nowConnectionInstance, noteCapture, timelineCapture)
             }
         })
 
+        initViewModelListener()
     }
 
-    private fun init(nowConnectionInstance: ConnectionInstance, noteCapture: NoteCapture, timelineCapture: TimelineCapture?){
+    private fun initTimeline(nowConnectionInstance: ConnectionInstance, noteCapture: NoteCapture, timelineCapture: TimelineCapture?){
         val a = TimelineViewModelFactory(nowConnectionInstance, mSetting, noteCapture, timelineCapture)
         mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
 
-        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner)
+        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, mViewModel!!)
         list_view.adapter = adapter
         list_view.addOnScrollListener(mScrollListener)
 
@@ -136,6 +129,24 @@ class TimelineFragment : Fragment(){
             if(it != null && !it){
                 refresh?.isRefreshing = false
             }
+        })
+    }
+
+    private fun initViewModelListener(){
+        mViewModel?.replyTarget?.observe(viewLifecycleOwner, Observer{
+            Log.d("TimelineFragment", "reply clicked :$it")
+        })
+
+        mViewModel?.reNoteTarget?.observe(viewLifecycleOwner, Observer{
+            Log.d("TimelineFragment", "renote clicked :$it")
+        })
+
+        mViewModel?.shareTarget?.observe(viewLifecycleOwner, Observer{
+            Log.d("TimelineFragment", "share clicked :$it")
+        })
+
+        mViewModel?.targetUser?.observe(viewLifecycleOwner, Observer{
+            Log.d("TimelineFragment", "user clicked :$it")
         })
     }
 

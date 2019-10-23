@@ -8,6 +8,10 @@
         <variable
                 name="reactionAdapter"
                 type="jp.panta.misskeyandroidclient.view.notes.reaction.ReactionAdapter" />
+
+        <variable
+                name="timelineViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel" />
         <import type="jp.panta.misskeyandroidclient.R"/>
     </data>
 
@@ -203,6 +207,7 @@
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="5dp"
                             android:scaleType="centerCrop"
+                            android:onClick="@{ () -> timelineViewModel.setTargetToReply(note) }"
                     />
                     <TextView
                             android:text='@{note.replyCount}'
@@ -219,6 +224,7 @@
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="7dp"
                             android:scaleType="centerCrop"
+                            android:onClick="@{ ()-> timelineViewModel.setTargetToReNote(note) }"
                     />
                     <TextView
                             android:text='@{note.reNoteCount}'
