@@ -25,4 +25,5 @@
     <string name="renote">リノート</string>
     <string name="quote_renote">引用リノート</string>
     <string name="discovery">discovery</string>
+    <string name="renote_was">renoteしました</string>
 </resources>

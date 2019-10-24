@@ -30,13 +30,7 @@ class TimelineViewModel(
 
     val isLoading = timelineLiveData.isLoading
 
-    val reNoteTarget = MutableLiveData<PlaneNoteViewData>()
 
-    val replyTarget = MutableLiveData<PlaneNoteViewData>()
-
-    val shareTarget = MutableLiveData<PlaneNoteViewData>()
-
-    val targetUser = MutableLiveData<User>()
 
     fun getTimelineLiveData() : LiveData<TimelineState>{
         return timelineLiveData
@@ -54,20 +48,6 @@ class TimelineViewModel(
         timelineLiveData.loadInit()
     }
 
-    fun setTargetToReNote(note: PlaneNoteViewData){
-        reNoteTarget.postValue(note)
-    }
 
-    fun setTargetToReply(note: PlaneNoteViewData){
-        replyTarget.postValue(note)
-    }
-
-    fun setTargetToShare(note: PlaneNoteViewData){
-        shareTarget.postValue(note)
-    }
-
-    fun setTargetToUser(user: User){
-        targetUser.postValue(user)
-    }
 
 }

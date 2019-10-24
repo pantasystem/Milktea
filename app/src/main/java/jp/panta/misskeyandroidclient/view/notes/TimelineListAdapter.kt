@@ -15,13 +15,14 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.util.ObservableArrayListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionAdapter
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 
 class TimelineListAdapter(
     diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>,
     private val lifecycleOwner: LifecycleOwner,
-    private val timelineViewModel: TimelineViewModel
+    private val notesViewModel: NotesViewModel
 ) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolder>(diffUtilCallBack){
 
     class NoteViewHolder(val binding: ItemNoteBinding): RecyclerView.ViewHolder(binding.root)
@@ -55,7 +56,7 @@ class TimelineListAdapter(
         p0.binding.reactionView.layoutManager = LinearLayoutManager(p0.binding.root.context, LinearLayoutManager.HORIZONTAL, false)
         p0.binding.lifecycleOwner = lifecycleOwner
         p0.binding.executePendingBindings()
-        p0.binding.timelineViewModel = timelineViewModel
+        p0.binding.notesViewModel = notesViewModel
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): NoteViewHolder {

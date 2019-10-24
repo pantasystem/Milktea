@@ -33,6 +33,7 @@
                 android:layout_weight="1"
                 android:text="@string/renote"
                 android:textSize="20sp"
+                android:id="@+id/renote"
 
                 />
     </LinearLayout>
@@ -60,6 +61,7 @@
                 android:layout_weight="1"
                 android:text="@string/quote_renote"
                 android:textSize="20sp"
+                android:id="@+id/quote_renote"
 
 
                 />

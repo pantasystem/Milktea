@@ -21,6 +21,7 @@ import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.main.MainViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
@@ -80,7 +81,7 @@ class TimelineFragment : Fragment(){
             }
         })
 
-        initViewModelListener()
+        //initViewModelListener()
     }
 
     private fun initTimeline(nowConnectionInstance: ConnectionInstance, miApplication: MiApplication, isAutoLoad: Boolean){
@@ -93,7 +94,9 @@ class TimelineFragment : Fragment(){
         }
         mViewModel = ViewModelProvider(store, a).get(mSetting?.toString()!!,TimelineViewModel::class.java)
 
-        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, mViewModel!!)
+        val notesViewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
+
+        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
         list_view.adapter = adapter
         list_view.addOnScrollListener(mScrollListener)
 
@@ -130,28 +133,7 @@ class TimelineFragment : Fragment(){
         })
     }
 
-    private fun initViewModelListener(){
-        mViewModel?.replyTarget?.observe(viewLifecycleOwner, Observer{
-            Log.d("TimelineFragment", "reply clicked :$it")
-        })
 
-        mViewModel?.reNoteTarget?.observe(viewLifecycleOwner, Observer{
-            Log.d("TimelineFragment", "renote clicked :$it")
-            val dialog = RenoteBottomSheetDialog()
-            val ft = activity?.supportFragmentManager
-            if(ft != null){
-                dialog.show(ft, "timelineFragment")
-            }
-        })
-
-        mViewModel?.shareTarget?.observe(viewLifecycleOwner, Observer{
-            Log.d("TimelineFragment", "share clicked :$it")
-        })
-
-        mViewModel?.targetUser?.observe(viewLifecycleOwner, Observer{
-            Log.d("TimelineFragment", "user clicked :$it")
-        })
-    }
 
     override fun onResume() {
         super.onResume()

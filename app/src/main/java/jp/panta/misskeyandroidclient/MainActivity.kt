@@ -6,6 +6,7 @@ import android.util.Log
 
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -26,11 +27,14 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.message.MessageListFragment
+import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchFragment
 import jp.panta.misskeyandroidclient.viewmodel.main.MainViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
@@ -40,6 +44,7 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private lateinit var mNotesViewModel: NotesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,16 +74,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //replaceTimelineFragment()
         init()
+
         /*val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         mainViewModel.test.observe(this, Observer {
             Log.d("MainActivity", "値の更新があった更新内容: $it")
         })*/
 
         val miApplication = application as MiApplication
+
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             init()
             setHeaderProfile(it, mainBinding)
-
+            mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
+            initViewModelListener()
         })
 
         miApplication.isSuccessLoadConnectionInstance.observe(this, Observer {
@@ -122,6 +130,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //setHeaderProfile(ci)
         }
 
+    }
+
+    private fun initViewModelListener(){
+        mNotesViewModel.replyTarget.observe(this, Observer{
+            Log.d("TimelineFragment", "reply clicked :$it")
+        })
+
+        mNotesViewModel.reNoteTarget.observe(this, Observer{
+            Log.d("TimelineFragment", "renote clicked :$it")
+            val dialog = RenoteBottomSheetDialog()
+            dialog.show(supportFragmentManager, "timelineFragment")
+
+        })
+
+        mNotesViewModel.shareTarget.observe(this, Observer{
+            Log.d("TimelineFragment", "share clicked :$it")
+        })
+
+        mNotesViewModel.targetUser.observe(this, Observer{
+            Log.d("TimelineFragment", "user clicked :$it")
+        })
+
+        mNotesViewModel.statusMessage.observe(this, Observer{
+            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+        })
+
+        mNotesViewModel.quoteRenoteTarget.observe(this, Observer{
+            startActivity(Intent(this, NoteEditorActivity::class.java))
+        })
     }
 
     fun changeTitle(title: String?){

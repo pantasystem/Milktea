@@ -9,10 +9,12 @@
                 name="reactionAdapter"
                 type="jp.panta.misskeyandroidclient.view.notes.reaction.ReactionAdapter" />
 
-        <variable
-                name="timelineViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel" />
+
         <import type="jp.panta.misskeyandroidclient.R"/>
+
+        <variable
+                name="notesViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -207,7 +209,7 @@
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="5dp"
                             android:scaleType="centerCrop"
-                            android:onClick="@{ () -> timelineViewModel.setTargetToReply(note) }"
+                            android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                     />
                     <TextView
                             android:text='@{note.replyCount}'
@@ -224,7 +226,7 @@
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="7dp"
                             android:scaleType="centerCrop"
-                            android:onClick="@{ ()-> timelineViewModel.setTargetToReNote(note) }"
+                            android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
                     />
                     <TextView
                             android:text='@{note.reNoteCount}'
@@ -264,6 +266,7 @@
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="8dp"
                             android:scaleType="centerCrop"
+                            android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
                     />
                 </LinearLayout>
 

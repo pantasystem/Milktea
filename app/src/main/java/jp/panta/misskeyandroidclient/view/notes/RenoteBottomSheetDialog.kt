@@ -9,16 +9,14 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
+import kotlinx.android.synthetic.main.dialog_renote.view.*
 
 class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
 
-    companion object{
-        fun newInstance(setting: NoteRequest.Setting){
-
-        }
-    }
 
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
@@ -31,18 +29,21 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         val tc = miApplication.timelineCapture
         val nc = miApplication.noteCapture
 
-        val store = parentFragment?.viewModelStore
-        if(store == null){
-            Log.d("RenoteBottomSheetDialog", "store is null")
-        }
-        if(cn != null && store != null){
-            //val viewModel = ViewModelProvider(store, factory).get(, NotesViewModel::class.java)
-            //val factory = TimelineViewModelFactory(cn, NoteRequest.Setting("", NoteType.HOME), nc, tc)
+        val activity = activity
+        if(activity != null && cn != null){
+            val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(cn, miApplication)).get(NotesViewModel::class.java)
 
-            //val viewModel = ViewModelProvider(store, factory).get(TimelineViewModel::class.java)
-            //Log.d("RenoteBottomSheetDialog", "対象のノート: ${viewModel.reNoteTarget.value?.toShowNote}")
+            view.renote.setOnClickListener{
+                notesViewModel.postRenote()
+                dismiss()
+            }
+
+            view.quote_renote.setOnClickListener {
+                notesViewModel.putQuoteRenoteTarget()
+                dismiss()
+            }
+
         }
-        parentFragment?.viewModelStore
         //val viewModel =
     }
 }
