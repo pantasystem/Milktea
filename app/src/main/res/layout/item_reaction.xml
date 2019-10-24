@@ -12,6 +12,10 @@
         <variable
                 name="note"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData" />
+
+        <variable
+                name="notesViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
     </data>
     <LinearLayout
             android:layout_width="wrap_content"
@@ -26,6 +30,7 @@
 
             android:background='@{note.myReaction == reaction.first ? @drawable/shape_selected_reaction_background : @drawable/shape_normal_reaction_backgruond }'
 
+            android:onClick="@{ () -> notesViewModel.postReaction(note, reaction.first) }"
 
             >
         <ImageView

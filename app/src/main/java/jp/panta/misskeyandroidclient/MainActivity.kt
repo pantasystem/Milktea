@@ -134,22 +134,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initViewModelListener(){
         mNotesViewModel.replyTarget.observe(this, Observer{
-            Log.d("TimelineFragment", "reply clicked :$it")
+            Log.d("MainActivity", "reply clicked :$it")
         })
 
         mNotesViewModel.reNoteTarget.observe(this, Observer{
-            Log.d("TimelineFragment", "renote clicked :$it")
+            Log.d("MainActivity", "renote clicked :$it")
             val dialog = RenoteBottomSheetDialog()
             dialog.show(supportFragmentManager, "timelineFragment")
 
         })
 
         mNotesViewModel.shareTarget.observe(this, Observer{
-            Log.d("TimelineFragment", "share clicked :$it")
+            Log.d("MainActivity", "share clicked :$it")
         })
 
         mNotesViewModel.targetUser.observe(this, Observer{
-            Log.d("TimelineFragment", "user clicked :$it")
+            Log.d("MainActivity", "user clicked :$it")
         })
 
         mNotesViewModel.statusMessage.observe(this, Observer{
@@ -158,6 +158,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mNotesViewModel.quoteRenoteTarget.observe(this, Observer{
             startActivity(Intent(this, NoteEditorActivity::class.java))
+        })
+
+        mNotesViewModel.reactionTarget.observe(this, Observer{
+            Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
         })
     }
 

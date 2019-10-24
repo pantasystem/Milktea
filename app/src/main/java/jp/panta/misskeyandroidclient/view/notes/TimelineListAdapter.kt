@@ -47,7 +47,7 @@ class TimelineListAdapter(
                     return oldItem.first == newItem.first
                 }
             }
-        , getItem(p1), lifecycleOwner)
+        , getItem(p1), notesViewModel)
         adapter.submitList(getItem(p1).reactionCounts.value?.toList())
         getItem(p1).reactionCounts.observe(lifecycleOwner, Observer {
             adapter.submitList(it.toList())

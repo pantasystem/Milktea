@@ -247,6 +247,7 @@
                             style="?android:attr/borderlessButtonStyle"
                             android:padding="5dp"
                             android:scaleType="centerCrop"
+                            android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
                     />
                     <TextView
                             android:text='@{note.reactionCount.toString()}'

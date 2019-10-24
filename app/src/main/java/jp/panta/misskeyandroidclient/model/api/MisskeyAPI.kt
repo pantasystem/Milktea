@@ -26,9 +26,9 @@ interface MisskeyAPI {
     fun delete(@Body deleteNote: DeleteNote)
 
     @POST("api/notes/reactions/create")
-    fun createReaction(@Body reaction: CreateReaction)
+    fun createReaction(@Body reaction: CreateReaction): Call<Unit>
     @POST("api/notes/reactions/delete")
-    fun deleteReaction(@Body deleteNote: DeleteNote)
+    fun deleteReaction(@Body deleteNote: DeleteNote): Call<Unit>
 
     @POST("api/notes/search")
     fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
