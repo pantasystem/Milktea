@@ -14,7 +14,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class NoteCapture(
-    var myUserId: String
+    var myUserId: String?
 ) : Observer{
 
 

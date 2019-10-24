@@ -47,10 +47,9 @@ class MiApplication : Application(){
 
     var streamingAdapter: StreamingAdapter? = null
         private set
-    var noteCapture: NoteCapture? = null
-        private set
+    val noteCapture: NoteCapture = NoteCapture(null)
 
-    var timelineCapture: TimelineCapture? = null
+    val timelineCapture: TimelineCapture = TimelineCapture()
 
     //var connectionInstance: ConnectionInstance? = null
     private var mConnectionInstance: ConnectionInstance? = null
@@ -110,11 +109,12 @@ class MiApplication : Application(){
             misskeyAPIService = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
             streamingAdapter = StreamingAdapter(ci)
             streamingAdapter?.connect()
-            noteCapture = NoteCapture(ci.userId)
-            timelineCapture = TimelineCapture()
+            //noteCapture = NoteCapture(ci.userId)
+            noteCapture.myUserId = ci.userId
+            //timelineCapture = TimelineCapture()
 
-            streamingAdapter?.addObserver(noteCapture!!)
-            streamingAdapter?.addObserver(timelineCapture!!)
+            streamingAdapter?.addObserver(noteCapture)
+            streamingAdapter?.addObserver(timelineCapture)
 
             mConnectionInstance = ci
             currentConnectionInstanceLiveData.postValue(ci)

@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
+import jp.panta.misskeyandroidclient.viewmodel.main.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
@@ -63,37 +64,34 @@ class TimelineFragment : Fragment(){
 
         //データ受け取り
 
-        mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting?
+        mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting
 
         val miApplication = context?.applicationContext as MiApplication
         val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
-        val noteCapture = miApplication.noteCapture
 
-        val isAutoStream = true
-        val timelineCapture = if(isAutoStream){
-            miApplication.timelineCapture
-        }else{
-            null
-        }
-
-
-        if(nowConnectionInstance != null && noteCapture != null){
-            initTimeline(nowConnectionInstance, noteCapture, timelineCapture)
+        if(nowConnectionInstance != null){
+            initTimeline(nowConnectionInstance, miApplication, true)
 
         }
 
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
-            if(mViewModel != null && nowConnectionInstance != null && noteCapture != null){
-                initTimeline(nowConnectionInstance, noteCapture, timelineCapture)
+            if(mViewModel != null){
+                initTimeline(it, miApplication, true)
             }
         })
 
         initViewModelListener()
     }
 
-    private fun initTimeline(nowConnectionInstance: ConnectionInstance, noteCapture: NoteCapture, timelineCapture: TimelineCapture?){
-        val a = TimelineViewModelFactory(nowConnectionInstance, mSetting, noteCapture, timelineCapture)
-        mViewModel = ViewModelProvider(viewModelStore, a).get(TimelineViewModel::class.java)
+    private fun initTimeline(nowConnectionInstance: ConnectionInstance, miApplication: MiApplication, isAutoLoad: Boolean){
+        val a = TimelineViewModelFactory(nowConnectionInstance, mSetting!!, miApplication, isAutoLoad)
+        Log.d("TimelineFragment", "setting: $mSetting")
+        val store = activity?.viewModelStore
+        if(store == null){
+            Log.e("TimelineFragment", "activity#viewModelStore is null")
+            return
+        }
+        mViewModel = ViewModelProvider(store, a).get(mSetting?.toString()!!,TimelineViewModel::class.java)
 
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, mViewModel!!)
         list_view.adapter = adapter
@@ -219,4 +217,5 @@ class TimelineFragment : Fragment(){
 
         }
     }
+
 }

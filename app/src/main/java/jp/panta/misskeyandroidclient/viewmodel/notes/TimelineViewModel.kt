@@ -6,6 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
@@ -14,8 +15,9 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 
 class TimelineViewModel(
-    private val connectionInstance: ConnectionInstance,
-    private val requestBaseSetting: NoteRequest.Setting,
+    connectionInstance: ConnectionInstance,
+    requestBaseSetting: NoteRequest.Setting,
+    misskeyAPI: MisskeyAPI,
     private val noteCapture: NoteCapture,
     private val timelineCapture: TimelineCapture?
 ) : ViewModel(){
@@ -24,7 +26,7 @@ class TimelineViewModel(
 
     //private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
 
-    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting, noteCapture, timelineCapture)
+    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting, misskeyAPI, noteCapture, timelineCapture)
 
     val isLoading = timelineLiveData.isLoading
 

@@ -14,6 +14,12 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
 
 class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
 
+    companion object{
+        fun newInstance(setting: NoteRequest.Setting){
+
+        }
+    }
+
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
         val view = View.inflate(context, R.layout.dialog_renote, null)
@@ -29,11 +35,12 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         if(store == null){
             Log.d("RenoteBottomSheetDialog", "store is null")
         }
-        if(cn != null && tc != null && nc != null && store != null){
-            val factory = TimelineViewModelFactory(cn, NoteRequest.Setting("", NoteType.HOME), nc, tc)
+        if(cn != null && store != null){
+            //val viewModel = ViewModelProvider(store, factory).get(, NotesViewModel::class.java)
+            //val factory = TimelineViewModelFactory(cn, NoteRequest.Setting("", NoteType.HOME), nc, tc)
 
-            val viewModel = ViewModelProvider(store, factory).get(TimelineViewModel::class.java)
-            Log.d("RenoteBottomSheetDialog", "対象のノート: ${viewModel.reNoteTarget.value?.toShowNote}")
+            //val viewModel = ViewModelProvider(store, factory).get(TimelineViewModel::class.java)
+            //Log.d("RenoteBottomSheetDialog", "対象のノート: ${viewModel.reNoteTarget.value?.toShowNote}")
         }
         parentFragment?.viewModelStore
         //val viewModel =

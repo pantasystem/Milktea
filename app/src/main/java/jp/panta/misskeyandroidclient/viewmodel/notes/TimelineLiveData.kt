@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -16,13 +17,14 @@ import retrofit2.Response
 class TimelineLiveData(
     private val connectionInstance: ConnectionInstance,
     private val requestBase: NoteRequest.Setting,
+    misskeyAPI: MisskeyAPI,
     private val noteCapture: NoteCapture,
     private val timelineCapture: TimelineCapture?
 ) : MutableLiveData<TimelineState>(){
 
     var isLoading =  MutableLiveData<Boolean>()
 
-    private val misskeyAPI = MisskeyAPIServiceBuilder.build(connectionInstance.instanceBaseUrl)
+    //private val misskeyAPI = MisskeyAPIServiceBuilder.build(connectionInstance.instanceBaseUrl)
 
     private val timelineStore = when(requestBase.type){
         NoteType.HOME -> misskeyAPI::homeTimeline
