@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +30,7 @@ import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchFragment
+import jp.panta.misskeyandroidclient.viewmodel.main.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
@@ -67,6 +69,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //replaceTimelineFragment()
         init()
+        /*val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        mainViewModel.test.observe(this, Observer {
+            Log.d("MainActivity", "値の更新があった更新内容: $it")
+        })*/
 
         val miApplication = application as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {

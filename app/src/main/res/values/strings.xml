@@ -22,4 +22,7 @@
     <string name="san">さん</string>
     <string name="following">フォロー</string>
     <string name="follower">フォロワー</string>
+    <string name="renote">リノート</string>
+    <string name="quote_renote">引用リノート</string>
+    <string name="discovery">discovery</string>
 </resources>

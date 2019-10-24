@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.files.FileProperty
 import java.lang.IndexOutOfBoundsException
 
@@ -39,6 +40,7 @@ object ImagePreviewHelper {
                 Glide
                     .with(this.context)
                     .load(file.thumbnailUrl)
+                    .error(R.drawable.ic_cloud_off_black_24dp)
                     .centerCrop()
                     .into(view)
             }catch(e: IndexOutOfBoundsException){

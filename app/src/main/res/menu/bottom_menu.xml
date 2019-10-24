@@ -11,7 +11,7 @@
             android:title="@string/menu_home" />
     <item
             android:id="@+id/navigation_search"
-            android:title="@string/seach"
+            android:title="@string/discovery"
             android:icon="@drawable/ic_search_black_24dp"/>
     <item
             android:id="@+id/navigation_notification"
