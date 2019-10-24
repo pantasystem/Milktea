@@ -139,6 +139,11 @@ class TimelineFragment : Fragment(){
 
         mViewModel?.reNoteTarget?.observe(viewLifecycleOwner, Observer{
             Log.d("TimelineFragment", "renote clicked :$it")
+            val dialog = RenoteBottomSheetDialog()
+            val ft = activity?.supportFragmentManager
+            if(ft != null){
+                dialog.show(ft, "timelineFragment")
+            }
         })
 
         mViewModel?.shareTarget?.observe(viewLifecycleOwner, Observer{
