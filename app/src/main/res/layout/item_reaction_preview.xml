@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="reaction"
+                type="kotlin.Pair&lt;java.lang.String, java.lang.Integer>" />
+        <variable
+                name="notesViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+    </data>
+
+    <LinearLayout
+            android:orientation="horizontal" android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            app:reactionImageView="@{reactionImagePreview}"
+            app:reactionStringView="@{reactionStringPreview}"
+            app:reaction="@{reaction.first}"
+            android:onClick="@{ ()-> notesViewModel.postReaction(reaction.first) }"
+            >
+
+        <ImageView
+                android:id="@+id/reactionImagePreview"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                tools:srcCompat="@mipmap/ic_launcher"
+                android:layout_marginEnd="4dp"
+                />
+        <TextView
+                android:id="@+id/reactionStringPreview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="😇"
+                android:layout_gravity="center"
+            />
+
+        <TextView
+                android:id="@+id/textView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:text="@{reaction.first}" />
+    </LinearLayout>
+</layout>

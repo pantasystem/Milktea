@@ -28,12 +28,12 @@ import jp.panta.misskeyandroidclient.util.svg.GlideApp
 object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")
     @JvmStatic
-    fun LinearLayout.setReaction(reactionImageView: ImageView, reactionStringView: TextView, reaction: Pair<String, Int>) {
+    fun LinearLayout.setReaction(reactionImageView: ImageView, reactionStringView: TextView, reaction: String) {
         Log.d("ReactionViewHelper", "reaction $reaction")
-        if(reaction.first.startsWith(":") && reaction.first.endsWith(":")){
+        if(reaction.startsWith(":") && reaction.endsWith(":")){
             val miApplication = this.context.applicationContext as MiApplication
             val emoji = miApplication.nowInstanceMeta?.emojis?.firstOrNull{
-                it.name == reaction.first.replace(":", "")
+                it.name == reaction.replace(":", "")
             }
 
             if(emoji != null){
@@ -71,7 +71,7 @@ object ReactionViewHelper {
 
         }
 
-        val reactionResourceId = ReactionResourceMap.reactionDrawableMap[reaction.first]
+        val reactionResourceId = ReactionResourceMap.reactionDrawableMap[reaction]
         if(reactionResourceId != null){
 
             Glide.with(reactionImageView)
@@ -82,7 +82,7 @@ object ReactionViewHelper {
             reactionStringView.visibility = View.GONE
         }else{
             Log.d("ReactionViewHelper", "どれにも当てはまらなかった")
-            reactionStringView.text = reaction.first
+            reactionStringView.text = reaction
             reactionImageView.visibility = View.GONE
             reactionStringView.visibility = View.VISIBLE
         }

@@ -24,11 +24,12 @@
             android:padding="5dp"
             app:reactionImageView="@{reactionImage}"
             app:reactionStringView="@{reactionText}"
-            app:reaction="@{reaction}"
+            app:reaction="@{reaction.first}"
             android:layout_marginEnd="5dp"
             tools:background="@drawable/shape_normal_reaction_backgruond"
 
-            android:background='@{note.myReaction == reaction.first ? @drawable/shape_selected_reaction_background : @drawable/shape_normal_reaction_backgruond }'
+            app:reactionNote="@{note}"
+            app:reactionBackground="@{reaction}"
 
             android:onClick="@{ () -> notesViewModel.postReaction(note, reaction.first) }"
 

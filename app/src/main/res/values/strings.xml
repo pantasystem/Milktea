@@ -26,4 +26,5 @@
     <string name="quote_renote">引用リノート</string>
     <string name="discovery">discovery</string>
     <string name="renote_was">renoteしました</string>
+    <string name="input_custom_emoji">絵文字/カスタム絵文字を入力</string>
 </resources>

@@ -30,6 +30,7 @@ import jp.panta.misskeyandroidclient.view.message.MessageListFragment
 import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchFragment
 import jp.panta.misskeyandroidclient.viewmodel.main.MainViewModel
@@ -162,6 +163,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mNotesViewModel.reactionTarget.observe(this, Observer{
             Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
+            ReactionSelectionDialog().show(supportFragmentManager, "MainActivity")
         })
     }
 

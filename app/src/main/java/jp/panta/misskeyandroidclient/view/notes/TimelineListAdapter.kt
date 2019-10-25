@@ -4,7 +4,6 @@ package jp.panta.misskeyandroidclient.view.notes
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
@@ -13,11 +12,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
-import jp.panta.misskeyandroidclient.util.ObservableArrayListAdapter
-import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionAdapter
+import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 
 class TimelineListAdapter(
     diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>,
@@ -31,7 +28,7 @@ class TimelineListAdapter(
     override fun onBindViewHolder(p0: NoteViewHolder, p1: Int) {
         //p0.binding.note = observableList[p1]
         p0.binding.note = getItem(p1)
-        val adapter =ReactionAdapter(
+        val adapter =ReactionCountAdapter(
             object : DiffUtil.ItemCallback<Pair<String, Int>>(){
                 override fun areContentsTheSame(
                     oldItem: Pair<String, Int>,

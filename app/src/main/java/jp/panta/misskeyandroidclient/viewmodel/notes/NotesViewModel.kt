@@ -35,6 +35,8 @@ class NotesViewModel(
 
     val reactionTarget = MutableLiveData<PlaneNoteViewData>()
 
+    val submittedNotesOnReaction = MutableLiveData<PlaneNoteViewData>()
+
     val shareTarget = MutableLiveData<PlaneNoteViewData>()
 
     val targetUser = MutableLiveData<User>()
@@ -97,7 +99,7 @@ class NotesViewModel(
                     reaction = reaction,
                     noteId = planeNoteViewData.toShowNote.id
                 )).execute()
-
+                submittedNotesOnReaction.postValue(planeNoteViewData)
             }catch(e: Exception){
                 Log.e("NotesViewModel", "postReaction error", e)
             }
