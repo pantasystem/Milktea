@@ -84,6 +84,8 @@ class NotesViewModel(
 
         viewModelScope.launch(Dispatchers.IO){
             //リアクション解除処理をする
+            submittedNotesOnReaction.postValue(planeNoteViewData)
+            Log.d("NotesViewModel", "postReaction(n, n)")
             try{
                 if(myReaction != null){
                     misskeyAPI.deleteReaction(
@@ -99,7 +101,6 @@ class NotesViewModel(
                     reaction = reaction,
                     noteId = planeNoteViewData.toShowNote.id
                 )).execute()
-                submittedNotesOnReaction.postValue(planeNoteViewData)
             }catch(e: Exception){
                 Log.e("NotesViewModel", "postReaction error", e)
             }

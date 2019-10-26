@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="reaction"
-                type="kotlin.Pair&lt;java.lang.String, java.lang.Integer>" />
+                type="java.lang.String" />
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
@@ -17,8 +17,8 @@
             android:padding="10dp"
             app:reactionImageView="@{reactionImagePreview}"
             app:reactionStringView="@{reactionStringPreview}"
-            app:reaction="@{reaction.first}"
-            android:onClick="@{ ()-> notesViewModel.postReaction(reaction.first) }"
+            app:reaction="@{reaction}"
+            android:onClick="@{ ()-> notesViewModel.postReaction(reaction) }"
             >
 
         <ImageView
@@ -43,6 +43,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_gravity="center"
-                android:text="@{reaction.first}" />
+                android:text="@{reaction}" />
     </LinearLayout>
 </layout>

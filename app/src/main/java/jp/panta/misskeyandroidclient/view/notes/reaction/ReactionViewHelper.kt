@@ -29,7 +29,7 @@ object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")
     @JvmStatic
     fun LinearLayout.setReaction(reactionImageView: ImageView, reactionStringView: TextView, reaction: String) {
-        Log.d("ReactionViewHelper", "reaction $reaction")
+        //Log.d("ReactionViewHelper", "reaction $reaction")
         if(reaction.startsWith(":") && reaction.endsWith(":")){
             val miApplication = this.context.applicationContext as MiApplication
             val emoji = miApplication.nowInstanceMeta?.emojis?.firstOrNull{
@@ -37,7 +37,7 @@ object ReactionViewHelper {
             }
 
             if(emoji != null){
-                Log.d("ReactionViewHelper", "カスタム絵文字を発見した: ${emoji}")
+                //Log.d("ReactionViewHelper", "カスタム絵文字を発見した: ${emoji}")
                 if(emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true|| emoji.uri?.contains("svg") == true){
                     /*GlideApp.with(this.context)
                         .`as`(PictureDrawable::class.java)
@@ -54,7 +54,7 @@ object ReactionViewHelper {
                         .into(reactionImageView)
 
 
-                    Log.d("ReactionViewHolder", "svgを読み込みました")
+                    //Log.d("ReactionViewHolder", "svgを読み込みました")
                 }else{
                     Glide.with(reactionImageView.context)
                         .load(emoji.url?: emoji.uri)
@@ -81,7 +81,7 @@ object ReactionViewHelper {
             reactionImageView.visibility = View.VISIBLE
             reactionStringView.visibility = View.GONE
         }else{
-            Log.d("ReactionViewHelper", "どれにも当てはまらなかった")
+            //Log.d("ReactionViewHelper", "どれにも当てはまらなかった")
             reactionStringView.text = reaction
             reactionImageView.visibility = View.GONE
             reactionStringView.visibility = View.VISIBLE
