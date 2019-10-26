@@ -2,10 +2,10 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
             android:state_checked="true"
-            android:color="#000000"
+            android:color="?attr/colorBottomNavigationSelected"
     />
     <item
             android:state_checked="false"
-            android:color="@color/colorItemNotSelected"/>
-    <item android:color="@color/colorItemNotSelected"/>
+            android:color="?attr/colorBottomNavigationNotSelect"/>
+    <item android:color="?attr/colorBottomNavigationNotSelect"/>
 </selector>

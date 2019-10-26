@@ -12,6 +12,10 @@
         <attr name="colorNormalReactionCounterBackground" format="color"/>
         <attr name="colorSelectedReactionCounterBackground" format="color" />
 
+        <attr name="colorBottomNavigationSelected" format="color"/>
+        <attr name="colorBottomNavigationNotSelect" format="color"/>
+
+        <attr name="colorNoteActionButtonTint" format="color"/>
 
     </declare-styleable>
     <!-- Base application theme. -->
@@ -27,6 +31,8 @@
         <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
         <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
     </style>
     <style name="AppTheme.NoActionBar">
@@ -39,12 +45,14 @@
 
     <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorDarkPrimary</item>
-        <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorDarkPrimary</item>
         <item name="colorAccent">@color/colorDarkAccent</item>
-        <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
-        <item name="colorSurface">@color/colorDarkSurface</item>
-        <item name="android:tint">@color/colorDarkIconTint</item>
+        <item name="android:windowBackground">@color/colorDarkPrimary</item>
+        <item name="colorSurface">@color/colorDarkPrimary</item>
         <item name="android:textColor">@color/colorDarkTextColor</item>
+
+        <item name="colorBottomNavigationSelected">@color/colorDarkTextColor</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
     </style>
 

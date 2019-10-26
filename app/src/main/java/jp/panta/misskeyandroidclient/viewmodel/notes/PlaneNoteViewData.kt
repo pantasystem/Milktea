@@ -67,7 +67,12 @@ class PlaneNoteViewData (private val note: Note){
 
     //val reactionCount: String? = if(toShowNote.reactionCounts?.isNullOrEmpty() == false) toShowNote.reactionCounts?.size.toString() else null
     //val reactionCounts = toShowNote.reactionCounts
-    val reactionCounts = MutableLiveData<LinkedHashMap<String, Int>>(toShowNote.reactionCounts)
+    val reactionCounts = MutableLiveData<LinkedHashMap<String, Int>>(
+        LinkedHashMap(
+            toShowNote.reactionCounts?.filter{
+                it.value > 0
+            }
+    ))
 
     val reactionCount = Transformations.map(reactionCounts){
         var sum = 0
