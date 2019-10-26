@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.notes.CreateReaction
 import jp.panta.misskeyandroidclient.model.notes.DeleteNote
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -23,59 +24,61 @@ class NotesViewModel(
     private val misskeyAPI: MisskeyAPI
 ) : ViewModel(){
 
-    val statusMessage = MutableLiveData<String>()
+    val statusMessage = EventBus<String>()
 
-    val errorStatusMessage = MutableLiveData<String>()
+    val errorStatusMessage = EventBus<String>()
 
-    val reNoteTarget = MutableLiveData<PlaneNoteViewData>()
+    val reNoteTarget = EventBus<PlaneNoteViewData>()
 
-    val quoteRenoteTarget = MutableLiveData<PlaneNoteViewData>()
+    val quoteRenoteTarget = EventBus<PlaneNoteViewData>()
 
-    val replyTarget = MutableLiveData<PlaneNoteViewData>()
+    val replyTarget = EventBus<PlaneNoteViewData>()
 
-    val reactionTarget = MutableLiveData<PlaneNoteViewData>()
+    val reactionTarget = EventBus<PlaneNoteViewData>()
 
-    val submittedNotesOnReaction = MutableLiveData<PlaneNoteViewData>()
+    val submittedNotesOnReaction = EventBus<PlaneNoteViewData>()
 
-    val shareTarget = MutableLiveData<PlaneNoteViewData>()
+    val shareTarget = EventBus<PlaneNoteViewData>()
 
-    val targetUser = MutableLiveData<User>()
+    val targetUser = EventBus<User>()
 
 
     fun setTargetToReNote(note: PlaneNoteViewData){
-        reNoteTarget.postValue(note)
+        //reNoteTarget.postValue(note)
+        Log.d("NotesViewModel", "登録しました: $note")
+        reNoteTarget.event = note
     }
 
     fun setTargetToReply(note: PlaneNoteViewData){
-        replyTarget.postValue(note)
+        replyTarget.event = note
     }
 
     fun setTargetToShare(note: PlaneNoteViewData){
-        shareTarget.postValue(note)
+        shareTarget.event = note
     }
 
     fun setTargetToUser(user: User){
-        targetUser.postValue(user)
+        targetUser.event = user
     }
 
     fun postRenote(){
-        val renoteId = reNoteTarget.value?.toShowNote?.id
+        val renoteId = reNoteTarget.event?.toShowNote?.id
         if(renoteId != null){
             val request = CreateNote(i = connectionInstance.getI()!!, text = null, renoteId = renoteId)
             misskeyAPI.create(request).enqueue(object : Callback<Note?>{
                 override fun onResponse(call: Call<Note?>, response: Response<Note?>) {
-                    statusMessage.postValue("renoteしました")
+                    statusMessage.event = "renoteしました"
                 }
 
                 override fun onFailure(call: Call<Note?>, t: Throwable) {
-                    errorStatusMessage.postValue("renote失敗")
+                    errorStatusMessage.event = "renote失敗しました"
                 }
             })
         }
     }
 
     fun putQuoteRenoteTarget(){
-        quoteRenoteTarget.postValue(reNoteTarget.value)
+        quoteRenoteTarget.event = reNoteTarget.event
     }
 
     //直接送信
@@ -84,7 +87,7 @@ class NotesViewModel(
 
         viewModelScope.launch(Dispatchers.IO){
             //リアクション解除処理をする
-            submittedNotesOnReaction.postValue(planeNoteViewData)
+            submittedNotesOnReaction.event = planeNoteViewData
             Log.d("NotesViewModel", "postReaction(n, n)")
             try{
                 if(myReaction != null){
@@ -109,12 +112,12 @@ class NotesViewModel(
     }
 
     fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData){
-        reactionTarget.postValue(planeNoteViewData)
+        reactionTarget.event = planeNoteViewData
     }
 
     //setTargetToReactionが呼び出されている必要がある
     fun postReaction(reaction: String){
-        val targetNote =  reactionTarget.value
+        val targetNote =  reactionTarget.event
         if(targetNote != null){
             postReaction(targetNote, reaction)
         }

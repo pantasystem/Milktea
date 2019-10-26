@@ -16,29 +16,22 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.message.MessageListFragment
 import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
-import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchFragment
-import jp.panta.misskeyandroidclient.viewmodel.main.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import kotlinx.android.synthetic.main.activity_main.*
+import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.nav_header_main.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -83,11 +76,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val miApplication = application as MiApplication
 
+        var init = false
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
-            init()
-            setHeaderProfile(it, mainBinding)
-            mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
-            initViewModelListener()
+            if(!init){
+                init()
+                setHeaderProfile(it, mainBinding)
+                mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
+                initViewModelListener()
+                init = true
+                Log.d("MainActivity", "初期化処理")
+            }
+
         })
 
         miApplication.isSuccessLoadConnectionInstance.observe(this, Observer {
@@ -132,39 +131,57 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
     }
+    private val replyTargetObserver = Observer<PlaneNoteViewData> {
+        Log.d("MainActivity", "reply clicked :$it")
+    }
 
+    private val reNoteTargetObserver = Observer<PlaneNoteViewData>{
+        Log.d("MainActivity", "renote clicked :$it")
+        val dialog = RenoteBottomSheetDialog()
+        dialog.show(supportFragmentManager, "timelineFragment")
+
+    }
+    private val shareTargetObserver = Observer<PlaneNoteViewData> {
+        Log.d("MainActivity", "share clicked :$it")
+
+    }
+    private val targetUserObserver = Observer<User>{
+        Log.d("MainActivity", "user clicked :$it")
+    }
+
+    private val statusMessageObserver = Observer<String>{
+        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+    }
+
+    private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData>{
+        startActivity(Intent(this, NoteEditorActivity::class.java))
+    }
+
+    private val reactionTargetObserver = Observer<PlaneNoteViewData>{
+        Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
+        ReactionSelectionDialog().show(supportFragmentManager, "MainActivity")
+    }
     private fun initViewModelListener(){
-        mNotesViewModel.replyTarget.observe(this, Observer{
-            Log.d("MainActivity", "reply clicked :$it")
-        })
+        mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
+        mNotesViewModel.replyTarget.observe(this, replyTargetObserver)
 
-        mNotesViewModel.reNoteTarget.observe(this, Observer{
-            Log.d("MainActivity", "renote clicked :$it")
-            val dialog = RenoteBottomSheetDialog()
-            dialog.show(supportFragmentManager, "timelineFragment")
+        mNotesViewModel.reNoteTarget.removeObserver(reNoteTargetObserver)
+        mNotesViewModel.reNoteTarget.observe(this, reNoteTargetObserver)
 
-        })
+        mNotesViewModel.shareTarget.removeObserver(shareTargetObserver)
+        mNotesViewModel.shareTarget.observe(this, shareTargetObserver)
 
-        mNotesViewModel.shareTarget.observe(this, Observer{
-            Log.d("MainActivity", "share clicked :$it")
-        })
+        mNotesViewModel.targetUser.removeObserver(targetUserObserver)
+        mNotesViewModel.targetUser.observe(this, targetUserObserver)
 
-        mNotesViewModel.targetUser.observe(this, Observer{
-            Log.d("MainActivity", "user clicked :$it")
-        })
+        mNotesViewModel.statusMessage.removeObserver(statusMessageObserver)
+        mNotesViewModel.statusMessage.observe(this, statusMessageObserver)
 
-        mNotesViewModel.statusMessage.observe(this, Observer{
-            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-        })
+        mNotesViewModel.quoteRenoteTarget.removeObserver(quoteRenoteTargetObserver)
+        mNotesViewModel.quoteRenoteTarget.observe(this, quoteRenoteTargetObserver)
 
-        mNotesViewModel.quoteRenoteTarget.observe(this, Observer{
-            startActivity(Intent(this, NoteEditorActivity::class.java))
-        })
-
-        mNotesViewModel.reactionTarget.observe(this, Observer{
-            Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
-            ReactionSelectionDialog().show(supportFragmentManager, "MainActivity")
-        })
+        mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
+        mNotesViewModel.reactionTarget.observe(this, reactionTargetObserver)
     }
 
     fun changeTitle(title: String?){
