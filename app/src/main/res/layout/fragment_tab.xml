@@ -9,7 +9,9 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:background="?attr/colorPrimary"
-
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
             android:elevation="4dp"
             android:id="@+id/tabLayout">
 

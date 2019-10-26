@@ -19,6 +19,7 @@ class ReactionCountAdapter(diffUtilCallBack: DiffUtil.ItemCallback<Pair<String, 
         holder.binding.reaction = item//Pair(java.lang.String(item.first), Integer.valueOf(item.second))
         holder.binding.note = note
         holder.binding.notesViewModel = notesViewModel
+        holder.binding.executePendingBindings()
         //holder.binding.lifecycleOwner = lifecycleOwner
     }
 

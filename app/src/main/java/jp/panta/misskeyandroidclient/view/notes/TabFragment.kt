@@ -48,7 +48,9 @@ class TabFragment : Fragment(){
             val testData1 = NoteRequest.Setting(connectionInstance.getI()!!, type = NoteType.HOME)
             val testData2 = NoteRequest.Setting(i = i, type = NoteType.SOCIAL)
             val testData3 = NoteRequest.Setting(i = i, type = NoteType.GLOBAL)
-            val testData4 = NoteRequest.Setting(i = i, type = NoteType.SEARCH, query = "おはよう")
+            val testData4 = NoteRequest.Setting(i = i, type = NoteType.LOCAL)
+
+            //val testData5 = NoteRequest.Setting(i = i, type = NoteType.SEARCH, query = "おはよう")
             val testDataList = listOf(testData1, testData2, testData3, testData4)
             if(testDataList.size <= 1){
                 tabLayout.visibility = View.GONE
