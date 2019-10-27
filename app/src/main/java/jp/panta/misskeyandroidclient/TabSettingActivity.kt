@@ -14,7 +14,7 @@ class TabSettingActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.content_main, TabSettingFragment())
+        ft.replace(R.id.setting_tab_content_main, TabSettingFragment())
         ft.commit()
     }
 

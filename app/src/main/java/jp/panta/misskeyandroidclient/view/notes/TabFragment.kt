@@ -89,7 +89,7 @@ class TabFragment : Fragment(){
 
     private fun makeDefaultNoteSetting(list: List<NoteType>,i: String): List<NoteRequest.Setting>{
         return list.map{
-            NoteRequest.Setting(i = i, type = it)
+            NoteRequest.Setting(type = it)
         }
     }
 

@@ -82,7 +82,7 @@ class TimelineLiveData(
 
             isLoadingFlag = true
 
-            timelineStore(requestBase.buildRequest(NoteRequest.Conditions())).enqueue( object : Callback<List<Note>?>{
+            timelineStore(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions())).enqueue( object : Callback<List<Note>?>{
                 override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
                     val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
                     if(list == null){
@@ -118,7 +118,7 @@ class TimelineLiveData(
                 //初期化処理 or 何もしない
             }else{
 
-                val req = requestBase.buildRequest(NoteRequest.Conditions(sinceId = sinceId))
+                val req = requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(sinceId = sinceId))
                 timelineStore(req).enqueue(object : Callback<List<Note>?> {
                     override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
                         val newNotes = response.body()?.asReversed()
@@ -158,7 +158,7 @@ class TimelineLiveData(
             //何もしない
         }else{
             isLoadingFlag = true
-            val req = requestBase.buildRequest(NoteRequest.Conditions(untilId = untilId))
+            val req = requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(untilId = untilId))
             timelineStore(req).enqueue(object : Callback<List<Note>?>{
                 override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
                     val list = response.body()?.map{ it -> PlaneNoteViewData(it) }

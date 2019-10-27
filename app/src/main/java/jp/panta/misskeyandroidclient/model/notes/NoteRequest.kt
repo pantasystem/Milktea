@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.notes
 
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.io.Serializable
 
 data class NoteRequest(
@@ -24,7 +25,6 @@ data class NoteRequest(
 
     @Entity(tableName = "setting")
     data class Setting(
-        val i: String,
         @TypeConverters(NoteTypeConverter::class) val type: NoteType,
         val userId: String? = null,
         val limit: Int? = null,
@@ -47,9 +47,9 @@ data class NoteRequest(
         @Ignore
         var includeRenotedMyNotes: Boolean? = null
 
-        fun buildRequest(conditions: Conditions): NoteRequest{
+        fun buildRequest(connectionInstance: ConnectionInstance, conditions: Conditions): NoteRequest{
             return NoteRequest(
-                i = i,
+                i = connectionInstance.getI()!!,
                 userId = userId,
                 withFiles = withFiles,
                 fileType = fileType,
