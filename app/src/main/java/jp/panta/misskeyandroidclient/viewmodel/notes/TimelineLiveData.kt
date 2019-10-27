@@ -102,6 +102,7 @@ class TimelineLiveData(
 
                 override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
                     isLoadingFlag = false
+                    isLoading.postValue(false)
                 }
             })
         }

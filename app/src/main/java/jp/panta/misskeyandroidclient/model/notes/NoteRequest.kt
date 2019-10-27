@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
@@ -16,22 +15,37 @@ data class NoteRequest(
     @SerializedName("untilId") val untilId: String? = null,
     @SerializedName("sinceDate") val sinceDate: Long? = null,
     @SerializedName("untilDate") val untilDate: Long? = null,
-    @SerializedName("query") val query: String? = null
+    @SerializedName("query") val query: String? = null,
+    @SerializedName("includeLocalRenotes") val includeLocalRenotes: Boolean? = null,
+    @SerializedName("includeMyRenotes") val includeMyRenotes: Boolean? = null,
+    @SerializedName("includeRenotedMyNotes") val includeRenotedMyNotes: Boolean? = null
+
 ): Serializable{
 
-    @Entity
+    @Entity(tableName = "setting")
     data class Setting(
         val i: String,
-        val type: NoteType,
+        @TypeConverters(NoteTypeConverter::class) val type: NoteType,
         val userId: String? = null,
         val limit: Int? = null,
         val withFiles: Boolean? = null,
         val fileType: String? = null,
         val excludeNsfw: Boolean? = null,
         val query: String? = null
+
     ): Serializable{
         @PrimaryKey(autoGenerate = true)
-        val id: Long? = null
+        var id: Long? = null
+
+        //SharedPreferencesで設定し後付けする
+        @Ignore
+        var includeLocalRenotes: Boolean? = null
+
+        @Ignore
+        var includeMyRenotes: Boolean? = null
+
+        @Ignore
+        var includeRenotedMyNotes: Boolean? = null
 
         fun buildRequest(conditions: Conditions): NoteRequest{
             return NoteRequest(
@@ -44,7 +58,10 @@ data class NoteRequest(
                 sinceId = conditions.sinceId,
                 untilId = conditions.untilId,
                 sinceDate = conditions.sinceDate,
-                untilDate = conditions.untilDate
+                untilDate = conditions.untilDate,
+                includeLocalRenotes = includeLocalRenotes,
+                includeMyRenotes = includeMyRenotes,
+                includeRenotedMyNotes = includeRenotedMyNotes
 
             )
         }
@@ -62,6 +79,19 @@ data class NoteRequest(
     }
     fun makeUntilId(id: String): NoteRequest{
         return this.copy(sinceId = null, untilId = id, untilDate = null, sinceDate = null)
+    }
+
+    class NoteTypeConverter{
+
+        @TypeConverter
+        fun fromNoteType(type: NoteType): String{
+            return type.name
+        }
+
+        @TypeConverter
+        fun fromString(type: String): NoteType{
+            return NoteType.valueOf(type)
+        }
     }
 
 }

@@ -1,6 +1,9 @@
 package jp.panta.misskeyandroidclient.view.notes
 
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 
 import android.view.LayoutInflater
@@ -9,6 +12,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
@@ -19,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_tab.*
 class TabFragment : Fragment(){
 
     companion object{
+
         fun localizationTitle(requestBase: NoteRequest.Setting): String?{
             return when(requestBase.type){
                 NoteType.HOME -> "Home"
@@ -31,6 +36,8 @@ class TabFragment : Fragment(){
         }
 
     }
+    private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //return super.onCreateView(inflater, container, savedInstanceState)
@@ -43,25 +50,47 @@ class TabFragment : Fragment(){
         val miApp = context?.applicationContext as MiApplication
         val connectionInstance = miApp.currentConnectionInstanceLiveData.value
         val i = connectionInstance?.getI()
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
+        val includeMyRenotes = sharedPreferences.getBoolean("includeMyRenotes", true)
+        val includeRenotedMyNotes = sharedPreferences.getBoolean("includeRenotedMyNotes", true)
+        val includeLocalRenotes = sharedPreferences.getBoolean("includeLocalRenotes", true)
+
+        Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
+
         if(i != null){
 
-            val testData1 = NoteRequest.Setting(connectionInstance.getI()!!, type = NoteType.HOME)
-            val testData2 = NoteRequest.Setting(i = i, type = NoteType.SOCIAL)
-            val testData3 = NoteRequest.Setting(i = i, type = NoteType.GLOBAL)
-            //val testData4 = NoteRequest.Setting(i = i, type = NoteType.LOCAL)
+            miApp.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {
+                val settings = if(it.isNullOrEmpty()){
+                    makeDefaultNoteSetting(defaultTabType, i)
+                }else it
 
-            //val testData5 = NoteRequest.Setting(i = i, type = NoteType.SEARCH, query = "おはよう")
-            val testDataList = listOf(testData1, testData2, testData3)
-            if(testDataList.size <= 1){
-                tabLayout.visibility = View.GONE
-            }
-            val adapter = TimelinePagerAdapter(activity?.supportFragmentManager, testDataList)
-            viewPager.adapter = adapter
-            tabLayout.setupWithViewPager(viewPager)
+                settings.forEach{setting ->
+                    setting.includeLocalRenotes = includeLocalRenotes
+                    setting.includeMyRenotes = includeMyRenotes
+                    setting.includeRenotedMyNotes = includeRenotedMyNotes
+                }
+
+                val adapter = TimelinePagerAdapter(activity?.supportFragmentManager, settings)
+                viewPager.adapter = adapter
+                tabLayout.setupWithViewPager(viewPager)
+
+                if(settings.size <= 1){
+                    tabLayout.visibility = View.GONE
+                }
+            })
+
+
         }
 
 
 
+    }
+
+    private fun makeDefaultNoteSetting(list: List<NoteType>,i: String): List<NoteRequest.Setting>{
+        return list.map{
+            NoteRequest.Setting(i = i, type = it)
+        }
     }
 
     class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, val requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){

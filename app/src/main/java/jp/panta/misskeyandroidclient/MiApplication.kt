@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
+import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
@@ -33,6 +34,7 @@ class MiApplication : Application(){
     var connectionInstanceDao: ConnectionInstanceDao? = null
         private set
 
+    var noteRequestSettingDao: NoteRequestSettingDao? = null
     //var currentUserId: String? = null
 
     //private val misskeyAPIService = MisskeyAPIServiceBuilder.build(nowInstance)
@@ -62,6 +64,7 @@ class MiApplication : Application(){
     }*/
 
 
+
     override fun onCreate() {
         super.onCreate()
 
@@ -69,6 +72,8 @@ class MiApplication : Application(){
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database").fallbackToDestructiveMigration().build()
         connectionInstanceDao = database.connectionInstanceDao()
+
+        noteRequestSettingDao = database.noteSettingDao()
 
         val currentUserId = getCurrentUserId()
         GlobalScope.launch{

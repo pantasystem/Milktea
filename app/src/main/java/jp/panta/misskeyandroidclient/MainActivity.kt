@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
                 initViewModelListener()
                 init = true
+                //observeTab()
                 Log.d("MainActivity", "初期化処理")
             }
 
@@ -131,6 +132,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
     }
+
+    /*private fun observeTab(){
+        (application as MiApplication).tabDao?.findAll()?.observe(this, Observer {
+            updateHome()
+        })
+    }*/
+
+    private fun updateHome(){
+        val ci = (application as MiApplication).currentConnectionInstanceLiveData.value
+        if(ci != null){
+            val ft = supportFragmentManager.beginTransaction()
+            val homeFragment = supportFragmentManager.findFragmentByTag("home")
+            if(homeFragment != null){
+                ft.remove(homeFragment)
+            }
+            ft.add(R.id.content_main, TabFragment(), "home")
+
+            ft.commit()
+        }
+    }
+
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "reply clicked :$it")
     }
@@ -308,23 +330,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_home -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
 
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_tools -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
-
+            R.id.nav_setting ->{
+                startActivity(Intent(this, SettingsActivity::class.java))
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
