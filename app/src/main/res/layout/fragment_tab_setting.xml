@@ -13,7 +13,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="8dp"
             >
 
         <TextView
@@ -21,6 +20,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
+                android:background="?attr/colorSurface"
+                android:padding="12dp"
+                android:elevation="4dp"
                 android:text="@string/tab_selected" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -37,6 +39,11 @@
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:layout_marginTop="10dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="?attr/colorSurface"
+                android:padding="12dp"
+                android:elevation="4dp"
                 android:text="@string/tab_selectable" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -54,6 +61,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/save_setting"
+                    android:layout_marginBottom="10dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
                     />
         </LinearLayout>
 

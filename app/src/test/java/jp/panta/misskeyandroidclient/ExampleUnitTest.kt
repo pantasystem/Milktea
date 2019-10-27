@@ -1,5 +1,9 @@
 package jp.panta.misskeyandroidclient
 
+import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import org.junit.Assert
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -12,6 +16,10 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        //assertEquals(4, 2 + 2)
+        val api  =MisskeyAPIServiceBuilder.build("https://misskey.io")
+        val res = api.searchNote(NoteRequest(i = "", query = "おはよう")).execute()
+        println("${res.body()}, ${res.code()}, ${res.message()}")
+        Assert.assertNotEquals(res.body(), null)
     }
 }
