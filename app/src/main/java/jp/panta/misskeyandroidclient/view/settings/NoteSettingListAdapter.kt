@@ -20,7 +20,7 @@ class NoteSettingListAdapter(diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting
 
     abstract class NoteSettingViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
     inner class NoteSettingViewHolder(private val view: View) : NoteSettingViewHolderBase(view){
-        fun onBind(item: NoteRequest.Setting, isSelected: Boolean, position: Int){
+        fun onBind(item: NoteRequest.Setting, isSelected: Boolean){
             view.setting_title.text = TabFragment.localizationTitle(item)
             if(isSelected){
                 view.add_or_remove_icon.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp)
@@ -28,7 +28,7 @@ class NoteSettingListAdapter(diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting
                 view.add_or_remove_icon.setImageResource(R.drawable.ic_add_circle_outline_black_24dp)
             }
             view.add_or_remove_icon.setOnClickListener {
-                listener.onClick(position)
+                listener.onClick(item)
             }
         }
     }
@@ -36,7 +36,7 @@ class NoteSettingListAdapter(diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting
 
     override fun onBindViewHolder(holder: NoteSettingViewHolder, position: Int) {
         val item = getItem(position)
-        holder.onBind(item, isSelected, position)
+        holder.onBind(item, isSelected)
 
     }
 
@@ -48,6 +48,6 @@ class NoteSettingListAdapter(diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting
     }
 
     interface ItemAddOrRemoveButtonClickedListener{
-        fun onClick(position: Int)
+        fun onClick(item: NoteRequest.Setting)
     }
 }

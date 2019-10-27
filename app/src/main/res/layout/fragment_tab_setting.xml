@@ -1,53 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-            android:id="@+id/textView9"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:text="@string/tab_selected" />
-
-    <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/selected_tab_list"
-            tools:layout_height="wrap_content"
-            tools:layout_weight="0"
-            />
-
-    <TextView
-            android:id="@+id/textView13"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:layout_marginTop="10dp"
-            android:text="@string/tab_selectable" />
-
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/selectable_tab_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+<androidx.core.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+    >
     <LinearLayout
+
+
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp"
+            >
 
-
-        <Button
-                android:id="@+id/save_setting"
+        <TextView
+                android:id="@+id/textView9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/save_setting" />
+                android:textSize="24sp"
+                android:text="@string/tab_selected" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selected_tab_list"
+                tools:layout_height="wrap_content"
+                tools:layout_weight="0"
+                />
+
+        <TextView
+                android:id="@+id/textView13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:layout_marginTop="10dp"
+                android:text="@string/tab_selectable" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/selectable_tab_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+            <Button
+                    android:id="@+id/save_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/save_setting"
+                    />
+        </LinearLayout>
+
+
     </LinearLayout>
-
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

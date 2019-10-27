@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.view.settings
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,12 +17,13 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import kotlinx.android.synthetic.main.fragment_tab_setting.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class TabSettingFragment : Fragment(){
 
     private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
-
-    //private lateinit var mAdapter: NoteSettingListAdapter
 
     val mSelectedListLiveData = MutableLiveData<List<NoteRequest.Setting>>()
 
@@ -42,22 +44,26 @@ class TabSettingFragment : Fragment(){
         val miApplication = context?.applicationContext as MiApplication
 
         val selectedTabAdapter = NoteSettingListAdapter(diffUtilCallBack,true, object : NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener{
-            override fun onClick(position: Int) {
+            override fun onClick(item: NoteRequest.Setting) {
                 val list = mSelectedListLiveData.value?: return
                 val arrayList = ArrayList<NoteRequest.Setting>(list)
-                arrayList.removeAt(position)
+                arrayList.remove(item)
                 mSelectedListLiveData.value = arrayList
+                mSelectableListLiveData.value = notSelectedSettings(arrayList)
             }
         })
 
-        //TODO search, search_hashの場合ワード入力画面を表示する
         val selectableTabAdapter = NoteSettingListAdapter(diffUtilCallBack, false, object : NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener{
-            override fun onClick(position: Int) {
+            override fun onClick(item: NoteRequest.Setting) {
+                when(item.type){
+                    NoteType.SEARCH, NoteType.SEARCH_HASH -> return
+                }
                 val list = mSelectedListLiveData.value?: return
-                val selectableList = mSelectableListLiveData.value?: return
+                //val selectableList = mSelectableListLiveData.value?: return
                 val arrayList = ArrayList<NoteRequest.Setting>(list)
-                arrayList.add(selectableList[position])
-                mSelectedListLiveData.postValue(arrayList)
+                arrayList.add(item)
+                mSelectedListLiveData.value = arrayList
+                mSelectableListLiveData.value = notSelectedSettings(arrayList)
             }
         })
 
@@ -79,11 +85,11 @@ class TabSettingFragment : Fragment(){
             }else{
                 it
             }
-            //val selectableList = notSelectedSettings(list)
+            val selectableList = notSelectedSettings(list)
             mSelectedListLiveData.postValue(list)
+            mSelectableListLiveData.postValue(selectableList)
 
         })
-        mSelectableListLiveData.postValue(getDefaultSettings())
 
 
 
@@ -96,8 +102,27 @@ class TabSettingFragment : Fragment(){
             selectableTabAdapter.submitList(it)
         })
 
+        save_setting.setOnClickListener {
+            saveTabs()
+        }
+
     }
 
+    private fun saveTabs(){
+        GlobalScope.launch{
+            val miApplication = context?.applicationContext as MiApplication?
+            val dao = miApplication?.noteRequestSettingDao?: return@launch
+
+            val selectedList = mSelectedListLiveData.value?: return@launch
+            dao.deleteAll()
+
+            for(n in 0.until(selectedList.size)){
+                selectedList[n].id = n.toLong()
+            }
+            dao.insertAll(selectedList)
+            Log.d("TabSettingFragment", "設定完了")
+        }
+    }
 
 
     private fun defaultTabVisibleSettings(): List<NoteRequest.Setting>{
@@ -158,7 +183,7 @@ class TabSettingFragment : Fragment(){
         }
     }
 
-    val diffUtilCallBack  =object : DiffUtil.ItemCallback<NoteRequest.Setting>(){
+    private val diffUtilCallBack  =object : DiffUtil.ItemCallback<NoteRequest.Setting>(){
         override fun areContentsTheSame(
             oldItem: NoteRequest.Setting,
             newItem: NoteRequest.Setting
