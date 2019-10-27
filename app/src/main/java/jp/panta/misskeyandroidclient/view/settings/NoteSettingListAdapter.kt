@@ -16,53 +16,38 @@ import java.io.Serializable
 import java.lang.ClassCastException
 import java.lang.IllegalArgumentException
 
-class NoteSettingListAdapter(diffUtil: DiffUtil.ItemCallback<Serializable>) : ListAdapter<Serializable, NoteSettingListAdapter.NoteSettingViewHolderBase>(diffUtil){
-    companion object{
-        private const val TYPE_SETTING = 0
-        private const val TYPE_TITLE = 1
-    }
+class NoteSettingListAdapter(diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting>, private val isSelected: Boolean, private val listener: ItemAddOrRemoveButtonClickedListener) : ListAdapter<NoteRequest.Setting, NoteSettingListAdapter.NoteSettingViewHolder>(diffUtil){
 
     abstract class NoteSettingViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
-    class NoteSettingViewHolder(private val view: View) : NoteSettingViewHolderBase(view){
-        fun onBind(item: NoteRequest.Setting){
+    inner class NoteSettingViewHolder(private val view: View) : NoteSettingViewHolderBase(view){
+        fun onBind(item: NoteRequest.Setting, isSelected: Boolean, position: Int){
             view.setting_title.text = TabFragment.localizationTitle(item)
-        }
-    }
-    class NoteSettingBoundViewHolder(private val view: View) : NoteSettingViewHolderBase(view){
-        fun onBind(item: SettingTitle){
-            view.setting_bound_title.text = item.title
-        }
-    }
-
-
-
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is NoteRequest.Setting -> TYPE_SETTING
-            is SettingTitle -> TYPE_TITLE
-            else -> throw ClassCastException("NoteRequest.Setting.class, SettingTitleのみしか許可されていません")
-        }
-    }
-    override fun onBindViewHolder(holder: NoteSettingViewHolderBase, position: Int) {
-        val item = getItem(position)
-        if(item is SettingTitle && holder is NoteSettingBoundViewHolder){
-            holder.onBind(item)
-        }else if(item is NoteRequest.Setting && holder is NoteSettingViewHolder){
-            holder.onBind(item)
-        }else{
-            Log.e("NoteSettingListAdapter", "不明な型ですbindに失敗しました")
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteSettingViewHolderBase {
-        return when(viewType){
-            TYPE_SETTING ->{
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_note_setting, parent, false)
-                NoteSettingViewHolder(view)
+            if(isSelected){
+                view.add_or_remove_icon.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp)
+            }else{
+                view.add_or_remove_icon.setImageResource(R.drawable.ic_add_circle_outline_black_24dp)
             }
-            TYPE_TITLE -> NoteSettingBoundViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_note_setting_bound, parent, false))
-            else -> throw IllegalArgumentException("ViewTypeが異常ですNoteSettingListAdapterに問題があります")
+            view.add_or_remove_icon.setOnClickListener {
+                listener.onClick(position)
+            }
         }
+    }
 
+
+    override fun onBindViewHolder(holder: NoteSettingViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.onBind(item, isSelected, position)
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteSettingViewHolder {
+
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_note_setting, parent, false)
+        return NoteSettingViewHolder(view)
+
+    }
+
+    interface ItemAddOrRemoveButtonClickedListener{
+        fun onClick(position: Int)
     }
 }

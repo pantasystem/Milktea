@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
@@ -11,10 +12,21 @@
         android:paddingEnd="16sp"
         >
 
+    <ImageView
+            android:id="@+id/add_or_remove_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
+            android:layout_marginEnd="4dp"
+            />
+
     <TextView
             android:id="@+id/setting_title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
             tools:text="Home" />
 </LinearLayout>

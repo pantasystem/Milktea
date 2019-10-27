@@ -9,23 +9,38 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <TextView
+            android:id="@+id/textView9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:text="@string/tab_selected" />
+
     <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:id="@+id/setting_note_list_view"
+            android:layout_height="wrap_content"
+            android:id="@+id/selected_tab_list"
+            tools:layout_height="wrap_content"
+            tools:layout_weight="0"
             />
 
+    <TextView
+            android:id="@+id/textView13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:layout_marginTop="10dp"
+            android:text="@string/tab_selectable" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/selectable_tab_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <Button
-                android:id="@+id/add_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/add_search" />
 
         <Button
                 android:id="@+id/save_setting"
@@ -33,4 +48,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/save_setting" />
     </LinearLayout>
+
+
 </LinearLayout>

@@ -16,7 +16,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import kotlinx.android.synthetic.main.fragment_tab_setting.*
-import java.io.Serializable
 
 class TabSettingFragment : Fragment(){
 
@@ -24,7 +23,9 @@ class TabSettingFragment : Fragment(){
 
     //private lateinit var mAdapter: NoteSettingListAdapter
 
-    val mListLiveData = MutableLiveData<List<Serializable>>()
+    val mSelectedListLiveData = MutableLiveData<List<NoteRequest.Setting>>()
+
+    val mSelectableListLiveData = MutableLiveData<List<NoteRequest.Setting>>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,64 +41,64 @@ class TabSettingFragment : Fragment(){
 
         val miApplication = context?.applicationContext as MiApplication
 
-        val adapter = NoteSettingListAdapter(object : DiffUtil.ItemCallback<Serializable>(){
-            override fun areContentsTheSame(oldItem: Serializable, newItem: Serializable): Boolean {
-                return if(oldItem is NoteRequest.Setting && newItem is NoteRequest.Setting){
-                    return newItem.equals(oldItem)
-                }else if(oldItem is SettingTitle && newItem is SettingTitle){
-                    //oldItem.title == newItem.title
-                    return oldItem.equals(newItem)
-                }else{
-                    false
-                }
-            }
-
-            override fun areItemsTheSame(oldItem: Serializable, newItem: Serializable): Boolean {
-                return if(oldItem is NoteRequest.Setting && newItem is NoteRequest.Setting){
-                    return newItem.equals(oldItem)
-                }else if(oldItem is SettingTitle && newItem is SettingTitle){
-                    //oldItem.title == newItem.title
-                    return oldItem.equals(newItem)
-                }else{
-                    false
-                }
+        val selectedTabAdapter = NoteSettingListAdapter(diffUtilCallBack,true, object : NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener{
+            override fun onClick(position: Int) {
+                val list = mSelectedListLiveData.value?: return
+                val arrayList = ArrayList<NoteRequest.Setting>(list)
+                arrayList.removeAt(position)
+                mSelectedListLiveData.value = arrayList
             }
         })
 
-        setting_note_list_view.layoutManager = LinearLayoutManager(this.context)
-        setting_note_list_view.adapter = adapter
+        //TODO search, search_hashの場合ワード入力画面を表示する
+        val selectableTabAdapter = NoteSettingListAdapter(diffUtilCallBack, false, object : NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener{
+            override fun onClick(position: Int) {
+                val list = mSelectedListLiveData.value?: return
+                val selectableList = mSelectableListLiveData.value?: return
+                val arrayList = ArrayList<NoteRequest.Setting>(list)
+                arrayList.add(selectableList[position])
+                mSelectedListLiveData.postValue(arrayList)
+            }
+        })
+
+
+
+        selected_tab_list.layoutManager = LinearLayoutManager(this.context)
+        selected_tab_list.adapter = selectedTabAdapter
         val touchHelper = ItemTouchHelper(ItemTouchCallBack())
-        touchHelper.attachToRecyclerView(setting_note_list_view)
-        setting_note_list_view.addItemDecoration(touchHelper)
+        touchHelper.attachToRecyclerView(selected_tab_list)
+        selected_tab_list.addItemDecoration(touchHelper)
+
+        selectable_tab_list.layoutManager = LinearLayoutManager(this.context)
+        selectable_tab_list.adapter = selectableTabAdapter
+
 
         miApplication.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {
             val list = if(it.isNullOrEmpty()){
-                makeList(defaultTabVisibleSettings())
+                defaultTabVisibleSettings()
             }else{
-                makeList(it)
+                it
             }
-            mListLiveData.postValue(list)
+            //val selectableList = notSelectedSettings(list)
+            mSelectedListLiveData.postValue(list)
 
         })
+        mSelectableListLiveData.postValue(getDefaultSettings())
 
-        mListLiveData.observe(viewLifecycleOwner, Observer {
-            adapter.submitList(it)
+
+
+
+        mSelectedListLiveData.observe(viewLifecycleOwner, Observer {
+            selectedTabAdapter.submitList(it)
+        })
+
+        mSelectableListLiveData.observe(viewLifecycleOwner, Observer {
+            selectableTabAdapter.submitList(it)
         })
 
     }
 
-    private fun makeList(selectedList: List<NoteRequest.Setting>): List<Serializable>{
-        val notSelectedList = notSelectedSettings(selectedList)
-        val notSelected = SettingTitle("未選択")
-        val selected = SettingTitle("選択済み")
-        return ArrayList<Serializable>().apply{
-            add(selected)
-            addAll(selectedList)
-            add(notSelected)
-            addAll(notSelectedList)
-        }
 
-    }
 
     private fun defaultTabVisibleSettings(): List<NoteRequest.Setting>{
         return defaultTabType.map{
@@ -107,9 +108,15 @@ class TabSettingFragment : Fragment(){
 
     private fun notSelectedSettings(selectedSettings: List<NoteRequest.Setting>): List<NoteRequest.Setting>{
         return getDefaultSettings().filter{out ->
-            selectedSettings.none { inner ->
-                out.type == inner.type
+            if(out.type == NoteType.SEARCH_HASH || out.type == NoteType.SEARCH){
+                true
+            }else{
+                selectedSettings.none { inner ->
+                    out.type == inner.type
+                }
             }
+
+
         }
     }
 
@@ -136,18 +143,34 @@ class TabSettingFragment : Fragment(){
 
             val from = viewHolder.adapterPosition
             val to = target.adapterPosition
-            val list = mListLiveData.value?: return false
+            val list = mSelectedListLiveData.value?: return false
 
-            val arrayList = ArrayList<Serializable>(list)
+            val arrayList = ArrayList<NoteRequest.Setting>(list)
             val data =arrayList.removeAt(from)
             arrayList.add(to, data)
-            mListLiveData.value = arrayList
+            mSelectedListLiveData.value = arrayList
 
             return true
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             //何もしない
+        }
+    }
+
+    val diffUtilCallBack  =object : DiffUtil.ItemCallback<NoteRequest.Setting>(){
+        override fun areContentsTheSame(
+            oldItem: NoteRequest.Setting,
+            newItem: NoteRequest.Setting
+        ): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(
+            oldItem: NoteRequest.Setting,
+            newItem: NoteRequest.Setting
+        ): Boolean {
+            return oldItem == newItem
         }
     }
 }
