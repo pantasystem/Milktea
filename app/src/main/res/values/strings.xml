@@ -47,4 +47,7 @@
     <string name="nav_like">お気に入り</string>
     <string name="nav_list">リスト</string>
     <string name="nav_cloud">ドライブ</string>
+    <string name="nav_setting_tab">タブを設定</string>
+    <string name="add_search">検索を追加する</string>
+    <string name="save_setting">設定を保存する</string>
 </resources>

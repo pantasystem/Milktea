@@ -14,9 +14,10 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".TabSettingActivity"></activity>
         <activity
                 android:name=".SettingsActivity"
-                android:label="@string/title_activity_settings"></activity>
+                android:label="@string/title_activity_settings" />
         <activity android:name=".NoteEditorActivity" />
         <activity android:name=".AuthCallBackActivity">
             <intent-filter tools:ignore="AppLinkUrlError">

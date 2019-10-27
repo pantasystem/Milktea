@@ -323,6 +323,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.action_tab_setting-> {
+                startActivity(Intent(this,TabSettingActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
