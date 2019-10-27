@@ -17,6 +17,7 @@
 
         <attr name="colorNoteActionButtonTint" format="color"/>
 
+
     </declare-styleable>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
@@ -34,6 +35,7 @@
         <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
+        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
     </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -53,9 +55,10 @@
 
         <item name="colorBottomNavigationSelected">@color/colorDarkTextColor</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
+        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
+
 
     </style>
 
-    
 
 </resources>

@@ -3,7 +3,7 @@
     <color name="colorPrimary">#FFFFFF</color>
     <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorLightSurface">#FFFFFF</color>
-    <color name="colorAccent">#007FDF</color>
+    <color name="colorAccent">#000000</color>
     <color name="colorNormalIconTint">#263238</color>
     <color name="colorItemNotSelected">#5F5F5F</color>
     <color name="colorItemSelected">#202020</color>
