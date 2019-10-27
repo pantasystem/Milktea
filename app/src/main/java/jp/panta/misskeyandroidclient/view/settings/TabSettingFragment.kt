@@ -5,9 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -18,6 +21,10 @@ import java.io.Serializable
 class TabSettingFragment : Fragment(){
 
     private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
+
+    //private lateinit var mAdapter: NoteSettingListAdapter
+
+    val mListLiveData = MutableLiveData<List<Serializable>>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,6 +66,9 @@ class TabSettingFragment : Fragment(){
 
         setting_note_list_view.layoutManager = LinearLayoutManager(this.context)
         setting_note_list_view.adapter = adapter
+        val touchHelper = ItemTouchHelper(ItemTouchCallBack())
+        touchHelper.attachToRecyclerView(setting_note_list_view)
+        setting_note_list_view.addItemDecoration(touchHelper)
 
         miApplication.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {
             val list = if(it.isNullOrEmpty()){
@@ -66,8 +76,12 @@ class TabSettingFragment : Fragment(){
             }else{
                 makeList(it)
             }
-            adapter.submitList(list)
+            mListLiveData.postValue(list)
 
+        })
+
+        mListLiveData.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
         })
 
     }
@@ -110,6 +124,30 @@ class TabSettingFragment : Fragment(){
             }
 
 
+        }
+    }
+
+    inner class ItemTouchCallBack : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.ACTION_STATE_IDLE){
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+
+            val from = viewHolder.adapterPosition
+            val to = target.adapterPosition
+            val list = mListLiveData.value?: return false
+
+            val arrayList = ArrayList<Serializable>(list)
+            val data =arrayList.removeAt(from)
+            arrayList.add(to, data)
+            mListLiveData.value = arrayList
+
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            //何もしない
         }
     }
 }
