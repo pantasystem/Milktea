@@ -23,6 +23,7 @@ class NoteTimelineStore(
         NoteType.SEARCH -> misskeyAPI::searchNote
         NoteType.SEARCH_HASH -> misskeyAPI::searchByTag
         NoteType.USER -> misskeyAPI::userNotes
+        NoteType.FEATURED -> misskeyAPI::featured
         NoteType.FAVORITE -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
     }
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {

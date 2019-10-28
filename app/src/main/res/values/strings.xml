@@ -52,4 +52,5 @@
     <string name="save_setting">設定を保存する</string>
     <string name="tab_selected">追加済み</string>
     <string name="tab_selectable">以下から追加</string>
+    <string name="title_featured">ハイライト</string>
 </resources>

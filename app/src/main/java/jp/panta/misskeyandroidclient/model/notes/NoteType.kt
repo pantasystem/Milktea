@@ -8,6 +8,7 @@ enum class NoteType{
     SEARCH,
     SEARCH_HASH,
     USER,
-    FAVORITE
+    FAVORITE,
+    FEATURED
     //USER_PINは別
 }

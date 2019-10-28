@@ -34,6 +34,9 @@ interface MisskeyAPI {
     @POST("api/notes/search")
     fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
+    @POST("api/notes/featured")
+    fun featured(@Body noteRequest: NoteRequest): Call<List<Note>?>
+
     //timeline
     @POST("api/notes/timeline")
     fun homeTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>

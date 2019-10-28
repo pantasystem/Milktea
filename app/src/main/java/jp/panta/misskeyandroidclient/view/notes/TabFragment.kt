@@ -33,6 +33,7 @@ class TabFragment : Fragment(){
                 NoteType.SEARCH, NoteType.SEARCH_HASH -> requestBase.query
                 NoteType.USER -> requestBase.userId
                 NoteType.FAVORITE -> "Favorite"
+                NoteType.FEATURED -> "Featured"
             }
         }
 

@@ -27,7 +27,7 @@ import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
-import jp.panta.misskeyandroidclient.view.search.SearchFragment
+import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
@@ -267,7 +267,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun newFragmentByTag(tag: String): Fragment{
         return when(tag){
             "home" -> TabFragment()
-            "search" -> SearchFragment()
+            "search" -> SearchTopFragment()
             "notification" -> NotificationFragment()
             "message" -> MessageListFragment()
             else -> throw IllegalArgumentException("サポートしていないタグです")
