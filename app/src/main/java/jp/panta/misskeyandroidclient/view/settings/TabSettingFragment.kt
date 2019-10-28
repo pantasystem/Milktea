@@ -146,11 +146,13 @@ class TabSettingFragment : Fragment(){
     }
 
     private fun getDefaultSettings(): List<NoteRequest.Setting>{
-        return listOf(NoteType.HOME, NoteType.LOCAL, NoteType.GLOBAL, NoteType.SOCIAL, NoteType.SEARCH, NoteType.SEARCH_HASH, NoteType.FAVORITE).map{
+        return NoteType.values().map{
             if(it == NoteType.SEARCH){
                 NoteRequest.Setting(type = it, query = "検索")
             }else if(it == NoteType.SEARCH_HASH){
                 NoteRequest.Setting(type = it, query = "#検索")
+            }else if(it == NoteType.USER){
+                NoteRequest.Setting(type = it)
             }else{
                 NoteRequest.Setting(type = it)
             }
