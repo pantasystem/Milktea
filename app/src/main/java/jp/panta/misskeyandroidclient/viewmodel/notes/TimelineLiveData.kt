@@ -10,23 +10,27 @@ import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 
 class TimelineLiveData(
-    private val connectionInstance: ConnectionInstance,
     private val requestBase: NoteRequest.Setting,
-    misskeyAPI: MisskeyAPI,
+    private val notePagedStore: NotePagedStore,
     private val noteCapture: NoteCapture,
-    private val timelineCapture: TimelineCapture?
+    private val timelineCapture: TimelineCapture?,
+    private val coroutineScope: CoroutineScope
 ) : MutableLiveData<TimelineState>(){
 
     var isLoading =  MutableLiveData<Boolean>()
 
     //private val misskeyAPI = MisskeyAPIServiceBuilder.build(connectionInstance.instanceBaseUrl)
 
-    private val timelineStore = when(requestBase.type){
+    /*private val timelineStore = when(requestBase.type){
         NoteType.HOME -> misskeyAPI::homeTimeline
         NoteType.LOCAL -> misskeyAPI::localTimeline
         NoteType.SOCIAL -> misskeyAPI::hybridTimeline
@@ -35,7 +39,7 @@ class TimelineLiveData(
         NoteType.SEARCH_HASH -> misskeyAPI::searchByTag
         NoteType.USER -> misskeyAPI::userNotes
 
-    }
+    }*/
 
     private var isLoadingFlag = false
 
@@ -82,29 +86,29 @@ class TimelineLiveData(
 
             isLoadingFlag = true
 
-            timelineStore(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions())).enqueue( object : Callback<List<Note>?>{
-                override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
-                    val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
-                    if(list == null){
+            coroutineScope.launch(Dispatchers.IO){
+                try{
+                    val response = notePagedStore.loadInit()
+                    val list = response.second
+                    if(list == null || list.isEmpty()){
                         isLoadingFlag = false
-                        return
+                        isLoading.postValue(false)
+                        return@launch
+                    }else{
+                        val state = TimelineState(list, TimelineState.State.INIT)
+                        postValue(state)
+                        noteCapture.addAll(list)
+                        isLoadingFlag = false
+
                     }
 
-                    //observableTimelineList.clear()
-                    //observableTimelineList.addAll(list)
-                    noteCapture.addAll(list)
-                    val state = TimelineState(list, TimelineState.State.INIT)
-                    postValue(state)
-                    isLoadingFlag = false
-
-                    //test()
-                }
-
-                override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
+                }catch(e: IOException){
                     isLoadingFlag = false
                     isLoading.postValue(false)
                 }
-            })
+
+            }
+
         }
     }
 
@@ -116,37 +120,38 @@ class TimelineLiveData(
             if(sinceId == null){
                 isLoadingFlag = false
                 //初期化処理 or 何もしない
-            }else{
-
-                val req = requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(sinceId = sinceId))
-                timelineStore(req).enqueue(object : Callback<List<Note>?> {
-                    override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
-                        val newNotes = response.body()?.asReversed()
+                isLoading.postValue(false)
+                return
+            }
+            coroutineScope.launch(Dispatchers.IO){
+                try{
+                    val res = notePagedStore.loadNew(sinceId)
+                    val list = res.second
+                    if(list == null || list.isEmpty()){
                         isLoadingFlag = false
-                        val planeNotes = newNotes?.map{ it -> PlaneNoteViewData(it) }
-                            ?: return
+                        isLoading.postValue(false)
+                        return@launch
+                    }else{
+                        noteCapture.addAll(list)
 
-                        noteCapture.addAll(planeNotes)
-                        //observableTimelineList.addAll(0, planeNotes)
-                        var state = value
-                        state = if(state == null){
-                            TimelineState(planeNotes, TimelineState.State.LOAD_NEW)
+                        val state = value
+                        val newState = if(state == null){
+                            TimelineState(list, TimelineState.State.LOAD_NEW)
                         }else{
                             val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
-                                addAll(0, planeNotes)
+                                addAll(0, list)
                             }
                             TimelineState(newList, TimelineState.State.LOAD_NEW)
                         }
-                        postValue(state)
-                        isLoading.postValue(false)
-
-                    }
-
-                    override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
+                        postValue(newState)
                         isLoadingFlag = false
                         isLoading.postValue(false)
                     }
-                })
+                }catch(e: IOException){
+                    isLoadingFlag = false
+                    isLoading.postValue(false)
+                }
+
             }
 
         }
@@ -154,24 +159,22 @@ class TimelineLiveData(
 
     fun loadOld(){
         val untilId = value?.getUntilId()
-        if(  isLoadingFlag || untilId == null){
-            //何もしない
-        }else{
-            isLoadingFlag = true
-            val req = requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(untilId = untilId))
-            timelineStore(req).enqueue(object : Callback<List<Note>?>{
-                override fun onResponse(call: Call<List<Note>?>, response: Response<List<Note>?>) {
-                    val list = response.body()?.map{ it -> PlaneNoteViewData(it) }
-
-                    if(list == null){
-                        isLoadingFlag = false
-                        return
-                    }
-
+        if( isLoadingFlag || untilId == null){
+            return
+        }
+        isLoadingFlag = true
+        coroutineScope.launch(Dispatchers.IO){
+            try {
+                val res = notePagedStore.loadOld(untilId)
+                val list = res.second
+                if(list == null || list.isEmpty()){
+                    isLoadingFlag = false
+                    return@launch
+                }else{
                     noteCapture.addAll(list)
-                    //observableTimelineList.addAll(list)
-                    var state = value
-                    state = if(state == null){
+                    val state = value
+
+                    val newState = if(state == null){
                         TimelineState(list, TimelineState.State.LOAD_OLD)
                     }else{
                         val newList = ArrayList<PlaneNoteViewData>(state.notes).apply{
@@ -179,16 +182,16 @@ class TimelineLiveData(
                         }
                         TimelineState(newList, TimelineState.State.LOAD_OLD)
                     }
-                    postValue(state)
-                    isLoadingFlag = false
-
-                }
-                override fun onFailure(call: Call<List<Note>?>, t: Throwable) {
+                    postValue(newState)
                     isLoadingFlag = false
                 }
-            })
-
+            }catch (e: IOException){
+                isLoadingFlag = false
+            }
         }
+
+
+
     }
 
     private val timelineObserver = object : TimelineCapture.Observer{

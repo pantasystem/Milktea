@@ -3,30 +3,33 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.notes.timelines.NoteTimelineStore
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
+import kotlin.coroutines.coroutineContext
 
 class TimelineViewModel(
     connectionInstance: ConnectionInstance,
     requestBaseSetting: NoteRequest.Setting,
     misskeyAPI: MisskeyAPI,
-    private val noteCapture: NoteCapture,
-    private val timelineCapture: TimelineCapture?
+    noteCapture: NoteCapture,
+    timelineCapture: TimelineCapture?
 ) : ViewModel(){
 
     val errorState = MediatorLiveData<String>()
 
     //private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
 
-    private val timelineLiveData = TimelineLiveData(connectionInstance, requestBaseSetting, misskeyAPI, noteCapture, timelineCapture)
+    private val notePagingStore = NoteTimelineStore(connectionInstance, requestBaseSetting, misskeyAPI)
+
+    private val timelineLiveData = TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, timelineCapture, viewModelScope)
 
     val isLoading = timelineLiveData.isLoading
 

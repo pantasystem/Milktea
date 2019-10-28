@@ -15,10 +15,10 @@ data class TimelineState(
     }
 
     fun getSinceId(): String?{
-        return notes.firstOrNull()?.id
+        return notes.firstOrNull()?.getRequestId()
     }
 
     fun getUntilId(): String?{
-        return notes.lastOrNull()?.id
+        return notes.lastOrNull()?.getRequestId()
     }
 }

@@ -5,9 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.notes.Note
 
-class PlaneNoteViewData (private val note: Note){
+open class PlaneNoteViewData (private val note: Note) : NoteViewData{
 
     val id = note.id
+
+    override fun getRequestId(): String {
+        return id
+    }
 
     val toShowNote: Note
         get() {
