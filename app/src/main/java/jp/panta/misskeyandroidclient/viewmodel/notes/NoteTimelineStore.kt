@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.notes.timelines
+package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
@@ -6,9 +6,8 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotePagedStore
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Response
+import java.lang.IllegalArgumentException
 
 class NoteTimelineStore(
     override val connectionInstance: ConnectionInstance,
@@ -24,7 +23,7 @@ class NoteTimelineStore(
         NoteType.SEARCH -> misskeyAPI::searchNote
         NoteType.SEARCH_HASH -> misskeyAPI::searchByTag
         NoteType.USER -> misskeyAPI::userNotes
-
+        NoteType.FAVORITE -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
     }
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){

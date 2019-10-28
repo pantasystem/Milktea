@@ -7,6 +7,7 @@ enum class NoteType{
     GLOBAL,
     SEARCH,
     SEARCH_HASH,
-    USER
+    USER,
+    FAVORITE
     //USER_PINは別
 }

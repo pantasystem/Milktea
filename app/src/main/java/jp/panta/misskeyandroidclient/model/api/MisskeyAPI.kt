@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.AppSecret
 import jp.panta.misskeyandroidclient.model.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.UserKey
+import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -54,6 +55,9 @@ interface MisskeyAPI {
     @POST("api/users/notes")
     fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
+    //account
+    @POST("api/i/favorites")
+    fun favorites(@Body noteRequest: NoteRequest): Call<List<Favorite>?>
 
     //meta
     @POST("api/meta")

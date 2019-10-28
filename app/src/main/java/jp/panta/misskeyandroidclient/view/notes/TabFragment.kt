@@ -32,6 +32,7 @@ class TabFragment : Fragment(){
                 NoteType.GLOBAL -> "Global"
                 NoteType.SEARCH, NoteType.SEARCH_HASH -> requestBase.query
                 NoteType.USER -> requestBase.userId
+                NoteType.FAVORITE -> "Favorite"
             }
         }
 

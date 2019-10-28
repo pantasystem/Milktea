@@ -9,11 +9,10 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
-import jp.panta.misskeyandroidclient.model.notes.timelines.NoteTimelineStore
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.TimelineState
-import kotlin.coroutines.coroutineContext
+import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 
 class TimelineViewModel(
     connectionInstance: ConnectionInstance,
@@ -27,8 +26,20 @@ class TimelineViewModel(
 
     //private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
 
-    private val notePagingStore = NoteTimelineStore(connectionInstance, requestBaseSetting, misskeyAPI)
+    /*private val notePagingStore = NoteTimelineStore(
+        connectionInstance,
+        requestBaseSetting,
+        misskeyAPI
+    )*/
 
+    private val notePagingStore = when(requestBaseSetting.type){
+        NoteType.FAVORITE -> FavoriteNotePagingStore(connectionInstance, requestBaseSetting, misskeyAPI)
+        else -> NoteTimelineStore(
+            connectionInstance,
+            requestBaseSetting,
+            misskeyAPI
+        )
+    }
     private val timelineLiveData = TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, timelineCapture, viewModelScope)
 
     val isLoading = timelineLiveData.isLoading
