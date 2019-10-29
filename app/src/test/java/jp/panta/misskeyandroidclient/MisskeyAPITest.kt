@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient
 
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import org.junit.Assert
 import org.junit.Test
@@ -17,5 +18,14 @@ class MisskeyAPITest {
         println(list)
         Assert.assertNotEquals(list, null)
         assert(! list.isNullOrEmpty())
+    }
+
+    @Test
+    fun testGetMeta(){
+        val res = misskeyAPI.getMeta(RequestMeta()).execute()
+        val meta = res.body()
+        println(meta)
+        Assert.assertNotEquals(meta, null)
+
     }
 }

@@ -1,6 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel
-
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+package jp.panta.misskeyandroidclient.viewmodel.notes
 
 data class TimelineState(
     val notes: List<PlaneNoteViewData>,

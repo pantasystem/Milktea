@@ -11,7 +11,6 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 
 class TimelineViewModel(

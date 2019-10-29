@@ -1,21 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.viewmodel.TimelineState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.IOException
 
 class TimelineLiveData(
@@ -59,7 +50,12 @@ class TimelineLiveData(
                     }.forEach{
                         timeline.remove(it)
                     }
-                    postValue(TimelineState(timeline, TimelineState.State.REMOVED))
+                    postValue(
+                        TimelineState(
+                            timeline,
+                            TimelineState.State.REMOVED
+                        )
+                    )
                 }
 
             }
@@ -95,7 +91,10 @@ class TimelineLiveData(
                         isLoading.postValue(false)
                         return@launch
                     }else{
-                        val state = TimelineState(list, TimelineState.State.INIT)
+                        val state = TimelineState(
+                            list,
+                            TimelineState.State.INIT
+                        )
                         postValue(state)
                         noteCapture.addAll(list)
                         isLoadingFlag = false
@@ -136,12 +135,18 @@ class TimelineLiveData(
 
                         val state = value
                         val newState = if(state == null){
-                            TimelineState(list, TimelineState.State.LOAD_NEW)
+                            TimelineState(
+                                list,
+                                TimelineState.State.LOAD_NEW
+                            )
                         }else{
                             val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
                                 addAll(0, list)
                             }
-                            TimelineState(newList, TimelineState.State.LOAD_NEW)
+                            TimelineState(
+                                newList,
+                                TimelineState.State.LOAD_NEW
+                            )
                         }
                         postValue(newState)
                         isLoadingFlag = false
@@ -175,12 +180,18 @@ class TimelineLiveData(
                     val state = value
 
                     val newState = if(state == null){
-                        TimelineState(list, TimelineState.State.LOAD_OLD)
+                        TimelineState(
+                            list,
+                            TimelineState.State.LOAD_OLD
+                        )
                     }else{
                         val newList = ArrayList<PlaneNoteViewData>(state.notes).apply{
                             addAll(list)
                         }
-                        TimelineState(newList, TimelineState.State.LOAD_OLD)
+                        TimelineState(
+                            newList,
+                            TimelineState.State.LOAD_OLD
+                        )
                     }
                     postValue(newState)
                     isLoadingFlag = false
@@ -205,7 +216,12 @@ class TimelineLiveData(
                     add(0, note)
                 }
             }
-            postValue(TimelineState(list, TimelineState.State.RECEIVED_NEW))
+            postValue(
+                TimelineState(
+                    list,
+                    TimelineState.State.RECEIVED_NEW
+                )
+            )
         }
     }
 }

@@ -49,8 +49,8 @@ class TimelineListAdapter(
         getItem(p1).reactionCounts.observe(lifecycleOwner, Observer {
             adapter.submitList(it.toList())
         })
-        p0.binding.reactionView.adapter = adapter
-        p0.binding.reactionView.layoutManager = LinearLayoutManager(p0.binding.root.context, LinearLayoutManager.HORIZONTAL, false)
+        p0.binding.simpleNote.reactionView.adapter = adapter
+        p0.binding.simpleNote.reactionView.layoutManager = LinearLayoutManager(p0.binding.root.context, LinearLayoutManager.HORIZONTAL, false)
         p0.binding.lifecycleOwner = lifecycleOwner
         p0.binding.executePendingBindings()
         p0.binding.notesViewModel = notesViewModel

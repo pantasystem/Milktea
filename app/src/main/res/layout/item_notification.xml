@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="notification" type="jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData"/>
+
+        <import type="android.view.View"/>
+
+        <import type="jp.panta.misskeyandroidclient.R"/>
+
+        <variable
+                name="notesViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="0.1dp"
+            >
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:notificationStatusView="@{notificationStatus}"
+                    app:notificationReactionImageView="@{reactionImage}"
+                    app:notificationReactionStringView="@{reactionString}"
+                    app:notificationType="@{notification.statusType}"
+                    app:notificationReaction="@{notification.reaction}"
+
+                    >
+                <ImageView
+                        android:id="@+id/notificationStatus"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="8dp"
+                        tools:srcCompat="@drawable/ic_follow"
+                        android:visibility="@{notification.reaction == null ? View.VISIBLE : View.GONE }"
+                        />
+
+                <ImageView
+                        android:id="@+id/reactionImage"
+                        android:layout_width="37dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="8dp"
+                        android:visibility="@{notification.reaction == null ? View.GONE : View.VISIBLE }"
+                        tools:srcCompat="@drawable/ic_reaction_like"
+
+                        />
+                <TextView
+                        android:id="@+id/reactionString"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        tools:text="😇"
+                        android:textSize="24sp"
+                    />
+
+
+                <ImageView
+                        android:id="@+id/imageView5"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        tools:srcCompat="@mipmap/ic_launcher_round"
+                        android:layout_marginEnd="5dp"
+                        app:circleIcon="@{notification.avatarIconUrl}"
+                        />
+
+
+
+                <TextView
+                        android:id="@+id/userName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        tools:text="name" />
+            </LinearLayout>
+            <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:layout_height="100dp"
+                    android:visibility="@{notification.noteViewData == null ? View.GONE : View.VISIBLE}"
+                    >
+                <include android:id="@+id/simpleNote"
+                        layout="@layout/item_simple_note"
+                        app:note="@{notification.noteViewData}"
+                        app:notesViewModel="@{notesViewModel}"
+                        />
+            </FrameLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
+</layout>

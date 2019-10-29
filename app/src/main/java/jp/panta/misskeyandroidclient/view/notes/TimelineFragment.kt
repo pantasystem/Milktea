@@ -17,10 +17,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.streming.NoteCapture
-import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.viewmodel.TimelineState
-import jp.panta.misskeyandroidclient.viewmodel.main.MainViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
