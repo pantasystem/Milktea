@@ -58,111 +58,167 @@
                 app:emojis='@{note.toShowNote.user.emojis}'
 
                 />
+        <TextView
+                android:id="@+id/cw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="cwcwcwwcwcw"
+                android:text="@{note.cw}"
+                android:layout_toEndOf="@+id/avatarIcon"
+                android:layout_below="@+id/userName"
+                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
+                />
 
 
         <TextView
-                android:id="@id/text"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:id="@+id/contentFoldingButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/userName"
-                android:layout_toEndOf="@id/avatarIcon"
-                android:textSize="15sp"
-                app:text='@{note.text}'
-                app:emojis='@{note.emojis}'
-                tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
-                android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
-                />
-
-        <ImageView
-                android:id="@+id/imagePreviewTopLeft"
-                android:layout_width="160dp" android:layout_height="90dp"
-                android:layout_toEndOf="@id/avatarIcon"
-                android:layout_below="@id/text"
-
-
-                />
-        <ImageView
-                android:id="@+id/image_preview_top_right"
-                android:layout_width="160dp" android:layout_height="90dp"
-                android:layout_toEndOf="@id/imagePreviewTopLeft"
-                android:layout_below="@id/text"
-                />
-
-
-        <ImageView
-                android:id="@+id/imagePreviewBottomLeft"
-                android:layout_width="160dp" android:layout_height="90dp"
-                android:layout_below="@id/imagePreviewTopLeft"
-                android:layout_toEndOf="@id/avatarIcon"
-                />
-
-        <ImageView
-                android:id="@+id/imagePreviewBottomRight"
-                android:layout_width="160dp" android:layout_height="90dp"
-                android:layout_below="@id/image_preview_top_right"
-                android:layout_toEndOf="@id/imagePreviewBottomLeft"
-                />
-
-
-
+                android:layout_toEndOf="@+id/cw"
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="5dp"
+                tools:text="展開する"
+                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
+                android:textColor="?attr/colorAccent"
+                android:text="@{note.contentFoldingStatusMessage}"
+                android:onClick="@{()-> note.changeContentFolding() }"
+            />
         <RelativeLayout
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_below="@+id/imagePreviewBottomLeft"
+                android:id="@+id/contentMain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/contentFoldingButton"
                 android:layout_toEndOf="@id/avatarIcon"
-                android:paddingTop="8dp"
-                android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
-                android:id="@+id/subNote"
-
-
+                android:visibility="@{note.contentFolding ? View.GONE : View.VISIBLE }"
                 >
+            <TextView
+                    android:id="@id/text"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    app:text='@{note.text}'
+                    app:emojis='@{note.emojis}'
+                    tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
+                    android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
+                    />
+
             <ImageView
-                    android:id="@+id/subAvatarIcon"
-                    android:layout_width="20dp" android:layout_height="20dp"
-                    android:layout_marginEnd="5dp"
-                    app:circleIcon='@{note.subNoteAvatarUrl}'
-                    />
+                    android:id="@+id/imagePreviewTopLeft"
+                    android:layout_width="160dp" android:layout_height="90dp"
+                    android:layout_below="@id/text"
 
-            <TextView
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_toEndOf="@+id/subAvatarIcon"
-                    android:text='@{note.subNoteUserName, default="@subUserId"}'
-                    android:id="@+id/subNoteUserName"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
-
-                    android:layout_marginEnd="8dp"
-                    />
-            <TextView
-                    android:layout_toEndOf="@id/subNoteUserName"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text='@{note.subNoteName, default="SubName SubName"}'
-                    android:textStyle="italic"
-                    android:id="@+id/subNoteName"
-                    android:textSize="15sp"
-                    android:singleLine="true"
 
                     />
+            <ImageView
+                    android:id="@+id/image_preview_top_right"
+                    android:layout_width="160dp" android:layout_height="90dp"
+                    android:layout_toEndOf="@id/imagePreviewTopLeft"
+                    android:layout_below="@id/text"
+                    />
 
-            <TextView
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_below="@+id/subNoteName"
-                    android:textSize="15sp"
-                    android:id="@+id/subNoteText"
-                    tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
-                    app:text='@{note.subNoteText}'
-                    app:emojis='@{note.subNoteEmojis}'
+
+            <ImageView
+                    android:id="@+id/imagePreviewBottomLeft"
+                    android:layout_width="160dp" android:layout_height="90dp"
+                    android:layout_below="@id/imagePreviewTopLeft"
+                    />
+
+            <ImageView
+                    android:id="@+id/imagePreviewBottomRight"
+                    android:layout_width="160dp" android:layout_height="90dp"
+                    android:layout_below="@id/image_preview_top_right"
+                    android:layout_toEndOf="@id/imagePreviewBottomLeft"
                     />
 
 
 
+            <RelativeLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_below="@+id/imagePreviewBottomLeft"
+                    android:paddingTop="8dp"
+                    android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
+                    android:id="@+id/subNote"
 
+
+                    >
+                <ImageView
+                        android:id="@+id/subAvatarIcon"
+                        android:layout_width="20dp" android:layout_height="20dp"
+                        android:layout_marginEnd="5dp"
+                        app:circleIcon='@{note.subNoteAvatarUrl}'
+                        />
+
+                <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/subAvatarIcon"
+                        android:text='@{note.subNoteUserName, default="@subUserId"}'
+                        android:id="@+id/subNoteUserName"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+
+                        android:layout_marginEnd="8dp"
+                        />
+                <TextView
+                        android:layout_toEndOf="@id/subNoteUserName"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text='@{note.subNoteName, default="SubName SubName"}'
+                        android:textStyle="italic"
+                        android:id="@+id/subNoteName"
+                        android:textSize="15sp"
+                        android:singleLine="true"
+
+                        />
+
+                <TextView
+                        android:id="@+id/subCw"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="cwcwcwwcwcw"
+                        android:text="@{note.subCw}"
+                        android:layout_below="@+id/subNoteUserName"
+                        android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
+                        />
+
+
+                <TextView
+                        android:id="@+id/subContentFoldingButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/subNoteUserName"
+                        android:layout_toEndOf="@+id/subCw"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginBottom="5dp"
+                        tools:text="展開する"
+                        android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
+                        android:textColor="?attr/colorAccent"
+                        android:text="@{note.subContentFoldingStatusMessage}"
+                        android:onClick="@{()-> note.changeSubContentFolding() }"
+
+                        />
+                <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_below="@+id/subContentFoldingButton"
+                        android:textSize="15sp"
+                        android:id="@+id/subNoteText"
+                        tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
+                        app:text='@{note.subNoteText}'
+                        app:emojis='@{note.subNoteEmojis}'
+                        android:visibility="@{note.subContentFolding? View.GONE : View.VISIBLE }"
+                        />
+
+
+
+
+            </RelativeLayout>
         </RelativeLayout>
+
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reaction_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/avatarIcon"
-                android:layout_below="@id/subNote"
+                android:layout_below="@id/contentMain"
                 android:layout_marginTop="8dp"
                 tools:visibility="visible"
 

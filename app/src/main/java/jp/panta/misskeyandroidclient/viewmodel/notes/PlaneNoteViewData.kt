@@ -58,6 +58,15 @@ open class PlaneNoteViewData (private val note: Note) : NoteViewData{
 
     val avatarUrl = toShowNote.user.avatarUrl
 
+    val cw = toShowNote.cw
+
+    //true　折り畳み
+    val contentFolding = MutableLiveData<Boolean>(cw != null)
+    val contentFoldingStatusMessage = Transformations.map(contentFolding){
+        if(it) "もっと見る: ${text?.length}文字" else "隠す"
+    }
+
+
     val text = toShowNote.text
 
     val emojis = toShowNote.emojis
@@ -69,8 +78,6 @@ open class PlaneNoteViewData (private val note: Note) : NoteViewData{
     val reNoteCount: String?
         get() = if(toShowNote.reNoteCount > 0) toShowNote.reNoteCount.toString() else null
 
-    //val reactionCount: String? = if(toShowNote.reactionCounts?.isNullOrEmpty() == false) toShowNote.reactionCounts?.size.toString() else null
-    //val reactionCounts = toShowNote.reactionCounts
     val reactionCounts = MutableLiveData<LinkedHashMap<String, Int>>(
         LinkedHashMap(
             toShowNote.reactionCounts?.filter{
@@ -96,6 +103,13 @@ open class PlaneNoteViewData (private val note: Note) : NoteViewData{
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteText = subNote?.text
     val subNoteEmojis = subNote?.emojis
+
+    val subCw = subNote?.cw
+    //true　折り畳み
+    val subContentFolding = MutableLiveData<Boolean>( subCw != null )
+    val subContentFoldingStatusMessage = Transformations.map(subContentFolding){
+        if(it) "もっと見る: ${subNoteText?.length}" else "閉じる"
+    }
 
 
     fun addReaction(reaction: String, isMyReaction: Boolean = false){
@@ -135,8 +149,15 @@ open class PlaneNoteViewData (private val note: Note) : NoteViewData{
 
     }
 
-    init{
-        Log.d("PlaneNoteViewData", "reactions: ${toShowNote.reactionCounts}, myReaction: ${this.myReaction.value}")
+    fun changeContentFolding(){
+        val isFolding = contentFolding.value?: return
+        contentFolding.value = !isFolding
     }
+
+    fun changeSubContentFolding(){
+        val isFolding = subContentFolding.value?: return
+        subContentFolding.value = !isFolding
+    }
+
 
 }
