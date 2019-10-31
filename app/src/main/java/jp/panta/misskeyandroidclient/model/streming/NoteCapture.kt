@@ -102,9 +102,37 @@ class NoteCapture(
 
     }
 
+    fun remove(planeNoteViewData: PlaneNoteViewData){
+        val key = planeNoteViewData.toShowNote.id
+        synchronized(observeNoteMap){
+            val noteEvents = observeNoteMap[key]
+                ?: return
+            synchronized(noteEvents){
+                val iterator = noteEvents.notes.iterator()
+                while(iterator.hasNext()){
+                    val next = iterator.next()
+                    if(next === planeNoteViewData){
+                        iterator.remove()
+                    }
+                }
+                if(noteEvents.notes.size < 1){
+                    observeNoteMap.remove(key)
+                    streamingAdapter?.send(gson.toJson(createUnCaptureRequest(key)))
+                }
+            }
+
+        }
+    }
+
     fun addAll(planeNoteViewDataList: List<PlaneNoteViewData>){
         planeNoteViewDataList.forEach{
             add(it)
+        }
+    }
+
+    fun removeAll(planeNoteViewDataList: List<PlaneNoteViewData>){
+        planeNoteViewDataList.forEach{
+            remove(it)
         }
     }
 
@@ -114,6 +142,10 @@ class NoteCapture(
 
     private fun createCaptureRequest(noteId: String): CaptureRequest{
         return CaptureRequest(body = CaptureRequestBody(noteId))
+    }
+
+    private fun createUnCaptureRequest(noteId: String): CaptureRequest{
+        return CaptureRequest(type = "unsubNote", body = CaptureRequestBody(noteId))
     }
 
     private fun addReaction(noteId: String, reaction: String, isMyReaction: Boolean){

@@ -19,24 +19,8 @@ class TimelineLiveData(
 
     var isLoading =  MutableLiveData<Boolean>()
 
-    //private val misskeyAPI = MisskeyAPIServiceBuilder.build(connectionInstance.instanceBaseUrl)
-
-    /*private val timelineStore = when(requestBase.type){
-        NoteType.HOME -> misskeyAPI::homeTimeline
-        NoteType.LOCAL -> misskeyAPI::localTimeline
-        NoteType.SOCIAL -> misskeyAPI::hybridTimeline
-        NoteType.GLOBAL -> misskeyAPI::globalTimeline
-        NoteType.SEARCH -> misskeyAPI::searchNote
-        NoteType.SEARCH_HASH -> misskeyAPI::searchByTag
-        NoteType.USER -> misskeyAPI::userNotes
-
-    }*/
-
     private var isLoadingFlag = false
 
-
-
-    //private var timelineState: TimelineState? = null
     init{
         noteCapture.addNoteRemoveListener(object : NoteCapture.NoteRemoveListener{
             override fun onRemoved(id: String) {
@@ -74,6 +58,11 @@ class TimelineLiveData(
         }
     }
 
+    override fun onInactive() {
+        super.onInactive()
+        val notes = value?.notes?: return
+        noteCapture.removeAll(notes)
+    }
 
     fun loadInit(){
         this.isLoading.postValue(true)

@@ -62,6 +62,8 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
             notification_swipe_refresh.setOnRefreshListener {
                 mViewModel.loadInit()
             }
+
+            notification_list_view.addOnScrollListener(mScrollListener)
         }
 
 

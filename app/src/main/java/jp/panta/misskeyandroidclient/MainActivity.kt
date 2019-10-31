@@ -218,6 +218,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var currentFragmentTag = "home"
     private fun setFragment(tag: String){
         setBottomNavigationSelectState(tag)
+        setTitleByTag(tag)
 
         val ft = supportFragmentManager.beginTransaction()
 
@@ -271,6 +272,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "notification" -> NotificationFragment()
             "message" -> MessageListFragment()
             else -> throw IllegalArgumentException("サポートしていないタグです")
+        }
+    }
+
+    private fun setTitleByTag(tag: String){
+        when(tag){
+            "home" -> changeTitle("Home")
+            "search" -> changeTitle("Search")
+            "notification" -> changeTitle("Notification")
+            "message" -> changeTitle("Message")
         }
     }
 

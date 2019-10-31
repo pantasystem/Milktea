@@ -21,13 +21,21 @@ class NotificationViewModel(
     val isLoading = MutableLiveData<Boolean>()
     //loadNewはない
 
-    val notificationsLiveData = MutableLiveData<List<NotificationViewData>>()
+    val notificationsLiveData = object : MutableLiveData<List<NotificationViewData>>(){
+
+        override fun onInactive() {
+            super.onInactive()
+            val list = value?: return
+            removeNoteObserver(list)
+        }
+    }
 
     fun loadInit(){
         if(isLoadingFlag){
             return
         }
         isLoadingFlag = true
+        val oldList = notificationsLiveData.value
         val request = NotificationRequest(i = connectionInstance.getI()!!, limit = 20)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
@@ -100,13 +108,23 @@ class NotificationViewModel(
         })
     }
 
-    fun addNoteObserver(notificationViewDataList: List<NotificationViewData>){
-        val noteList = notificationViewDataList.asSequence().filter{
+    private fun removeNoteObserver(notificationViewDataList: List<NotificationViewData>){
+        val notes = notificationViewDataList.asSequence().filter{
             it.noteViewData != null
         }.map{
             it.noteViewData!!
         }.toList()
-        noteCapture.addAll(noteList)
+        noteCapture.removeAll(notes)
+    }
+
+    fun addNoteObserver(notificationViewDataList: List<NotificationViewData>){
+        notificationViewDataList.asSequence().filter{
+            it.noteViewData != null
+        }.map{
+            it.noteViewData!!
+        }.toList().let{
+            noteCapture.removeAll(it)
+        }
     }
 
 
