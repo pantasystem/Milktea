@@ -24,7 +24,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 
-class TimelineFragment : Fragment(){
+class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view){
 
     companion object{
         private const val EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.setting"
@@ -49,9 +49,9 @@ class TimelineFragment : Fragment(){
 
     private var mFirstVisibleItemPosition: Int? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    /*override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_swipe_refresh_recycler_view, container, false)
-    }
+    }*/
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

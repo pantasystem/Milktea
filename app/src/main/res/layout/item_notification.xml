@@ -37,20 +37,20 @@
                     app:notificationReaction="@{notification.reaction}"
 
                     >
+
                 <ImageView
                         android:id="@+id/notificationStatus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="37dp"
+                        android:layout_height="37dp"
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
-                        tools:srcCompat="@drawable/ic_follow"
                         android:visibility="@{notification.reaction == null ? View.VISIBLE : View.GONE }"
-                        />
+                        tools:srcCompat="@drawable/ic_follow" />
 
                 <ImageView
                         android:id="@+id/reactionImage"
                         android:layout_width="37dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="37dp"
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
                         android:visibility="@{notification.reaction == null ? View.GONE : View.VISIBLE }"

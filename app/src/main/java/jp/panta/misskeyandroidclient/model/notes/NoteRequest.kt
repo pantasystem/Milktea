@@ -54,7 +54,7 @@ data class NoteRequest(
                 withFiles = withFiles,
                 fileType = fileType,
                 excludeNsfw = excludeNsfw,
-                limit = limit,
+                limit = limit?: 20,
                 sinceId = conditions.sinceId,
                 untilId = conditions.untilId,
                 sinceDate = conditions.sinceDate,

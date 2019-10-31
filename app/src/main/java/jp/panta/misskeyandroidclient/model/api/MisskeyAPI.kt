@@ -9,6 +9,8 @@ import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notification.Notification
+import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.model.users.User
 import retrofit2.Call
 import retrofit2.http.Body
@@ -19,6 +21,13 @@ interface MisskeyAPI {
 
     @POST("api/i")
     fun i(@Body i: I): Call<User>
+
+    //account
+    @POST("api/i/favorites")
+    fun favorites(@Body noteRequest: NoteRequest): Call<List<Favorite>?>
+
+    @POST("api/i/notifications")
+    fun notification(@Body notificationRequest: NotificationRequest): Call<List<Notification>?>
 
     @POST("api/notes/create")
     fun create(@Body createNote: CreateNote): Call<Note?>
@@ -58,9 +67,7 @@ interface MisskeyAPI {
     @POST("api/users/notes")
     fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
-    //account
-    @POST("api/i/favorites")
-    fun favorites(@Body noteRequest: NoteRequest): Call<List<Favorite>?>
+
 
     //meta
     @POST("api/meta")
