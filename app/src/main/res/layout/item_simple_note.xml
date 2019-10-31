@@ -28,12 +28,14 @@
             app:previewFiles='@{note.files}'
 
             >
+
         <ImageView
                 android:id="@+id/avatarIcon"
-                android:layout_width="50dp" android:layout_height="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginEnd="8dp"
                 app:circleIcon='@{note.avatarUrl}'
-                />
+                tools:srcCompat="@android:drawable/sym_def_app_icon" />
 
         <TextView
                 android:layout_width="wrap_content" android:layout_height="wrap_content"

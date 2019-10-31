@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <import type="jp.panta.misskeyandroidclient.R"/>
+
+        <variable name="hasReplyToNote" type="jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData"/>
+        <variable
+                name="notesViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+    </data>
+
+    <LinearLayout
+            android:orientation="vertical" android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="12dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                >
+            <ImageView
+                    android:id="@+id/replyToAvatarIcon"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:circleIcon="@{hasReplyToNote.replyTo.avatarUrl}"
+                    android:layout_marginEnd="8dp"
+                />
+
+            <TextView
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/replyToAvatarIcon"
+                    android:text='@{hasReplyToNote.replyTo.userName, default="@Panta"}'
+                    android:id="@+id/replyToUserName"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    tools:text="userName"
+
+                    android:layout_marginEnd="8dp"
+                    />
+            <TextView
+                    android:id="@+id/replyToName"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/replyToUserName"
+                    android:text='@{hasReplyToNote.replyTo.name, default="name name"}'
+                    android:textStyle="italic"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="15sp"
+                    app:text='@{hasReplyToNote.replyTo.name}'
+                    app:emojis='@{hasReplyToNote.replyTo.toShowNote.user.emojis}'
+                    />
+
+            <TextView
+                    android:id="@+id/replyToCw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="cwcwcwwcwcw"
+                    android:text="@{hasReplyToNote.replyTo.cw}"
+                    android:layout_toEndOf="@+id/replyToAvatarIcon"
+                    android:layout_below="@+id/replyToUserName"
+                    android:visibility='@{hasReplyToNote.replyTo.cw == null ? View.GONE : View.VISIBLE}'
+                    />
+
+
+            <TextView
+                    android:id="@+id/replyToContentFoldingButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/replyToUserName"
+                    android:layout_toEndOf="@+id/replyToCw"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginBottom="5dp"
+                    tools:text="展開する"
+                    android:visibility='@{hasReplyToNote.replyTo.cw == null ? View.GONE : View.VISIBLE }'
+                    android:textColor="?attr/colorAccent"
+                    android:text="@{hasReplyToNote.replyTo.contentFoldingStatusMessage}"
+                    android:onClick="@{()-> hasReplyToNote.replyTo.changeContentFolding() }"
+                    />
+            <RelativeLayout
+                    android:id="@+id/replyToContentMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/replyToContentFoldingButton"
+                    android:layout_toEndOf="@id/replyToAvatarIcon"
+                    android:visibility="@{hasReplyToNote.replyTo.contentFolding ? View.GONE : View.VISIBLE }"
+                    >
+                <TextView
+                        android:id="@id/text"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        app:text='@{hasReplyToNote.replyTo.text}'
+                        app:emojis='@{hasReplyToNote.replyTo.emojis}'
+                        tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
+                        android:visibility='@{hasReplyToNote.replyTo.text == null ? View.GONE : View.VISIBLE}'
+                        />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                app:cardUseCompatPadding="false"
+                app:cardCornerRadius="0dp"
+                android:elevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                tools:layout_height="200dp"
+                >
+            <include layout="@layout/item_simple_note"
+                    app:note="@{hasReplyToNote}"
+                    app:notesViewModel="@{notesViewModel}"
+                    android:id="@+id/simpleNote"
+                    />
+        </androidx.cardview.widget.CardView>
+
+
+    </LinearLayout>
+</layout>

@@ -50,6 +50,12 @@ class NoteTimelineStore(
     }
 
     private fun makeResponse(list: List<Note>?, response: Response<List<Note>?>): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
-        return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{ PlaneNoteViewData(it) })
+        return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
+            if(it.reply == null){
+                PlaneNoteViewData(it)
+            }else{
+                HasReplyToNoteViewData(it)
+            }
+        })
     }
 }
