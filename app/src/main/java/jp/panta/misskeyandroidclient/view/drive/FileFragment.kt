@@ -32,14 +32,14 @@ class FileFragment : Fragment(R.layout.fragment_file){
 
         val miApplication = context?.applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
-            val factory  = FileViewModelFactory(it, miApplication)
+            val factory  = FileViewModelFactory(it, miApplication, isSelectable = true, maxSelectableItemSize = 5)
             val viewModel  = ViewModelProvider(this, factory).get(FileViewModel::class.java)
             mViewModel = viewModel
             viewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
                 refresh.isRefreshing = isRefreshing
             })
 
-            val adapter = FileListAdapter(fileDiffUtilCallback, viewModel)
+            val adapter = FileListAdapter(fileDiffUtilCallback, viewModel,viewLifecycleOwner)
             files_view.adapter = adapter
 
             viewModel.filesLiveData.observe(viewLifecycleOwner, Observer {files ->
@@ -55,9 +55,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
 
     private val fileDiffUtilCallback = object : DiffUtil.ItemCallback<FileViewData>(){
         override fun areContentsTheSame(oldItem: FileViewData, newItem: FileViewData): Boolean {
-            return oldItem.name == newItem.name
-                    && oldItem.id == newItem.id
-                    && oldItem.md5 == newItem.md5
+            return oldItem == newItem
         }
 
         override fun areItemsTheSame(oldItem: FileViewData, newItem: FileViewData): Boolean {

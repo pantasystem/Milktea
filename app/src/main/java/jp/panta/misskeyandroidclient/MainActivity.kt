@@ -281,6 +281,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when(tag){
             "home" -> changeTitle("Home")
             "search" -> changeTitle("Search")
+            "drive" -> changeTitle("Drive")
             "notification" -> changeTitle("Notification")
             "message" -> changeTitle("Message")
         }

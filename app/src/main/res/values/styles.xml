@@ -27,7 +27,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSurface">@color/colorLightSurface</item>
 
-        <item name="actionBarSize">50dp</item>
+        <item name="actionBarSize">53dp</item>
 
         <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
         <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>

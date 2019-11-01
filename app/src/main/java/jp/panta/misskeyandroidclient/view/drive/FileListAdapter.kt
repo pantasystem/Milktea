@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.view.drive
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,8 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 
 class FileListAdapter(
     diffUtilItemCallback: DiffUtil.ItemCallback<FileViewData>,
-    private val fileViewModel: FileViewModel
+    private val fileViewModel: FileViewModel,
+    private val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<FileViewData, FileListAdapter.FileViewHolder>(diffUtilItemCallback){
     class FileViewHolder(val binding: ItemFileBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -21,6 +23,7 @@ class FileListAdapter(
         val item = getItem(position)
         holder.binding.fileViewModel = fileViewModel
         holder.binding.fileViewData = item
+        holder.binding.lifecycleOwner = lifecycleOwner
         holder.binding.executePendingBindings()
     }
 

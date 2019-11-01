@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive.file
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -58,6 +59,7 @@ class FileViewModel(
                 }
 
                 filesLiveData.postValue(viewDataList)
+                selectedItemMap.clear()
 
                 isLoading = false
                 isRefreshing.postValue(false)
@@ -96,7 +98,9 @@ class FileViewModel(
 
                 val viewDataList = ArrayList<FileViewData>(beforeList).apply{
                     addAll(rawList.map{
-                        FileViewData(it)
+                        FileViewData(it).apply{
+                            isEnabledSelect.postValue(selectedItemMap.size < maxSelectableItemSize)
+                        }
                     })
                 }
 
@@ -111,13 +115,13 @@ class FileViewModel(
     }
 
     fun changeSelectItemState(fileViewData: FileViewData){
-        if(selectedItemMap.size >= maxSelectableItemSize)
-            return
+        /*if(selectedItemMap.size >= maxSelectableItemSize)
+            return*/
 
         //nullはfalseとして扱う
         val isSelect = fileViewData.isSelect.value
         if(isSelect == null){
-            fileViewData.isSelect.value = true
+            fileViewData.isSelect.postValue(true)
             selectedItemMap[fileViewData.id] = fileViewData
             if(selectedItemMap.size >= maxSelectableItemSize){
                 allDisabledSelect()
@@ -127,13 +131,14 @@ class FileViewModel(
 
         if(isSelect){
             selectedItemMap.remove(fileViewData.id)
-            fileViewData.isSelect.value = false
-            if(selectedItemMap.size < maxSelectableItemSize){
-                allEnabledSelect()
-            }
+            fileViewData.isSelect.postValue(false)
+            allEnabledSelect()
+            Log.d("FileViewModel", "解除した")
+            /*if(selectedItemMap.size < maxSelectableItemSize){
+            }*/
         }else{
             selectedItemMap[fileViewData.id] = fileViewData
-            fileViewData.isSelect.value = true
+            fileViewData.isSelect.postValue(true)
             if(selectedItemMap.size >= maxSelectableItemSize){
                 allDisabledSelect()
             }
@@ -144,14 +149,14 @@ class FileViewModel(
         filesLiveData.value?.forEach{
             val item = selectedItemMap[it.id]
             if(item == null){
-                it.isEnabledSelect.value = false
+                it.isEnabledSelect.postValue(false)
             }
         }
     }
 
     private fun allEnabledSelect(){
         filesLiveData.value?.forEach{
-            it.isEnabledSelect.value = true
+            it.isEnabledSelect.postValue(true)
         }
     }
 
