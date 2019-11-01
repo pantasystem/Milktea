@@ -12,7 +12,7 @@ object FileThumbnailHelper {
 
     @JvmStatic
     @BindingAdapter("fileThumbnailMain", "fileThumbnailMask", "thumbnailFileViewData")
-    fun setFileThumbnail(fileThumbnailMain: ImageView, fileThumbnailMask: ImageView, thumbnailFileViewData: FileViewData){
+    fun FrameLayout.setFileThumbnail(fileThumbnailMain: ImageView, fileThumbnailMask: ImageView, thumbnailFileViewData: FileViewData){
         val thumbnailUrl = thumbnailFileViewData.thumbnailUrl
         setThumbnail(fileThumbnailMain, thumbnailUrl)
 
