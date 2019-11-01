@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+                name="fileViewData"
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData" />
+        <variable
+                name="fileViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel" />
+    </data>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            >
+
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                >
+
+            <ImageView
+                    android:id="@+id/thumbnail_view"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_marginEnd="8dp" />
+
+            <TextView
+                    android:id="@+id/file_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_toEndOf="@+id/thumbnail_view"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    tools:text="fileName"
+                    android:text="@{fileViewData.name}"
+                    />
+
+            <TextView
+                    android:id="@+id/file_meta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/file_name"
+                    android:layout_toEndOf="@+id/thumbnail_view"
+                    tools:text="image/jpg"
+                    android:text="@{fileViewData.type}"
+
+                    />
+
+            <TextView
+                    android:id="@+id/file_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/file_name"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/file_meta"
+                    tools:text="24byte"
+                    android:text="@{fileViewData.size}"
+                    />
+
+            <TextView
+                    android:id="@+id/updated_at"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/file_name"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/file_size"
+                    android:visibility="gone"
+                    tools:text="updated 3 hour" />
+        </RelativeLayout>
+
+        <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility='@{fileViewModel.isSelectable ? View.VISIBLE : View.GONE }'
+                android:onClick='@{()-> fileViewModel.changeSelectItemState(fileViewData) }'
+                />
+    </LinearLayout>
+
+</layout>

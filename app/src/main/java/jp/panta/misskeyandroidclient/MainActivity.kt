@@ -22,6 +22,7 @@ import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.view.message.MessageListFragment
 import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
@@ -103,8 +104,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     setFragment("home")
                     true
                 }
-                R.id.navigation_search ->{
-                    setFragment("search")
+                R.id.navigation_drive ->{
+                    setFragment("drive")
                     true
                 }
                 R.id.navigation_notification ->{
@@ -259,7 +260,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setBottomNavigationSelectState(tag: String){
         when(tag){
             "home" -> bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
-            "search" -> bottom_navigation.menu.findItem(R.id.navigation_search).isChecked = true
+            "search" -> bottom_navigation.menu.findItem(R.id.navigation_drive).isChecked = true
             "notification" -> bottom_navigation.menu.findItem(R.id.navigation_notification).isChecked = true
             "message" -> bottom_navigation.menu.findItem(R.id.navigation_message_list).isChecked = true
         }
@@ -269,6 +270,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return when(tag){
             "home" -> TabFragment()
             "search" -> SearchTopFragment()
+            "drive" -> DriveFragment()
             "notification" -> NotificationFragment()
             "message" -> MessageListFragment()
             else -> throw IllegalArgumentException("サポートしていないタグです")
