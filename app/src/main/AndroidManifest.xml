@@ -14,7 +14,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".TabSettingActivity"></activity>
+        <activity android:name=".DriveActivity"></activity>
+        <activity android:name=".TabSettingActivity" />
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings" />

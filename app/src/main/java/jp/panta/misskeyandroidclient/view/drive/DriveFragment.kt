@@ -26,7 +26,7 @@ class DriveFragment : Fragment(R.layout.fragment_drive){
 
         override fun getItem(position: Int): Fragment {
             return when(titleList[position]){
-                titleList[0] -> FileFragment()
+                titleList[0] -> FileFragment.newInstance(3)
                 titleList[1] -> FolderFragment()
                 else -> FileFragment()
             }

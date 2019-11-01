@@ -104,8 +104,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     setFragment("home")
                     true
                 }
-                R.id.navigation_drive ->{
-                    setFragment("drive")
+                R.id.navigation_search ->{
+                    setFragment("search")
                     true
                 }
                 R.id.navigation_notification ->{
@@ -260,7 +260,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setBottomNavigationSelectState(tag: String){
         when(tag){
             "home" -> bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
-            "search" -> bottom_navigation.menu.findItem(R.id.navigation_drive).isChecked = true
+            "search" -> bottom_navigation.menu.findItem(R.id.navigation_search).isChecked = true
             "notification" -> bottom_navigation.menu.findItem(R.id.navigation_notification).isChecked = true
             "message" -> bottom_navigation.menu.findItem(R.id.navigation_message_list).isChecked = true
         }
@@ -351,9 +351,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_setting ->{
                 startActivity(Intent(this, SettingsActivity::class.java))
             }
+            R.id.nav_drive ->{
+                startActivity(Intent(this, DriveActivity::class.java))
+            }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
-        return true
+        return false
     }
 }

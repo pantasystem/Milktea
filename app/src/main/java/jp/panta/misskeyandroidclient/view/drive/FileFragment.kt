@@ -15,10 +15,34 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import kotlinx.android.synthetic.main.fragment_file.*
+import java.lang.IllegalArgumentException
 
 class FileFragment : Fragment(R.layout.fragment_file){
 
     companion object{
+        private const val ARGS_SELECTABLE_MAX_SIZE = "file_fragment_selectable_max_size"
+        private const val ARGS_FOLDER_ID = "file_fragment_folder_id"
+
+        fun newInstance(selectableMaxSize: Int, folderId: String? = null): FileFragment{
+            val bundle = Bundle().apply{
+                require(selectableMaxSize > 0) { "このメソッドを使ってインスタンス化するときは0より大きい数値を指定してください" }
+                putInt(ARGS_SELECTABLE_MAX_SIZE, selectableMaxSize)
+                putString(ARGS_FOLDER_ID, folderId)
+            }
+            return FileFragment().apply{
+                arguments = bundle
+            }
+
+        }
+
+        fun newInstance(folderId: String): FileFragment{
+            val bundle = Bundle().apply{
+                putString(ARGS_FOLDER_ID, folderId)
+            }
+            return FileFragment().apply{
+                arguments = bundle
+            }
+        }
     }
 
     private var mViewModel: FileViewModel? = null
@@ -27,12 +51,16 @@ class FileFragment : Fragment(R.layout.fragment_file){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val maxSize = arguments?.getInt(ARGS_SELECTABLE_MAX_SIZE)
+        val isSelectable = maxSize != null
+        val folderId = arguments?.getString(ARGS_FOLDER_ID)
+
         mLinearLayoutManager = LinearLayoutManager(context)
         files_view.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
-            val factory  = FileViewModelFactory(it, miApplication, isSelectable = true, maxSelectableItemSize = 5)
+            val factory  = FileViewModelFactory(it, miApplication, isSelectable = isSelectable, maxSelectableItemSize = maxSize?: 0, folderId = folderId)
             val viewModel  = ViewModelProvider(this, factory).get(FileViewModel::class.java)
             mViewModel = viewModel
             viewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
@@ -45,7 +73,10 @@ class FileFragment : Fragment(R.layout.fragment_file){
             viewModel.filesLiveData.observe(viewLifecycleOwner, Observer {files ->
                 adapter.submitList(files)
             })
-            viewModel.loadInit()
+            viewModel.currentFolder.observe(viewLifecycleOwner, Observer {
+                viewModel.loadInit()
+            })
+
             refresh.setOnRefreshListener {
                 viewModel.loadInit()
             }

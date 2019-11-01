@@ -56,13 +56,10 @@ class TimelineLiveData(
             if(observer != null) timelineCapture.addChannelObserver(observer)
 
         }
+        //val notes = value?.notes?: return
+        //noteCapture.addAll(notes)
     }
 
-    override fun onInactive() {
-        super.onInactive()
-        val notes = value?.notes?: return
-        noteCapture.removeAll(notes)
-    }
 
     fun loadInit(){
         this.isLoading.postValue(true)

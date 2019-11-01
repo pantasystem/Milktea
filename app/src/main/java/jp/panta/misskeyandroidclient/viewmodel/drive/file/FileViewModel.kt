@@ -26,6 +26,7 @@ class FileViewModel(
 
     val isRefreshing = MutableLiveData<Boolean>(false)
 
+    val currentFolder = MutableLiveData<String>(folderId)
 
     private val selectedItemMap = HashMap<String, FileViewData>()
 
@@ -41,7 +42,7 @@ class FileViewModel(
         }
         isLoading = true
         isRefreshing.postValue(true)
-        val request = RequestFile(i = connectionInstance.getI()!!, folderId = folderId, limit = 20)
+        val request = RequestFile(i = connectionInstance.getI()!!, folderId = currentFolder.value, limit = 20)
         misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
             override fun onResponse(
                 call: Call<List<FileProperty>>,
@@ -59,7 +60,16 @@ class FileViewModel(
                 }
 
                 filesLiveData.postValue(viewDataList)
-                selectedItemMap.clear()
+                //selectedItemMap.clear()
+                viewDataList.forEach{
+                    val selected = selectedItemMap[it.id]
+                    if(selected != null){
+                        it.isSelect.postValue(true)
+                    }else if(selectedItemMap.size >= maxSelectableItemSize){
+                        it.isEnabledSelect.postValue(false)
+                    }
+
+                }
 
                 isLoading = false
                 isRefreshing.postValue(false)
@@ -84,7 +94,7 @@ class FileViewModel(
             isLoading = false
             return
         }
-        val request = RequestFile(i = connectionInstance.getI()!!, folderId = folderId, limit = 20, untilId = untilId)
+        val request = RequestFile(i = connectionInstance.getI()!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
         misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
             override fun onResponse(
                 call: Call<List<FileProperty>>,
@@ -99,7 +109,12 @@ class FileViewModel(
                 val viewDataList = ArrayList<FileViewData>(beforeList).apply{
                     addAll(rawList.map{
                         FileViewData(it).apply{
-                            isEnabledSelect.postValue(selectedItemMap.size < maxSelectableItemSize)
+                            val selected = selectedItemMap[id]
+                            if(selected != null){
+                                isSelect.postValue(true)
+                            }else{
+                                isEnabledSelect.postValue(selectedItemMap.size < maxSelectableItemSize)
+                            }
                         }
                     })
                 }
