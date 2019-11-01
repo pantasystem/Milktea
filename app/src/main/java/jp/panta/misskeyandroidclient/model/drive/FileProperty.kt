@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.files
+package jp.panta.misskeyandroidclient.model.drive
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

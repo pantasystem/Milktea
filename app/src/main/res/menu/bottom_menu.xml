@@ -11,12 +11,12 @@
             android:title="@string/menu_home" />
     <item
             android:id="@+id/navigation_search"
-            android:title="@string/discovery"
-            android:icon="@drawable/ic_search_black_24dp"/>
+            android:title="@string/drive"
+            android:icon="@drawable/ic_selectable_file"/>
     <item
             android:id="@+id/navigation_notification"
-            android:title="@string/notification" android:icon="@drawable/ic_notifications_black_24dp"/>
+            android:title="@string/notification" android:icon="@drawable/ic_selectable_notification"/>
     <item
             android:id="@+id/navigation_message_list"
-            android:title="@string/message" android:icon="@drawable/ic_message_black_24dp"/>
+            android:title="@string/message" android:icon="@drawable/ic_selectable_message"/>
 </menu>

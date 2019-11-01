@@ -1,13 +1,12 @@
 package jp.panta.misskeyandroidclient.view.notes
 
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.files.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import java.lang.IndexOutOfBoundsException
 
 object ImagePreviewHelper {
