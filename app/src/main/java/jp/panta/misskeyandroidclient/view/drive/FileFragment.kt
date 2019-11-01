@@ -34,6 +34,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
             val factory  = FileViewModelFactory(it, miApplication)
             val viewModel  = ViewModelProvider(this, factory).get(FileViewModel::class.java)
+            mViewModel = viewModel
             viewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
                 refresh.isRefreshing = isRefreshing
             })
@@ -44,6 +45,10 @@ class FileFragment : Fragment(R.layout.fragment_file){
             viewModel.filesLiveData.observe(viewLifecycleOwner, Observer {files ->
                 adapter.submitList(files)
             })
+            viewModel.loadInit()
+            refresh.setOnRefreshListener {
+                viewModel.loadInit()
+            }
         })
         files_view.addOnScrollListener(mScrollListener)
     }

@@ -54,4 +54,7 @@
     <string name="tab_selectable">以下から追加</string>
     <string name="title_featured">ハイライト</string>
     <string name="drive">drive</string>
+
+    <string name="file">File</string>
+    <string name="folder">Folder</string>
 </resources>

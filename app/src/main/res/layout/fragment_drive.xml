@@ -6,7 +6,7 @@
         android:layout_width="match_parent" android:layout_height="match_parent">
 
     <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout2"
+            android:id="@+id/drive_tab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -14,18 +14,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:elevation="4dp"
+            android:background="?attr/colorPrimary"
             >
 
 
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager.widget.ViewPager
+            android:id="@+id/drive_view_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tabLayout2">
+            app:layout_constraintTop_toBottomOf="@+id/drive_tab">
 
     </androidx.viewpager.widget.ViewPager>
 </androidx.constraintlayout.widget.ConstraintLayout>
