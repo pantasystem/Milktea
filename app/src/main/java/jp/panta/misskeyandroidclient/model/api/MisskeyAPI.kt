@@ -5,6 +5,8 @@ import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.AppSecret
 import jp.panta.misskeyandroidclient.model.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.UserKey
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
@@ -67,6 +69,10 @@ interface MisskeyAPI {
     @POST("api/users/notes")
     fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
+
+    //drive
+    @POST("api/drive/files")
+    fun getFiles(@Body fileRequest: RequestFile): Call<List<FileProperty>>
 
 
     //meta
