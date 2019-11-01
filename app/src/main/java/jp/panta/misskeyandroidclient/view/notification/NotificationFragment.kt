@@ -100,7 +100,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
             oldItem: NotificationViewData,
             newItem: NotificationViewData
         ): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem == newItem
         }
 
         override fun areItemsTheSame(

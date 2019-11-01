@@ -20,7 +20,7 @@
 
     </declare-styleable>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -36,6 +36,7 @@
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
+
     </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
