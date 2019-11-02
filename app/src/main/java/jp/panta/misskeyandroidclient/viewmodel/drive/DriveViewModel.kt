@@ -2,15 +2,9 @@ package jp.panta.misskeyandroidclient.viewmodel.drive
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.drive.FolderProperty
-import jp.panta.misskeyandroidclient.model.drive.RequestFile
-import jp.panta.misskeyandroidclient.model.drive.RequestFolder
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
-import kotlinx.coroutines.launch
 import java.util.*
 
 class DriveViewModel(
@@ -53,12 +47,14 @@ class DriveViewModel(
         val list = hierarchyDirectory.value
             ?: return
         val arrayList = ArrayList<Directory>(list)
-        val lastIndex = arrayList.size - 1
-        if(lastIndex < 0){
+        val currentIndex = arrayList.size - 1
+        if(currentIndex < 1){
             return
         }else{
-            val lastItem = arrayList.removeAt(lastIndex)
-            currentDirectory.postValue(lastItem)
+            arrayList.removeAt(currentIndex)
+            //val lastItem = arrayList.removeAt(currentIndex)
+            val parentItem = arrayList.lastOrNull()
+            currentDirectory.postValue(parentItem)
             hierarchyDirectory.postValue(arrayList)
         }
     }
