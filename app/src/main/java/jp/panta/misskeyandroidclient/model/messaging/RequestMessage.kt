@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.message
+package jp.panta.misskeyandroidclient.model.messaging
 
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.group.Group

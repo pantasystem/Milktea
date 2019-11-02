@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.message
+package jp.panta.misskeyandroidclient.model.messaging
 
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.drive.FileProperty

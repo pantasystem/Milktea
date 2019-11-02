@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.message
+package jp.panta.misskeyandroidclient.model.messaging
 
 data class RequestMessageHistory(
     val i: String,

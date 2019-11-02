@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.view.message
+package jp.panta.misskeyandroidclient.view.messaging
 
 import android.os.Bundle
 import android.view.LayoutInflater

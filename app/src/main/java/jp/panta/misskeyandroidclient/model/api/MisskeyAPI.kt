@@ -1,18 +1,14 @@
 package jp.panta.misskeyandroidclient.model.api
 
 import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.auth.AccessToken
-import jp.panta.misskeyandroidclient.model.auth.AppSecret
-import jp.panta.misskeyandroidclient.model.auth.Session
-import jp.panta.misskeyandroidclient.model.auth.UserKey
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
-import jp.panta.misskeyandroidclient.model.message.Message
-import jp.panta.misskeyandroidclient.model.message.RequestMessage
-import jp.panta.misskeyandroidclient.model.message.RequestMessageHistory
+import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.*
