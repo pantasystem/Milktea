@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
@@ -62,6 +64,15 @@ class FileFragment : Fragment(R.layout.fragment_file){
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
             val factory  = FileViewModelFactory(it, miApplication, isSelectable = isSelectable, maxSelectableItemSize = maxSize?: 0, folderId = folderId)
             val viewModel  = ViewModelProvider(this, factory).get(FileViewModel::class.java)
+
+            val activity = activity?: return@Observer
+            val driveViewModelFactory = DriveViewModelFactory(it, miApplication)
+            val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
+
+            driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {directory ->
+                viewModel.currentFolder.postValue(directory.id)
+            })
+
             mViewModel = viewModel
             viewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
                 refresh.isRefreshing = isRefreshing

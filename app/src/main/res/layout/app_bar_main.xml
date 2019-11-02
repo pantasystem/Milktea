@@ -45,6 +45,7 @@
             app:itemBackground="?attr/colorPrimary"
             app:itemIconTint="@drawable/bottom_navigation_colors"
             app:itemTextColor="@drawable/bottom_navigation_colors"
+            app:labelVisibilityMode="unlabeled"
             app:menu="@menu/bottom_menu">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>

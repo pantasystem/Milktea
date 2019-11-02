@@ -6,7 +6,9 @@ import jp.panta.misskeyandroidclient.model.auth.AppSecret
 import jp.panta.misskeyandroidclient.model.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.UserKey
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
+import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
@@ -73,6 +75,9 @@ interface MisskeyAPI {
     //drive
     @POST("api/drive/files")
     fun getFiles(@Body fileRequest: RequestFile): Call<List<FileProperty>>
+
+    @POST("api/drive/folders")
+    fun getFolders(@Body folderRequest: RequestFolder): Call<List<FolderProperty>>
 
 
     //meta
