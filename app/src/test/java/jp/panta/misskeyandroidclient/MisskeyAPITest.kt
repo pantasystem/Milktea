@@ -28,4 +28,5 @@ class MisskeyAPITest {
         Assert.assertNotEquals(meta, null)
 
     }
+
 }

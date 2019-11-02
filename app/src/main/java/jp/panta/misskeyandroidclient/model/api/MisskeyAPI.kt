@@ -10,6 +10,9 @@ import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
+import jp.panta.misskeyandroidclient.model.message.Message
+import jp.panta.misskeyandroidclient.model.message.RequestMessage
+import jp.panta.misskeyandroidclient.model.message.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -85,4 +88,10 @@ interface MisskeyAPI {
     fun getMeta(@Body requestMeta: RequestMeta): Call<Meta>
 
 
+    //message
+    @POST("api/messaging/history")
+    fun getMessageHistory(@Body requestMessageHistory: RequestMessageHistory): Call<List<Message>>
+
+    @POST("api/messaging/messages")
+    fun getMessages(@Body requestMessage: RequestMessage): Call<List<Message>>
 }
