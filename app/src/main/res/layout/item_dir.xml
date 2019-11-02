@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="directory"
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.Directory" />
+        <variable
+                name="driveViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel" />
+    </data>
+    <LinearLayout
+            android:orientation="horizontal" android:layout_width="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:onClick="@{()-> driveViewModel.moveDirectory(directory)}"
+            >
+
+        <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="TextView"
+                android:layout_gravity="center"
+                android:text="@{directory.name}"
+                />
+
+        <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_keyboard_arrow_right_black_24dp"
+            />
+    </LinearLayout>
+</layout>
+
+

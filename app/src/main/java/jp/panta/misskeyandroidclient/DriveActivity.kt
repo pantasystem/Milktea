@@ -2,12 +2,18 @@ package jp.panta.misskeyandroidclient
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
+import jp.panta.misskeyandroidclient.viewmodel.drive.Directory
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
+import kotlinx.android.synthetic.main.activity_drive.*
 
 class DriveActivity : AppCompatActivity() {
 
@@ -17,12 +23,22 @@ class DriveActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drive)
 
+        setSupportActionBar(driveToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        dirListView.layoutManager = layoutManager
 
         val miApplication = applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             val viewModel = ViewModelProvider(this, DriveViewModelFactory(it, miApplication)).get(DriveViewModel::class.java)
             mViewModel = viewModel
+
+            val adapter = DirListAdapter(diffutilItemCallback, viewModel)
+            viewModel.hierarchyDirectory.observe(this, Observer {dir ->
+                Log.d("DriveActivity", "更新がありました: $dir")
+                adapter.submitList(dir)
+            })
         })
 
         if(savedInstanceState == null){
@@ -46,5 +62,16 @@ class DriveActivity : AppCompatActivity() {
             return
         }
         super.onBackPressed()
+    }
+
+    private val diffutilItemCallback = object : DiffUtil.ItemCallback<Directory>(){
+        override fun areContentsTheSame(oldItem: Directory, newItem: Directory): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(oldItem: Directory, newItem: Directory): Boolean {
+            return oldItem.id == newItem.id
+
+        }
     }
 }

@@ -59,6 +59,15 @@ class DriveViewModel(
         }
     }
 
+    fun moveDirectory(directory: Directory){
+        val dirs = hierarchyDirectory.value
+            ?:return
+        val index = dirs.indexOf(directory)
+        val current = dirs.get(index)
+        val newDirs = dirs.subList(0, index)
+        currentDirectory.postValue(current)
+        hierarchyDirectory.postValue(newDirs)
+    }
 
 
 }
