@@ -17,6 +17,8 @@
 
         <attr name="colorNoteActionButtonTint" format="color"/>
 
+        <attr name="colorMessageSelf" format="color" />
+        <attr name="colorMessageRecipient" format="color" />
 
     </declare-styleable>
     <!-- Base application theme. -->
@@ -36,6 +38,9 @@
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
+
+        <item name="colorMessageSelf">@color/colorMessageSelf</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
 
     </style>
     <style name="AppTheme.NoActionBar">
