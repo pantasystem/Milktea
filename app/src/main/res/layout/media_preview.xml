@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="files"
+                type="java.util.List&lt;jp.panta.misskeyandroidclient.model.drive.FileProperty>" />
+    </data>
+    <LinearLayout
+            android:orientation="horizontal" android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            app:thumbnailTopLeft="@{thumbnailTopLeft}"
+            app:thumbnailTopRight="@{thumbnailTopRight}"
+            app:thumbnailBottomLeft="@{thumbnailBottomLeft}"
+            app:thumbnailBottomRight="@{thumbnailBottomRight}"
+
+            app:actionButtonTopLeft="@{actionButtonTopLeft}"
+            app:actionButtonTopRight="@{actionButtonTopRight}"
+            app:actionButtonBottomLeft="@{actionButtonBottomLeft}"
+            app:actionButtonBottomRight="@{actionButtonBottomRight}"
+
+            app:baseFrameTopLeft="@{baseFrameTopLeft}"
+            app:baseFrameTopRight="@{baseFrameTopRight}"
+            app:baseFrameBottomLeft="@{baseFrameBottomLeft}"
+            app:baseFrameBottomRight="@{baseFrameBottomRight}"
+            app:previewMediaFiles="@{files}"
+            >
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+
+            <FrameLayout
+                    android:id="@+id/baseFrameTopLeft"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:ignore="NestedWeights">
+
+                <ImageView
+                        android:id="@+id/thumbnailTopLeft"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                <ImageButton
+                        android:id="@+id/actionButtonTopLeft"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        style="?android:attr/borderlessButtonStyle"
+                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+                        android:scaleType="centerCrop"
+                        />
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/baseFrameBottomLeft"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    >
+                <ImageView
+                        android:id="@+id/thumbnailBottomLeft"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                <ImageButton
+                        android:id="@+id/actionButtonBottomLeft"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        style="?android:attr/borderlessButtonStyle"
+                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+                        android:scaleType="centerCrop"
+                        />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+            <FrameLayout
+                    android:id="@+id/baseFrameTopRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:ignore="NestedWeights">
+                <ImageView
+                        android:id="@+id/thumbnailTopRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                <ImageButton
+                        android:id="@+id/actionButtonTopRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        style="?android:attr/borderlessButtonStyle"
+                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+                        android:scaleType="centerCrop"
+                        />
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/baseFrameBottomRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    >
+                <ImageView
+                        android:id="@+id/thumbnailBottomRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                <ImageButton
+                        android:id="@+id/actionButtonBottomRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        style="?android:attr/borderlessButtonStyle"
+                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+                        android:scaleType="centerCrop"
+                        />
+
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</layout>
