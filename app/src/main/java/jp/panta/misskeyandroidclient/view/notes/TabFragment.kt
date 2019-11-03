@@ -50,8 +50,8 @@ class TabFragment : Fragment(){
         super.onViewCreated(view, savedInstanceState)
 
         val miApp = context?.applicationContext as MiApplication
-        val connectionInstance = miApp.currentConnectionInstanceLiveData.value
-        val i = connectionInstance?.getI()
+        //val connectionInstance = miApp.currentConnectionInstanceLiveData.value
+        //val i = connectionInstance?.getI()
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         val includeMyRenotes = sharedPreferences.getBoolean("includeMyRenotes", true)
@@ -60,12 +60,11 @@ class TabFragment : Fragment(){
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
 
-        if(i != null){
-
-            miApp.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {
-                val settings = if(it.isNullOrEmpty()){
-                    makeDefaultNoteSetting(defaultTabType, i)
-                }else it
+        miApp.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
+            miApp.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {settingList ->
+                val settings = if(settingList.isNullOrEmpty()){
+                    makeDefaultNoteSetting(defaultTabType, ci.getI()!!)
+                }else settingList
 
                 settings.forEach{setting ->
                     setting.includeLocalRenotes = includeLocalRenotes
@@ -81,11 +80,7 @@ class TabFragment : Fragment(){
                     tabLayout.visibility = View.GONE
                 }
             })
-
-
-        }
-
-
+        })
 
     }
 

@@ -52,6 +52,8 @@ class NotificationListAdapter(
         note.reactionCounts.observe(lifecycleOwner, Observer {
             adapter.submitList(it.toList())
         })
+        holder.binding.executePendingBindings()
+        holder.binding.lifecycleOwner = lifecycleOwner
 
     }
 

@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,7 +28,7 @@ class MessageHistoryViewModel(
 
     fun loadGroupAndUser(){
         isRefreshing.postValue(true)
-        viewModelScope.launch{
+        viewModelScope.launch(Dispatchers.IO){
             try{
                 val groupRequest = RequestMessageHistory(i = connectionInstance.getI()!!, group = true, limit = 100)
                 val userRequest = RequestMessageHistory(i = connectionInstance.getI()!!, group = false, limit = 100)
@@ -55,6 +56,7 @@ class MessageHistoryViewModel(
 
             }catch(e: Exception){
                 //セイバーかわいい
+                Log.d("HistoryViewModel", "load error", e)
                 isRefreshing.postValue(false)
             }
         }
