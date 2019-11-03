@@ -21,11 +21,7 @@
             android:paddingEnd="8dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
-            app:imagePreviewTopLeft='@{imagePreviewTopLeft}'
-            app:imagePreviewTopRight='@{imagePreviewTopRight}'
-            app:imagePreviewBottomLeft='@{imagePreviewBottomLeft}'
-            app:imagePreviewBottomRight='@{imagePreviewBottomRight}'
-            app:previewFiles='@{note.files}'
+
 
             >
 
@@ -104,39 +100,25 @@
                     android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                     />
 
-            <ImageView
-                    android:id="@+id/imagePreviewTopLeft"
-                    android:layout_width="160dp" android:layout_height="90dp"
+            <FrameLayout
+                    android:id="@+id/mediaPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
                     android:layout_below="@id/text"
+                    android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
+                    tools:visibility="gone"
+                    >
+                <include layout="@layout/media_preview"
+                        app:files="@{note.files}"
 
-
-                    />
-            <ImageView
-                    android:id="@+id/image_preview_top_right"
-                    android:layout_width="160dp" android:layout_height="90dp"
-                    android:layout_toEndOf="@id/imagePreviewTopLeft"
-                    android:layout_below="@id/text"
-                    />
-
-
-            <ImageView
-                    android:id="@+id/imagePreviewBottomLeft"
-                    android:layout_width="160dp" android:layout_height="90dp"
-                    android:layout_below="@id/imagePreviewTopLeft"
-                    />
-
-            <ImageView
-                    android:id="@+id/imagePreviewBottomRight"
-                    android:layout_width="160dp" android:layout_height="90dp"
-                    android:layout_below="@id/image_preview_top_right"
-                    android:layout_toEndOf="@id/imagePreviewBottomLeft"
-                    />
+                        />
+            </FrameLayout>
 
 
 
             <RelativeLayout
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_below="@+id/imagePreviewBottomLeft"
+                    android:layout_below="@+id/mediaPreview"
                     android:paddingTop="8dp"
                     android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                     android:id="@+id/subNote"
@@ -208,6 +190,18 @@
                         android:visibility="@{note.subContentFolding? View.GONE : View.VISIBLE }"
                         />
 
+                <FrameLayout
+                        android:id="@+id/subNoteMediaPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_below="@id/subNoteText"
+                        android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
+                        >
+                    <include layout="@layout/media_preview"
+                            app:files="@{note.subNoteFiles}"
+
+                            />
+                </FrameLayout>
 
 
 

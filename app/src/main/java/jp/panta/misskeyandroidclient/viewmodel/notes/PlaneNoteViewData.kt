@@ -110,7 +110,7 @@ open class PlaneNoteViewData (private val note: Note) : NoteViewData{
     val subContentFoldingStatusMessage = Transformations.map(subContentFolding){
         if(it) "もっと見る: ${subNoteText?.length}" else "閉じる"
     }
-
+    val subNoteFiles = subNote?.files
 
     fun addReaction(reaction: String, isMyReaction: Boolean = false){
         val reactions = reactionCounts.value?: LinkedHashMap()

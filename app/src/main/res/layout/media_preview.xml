@@ -26,6 +26,9 @@
             app:baseFrameTopRight="@{baseFrameTopRight}"
             app:baseFrameBottomLeft="@{baseFrameBottomLeft}"
             app:baseFrameBottomRight="@{baseFrameBottomRight}"
+
+            app:shieldLeft="@{shieldLeft}"
+            app:shieldRight="@{shieldRight}"
             app:previewMediaFiles="@{files}"
             >
 
@@ -34,6 +37,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
+                android:id="@+id/shieldLeft"
                 >
 
             <FrameLayout
@@ -82,7 +86,7 @@
         </LinearLayout>
 
         <LinearLayout
-
+                android:id="@+id/shieldRight"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
