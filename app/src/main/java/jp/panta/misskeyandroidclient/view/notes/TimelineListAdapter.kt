@@ -64,7 +64,7 @@ class TimelineListAdapter(
             , getItem(position), notesViewModel)
         adapter.submitList(getItem(position).reactionCounts.value?.toList())
         getItem(position).reactionCounts.observe(lifecycleOwner, Observer {
-            adapter.submitList(it.toList())
+            adapter.submitList(it?.toList())
         })
 
         val item = getItem(position)

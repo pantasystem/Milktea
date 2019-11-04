@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+import android.util.Log
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -7,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import retrofit2.Response
+import java.lang.Exception
 import java.lang.IllegalArgumentException
 
 class NoteTimelineStore(
@@ -51,11 +53,17 @@ class NoteTimelineStore(
 
     private fun makeResponse(list: List<Note>?, response: Response<List<Note>?>): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
-            if(it.reply == null){
-                PlaneNoteViewData(it)
-            }else{
-                HasReplyToNoteViewData(it)
+            try{
+                if(it.reply == null){
+                    PlaneNoteViewData(it)
+                }else{
+                    HasReplyToNoteViewData(it)
+                }
+            }catch(e: Exception){
+                Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)
+                null
             }
-        })
+
+        }?.filterNotNull())
     }
 }

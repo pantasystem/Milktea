@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
@@ -90,6 +91,8 @@ class TimelineLiveData(
                 }catch(e: IOException){
                     isLoadingFlag = false
                     isLoading.postValue(false)
+                }catch (e: Exception){
+                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
                 }
 
             }
@@ -140,6 +143,8 @@ class TimelineLiveData(
                 }catch(e: IOException){
                     isLoadingFlag = false
                     isLoading.postValue(false)
+                }catch (e: Exception){
+                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
                 }
 
             }
@@ -183,6 +188,8 @@ class TimelineLiveData(
                 }
             }catch (e: IOException){
                 isLoadingFlag = false
+            }catch(e: Exception){
+                Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
             }
         }
 

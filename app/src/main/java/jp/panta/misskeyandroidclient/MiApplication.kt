@@ -223,9 +223,14 @@ class MiApplication : Application(){
             }
         }
         GlobalScope.launch{
-            Log.d("MiApplication", "Accountsの取得を開始します")
-            val notNullUsers = a.awaitAll().filterNotNull()
-            accountsLiveData.postValue(notNullUsers)
+            try{
+                Log.d("MiApplication", "Accountsの取得を開始します")
+                val notNullUsers = a.awaitAll().filterNotNull()
+                accountsLiveData.postValue(notNullUsers)
+            }catch(e: Exception){
+                Log.d("MiApplication", "Account取得中にエラー発生", e)
+            }
+
         }
 
     }

@@ -50,7 +50,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
        val accounts = miApplication.accountsLiveData.value
 
         val a = connectionInstances.map{ci ->
-            val account = accounts?.first{user ->
+            val account = accounts?.firstOrNull{user ->
                 user.id == ci.userId
             }
             if(account != null){
