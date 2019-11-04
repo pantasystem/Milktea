@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -25,6 +26,8 @@ class MessageHistoryViewModel(
     val historyGroupAndUserLiveData = MutableLiveData<List<HistoryViewData>>()
 
     val isRefreshing = MutableLiveData<Boolean>(false)
+
+    val messageHistorySelected = EventBus<HistoryViewData>()
 
     fun loadGroupAndUser(){
         isRefreshing.postValue(true)
@@ -103,6 +106,10 @@ class MessageHistoryViewModel(
                 Log.d("MessageHistory", "user historyの取得に失敗しました・・セイバーかわいい:$call")
             }
         })
+    }
+
+    fun openMessage(messageHistory: HistoryViewData){
+        messageHistorySelected.event = messageHistory
     }
 
 }

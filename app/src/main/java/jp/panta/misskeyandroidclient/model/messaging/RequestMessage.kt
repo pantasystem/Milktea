@@ -14,19 +14,19 @@ data class RequestMessage(
 
 ){
     class Builder(private val connectionInstance: ConnectionInstance, message: Message){
-        val group: Group? = null
+        val group = message.group
         val user = if(connectionInstance.userId == message.recipient?.id){
             message.user
         }else{
             message.recipient
         }
         var limit: Int? = null
-        val markAsRead: Boolean? = null
+        var markAsRead: Boolean? = null
 
         fun build(sinceId: String?, untilId: String?): RequestMessage{
             return RequestMessage(
                 i = connectionInstance.getI()!!,
-                userId = user?.id,
+                userId = if(group == null) user?.id else null,
                 groupId = group?.id,
                 limit = limit,
                 sinceId = sinceId,

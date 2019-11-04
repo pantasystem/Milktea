@@ -23,7 +23,6 @@ import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
-import jp.panta.misskeyandroidclient.view.messaging.MessageListFragment
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment

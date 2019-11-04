@@ -6,6 +6,9 @@
         <variable
                 name="historyViewData"
                 type="jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData" />
+        <variable
+                name="historyViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -16,7 +19,9 @@
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp">
+                android:padding="8dp"
+                android:onClick="@{ ()-> historyViewModel.openMessage(historyViewData) }"
+                >
 
             <ImageView
                     android:id="@+id/history_icon"

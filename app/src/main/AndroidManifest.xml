@@ -14,7 +14,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".DriveActivity"></activity>
+        <activity android:name=".MessageActivity"></activity>
+        <activity android:name=".DriveActivity" />
         <activity android:name=".TabSettingActivity" />
         <activity
                 android:name=".SettingsActivity"
@@ -36,8 +37,7 @@
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"
-                android:windowSoftInputMode="adjustPan"
-                >
+                android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -24,5 +24,7 @@ class HistoryListAdapter(
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         holder.binding.historyViewData = getItem(position)
+        holder.binding.historyViewModel = historyViewModel
+        holder.binding.executePendingBindings()
     }
 }

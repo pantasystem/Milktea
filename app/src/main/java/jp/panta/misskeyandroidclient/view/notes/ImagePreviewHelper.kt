@@ -8,7 +8,7 @@ import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import java.lang.IndexOutOfBoundsException
-
+/*
 object ImagePreviewHelper {
 
 
@@ -49,4 +49,4 @@ object ImagePreviewHelper {
         //for(n in 0.until(previewFiles?.size?: 0))
     }
 
-}
+}*/

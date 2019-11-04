@@ -1,6 +1,9 @@
 package jp.panta.misskeyandroidclient.view.messaging
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -9,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import jp.panta.misskeyandroidclient.MessageActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData
@@ -48,7 +52,16 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
                 historyViewModel.loadGroupAndUser()
             }
 
+            historyViewModel.messageHistorySelected.observe(viewLifecycleOwner, Observer {
+                Handler(Looper.getMainLooper()).post{
+                    val intent = Intent(activity, MessageActivity::class.java)
+                    intent.putExtra(MessageActivity.EXTRA_MESSAGE_HISTORY, it.message)
+                    startActivity(intent)
+                }
+            })
+
             historyViewModel.loadGroupAndUser()
+
 
         })
 

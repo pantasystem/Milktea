@@ -51,7 +51,11 @@ class StreamingAdapter(
 
             if (text.isNotBlank()) {
                 observers.forEach {
-                    it.onReceived(text)
+                    try{
+                        it.onReceived(text)
+                    }catch(e: Exception){
+                        Log.d("StreamingAdapter", "error")
+                    }
                 }
             }
         }
