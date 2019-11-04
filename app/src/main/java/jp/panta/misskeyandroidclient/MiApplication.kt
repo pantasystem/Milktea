@@ -38,7 +38,9 @@ class MiApplication : Application(){
     //var currentUserId: String? = null
 
     //private val misskeyAPIService = MisskeyAPIServiceBuilder.build(nowInstance)
-    var currentConnectionInstanceLiveData = MutableLiveData<ConnectionInstance>()
+    val currentConnectionInstanceLiveData = MutableLiveData<ConnectionInstance>()
+
+    val connectionInstancesLiveData = MutableLiveData<List<ConnectionInstance>>()
 
     var nowInstanceMeta: Meta? = null
 
@@ -78,6 +80,8 @@ class MiApplication : Application(){
         val currentUserId = getCurrentUserId()
         GlobalScope.launch{
             try{
+                connectionInstancesLiveData.postValue(connectionInstanceDao!!.findAll())
+
                 val ci = if(currentUserId == null){
                     connectionInstanceDao!!.findAll()?.firstOrNull()
 
