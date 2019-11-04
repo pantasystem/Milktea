@@ -49,14 +49,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private var mFirstVisibleItemPosition: Int? = null
 
-    /*override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_swipe_refresh_recycler_view, container, false)
-    }*/
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //val adapter = TimelineListAdapter(diffUtilCallBack)
-        //list_view.adapter = adapter
+
         mLinearLayoutManager = LinearLayoutManager(this.context!!)
         list_view.layoutManager = mLinearLayoutManager
 
@@ -65,72 +62,50 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting
 
         val miApplication = context?.applicationContext as MiApplication
-        val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
 
-        if(nowConnectionInstance != null){
-            initTimeline(nowConnectionInstance, miApplication, true)
-
-        }
-
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
-            if(mViewModel != null){
-                initTimeline(it, miApplication, true)
-            }
-        })
-
-        //initViewModelListener()
-    }
-
-    private fun initTimeline(nowConnectionInstance: ConnectionInstance, miApplication: MiApplication, isAutoLoad: Boolean){
-        val a = TimelineViewModelFactory(nowConnectionInstance, mSetting!!, miApplication, isAutoLoad)
-        Log.d("TimelineFragment", "setting: $mSetting")
-        val store = activity?.viewModelStore
-        if(store == null){
-            Log.e("TimelineFragment", "activity#viewModelStore is null")
-            return
-        }
-        mViewModel = ViewModelProvider(store, a).get(mSetting?.toString()!!,TimelineViewModel::class.java)
-
-        val notesViewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
-
-        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
-        list_view.adapter = adapter
         list_view.addOnScrollListener(mScrollListener)
+        list_view.layoutManager = mLinearLayoutManager
 
-        var timelineState: TimelineState.State? = null
-        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
+        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
+            val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, true)
+            mViewModel = ViewModelProvider(this, factory).get(TimelineViewModel::class.java)
 
-            adapter.submitList(it.notes)
-            timelineState = it.state
+            val notesViewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
 
-        })
+            val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
+            list_view.adapter = adapter
 
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+            var  timelineState: TimelineState.State? = null
+            mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
+                adapter.submitList(it.notes)
+                timelineState = it.state
+            })
 
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
+            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
 
-                if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
-                    mLinearLayoutManager.scrollToPosition(0)
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+
+                    if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
+                        mLinearLayoutManager.scrollToPosition(0)
+                    }
+                    //Log.d("onItemRangeInserted", "positionStart: $positionStart")
                 }
-                //Log.d("onItemRangeInserted", "positionStart: $positionStart")
-            }
+            })
+
+            mViewModel?.isLoading?.observe(viewLifecycleOwner, Observer<Boolean> {
+                if(it != null && !it){
+                    refresh?.isRefreshing = false
+                }
+            })
         })
-
-
 
         refresh.setOnRefreshListener {
             mViewModel?.loadNew()
         }
 
-        mViewModel?.isLoading?.observe(viewLifecycleOwner, Observer<Boolean> {
-            if(it != null && !it){
-                refresh?.isRefreshing = false
-            }
-        })
+
     }
-
-
 
     override fun onResume() {
         super.onResume()
@@ -180,16 +155,13 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val itemCount = mLinearLayoutManager?.itemCount?: -1
 
             mFirstVisibleItemPosition = firstVisibleItemPosition
-            //val childCount = recyclerView.childCount
-            //Log.d("", "firstVisibleItem: $firstVisibleItemPosition, itemCount: $itemCount, childCount: $childCount")
-            //Log.d("", "first:$firstVisibleItemPosition, end:$endVisibleItemPosition, itemCount:$itemCount")
+
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")
             }
 
             if(endVisibleItemPosition == (itemCount - 1)){
                 Log.d("", "後ろ")
-                //mTimelineViewModel?.getOldTimeline()
                 mViewModel?.loadOld()
 
             }
