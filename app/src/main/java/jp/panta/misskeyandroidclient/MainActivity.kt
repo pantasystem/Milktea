@@ -22,6 +22,7 @@ import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
@@ -29,9 +30,11 @@ import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
+import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,6 +43,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var mNotesViewModel: NotesViewModel
+    private lateinit var mAccountViewModel: AccountViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +56,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        /*val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }*/
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val toggle = ActionBarDrawerToggle(
@@ -70,10 +69,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //replaceTimelineFragment()
         init()
 
-        /*val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        mainViewModel.test.observe(this, Observer {
-            Log.d("MainActivity", "値の更新があった更新内容: $it")
-        })*/
 
         val miApplication = application as MiApplication
 
@@ -81,9 +76,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             if(!init){
                 init()
-                setHeaderProfile(it, mainBinding)
                 mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
+                mAccountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
+
                 initViewModelListener()
+                initAccountViewModelListener()
+
+                setHeaderProfile(it, mainBinding, mAccountViewModel)
+
                 init = true
                 //observeTab()
                 Log.d("MainActivity", "初期化処理")
@@ -134,25 +134,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    /*private fun observeTab(){
-        (application as MiApplication).tabDao?.findAll()?.observe(this, Observer {
-            updateHome()
-        })
-    }*/
-
-    private fun updateHome(){
-        val ci = (application as MiApplication).currentConnectionInstanceLiveData.value
-        if(ci != null){
-            val ft = supportFragmentManager.beginTransaction()
-            val homeFragment = supportFragmentManager.findFragmentByTag("home")
-            if(homeFragment != null){
-                ft.remove(homeFragment)
-            }
-            ft.add(R.id.content_main, TabFragment(), "home")
-
-            ft.commit()
-        }
-    }
 
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "reply clicked :$it")
@@ -207,6 +188,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mNotesViewModel.reactionTarget.observe(this, reactionTargetObserver)
     }
 
+    private val switchAccountButtonObserver = Observer<Int>{
+        runOnUiThread{
+            drawer_layout.closeDrawer(GravityCompat.START)
+            val dialog = AccountSwitchingDialog()
+            dialog.show(supportFragmentManager, "mainActivity")
+        }
+    }
+
+    private val switchAccountObserver = Observer<ConnectionInstance>{
+        (application as MiApplication).switchAccount(it)
+    }
+
+    private fun initAccountViewModelListener(){
+        mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
+        mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
+
+        mAccountViewModel.switchTargetConnectionInstance.removeObserver(switchAccountObserver)
+        mAccountViewModel.switchTargetConnectionInstance.observe(this, switchAccountObserver)
+    }
     fun changeTitle(title: String?){
         toolbar.title = title
     }
@@ -287,11 +287,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun setHeaderProfile(ci: ConnectionInstance, activityMainBinding: ActivityMainBinding){
+    private fun setHeaderProfile(ci: ConnectionInstance, activityMainBinding: ActivityMainBinding, accountViewModel: AccountViewModel){
 
 
         DataBindingUtil.bind<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
         val headerBinding = DataBindingUtil.getBinding<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
+        headerBinding?.accountViewModel = mAccountViewModel
 
         runOnUiThread {
             //nav_view.name.text = "namenamename"

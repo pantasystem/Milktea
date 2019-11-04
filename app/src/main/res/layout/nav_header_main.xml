@@ -6,6 +6,9 @@
         <variable
                 name="user"
                 type="jp.panta.misskeyandroidclient.model.users.User" />
+        <variable
+                name="accountViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
     </data>
     <RelativeLayout
             android:layout_width="match_parent"
@@ -36,7 +39,9 @@
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="30dp"
-                app:srcCompat="@drawable/ic_menu_black_24dp" />
+                app:srcCompat="@drawable/ic_menu_black_24dp"
+                android:onClick="@{() -> accountViewModel.showSwitchDialog() }"
+                />
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
