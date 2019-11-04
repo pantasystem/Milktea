@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
+import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
@@ -18,13 +18,13 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import jp.panta.misskeyandroidclient.model.users.User
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
+import java.lang.IllegalArgumentException
 
 
 //基本的な情報はここを返して扱われる
@@ -44,12 +44,17 @@ class MiApplication : Application(){
 
     val connectionInstancesLiveData = MutableLiveData<List<ConnectionInstance>>()
 
+    val currentAccountLiveData = MutableLiveData<User>()
+    val accountsLiveData = MutableLiveData<List<User>>()
+
     var nowInstanceMeta: Meta? = null
 
     private lateinit var sharedPreferences: SharedPreferences
 
     var misskeyAPIService: MisskeyAPI? = null
         private set
+
+    private var misskeyAPIServiceDomainMap: Map<String, MisskeyAPI>? = null
 
     var streamingAdapter: StreamingAdapter? = null
         private set
@@ -61,12 +66,6 @@ class MiApplication : Application(){
     private var mConnectionInstance: ConnectionInstance? = null
 
     var isSuccessLoadConnectionInstance = MutableLiveData<Boolean>()
-    //val streamingAdapter: StreamingAdapter = StreamingAdapter(getConnectionInstance())
-
-    /*fun getConnectionInstance(): ConnectionInstance{
-        return ConnectionInstance(instanceBaseUrl = nowInstance, userId = "7roinhytrr", accessToken = "")
-    }*/
-
 
 
     override fun onCreate() {
@@ -85,6 +84,11 @@ class MiApplication : Application(){
             try{
                 val connectionInstances = connectionInstanceDao!!.findAll()
                 this@MiApplication.connectionInstancesLiveData.postValue(connectionInstances)
+                Log.d("MiApplication", "connectionInstances: $connectionInstances")
+
+                misskeyAPIServiceDomainMap = connectionInstances?.map{
+                    it.instanceBaseUrl to MisskeyAPIServiceBuilder.build(it.instanceBaseUrl)
+                }?.toMap()
 
                 val current = if(currentUserId == null){
                     connectionInstanceDao?.findAll()?.firstOrNull()
@@ -103,50 +107,41 @@ class MiApplication : Application(){
                 isSuccessLoadConnectionInstance.postValue(false)
             }
         }
-        //old
 
-        GlobalScope.launch{
-            try{
-                connectionInstancesLiveData.postValue(connectionInstanceDao!!.findAll())
-
-                val ci = if(currentUserId == null){
-                    connectionInstanceDao!!.findAll()?.firstOrNull()
-
-                }else{
-                    connectionInstanceDao!!.findByUserId(currentUserId)
-                }
-
-                if(ci == null){
-                    Log.w("MiApplication", "接続可能なアカウントを発見不能")
-                    isSuccessLoadConnectionInstance.postValue(false)
-                }else{
-                    //init
-                    updateRelationConnectionInstanceProperty(ci)
-                }
-            }catch(e: Exception){
-                isSuccessLoadConnectionInstance.postValue(false)
-
-            }
-
+        connectionInstancesLiveData.observeForever {
+            updateAccounts(it)
         }
+
+        currentConnectionInstanceLiveData.observeForever {
+            updateCurrentAccount(it, misskeyAPIService)
+        }
+
 
 
     }
 
     fun switchAccount(ci: ConnectionInstance){
-        GlobalScope.launch(Dispatchers.IO){
-            try{
-                updateRelationConnectionInstanceProperty(ci)
-            }catch(e: Exception){
-                Log.d("MiViewModel", "アカウントの切り替えに失敗しました")
-            }
+
+        val count = connectionInstancesLiveData.value?.filter{
+            it.userId == ci.userId && it.accessToken == ci.accessToken
+        }?.size
+        if(count != null && count > 0){
+            updateRelationConnectionInstanceProperty(ci)
+        }else{
+            throw IllegalArgumentException("対象のアカウントが存在しませんこのメソッドは無効です")
         }
+
     }
 
     fun addAccount(ci: ConnectionInstance){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 connectionInstanceDao?.insert(ci)
+                val connectionInstances = connectionInstanceDao?.findAll()
+                misskeyAPIServiceDomainMap = connectionInstances?.map{
+                    it.instanceBaseUrl to MisskeyAPIServiceBuilder.build(it.instanceBaseUrl)
+                }?.toMap()
+
                 updateRelationConnectionInstanceProperty(ci)
                 connectionInstancesLiveData.postValue(connectionInstanceDao?.findAll())
             }catch(e: Exception){
@@ -160,8 +155,16 @@ class MiApplication : Application(){
     private fun updateRelationConnectionInstanceProperty(ci: ConnectionInstance){
         try{
             setCurrentUserId(ci.userId)
-            misskeyAPIService = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
+            //misskeyAPIService = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
+            var service = misskeyAPIServiceDomainMap?.get(ci.instanceBaseUrl)
+            if(service == null){
+                Log.e("MiApplication","MisskeyAPIServiceを発見できなかった")
+                service = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
+            }
+            misskeyAPIService = service
+            streamingAdapter?.dissconnect()
             streamingAdapter = StreamingAdapter(ci)
+
             streamingAdapter?.connect()
             //noteCapture = NoteCapture(ci.userId)
             noteCapture.myUserId = ci.userId
@@ -204,4 +207,40 @@ class MiApplication : Application(){
                 }
             })
     }
+
+    private fun updateAccounts(instances: List<ConnectionInstance>){
+
+        val a = instances.map{
+            GlobalScope.async {
+                try{
+                    val api = misskeyAPIServiceDomainMap?.get(it.instanceBaseUrl)
+
+                    api?.i(I(it.getI()!!))?.execute()?.body()
+
+                }catch(e: Exception){
+                    null
+                }
+            }
+        }
+        GlobalScope.launch{
+            Log.d("MiApplication", "Accountsの取得を開始します")
+            val notNullUsers = a.awaitAll().filterNotNull()
+            accountsLiveData.postValue(notNullUsers)
+        }
+
+    }
+
+    private fun updateCurrentAccount(ci: ConnectionInstance, misskeyAPI: MisskeyAPI?){
+        misskeyAPI?.i(I(i = ci.getI()!!))?.enqueue(object : Callback<User>{
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                Log.d("MiApplication", "iを取得しました${response.body()}")
+                currentAccountLiveData.postValue(response.body())
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                Log.d("MiApplication", "iの取得に失敗しました")
+            }
+        })
+    }
+
 }

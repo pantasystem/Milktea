@@ -20,9 +20,12 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class NotesViewModel(
-    private val connectionInstance: ConnectionInstance,
-    private val misskeyAPI: MisskeyAPI
+    ci: ConnectionInstance,
+    api: MisskeyAPI
 ) : ViewModel(){
+
+    var connectionInstance = ci
+    var misskeyAPI = api
 
     val statusMessage = EventBus<String>()
 
@@ -99,11 +102,12 @@ class NotesViewModel(
                     ).execute()
 
                 }
-                misskeyAPI.createReaction(CreateReaction(
+                val res = misskeyAPI.createReaction(CreateReaction(
                     i = connectionInstance.getI()!!,
                     reaction = reaction,
                     noteId = planeNoteViewData.toShowNote.id
                 )).execute()
+                Log.d("NotesViewModel", "結果: $res")
             }catch(e: Exception){
                 Log.e("NotesViewModel", "postReaction error", e)
             }
@@ -112,6 +116,7 @@ class NotesViewModel(
     }
 
     fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData){
+        Log.d("NotesViewModel", "connectionInstance: $connectionInstance")
         reactionTarget.event = planeNoteViewData
     }
 

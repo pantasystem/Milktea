@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
@@ -21,13 +22,7 @@ import kotlinx.android.synthetic.main.fragment_notification.*
 
 class NotificationFragment : Fragment(R.layout.fragment_notification){
 
-    /*override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_notification, container, false)
-    }*/
+
     lateinit var mLinearLayoutManager: LinearLayoutManager
     lateinit var mViewModel: NotificationViewModel
 
@@ -43,7 +38,8 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
             val factory = NotificationViewModelFactory(nowConnectionInstance, miApplication)
             mViewModel = ViewModelProvider(this, factory).get(NotificationViewModel::class.java)
 
-            val notesViewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
+            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(nowConnectionInstance, miApplication)).get(NotesViewModel::class.java)
+
 
             val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, viewLifecycleOwner)
             notification_list_view.adapter = adapter
@@ -77,10 +73,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
             val endVisibleItemPosition = mLinearLayoutManager?.findLastVisibleItemPosition()?: -1
             val itemCount = mLinearLayoutManager?.itemCount?: -1
 
-            //mFirstVisibleItemPosition = firstVisibleItemPosition
-            //val childCount = recyclerView.childCount
-            //Log.d("", "firstVisibleItem: $firstVisibleItemPosition, itemCount: $itemCount, childCount: $childCount")
-            //Log.d("", "first:$firstVisibleItemPosition, end:$endVisibleItemPosition, itemCount:$itemCount")
+
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")
             }

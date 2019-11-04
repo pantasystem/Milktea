@@ -68,9 +68,12 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
             val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, true)
-            mViewModel = ViewModelProvider(this, factory).get(TimelineViewModel::class.java)
+            mViewModel = ViewModelProvider(this, factory).get("$ci",TimelineViewModel::class.java)
 
             val notesViewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
+            notesViewModel.connectionInstance = ci
+            notesViewModel.misskeyAPI = miApplication.misskeyAPIService!!
+            Log.d("TimelineFragment", "Activityとの一致度！！！！: ${notesViewModel === (activity as MainActivity?)?.mNotesViewModel}")
 
             val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
             list_view.adapter = adapter

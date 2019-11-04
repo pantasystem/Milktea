@@ -104,9 +104,8 @@ class TimelineLiveData(
             val sinceId = value?.getSinceId()
             if(sinceId == null){
                 isLoadingFlag = false
-                //初期化処理 or 何もしない
                 isLoading.postValue(false)
-                return
+                return loadInit()
             }
             coroutineScope.launch(Dispatchers.IO){
                 try{
@@ -149,8 +148,8 @@ class TimelineLiveData(
     }
 
     fun loadOld(){
-        val untilId = value?.getUntilId()
-        if( isLoadingFlag || untilId == null){
+        val untilId = value?.getUntilId() ?: return loadInit()
+        if( isLoadingFlag){
             return
         }
         isLoadingFlag = true

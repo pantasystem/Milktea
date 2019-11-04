@@ -36,6 +36,10 @@ class StreamingAdapter(
         mWebSocket = OkHttpClient().newWebSocket(request, webSocketListener)
     }
 
+    fun dissconnect(){
+        mWebSocket?.cancel()
+    }
+
     private val webSocketListener = object : WebSocketListener(){
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d(TAG, "onOpenコネクション開始")
@@ -86,20 +90,7 @@ class StreamingAdapter(
             }
             Thread.sleep(1000)
             connect()
-            /*synchronized(captureNoteMap){
-                val iterator = captureNoteMap.iterator()
-                while( iterator.hasNext() ){
-                    val next = iterator.next()
-                    couldNoteBeSentDataQueue.add(next.value)
-                    iterator.remove()
-                }
-            }
-            mWebSocket = null
 
-            Thread.sleep(1000)
-            start()
-
-        }*/
         }
     }
 

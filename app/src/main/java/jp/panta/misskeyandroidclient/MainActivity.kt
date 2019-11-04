@@ -42,7 +42,7 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private lateinit var mNotesViewModel: NotesViewModel
+    lateinit var mNotesViewModel: NotesViewModel
     private lateinit var mAccountViewModel: AccountViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,14 +75,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var init = false
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             if(!init){
-                init()
                 mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
+
                 mAccountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
+                Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.connectionInstance}")
+
+                init()
 
                 initViewModelListener()
                 initAccountViewModelListener()
 
-                setHeaderProfile(it, mainBinding, mAccountViewModel)
+                setHeaderProfile(mainBinding)
 
                 init = true
                 //observeTab()
@@ -287,31 +290,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun setHeaderProfile(ci: ConnectionInstance, activityMainBinding: ActivityMainBinding, accountViewModel: AccountViewModel){
+    private fun setHeaderProfile(activityMainBinding: ActivityMainBinding){
 
 
         DataBindingUtil.bind<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
         val headerBinding = DataBindingUtil.getBinding<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
         headerBinding?.accountViewModel = mAccountViewModel
 
-        runOnUiThread {
-            //nav_view.name.text = "namenamename"
-
-        }
-        val i = ci.getI()
-        if(i != null){
-            (application as MiApplication).misskeyAPIService?.i(I(i))?.enqueue( object: Callback<User>{
-                override fun onResponse(call: Call<User>, response: Response<User>) {
-                    Log.d("MainActivity", "i: ${response.body()}")
-                    //binding.user = response.body()
-                    headerBinding?.user = response.body()
-                }
-
-                override fun onFailure(call: Call<User>, t: Throwable) {
-
-                }
-            })
-        }
+        (application as MiApplication).currentAccountLiveData.observe(this, Observer {
+            headerBinding?.user = it
+        })
     }
 
     override fun onBackPressed() {
