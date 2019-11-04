@@ -57,4 +57,5 @@
 
     <string name="file">File</string>
     <string name="folder">Folder</string>
+    <string name="add_account">アカウントを追加</string>
 </resources>
