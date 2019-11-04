@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
@@ -17,6 +18,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -78,6 +80,31 @@ class MiApplication : Application(){
         noteRequestSettingDao = database.noteSettingDao()
 
         val currentUserId = getCurrentUserId()
+
+        GlobalScope.launch{
+            try{
+                val connectionInstances = connectionInstanceDao!!.findAll()
+                this@MiApplication.connectionInstancesLiveData.postValue(connectionInstances)
+
+                val current = if(currentUserId == null){
+                    connectionInstanceDao?.findAll()?.firstOrNull()
+                }else{
+                    connectionInstanceDao!!.findByUserId(currentUserId)
+                        ?: connectionInstanceDao?.findAll()?.firstOrNull()
+                }
+
+                if(current == null){
+                    Log.w("MiApplication", "接続可能なアカウントを発見不能")
+                    isSuccessLoadConnectionInstance.postValue(false)
+                }else{
+                    updateRelationConnectionInstanceProperty(current)
+                }
+            }catch(e: Exception){
+                isSuccessLoadConnectionInstance.postValue(false)
+            }
+        }
+        //old
+
         GlobalScope.launch{
             try{
                 connectionInstancesLiveData.postValue(connectionInstanceDao!!.findAll())
@@ -94,7 +121,7 @@ class MiApplication : Application(){
                     isSuccessLoadConnectionInstance.postValue(false)
                 }else{
                     //init
-                    initConnectionInstance(ci)
+                    updateRelationConnectionInstanceProperty(ci)
                 }
             }catch(e: Exception){
                 isSuccessLoadConnectionInstance.postValue(false)
@@ -106,13 +133,31 @@ class MiApplication : Application(){
 
     }
 
-    fun setCurrentInstance(ci: ConnectionInstance){
-        this.currentConnectionInstanceLiveData.postValue(ci)
-        initConnectionInstance(ci)
-
+    fun switchAccount(ci: ConnectionInstance){
+        GlobalScope.launch(Dispatchers.IO){
+            try{
+                updateRelationConnectionInstanceProperty(ci)
+            }catch(e: Exception){
+                Log.d("MiViewModel", "アカウントの切り替えに失敗しました")
+            }
+        }
     }
 
-    private fun initConnectionInstance(ci: ConnectionInstance){
+    fun addAccount(ci: ConnectionInstance){
+        GlobalScope.launch(Dispatchers.IO){
+            try{
+                connectionInstanceDao?.insert(ci)
+                updateRelationConnectionInstanceProperty(ci)
+                connectionInstancesLiveData.postValue(connectionInstanceDao?.findAll())
+            }catch(e: Exception){
+                Log.e("MiViewModel", "アカウントを追加することに失敗しました", e)
+            }
+        }
+    }
+
+
+
+    private fun updateRelationConnectionInstanceProperty(ci: ConnectionInstance){
         try{
             setCurrentUserId(ci.userId)
             misskeyAPIService = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)

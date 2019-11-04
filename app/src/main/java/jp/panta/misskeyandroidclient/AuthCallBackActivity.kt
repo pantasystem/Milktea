@@ -63,8 +63,9 @@ class AuthCallBackActivity : AppCompatActivity() {
                     Toast.makeText(this, "Please wait.", Toast.LENGTH_LONG).show()
                 }else{
                     val ci = ConnectionInstance(instanceBaseUrl = instance.domain, accessToken = token.accessToken, userId = token.user.id)
-                    (application as MiApplication).setCurrentInstance(ci)
-                    GlobalScope.launch{
+                    (application as MiApplication).addAccount(ci)
+                    finish()
+                    /*GlobalScope.launch{
                         try{
                             (application as MiApplication).connectionInstanceDao?.insert(ci)
                             runOnUiThread {
@@ -75,7 +76,7 @@ class AuthCallBackActivity : AppCompatActivity() {
                             Log.d("AuthActivity", "エラー", e)
                         }
 
-                    }
+                    }*/
                 }
             }
 
