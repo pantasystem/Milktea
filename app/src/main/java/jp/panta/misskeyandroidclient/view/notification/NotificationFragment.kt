@@ -32,13 +32,12 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
         mLinearLayoutManager = LinearLayoutManager(this.context!!)
 
         val miApplication = context?.applicationContext as MiApplication
-        val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
+        //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
+        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
+            val factory = NotificationViewModelFactory(ci, miApplication)
+            mViewModel = ViewModelProvider(this, factory).get("$ci",NotificationViewModel::class.java)
 
-        if(nowConnectionInstance != null){
-            val factory = NotificationViewModelFactory(nowConnectionInstance, miApplication)
-            mViewModel = ViewModelProvider(this, factory).get(NotificationViewModel::class.java)
-
-            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(nowConnectionInstance, miApplication)).get(NotesViewModel::class.java)
+            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ci, miApplication)).get(NotesViewModel::class.java)
 
 
             val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, viewLifecycleOwner)
@@ -59,8 +58,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
                 mViewModel.loadInit()
             }
 
-            notification_list_view.addOnScrollListener(mScrollListener)
-        }
+        })
+
+        notification_list_view.addOnScrollListener(mScrollListener)
 
 
     }

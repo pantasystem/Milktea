@@ -101,6 +101,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     refresh?.isRefreshing = false
                 }
             })
+
+            mViewModel?.loadInit()
+
         })
 
         refresh.setOnRefreshListener {
@@ -118,7 +121,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         if(isLoadInit){
 
         }else{
-            mViewModel?.loadInit()
+            //mViewModel?.loadInit()
             isLoadInit = true
         }
 
