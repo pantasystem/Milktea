@@ -14,13 +14,15 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MessageActivity"></activity>
+        <activity android:name=".MessageActivity"/>
         <activity android:name=".DriveActivity" />
         <activity android:name=".TabSettingActivity" />
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings" />
-        <activity android:name=".NoteEditorActivity" />
+        <activity android:name=".NoteEditorActivity"
+                android:windowSoftInputMode="adjustResize"
+                />
         <activity android:name=".AuthCallBackActivity">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
