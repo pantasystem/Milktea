@@ -38,7 +38,7 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
 
             val activity = activity
                 ?:return@Observer
-            val driveViewModelFactory = DriveViewModelFactory(cn ,miApplication)
+            val driveViewModelFactory = DriveViewModelFactory(cn ,miApplication, 0)
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {
                 folderViewModel.currentFolder.postValue(it.id)

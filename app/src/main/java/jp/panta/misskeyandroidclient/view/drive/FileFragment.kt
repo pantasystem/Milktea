@@ -53,8 +53,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val maxSize = arguments?.getInt(ARGS_SELECTABLE_MAX_SIZE)
-        val isSelectable = maxSize != null
+        val maxSize = arguments?.getInt(ARGS_SELECTABLE_MAX_SIZE)?: 0
         val folderId = arguments?.getString(ARGS_FOLDER_ID)
 
         mLinearLayoutManager = LinearLayoutManager(context)
@@ -62,12 +61,15 @@ class FileFragment : Fragment(R.layout.fragment_file){
 
         val miApplication = context?.applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
-            val factory  = FileViewModelFactory(it, miApplication, isSelectable = isSelectable, maxSelectableItemSize = maxSize?: 0, folderId = folderId)
+            val activity = activity?: return@Observer
+
+            val driveViewModelFactory = DriveViewModelFactory(it, miApplication, maxSize)
+            val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
+
+            val factory  = FileViewModelFactory(it, miApplication, driveViewModel.selectedFilesMapLiveData, maxSelectableItemSize = driveViewModel.selectableMaxSize, folderId = folderId)
             val viewModel  = ViewModelProvider(this, factory).get(FileViewModel::class.java)
 
-            val activity = activity?: return@Observer
-            val driveViewModelFactory = DriveViewModelFactory(it, miApplication)
-            val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
+
 
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {directory ->
                 viewModel.currentFolder.postValue(directory.id)

@@ -8,13 +8,14 @@ import java.lang.IllegalArgumentException
 
 class DriveViewModelFactory(
     private val connectionInstance: ConnectionInstance,
-    private val miApplication: MiApplication
+    private val miApplication: MiApplication,
+    private val maxSelectableSize: Int
 ) : ViewModelProvider.Factory{
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == DriveViewModel::class.java){
             val misskeyAPI = miApplication.misskeyAPIService!!
-            return DriveViewModel(connectionInstance, misskeyAPI) as T
+            return DriveViewModel(connectionInstance, misskeyAPI, maxSelectableSize) as T
         }
         throw IllegalArgumentException("DriveViewModel::class.javaを指定してください")
     }

@@ -16,6 +16,11 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import kotlinx.android.synthetic.main.activity_drive.*
 
 class DriveActivity : AppCompatActivity() {
+    companion object{
+        //const val EXTRA_IS_FILE_SELECTABLE = "jp.panta.misskeyandroidclient.EXTRA_IS_FILE_SELECTABLE"
+        const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
+        const val EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
+    }
 
     private var mViewModel: DriveViewModel? = null
 
@@ -29,12 +34,15 @@ class DriveActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         dirListView.layoutManager = layoutManager
 
+        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
+
         val miApplication = applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
-            val viewModel = ViewModelProvider(this, DriveViewModelFactory(it, miApplication)).get(DriveViewModel::class.java)
+            val viewModel = ViewModelProvider(this, DriveViewModelFactory(it, miApplication, maxSize)).get(DriveViewModel::class.java)
             mViewModel = viewModel
 
             val adapter = DirListAdapter(diffUtilItemCallback, viewModel)
+            dirListView.adapter = adapter
             viewModel.hierarchyDirectory.observe(this, Observer {dir ->
                 Log.d("DriveActivity", "更新がありました: $dir")
                 adapter.submitList(dir)
@@ -61,6 +69,7 @@ class DriveActivity : AppCompatActivity() {
             mViewModel?.moveParentDirectory()
             return
         }
+        mViewModel
         super.onBackPressed()
     }
 
