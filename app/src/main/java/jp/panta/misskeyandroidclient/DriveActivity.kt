@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +25,7 @@ class DriveActivity : AppCompatActivity() {
     }
 
     private var mViewModel: DriveViewModel? = null
+    private var mMenuOpen: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +37,7 @@ class DriveActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         dirListView.layoutManager = layoutManager
 
-        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 4)
+        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
 
         if(maxSize > 0){
             supportActionBar?.title = "ファイルを選択"
@@ -56,6 +59,7 @@ class DriveActivity : AppCompatActivity() {
 
             viewModel.selectedFilesMapLiveData?.observe(this, Observer{selected ->
                 supportActionBar?.title = "選択済み ${selected.size}/${maxSize}"
+                mMenuOpen?.isEnabled = selected.isNotEmpty() && selected.size <= maxSize
             })
         })
 
@@ -66,9 +70,34 @@ class DriveActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_drive, menu)
+        val openMenu = menu?.findItem(R.id.action_open)
+        mMenuOpen = openMenu
+        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
+        //openMenu?.isCheckable = true
+        //openMenu?.isEnabled = false
+        openMenu?.isVisible = maxSize > 0
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             android.R.id.home -> finish()
+            R.id.action_open ->{
+                val ids = mViewModel?.getSelectedFileIds()
+                if(ids != null){
+                    intent.putStringArrayListExtra(EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID, ArrayList(ids))
+
+                    setResult(RESULT_OK)
+                    finish()
+
+                }else{
+                    setResult(Activity.RESULT_CANCELED)
+                    finish()
+                }
+            }
         }
         return super.onOptionsItemSelected(item)
     }
