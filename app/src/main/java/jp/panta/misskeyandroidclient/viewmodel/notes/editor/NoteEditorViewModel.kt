@@ -37,12 +37,6 @@ class NoteEditorViewModel(
     }
 
 
-
-
-    /*val isPostAvailable = Transformations.map(textRemaining){
-        val totalImageTmp = totalImageCount.value
-        it in 0 until maxTextLength || (totalImageTmp != null && totalImageTmp > 0 && totalImageTmp <= 4)
-    }*/
     val isPostAvailable = MediatorLiveData<Boolean>().apply{
         this.addSource(textRemaining){
             val totalImageTmp = totalImageCount.value
@@ -51,6 +45,23 @@ class NoteEditorViewModel(
         this.addSource(totalImageCount){
             val tmpTextSize = textRemaining.value
             this.value = tmpTextSize in 0 until maxTextLength || (it != null && it > 0 && it <= 4)
+        }
+    }
+
+    fun addLocalFile(file: File): Boolean{
+        val files = localImages.value
+        return when {
+            files == null -> {
+                localImages.value = listOf(file)
+                true
+            }
+            files.size >= 4 -> false
+            else -> {
+                localImages.value = ArrayList<File>(files).apply{
+                    add(file)
+                }
+                true
+            }
         }
     }
 

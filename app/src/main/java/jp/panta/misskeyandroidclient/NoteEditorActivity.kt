@@ -117,6 +117,9 @@ class NoteEditorActivity : AppCompatActivity() {
                         }else{
                             getDocumentFile(data)
                         }
+                        if(file?.exists() == true){
+                            mViewModel?.addLocalFile(file)
+                        }
                         Log.d("NoteEditorActivity", "fileは有効なのか？:${file?.exists()}")
                     }
 
