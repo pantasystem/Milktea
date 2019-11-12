@@ -100,7 +100,7 @@
                 app:layout_constraintStart_toStartOf="parent">
 
             <ImageButton
-                    android:id="@+id/imageButton7"
+                    android:id="@+id/selectFileFromLocal"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
                     app:srcCompat="@drawable/ic_menu_gallery" />
 
             <ImageButton
-                    android:id="@+id/imageButton8"
+                    android:id="@+id/selectFileFromDrive"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -116,7 +116,7 @@
                     app:srcCompat="@drawable/ic_cloud_black_24dp" />
 
             <ImageButton
-                    android:id="@+id/imageButton9"
+                    android:id="@+id/makePoll"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
                     app:srcCompat="@drawable/ic_poll_black_24dp" />
 
             <ImageButton
-                    android:id="@+id/imageButton10"
+                    android:id="@+id/setCw"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -132,7 +132,7 @@
                     app:srcCompat="@drawable/ic_visibility_off_black_24dp" />
 
             <ImageButton
-                    android:id="@+id/imageButton11"
+                    android:id="@+id/noteVisibility"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

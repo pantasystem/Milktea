@@ -2,10 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.drive.file
 
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import java.io.Serializable
 
 class FileViewData(
-    private val file: FileProperty
-){
+    val file: FileProperty
+): Serializable{
 
     val id: String = file.id
     val name = file.name

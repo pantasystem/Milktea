@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.viewmodel.drive.Directory
@@ -22,6 +23,7 @@ class DriveActivity : AppCompatActivity() {
         //const val EXTRA_IS_FILE_SELECTABLE = "jp.panta.misskeyandroidclient.EXTRA_IS_FILE_SELECTABLE"
         const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
         const val EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
+        const val EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE = "jp.panta.misskeyandroiclient.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE"
     }
 
     private var mViewModel: DriveViewModel? = null
@@ -38,6 +40,9 @@ class DriveActivity : AppCompatActivity() {
         dirListView.layoutManager = layoutManager
 
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
+        val selectedItem = (intent.getSerializableExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
+            it as FileProperty
+        }
 
         if(maxSize > 0){
             supportActionBar?.title = "ファイルを選択"
@@ -50,6 +55,9 @@ class DriveActivity : AppCompatActivity() {
             val viewModel = ViewModelProvider(this, DriveViewModelFactory(it, miApplication, maxSize)).get(DriveViewModel::class.java)
             mViewModel = viewModel
 
+            if(selectedItem != null){
+                viewModel.setSelectedFileList(selectedItem)
+            }
             val adapter = DirListAdapter(diffUtilItemCallback, viewModel)
             dirListView.adapter = adapter
             viewModel.hierarchyDirectory.observe(this, Observer {dir ->
@@ -87,10 +95,11 @@ class DriveActivity : AppCompatActivity() {
             android.R.id.home -> finish()
             R.id.action_open ->{
                 val ids = mViewModel?.getSelectedFileIds()
-                if(ids != null){
+                val files = mViewModel?.getSelectedFileList()
+                if(ids != null && files != null){
                     intent.putStringArrayListExtra(EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID, ArrayList(ids))
-
-                    setResult(RESULT_OK)
+                    intent.putExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FileProperty>(files))
+                    setResult(RESULT_OK, intent)
                     finish()
 
                 }else{

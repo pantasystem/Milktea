@@ -41,6 +41,18 @@ class DriveViewModel(
         }
     }
 
+    fun getSelectedFileList(): List<FileProperty>?{
+        return selectedFilesMapLiveData?.value?.values?.map{
+            it.file
+        }?.toList()
+    }
+
+    fun setSelectedFileList(files: List<FileProperty>){
+        selectedFilesMapLiveData?.postValue(
+        files.map{
+            Pair<String, FileViewData>(it.id , FileViewData(it))
+        }.toMap())
+    }
 
     fun moveChildDirectory(childDirectory: FolderViewData){
         val current = Directory(childDirectory.folderProperty)

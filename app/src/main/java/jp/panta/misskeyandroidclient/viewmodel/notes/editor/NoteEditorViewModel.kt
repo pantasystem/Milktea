@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.meta.Meta
+import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import java.io.File
 
 class NoteEditorViewModel(
