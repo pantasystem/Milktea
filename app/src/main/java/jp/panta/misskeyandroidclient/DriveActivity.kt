@@ -34,7 +34,7 @@ class DriveActivity : AppCompatActivity() {
             val viewModel = ViewModelProvider(this, DriveViewModelFactory(it, miApplication)).get(DriveViewModel::class.java)
             mViewModel = viewModel
 
-            val adapter = DirListAdapter(diffutilItemCallback, viewModel)
+            val adapter = DirListAdapter(diffUtilItemCallback, viewModel)
             viewModel.hierarchyDirectory.observe(this, Observer {dir ->
                 Log.d("DriveActivity", "更新がありました: $dir")
                 adapter.submitList(dir)
@@ -64,7 +64,7 @@ class DriveActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    private val diffutilItemCallback = object : DiffUtil.ItemCallback<Directory>(){
+    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<Directory>(){
         override fun areContentsTheSame(oldItem: Directory, newItem: Directory): Boolean {
             return oldItem == newItem
         }

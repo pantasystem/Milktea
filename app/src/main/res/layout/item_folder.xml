@@ -25,7 +25,7 @@
         <RelativeLayout
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:onClick="@{()-> driveViewModel.moveChildDrectory(folder) }"
+                android:onClick="@{()-> driveViewModel.moveChildDirectory(folder) }"
                 >
 
 

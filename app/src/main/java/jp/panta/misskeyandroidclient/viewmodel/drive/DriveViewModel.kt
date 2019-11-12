@@ -29,7 +29,7 @@ class DriveViewModel(
 
 
 
-    fun moveChildDrectory(childDirectory: FolderViewData){
+    fun moveChildDirectory(childDirectory: FolderViewData){
         val current = Directory(childDirectory.folderProperty)
         currentDirectory.postValue(current)
         val list = hierarchyDirectory.value
