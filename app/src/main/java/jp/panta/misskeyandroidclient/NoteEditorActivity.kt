@@ -59,12 +59,10 @@ class NoteEditorActivity : AppCompatActivity() {
         when(requestCode){
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK){
-                    val list = data?.getStringArrayListExtra(DriveActivity.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID)
                     val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
                         it as FileProperty
                     }
                     mViewModel?.driveImages?.postValue(files)
-                    Log.d("NoteEditor", "選択したファイル: $list")
                 }
             }
         }

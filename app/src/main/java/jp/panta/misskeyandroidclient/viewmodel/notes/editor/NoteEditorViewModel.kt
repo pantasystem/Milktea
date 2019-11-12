@@ -39,9 +39,19 @@ class NoteEditorViewModel(
 
 
 
-    val isPostAvailable = Transformations.map(textRemaining){
+    /*val isPostAvailable = Transformations.map(textRemaining){
         val totalImageTmp = totalImageCount.value
         it in 0 until maxTextLength || (totalImageTmp != null && totalImageTmp > 0 && totalImageTmp <= 4)
+    }*/
+    val isPostAvailable = MediatorLiveData<Boolean>().apply{
+        this.addSource(textRemaining){
+            val totalImageTmp = totalImageCount.value
+            this.value =  it in 0 until maxTextLength || (totalImageTmp != null && totalImageTmp > 0 && totalImageTmp <= 4)
+        }
+        this.addSource(totalImageCount){
+            val tmpTextSize = textRemaining.value
+            this.value = tmpTextSize in 0 until maxTextLength || (it != null && it > 0 && it <= 4)
+        }
     }
 
 }
