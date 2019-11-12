@@ -34,7 +34,13 @@ class DriveActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         dirListView.layoutManager = layoutManager
 
-        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
+        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 4)
+
+        if(maxSize > 0){
+            supportActionBar?.title = "ファイルを選択"
+        }else{
+            supportActionBar?.title = "ドライブ"
+        }
 
         val miApplication = applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
@@ -46,6 +52,10 @@ class DriveActivity : AppCompatActivity() {
             viewModel.hierarchyDirectory.observe(this, Observer {dir ->
                 Log.d("DriveActivity", "更新がありました: $dir")
                 adapter.submitList(dir)
+            })
+
+            viewModel.selectedFilesMapLiveData?.observe(this, Observer{selected ->
+                supportActionBar?.title = "選択済み ${selected.size}/${maxSize}"
             })
         })
 
