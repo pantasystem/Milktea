@@ -4,6 +4,7 @@
         package="jp.panta.misskeyandroidclient">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
             android:name=".MiApplication"
