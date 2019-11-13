@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
+import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -29,10 +30,25 @@ class NoteEditorViewModel(
 
     val totalImageCount = MediatorLiveData<Int>().apply{
         this.addSource(driveImages){
-            value = localImages.value?.size?: 0 + it.size
+            val localImageSize = localImages.value?.size
+            Log.d("NoteEditorViewModel", "FileProperty達に変化があった. localImage-size:${localImageSize}, driveImages-size:${it.size}")
+            val total = if(localImageSize != null){
+                localImageSize + it.size
+            }else{
+                it.size
+            }
+            Log.d("NoteEditorViewModel", "計算済みのトータル:$total")
+            this.value = total
         }
         this.addSource(localImages){
-            value = driveImages.value?.size?:0 + it.size
+            Log.d("NoteEditorViewModel", "ローカルイメージ達に変化があった:${localImages.value}")
+            val driveImageSize = driveImages.value?.size
+            val total = if(driveImageSize != null){
+                driveImageSize + it.size
+            }else{
+                it.size
+            }
+            value = total
         }
     }
 
@@ -50,12 +66,13 @@ class NoteEditorViewModel(
 
     fun addLocalFile(file: File): Boolean{
         val files = localImages.value
+        val totalSize = totalImageCount.value?:0
         return when {
             files == null -> {
                 localImages.value = listOf(file)
                 true
             }
-            files.size >= 4 -> false
+            totalSize >= 4 -> false
             else -> {
                 localImages.value = ArrayList<File>(files).apply{
                     add(file)

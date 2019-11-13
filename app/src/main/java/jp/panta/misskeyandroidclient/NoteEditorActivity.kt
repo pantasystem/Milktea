@@ -73,7 +73,10 @@ class NoteEditorActivity : AppCompatActivity() {
     private fun showDriveFileSelector(){
         val selectedSize = mViewModel?.totalImageCount?.value?: 0
         val selected = mViewModel?.driveImages?.value
-        val selectableMaxSize = 4 - selectedSize
+
+        //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
+        val selectableMaxSize = 4 - selectedSize + (selected?.size?: 0)
+        Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
         if(selected != null){
@@ -118,7 +121,8 @@ class NoteEditorActivity : AppCompatActivity() {
                             getDocumentFile(data)
                         }
                         if(file?.exists() == true){
-                            mViewModel?.addLocalFile(file)
+                            val result = mViewModel?.addLocalFile(file)?:false
+                            Log.d("NoteEditorActivity", if(result)"成功しました" else "失敗しました")
                         }
                         Log.d("NoteEditorActivity", "fileは有効なのか？:${file?.exists()}")
                     }
