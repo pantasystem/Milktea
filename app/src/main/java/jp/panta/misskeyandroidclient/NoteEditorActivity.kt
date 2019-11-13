@@ -14,8 +14,10 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import kotlinx.android.synthetic.main.activity_note_editor.*
@@ -41,12 +43,24 @@ class NoteEditorActivity : AppCompatActivity() {
         //binding.viewModel
         binding.lifecycleOwner = this
 
+
+        binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
         val miApplication = applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             val factory = NoteEditorViewModelFactory(it, miApplication)
             val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
             mViewModel = viewModel
             binding.viewModel = viewModel
+
+            val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(viewModel)
+            binding.imageListPreview.adapter = simpleImagePreviewAdapter
+
+            viewModel.editorFiles.observe(this, Observer{list ->
+                simpleImagePreviewAdapter.submitList(list)
+            })
+
+
         })
 
         selectFileFromDrive.setOnClickListener {
@@ -72,16 +86,16 @@ class NoteEditorActivity : AppCompatActivity() {
 
     private fun showDriveFileSelector(){
         val selectedSize = mViewModel?.totalImageCount?.value?: 0
-        val selected = mViewModel?.driveImages?.value
+        val selected = mViewModel?.driveFiles()
 
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
-        val selectableMaxSize = 4 - selectedSize + (selected?.size?: 0)
+        val selectableMaxSize = 4 - selectedSize
         Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
-        if(selected != null){
-            intent.putExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FileProperty>(selected))
-        }
+        /*if(selected != null){
+            //intent.putExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FileProperty>(selected))
+        }*/
         startActivityForResult(intent, SELECT_DRIVE_FILE_REQUEST_CODE)
     }
 
@@ -106,7 +120,16 @@ class NoteEditorActivity : AppCompatActivity() {
                     val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
                         it as FileProperty
                     }
-                    mViewModel?.driveImages?.postValue(files)
+                    //mViewModel?.driveFiles?.postValue(files)
+                    if(files != null){
+                        val exFiles = mViewModel?.driveFiles()
+                        val addFiles = files.filter{out ->
+                            exFiles?.firstOrNull {
+                                it == out
+                            } == null
+                        }
+                        mViewModel?.addAllFileProperty(addFiles)
+                    }
                 }
             }
             SELECT_LOCAL_FILE_REQUEST_CODE ->{
@@ -121,8 +144,14 @@ class NoteEditorActivity : AppCompatActivity() {
                             getDocumentFile(data)
                         }
                         if(file?.exists() == true){
-                            val result = mViewModel?.addLocalFile(file)?:false
-                            Log.d("NoteEditorActivity", if(result)"成功しました" else "失敗しました")
+                            val size = mViewModel?.fileTotal()
+                            if(size != null && size < 4){
+                                mViewModel?.add(file)
+                                Log.d("NoteEditorActivity", "成功しました")
+                            }else{
+                                Log.d("NoteEditorActivity", "失敗しました")
+                            }
+                            //Log.d("NoteEditorActivity", if(result)"成功しました" else "失敗しました")
                         }
                         Log.d("NoteEditorActivity", "fileは有効なのか？:${file?.exists()}")
                     }

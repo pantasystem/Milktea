@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.meta.Meta
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
+import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import java.io.File
 
 class NoteEditorViewModel(
@@ -24,31 +24,53 @@ class NoteEditorViewModel(
         maxTextLength - it.length
     }
 
-    val driveImages = MediatorLiveData<List<FileProperty>>()
+    /*val driveFiles = MediatorLiveData<List<FileProperty>>()
 
-    val localImages = MediatorLiveData<List<File>>()
+    val localFiles = MediatorLiveData<List<File>>()*/
+
+    val editorFiles = MediatorLiveData<List<FileNoteEditorData>>().apply{
+        /*this.addSource(driveFiles){
+            val drives = it.map{fp ->
+                FileNoteEditorData(fp)
+            }
+            ArrayList<FileNoteEditorData>(drives).apply{
+                val local = localFiles.value?.map{f ->
+                    FileNoteEditorData(f)
+                }
+                if(local != null){
+                    addAll(local)
+                }
+            }
+        }
+        this.addSource(localFiles){
+            val drives = driveFiles.value?.map{
+                FileNoteEditorData(it)
+            }
+        }*/
+    }
 
     val totalImageCount = MediatorLiveData<Int>().apply{
-        this.addSource(driveImages){
-            val localImageSize = localImages.value?.size
-            Log.d("NoteEditorViewModel", "FileProperty達に変化があった. localImage-size:${localImageSize}, driveImages-size:${it.size}")
+        /*this.addSource(driveFiles){
+            val localImageSize = localFiles.value?.size
             val total = if(localImageSize != null){
                 localImageSize + it.size
             }else{
                 it.size
             }
-            Log.d("NoteEditorViewModel", "計算済みのトータル:$total")
             this.value = total
         }
-        this.addSource(localImages){
-            Log.d("NoteEditorViewModel", "ローカルイメージ達に変化があった:${localImages.value}")
-            val driveImageSize = driveImages.value?.size
+        this.addSource(localFiles){
+            val driveImageSize = driveFiles.value?.size
             val total = if(driveImageSize != null){
                 driveImageSize + it.size
             }else{
                 it.size
             }
             value = total
+        }*/
+        this.addSource(editorFiles){
+            Log.d("NoteEditorViewModel", "list$it, sizeは: ${it.size}")
+            this.value = it.size
         }
     }
 
@@ -64,22 +86,99 @@ class NoteEditorViewModel(
         }
     }
 
-    fun addLocalFile(file: File): Boolean{
-        val files = localImages.value
+    /*fun addLocalFile(file: File): Boolean{
+        val files = localFiles.value
         val totalSize = totalImageCount.value?:0
         return when {
             files == null -> {
-                localImages.value = listOf(file)
+                localFiles.value = listOf(file)
                 true
             }
             totalSize >= 4 -> false
             else -> {
-                localImages.value = ArrayList<File>(files).apply{
+                localFiles.value = ArrayList<File>(files).apply{
                     add(file)
                 }
                 true
             }
         }
+    }*/
+
+    fun add(file: File){
+        val files = editorFiles.value.toArrayList()
+        files.add(FileNoteEditorData(file))
+        editorFiles.value = files
     }
+
+    fun add(fp: FileProperty){
+        val files = editorFiles.value.toArrayList()
+        files.add(FileNoteEditorData(fp))
+        editorFiles.value = files
+    }
+
+    fun addAllFile(file: List<File>){
+        val files = editorFiles.value.toArrayList()
+        files.addAll(file.map{
+            FileNoteEditorData(it)
+        })
+        editorFiles.value = files
+    }
+
+    fun addAllFileProperty(fpList: List<FileProperty>){
+        val files = editorFiles.value.toArrayList()
+        files.addAll(fpList.map{
+            FileNoteEditorData(it)
+        })
+        editorFiles.value = files
+    }
+
+    fun removeFileNoteEditorData(data: FileNoteEditorData){
+        val files = editorFiles.value.toArrayList()
+        files.remove(data)
+        editorFiles.value = files
+    }
+
+    fun localFileTotal(): Int{
+        return editorFiles.value?.filter{
+            it.isLocal
+        }?.size?: 0
+    }
+
+    fun driveFileTotal(): Int{
+        return editorFiles.value?.filter{
+            !it.isLocal
+        }?.size?: 0
+    }
+
+    fun fileTotal(): Int{
+        return editorFiles.value?.size?: 0
+    }
+
+    fun driveFiles(): List<FileProperty>{
+        return editorFiles.value?.filter {
+            !it.isLocal && it.fileProperty != null
+        }?.mapNotNull {
+            it.fileProperty
+        } ?: emptyList()
+    }
+
+    fun localFiles(): List<File>{
+        return editorFiles.value?.filter{
+            it.isLocal && it.file != null
+        }?.mapNotNull {
+            it.file
+        }?: emptyList()
+    }
+
+
+
+    private fun List<FileNoteEditorData>?.toArrayList(): ArrayList<FileNoteEditorData>{
+        return if(this == null){
+            ArrayList<FileNoteEditorData>()
+        }else{
+            ArrayList<FileNoteEditorData>(this)
+        }
+    }
+
 
 }

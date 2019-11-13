@@ -39,12 +39,12 @@ class DriveActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         dirListView.layoutManager = layoutManager
 
-        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
+        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
         val selectedItem = (intent.getSerializableExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
             it as FileProperty
         }
 
-        if(maxSize > 0){
+        if(maxSize > -1){
             supportActionBar?.title = "ファイルを選択"
         }else{
             supportActionBar?.title = "ドライブ"
@@ -85,7 +85,7 @@ class DriveActivity : AppCompatActivity() {
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
         //openMenu?.isCheckable = true
         //openMenu?.isEnabled = false
-        openMenu?.isVisible = maxSize > 0
+        openMenu?.isVisible = maxSize > -1
 
         return super.onCreateOptionsMenu(menu)
     }

@@ -20,7 +20,7 @@ class DriveViewModel(
     val hierarchyDirectory = MutableLiveData<List<Directory>>()
 
     //val selectedFilesMap = HashMap<String, FileViewData>()
-    val selectedFilesMapLiveData = if(selectableMaxSize > 0){
+    val selectedFilesMapLiveData = if(selectableMaxSize > -1){
         MutableLiveData<Map<String, FileViewData>>()
     }else{
         null
