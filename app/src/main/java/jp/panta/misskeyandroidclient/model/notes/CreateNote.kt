@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+
 data class CreateNote(
     val i: String,
     val visibility: String = "public",
@@ -13,7 +15,8 @@ data class CreateNote(
     val noExtractEmojis: Boolean? = null,
     var fileIds: List<String>? = null,
     val replyId: String? = null,
-    val renoteId: String? = null
+    val renoteId: String? = null,
+    val poll: CreatePoll? = null
 
 
 )
