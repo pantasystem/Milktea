@@ -17,57 +17,18 @@ class NoteEditorViewModel(
     private val misskeyAPI: MisskeyAPI,
     private val meta: Meta
 ) : ViewModel(){
-
+    val hasCw = MutableLiveData<Boolean>(false)
+    val cw = MutableLiveData<String>()
     val text = MutableLiveData<String>("")
     val maxTextLength = meta.maxNoteTextLength?: 1500
     val textRemaining = Transformations.map(text){
         maxTextLength - it.length
     }
 
-    /*val driveFiles = MediatorLiveData<List<FileProperty>>()
-
-    val localFiles = MediatorLiveData<List<File>>()*/
-
-    val editorFiles = MediatorLiveData<List<FileNoteEditorData>>().apply{
-        /*this.addSource(driveFiles){
-            val drives = it.map{fp ->
-                FileNoteEditorData(fp)
-            }
-            ArrayList<FileNoteEditorData>(drives).apply{
-                val local = localFiles.value?.map{f ->
-                    FileNoteEditorData(f)
-                }
-                if(local != null){
-                    addAll(local)
-                }
-            }
-        }
-        this.addSource(localFiles){
-            val drives = driveFiles.value?.map{
-                FileNoteEditorData(it)
-            }
-        }*/
-    }
+    val editorFiles = MediatorLiveData<List<FileNoteEditorData>>()
 
     val totalImageCount = MediatorLiveData<Int>().apply{
-        /*this.addSource(driveFiles){
-            val localImageSize = localFiles.value?.size
-            val total = if(localImageSize != null){
-                localImageSize + it.size
-            }else{
-                it.size
-            }
-            this.value = total
-        }
-        this.addSource(localFiles){
-            val driveImageSize = driveFiles.value?.size
-            val total = if(driveImageSize != null){
-                driveImageSize + it.size
-            }else{
-                it.size
-            }
-            value = total
-        }*/
+
         this.addSource(editorFiles){
             Log.d("NoteEditorViewModel", "list$it, sizeは: ${it.size}")
             this.value = it.size
@@ -86,23 +47,7 @@ class NoteEditorViewModel(
         }
     }
 
-    /*fun addLocalFile(file: File): Boolean{
-        val files = localFiles.value
-        val totalSize = totalImageCount.value?:0
-        return when {
-            files == null -> {
-                localFiles.value = listOf(file)
-                true
-            }
-            totalSize >= 4 -> false
-            else -> {
-                localFiles.value = ArrayList<File>(files).apply{
-                    add(file)
-                }
-                true
-            }
-        }
-    }*/
+
 
     fun add(file: File){
         val files = editorFiles.value.toArrayList()

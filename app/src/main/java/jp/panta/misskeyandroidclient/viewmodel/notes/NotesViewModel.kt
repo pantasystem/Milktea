@@ -68,14 +68,19 @@ class NotesViewModel(
         val renoteId = reNoteTarget.event?.toShowNote?.id
         if(renoteId != null){
             val request = CreateNote(i = connectionInstance.getI()!!, text = null, renoteId = renoteId)
-            misskeyAPI.create(request).enqueue(object : Callback<Note?>{
-                override fun onResponse(call: Call<Note?>, response: Response<Note?>) {
+            misskeyAPI.create(request).enqueue(object : Callback<CreateNote.Response>{
+                override fun onResponse(
+                    call: Call<CreateNote.Response>,
+                    response: Response<CreateNote.Response>
+                ) {
                     statusMessage.event = "renoteしました"
+
+                }
+                override fun onFailure(call: Call<CreateNote.Response>, t: Throwable) {
+                    errorStatusMessage.event = "renote失敗しました"
+
                 }
 
-                override fun onFailure(call: Call<Note?>, t: Throwable) {
-                    errorStatusMessage.event = "renote失敗しました"
-                }
             })
         }
     }

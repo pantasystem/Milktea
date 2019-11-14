@@ -19,4 +19,6 @@ data class CreateNote(
     val poll: CreatePoll? = null
 
 
-)
+){
+    data class Response(val createdNote: Note)
+}

@@ -2,7 +2,9 @@ package jp.panta.misskeyandroidclient
 
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
+import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runners.Suite
@@ -27,6 +29,18 @@ class MisskeyAPITest {
         println(meta)
         Assert.assertNotEquals(meta, null)
 
+    }
+
+    @Test
+    fun createNotePollTest(){
+        //成功したので封印
+        /*val createPoll = CreatePoll(
+            choices = listOf("ごはん", "パン", "その他"),
+            multiple = false
+        )
+        val request = CreateNote(i = SecretConstantTest.i(), text = "主食は？", poll = createPoll)
+        val response = misskeyAPI.create(request).execute()
+        assert(response.body() != null)*/
     }
 
 }

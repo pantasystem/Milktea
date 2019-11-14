@@ -18,4 +18,10 @@
         <item>light</item>
         <item>black</item>
     </string-array>
+
+    <string-array name="deadline_choices">
+        <item>無期限</item>
+        <item>日時指定</item>
+        <item>経過指定</item>
+    </string-array>
 </resources>

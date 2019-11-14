@@ -33,7 +33,7 @@ interface MisskeyAPI {
     fun notification(@Body notificationRequest: NotificationRequest): Call<List<Notification>?>
 
     @POST("api/notes/create")
-    fun create(@Body createNote: CreateNote): Call<Note?>
+    fun create(@Body createNote: CreateNote): Call<CreateNote.Response>
 
     @POST("api/notes/delete")
     fun delete(@Body deleteNote: DeleteNote)
