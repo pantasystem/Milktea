@@ -17,9 +17,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.view.notes.editor.PollEditorFragment
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import kotlinx.android.synthetic.main.activity_note_editor.*
 import java.io.File
 
@@ -60,6 +62,13 @@ class NoteEditorActivity : AppCompatActivity() {
                 simpleImagePreviewAdapter.submitList(list)
             })
 
+            viewModel.poll.observe(this, Observer { poll ->
+                if(poll == null){
+                    removePollFragment()
+                }else{
+                    setPollFragment()
+                }
+            })
 
         })
 
@@ -69,6 +78,21 @@ class NoteEditorActivity : AppCompatActivity() {
 
         selectFileFromLocal.setOnClickListener {
             showFileManager()
+        }
+    }
+
+    private fun setPollFragment(){
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.edit_poll, PollEditorFragment(), "pollFragment")
+        ft.commit()
+    }
+
+    private fun removePollFragment(){
+        val fragment = supportFragmentManager.findFragmentByTag("pollFragment")
+        if(fragment != null){
+            val ft = supportFragmentManager.beginTransaction()
+            ft.remove(fragment)
+            ft.commit()
         }
     }
 

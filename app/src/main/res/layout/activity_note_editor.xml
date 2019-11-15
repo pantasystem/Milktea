@@ -76,6 +76,17 @@
                         android:orientation="vertical">
 
                     <EditText
+                            android:id="@+id/cw"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:inputType="text"
+                            android:text="@={viewModel.cw}"
+                            android:hint="@string/cw_hint"
+                            android:visibility="@{viewModel.hasCw ? View.VISIBLE : View.GONE}"
+                            />
+
+                    <EditText
                             android:id="@+id/editText2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -87,6 +98,13 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar" />
+
+                    <FrameLayout
+                            android:id="@+id/edit_poll"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="bottom"
+                            />
                 </LinearLayout>
             </ScrollView>
         </FrameLayout>
@@ -123,7 +141,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_poll_black_24dp" />
+                    app:srcCompat="@drawable/ic_poll_black_24dp"
+                    android:onClick="@{()-> viewModel.enablePoll()}"
+                    />
 
             <ImageButton
                     android:id="@+id/setCw"
@@ -131,7 +151,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_visibility_off_black_24dp" />
+                    app:srcCompat="@drawable/ic_visibility_off_black_24dp"
+                    android:onClick="@{()-> viewModel.changeCwEnabled() }"
+                    />
 
             <ImageButton
                     android:id="@+id/noteVisibility"

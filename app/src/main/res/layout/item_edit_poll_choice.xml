@@ -1,26 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="horizontal" android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        >
-
-    <EditText
-            android:id="@+id/editText3"
-            android:layout_width="0dp"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="choice"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollChoice" />
+        <variable
+                name="pollViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor" />
+    </data>
+    <LinearLayout
+            android:orientation="horizontal" android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="text"
-            />
+            android:padding="8dp"
+            >
 
-    <ImageView
-            android:id="@+id/imageButton7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_clear_black_24dp"
-            tools:ignore="PrivateResource" />
-</LinearLayout>
+        <EditText
+                android:id="@+id/editText3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:text="@={choice.text}"
+                />
+
+        <ImageView
+                android:id="@+id/imageButton7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_clear_black_24dp"
+                tools:ignore="PrivateResource"
+                android:onClick="@{()-> pollViewModel.removeChoice(choice) }"
+                />
+    </LinearLayout>
+</layout>

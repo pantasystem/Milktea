@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
+import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import java.io.File
 
 class NoteEditorViewModel(
@@ -49,6 +50,8 @@ class NoteEditorViewModel(
     }
 
     val visibility = MutableLiveData<String>()
+
+    val poll = MutableLiveData<PollEditor?>()
 
     fun add(file: File){
         val files = editorFiles.value.toArrayList()
@@ -116,6 +119,23 @@ class NoteEditorViewModel(
         }?: emptyList()
     }
 
+    fun changeCwEnabled(){
+        hasCw.value = !(hasCw.value?: false)
+    }
+
+    fun enablePoll(){
+        val p = poll.value
+        if(p == null){
+            poll.value = PollEditor()
+        }
+    }
+
+    fun disablePoll(){
+        val p = poll.value
+        if(p != null){
+            poll.value = null
+        }
+    }
 
 
     private fun List<FileNoteEditorData>?.toArrayList(): ArrayList<FileNoteEditorData>{

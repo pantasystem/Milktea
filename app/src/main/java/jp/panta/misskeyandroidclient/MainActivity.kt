@@ -66,6 +66,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navView.setNavigationItemSelectedListener(this)
 
+        fab.setOnClickListener{
+            startActivity(Intent(this, NoteEditorActivity::class.java))
+        }
         //replaceTimelineFragment()
         init()
 

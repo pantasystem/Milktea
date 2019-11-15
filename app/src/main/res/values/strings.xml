@@ -63,4 +63,5 @@
     <string name="open">開く</string>
     <string name="multiple_answer">複数回答可能</string>
     <string name="add_choice">解答を追加</string>
+    <string name="cw_hint">内容への注釈(オプション)</string>
 </resources>
