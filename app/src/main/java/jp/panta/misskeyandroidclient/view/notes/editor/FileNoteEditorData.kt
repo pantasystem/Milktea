@@ -3,8 +3,9 @@ package jp.panta.misskeyandroidclient.view.notes.editor
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import java.io.File
+import java.io.Serializable
 
-class FileNoteEditorData{
+class FileNoteEditorData: Serializable{
     val url: String
     val uploadFile: UploadFile?
     val fileProperty: FileProperty?

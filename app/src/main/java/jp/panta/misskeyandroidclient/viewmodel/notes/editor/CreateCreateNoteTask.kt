@@ -6,12 +6,13 @@ import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
+import java.io.Serializable
 import java.util.*
 
 class CreateCreateNoteTask(
     private val connectionInstance: ConnectionInstance,
     private val fileUploader: FileUploader
-){
+): Serializable{
     private val i: String = connectionInstance.getI()!!
     private var visibleUsers: List<String>? = null
     private var visibility: CreateNote.Visibility? = null
@@ -20,14 +21,14 @@ class CreateCreateNoteTask(
     private var filesIds: List<String>? = null
     var text: String? = null
     var cw: String? = null
-    val viaMobile: Boolean? = null
-    val localOnly: Boolean? = null
-    val noExtractMentions: Boolean? = null
-    val noExtractHashtags: Boolean? = null
-    val noExtractEmojis: Boolean? = null
-    val replyId: String? = null
-    val renoteId: String? = null
-    val poll: CreatePoll? = null
+    var viaMobile: Boolean? = null
+    var localOnly: Boolean? = null
+    var noExtractMentions: Boolean? = null
+    var noExtractHashtags: Boolean? = null
+    var noExtractEmojis: Boolean? = null
+    var replyId: String? = null
+    var renoteId: String? = null
+    var poll: CreatePoll? = null
     //　世界か美優か？いい加減にしろ美優に決まってんだろ！！！
     //  でもその迷いが発せしてしまう純心さと優しさが尊い！！
     fun setVisibility(visibility: CreateNote.Visibility, isLocal: Boolean, visibilityUsers: List<String>? = null){

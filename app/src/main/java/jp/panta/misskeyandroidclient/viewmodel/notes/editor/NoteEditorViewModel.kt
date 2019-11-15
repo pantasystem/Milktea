@@ -5,9 +5,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.google.gson.GsonBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
@@ -52,6 +54,20 @@ class NoteEditorViewModel(
     val visibility = MutableLiveData<String>()
 
     val poll = MutableLiveData<PollEditor?>()
+
+    val noteTask = MutableLiveData<CreateCreateNoteTask>()
+
+    fun post(){
+        val noteTask = CreateCreateNoteTask(connectionInstance, OkHttpDriveFileUploader(connectionInstance, GsonBuilder().create()))
+        noteTask.cw = cw.value
+        noteTask.files = editorFiles.value
+        //noteTask.localOnl
+        //noteTask.noExtractEmojis =
+        noteTask.text =text.value
+        noteTask.poll = poll.value?.buildCreatePoll()
+        //noteTask.setVisibility()
+        this.noteTask.postValue(noteTask)
+    }
 
     fun add(file: File){
         val files = editorFiles.value.toArrayList()
