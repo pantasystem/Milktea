@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+import java.lang.IllegalArgumentException
 
 data class CreateNote(
     val i: String,
@@ -21,4 +23,13 @@ data class CreateNote(
 
 ){
     data class Response(val createdNote: Note)
+
+    enum class Visibility{
+        PUBLIC,
+        LOCAL,
+        HOME,
+        FOLLOWERS,
+        SPECIFED
+
+    }
 }

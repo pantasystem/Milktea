@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import java.io.File
@@ -47,11 +48,11 @@ class NoteEditorViewModel(
         }
     }
 
-
+    val visibility = MutableLiveData<String>()
 
     fun add(file: File){
         val files = editorFiles.value.toArrayList()
-        files.add(FileNoteEditorData(file))
+        files.add(FileNoteEditorData(UploadFile(file, true)))
         editorFiles.value = files
     }
 
@@ -64,7 +65,7 @@ class NoteEditorViewModel(
     fun addAllFile(file: List<File>){
         val files = editorFiles.value.toArrayList()
         files.addAll(file.map{
-            FileNoteEditorData(it)
+            FileNoteEditorData(UploadFile(it, true))
         })
         editorFiles.value = files
     }
@@ -109,9 +110,9 @@ class NoteEditorViewModel(
 
     fun localFiles(): List<File>{
         return editorFiles.value?.filter{
-            it.isLocal && it.file != null
+            it.isLocal && it.uploadFile != null
         }?.mapNotNull {
-            it.file
+            it.uploadFile?.file
         }?: emptyList()
     }
 
