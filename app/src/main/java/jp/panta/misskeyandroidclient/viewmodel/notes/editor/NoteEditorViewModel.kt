@@ -55,10 +55,10 @@ class NoteEditorViewModel(
 
     val poll = MutableLiveData<PollEditor?>()
 
-    val noteTask = MutableLiveData<CreateCreateNoteTask>()
+    val noteTask = MutableLiveData<PostNoteTask>()
 
     fun post(){
-        val noteTask = CreateCreateNoteTask(connectionInstance, OkHttpDriveFileUploader(connectionInstance, GsonBuilder().create()))
+        val noteTask = PostNoteTask(connectionInstance)
         noteTask.cw = cw.value
         noteTask.files = editorFiles.value
         //noteTask.localOnl

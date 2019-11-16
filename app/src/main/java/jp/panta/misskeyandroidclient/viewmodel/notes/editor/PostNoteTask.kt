@@ -9,9 +9,9 @@ import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import java.io.Serializable
 import java.util.*
 
-class CreateCreateNoteTask(
-    private val connectionInstance: ConnectionInstance,
-    private val fileUploader: FileUploader
+class PostNoteTask(
+    connectionInstance: ConnectionInstance
+    //private val fileUploader: FileUploader
 ): Serializable{
     private val i: String = connectionInstance.getI()!!
     private var visibleUsers: List<String>? = null
@@ -43,11 +43,11 @@ class CreateCreateNoteTask(
         this.visibleUsers = visibilityUsers
     }
     
-    fun execute(): CreateNote?{
+    fun execute(fileUploader: FileUploader): CreateNote?{
          val ok = if(files.isNullOrEmpty()){
-            executeFileUpload(fileUploader)
-        }else{
-           true
+             true
+         }else{
+             executeFileUpload(fileUploader)
         }
         return if(ok){
             CreateNote(
@@ -63,7 +63,8 @@ class CreateCreateNoteTask(
                 noExtractHashtags = noExtractHashtags,
                 replyId = replyId,
                 renoteId = renoteId,
-                poll = poll
+                poll = poll,
+                fileIds = filesIds
                 )
         }else{
             null

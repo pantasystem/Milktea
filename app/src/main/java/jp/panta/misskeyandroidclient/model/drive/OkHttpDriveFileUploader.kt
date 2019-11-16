@@ -30,7 +30,7 @@ class OkHttpDriveFileUploader(
 
             val requestBody = requestBodyBuilder.build()
 
-            val request = Request.Builder().url(URL("${connectionInstance.instanceBaseUrl}/")).post(requestBody).build()
+            val request = Request.Builder().url(URL("${connectionInstance.instanceBaseUrl}/api/drive/files/create")).post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code()
             if(code < 300){
