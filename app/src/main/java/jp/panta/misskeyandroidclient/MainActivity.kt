@@ -171,6 +171,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
         ReactionSelectionDialog().show(supportFragmentManager, "MainActivity")
     }
+
+    private val noteTargetObserver = Observer<PlaneNoteViewData>{
+        val intent = Intent(this, NoteDetailActivity::class.java)
+        intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.toShowNote.id)
+        startActivity(intent)
+    }
+
     private fun initViewModelListener(){
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
         mNotesViewModel.replyTarget.observe(this, replyTargetObserver)
@@ -192,6 +199,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
         mNotesViewModel.reactionTarget.observe(this, reactionTargetObserver)
+
+        mNotesViewModel.targetNote.removeObserver(noteTargetObserver)
+        mNotesViewModel.targetNote.observe(this, noteTargetObserver)
     }
 
     private val switchAccountButtonObserver = Observer<Int>{

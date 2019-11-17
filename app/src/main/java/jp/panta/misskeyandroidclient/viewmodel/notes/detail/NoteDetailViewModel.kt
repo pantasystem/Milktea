@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 class NoteDetailViewModel(
     val connectionInstance: ConnectionInstance,
     val misskeyAPI: MisskeyAPI,
-    val note: PlaneNoteViewData,
-    val requestBase: NoteRequest.Setting = NoteRequest.Setting(type = NoteType.DETAIL, noteId = note.toShowNote.id)
+    val noteId: String,
+    val requestBase: NoteRequest.Setting = NoteRequest.Setting(type = NoteType.DETAIL, noteId = noteId)
 ) : ViewModel(){
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
@@ -93,8 +93,8 @@ class NoteDetailViewModel(
     }
 
     private fun loadChildren(): List<NoteConversationViewData>?{
-        return loadChildren(id = note.toShowNote.id)?.filter{
-            it.reNote?.id != note.toShowNote.id
+        return loadChildren(id = noteId)?.filter{
+            it.reNote?.id != noteId
         }?.map{
             val planeNoteViewData = PlaneNoteViewData(it)
             val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->
