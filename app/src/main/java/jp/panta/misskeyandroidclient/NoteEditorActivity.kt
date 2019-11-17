@@ -28,6 +28,8 @@ import java.io.File
 class NoteEditorActivity : AppCompatActivity() {
 
     companion object{
+        const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
+        const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
         const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
@@ -45,12 +47,15 @@ class NoteEditorActivity : AppCompatActivity() {
         //binding.viewModel
         binding.lifecycleOwner = this
 
+        val replyToNoteId: String? = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)
+        val quoteToNoteId: String? = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)
+
 
         binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         val miApplication = applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
-            val factory = NoteEditorViewModelFactory(it, miApplication)
+            val factory = NoteEditorViewModelFactory(it, miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId)
             val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
             mViewModel = viewModel
             binding.viewModel = viewModel

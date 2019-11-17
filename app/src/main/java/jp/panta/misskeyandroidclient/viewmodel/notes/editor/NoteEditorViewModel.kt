@@ -19,7 +19,9 @@ import java.io.File
 class NoteEditorViewModel(
     private val connectionInstance: ConnectionInstance,
     private val misskeyAPI: MisskeyAPI,
-    private val meta: Meta
+    private val meta: Meta,
+    private val replyToNoteId: String? = null,
+    private val quoteToNoteId: String? = null
 ) : ViewModel(){
     val hasCw = MutableLiveData<Boolean>(false)
     val cw = MutableLiveData<String>()
@@ -43,11 +45,15 @@ class NoteEditorViewModel(
     val isPostAvailable = MediatorLiveData<Boolean>().apply{
         this.addSource(textRemaining){
             val totalImageTmp = totalImageCount.value
-            this.value =  it in 0 until maxTextLength || (totalImageTmp != null && totalImageTmp > 0 && totalImageTmp <= 4)
+            this.value =  it in 0 until maxTextLength
+                    || (totalImageTmp != null && totalImageTmp > 0 && totalImageTmp <= 4)
+                    || quoteToNoteId != null
         }
         this.addSource(totalImageCount){
             val tmpTextSize = textRemaining.value
-            this.value = tmpTextSize in 0 until maxTextLength || (it != null && it > 0 && it <= 4)
+            this.value = tmpTextSize in 0 until maxTextLength
+                    || (it != null && it > 0 && it <= 4)
+                    || quoteToNoteId != null
         }
     }
 
@@ -65,6 +71,8 @@ class NoteEditorViewModel(
         //noteTask.noExtractEmojis =
         noteTask.text =text.value
         noteTask.poll = poll.value?.buildCreatePoll()
+        noteTask.renoteId = quoteToNoteId
+        noteTask.replyId = replyToNoteId
         //noteTask.setVisibility()
         this.noteTask.postValue(noteTask)
     }

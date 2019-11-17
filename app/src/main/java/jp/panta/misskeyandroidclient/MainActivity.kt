@@ -142,7 +142,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
-        Log.d("MainActivity", "reply clicked :$it")
+        //Log.d("MainActivity", "reply clicked :$it")
+        val intent = Intent(this, NoteEditorActivity::class.java)
+        intent.putExtra(NoteEditorActivity.EXTRA_REPLY_TO_NOTE_ID, it.toShowNote.id)
+        startActivity(intent)
     }
 
     private val reNoteTargetObserver = Observer<PlaneNoteViewData>{
@@ -164,7 +167,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData>{
-        startActivity(Intent(this, NoteEditorActivity::class.java))
+        val intent = Intent(this, NoteEditorActivity::class.java)
+        intent.putExtra(NoteEditorActivity.EXTRA_QUOTE_TO_NOTE_ID, it.toShowNote.id)
+        startActivity(intent)
     }
 
     private val reactionTargetObserver = Observer<PlaneNoteViewData>{
