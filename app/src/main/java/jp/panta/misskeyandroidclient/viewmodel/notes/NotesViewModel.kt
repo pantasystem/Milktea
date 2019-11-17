@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+import android.media.Image
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -45,6 +46,7 @@ class NotesViewModel(
 
     val targetUser = EventBus<User>()
 
+    val targetNote = EventBus<PlaneNoteViewData>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
@@ -62,6 +64,10 @@ class NotesViewModel(
 
     fun setTargetToUser(user: User){
         targetUser.event = user
+    }
+
+    fun setTargetToNote(note: PlaneNoteViewData){
+        targetNote.event = note
     }
 
     fun postRenote(){

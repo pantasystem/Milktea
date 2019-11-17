@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View"/>
         <variable
@@ -9,6 +10,9 @@
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+        <variable
+                name="noteDetailViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel" />
     </data>
     <LinearLayout
             android:layout_width="match_parent"
@@ -16,7 +20,9 @@
             android:orientation="vertical">
         <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                tools:layout_height="100dp"
+                >
             <include
                     android:id="@+id/childNote"
                     layout="@layout/item_simple_note"
@@ -42,6 +48,7 @@
                 android:textColor="?attr/colorAccent"
                 android:text="@string/show_conversation"
                 android:visibility="@{childrenViewData.hasConversation ? View.VISIBLE : View.GONE }"
+                android:onClick="@{()-> noteDetailViewModel.loadNewConversation(childrenViewData) }"
                 />
 
         <TextView

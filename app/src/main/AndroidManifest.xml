@@ -15,9 +15,11 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".NoteDetailActivity"></activity>
+
         <service
                 android:name=".PostNoteService"
-                android:exported="false"></service>
+                android:exported="false" />
 
         <activity android:name=".MessageActivity" />
         <activity android:name=".DriveActivity" />

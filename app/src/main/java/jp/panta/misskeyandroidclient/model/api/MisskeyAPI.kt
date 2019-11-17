@@ -46,6 +46,15 @@ interface MisskeyAPI {
     @POST("api/notes/search")
     fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
+    @POST("api/notes/show")
+    fun showNote(@Body requestNote: NoteRequest): Call<Note>
+
+    @POST("api/notes/children")
+    fun children(@Body noteRequest: NoteRequest): Call<List<Note>>
+
+    @POST("api/notes/conversation")
+    fun conversation(@Body noteRequest: NoteRequest): Call<List<Note>>
+
     @POST("api/notes/featured")
     fun featured(@Body noteRequest: NoteRequest): Call<List<Note>?>
 

@@ -34,6 +34,7 @@ class TabFragment : Fragment(){
                 NoteType.USER -> requestBase.userId
                 NoteType.FAVORITE -> "Favorite"
                 NoteType.FEATURED -> "Featured"
+                NoteType.DETAIL -> "Detail"
             }
         }
 

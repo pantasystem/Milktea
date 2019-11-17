@@ -17,13 +17,25 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteConversationViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel
 import java.lang.IllegalArgumentException
 
 class NoteDetailAdapter(
-    diffUtilItemCallback: DiffUtil.ItemCallback<PlaneNoteViewData>,
-    private val notesViewModel: NotesViewModel
-)
-    : ListAdapter<PlaneNoteViewData, NoteDetailAdapter.ViewHolder>(diffUtilItemCallback){
+    private val notesViewModel: NotesViewModel,
+    private val noteDetailViewModel: NoteDetailViewModel,
+    private val diffUtil: DiffUtil.ItemCallback<PlaneNoteViewData> = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
+        override fun areContentsTheSame(
+            oldItem: PlaneNoteViewData,
+            newItem: PlaneNoteViewData
+        ): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areItemsTheSame(oldItem: PlaneNoteViewData, newItem: PlaneNoteViewData): Boolean {
+            return oldItem.id == newItem.id
+        }
+    }
+) : ListAdapter<PlaneNoteViewData, NoteDetailAdapter.ViewHolder>(diffUtil){
 
     companion object{
         const val NOTE = 0
@@ -90,7 +102,10 @@ class NoteDetailAdapter(
                 holder.binding.notesViewModel = notesViewModel
                 holder.binding.childNote.reactionView.layoutManager = layoutManager
                 holder.binding.childNote.reactionView.adapter = reactionAdapter
+                holder.binding.noteDetailViewModel = noteDetailViewModel
                 holder.binding.conversationView.apply{
+                    adapter = NoteChildConversationAdapter(notesViewModel, reactionAdapter)
+                    this.layoutManager = layoutManager
 
                 }
                 holder.binding.executePendingBindings()
