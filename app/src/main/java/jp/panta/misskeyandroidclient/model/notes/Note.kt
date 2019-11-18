@@ -25,6 +25,7 @@ data class Note(
     val visibilityUserIds: List<String?>?,
 
     val url: String?,
+    val uri: String?,
     @SerializedName("renoteCount") val reNoteCount: Int,
     @SerializedName("reactions") val reactionCounts: LinkedHashMap<String, Int>?,
     @SerializedName("emojis") val emojis: List<Emoji>?,

@@ -26,6 +26,7 @@ import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
+import jp.panta.misskeyandroidclient.view.notes.ShareBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
     private val shareTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "share clicked :$it")
-
+        ShareBottomSheetDialog().show(supportFragmentManager, "MainActivity")
     }
     private val targetUserObserver = Observer<User>{
         Log.d("MainActivity", "user clicked :$it")

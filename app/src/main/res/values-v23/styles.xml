@@ -27,5 +27,8 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+
+        <item name="colorSeparator">@color/colorSeparator</item>
+
     </style>
 </resources>

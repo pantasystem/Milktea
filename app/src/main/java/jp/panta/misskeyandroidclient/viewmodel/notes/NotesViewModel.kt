@@ -1,17 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import android.media.Image
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.notes.CreateNote
-import jp.panta.misskeyandroidclient.model.notes.CreateReaction
-import jp.panta.misskeyandroidclient.model.notes.DeleteNote
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +19,7 @@ class NotesViewModel(
     ci: ConnectionInstance,
     api: MisskeyAPI
 ) : ViewModel(){
-
+    private val TAG = "NotesViewModel"
     var connectionInstance = ci
     var misskeyAPI = api
 
@@ -43,6 +38,7 @@ class NotesViewModel(
     val submittedNotesOnReaction = EventBus<PlaneNoteViewData>()
 
     val shareTarget = EventBus<PlaneNoteViewData>()
+    val shareNoteState = MutableLiveData<State>()
 
     val targetUser = EventBus<User>()
 
@@ -60,12 +56,16 @@ class NotesViewModel(
 
     fun setTargetToShare(note: PlaneNoteViewData){
         shareTarget.event = note
+        loadNoteState(note)
     }
 
     fun setTargetToUser(user: User){
         targetUser.event = user
     }
 
+    fun setTargetToNote(){
+        targetNote.event = shareTarget.event
+    }
     fun setTargetToNote(note: PlaneNoteViewData){
         targetNote.event = note
     }
@@ -137,5 +137,64 @@ class NotesViewModel(
         if(targetNote != null){
             postReaction(targetNote, reaction)
         }
+    }
+
+    fun addFavorite(note: PlaneNoteViewData? = shareTarget.event){
+        note?: return
+
+        misskeyAPI.createFavorite(
+            NoteRequest(
+                i = connectionInstance.getI(),
+                noteId = note.toShowNote.id
+            )
+        ).enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Log.d(TAG, "お気に入りに追加しました")
+                statusMessage.event = "お気に入りに追加しました"
+            }
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e(TAG, "お気に入りに追加失敗しました", t)
+                statusMessage.event = "お気に入りにへの追加に失敗しました"
+            }
+        })
+
+    }
+
+    fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event){
+        note?: return
+
+        misskeyAPI.deleteFavorite(
+            NoteRequest(
+                i = connectionInstance.getI(),
+                noteId = note.toShowNote.id
+            )
+        ).enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Log.d(TAG, "お気に入りから削除しました")
+                statusMessage.event = "お気に入りから削除しました"
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e(TAG, "お気に入りの削除に追加失敗しました", t)
+                statusMessage.event = "お気に入りの削除に失敗しました"
+            }
+        })
+    }
+
+    private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
+        misskeyAPI.noteState(NoteRequest(i = connectionInstance.getI(), noteId = planeNoteViewData.toShowNote.id))
+            .enqueue(object : Callback<State>{
+                override fun onResponse(call: Call<State>, response: Response<State>) {
+                    val nowNoteId = shareTarget.event?.toShowNote?.id
+                    if(nowNoteId == planeNoteViewData.toShowNote.id){
+                        val state = response.body()?: return
+                        Log.d(TAG, "state: $state")
+                        shareNoteState.postValue(state)
+                    }
+                }
+                override fun onFailure(call: Call<State>, t: Throwable) {
+                    Log.e(TAG, "note stateの取得に失敗しました", t)
+                }
+            })
     }
 }

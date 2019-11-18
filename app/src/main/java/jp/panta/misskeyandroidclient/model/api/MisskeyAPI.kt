@@ -29,6 +29,12 @@ interface MisskeyAPI {
     @POST("api/i/favorites")
     fun favorites(@Body noteRequest: NoteRequest): Call<List<Favorite>?>
 
+    @POST("api/notes/favorites/create")
+    fun createFavorite(@Body noteRequest: NoteRequest): Call<Unit>
+
+    @POST("api/notes/favorites/delete")
+    fun deleteFavorite(@Body noteRequest: NoteRequest): Call<Unit>
+
     @POST("api/i/notifications")
     fun notification(@Body notificationRequest: NotificationRequest): Call<List<Notification>?>
 
@@ -45,6 +51,9 @@ interface MisskeyAPI {
 
     @POST("api/notes/search")
     fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
+
+    @POST("api/notes/state")
+    fun noteState(@Body noteRequest: NoteRequest): Call<State>
 
     @POST("api/notes/show")
     fun showNote(@Body requestNote: NoteRequest): Call<Note>

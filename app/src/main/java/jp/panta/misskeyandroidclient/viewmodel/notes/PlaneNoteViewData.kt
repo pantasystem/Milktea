@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.notes.Note
 
-open class PlaneNoteViewData (private val note: Note) : NoteViewData{
+open class PlaneNoteViewData (val note: Note) : NoteViewData{
 
     val id = note.id
 

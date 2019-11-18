@@ -66,4 +66,10 @@
     <string name="cw_hint">内容への注釈(オプション)</string>
     <string name="show_reply">返信を表示する</string>
     <string name="show_conversation">会話を表示する</string>
+    <string name="copy_url">URLをコピー</string>
+    <string name="copy_content">内容をコピー</string>
+    <string name="show_detail">詳細</string>
+    <string name="favorite">お気に入り</string>
+    <string name="remove_favorite">お気に入りを解除</string>
+    <string name="remove">削除</string>
 </resources>

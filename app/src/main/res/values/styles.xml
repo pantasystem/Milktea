@@ -20,6 +20,8 @@
         <attr name="colorMessageSelf" format="color" />
         <attr name="colorMessageRecipient" format="color" />
 
+        <attr name="colorSeparator" format="color"/>
+
     </declare-styleable>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -41,6 +43,7 @@
 
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+        <item name="colorSeparator">@color/colorSeparator</item>
 
     </style>
     <style name="AppTheme.NoActionBar">
