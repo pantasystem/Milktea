@@ -11,12 +11,22 @@ data class ConnectionInstance(
     @PrimaryKey
     val userId: String,
     val instanceBaseUrl: String,
-    val accessToken: String
+    val accessToken: String?,
+    val directI: String? = null,
+    val customAppSecret: String? = null
+
 ){
     fun getI(): String?{
         //return SecretConstant.i()
-        val appSecret = SecretConstant.getInstances()[instanceBaseUrl]?: return null
-        return sha256(accessToken + appSecret.appSecret)
+        if(directI != null){
+            return directI
+        }else if(customAppSecret != null && accessToken != null){
+            return sha256(accessToken + customAppSecret)
+        }else{
+            val appSecret = SecretConstant.getInstances()[instanceBaseUrl]?: return null
+            return sha256(accessToken + appSecret.appSecret)
+        }
+
     }
 
     private fun sha256(input: String) = hashString("SHA-256", input)

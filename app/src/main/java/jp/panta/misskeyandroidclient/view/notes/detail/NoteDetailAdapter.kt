@@ -104,8 +104,8 @@ class NoteDetailAdapter(
                 holder.binding.childNote.reactionView.adapter = reactionAdapter
                 holder.binding.noteDetailViewModel = noteDetailViewModel
                 holder.binding.conversationView.apply{
-                    adapter = NoteChildConversationAdapter(notesViewModel, reactionAdapter)
-                    this.layoutManager = layoutManager
+                    //adapter = NoteChildConversationAdapter(notesViewModel, reactionAdapter)
+                    //this.layoutManager = layoutManager
 
                 }
                 holder.binding.executePendingBindings()
