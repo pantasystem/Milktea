@@ -1,9 +1,12 @@
 package jp.panta.misskeyandroidclient.view.notes.detail
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -23,6 +26,7 @@ import java.lang.IllegalArgumentException
 class NoteDetailAdapter(
     private val notesViewModel: NotesViewModel,
     private val noteDetailViewModel: NoteDetailViewModel,
+    private val viewLifecycleOwner: LifecycleOwner,
     private val diffUtil: DiffUtil.ItemCallback<PlaneNoteViewData> = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
         override fun areContentsTheSame(
             oldItem: PlaneNoteViewData,
@@ -98,16 +102,19 @@ class NoteDetailAdapter(
                 holder.binding.executePendingBindings()
             }
             is ConversationHolder ->{
+                Log.d("NoteDetailAdapter", "conversation: ${(note as NoteConversationViewData).conversation.value?.size}")
                 holder.binding.childrenViewData = note as NoteConversationViewData
                 holder.binding.notesViewModel = notesViewModel
                 holder.binding.childNote.reactionView.layoutManager = layoutManager
                 holder.binding.childNote.reactionView.adapter = reactionAdapter
                 holder.binding.noteDetailViewModel = noteDetailViewModel
-                holder.binding.conversationView.apply{
-                    //adapter = NoteChildConversationAdapter(notesViewModel, reactionAdapter)
-                    //this.layoutManager = layoutManager
+                val adapter = NoteChildConversationAdapter(notesViewModel, reactionAdapter)
+                holder.binding.conversationView.adapter = adapter
+                holder.binding.conversationView.layoutManager = LinearLayoutManager(holder.itemView.context)
+                note.conversation.observe(viewLifecycleOwner, Observer {
+                    adapter.submitList(it)
+                })
 
-                }
                 holder.binding.executePendingBindings()
             }
         }

@@ -4,7 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.android.synthetic.main.activity_note_detail.*
 
@@ -26,9 +31,15 @@ class NoteDetailActivity : AppCompatActivity() {
         val noteId = intent.getStringExtra(EXTRA_NOTE_ID)
         Log.d(TAG, "受け取ったnoteId: $noteId")
 
-        val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId))
-        ft.commit()
+        val miApplication = applicationContext as MiApplication
+        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
+            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ci, miApplication))[NotesViewModel::class.java]
+            ActionNoteHandler(this, notesViewModel).initViewModelListener()
+            val ft = supportFragmentManager.beginTransaction()
+            ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId))
+            ft.commit()
+        })
+
 
     }
 

@@ -25,6 +25,7 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
+import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.ShareBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
@@ -86,7 +87,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 init()
 
-                initViewModelListener()
+                //initViewModelListener()
+                ActionNoteHandler(this, mNotesViewModel).initViewModelListener()
                 initAccountViewModelListener()
 
                 setHeaderProfile(mainBinding)
@@ -142,7 +144,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    private val replyTargetObserver = Observer<PlaneNoteViewData> {
+    /*private val replyTargetObserver = Observer<PlaneNoteViewData> {
         //Log.d("MainActivity", "reply clicked :$it")
         val intent = Intent(this, NoteEditorActivity::class.java)
         intent.putExtra(NoteEditorActivity.EXTRA_REPLY_TO_NOTE_ID, it.toShowNote.id)
@@ -208,7 +210,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mNotesViewModel.targetNote.removeObserver(noteTargetObserver)
         mNotesViewModel.targetNote.observe(this, noteTargetObserver)
-    }
+    }*/
 
     private val switchAccountButtonObserver = Observer<Int>{
         runOnUiThread{

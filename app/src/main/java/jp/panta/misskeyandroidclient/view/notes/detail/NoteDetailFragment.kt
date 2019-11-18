@@ -42,7 +42,8 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
             noteDetailViewModel.loadDetail()
             val adapter = NoteDetailAdapter(
                 noteDetailViewModel = noteDetailViewModel,
-                notesViewModel = notesViewModel
+                notesViewModel = notesViewModel,
+                viewLifecycleOwner = viewLifecycleOwner
             )
             noteDetailViewModel.notes.observe(viewLifecycleOwner, Observer {
                 adapter.submitList(it)

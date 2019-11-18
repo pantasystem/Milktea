@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.detail
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +32,7 @@ class NoteDetailViewModel(
                 var list: List<PlaneNoteViewData> = listOf(detail)
                 notes.postValue(list)
 
-                val conversation = loadConversation()
+                val conversation = loadConversation()?.asReversed()
                 if(conversation != null){
                     list = ArrayList<PlaneNoteViewData>(conversation).apply{
                         addAll(list)
@@ -55,13 +56,14 @@ class NoteDetailViewModel(
 
 
     fun loadNewConversation(noteConversationViewData: NoteConversationViewData){
+        Log.d("NoteDetailViewModel", "新たにConversationを読み込もうとした")
         viewModelScope.launch(Dispatchers.IO){
             try{
                 val conversation = noteConversationViewData.conversation.value
                     ?: emptyList()
                 getChildrenToIterate(noteConversationViewData, ArrayList(conversation))
             }catch(e: Exception){
-
+                Log.e("NoteDetailViewModel", "loadNewConversation中にエラー発生", e)
             }
         }
     }
@@ -71,9 +73,11 @@ class NoteDetailViewModel(
         conversation: ArrayList<PlaneNoteViewData>
     ): NoteConversationViewData{
         val next = noteConversationViewData.getNextNoteForConversation()
+        println("ねくすと: ${next?.id}, :${next?.text}")
         return if(next == null){
             noteConversationViewData.conversation.postValue(conversation)
             noteConversationViewData.hasConversation.postValue(false)
+            println("こんばーせーしょんの最終さいずは:${conversation.size}")
             noteConversationViewData
         }else{
             conversation.add(next)

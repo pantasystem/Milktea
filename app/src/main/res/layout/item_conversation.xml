@@ -72,6 +72,7 @@
                     android:textColor="?attr/colorAccent"
                     android:text="@string/show_reply"
                     android:visibility="@{childrenViewData.hasConversation ? View.GONE : View.VISIBLE}"
+                    android:onClick="@{()-> notesViewModel.setTargetToNote(childrenViewData)}"
                     />
 
         </LinearLayout>
