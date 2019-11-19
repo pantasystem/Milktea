@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
+import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
@@ -55,9 +56,9 @@ class TabFragment : Fragment(){
         //val i = connectionInstance?.getI()
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
-        val includeMyRenotes = sharedPreferences.getBoolean("includeMyRenotes", true)
-        val includeRenotedMyNotes = sharedPreferences.getBoolean("includeRenotedMyNotes", true)
-        val includeLocalRenotes = sharedPreferences.getBoolean("includeLocalRenotes", true)
+        val includeMyRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_MY_RENOTES.name, true)
+        val includeRenotedMyNotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name, true)
+        val includeLocalRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
         miApp.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {settingList ->

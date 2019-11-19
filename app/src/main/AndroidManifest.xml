@@ -15,7 +15,10 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".UserDetailActivity"></activity>
+        <activity
+                android:name=".SettingsActivity"
+                android:label="@string/title_activity_settings"></activity>
+        <activity android:name=".UserDetailActivity" />
         <activity android:name=".NoteDetailActivity" />
 
         <service
@@ -25,9 +28,6 @@
         <activity android:name=".MessageActivity" />
         <activity android:name=".DriveActivity" />
         <activity android:name=".TabSettingActivity" />
-        <activity
-                android:name=".SettingsActivity"
-                android:label="@string/title_activity_settings" />
         <activity
                 android:name=".NoteEditorActivity"
                 android:windowSoftInputMode="adjustResize" />
