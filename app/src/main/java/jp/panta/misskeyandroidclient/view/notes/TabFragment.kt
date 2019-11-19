@@ -79,6 +79,7 @@ class TabFragment : Fragment(){
 
                 if(settings.size <= 1){
                     tabLayout.visibility = View.GONE
+                    elevationView.visibility = View.VISIBLE
                 }
             })
         })
