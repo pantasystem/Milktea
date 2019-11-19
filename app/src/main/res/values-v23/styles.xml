@@ -19,7 +19,6 @@
 
         <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
         <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
-        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 

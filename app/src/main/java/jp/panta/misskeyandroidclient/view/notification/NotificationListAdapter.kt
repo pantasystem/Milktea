@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
@@ -52,6 +53,8 @@ class NotificationListAdapter(
         note.reactionCounts.observe(lifecycleOwner, Observer {
             adapter.submitList(it.toList())
         })
+        holder.binding.simpleNote.reactionView.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
+        holder.binding.simpleNote.reactionView.adapter = adapter
         holder.binding.executePendingBindings()
         holder.binding.lifecycleOwner = lifecycleOwner
 
