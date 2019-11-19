@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.NoteDetailActivity
 import jp.panta.misskeyandroidclient.NoteEditorActivity
+import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -39,6 +40,9 @@ class ActionNoteHandler(
     }
     private val targetUserObserver = Observer<User>{
         Log.d("MainActivity", "user clicked :$it")
+        val intent = Intent(activity, UserDetailActivity::class.java)
+        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+        activity.startActivity(intent)
     }
 
     private val statusMessageObserver = Observer<String>{

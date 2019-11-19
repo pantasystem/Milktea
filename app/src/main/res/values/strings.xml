@@ -72,4 +72,7 @@
     <string name="favorite">お気に入り</string>
     <string name="remove_favorite">お気に入りを解除</string>
     <string name="remove">削除</string>
+
+    <string name="pin">ピン</string>
+    <string name="media">メディア</string>
 </resources>

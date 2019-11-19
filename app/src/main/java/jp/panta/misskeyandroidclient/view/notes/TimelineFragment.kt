@@ -17,11 +17,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineState
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view){
@@ -70,10 +66,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, true)
             mViewModel = ViewModelProvider(this, factory).get("$ci",TimelineViewModel::class.java)
 
-            val notesViewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
+            val notesViewModelFactory = NotesViewModelFactory(ci, miApplication)
+            val notesViewModel = ViewModelProvider(activity!!, notesViewModelFactory).get(NotesViewModel::class.java)
             notesViewModel.connectionInstance = ci
             notesViewModel.misskeyAPI = miApplication.misskeyAPIService!!
-            Log.d("TimelineFragment", "Activityとの一致度！！！！: ${notesViewModel === (activity as MainActivity?)?.mNotesViewModel}")
+            //Log.d("TimelineFragment", "Activityとの一致度！！！！: ${notesViewModel === (activity as MainActivity?)?.mNotesViewModel}")
 
             val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
             list_view.adapter = adapter

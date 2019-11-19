@@ -33,7 +33,10 @@ data class User(
     @SerializedName("avatarUrl") val avatarUrl: String?,
     @SerializedName("bannerUrl") val bannerUrl: String?,
     //@SerializedName("avatarColor") val avatarColor: Any?,
-    @SerializedName("emojis") val emojis: List<Emoji>?
+    @SerializedName("emojis") val emojis: List<Emoji>?,
+
+    @SerializedName("isFollowing") val isFollowing: Boolean,
+    @SerializedName("isFollowed") val isFollowed: Boolean
     //JsonProperty("isVerified") val isVerified: Boolean,
     //@JsonProperty("isLocked") val isLocked: Boolean
 ): Serializable

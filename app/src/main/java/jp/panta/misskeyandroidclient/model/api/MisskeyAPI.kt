@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import retrofit2.Call
 import retrofit2.http.Body
@@ -24,6 +25,16 @@ interface MisskeyAPI {
 
     @POST("api/i")
     fun i(@Body i: I): Call<User>
+
+    //users
+    @POST("api/users/show")
+    fun showUser(@Body requestUser: RequestUser): Call<User>
+
+    @POST("api/following/delete")
+    fun unFollowUser(@Body requestUser: RequestUser): Call<User>
+
+    @POST("api/following/create")
+    fun followUser(@Body requestUser: RequestUser): Call<User>
 
     //account
     @POST("api/i/favorites")

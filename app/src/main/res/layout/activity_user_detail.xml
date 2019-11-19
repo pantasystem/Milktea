@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+                name="userViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".UserDetailActivity">
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    >
+
+                <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="?attr/actionBarSize"
+                        >
+                    <ImageView
+                            android:id="@+id/headerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            />
+
+                    <ImageView
+                            android:id="@+id/avatarIcon"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_below="@id/headerView"
+                            android:layout_marginTop="-30dp"
+                            android:layout_marginStart="15dp"
+                            app:circleIcon="@{userViewModel.user.avatarUrl}"
+                            tools:srcCompat="@drawable/ic_follow"
+                            android:layout_marginBottom="8dp"
+                            />
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/avatarIcon"
+                            android:layout_below="@id/headerView"
+                            android:gravity="end"
+                            android:layout_alignBottom="@id/avatarIcon"
+                            android:layout_marginEnd="8dp"
+                            >
+
+
+                        <ImageButton
+                                android:id="@+id/optionButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                app:srcCompat="@drawable/ic_more_horiz_black_24dp" />
+
+                        <Button
+                                android:id="@+id/followButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom"
+                                tools:text="フォロー"
+                                android:text="@{userViewModel.followButtonStatus}"
+                                android:visibility="@{userViewModel.mine ? View.GONE : View.VISIBLE}"
+                                android:onClick="@{()-> userViewModel.changeFollow()}"
+                                />
+                    </LinearLayout>
+                    <TextView
+                            android:id="@+id/name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Panta"
+                            android:layout_below="@id/avatarIcon"
+                            android:layout_alignStart="@id/avatarIcon"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            app:text="@{userViewModel.user.name}"
+                            app:emojis="@{userViewModel.user.emojis}"
+
+                            />
+                    <TextView
+                            android:id="@+id/userName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/name"
+                            android:layout_alignStart="@id/avatarIcon"
+                            tools:text="userName"
+                            android:textSize="20sp"
+                            android:text="@{userViewModel.userName}"
+                            />
+
+                    <TextView
+                            android:id="@+id/profileText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignStart="@id/avatarIcon"
+                            app:text="@{userViewModel.user.description}"
+                            app:emojis="@{userViewModel.user.emojis}"
+                            android:layout_below="@id/userName"
+                            tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="8dp"
+                            android:visibility="@{userViewModel.user.description == null ? View.GONE : View.VISIBLE}"
+                            />
+                </RelativeLayout>
+                <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/userDetailToolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/colorPrimary"
+                        android:minHeight="?attr/actionBarSize"
+                        android:theme="?attr/actionBarTheme"
+                        app:layout_collapseMode="pin"
+                        />
+
+
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+
+            <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/userTimelineTab"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Monday" />
+
+                <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tuesday" />
+
+                <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Wednesday" />
+            </com.google.android.material.tabs.TabLayout>
+
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <FrameLayout
+                android:id="@+id/fragment_base"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+                >
+
+            <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/userTimelinePager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+        </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
