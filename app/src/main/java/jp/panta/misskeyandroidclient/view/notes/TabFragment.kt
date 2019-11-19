@@ -60,33 +60,29 @@ class TabFragment : Fragment(){
         val includeLocalRenotes = sharedPreferences.getBoolean("includeLocalRenotes", true)
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
+        miApp.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {settingList ->
+            val settings = if(settingList.isNullOrEmpty()){
+                makeDefaultNoteSetting(defaultTabType)
+            }else settingList
 
-        miApp.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
-            miApp.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {settingList ->
-                val settings = if(settingList.isNullOrEmpty()){
-                    makeDefaultNoteSetting(defaultTabType, ci.getI()!!)
-                }else settingList
+            settings.forEach{setting ->
+                setting.includeLocalRenotes = includeLocalRenotes
+                setting.includeMyRenotes = includeMyRenotes
+                setting.includeRenotedMyNotes = includeRenotedMyNotes
+            }
 
-                settings.forEach{setting ->
-                    setting.includeLocalRenotes = includeLocalRenotes
-                    setting.includeMyRenotes = includeMyRenotes
-                    setting.includeRenotedMyNotes = includeRenotedMyNotes
-                }
+            val adapter = TimelinePagerAdapter(activity?.supportFragmentManager, settings)
+            viewPager.adapter = adapter
+            tabLayout.setupWithViewPager(viewPager)
 
-                val adapter = TimelinePagerAdapter(activity?.supportFragmentManager, settings)
-                viewPager.adapter = adapter
-                tabLayout.setupWithViewPager(viewPager)
-
-                if(settings.size <= 1){
-                    tabLayout.visibility = View.GONE
-                    elevationView.visibility = View.VISIBLE
-                }
-            })
+            if(settings.size <= 1){
+                tabLayout.visibility = View.GONE
+                elevationView.visibility = View.VISIBLE
+            }
         })
-
     }
 
-    private fun makeDefaultNoteSetting(list: List<NoteType>,i: String): List<NoteRequest.Setting>{
+    private fun makeDefaultNoteSetting(list: List<NoteType>): List<NoteRequest.Setting>{
         return list.map{
             NoteRequest.Setting(type = it)
         }

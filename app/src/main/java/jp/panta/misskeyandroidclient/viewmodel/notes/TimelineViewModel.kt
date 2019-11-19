@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -14,7 +11,7 @@ import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 
 class TimelineViewModel(
-    connectionInstance: ConnectionInstance,
+    val connectionInstance: ConnectionInstance,
     requestBaseSetting: NoteRequest.Setting,
     misskeyAPI: MisskeyAPI,
     noteCapture: NoteCapture,
@@ -30,6 +27,7 @@ class TimelineViewModel(
         requestBaseSetting,
         misskeyAPI
     )*/
+    val position = MutableLiveData<Int>()
 
     private val notePagingStore = when(requestBaseSetting.type){
         NoteType.FAVORITE -> FavoriteNotePagingStore(connectionInstance, requestBaseSetting, misskeyAPI)

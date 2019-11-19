@@ -3,19 +3,15 @@ package jp.panta.misskeyandroidclient.view.notes
 import android.os.Bundle
 
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
@@ -35,6 +31,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private lateinit var mLinearLayoutManager: LinearLayoutManager
     private var mViewModel: TimelineViewModel? = null
+    private var mNotesViewModel: NotesViewModel? = null
 
     //private var isViewCreated: Boolean = false
     //private var isLoadInited: Boolean = false
@@ -64,34 +61,25 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
             val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, true)
-            mViewModel = ViewModelProvider(this, factory).get("$ci",TimelineViewModel::class.java)
+            val vm = mViewModel
 
-            val notesViewModelFactory = NotesViewModelFactory(ci, miApplication)
-            val notesViewModel = ViewModelProvider(activity!!, notesViewModelFactory).get(NotesViewModel::class.java)
-            notesViewModel.connectionInstance = ci
-            notesViewModel.misskeyAPI = miApplication.misskeyAPIService!!
-            //Log.d("TimelineFragment", "Activityとの一致度！！！！: ${notesViewModel === (activity as MainActivity?)?.mNotesViewModel}")
+            //TimelineViewModelは必ず参照がnullになるか接続先の情報に更新があったときのみ初期化する
+            if(vm == null || vm.connectionInstance != ci){
+                Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, CI非一致:${vm?.connectionInstance != ci}")
+                mViewModel = ViewModelProvider(this, factory).get("$ci",TimelineViewModel::class.java)
+                mViewModel?.loadInit()
 
-            val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
-            list_view.adapter = adapter
+                val notesViewModelFactory = NotesViewModelFactory(ci, miApplication)
+                mNotesViewModel = ViewModelProvider(activity!!, notesViewModelFactory).get(NotesViewModel::class.java)
+                mNotesViewModel?.connectionInstance = ci
+                mNotesViewModel?.misskeyAPI = miApplication.misskeyAPIService!!
 
-            var  timelineState: TimelineState.State? = null
-            mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
-                adapter.submitList(it.notes)
-                timelineState = it.state
-            })
 
-            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
 
-                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-
-                    if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
-                        mLinearLayoutManager.scrollToPosition(0)
-                    }
-                    //Log.d("onItemRangeInserted", "positionStart: $positionStart")
-                }
-            })
+            }
+            refresh.setOnRefreshListener {
+                mViewModel?.loadNew()
+            }
 
             mViewModel?.isLoading?.observe(viewLifecycleOwner, Observer<Boolean> {
                 if(it != null && !it){
@@ -99,14 +87,35 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 }
             })
 
-            mViewModel?.loadInit()
+            val nvm = mNotesViewModel
+            if(nvm != null){
+
+                mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
+                val adapter = list_view.adapter as TimelineListAdapter?
+                    ?: TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, nvm)
+                list_view.adapter = adapter
+
+                var  timelineState: TimelineState.State? = null
+                mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
+                    adapter.submitList(it.notes)
+                    timelineState = it.state
+                })
+
+                adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+
+                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                        super.onItemRangeInserted(positionStart, itemCount)
+
+                        if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
+                            mLinearLayoutManager.scrollToPosition(0)
+                        }
+                    }
+                })
+            }
+
+
 
         })
-
-        refresh.setOnRefreshListener {
-            mViewModel?.loadNew()
-        }
-
 
     }
 
@@ -132,6 +141,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         Log.d("TimelineFragment", "onPause")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        Log.d("TimelineFragment", "onDestroyView")
+    }
 
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
         override fun areContentsTheSame(
@@ -158,6 +172,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val itemCount = mLinearLayoutManager?.itemCount?: -1
 
             mFirstVisibleItemPosition = firstVisibleItemPosition
+            mViewModel?.position?.value = firstVisibleItemPosition
 
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")

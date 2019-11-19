@@ -101,6 +101,7 @@ class TimelineLiveData(
     }
 
     fun loadNew(){
+        Log.d("TimelineLiveData", "loadNew")
         if( ! isLoadingFlag ){
             isLoadingFlag = true
             //val sinceId = observableTimelineList.firstOrNull()?.id
