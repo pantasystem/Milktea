@@ -12,7 +12,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".UserDetailActivity">
+            tools:context=".UserDetailActivity"
+            >
 
         <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
@@ -31,7 +32,8 @@
                     <ImageView
                             android:id="@+id/headerView"
                             android:layout_width="match_parent"
-                            android:layout_height="100dp"
+                            android:layout_height="140dp"
+                            app:headerImageUrl="@{userViewModel.user.bannerUrl}"
                             />
 
                     <ImageView
@@ -112,6 +114,53 @@
                             android:layout_marginTop="8dp"
                             android:visibility="@{userViewModel.user.description == null ? View.GONE : View.VISIBLE}"
                             />
+                    <LinearLayout
+                            android:layout_below="@id/profileText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_alignStart="@id/avatarIcon"
+                            android:layout_marginEnd="8dp"
+                            >
+                        <TextView
+                                android:id="@+id/notesCounter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="500"
+                                android:layout_marginEnd="4dp"
+                                android:text="@{Integer.toString(userViewModel.user.notesCount)}"
+                                />
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/post"
+                                android:layout_marginEnd="8dp" />
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="4dp"
+                                tools:text="20"
+                                android:text="@{Integer.toString(userViewModel.user.followingCount)}"
+                                />
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/follow"
+                                android:layout_marginEnd="8dp"
+                                />
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="40"
+                                android:text="@{Integer.toString(userViewModel.user.followersCount)}"
+                                android:layout_marginEnd="4dp"
+                                />
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/follower"/>
+                    </LinearLayout>
+
                 </RelativeLayout>
                 <androidx.appcompat.widget.Toolbar
                         android:id="@+id/userDetailToolbar"
@@ -119,7 +168,6 @@
                         android:layout_height="wrap_content"
                         android:background="?attr/colorPrimary"
                         android:minHeight="?attr/actionBarSize"
-                        android:theme="?attr/actionBarTheme"
                         app:layout_collapseMode="pin"
                         />
 
@@ -131,23 +179,9 @@
             <com.google.android.material.tabs.TabLayout
                     android:id="@+id/userTimelineTab"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"/>
 
-                <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Monday" />
 
-                <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tuesday" />
-
-                <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Wednesday" />
-            </com.google.android.material.tabs.TabLayout>
 
 
         </com.google.android.material.appbar.AppBarLayout>

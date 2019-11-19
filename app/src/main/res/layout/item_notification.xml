@@ -45,7 +45,8 @@
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
                         android:visibility="@{notification.reaction == null ? View.VISIBLE : View.GONE }"
-                        tools:srcCompat="@drawable/ic_follow" />
+                        tools:srcCompat="@drawable/ic_follow"
+                        android:onClick="@{()-> notesViewModel.setTargetToUser(notification.user)}"/>
 
                 <ImageView
                         android:id="@+id/reactionImage"

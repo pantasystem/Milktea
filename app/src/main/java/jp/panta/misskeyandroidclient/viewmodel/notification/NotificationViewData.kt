@@ -10,7 +10,7 @@ class NotificationViewData(private val notification: Notification) {
 
     val statusType: String = notification.type
 
-    //val user: User = notification.user
+    val user: User = notification.user
     val avatarIconUrl = notification.user.avatarUrl
     val name = notification.user.name
     val userName = notification.user.userName

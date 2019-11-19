@@ -55,6 +55,9 @@ class UserDetailActivity : AppCompatActivity() {
             binding.userTimelinePager.adapter = adapter
             binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
 
+            viewModel.userName.observe(this, Observer{
+                supportActionBar?.title = it
+            })
             //userTimelineTab.setupWithViewPager()
 
         })
