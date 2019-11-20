@@ -1,14 +1,15 @@
 package jp.panta.misskeyandroidclient
 
-import android.content.SharedPreferences
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
-import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
+import jp.panta.misskeyandroidclient.view.settings.activities.SettingMovementActivity
+import jp.panta.misskeyandroidclient.view.settings.activities.TabSettingActivity
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
+import jp.panta.misskeyandroidclient.viewmodel.setting.MoveSettingActivityPanel
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity() {
@@ -17,88 +18,35 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val keys = KeyStore.BooleanKey.values().toList()
-        val pref = PreferenceManager.getDefaultSharedPreferences(this)
-
-        /*keys.forEach{
-
-        }*/
-        val includeLocalRenotes = BooleanSharedItem(
-            key = KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name,
-            default = KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.include_local_renotes
-
+        val movementSetting = MoveSettingActivityPanel<SettingMovementActivity>(
+            titleStringRes = R.string.movement,
+            activity = SettingMovementActivity::class.java,
+            context = this
         )
-
-        val includeRenotedMeyNotes = BooleanSharedItem(
-            key = KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name,
-            default = KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.include_renoted_my_notes
-        )
-
-        val includeMyRenotes = BooleanSharedItem(
-            key = KeyStore.BooleanKey.INCLUDE_MY_RENOTES.name,
-            default = KeyStore.BooleanKey.INCLUDE_MY_RENOTES.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.include_my_renotes
-        )
-        val autoLoadTimeline = BooleanSharedItem(
-            key = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE.name,
-            default = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.auto_load_timeline
-        )
-        val timelineGroup = Group(
-            titleStringRes = R.string.timeline,
-            context = this,
-            items = listOf(includeLocalRenotes, includeRenotedMeyNotes, includeMyRenotes, autoLoadTimeline)
-        )
-
-        val captureNoteWhenStopped = BooleanSharedItem(
-            key = KeyStore.BooleanKey.CAPTURE_NOTE_WHEN_STOPPED.name,
-            default = KeyStore.BooleanKey.CAPTURE_NOTE_WHEN_STOPPED.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.capture_note_when_stopped
-        )
-
-        val autoLoadTimelineWhenStopped = BooleanSharedItem(
-            key = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE_WHEN_STOPPED.name,
-            default = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE_WHEN_STOPPED.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.auto_load_when_stopped
-        )
-        autoLoadTimeline.choice.observe(this, Observer{
-            if(!it){
-                autoLoadTimelineWhenStopped.choice.value = false
-            }
-
-            autoLoadTimelineWhenStopped.enabled.value = it
-
+        movementSetting.startActivityEventBus.observe(this, Observer {
+            startActivity(Intent(this, it))
         })
 
-
-
-        val syncGroup = Group(
-            titleStringRes = R.string.sync,
-            items = listOf(captureNoteWhenStopped, autoLoadTimelineWhenStopped),
+        val tabSetting = MoveSettingActivityPanel(
+            titleStringRes = R.string.nav_setting_tab,
+            activity = TabSettingActivity::class.java,
             context = this
+        )
+        tabSetting.startActivityEventBus.observe(this, Observer {
+            startActivity(Intent(this, it))
+        })
+
+        val group = Group(
+            titleStringRes = null,
+            context = this,
+            items = listOf(movementSetting, tabSetting)
         )
 
         val adapter = SettingAdapter(this)
         setting_list.adapter = adapter
         setting_list.layoutManager = LinearLayoutManager(this)
-
-        adapter.submitList(listOf(timelineGroup, syncGroup))
-
-
+        adapter.submitList(listOf(group))
 
     }
+
 }

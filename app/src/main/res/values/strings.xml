@@ -13,7 +13,7 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
-    <string name="seach">Seach</string>
+    <string name="search">Search</string>
     <string name="notification">Notification</string>
     <string name="message">Message</string>
     <string name="start_auth">認証する</string>
@@ -86,4 +86,6 @@
     <string name="capture_note_when_stopped">停止時もノートをキャプチャーする</string>
     <string name="auto_load_when_stopped">停止時もタイムラインを自動で読み込む</string>
     <string name="sync">同期</string>
+
+    <string name="movement">動き</string>
 </resources>

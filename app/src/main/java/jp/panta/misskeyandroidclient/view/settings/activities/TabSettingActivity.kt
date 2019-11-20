@@ -1,8 +1,9 @@
-package jp.panta.misskeyandroidclient
+package jp.panta.misskeyandroidclient.view.settings.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.settings.TabSettingFragment
 
 class TabSettingActivity : AppCompatActivity() {

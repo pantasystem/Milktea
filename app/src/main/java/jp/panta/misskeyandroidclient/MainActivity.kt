@@ -6,7 +6,6 @@ import android.util.Log
 
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -19,28 +18,20 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.navigation.NavigationView
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notes.RenoteBottomSheetDialog
-import jp.panta.misskeyandroidclient.view.notes.ShareBottomSheetDialog
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
-import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
+import jp.panta.misskeyandroidclient.view.settings.activities.TabSettingActivity
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -347,7 +338,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return when (item.itemId) {
             R.id.action_settings -> true
             R.id.action_tab_setting-> {
-                startActivity(Intent(this,TabSettingActivity::class.java))
+                startActivity(Intent(this,
+                    TabSettingActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
