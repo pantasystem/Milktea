@@ -10,7 +10,7 @@ class SelectionSharedItem (
     val default: Int,
     val selectionMap: LinkedHashMap<String, Int>,
     private val context: Context
-): SharedItem<Int>(){
+): SharedItem(){
     val title = context.getString(titleStringRes)
 
     val choice = IntSharedPreferenceLiveData(

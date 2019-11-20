@@ -11,7 +11,7 @@ class BooleanSharedItem(
     val default: Boolean,
     val choiceType: ChoiceType,
     private val context: Context
-) : SharedItem<Boolean>(){
+) : SharedItem(){
     enum class ChoiceType{
         CHECK_BOX,
         SWITCH

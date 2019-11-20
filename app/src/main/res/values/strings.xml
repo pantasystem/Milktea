@@ -76,4 +76,10 @@
     <string name="pin">ピン</string>
     <string name="media">メディア</string>
     <string name="follow">フォロー</string>
+
+    <string name="include_local_renotes">ローカルの投稿のRenoteをタイムラインに表示する</string>
+    <string name="include_renoted_my_notes">自分の投稿のRenoteをタイムラインに表示する</string>
+    <string name="include_my_renotes">自分の行ったRenoteをタイムラインに表示する</string>
+    <string name="auto_load_timeline">タイムラインを自動で読み込む</string>
+    <string name="timeline">タイムライン</string>
 </resources>

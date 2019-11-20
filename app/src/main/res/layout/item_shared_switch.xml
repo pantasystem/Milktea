@@ -19,7 +19,7 @@
                 android:layout_weight="1"
                 tools:text="Switch"
                 android:text="@{item.title}"
-                android:checked="@{item.choice}"
+                android:checked="@={item.choice}"
                 />
     </LinearLayout>
 </layout>
