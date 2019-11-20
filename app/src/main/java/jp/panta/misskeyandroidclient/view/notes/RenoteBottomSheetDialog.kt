@@ -26,8 +26,6 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         val miApplication = context?.applicationContext as MiApplication
         val cn = miApplication.currentConnectionInstanceLiveData.value
          //val requestSetting =
-        val tc = miApplication.timelineCapture
-        val nc = miApplication.noteCapture
 
         val activity = activity
         if(activity != null && cn != null){

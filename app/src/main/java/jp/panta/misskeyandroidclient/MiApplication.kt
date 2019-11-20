@@ -56,13 +56,6 @@ class MiApplication : Application(){
 
     private var misskeyAPIServiceDomainMap: Map<String, MisskeyAPI>? = null
 
-    var streamingAdapter: StreamingAdapter? = null
-        private set
-    val noteCapture: NoteCapture = NoteCapture(null)
-
-    val timelineCapture: TimelineCapture = TimelineCapture()
-
-    //var connectionInstance: ConnectionInstance? = null
     private var mConnectionInstance: ConnectionInstance? = null
 
     var isSuccessLoadConnectionInstance = MutableLiveData<Boolean>()
@@ -162,16 +155,6 @@ class MiApplication : Application(){
                 service = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
             }
             misskeyAPIService = service
-            streamingAdapter?.disconnect()
-            streamingAdapter = StreamingAdapter(ci)
-
-            streamingAdapter?.connect()
-            //noteCapture = NoteCapture(ci.userId)
-            noteCapture.myUserId = ci.userId
-            //timelineCapture = TimelineCapture()
-
-            streamingAdapter?.addObserver(noteCapture)
-            streamingAdapter?.addObserver(timelineCapture)
 
             mConnectionInstance = ci
             currentConnectionInstanceLiveData.postValue(ci)

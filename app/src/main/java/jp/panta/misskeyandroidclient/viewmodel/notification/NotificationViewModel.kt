@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notification
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -7,27 +8,47 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class NotificationViewModel(
     private val connectionInstance: ConnectionInstance,
-    private val misskeyAPI: MisskeyAPI,
-    private val noteCapture: NoteCapture
+    private val misskeyAPI: MisskeyAPI
+    //private val noteCapture: NoteCapture
 ) : ViewModel(){
 
     private var isLoadingFlag = false
     val isLoading = MutableLiveData<Boolean>()
     //loadNewはない
 
-    val notificationsLiveData = object : MutableLiveData<List<NotificationViewData>>(){
+    private val streamingAdapter = StreamingAdapter(connectionInstance)
+    private val noteCapture = NoteCapture(connectionInstance.userId)
 
+    val notificationsLiveData = object : MutableLiveData<List<NotificationViewData>>(){
+        override fun onActive() {
+            super.onActive()
+            streamingAdapter.addObserver(noteCapture)
+            val list = value
+            if(list != null){
+                addNoteObserver(list)
+            }
+            streamingAdapter.connect()
+
+            Log.d("NotificationViewModel", "アクティブになった")
+        }
         override fun onInactive() {
             super.onInactive()
-            val list = value?: return
-            removeNoteObserver(list)
+            val list = value
+            if(list != null){
+                removeNoteObserver(list)
+            }
+            streamingAdapter.observers.clear()
+
+            streamingAdapter.disconnect()
         }
+
     }
 
     fun loadInit(){
@@ -35,7 +56,6 @@ class NotificationViewModel(
             return
         }
         isLoadingFlag = true
-        val oldList = notificationsLiveData.value
         val request = NotificationRequest(i = connectionInstance.getI()!!, limit = 20)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
