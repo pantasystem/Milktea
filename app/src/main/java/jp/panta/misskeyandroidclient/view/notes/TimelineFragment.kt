@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.view.notes
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 
 import android.util.Log
 import android.view.View
@@ -10,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -42,10 +45,12 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private var mFirstVisibleItemPosition: Int? = null
 
-
+    private lateinit var sharedPreference: SharedPreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sharedPreference = PreferenceManager.getDefaultSharedPreferences(this.context)
 
         mLinearLayoutManager = LinearLayoutManager(this.context!!)
         list_view.layoutManager = mLinearLayoutManager
@@ -59,8 +64,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.addOnScrollListener(mScrollListener)
         list_view.layoutManager = mLinearLayoutManager
 
+        val isAutoLoad = getBoolean(KeyStore.BooleanKey.AUTO_LOAD_TIMELINE)
+
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
-            val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, true)
+            val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, isAutoLoad)
             val vm = mViewModel
 
             //TimelineViewModelは必ず参照がnullになるか接続先の情報に更新があったときのみ初期化する
@@ -145,6 +152,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onDestroyView()
 
         Log.d("TimelineFragment", "onDestroyView")
+    }
+
+
+    private fun getBoolean(key: KeyStore.BooleanKey): Boolean{
+        return sharedPreference.getBoolean(key.name, key.default)
     }
 
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){

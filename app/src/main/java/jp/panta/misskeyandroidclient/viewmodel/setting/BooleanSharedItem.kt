@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.annotation.StringRes
+import androidx.lifecycle.MutableLiveData
 
 class BooleanSharedItem(
     override val key: String,
@@ -17,6 +18,7 @@ class BooleanSharedItem(
         SWITCH
     }
 
+    val enabled = MutableLiveData<Boolean>(true)
     val title = context.getString(titleStringRes)
     val choice = BooleanSharedPreferenceLiveData(
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),

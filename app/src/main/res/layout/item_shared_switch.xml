@@ -20,6 +20,7 @@
                 tools:text="Switch"
                 android:text="@{item.title}"
                 android:checked="@={item.choice}"
+                android:enabled="@{item.enabled}"
                 />
     </LinearLayout>
 </layout>

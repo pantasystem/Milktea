@@ -10,11 +10,14 @@ object KeyStore {
 
     }
 
-    enum class BooleanKey{
-        INCLUDE_MY_RENOTES,
-        INCLUDE_RENOTED_MY_NOTES,
-        INCLUDE_LOCAL_RENOTES,
-        AUTO_LOAD_TIMELINE,
+    enum class BooleanKey(val default: Boolean){
+        INCLUDE_MY_RENOTES(true),
+        INCLUDE_RENOTED_MY_NOTES(true),
+        INCLUDE_LOCAL_RENOTES(true),
+        AUTO_LOAD_TIMELINE(true),
+
+        CAPTURE_NOTE_WHEN_STOPPED(true),
+        AUTO_LOAD_TIMELINE_WHEN_STOPPED(true)
 
     }
 }
