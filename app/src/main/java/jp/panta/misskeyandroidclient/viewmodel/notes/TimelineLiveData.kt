@@ -49,7 +49,7 @@ class TimelineLiveData(
 
     }
 
-    override fun onActive() {
+   /* override fun onActive() {
         super.onActive()
 
         if(timelineCapture != null){
@@ -59,7 +59,7 @@ class TimelineLiveData(
         }
         //val notes = value?.notes?: return
         //noteCapture.addAll(notes)
-    }
+    }*/
 
 
     fun loadInit(){
@@ -198,7 +198,7 @@ class TimelineLiveData(
 
     }
 
-    private val timelineObserver = object : TimelineCapture.Observer{
+    val timelineObserver = object : TimelineCapture.Observer{
         override fun onReceived(note: PlaneNoteViewData) {
             noteCapture.add(note)
             val notes = value?.notes

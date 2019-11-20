@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 
@@ -64,10 +65,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.addOnScrollListener(mScrollListener)
         list_view.layoutManager = mLinearLayoutManager
 
-        val isAutoLoad = getBoolean(KeyStore.BooleanKey.AUTO_LOAD_TIMELINE)
-
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
-            val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, isAutoLoad)
+            val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, SettingStore(PreferenceManager.getDefaultSharedPreferences(context)))
             val vm = mViewModel
 
             //TimelineViewModelは必ず参照がnullになるか接続先の情報に更新があったときのみ初期化する
@@ -82,8 +81,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 mNotesViewModel?.misskeyAPI = miApplication.misskeyAPIService!!
 
 
-
             }
+
+            mViewModel?.streamingStop()
+            mViewModel?.streamingStart()
+
             refresh.setOnRefreshListener {
                 mViewModel?.loadNew()
             }
@@ -131,11 +133,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         isShowing = true
 
-        if(isLoadInit){
-
-        }else{
-            //mViewModel?.loadInit()
+        if(!isLoadInit){
             isLoadInit = true
+
         }
 
         //(activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
@@ -151,6 +151,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     override fun onDestroyView() {
         super.onDestroyView()
 
+        mViewModel?.streamingStop()
         Log.d("TimelineFragment", "onDestroyView")
     }
 
@@ -179,9 +180,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val firstVisibleItemPosition = mLinearLayoutManager?.findFirstVisibleItemPosition()?: -1
-            val endVisibleItemPosition = mLinearLayoutManager?.findLastVisibleItemPosition()?: -1
-            val itemCount = mLinearLayoutManager?.itemCount?: -1
+            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
+            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
+            val itemCount = mLinearLayoutManager.itemCount
 
             mFirstVisibleItemPosition = firstVisibleItemPosition
             mViewModel?.position?.value = firstVisibleItemPosition

@@ -1,32 +1,37 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 
+import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
+import java.lang.IndexOutOfBoundsException
 
 class TimelineViewModel(
     val connectionInstance: ConnectionInstance,
     requestBaseSetting: NoteRequest.Setting,
     misskeyAPI: MisskeyAPI,
-    noteCapture: NoteCapture,
-    timelineCapture: TimelineCapture?
+    private val settingStore: SettingStore
 ) : ViewModel(){
-
+    val tag = "TimelineViewModel"
     val errorState = MediatorLiveData<String>()
 
-    //private val connectionInstance = ConnectionInstance(instanceBaseUrl = baseUrl, userId = "7roinhytrr", userToken = "")
+    private val streamingAdapter = StreamingAdapter(connectionInstance)
+    private val noteCapture = NoteCapture(connectionInstance.userId)
+    private val timelineCapture = if(settingStore.isAutoLoadTimeline){
+        TimelineCapture()
+    }else{
+        null
+    }
 
-    /*private val notePagingStore = NoteTimelineStore(
-        connectionInstance,
-        requestBaseSetting,
-        misskeyAPI
-    )*/
+
     val position = MutableLiveData<Int>()
 
     private val notePagingStore = when(requestBaseSetting.type){
@@ -38,6 +43,13 @@ class TimelineViewModel(
         )
     }
     private val timelineLiveData = TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, timelineCapture, viewModelScope)
+
+    val observer = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, timelineLiveData.timelineObserver)
+    init{
+        if(observer != null){
+            timelineCapture?.addChannelObserver(observer)
+        }
+    }
 
     val isLoading = timelineLiveData.isLoading
 
@@ -59,6 +71,70 @@ class TimelineViewModel(
         timelineLiveData.loadInit()
     }
 
+    fun streamingStart(){
+        if( !streamingAdapter.isConnect){
+            streamingAdapter.connect()
+
+        }
+        val hasNoteCapture = streamingAdapter.observers.any {
+            it.javaClass.name == noteCapture.javaClass.name
+        }
+
+        if(!hasNoteCapture){
+
+            val notes = timelineLiveData.value?.notes
+            if(notes != null){
+                noteCapture.addAll(notes)
+            }
+            streamingAdapter.addObserver(noteCapture)
+            Log.d(tag, "NoteCaptureを追加した")
+        }
+
+        if(settingStore.isAutoLoadTimeline && timelineCapture != null){
+            val hasTimelineCapture = streamingAdapter.observers.any{
+                it.javaClass.name == timelineCapture.javaClass.name
+            }
+            if(!hasTimelineCapture){
+                streamingAdapter.addObserver(timelineCapture)
+            }
+
+        }
+
+
+
+    }
+
+    fun streamingStop(){
+        if(!settingStore.isCaptureNoteWhenStopped){
+            val notes = timelineLiveData.value?.notes
+            if(notes != null){
+                noteCapture.removeAll(notes)
+            }
+            val index = streamingAdapter.observers.indexOfFirst {
+                it.javaClass.name == noteCapture.javaClass.name
+            }
+            try{
+                streamingAdapter.observers.removeAt(index)
+                Log.d(tag, "NoteCaptureを削除した")
+            }catch(e: IndexOutOfBoundsException){
+
+            }
+
+
+        }
+        if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && timelineCapture != null){
+            val index = streamingAdapter.observers.indexOfFirst {
+                it.javaClass.name == timelineCapture.javaClass.name
+            }
+            try{
+                streamingAdapter.observers.removeAt(index)
+            }catch(e: IndexOutOfBoundsException){
+
+            }
+        }
+
+
+    }
 
 
 }

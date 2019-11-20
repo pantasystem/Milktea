@@ -17,6 +17,10 @@ class StreamingAdapter(
 
     val observers = ArrayList<Observer>()
 
+    var isConnect: Boolean = false
+        private set
+
+
     fun addObserver(observer: Observer){
         //observer.onConnect()
         observer.streamingAdapter = this
@@ -36,14 +40,14 @@ class StreamingAdapter(
         mWebSocket = OkHttpClient().newWebSocket(request, webSocketListener)
     }
 
-    fun dissconnect(){
-        mWebSocket?.cancel()
+    fun disconnect(){
+        mWebSocket?.close(1001, "close")
     }
 
     private val webSocketListener = object : WebSocketListener(){
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d(TAG, "onOpenコネクション開始")
-
+            isConnect = true
             observers.forEach{
                 it.onConnect()
             }
@@ -74,16 +78,19 @@ class StreamingAdapter(
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             Log.d(TAG, "onClose: 通信が途絶えてしまった code: $code")
             //mWebSocket = null
+            isConnect = false
 
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
             Log.d(TAG, "onClosing: 通信を閉じている code: $code")
+            isConnect = false
 
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             Log.d(TAG, "onFailure: ERROR通信が途絶えてしまった", t)
+            isConnect = false
 
             observers.forEach {
                 it.onDissconnect()

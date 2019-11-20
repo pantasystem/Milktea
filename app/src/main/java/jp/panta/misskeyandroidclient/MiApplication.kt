@@ -162,7 +162,7 @@ class MiApplication : Application(){
                 service = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
             }
             misskeyAPIService = service
-            streamingAdapter?.dissconnect()
+            streamingAdapter?.disconnect()
             streamingAdapter = StreamingAdapter(ci)
 
             streamingAdapter?.connect()
