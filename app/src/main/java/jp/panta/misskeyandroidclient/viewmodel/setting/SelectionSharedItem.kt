@@ -1,29 +1,32 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.preference.PreferenceManager
 
 class SelectionSharedItem (
     override val key: String,
-    override val title: Int,
+    override val titleStringRes: Int,
     val default: Int,
-    val selectionMap: LinkedHashMap<String, Int>
+    val selectionMap: LinkedHashMap<String, Int>,
+    private val context: Context
 ): SharedItem<Int>(){
+    val title = context.getString(titleStringRes)
 
-    fun choosing(sharedPreferences: SharedPreferences): String{
-        val k = get(sharedPreferences)
-        return selectionMap.filter{
-            it.value == k
+    val choice = IntSharedPreferenceLiveData(
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
+        default = default,
+        key = key
+    )
 
-        }.keys.first()
-    }
+    val choosing: String
+        get() {
+            val k = choice.value
+            return selectionMap.filter{
+                it.value == k
 
-    override fun get(sharedPreferences: SharedPreferences): Int {
-        return sharedPreferences.getInt(key, default)
-    }
+            }.keys.first()
+        }
 
-    override fun save(sharedPreferences: SharedPreferences, element: Int) {
-        val e =  sharedPreferences.edit()
-        e.putInt(key , element)
-        e.apply()
-    }
+
 }
