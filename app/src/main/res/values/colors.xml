@@ -3,9 +3,9 @@
     <color name="colorPrimary">#FFFFFF</color>
     <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorLightSurface">#FFFFFF</color>
-    <color name="colorAccent">#000000</color>
+    <color name="colorAccent">#252525</color>
     <color name="colorNormalIconTint">#263238</color>
-    <color name="colorItemNotSelected">#5F5F5F</color>
+    <color name="colorItemNotSelected">#727272</color>
     <color name="colorItemSelected">#202020</color>
 
     <color name="colorNormalReaction">#A7A6A6</color>

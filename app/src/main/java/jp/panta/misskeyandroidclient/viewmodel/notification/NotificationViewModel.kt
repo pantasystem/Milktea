@@ -36,7 +36,6 @@ class NotificationViewModel(
             }
             streamingAdapter.connect()
 
-            Log.d("NotificationViewModel", "アクティブになった")
         }
         override fun onInactive() {
             super.onInactive()
@@ -138,14 +137,21 @@ class NotificationViewModel(
     }
 
     fun addNoteObserver(notificationViewDataList: List<NotificationViewData>){
+
         notificationViewDataList.asSequence().filter{
+            //ノートが含まれない投稿を排除する
             it.noteViewData != null
         }.map{
             it.noteViewData!!
         }.toList().let{
+            //同様のノートの場合キャプチャーを一度解除する
             noteCapture.removeAll(it)
+
+            noteCapture.addAll(it)
         }
+
     }
+
 
 
 }
