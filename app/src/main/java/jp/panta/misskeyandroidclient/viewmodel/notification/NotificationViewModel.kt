@@ -12,6 +12,8 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NotificationViewModel(
     private val connectionInstance: ConnectionInstance,
@@ -26,10 +28,12 @@ class NotificationViewModel(
     private val streamingAdapter = StreamingAdapter(connectionInstance)
     private val noteCapture = NoteCapture(connectionInstance.userId)
 
+    val noteCaptureId = UUID.randomUUID().toString()
+
     val notificationsLiveData = object : MutableLiveData<List<NotificationViewData>>(){
         override fun onActive() {
             super.onActive()
-            streamingAdapter.addObserver(noteCapture)
+            streamingAdapter.addObserver(noteCaptureId, noteCapture)
             val list = value
             if(list != null){
                 addNoteObserver(list)
@@ -43,7 +47,8 @@ class NotificationViewModel(
             if(list != null){
                 removeNoteObserver(list)
             }
-            streamingAdapter.observers.clear()
+            //streamingAdapter.observers.clear()
+            streamingAdapter.observerMap.clear()
 
             streamingAdapter.disconnect()
         }

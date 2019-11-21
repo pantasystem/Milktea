@@ -15,16 +15,24 @@ class StreamingAdapter(
 
     private val TAG = "StreamingAdapter"
 
-    val observers = ArrayList<Observer>()
+    //val observers = ArrayList<Observer>()
+    val observerMap = HashMap<String, Observer>()
 
     var isConnect: Boolean = false
         private set
 
 
-    fun addObserver(observer: Observer){
+    fun addObserver(id: String, observer: Observer){
         //observer.onConnect()
         observer.streamingAdapter = this
-        observers.add(observer)
+        //observers.add(observer)
+        val exObserver = observerMap[id]
+        if(exObserver != null){
+            Log.d(TAG, "既存のObserverを検出したので切断しました")
+        }
+        exObserver?.onDissconnect()
+
+        observerMap[id] = observer
     }
 
 
@@ -48,8 +56,8 @@ class StreamingAdapter(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d(TAG, "onOpenコネクション開始")
             isConnect = true
-            observers.forEach{
-                it.onConnect()
+            observerMap.forEach {
+                it.value.onConnect()
             }
         }
 
@@ -58,11 +66,11 @@ class StreamingAdapter(
             //Log.d(TAG, "onMessage: $text")
 
             if (text.isNotBlank()) {
-                observers.forEach {
+                observerMap.forEach{
                     try{
-                        it.onReceived(text)
+                        it.value.onReceived(text)
                     }catch(e: Exception){
-                        Log.d("StreamingAdapter", "error")
+                        Log.d(TAG, "error", e)
                     }
                 }
             }
@@ -91,12 +99,11 @@ class StreamingAdapter(
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             Log.d(TAG, "onFailure: ERROR通信が途絶えてしまった", t)
             isConnect = false
-
-            observers.forEach {
-                it.onDissconnect()
+            observerMap.forEach {
+                it.value.onDissconnect()
             }
-            Thread.sleep(1000)
-            connect()
+            Thread.sleep(2000)
+
 
         }
     }

@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 import java.lang.IndexOutOfBoundsException
+import java.util.*
 
 class TimelineViewModel(
     val connectionInstance: ConnectionInstance,
@@ -51,6 +52,9 @@ class TimelineViewModel(
         }
     }
 
+    private val noteCaptureId = UUID.randomUUID().toString()
+    private val timelineCaptureId = UUID.randomUUID().toString()
+
     val isLoading = timelineLiveData.isLoading
 
 
@@ -76,9 +80,10 @@ class TimelineViewModel(
             streamingAdapter.connect()
 
         }
-        val hasNoteCapture = streamingAdapter.observers.any {
+        /*val hasNoteCapture = streamingAdapter.observers.any {
             it.javaClass.name == noteCapture.javaClass.name
-        }
+        }*/
+        val hasNoteCapture = streamingAdapter.observerMap[noteCaptureId] != null
 
         if(!hasNoteCapture){
 
@@ -86,16 +91,17 @@ class TimelineViewModel(
             if(notes != null){
                 noteCapture.addAll(notes)
             }
-            streamingAdapter.addObserver(noteCapture)
+            streamingAdapter.addObserver(noteCaptureId, noteCapture)
             Log.d(tag, "NoteCaptureを追加した")
         }
 
         if(settingStore.isAutoLoadTimeline && timelineCapture != null){
-            val hasTimelineCapture = streamingAdapter.observers.any{
+            /*val hasTimelineCapture = streamingAdapter.observers.any{
                 it.javaClass.name == timelineCapture.javaClass.name
-            }
+            }*/
+            val hasTimelineCapture = streamingAdapter.observerMap[timelineCaptureId] != null
             if(!hasTimelineCapture){
-                streamingAdapter.addObserver(timelineCapture)
+                streamingAdapter.addObserver(timelineCaptureId, timelineCapture)
             }
 
         }
@@ -110,11 +116,12 @@ class TimelineViewModel(
             if(notes != null){
                 noteCapture.removeAll(notes)
             }
-            val index = streamingAdapter.observers.indexOfFirst {
+            /*val index = streamingAdapter.observers.indexOfFirst {
                 it.javaClass.name == noteCapture.javaClass.name
-            }
+            }*/
             try{
-                streamingAdapter.observers.removeAt(index)
+                //streamingAdapter.observers.removeAt(index)
+                streamingAdapter.observerMap.remove(noteCaptureId)
                 Log.d(tag, "NoteCaptureを削除した")
             }catch(e: IndexOutOfBoundsException){
 
@@ -123,11 +130,12 @@ class TimelineViewModel(
 
         }
         if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && timelineCapture != null){
-            val index = streamingAdapter.observers.indexOfFirst {
+            /*val index = streamingAdapter.observers.indexOfFirst {
                 it.javaClass.name == timelineCapture.javaClass.name
-            }
+            }*/
             try{
-                streamingAdapter.observers.removeAt(index)
+                //streamingAdapter.observers.removeAt(index)
+                streamingAdapter.observerMap[timelineCaptureId]
             }catch(e: IndexOutOfBoundsException){
 
             }

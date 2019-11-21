@@ -121,8 +121,8 @@ class MiViewModel(application: Application) : AndroidViewModel(application){
         noteCapture.myUserId = ci.userId
 
         streamingAdapter?.apply{
-            addObserver(noteCapture)
-            addObserver(timelineCapture)
+            /*addObserver(noteCapture)
+            addObserver(timelineCapture)*/
         }
 
         isSuccessLoadConnectionInstance.postValue(true)
