@@ -56,9 +56,9 @@ class NoteTimelineStore(
         return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
             try{
                 if(it.reply == null){
-                    PlaneNoteViewData(it)
+                    PlaneNoteViewData(it, connectionInstance)
                 }else{
-                    HasReplyToNoteViewData(it)
+                    HasReplyToNoteViewData(it, connectionInstance)
                 }
             }catch(e: Exception){
                 Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)

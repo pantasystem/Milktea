@@ -27,7 +27,7 @@ class UserDetailViewModel(
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply{
         addSource(user){
             this.value = it.pinnedNotes?.map{note ->
-                PlaneNoteViewData(note)
+                PlaneNoteViewData(note, connectionInstance)
             }
         }
     }

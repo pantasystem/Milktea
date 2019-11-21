@@ -28,7 +28,7 @@ class NoteDetailViewModel(
             try{
                 val rawDetail = misskeyAPI.showNote(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions())).execute().body()
                     ?:return@launch
-                val detail = NoteDetailViewData(rawDetail)
+                val detail = NoteDetailViewData(rawDetail, connectionInstance)
                 var list: List<PlaneNoteViewData> = listOf(detail)
                 notes.postValue(list)
 
@@ -82,7 +82,7 @@ class NoteDetailViewModel(
         }else{
             conversation.add(next)
             val children = misskeyAPI.children(NoteRequest(connectionInstance.getI(), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
-                PlaneNoteViewData(it)
+                PlaneNoteViewData(it,connectionInstance)
             }
             noteConversationViewData.nextChildren = children
             getChildrenToIterate(noteConversationViewData, conversation)
@@ -92,7 +92,7 @@ class NoteDetailViewModel(
 
     private fun loadConversation(): List<PlaneNoteViewData>?{
         return misskeyAPI.conversation(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions())).execute().body()?.map{
-            PlaneNoteViewData(it)
+            PlaneNoteViewData(it, connectionInstance)
         }
     }
 
@@ -100,11 +100,11 @@ class NoteDetailViewModel(
         return loadChildren(id = noteId)?.filter{
             it.reNote?.id != noteId
         }?.map{
-            val planeNoteViewData = PlaneNoteViewData(it)
+            val planeNoteViewData = PlaneNoteViewData(it, connectionInstance)
             val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->
-                PlaneNoteViewData(n)
+                PlaneNoteViewData(n, connectionInstance)
             }
-            NoteConversationViewData(it, childInChild).apply{
+            NoteConversationViewData(it, childInChild, connectionInstance).apply{
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }
         }

@@ -27,7 +27,7 @@ class TimelineViewModel(
     private val streamingAdapter = StreamingAdapter(connectionInstance)
     private val noteCapture = NoteCapture(connectionInstance.userId)
     private val timelineCapture = if(settingStore.isAutoLoadTimeline){
-        TimelineCapture()
+        TimelineCapture(connectionInstance)
     }else{
         null
     }

@@ -69,5 +69,10 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
 
         }
 
+        dataBinding.removeMyNote.setOnClickListener {
+            viewModel.removeNoteFromShareTarget()
+            dismiss()
+        }
+
     }
 }

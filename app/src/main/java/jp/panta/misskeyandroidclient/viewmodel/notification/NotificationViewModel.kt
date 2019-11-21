@@ -67,7 +67,7 @@ class NotificationViewModel(
                 response: Response<List<Notification>?>
             ) {
                 val list = response.body()?.map{
-                    NotificationViewData((it))
+                    NotificationViewData((it), connectionInstance)
                 }
                 notificationsLiveData.postValue(
                     list
@@ -111,7 +111,7 @@ class NotificationViewModel(
                 }
 
                 val list = rawList.map{
-                    NotificationViewData(it)
+                    NotificationViewData(it, connectionInstance)
                 }
 
                 val notificationViewDataList = ArrayList<NotificationViewData>(exNotificationList).apply{

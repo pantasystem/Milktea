@@ -45,4 +45,8 @@ data class ConnectionInstance(
         }
         return result.toString()
     }
+
+    override fun toString(): String {
+        return "{userId:$userId, instanceBaseUrl:$instanceBaseUrl}"
+    }
 }

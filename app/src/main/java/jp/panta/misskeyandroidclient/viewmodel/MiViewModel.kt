@@ -43,7 +43,7 @@ class MiViewModel(application: Application) : AndroidViewModel(application){
         private set
     val noteCapture: NoteCapture = NoteCapture(null)
 
-    val timelineCapture: TimelineCapture = TimelineCapture()
+    //val timelineCapture: TimelineCapture = TimelineCapture()
 
     private val database = Room.databaseBuilder(application, DataBase::class.java, "mi_database").fallbackToDestructiveMigration().build()
     private val connectionInstanceDao = database.connectionInstanceDao()
@@ -128,7 +128,7 @@ class MiViewModel(application: Application) : AndroidViewModel(application){
         isSuccessLoadConnectionInstance.postValue(true)
         currentConnectionInstance.postValue(ci)
 
-        updateMeta(ci)
+        updateMeta()
         val oldVersion = relationConnectionInstancePropertiesVersion.value?: 0
         relationConnectionInstancePropertiesVersion.postValue(oldVersion + 1)
     }
@@ -140,7 +140,7 @@ class MiViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    private fun updateMeta(ci: ConnectionInstance){
+    private fun updateMeta(){
         misskeyAPIService?.getMeta(RequestMeta())
             ?.enqueue(object : Callback<Meta> {
                 override fun onResponse(call: Call<Meta>, response: Response<Meta>) {

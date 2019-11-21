@@ -39,7 +39,7 @@ class FavoriteNotePagingStore(
     private fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
-            FavoriteNoteViewData(it) as PlaneNoteViewData
+            FavoriteNoteViewData(it, connectionInstance) as PlaneNoteViewData
         }
         return Pair(BodyLessResponse(res), list)
     }

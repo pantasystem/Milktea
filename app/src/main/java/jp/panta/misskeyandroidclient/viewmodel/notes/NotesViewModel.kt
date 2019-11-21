@@ -181,6 +181,35 @@ class NotesViewModel(
         })
     }
 
+    fun removeNoteFromShareTarget(){
+        val note = shareTarget.event
+
+        val isNowCurrentAccount = note?.connectionInstance?.userId == connectionInstance.userId
+
+        if(note != null && isNowCurrentAccount){
+            removeNote(note)
+        }
+    }
+    fun removeNote(planeNoteViewData: PlaneNoteViewData){
+        misskeyAPI.delete(
+            DeleteNote(
+                i = connectionInstance.getI()!!,
+                noteId = planeNoteViewData.toShowNote.id
+            )
+        ).enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Log.d(TAG, "削除に成功しました")
+                if(response.code() == 204){
+                    statusMessage.event = "削除に成功しました"
+                }
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.d(TAG, "削除に失敗しました")
+            }
+        })
+    }
+
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
         misskeyAPI.noteState(NoteRequest(i = connectionInstance.getI(), noteId = planeNoteViewData.toShowNote.id))
             .enqueue(object : Callback<State>{

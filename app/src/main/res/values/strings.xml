@@ -88,4 +88,5 @@
     <string name="sync">同期</string>
 
     <string name="movement">動き</string>
+    <string name="remove_note">ノートを削除する</string>
 </resources>

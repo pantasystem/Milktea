@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.Expose
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData
@@ -11,7 +12,9 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.util.*
 import kotlin.collections.HashMap
 
-class TimelineCapture : Observer{
+class TimelineCapture(
+    val connectionInstance: ConnectionInstance
+) : Observer{
 
     interface Observer{
         fun onReceived(note: PlaneNoteViewData)
@@ -90,9 +93,9 @@ class TimelineCapture : Observer{
             val id = res.body.id
             if(note != null){
                 val viewData = if(note.reply == null){
-                    PlaneNoteViewData(note)
+                    PlaneNoteViewData(note, connectionInstance)
                 }else{
-                    HasReplyToNoteViewData(note)
+                    HasReplyToNoteViewData(note, connectionInstance)
                 }
                 observerMap[id]?.observer?.onReceived(viewData)
             }

@@ -53,7 +53,7 @@ interface MisskeyAPI {
     fun create(@Body createNote: CreateNote): Call<CreateNote.Response>
 
     @POST("api/notes/delete")
-    fun delete(@Body deleteNote: DeleteNote)
+    fun delete(@Body deleteNote: DeleteNote): Call<Unit>
 
     @POST("api/notes/reactions/create")
     fun createReaction(@Body reaction: CreateReaction): Call<Unit>
