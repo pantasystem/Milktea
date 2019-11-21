@@ -49,10 +49,24 @@ class SettingMovementActivity : AppCompatActivity() {
             context = this,
             titleStringRes = R.string.auto_load_timeline
         )
+
+        val hideRemovedNote = BooleanSharedItem(
+            key = KeyStore.BooleanKey.HIDE_REMOVED_NOTE.name,
+            default = KeyStore.BooleanKey.HIDE_REMOVED_NOTE.default,
+            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
+            context = this,
+            titleStringRes = R.string.hide_removed_note
+        )
         val timelineGroup = Group(
             titleStringRes = R.string.timeline,
             context = this,
-            items = listOf(includeLocalRenotes, includeRenotedMeyNotes, includeMyRenotes, autoLoadTimeline)
+            items = listOf(
+                includeLocalRenotes,
+                includeRenotedMeyNotes,
+                includeMyRenotes,
+                autoLoadTimeline,
+                hideRemovedNote
+            )
         )
 
         val captureNoteWhenStopped = BooleanSharedItem(

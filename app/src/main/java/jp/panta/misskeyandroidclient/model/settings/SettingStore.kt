@@ -20,6 +20,11 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             return fromBooleanEnum(KeyStore.BooleanKey.AUTO_LOAD_TIMELINE_WHEN_STOPPED)
         }
 
+    val isHideRemovedNote: Boolean
+        get(){
+            return fromBooleanEnum(KeyStore.BooleanKey.HIDE_REMOVED_NOTE)
+        }
+
     private fun fromBooleanEnum(key: KeyStore.BooleanKey): Boolean{
         return sharedPreferences.getBoolean(key.name, key.default)
     }

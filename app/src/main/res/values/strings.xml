@@ -89,4 +89,6 @@
 
     <string name="movement">動き</string>
     <string name="remove_note">ノートを削除する</string>
+
+    <string name="hide_removed_note">削除されたノートを非表示にする</string>
 </resources>

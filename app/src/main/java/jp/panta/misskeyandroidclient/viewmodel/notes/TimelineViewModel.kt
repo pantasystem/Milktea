@@ -43,7 +43,11 @@ class TimelineViewModel(
             misskeyAPI
         )
     }
-    private val timelineLiveData = TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, timelineCapture, viewModelScope)
+    private val timelineLiveData = TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, viewModelScope).apply{
+        if(settingStore.isHideRemovedNote){
+            noteCapture.addNoteRemoveListener(this.noteRemoveListener)
+        }
+    }
 
     val observer = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, timelineLiveData.timelineObserver)
     init{

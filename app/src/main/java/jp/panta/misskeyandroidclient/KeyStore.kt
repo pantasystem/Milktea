@@ -17,7 +17,9 @@ object KeyStore {
         AUTO_LOAD_TIMELINE(true),
 
         CAPTURE_NOTE_WHEN_STOPPED(true),
-        AUTO_LOAD_TIMELINE_WHEN_STOPPED(true)
+        AUTO_LOAD_TIMELINE_WHEN_STOPPED(true),
+
+        HIDE_REMOVED_NOTE(true)
 
     }
 }

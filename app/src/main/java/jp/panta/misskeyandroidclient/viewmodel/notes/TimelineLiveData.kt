@@ -14,7 +14,6 @@ class TimelineLiveData(
     private val requestBase: NoteRequest.Setting,
     private val notePagedStore: NotePagedStore,
     private val noteCapture: NoteCapture,
-    private val timelineCapture: TimelineCapture?,
     private val coroutineScope: CoroutineScope
 ) : MutableLiveData<TimelineState>(){
 
@@ -22,32 +21,11 @@ class TimelineLiveData(
 
     private var isLoadingFlag = false
 
-    init{
-        noteCapture.addNoteRemoveListener(object : NoteCapture.NoteRemoveListener{
-            override fun onRemoved(id: String) {
-                val list = value?.notes
-                if(list == null){
-                    return
-                }else{
-                    val timeline = ArrayList<PlaneNoteViewData>(list)
-                    timeline.filter{
-                        it.toShowNote.id == id
-                    }.forEach{
-                        timeline.remove(it)
-                    }
-                    postValue(
-                        TimelineState(
-                            timeline,
-                            TimelineState.State.REMOVED
-                        )
-                    )
-                }
-
-            }
-        })
+    /*init{
+        noteCapture.addNoteRemoveListener()
 
 
-    }
+    }*/
 
    /* override fun onActive() {
         super.onActive()
@@ -196,6 +174,28 @@ class TimelineLiveData(
 
 
 
+    }
+    val noteRemoveListener = object : NoteCapture.NoteRemoveListener{
+        override fun onRemoved(id: String) {
+            val list = value?.notes
+            if(list == null){
+                return
+            }else{
+                val timeline = ArrayList<PlaneNoteViewData>(list)
+                timeline.filter{
+                    it.toShowNote.id == id
+                }.forEach{
+                    timeline.remove(it)
+                }
+                postValue(
+                    TimelineState(
+                        timeline,
+                        TimelineState.State.REMOVED
+                    )
+                )
+            }
+
+        }
     }
 
     val timelineObserver = object : TimelineCapture.Observer{
