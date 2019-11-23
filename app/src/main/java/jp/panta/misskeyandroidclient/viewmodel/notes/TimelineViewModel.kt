@@ -356,7 +356,9 @@ class TimelineViewModel(
 
         }
     }.apply{
-        noteCapture.addNoteRemoveListener(this)
+        if(settingStore.isHideRemovedNote){
+            noteCapture.addNoteRemoveListener(this)
+        }
     }
 
 }
