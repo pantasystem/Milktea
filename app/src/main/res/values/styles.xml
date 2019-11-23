@@ -53,18 +53,46 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-    <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorDarkPrimary</item>
-        <item name="colorPrimaryDark">@color/colorDarkPrimary</item>
-        <item name="colorAccent">@color/colorDarkAccent</item>
-        <item name="android:windowBackground">@color/colorDarkPrimary</item>
-        <item name="colorSurface">@color/colorDarkPrimary</item>
-        <item name="android:textColor">@color/colorDarkTextColor</item>
+    <style name="AppThemeBlack" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorBlackPrimary</item>
+        <item name="colorPrimaryDark">@color/colorBlackPrimary</item>
+        <item name="colorAccent">@color/colorBlackAccent</item>
+        <item name="android:windowBackground">@color/colorBlackPrimary</item>
+        <item name="colorSurface">@color/colorBlackPrimary</item>
+        <item name="android:textColor">@color/colorBlackTextColor</item>
 
-        <item name="colorBottomNavigationSelected">@color/colorDarkTextColor</item>
+        <item name="colorBottomNavigationSelected">@color/colorBlackTextColor</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
+        <item name="actionBarSize">53dp</item>
 
+        <item name="colorMessageSelf">@color/colorMessageSelf</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+        <item name="colorSeparator">@color/colorSeparator</item>
+
+
+    </style>
+
+    <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorDarkPrimary</item>
+        <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
+        <item name="colorAccent">@color/colorDarkAccent</item>
+
+        <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
+        <item name="colorSurface">@color/colorDarkSurface</item>
+        <item name="android:textColor">@color/colorDarkTextColor</item>
+
+        <item name="colorBottomNavigationSelected">@color/colorDarkBottomNavSelected</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorDarkTextColor</item>
+        <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
+        <item name="actionBarSize">53dp</item>
+
+        <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
+        <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
+
+        <item name="colorMessageSelf">@color/colorMessageSelf</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+        <item name="colorSeparator">@color/colorSeparator</item>
 
     </style>
 

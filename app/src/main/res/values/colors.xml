@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--Normal Theme-->
     <color name="colorPrimary">#FFFFFF</color>
     <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorLightSurface">#FFFFFF</color>
@@ -14,11 +15,22 @@
     <color name="colorMessageRecipient">#FFFFFF</color>
     <color name="colorSeparator">#BEBEBE</color>
 
-    <color name="colorDarkPrimary">#000000</color>
-    <color name="colorDarkPrimaryDark">#000000</color>
-    <color name="colorDarkWindowBackground">#121212</color>
-    <color name="colorDarkAccent">#03DAC5</color>
-    <color name="colorDarkSurface">#000000</color>
+    <!--Black Theme-->
+    <color name="colorBlackPrimary">#000000</color>
+    <color name="colorBlackPrimaryDark">#000000</color>
+    <color name="colorBlackWindowBackground">#121212</color>
+    <color name="colorBlackAccent">#03DAC5</color>
+    <color name="colorBlackSurface">#000000</color>
+    <color name="colorBlackTextColor">#C5C5C5</color>
+    <color name="colorBlackIconTint">#838383</color>
+
+    <!--Dark Theme-->
+    <color name="colorDarkPrimary">#262626</color>
+    <color name="colorDarkPrimaryDark">#262626</color>
+    <color name="colorDarkWindowBackground">#0E0E0E</color>
+    <color name="colorDarkAccent">#00ACC1</color>
+    <color name="colorDarkSurface">#191919</color>
     <color name="colorDarkTextColor">#C5C5C5</color>
-    <color name="colorDarkIconTint">#838383</color>
+    <color name="colorDarkIconTint">#CCFEFD</color>
+    <color name="colorDarkBottomNavSelected">#FFFFFF</color>
 </resources>
