@@ -96,5 +96,11 @@
 
     </style>
 
+    <style name="AppThemeBread" parent="AppTheme">
+        <item name="colorPrimary" >@color/colorBreadPrimary</item>
+        <item name="colorPrimaryDark">@color/colorBreadPrimaryDark</item>
+        <item name="colorSurface">@color/colorBreadSurface</item>
+    </style>
+
 
 </resources>

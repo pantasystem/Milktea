@@ -33,4 +33,9 @@
     <color name="colorDarkTextColor">#C5C5C5</color>
     <color name="colorDarkIconTint">#CCFEFD</color>
     <color name="colorDarkBottomNavSelected">#FFFFFF</color>
+
+    <!--Bread Theme-->
+    <color name="colorBreadPrimary">#D9A042</color>
+    <color name="colorBreadPrimaryDark">#995633</color>
+    <color name="colorBreadSurface">#F8F5C9</color>
 </resources>

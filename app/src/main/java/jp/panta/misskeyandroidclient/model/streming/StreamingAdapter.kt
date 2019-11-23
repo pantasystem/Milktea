@@ -103,7 +103,7 @@ class StreamingAdapter(
                 it.value.onDissconnect()
             }
             Thread.sleep(2000)
-
+            this@StreamingAdapter.connect()
 
         }
     }
