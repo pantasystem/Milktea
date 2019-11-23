@@ -23,7 +23,7 @@ class TimelineCapture(
         override val type: String = "connect",
         val body: RequestBody,
         @Expose
-        val observer : Observer
+        val observer : Observer?
     ) : StreamingAction{
         companion object{
             fun create(channel: NoteType, observer: Observer): TimelineObserver?{
@@ -37,12 +37,21 @@ class TimelineCapture(
                 timelineType?: return null
                 return TimelineObserver(body = RequestBody(id = UUID.randomUUID().toString(), channel = timelineType), observer = observer)
             }
+
+            fun createDisconnect(id: String): TimelineObserver?{
+                return TimelineObserver(type = "disconnect",
+                    body = RequestBody(id = id, channel = null), observer = null)
+            }
         }
+
+        /*fun updateId(){
+            body.id = UUID.randomUUID().toString()
+        }*/
     }
 
     data class RequestBody(
         val id: String,
-        val channel: String
+        val channel: String?
     )
 
     private data class Response(override val type: String, val body: Body): StreamingAction
@@ -111,5 +120,12 @@ class TimelineCapture(
         observerMap[observer.body.id] = observer
         //Log.d("TimelineCapture", "登録しました: ${gson.toJson(observer)}")
         streamingAdapter?.send(gson.toJson(observer))
+    }
+
+    fun removeChannelObserver(observer: TimelineObserver){
+        val removed = observerMap.remove(observer.body.id)
+        if(removed != null){
+            streamingAdapter?.send(gson.toJson(TimelineObserver.createDisconnect(removed.body.id)))
+        }
     }
 }

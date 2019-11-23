@@ -17,7 +17,7 @@ import java.util.*
 
 class TimelineViewModel(
     val connectionInstance: ConnectionInstance,
-    requestBaseSetting: NoteRequest.Setting,
+    val requestBaseSetting: NoteRequest.Setting,
     misskeyAPI: MisskeyAPI,
     private val settingStore: SettingStore
 ) : ViewModel(){
@@ -32,6 +32,9 @@ class TimelineViewModel(
         null
     }
 
+    private var isNoteCaptureStarted = false
+    private var isTimelineCaptureStarted = false
+
 
     val position = MutableLiveData<Int>()
 
@@ -43,18 +46,38 @@ class TimelineViewModel(
             misskeyAPI
         )
     }
-    private val timelineLiveData = TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, viewModelScope).apply{
+    private val timelineLiveData = object : TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, viewModelScope){
+        override fun onActive() {
+            super.onActive()
+
+            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
+                startTimelineCapture()
+            }
+            if(!settingStore.isCaptureNoteWhenStopped){
+                startNoteCapture()
+            }
+        }
+
+        override fun onInactive() {
+            super.onInactive()
+
+            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
+                stopTimelineCapture()
+            }
+            if(!settingStore.isCaptureNoteWhenStopped){
+                stopNoteCapture()
+            }
+
+        }
+    }.apply{
         if(settingStore.isHideRemovedNote){
             noteCapture.addNoteRemoveListener(this.noteRemoveListener)
         }
+
     }
 
-    val observer = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, timelineLiveData.timelineObserver)
-    init{
-        if(observer != null){
-            timelineCapture?.addChannelObserver(observer)
-        }
-    }
+    private var mObserver = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, timelineLiveData.timelineObserver)
+
 
     private val noteCaptureId = UUID.randomUUID().toString()
     private val timelineCaptureId = UUID.randomUUID().toString()
@@ -79,74 +102,69 @@ class TimelineViewModel(
         timelineLiveData.loadInit()
     }
 
-    fun streamingStart(){
-        if( !streamingAdapter.isConnect){
+    fun start(){
+        startNoteCapture()
+        startTimelineCapture()
+        if(!streamingAdapter.isConnect){
             streamingAdapter.connect()
+        }
+    }
+
+    fun stop(){
+        stopNoteCapture()
+        stopTimelineCapture()
+    }
+
+
+    private fun startTimelineCapture(){
+        Log.d(tag, "タイムラインキャプチャーを開始しようとしている")
+        val exTimeline = streamingAdapter.observerMap[timelineCaptureId]
+        if(exTimeline == null && timelineCapture != null && !isTimelineCaptureStarted){
+            //observer?.updateId()
+            val observer = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, timelineLiveData.timelineObserver)
+            mObserver = observer
+            streamingAdapter.addObserver(timelineCaptureId, timelineCapture)
+            if(observer != null){
+                timelineCapture.addChannelObserver(observer)
+            }
+        }
+    }
+
+    private fun stopTimelineCapture(){
+        val exTimeline = streamingAdapter.observerMap[timelineCaptureId]
+        if(exTimeline != null && timelineCapture != null){
+            streamingAdapter.observerMap.remove(timelineCaptureId)
+            val observer = mObserver
+            if(observer != null){
+                timelineCapture.removeChannelObserver(observer)
+            }
 
         }
-        /*val hasNoteCapture = streamingAdapter.observers.any {
-            it.javaClass.name == noteCapture.javaClass.name
-        }*/
-        val hasNoteCapture = streamingAdapter.observerMap[noteCaptureId] != null
+    }
 
-        if(!hasNoteCapture){
+    private fun startNoteCapture(){
+        Log.d(tag, "ノートのキャプチャーを開始しようとしている")
 
-            val notes = timelineLiveData.value?.notes
-            if(notes != null){
-                noteCapture.addAll(notes)
-            }
+        val exCapture = streamingAdapter.observerMap[noteCaptureId]
+        if(exCapture == null && !isNoteCaptureStarted){
+            Log.d("TimelineViewModel", "ノートのキャプチャーを開始した")
+
+            isNoteCaptureStarted = true
             streamingAdapter.addObserver(noteCaptureId, noteCapture)
-            Log.d(tag, "NoteCaptureを追加した")
-        }
-
-        if(settingStore.isAutoLoadTimeline && timelineCapture != null){
-            /*val hasTimelineCapture = streamingAdapter.observers.any{
-                it.javaClass.name == timelineCapture.javaClass.name
-            }*/
-            val hasTimelineCapture = streamingAdapter.observerMap[timelineCaptureId] != null
-            if(!hasTimelineCapture){
-                streamingAdapter.addObserver(timelineCaptureId, timelineCapture)
-            }
+            val notes = timelineLiveData.value?.notes?: return
+            noteCapture.addAll(notes)
 
         }
-
-
-
     }
 
-    fun streamingStop(){
-        if(!settingStore.isCaptureNoteWhenStopped){
-            val notes = timelineLiveData.value?.notes
-            if(notes != null){
-                noteCapture.removeAll(notes)
-            }
-            /*val index = streamingAdapter.observers.indexOfFirst {
-                it.javaClass.name == noteCapture.javaClass.name
-            }*/
-            try{
-                //streamingAdapter.observers.removeAt(index)
-                streamingAdapter.observerMap.remove(noteCaptureId)
-                Log.d(tag, "NoteCaptureを削除した")
-            }catch(e: IndexOutOfBoundsException){
-
-            }
-
-
+    private fun stopNoteCapture(){
+        val exCapture = streamingAdapter.observerMap[noteCaptureId]
+        val notes = timelineLiveData.value?.notes
+        if(exCapture != null && notes != null && isNoteCaptureStarted){
+            noteCapture.removeAll(notes)
+            streamingAdapter.observerMap.remove(noteCaptureId)
+            isNoteCaptureStarted = false
         }
-        if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && timelineCapture != null){
-            /*val index = streamingAdapter.observers.indexOfFirst {
-                it.javaClass.name == timelineCapture.javaClass.name
-            }*/
-            try{
-                //streamingAdapter.observers.removeAt(index)
-                streamingAdapter.observerMap[timelineCaptureId]
-            }catch(e: IndexOutOfBoundsException){
-
-            }
-        }
-
-
     }
-
 
 }

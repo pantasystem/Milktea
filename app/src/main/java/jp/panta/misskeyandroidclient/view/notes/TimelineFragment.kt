@@ -83,8 +83,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
             }
 
-            mViewModel?.streamingStop()
-            mViewModel?.streamingStart()
+            //mViewModel?.streamingStop()
+            //mViewModel?.streamingStart()
+            mViewModel?.stop()
+            mViewModel?.start()
 
             refresh.setOnRefreshListener {
                 mViewModel?.loadNew()
@@ -151,14 +153,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     override fun onDestroyView() {
         super.onDestroyView()
 
-        mViewModel?.streamingStop()
+        //mViewModel?.streamingStop()
+        mViewModel?.stop()
         Log.d("TimelineFragment", "onDestroyView")
     }
 
-
-    private fun getBoolean(key: KeyStore.BooleanKey): Boolean{
-        return sharedPreference.getBoolean(key.name, key.default)
-    }
 
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
         override fun areContentsTheSame(

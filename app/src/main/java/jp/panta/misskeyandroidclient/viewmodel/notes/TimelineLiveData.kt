@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class TimelineLiveData(
+open class TimelineLiveData(
     private val requestBase: NoteRequest.Setting,
     private val notePagedStore: NotePagedStore,
     private val noteCapture: NoteCapture,
