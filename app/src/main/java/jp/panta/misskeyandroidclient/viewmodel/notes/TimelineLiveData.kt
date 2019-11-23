@@ -21,23 +21,6 @@ open class TimelineLiveData(
 
     private var isLoadingFlag = false
 
-    /*init{
-        noteCapture.addNoteRemoveListener()
-
-
-    }*/
-
-   /* override fun onActive() {
-        super.onActive()
-
-        if(timelineCapture != null){
-            val observer = TimelineCapture.TimelineObserver.create(requestBase.type, timelineObserver)
-            if(observer != null) timelineCapture.addChannelObserver(observer)
-
-        }
-        //val notes = value?.notes?: return
-        //noteCapture.addAll(notes)
-    }*/
 
 
     fun loadInit(){

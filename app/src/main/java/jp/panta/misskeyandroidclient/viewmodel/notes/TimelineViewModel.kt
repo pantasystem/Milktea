@@ -12,6 +12,9 @@ import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.IOException
 import java.lang.IndexOutOfBoundsException
 import java.util.*
 
@@ -21,6 +24,9 @@ class TimelineViewModel(
     misskeyAPI: MisskeyAPI,
     private val settingStore: SettingStore
 ) : ViewModel(){
+
+
+
     val tag = "TimelineViewModel"
     val errorState = MediatorLiveData<String>()
 
@@ -46,13 +52,15 @@ class TimelineViewModel(
             misskeyAPI
         )
     }
-    private val timelineLiveData = object : TimelineLiveData(requestBaseSetting, notePagingStore, noteCapture, viewModelScope){
+
+
+    private val timelineLiveData = object : MutableLiveData<TimelineState>(){
         override fun onActive() {
             super.onActive()
 
-            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
+            /*if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
                 startTimelineCapture()
-            }
+            }*/
             if(!settingStore.isCaptureNoteWhenStopped){
                 startNoteCapture()
             }
@@ -69,20 +77,18 @@ class TimelineViewModel(
             }
 
         }
-    }.apply{
-        if(settingStore.isHideRemovedNote){
-            noteCapture.addNoteRemoveListener(this.noteRemoveListener)
-        }
-
     }
 
-    private var mObserver = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, timelineLiveData.timelineObserver)
+
+    private var mObserver: TimelineCapture.TimelineObserver? = null
 
 
     private val noteCaptureId = UUID.randomUUID().toString()
     private val timelineCaptureId = UUID.randomUUID().toString()
 
-    val isLoading = timelineLiveData.isLoading
+    val isLoading = MutableLiveData<Boolean>()
+
+    private var isLoadingFlag = false
 
 
 
@@ -91,20 +97,159 @@ class TimelineViewModel(
     }
 
     fun loadNew(){
-        timelineLiveData.loadNew()
+        Log.d("TimelineLiveData", "loadNew")
+        if( ! isLoadingFlag ){
+            isLoadingFlag = true
+            //val sinceId = observableTimelineList.firstOrNull()?.id
+            val sinceId = timelineLiveData.value?.getSinceId()
+            if(sinceId == null){
+                isLoadingFlag = false
+                isLoading.postValue(false)
+                return loadInit()
+            }
+            viewModelScope.launch(Dispatchers.IO){
+                try{
+                    val res = notePagingStore.loadNew(sinceId)
+                    val list = res.second
+                    if(list == null || list.isEmpty()){
+                        isLoadingFlag = false
+                        isLoading.postValue(false)
+                        return@launch
+                    }else{
+                        noteCapture.addAll(list)
+
+                        val state = timelineLiveData.value
+                        val newState = if(state == null){
+                            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
+                                startTimelineCapture()
+                            }
+                            TimelineState(
+                                list,
+                                TimelineState.State.LOAD_NEW
+                            )
+                            /*if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
+                startTimelineCapture()
+            }*/
+                        }else{
+                            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && list.size < requestBaseSetting.limit?: 20){
+                                startTimelineCapture()
+                            }
+                            val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
+                                addAll(0, list)
+                            }
+                            TimelineState(
+                                newList,
+                                TimelineState.State.LOAD_NEW
+                            )
+                        }
+
+                        timelineLiveData.postValue(newState)
+                        isLoadingFlag = false
+                        isLoading.postValue(false)
+                    }
+                }catch(e: IOException){
+                    isLoadingFlag = false
+                    isLoading.postValue(false)
+                }catch (e: Exception){
+                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
+                }
+
+            }
+
+        }
     }
 
     fun loadOld(){
-        timelineLiveData.loadOld()
+        val untilId = timelineLiveData.value?.getUntilId() ?: return loadInit()
+        if( isLoadingFlag){
+            return
+        }
+        isLoadingFlag = true
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                val res = notePagingStore.loadOld(untilId)
+                val list = res.second
+                if(list == null || list.isEmpty()){
+                    isLoadingFlag = false
+                    return@launch
+                }else{
+                    noteCapture.addAll(list)
+                    val state = timelineLiveData.value
+
+                    val newState = if(state == null){
+                        TimelineState(
+                            list,
+                            TimelineState.State.LOAD_OLD
+                        )
+                    }else{
+                        val newList = ArrayList<PlaneNoteViewData>(state.notes).apply{
+                            addAll(list)
+                        }
+                        TimelineState(
+                            newList,
+                            TimelineState.State.LOAD_OLD
+                        )
+                    }
+
+
+                    timelineLiveData.postValue(newState)
+                    isLoadingFlag = false
+                }
+            }catch (e: IOException){
+                isLoadingFlag = false
+            }catch(e: Exception){
+                Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
+            }
+        }
     }
 
     fun loadInit(){
-        timelineLiveData.loadInit()
+        this.isLoading.postValue(true)
+
+        if( ! isLoadingFlag ){
+
+            isLoadingFlag = true
+
+            viewModelScope.launch(Dispatchers.IO){
+                try{
+                    val response = notePagingStore.loadInit()
+                    val list = response.second
+                    if(list == null || list.isEmpty()){
+                        isLoadingFlag = false
+                        isLoading.postValue(false)
+                        return@launch
+                    }else{
+                        val state = TimelineState(
+                            list,
+                            TimelineState.State.INIT
+                        )
+                        timelineLiveData.postValue(state)
+                        noteCapture.addAll(list)
+                        isLoadingFlag = false
+
+                    }
+
+                    if(settingStore.isAutoLoadTimeline){
+                        startTimelineCapture()
+                    }
+
+                }catch(e: IOException){
+                    isLoadingFlag = false
+                    isLoading.postValue(false)
+                }catch (e: Exception){
+                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
+                }
+
+            }
+
+        }
     }
 
     fun start(){
         startNoteCapture()
-        startTimelineCapture()
+        if(settingStore.isAutoLoadTimeline){
+            startTimelineCapture()
+        }
         if(!streamingAdapter.isConnect){
             streamingAdapter.connect()
         }
@@ -121,7 +266,7 @@ class TimelineViewModel(
         val exTimeline = streamingAdapter.observerMap[timelineCaptureId]
         if(exTimeline == null && timelineCapture != null && !isTimelineCaptureStarted){
             //observer?.updateId()
-            val observer = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, timelineLiveData.timelineObserver)
+            val observer = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, this.timelineObserver)
             mObserver = observer
             streamingAdapter.addObserver(timelineCaptureId, timelineCapture)
             if(observer != null){
@@ -165,6 +310,53 @@ class TimelineViewModel(
             streamingAdapter.observerMap.remove(noteCaptureId)
             isNoteCaptureStarted = false
         }
+    }
+
+
+
+    val timelineObserver = object : TimelineCapture.Observer{
+        override fun onReceived(note: PlaneNoteViewData) {
+            noteCapture.add(note)
+            val notes = timelineLiveData.value?.notes
+            val list = if(notes == null){
+                arrayListOf(note)
+            }else{
+                ArrayList<PlaneNoteViewData>(notes).apply{
+                    add(0, note)
+                }
+            }
+            timelineLiveData.postValue(
+                TimelineState(
+                    list,
+                    TimelineState.State.RECEIVED_NEW
+                )
+            )
+        }
+    }
+
+    private val noteRemovedListener = object : NoteCapture.NoteRemoveListener{
+        override fun onRemoved(id: String) {
+            val list = timelineLiveData.value?.notes
+            if(list == null){
+                return
+            }else{
+                val timeline = ArrayList<PlaneNoteViewData>(list)
+                timeline.filter{
+                    it.toShowNote.id == id
+                }.forEach{
+                    timeline.remove(it)
+                }
+                timelineLiveData.postValue(
+                    TimelineState(
+                        timeline,
+                        TimelineState.State.REMOVED
+                    )
+                )
+            }
+
+        }
+    }.apply{
+        noteCapture.addNoteRemoveListener(this)
     }
 
 }
