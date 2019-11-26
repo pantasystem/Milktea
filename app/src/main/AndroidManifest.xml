@@ -15,6 +15,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppThemeBread"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".view.settings.activities.SettingAppearanceActivity"></activity>
         <activity android:name=".view.settings.activities.SettingMovementActivity" />
         <activity
                 android:name=".SettingsActivity"

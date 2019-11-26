@@ -2,8 +2,12 @@ package jp.panta.misskeyandroidclient
 
 object KeyStore {
 
-    enum class IntKey{
-
+    enum class IntKey(val default: Int){
+        THEME_WHITE(0),
+        THEME_BLACK(1),
+        THEME_DARK(2),
+        THEME_BREAD(3),
+        THEME(THEME_WHITE.default)
     }
 
     enum class StringKey{

@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
+import jp.panta.misskeyandroidclient.view.settings.activities.SettingAppearanceActivity
 import jp.panta.misskeyandroidclient.view.settings.activities.SettingMovementActivity
 import jp.panta.misskeyandroidclient.view.settings.activities.TabSettingActivity
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
@@ -36,10 +37,20 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, it))
         })
 
+        val appearanceSetting = MoveSettingActivityPanel(
+            titleStringRes = R.string.appearance,
+            activity = SettingAppearanceActivity::class.java,
+            context = this
+        )
+
+        appearanceSetting.startActivityEventBus.observe(this, Observer{
+            startActivity(Intent(this, it))
+        })
+
         val group = Group(
             titleStringRes = null,
             context = this,
-            items = listOf(movementSetting, tabSetting)
+            items = listOf(movementSetting, tabSetting, appearanceSetting)
         )
 
         val adapter = SettingAdapter(this)

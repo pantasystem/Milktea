@@ -91,4 +91,11 @@
     <string name="remove_note">ノートを削除する</string>
 
     <string name="hide_removed_note">削除されたノートを非表示にする</string>
+
+    <string name="appearance">見た目</string>
+    <string name="theme">テーマ</string>
+    <string name="theme_white">ホワイト</string>
+    <string name="theme_black">ブラック</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="theme_bread">パンケーキ</string>
 </resources>

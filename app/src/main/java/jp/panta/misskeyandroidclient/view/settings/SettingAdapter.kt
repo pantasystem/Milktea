@@ -12,10 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.ItemMoveSettingActivityPanelBinding
-import jp.panta.misskeyandroidclient.databinding.ItemSettingGroupBinding
-import jp.panta.misskeyandroidclient.databinding.ItemSharedCheckboxBinding
-import jp.panta.misskeyandroidclient.databinding.ItemSharedSwitchBinding
+import jp.panta.misskeyandroidclient.databinding.*
 import jp.panta.misskeyandroidclient.viewmodel.setting.*
 import java.lang.IllegalArgumentException
 
@@ -50,12 +47,14 @@ class SettingAdapter(
     class ItemSharedSwitchHolder(val binding: ItemSharedSwitchBinding) : SharedHolder(binding.root)
     class ItemMoveSettingActivityPanelHolder(val binding: ItemMoveSettingActivityPanelBinding) : SharedHolder(binding.root)
     class ItemSettingGroupHolder(val binding: ItemSettingGroupBinding) : SharedHolder(binding.root)
+    class ItemSettingSelectionHolder(val binding: ItemSharedSelectionBinding) : SharedHolder(binding.root)
 
     companion object{
         const val GROUP = 0
         const val CHECK = 1
         const val SWITCH = 2
         const val MOVE = 3
+        const val SELECTION = 4
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -67,9 +66,8 @@ class SettingAdapter(
                     BooleanSharedItem.ChoiceType.SWITCH -> SWITCH
                 }
             }
-            is MoveSettingActivityPanel<*> ->{
-                MOVE
-            }
+            is MoveSettingActivityPanel<*> -> MOVE
+            is SelectionSharedItem -> SELECTION
             else -> throw IllegalArgumentException("not found")
         }
     }
@@ -102,6 +100,17 @@ class SettingAdapter(
                 holder.binding.lifecycleOwner = viewLifecycleOwner
                 holder.binding.executePendingBindings()
             }
+            is ItemSettingSelectionHolder ->{
+                val item = getItem(position) as SelectionSharedItem
+                holder.binding.selection = item
+                holder.binding.selectionList.layoutManager = LinearLayoutManager(holder.itemView.context)
+                val adapter = SelectionListAdapter(viewLifecycleOwner, item)
+                holder.binding.selectionList.adapter = adapter
+                adapter.submitList(item.choices)
+                holder.binding.lifecycleOwner = viewLifecycleOwner
+                holder.binding.executePendingBindings()
+
+            }
         }
     }
 
@@ -122,6 +131,10 @@ class SettingAdapter(
             MOVE ->{
                 val binding = makeBinding<ItemMoveSettingActivityPanelBinding>(parent, R.layout.item_move_setting_activity_panel)
                 ItemMoveSettingActivityPanelHolder(binding)
+            }
+            SELECTION ->{
+                val binding = makeBinding<ItemSharedSelectionBinding>(parent, R.layout.item_shared_selection)
+                ItemSettingSelectionHolder(binding)
             }
             else -> throw IllegalArgumentException("not found")
 
