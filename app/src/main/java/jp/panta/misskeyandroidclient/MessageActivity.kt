@@ -14,6 +14,7 @@ class MessageActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_message)
 
         val messageHistory = intent?.getSerializableExtra(EXTRA_MESSAGE_HISTORY) as Message?

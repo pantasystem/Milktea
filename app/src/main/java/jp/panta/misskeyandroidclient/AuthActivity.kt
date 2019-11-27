@@ -25,6 +25,7 @@ class AuthActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_auth)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

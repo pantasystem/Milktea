@@ -22,6 +22,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_note_detail)
 
         setSupportActionBar(noteDetailToolbar)

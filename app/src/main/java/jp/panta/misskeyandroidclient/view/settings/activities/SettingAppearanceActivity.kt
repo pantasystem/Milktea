@@ -2,9 +2,11 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
@@ -14,7 +16,11 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_setting_appearance)
+
+        setSupportActionBar(appearanceToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val themeChoices = listOf(
             SelectionSharedItem.Choice(
@@ -51,5 +57,12 @@ class SettingAppearanceActivity : AppCompatActivity() {
         setting_list.adapter = adapter
         adapter.submitList(listOf(themeSelection))
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

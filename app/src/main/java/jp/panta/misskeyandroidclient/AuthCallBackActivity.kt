@@ -25,6 +25,7 @@ class AuthCallBackActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_auth_call_back)
 
         val binding: ActivityAuthCallBackBinding = DataBindingUtil.setContentView(this, R.layout.activity_auth_call_back)

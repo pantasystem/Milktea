@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
@@ -17,7 +18,11 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_settings)
+
+        setSupportActionBar(settingToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val movementSetting = MoveSettingActivityPanel<SettingMovementActivity>(
             titleStringRes = R.string.movement,
@@ -58,6 +63,13 @@ class SettingsActivity : AppCompatActivity() {
         setting_list.layoutManager = LinearLayoutManager(this)
         adapter.submitList(listOf(group))
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 }

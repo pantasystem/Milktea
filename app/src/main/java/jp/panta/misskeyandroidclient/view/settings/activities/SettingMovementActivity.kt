@@ -3,10 +3,12 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
@@ -16,7 +18,11 @@ class SettingMovementActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_settings)
+
+        setSupportActionBar(settingToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val includeLocalRenotes = BooleanSharedItem(
             key = KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name,
@@ -106,5 +112,12 @@ class SettingMovementActivity : AppCompatActivity() {
         setting_list.layoutManager = LinearLayoutManager(this)
 
         adapter.submitList(listOf(timelineGroup, syncGroup))
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

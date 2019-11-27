@@ -38,6 +38,7 @@ class NoteEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_note_editor)
         setSupportActionBar(note_editor_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -122,16 +123,13 @@ class NoteEditorActivity : AppCompatActivity() {
 
     private fun showDriveFileSelector(){
         val selectedSize = mViewModel?.totalImageCount?.value?: 0
-        val selected = mViewModel?.driveFiles()
 
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = 4 - selectedSize
         Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
-        /*if(selected != null){
-            //intent.putExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FileProperty>(selected))
-        }*/
+
         startActivityForResult(intent, SELECT_DRIVE_FILE_REQUEST_CODE)
     }
 
