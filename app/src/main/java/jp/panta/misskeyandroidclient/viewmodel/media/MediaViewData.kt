@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.media
 
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import java.lang.IndexOutOfBoundsException
 
 class MediaViewData(files: List<FileProperty>) {
 
@@ -8,9 +9,9 @@ class MediaViewData(files: List<FileProperty>) {
         FileViewData(it)
     }
 
-    fun changeHidingState(index: Int){
-        if(index < files.size){
-            files[index].changeContentHiding()
-        }
-    }
+    val fileOne = this.files.getOrNull(0)
+    val fileTwo = this.files.getOrNull(1)
+    val fileThree = this.files.getOrNull(2)
+    val fileFour = this.files.getOrNull(3)
+
 }

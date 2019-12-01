@@ -126,12 +126,14 @@ object MediaPreviewHelper{
 
     }
 
-    @BindingAdapter("thumbnailView", "nsfwMessage", "playButton", "mediaViewData", "index")
-    fun FrameLayout.setPreview(thumbnailView: ImageView, nsfwMessage: TextView, playButton: ImageButton, mediaViewData: MediaViewData, index: Int){
+    @BindingAdapter("thumbnailView", "nsfwMessage", "playButton", "mediaViewData", "fileIndex")
+    @JvmStatic
+    fun FrameLayout.setPreview(thumbnailView: ImageView, nsfwMessage: TextView, playButton: ImageButton, mediaViewData: MediaViewData, fileIndex: Int){
         try{
-            val file = mediaViewData.files[index]
+            val file = mediaViewData.files[fileIndex]
             this.visibility = View.VISIBLE
 
+            Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
             when(file.type){
                 FileViewData.Type.IMAGE, FileViewData.Type.VIDEO -> {
                     Glide.with(thumbnailView)
@@ -151,6 +153,8 @@ object MediaPreviewHelper{
                                 .into(playButton)
                         }
                     }
+                    //thumbnailView.visibility = View.VISIBLE
+
                 }
                 FileViewData.Type.SOUND -> {
                     playButton.visibility = View.VISIBLE
@@ -164,15 +168,35 @@ object MediaPreviewHelper{
                 }
             }
 
-            if(file.isHiding.value == true){
+            /*val isHiding = file.isHiding.value?: false
+            if(isHiding){
                 thumbnailView.visibility = View.GONE
                 nsfwMessage.visibility = View.VISIBLE
             }else{
                 thumbnailView.visibility = View.VISIBLE
                 nsfwMessage.visibility = View.GONE
-            }
+            }*/
         }catch(e: IndexOutOfBoundsException){
             this.visibility = View.GONE
+        }
+    }
+
+    @BindingAdapter("leftMediaBase", "rightMediaBase", "mediaViewData")
+    @JvmStatic
+    fun LinearLayout.visibilityControl(leftMediaBase: LinearLayout, rightMediaBase: LinearLayout, mediaViewData: MediaViewData){
+        when {
+            mediaViewData.files.isEmpty() -> {
+                leftMediaBase.visibility = View.GONE
+                rightMediaBase.visibility = View.GONE
+            }
+            mediaViewData.files.size < 2 ->{
+                leftMediaBase.visibility = View.VISIBLE
+                rightMediaBase.visibility = View.GONE
+            }
+            else -> {
+                leftMediaBase.visibility = View.VISIBLE
+                rightMediaBase.visibility = View.VISIBLE
+            }
         }
     }
 

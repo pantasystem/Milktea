@@ -117,7 +117,7 @@
                         tools:visibility="gone"
                         >
                     <include layout="@layout/media_preview"
-                            app:files="@{note.files}"
+                            app:media="@{note.media}"
 
                             />
                 </FrameLayout>
@@ -206,7 +206,7 @@
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                             >
                         <include layout="@layout/media_preview"
-                                app:files="@{note.subNoteFiles}"
+                                app:media="@{note.subNoteMedia}"
 
                                 />
                     </FrameLayout>

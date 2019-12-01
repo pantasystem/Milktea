@@ -9,6 +9,7 @@
 
 
         <import type="jp.panta.misskeyandroidclient.R"/>
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
 
         <variable
                 name="notesViewModel"
@@ -81,7 +82,7 @@
                 tools:text="展開する"
                 android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
                 android:textColor="?attr/colorAccent"
-                android:text="@{note.contentFoldingStatusMessage}"
+                android:text="@{SafeUnbox.unbox(note.contentFoldingStatusMessage)}"
                 android:onClick="@{()-> note.changeContentFolding() }"
             />
         <RelativeLayout
@@ -90,13 +91,13 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/contentFoldingButton"
                 android:layout_toEndOf="@id/avatarIcon"
-                android:visibility="@{note.contentFolding ? View.GONE : View.VISIBLE }"
+                android:visibility="@{SafeUnbox.unbox(note.contentFolding) ? View.GONE : View.VISIBLE }"
                 >
             <TextView
                     android:id="@id/text"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:textSize="15sp"
-                    app:text='@{note.text}'
+                    app:text='@{SafeUnbox.unbox(note.text)}'
                     app:emojis='@{note.emojis}'
                     tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                     android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
@@ -111,7 +112,7 @@
                     tools:visibility="gone"
                     >
                 <include layout="@layout/media_preview"
-                        app:files="@{note.files}"
+                        app:media="@{note.media}"
 
                         />
             </FrameLayout>
@@ -137,7 +138,7 @@
                 <TextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_toEndOf="@+id/subAvatarIcon"
-                        android:text='@{note.subNoteUserName, default="@subUserId"}'
+                        android:text='@{SafeUnbox.unbox(note.subNoteUserName), default="@subUserId"}'
                         android:id="@+id/subNoteUserName"
                         android:textStyle="bold"
                         android:textSize="15sp"
@@ -147,7 +148,7 @@
                 <TextView
                         android:layout_toEndOf="@id/subNoteUserName"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text='@{note.subNoteName, default="SubName SubName"}'
+                        android:text='@{SafeUnbox.unbox(note.subNoteName), default="SubName SubName"}'
                         android:textStyle="italic"
                         android:id="@+id/subNoteName"
                         android:textSize="15sp"
@@ -160,7 +161,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="cwcwcwwcwcw"
-                        android:text="@{note.subCw}"
+                        android:text="@{SafeUnbox.unbox(note.subCw)}"
                         android:layout_below="@+id/subNoteUserName"
                         android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                         />
@@ -187,9 +188,9 @@
                         android:textSize="15sp"
                         android:id="@+id/subNoteText"
                         tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
-                        app:text='@{note.subNoteText}'
+                        app:text='@{SafeUnbox.unbox(note.subNoteText)}'
                         app:emojis='@{note.subNoteEmojis}'
-                        android:visibility="@{note.subContentFolding? View.GONE : View.VISIBLE }"
+                        android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
                         />
 
                 <FrameLayout
@@ -200,7 +201,7 @@
                         android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                         >
                     <include layout="@layout/media_preview"
-                            app:files="@{note.subNoteFiles}"
+                            app:media="@{note.subNoteMedia}"
 
                             />
                 </FrameLayout>

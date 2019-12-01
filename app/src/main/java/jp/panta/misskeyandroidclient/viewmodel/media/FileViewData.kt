@@ -25,7 +25,7 @@ class FileViewData(val fileProperty: FileProperty) {
     val url = fileProperty.url
     val thumbnailUrl = fileProperty.thumbnailUrl?: url
 
-    val isHiding = MutableLiveData<Boolean>(!isSensitive)
+    val isHiding = MutableLiveData<Boolean>(isSensitive)
 
     fun changeContentHiding(){
         if(isSensitive){

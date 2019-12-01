@@ -4,40 +4,29 @@
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="android.view.View" />
         <variable
-                name="files"
-                type="java.util.List&lt;jp.panta.misskeyandroidclient.model.drive.FileProperty>" />
+                name="media"
+                type="jp.panta.misskeyandroidclient.viewmodel.media.MediaViewData" />
     </data>
     <LinearLayout
             android:orientation="horizontal" android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:leftMediaBase="@{leftMediaBase}"
+            app:rightMediaBase="@{rightMediaBase}"
+            app:mediaViewData="@{media}"
 
-            app:thumbnailTopLeft="@{thumbnailTopLeft}"
-            app:thumbnailTopRight="@{thumbnailTopRight}"
-            app:thumbnailBottomLeft="@{thumbnailBottomLeft}"
-            app:thumbnailBottomRight="@{thumbnailBottomRight}"
 
-            app:actionButtonTopLeft="@{actionButtonTopLeft}"
-            app:actionButtonTopRight="@{actionButtonTopRight}"
-            app:actionButtonBottomLeft="@{actionButtonBottomLeft}"
-            app:actionButtonBottomRight="@{actionButtonBottomRight}"
 
-            app:baseFrameTopLeft="@{baseFrameTopLeft}"
-            app:baseFrameTopRight="@{baseFrameTopRight}"
-            app:baseFrameBottomLeft="@{baseFrameBottomLeft}"
-            app:baseFrameBottomRight="@{baseFrameBottomRight}"
-
-            app:shieldLeft="@{shieldLeft}"
-            app:shieldRight="@{shieldRight}"
-            app:previewMediaFiles="@{files}"
             >
 
         <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:id="@+id/shieldLeft"
+                android:id="@+id/leftMediaBase"
                 >
 
             <FrameLayout
@@ -45,28 +34,41 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    tools:ignore="NestedWeights">
+                    tools:ignore="NestedWeights"
+                    app:thumbnailView="@{thumbnailTopLeft}"
+                    app:nsfwMessage="@{nsfwMessageTopLeft}"
+                    app:playButton="@{actionButtonTopLeft}"
+                    app:mediaViewData="@{media}"
+                    app:fileIndex="@{0}"
+                    android:onClick="@{()-> media.fileOne.changeContentHiding()}"
+                    >
 
                 <ImageView
                         android:id="@+id/thumbnailTopLeft"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.GONE : View.VISIBLE }"
+                        />
                 <ImageButton
                         android:id="@+id/actionButtonTopLeft"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
+                        android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.GONE : View.VISIBLE }"
                         />
 
                 <TextView
+                        android:id="@+id/nsfwMessageTopLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="クリックで表示"
                         android:layout_gravity="center"
+                        android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
+                        android:text="@string/nsfw_message"
                         />
 
             </FrameLayout>
@@ -75,27 +77,45 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+
+                    app:thumbnailView="@{thumbnailBottomLeft}"
+                    app:nsfwMessage="@{nsfwMessageBottomLeft}"
+                    app:playButton="@{actionButtonBottomLeft}"
+                    app:mediaViewData="@{media}"
+                    app:fileIndex="@{2}"
+                    android:onClick="@{()-> media.fileThree.changeContentHiding()}"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomLeft"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
+                        />
                 <ImageButton
                         android:id="@+id/actionButtonBottomLeft"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
+                        android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
+                        />
+                <TextView
+                        android:id="@+id/nsfwMessageBottomLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nsfw_message"
+                        android:layout_gravity="center"
+                        android:visibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
                         />
             </FrameLayout>
         </LinearLayout>
 
         <LinearLayout
-                android:id="@+id/shieldRight"
-                android:layout_width="match_parent"
+                android:id="@+id/rightMediaBase"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
@@ -105,20 +125,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    tools:ignore="NestedWeights">
+                    tools:ignore="NestedWeights"
+                    app:thumbnailView="@{thumbnailTopRight}"
+                    app:nsfwMessage="@{nsfwMessageTopRight}"
+                    app:playButton="@{actionButtonTopRight}"
+                    app:mediaViewData="@{media}"
+                    app:fileIndex="@{1}"
+                    android:onClick="@{()-> media.fileTwo.changeContentHiding() }"
+                    >
                 <ImageView
                         android:id="@+id/thumbnailTopRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.GONE : View.VISIBLE }"/>
                 <ImageButton
                         android:id="@+id/actionButtonTopRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
+                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.GONE : View.VISIBLE }"
+                        />
+                <TextView
+                        android:id="@+id/nsfwMessageTopRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="クリックで表示"
+                        android:layout_gravity="center"
+                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
+                        android:text="@string/nsfw_message"
                         />
             </FrameLayout>
             <FrameLayout
@@ -126,20 +164,37 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    app:thumbnailView="@{thumbnailBottomRight}"
+                    app:nsfwMessage="@{nsfwMessageBottomRight}"
+                    app:playButton="@{actionButtonBottomRight}"
+                    app:mediaViewData="@{media}"
+                    app:fileIndex="@{3}"
+                    android:onClick="@{()-> media.fileFour.changeContentHiding() }"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh" />
+                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.GONE : View.VISIBLE}"
+                        />
                 <ImageButton
                         android:id="@+id/actionButtonBottomRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
+                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.GONE : View.VISIBLE}"
+                        />
+                <TextView
+                        android:id="@+id/nsfwMessageBottomRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nsfw_message"
+                        android:layout_gravity="center"
+                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}"
                         />
 
             </FrameLayout>
