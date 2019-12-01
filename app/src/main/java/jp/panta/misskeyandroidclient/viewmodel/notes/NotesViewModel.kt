@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 class NotesViewModel(
     ci: ConnectionInstance,
@@ -43,6 +45,8 @@ class NotesViewModel(
     val targetUser = EventBus<User>()
 
     val targetNote = EventBus<PlaneNoteViewData>()
+
+    val targetFile = EventBus<Pair<FileProperty, List<FileProperty>>>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
@@ -225,5 +229,9 @@ class NotesViewModel(
                     Log.e(TAG, "note stateの取得に失敗しました", t)
                 }
             })
+    }
+
+    fun showFile(file: FileProperty, files: List<FileProperty>){
+
     }
 }

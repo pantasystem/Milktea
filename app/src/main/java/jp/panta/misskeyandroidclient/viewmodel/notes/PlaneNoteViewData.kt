@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.viewmodel.media.MediaViewData
 
 open class PlaneNoteViewData (
     val note: Note,
@@ -77,7 +78,8 @@ open class PlaneNoteViewData (
 
     val emojis = toShowNote.emojis
 
-    val files = toShowNote.files
+    val files = toShowNote.files?: emptyList()
+    val media = MediaViewData(files)
 
     var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
 

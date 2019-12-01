@@ -98,4 +98,10 @@
     <string name="theme_black">ブラック</string>
     <string name="theme_dark">ダーク</string>
     <string name="theme_bread">パンケーキ</string>
+
+    <string name="title_activity_media">MediaActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="nsfw_message">回覧注意</string>
 </resources>

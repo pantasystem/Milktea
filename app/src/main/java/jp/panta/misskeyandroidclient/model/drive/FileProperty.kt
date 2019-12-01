@@ -15,7 +15,7 @@ data class FileProperty(
     @SerializedName("comment") val comment: String? = null,
     //@JsonProperty("properties") val properties: Property? = null,
     @SerializedName("isSensitive") val isSensitive: Boolean? = null,
-    @SerializedName("url") val url: String? = null,
+    @SerializedName("url") val url: String,
     //@SerializedName("webpublicUrl") val webPublicUrl: String? = null,
     @SerializedName("thumbnailUrl") val thumbnailUrl: String? = null,
     @SerializedName("attachedNoteIds") val attachedNoteIds: List<String?>? = null

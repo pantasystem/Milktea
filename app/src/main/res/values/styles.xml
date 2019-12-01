@@ -3,24 +3,24 @@
     <declare-styleable name="MyMaterialDesign">
         <!--<attr name="colorPrimaryVariant" format="color"/>-->
         <!--<attr name="colorSecondaryVariant" format="color"/>-->
-        <attr name="colorSurface" format="color"/>
+        <attr name="colorSurface" format="color" />
         <!--<attr name="colorOnPrimary" format="color"/>
         <attr name="colorOnSecondary" format="color"/>
         <item name="colorOnError" format="color"/>
         <item name="colorOnSurface" format="color"/>
         <item name="scrimBackground" format="color"/>-->
-        <attr name="colorNormalReactionCounterBackground" format="color"/>
+        <attr name="colorNormalReactionCounterBackground" format="color" />
         <attr name="colorSelectedReactionCounterBackground" format="color" />
 
-        <attr name="colorBottomNavigationSelected" format="color"/>
-        <attr name="colorBottomNavigationNotSelect" format="color"/>
+        <attr name="colorBottomNavigationSelected" format="color" />
+        <attr name="colorBottomNavigationNotSelect" format="color" />
 
-        <attr name="colorNoteActionButtonTint" format="color"/>
+        <attr name="colorNoteActionButtonTint" format="color" />
 
         <attr name="colorMessageSelf" format="color" />
         <attr name="colorMessageRecipient" format="color" />
 
-        <attr name="colorSeparator" format="color"/>
+        <attr name="colorSeparator" format="color" />
 
     </declare-styleable>
     <!-- Base application theme. -->
@@ -45,13 +45,15 @@
         <item name="colorSeparator">@color/colorSeparator</item>
 
     </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppThemeBlack" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorBlackPrimary</item>
@@ -97,7 +99,7 @@
     </style>
 
     <style name="AppThemeBread" parent="AppTheme">
-        <item name="colorPrimary" >@color/colorBreadPrimary</item>
+        <item name="colorPrimary">@color/colorBreadPrimary</item>
         <item name="colorPrimaryDark">@color/colorBreadPrimaryDark</item>
         <item name="colorSurface">@color/colorBreadSurface</item>
         <item name="colorAccent">@color/colorBreadAccent</item>

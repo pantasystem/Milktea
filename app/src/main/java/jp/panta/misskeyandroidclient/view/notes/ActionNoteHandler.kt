@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.NoteDetailActivity
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -66,6 +67,10 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
+    private val fileTargetObserver = Observer<Pair<FileProperty, List<FileProperty>>>{
+
+    }
+
     fun initViewModelListener(){
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
         mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
@@ -90,5 +95,8 @@ class ActionNoteHandler(
 
         mNotesViewModel.targetNote.removeObserver(noteTargetObserver)
         mNotesViewModel.targetNote.observe(activity, noteTargetObserver)
+
+        mNotesViewModel.targetFile.removeObserver(fileTargetObserver)
+        mNotesViewModel.targetFile.observe(activity, fileTargetObserver)
     }
 }

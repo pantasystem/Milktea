@@ -38,6 +38,8 @@
     <color name="colorBreadPrimary">#D9A042</color>
     <color name="colorBreadPrimaryDark">#995633</color>
     <color name="colorBreadSurface">#F8F5C9</color>
-    <color name="colorBreadAccent">#F35573</color>
-    <color name="colorBreadBottomNavSelected">#F35573</color>
+    <color name="colorBreadAccent">#69BAD6</color>
+    <color name="colorBreadBottomNavSelected">#69BAD6</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

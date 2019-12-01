@@ -3,14 +3,13 @@ package jp.panta.misskeyandroidclient.view.media
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.*
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.viewmodel.media.FileViewData
+import jp.panta.misskeyandroidclient.viewmodel.media.MediaViewData
 import java.lang.IndexOutOfBoundsException
 
 object MediaPreviewHelper{
@@ -126,6 +125,57 @@ object MediaPreviewHelper{
 
 
     }
+
+    @BindingAdapter("thumbnailView", "nsfwMessage", "playButton", "mediaViewData", "index")
+    fun FrameLayout.setPreview(thumbnailView: ImageView, nsfwMessage: TextView, playButton: ImageButton, mediaViewData: MediaViewData, index: Int){
+        try{
+            val file = mediaViewData.files[index]
+            this.visibility = View.VISIBLE
+
+            when(file.type){
+                FileViewData.Type.IMAGE, FileViewData.Type.VIDEO -> {
+                    Glide.with(thumbnailView)
+                        .load(file.thumbnailUrl)
+                        .centerCrop()
+                        .into(thumbnailView)
+
+                    when(file.type){
+                        FileViewData.Type.IMAGE ->{
+                            playButton.visibility = View.GONE
+                        }
+                        else ->{
+                            playButton.visibility = View.VISIBLE
+                            Glide.with(playButton)
+                                .load(R.drawable.ic_play_circle_outline_black_24dp)
+                                .centerInside()
+                                .into(playButton)
+                        }
+                    }
+                }
+                FileViewData.Type.SOUND -> {
+                    playButton.visibility = View.VISIBLE
+                    Glide.with(playButton.context)
+                        .load(R.drawable.ic_music_note_black_24dp)
+                        .centerInside()
+                        .into(playButton)
+                }
+                else ->{
+                    this.visibility = View.GONE
+                }
+            }
+
+            if(file.isHiding.value == true){
+                thumbnailView.visibility = View.GONE
+                nsfwMessage.visibility = View.VISIBLE
+            }else{
+                thumbnailView.visibility = View.VISIBLE
+                nsfwMessage.visibility = View.GONE
+            }
+        }catch(e: IndexOutOfBoundsException){
+            this.visibility = View.GONE
+        }
+    }
+
 
 
 }

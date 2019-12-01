@@ -24,6 +24,11 @@ android {
         }
     }
 
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     dataBinding {
         enabled = true
     }
@@ -90,5 +95,8 @@ dependencies {
 
     //svg
     implementation 'com.caverock:androidsvg-aar:1.4'
+
+    //ExoPlayer
+    implementation 'com.google.android.exoplayer:exoplayer:2.10.8'
 
 }
