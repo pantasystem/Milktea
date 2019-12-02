@@ -20,7 +20,7 @@
             app:leftMediaBase="@{leftMediaBase}"
             app:rightMediaBase="@{rightMediaBase}"
             app:mediaViewData="@{media}"
-
+            android:baselineAligned="false"
 
 
             >
@@ -44,21 +44,24 @@
                     app:playButton="@{actionButtonTopLeft}"
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{0}"
-                    android:onClick="@{()-> media.fileOne.changeContentHiding()}"
+                    android:onClick="@{()-> media.fileOne.show()}"
                     >
 
                 <ImageView
                         android:id="@+id/thumbnailTopLeft"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.GONE : View.VISIBLE }"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileOne) }"
                         />
                 <ImageButton
                         android:id="@+id/actionButtonTopLeft"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
@@ -88,15 +91,17 @@
                     app:playButton="@{actionButtonBottomLeft}"
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{2}"
-                    android:onClick="@{()-> media.fileThree.changeContentHiding()}"
+                    android:onClick="@{()-> media.fileThree.show()}"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomLeft"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileThree) }"
                         />
 
                 <ImageButton
@@ -104,6 +109,7 @@
                         style="?android:attr/borderlessButtonStyle"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
                         android:onClick="@{()-> notesViewModel.showFile(media, media.fileThree) }"
                         android:scaleType="fitCenter"
                         android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) || SafeUnbox.unbox(media.fileOne.image)? View.GONE : View.VISIBLE }"
@@ -138,19 +144,23 @@
                     app:playButton="@{actionButtonTopRight}"
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{1}"
-                    android:onClick="@{()-> media.fileTwo.changeContentHiding() }"
+                    android:onClick="@{()-> media.fileTwo.show() }"
                     >
                 <ImageView
                         android:id="@+id/thumbnailTopRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
-                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.GONE : View.VISIBLE }"/>
+                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.GONE : View.VISIBLE }"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileTwo) }"
+                        />
                 <ImageButton
                         android:id="@+id/actionButtonTopRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
@@ -177,20 +187,23 @@
                     app:playButton="@{actionButtonBottomRight}"
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{3}"
-                    android:onClick="@{()-> media.fileFour.changeContentHiding() }"
+                    android:onClick="@{()-> media.fileFour.show() }"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.GONE : View.VISIBLE}"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileFour) }"
                         />
                 <ImageButton
                         android:id="@+id/actionButtonBottomRight"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"

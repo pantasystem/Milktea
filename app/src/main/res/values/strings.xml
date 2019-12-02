@@ -104,4 +104,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
     <string name="nsfw_message">回覧注意</string>
+
+    <string name="thumbnail">サムネイル</string>
+    <string name="play_media">メディアを再生する</string>
 </resources>
