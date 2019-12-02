@@ -8,8 +8,8 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.viewmodel.media.FileViewData
-import jp.panta.misskeyandroidclient.viewmodel.media.MediaViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import java.lang.IndexOutOfBoundsException
 
 object MediaPreviewHelper{

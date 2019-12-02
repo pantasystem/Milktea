@@ -207,7 +207,7 @@
                             >
                         <include layout="@layout/media_preview"
                                 app:media="@{note.subNoteMedia}"
-
+                                app:notesViewModel="@{notesViewModel}"
                                 />
                     </FrameLayout>
 

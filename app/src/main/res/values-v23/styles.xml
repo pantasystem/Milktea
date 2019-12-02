@@ -30,4 +30,28 @@
         <item name="colorSeparator">@color/colorSeparator</item>
 
     </style>
+
+    <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorDarkPrimary</item>
+        <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
+        <item name="colorAccent">@color/colorDarkAccent</item>
+
+        <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
+        <item name="colorSurface">@color/colorDarkSurface</item>
+        <item name="android:textColor">@color/colorDarkTextColor</item>
+
+        <item name="colorBottomNavigationSelected">@color/colorDarkBottomNavSelected</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorDarkTextColor</item>
+        <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
+        <item name="actionBarSize">53dp</item>
+
+        <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
+        <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
+
+        <item name="colorMessageSelf">@color/colorMessageSelf</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+        <item name="colorSeparator">@color/colorSeparator</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+    </style>
 </resources>

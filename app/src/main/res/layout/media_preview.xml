@@ -8,7 +8,11 @@
         <import type="android.view.View" />
         <variable
                 name="media"
-                type="jp.panta.misskeyandroidclient.viewmodel.media.MediaViewData" />
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData" />
+
+        <variable
+                name="notesViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
     </data>
     <LinearLayout
             android:orientation="horizontal" android:layout_width="match_parent"
@@ -58,7 +62,8 @@
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
-                        android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.GONE : View.VISIBLE }"
+                        android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) || SafeUnbox.unbox(media.fileOne.image) ? View.GONE : View.VISIBLE }"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileOne) }"
                         />
 
                 <TextView
@@ -93,15 +98,17 @@
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
                         />
+
                 <ImageButton
                         android:id="@+id/actionButtonBottomLeft"
+                        style="?android:attr/borderlessButtonStyle"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        style="?android:attr/borderlessButtonStyle"
-                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileThree) }"
                         android:scaleType="fitCenter"
-                        android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
-                        />
+                        android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) || SafeUnbox.unbox(media.fileOne.image)? View.GONE : View.VISIBLE }"
+                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp" />
+
                 <TextView
                         android:id="@+id/nsfwMessageBottomLeft"
                         android:layout_width="wrap_content"
@@ -147,7 +154,8 @@
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
-                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.GONE : View.VISIBLE }"
+                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) || SafeUnbox.unbox(media.fileOne.image)? View.GONE : View.VISIBLE }"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileTwo) }"
                         />
                 <TextView
                         android:id="@+id/nsfwMessageTopRight"
@@ -186,7 +194,8 @@
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
-                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.GONE : View.VISIBLE}"
+                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) || SafeUnbox.unbox(media.fileOne.image) ? View.GONE : View.VISIBLE}"
+                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileFour) }"
                         />
                 <TextView
                         android:id="@+id/nsfwMessageBottomRight"

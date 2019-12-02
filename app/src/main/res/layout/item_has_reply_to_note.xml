@@ -4,7 +4,7 @@
     <data>
         <import type="android.view.View"/>
         <import type="jp.panta.misskeyandroidclient.R"/>
-
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
         <variable name="hasReplyToNote" type="jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData"/>
         <variable
                 name="notesViewModel"
@@ -97,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/replyToContentFoldingButton"
                         android:layout_toEndOf="@id/replyToAvatarIcon"
-                        android:visibility="@{hasReplyToNote.replyTo.contentFolding ? View.GONE : View.VISIBLE }"
+                        android:visibility="@{SafeUnbox.unbox(hasReplyToNote.replyTo.contentFolding) ? View.GONE : View.VISIBLE }"
                         >
                     <TextView
                             android:id="@id/text"

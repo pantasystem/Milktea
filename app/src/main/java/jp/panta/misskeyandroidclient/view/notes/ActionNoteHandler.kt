@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.NoteDetailActivity
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
@@ -13,6 +14,8 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 
 class ActionNoteHandler(
     val activity: AppCompatActivity,
@@ -67,8 +70,9 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
-    private val fileTargetObserver = Observer<Pair<FileProperty, List<FileProperty>>>{
-
+    private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{
+        Log.d("ActionNoteHandler", "${it.first.fileProperty}")
+        val intent = Intent(activity, MediaActivity::class.java)
     }
 
     fun initViewModelListener(){

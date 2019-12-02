@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.viewmodel.media.MediaViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 
 open class PlaneNoteViewData (
     val note: Note,
@@ -114,7 +114,8 @@ open class PlaneNoteViewData (
         if(it) "もっと見る: ${subNoteText?.length}" else "閉じる"
     }
     val subNoteFiles = subNote?.files?: emptyList()
-    val subNoteMedia = MediaViewData(subNoteFiles)
+    val subNoteMedia =
+        MediaViewData(subNoteFiles)
 
     fun addReaction(reaction: String, isMyReaction: Boolean = false){
         val reactions = reactionCounts.value?: LinkedHashMap()

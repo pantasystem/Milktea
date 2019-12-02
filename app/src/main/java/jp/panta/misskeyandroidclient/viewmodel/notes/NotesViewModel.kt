@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -46,7 +48,7 @@ class NotesViewModel(
 
     val targetNote = EventBus<PlaneNoteViewData>()
 
-    val targetFile = EventBus<Pair<FileProperty, List<FileProperty>>>()
+    val targetFile = EventBus<Pair<FileViewData, MediaViewData>>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
@@ -231,7 +233,7 @@ class NotesViewModel(
             })
     }
 
-    fun showFile(file: FileProperty, files: List<FileProperty>){
-
+    fun showFile(media: MediaViewData, file: FileViewData){
+        targetFile.event = Pair(file, media)
     }
 }

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel.media
+package jp.panta.misskeyandroidclient.viewmodel.notes.media
 
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -27,10 +27,19 @@ class FileViewData(val fileProperty: FileProperty) {
 
     val isHiding = MutableLiveData<Boolean>(isSensitive)
 
+    val isImage = type == Type.IMAGE
+
     fun changeContentHiding(){
         if(isSensitive){
             val now = isHiding.value?: false
             isHiding.value = !now
+        }
+    }
+
+    fun show(){
+        val now = isHiding.value?: false
+        if(isSensitive && now){
+            isHiding.value = false
         }
     }
 

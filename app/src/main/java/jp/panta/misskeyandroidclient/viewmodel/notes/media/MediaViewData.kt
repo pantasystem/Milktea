@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel.media
+package jp.panta.misskeyandroidclient.viewmodel.notes.media
 
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import java.lang.IndexOutOfBoundsException

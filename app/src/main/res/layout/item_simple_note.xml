@@ -113,6 +113,7 @@
                     >
                 <include layout="@layout/media_preview"
                         app:media="@{note.media}"
+                        app:notesViewModel="@{notesViewModel}"
 
                         />
             </FrameLayout>
@@ -201,6 +202,7 @@
                         android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                         >
                     <include layout="@layout/media_preview"
+                            app:notesViewModel="@{notesViewModel}"
                             app:media="@{note.subNoteMedia}"
 
                             />
