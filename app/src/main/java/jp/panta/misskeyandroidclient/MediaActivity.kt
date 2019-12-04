@@ -56,7 +56,10 @@ class MediaActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_media)
+        setSupportActionBar(mediaToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val fileProperty = intent.getSerializableExtra(EXTRA_FILE_PROPERTY) as FileProperty?
 
@@ -64,7 +67,7 @@ class MediaActivity : AppCompatActivity() {
             it as FileProperty?
         }?.filterNotNull()
 
-        val filePropertyListCurrentIndex = intent.getIntExtra(EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, 0)
+        //val filePropertyListCurrentIndex = intent.getIntExtra(EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, 0)
 
         val extraUri: String? = intent.getStringExtra(EXTRA_URI)
         val uri = if(extraUri.isNullOrBlank()) null else Uri.parse(extraUri)

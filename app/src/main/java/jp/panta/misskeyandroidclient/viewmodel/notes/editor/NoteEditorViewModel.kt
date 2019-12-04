@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,7 +20,7 @@ import java.io.File
 class NoteEditorViewModel(
     private val connectionInstance: ConnectionInstance,
     private val misskeyAPI: MisskeyAPI,
-    private val meta: Meta,
+    meta: Meta,
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null
 ) : ViewModel(){
@@ -77,7 +78,7 @@ class NoteEditorViewModel(
         this.noteTask.postValue(noteTask)
     }
 
-    fun add(file: File){
+    fun add(file: Uri){
         val files = editorFiles.value.toArrayList()
         files.add(FileNoteEditorData(UploadFile(file, true)))
         editorFiles.value = files
@@ -89,7 +90,7 @@ class NoteEditorViewModel(
         editorFiles.value = files
     }
 
-    fun addAllFile(file: List<File>){
+    fun addAllFile(file: List<Uri>){
         val files = editorFiles.value.toArrayList()
         files.addAll(file.map{
             FileNoteEditorData(UploadFile(it, true))
@@ -135,13 +136,7 @@ class NoteEditorViewModel(
         } ?: emptyList()
     }
 
-    fun localFiles(): List<File>{
-        return editorFiles.value?.filter{
-            it.isLocal && it.uploadFile != null
-        }?.mapNotNull {
-            it.uploadFile?.file
-        }?: emptyList()
-    }
+
 
     fun changeCwEnabled(){
         hasCw.value = !(hasCw.value?: false)

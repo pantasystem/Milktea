@@ -11,13 +11,13 @@ class FileNoteEditorData: Serializable{
     val fileProperty: FileProperty?
     val isLocal: Boolean
     constructor(uploadFile: UploadFile){
-        this.url = uploadFile.file.path
+        this.url = uploadFile.getUri().toString()
         this.uploadFile = uploadFile
         this.fileProperty = null
         this.isLocal = true
     }
     constructor(fileProperty: FileProperty){
-        this.url = fileProperty.thumbnailUrl?: fileProperty.url.toString()
+        this.url = fileProperty.thumbnailUrl?: fileProperty.url
         this.uploadFile = null
         this.fileProperty = fileProperty
         this.isLocal = false

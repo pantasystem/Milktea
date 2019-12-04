@@ -172,22 +172,15 @@ class NoteEditorActivity : AppCompatActivity() {
 
                     val uri = data?.data
                     if(uri != null){
-                        val file = if(uri.toString().startsWith("content://media")){
-                            getMediaFile(data)
+                        val size = mViewModel?.fileTotal()
+
+                        if(size != null && size < 4){
+                            mViewModel?.add(uri)
+                            Log.d("NoteEditorActivity", "成功しました")
                         }else{
-                            getDocumentFile(data)
+                            Log.d("NoteEditorActivity", "失敗しました")
                         }
-                        if(file?.exists() == true){
-                            val size = mViewModel?.fileTotal()
-                            if(size != null && size < 4){
-                                mViewModel?.add(file)
-                                Log.d("NoteEditorActivity", "成功しました")
-                            }else{
-                                Log.d("NoteEditorActivity", "失敗しました")
-                            }
-                            //Log.d("NoteEditorActivity", if(result)"成功しました" else "失敗しました")
-                        }
-                        Log.d("NoteEditorActivity", "fileは有効なのか？:${file?.exists()}")
+
                     }
 
                 }
