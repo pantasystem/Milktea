@@ -13,7 +13,7 @@ class FileViewData(val fileProperty: FileProperty) {
         fileProperty.type == null -> Type.OTHER
         fileProperty.type.startsWith("image") -> Type.IMAGE
         fileProperty.type.startsWith("video") -> Type.VIDEO
-        fileProperty.type.startsWith("sound") -> Type.SOUND
+        fileProperty.type.startsWith("audio") -> Type.SOUND
         else -> Type.OTHER
     }
     val md5 = fileProperty.md5

@@ -72,7 +72,13 @@ class ActionNoteHandler(
 
     private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{
         Log.d("ActionNoteHandler", "${it.first.fileProperty}")
-        val intent = Intent(activity, MediaActivity::class.java)
+        val currentItem = it.first
+        val list = it.second.files.map{fv ->
+            fv.fileProperty
+        }
+        val intent = MediaActivity.newIntent(activity, ArrayList(list), 0)
+        activity.startActivity(intent)
+        //val intent =
     }
 
     fun initViewModelListener(){
