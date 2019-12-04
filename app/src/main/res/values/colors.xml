@@ -31,8 +31,10 @@
     <color name="colorDarkAccent">#00ACC1</color>
     <color name="colorDarkSurface">#191919</color>
     <color name="colorDarkTextColor">#C5C5C5</color>
-    <color name="colorDarkIconTint">#CCFEFD</color>
     <color name="colorDarkBottomNavSelected">#FFFFFF</color>
+    <color name="colorTextColorPrimaryColorDarkDark">#FFFFFF</color>
+    <color name="colorIconTintDark">#C5C5C5</color>
+    <color name="colorTextColorSecondary">#C5C5C5</color>
 
     <!--Bread Theme-->
     <color name="colorBreadPrimary">#D9A042</color>
