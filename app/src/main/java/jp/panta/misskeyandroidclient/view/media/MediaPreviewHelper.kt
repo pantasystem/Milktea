@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import java.lang.IndexOutOfBoundsException
+import java.lang.NullPointerException
 
 object MediaPreviewHelper{
 
@@ -128,9 +129,9 @@ object MediaPreviewHelper{
 
     @BindingAdapter("thumbnailView", "nsfwMessage", "playButton", "mediaViewData", "fileIndex")
     @JvmStatic
-    fun FrameLayout.setPreview(thumbnailView: ImageView, nsfwMessage: TextView, playButton: ImageButton, mediaViewData: MediaViewData, fileIndex: Int){
+    fun FrameLayout.setPreview(thumbnailView: ImageView, nsfwMessage: TextView, playButton: ImageButton, mediaViewData: MediaViewData?, fileIndex: Int){
         try{
-            val file = mediaViewData.files[fileIndex]
+            val file = mediaViewData!!.files[fileIndex]
             this.visibility = View.VISIBLE
 
             Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
@@ -178,13 +179,19 @@ object MediaPreviewHelper{
             }*/
         }catch(e: IndexOutOfBoundsException){
             this.visibility = View.GONE
+        }catch(e: NullPointerException){
+            this.visibility = View.GONE
         }
     }
 
     @BindingAdapter("leftMediaBase", "rightMediaBase", "mediaViewData")
     @JvmStatic
-    fun LinearLayout.visibilityControl(leftMediaBase: LinearLayout, rightMediaBase: LinearLayout, mediaViewData: MediaViewData){
+    fun LinearLayout.visibilityControl(leftMediaBase: LinearLayout, rightMediaBase: LinearLayout, mediaViewData: MediaViewData?){
         when {
+            mediaViewData == null -> {
+                leftMediaBase.visibility = View.VISIBLE
+                rightMediaBase.visibility = View.VISIBLE
+            }
             mediaViewData.files.isEmpty() -> {
                 leftMediaBase.visibility = View.GONE
                 rightMediaBase.visibility = View.GONE

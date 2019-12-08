@@ -126,7 +126,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_menu_gallery" />
+                    app:srcCompat="@drawable/ic_menu_gallery"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    tools:ignore="ContentDescription" />
 
             <ImageButton
                     android:id="@+id/selectFileFromDrive"
@@ -134,7 +136,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_cloud_black_24dp" />
+                    app:srcCompat="@drawable/ic_cloud_black_24dp"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    tools:ignore="ContentDescription" />
 
             <ImageButton
                     android:id="@+id/makePoll"
@@ -144,7 +148,8 @@
                     android:layout_weight="1"
                     app:srcCompat="@drawable/ic_poll_black_24dp"
                     android:onClick="@{()-> viewModel.enablePoll()}"
-                    />
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    tools:ignore="ContentDescription" />
 
             <ImageButton
                     android:id="@+id/setCw"
@@ -153,8 +158,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     app:srcCompat="@drawable/ic_visibility_off_black_24dp"
+                    android:tint="?attr/colorNoteActionButtonTint"
                     android:onClick="@{()-> viewModel.changeCwEnabled() }"
-                    />
+                    tools:ignore="ContentDescription" />
 
             <ImageButton
                     android:id="@+id/noteVisibility"
@@ -162,7 +168,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_language_black_24dp" />
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    app:srcCompat="@drawable/ic_language_black_24dp"
+                    tools:ignore="ContentDescription" />
         </LinearLayout>
 
         <LinearLayout

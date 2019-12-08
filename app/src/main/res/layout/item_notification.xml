@@ -46,7 +46,7 @@
                         android:layout_marginEnd="8dp"
                         android:visibility="@{notification.reaction == null ? View.VISIBLE : View.GONE }"
                         tools:srcCompat="@drawable/ic_follow"
-                        android:onClick="@{()-> notesViewModel.setTargetToUser(notification.user)}"/>
+                        android:tint="?attr/colorNoteActionButtonTint"/>
 
                 <ImageView
                         android:id="@+id/reactionImage"
@@ -76,7 +76,9 @@
                         tools:srcCompat="@mipmap/ic_launcher_round"
                         android:layout_marginEnd="5dp"
                         app:circleIcon="@{notification.avatarIconUrl}"
-                        />
+                        android:onClick="@{()-> notesViewModel.setTargetToUser(notification.user)}"
+
+                />
 
 
 

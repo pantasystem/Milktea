@@ -26,6 +26,7 @@
                 android:layout_weight="1"
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/ic_re_note"
+                android:tint="?attr/colorNoteActionButtonTint"
                 tools:ignore="ContentDescription" />
 
         <Button
@@ -54,6 +55,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:scaleType="centerCrop"
+                android:tint="?attr/colorNoteActionButtonTint"
                 app:srcCompat="@drawable/ic_format_quote_black_24dp" />
 
         <Button

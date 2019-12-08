@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -12,7 +13,9 @@
             android:id="@+id/bottom_sheet_behavior_icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_expand_less_black_24dp" />
+            android:tint="?attr/colorNoteActionButtonTint"
+            app:srcCompat="@drawable/ic_expand_less_black_24dp"
+            tools:ignore="ContentDescription" />
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/reaction_preview_list"
