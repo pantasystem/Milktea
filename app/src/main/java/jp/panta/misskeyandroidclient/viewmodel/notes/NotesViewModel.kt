@@ -241,7 +241,7 @@ class NotesViewModel(
     }
 
     fun vote(poll: PollViewData, choice: PollViewData.Choice){
-        if(SafeUnbox.unbox(poll.isVotingMode.value)){
+        if(SafeUnbox.unbox(poll.canVote.value)){
             misskeyAPI.vote(
                 Vote(
                     i = connectionInstance.getI()!!,
@@ -250,7 +250,11 @@ class NotesViewModel(
                 )
             ).enqueue(object : Callback<Unit>{
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-
+                    if(response.code() == 204){
+                        Log.d(TAG, "投票に成功しました")
+                    }else{
+                        Log.d(TAG, "投票に失敗しました")
+                    }
                 }
 
                 override fun onFailure(call: Call<Unit>, t: Throwable) {

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemHasReplyToNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
+import jp.panta.misskeyandroidclient.view.notes.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -75,6 +76,10 @@ class TimelineListAdapter(
             p0.binding.lifecycleOwner = lifecycleOwner
             p0.binding.executePendingBindings()
             p0.binding.notesViewModel = notesViewModel
+            if(item.poll != null){
+                p0.binding.simpleNote.poll.adapter = PollListAdapter(item.poll, notesViewModel, lifecycleOwner)
+                p0.binding.simpleNote.poll.layoutManager = LinearLayoutManager(p0.binding.root.context)
+            }
         }else if(p0 is HasReplyToNoteViewHolder){
             p0.binding.hasReplyToNote = item as HasReplyToNoteViewData
             p0.binding.simpleNote.reactionView.adapter = adapter
@@ -82,6 +87,10 @@ class TimelineListAdapter(
             p0.binding.lifecycleOwner = lifecycleOwner
             p0.binding.executePendingBindings()
             p0.binding.notesViewModel = notesViewModel
+            if(item.poll != null){
+                p0.binding.simpleNote.poll.adapter = PollListAdapter(item.poll, notesViewModel, lifecycleOwner)
+                p0.binding.simpleNote.poll.layoutManager = LinearLayoutManager(p0.binding.root.context)
+            }
         }
 
 

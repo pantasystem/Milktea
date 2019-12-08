@@ -12,9 +12,7 @@ class PollViewData(poll: Poll, val noteId: String){
     inner class Choice(val choice: Poll.Choice, totalVote: MediatorLiveData<Int>, val number: Int, canVote: MediatorLiveData<Boolean>, isMultiple: Boolean){
         val isVoted = MutableLiveData<Boolean>(choice.isVoted).apply{
             canVote.addSource(this){
-                if(it && !isMultiple){
-                    canVote.value = false
-                }
+                canVote.value = !(it && !isMultiple)
             }
         }
 
@@ -28,7 +26,7 @@ class PollViewData(poll: Poll, val noteId: String){
         val percentage = MediatorLiveData<Float>().apply{
             addSource(totalVote){
                 val votes = voteCount.value?: 0
-                this.value = votes / it.toFloat()
+                this.value = votes / it.toFloat() * 100
             }
         }
         val text = choice.text

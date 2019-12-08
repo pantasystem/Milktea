@@ -107,4 +107,6 @@
 
     <string name="thumbnail">サムネイル</string>
     <string name="play_media">メディアを再生する</string>
+    <string name="avataricon">avatarIcon</string>
+    <string name="reaction">reaction</string>
 </resources>

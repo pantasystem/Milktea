@@ -39,7 +39,8 @@
                     android:layout_height="50dp"
                     android:layout_marginEnd="8dp"
                     app:circleIcon='@{note.avatarUrl}'
-                    tools:srcCompat="@android:drawable/sym_def_app_icon" />
+                    tools:srcCompat="@android:drawable/sym_def_app_icon"
+                    android:contentDescription="@string/avataricon"/>
 
             <TextView
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -122,11 +123,22 @@
                             />
                 </FrameLayout>
 
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/poll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:listitem="@layout/item_choice"
+                        tools:itemCount="2"
+                        android:layout_below="@id/mediaPreview"
+                        android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+
+
+                        />
 
 
                 <RelativeLayout
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_below="@+id/mediaPreview"
+                        android:layout_below="@+id/poll"
                         android:paddingTop="8dp"
                         android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                         android:id="@+id/subNote"
@@ -138,6 +150,7 @@
                             android:layout_width="20dp" android:layout_height="20dp"
                             android:layout_marginEnd="5dp"
                             app:circleIcon='@{note.subNoteAvatarUrl}'
+                            android:contentDescription="@string/avataricon"
                             />
 
                     <TextView
@@ -202,6 +215,7 @@
                             android:id="@+id/subNoteMediaPreview"
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
+                            tools:layout_height="100dp"
                             android:layout_below="@id/subNoteText"
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                             >
@@ -209,6 +223,7 @@
                                 app:media="@{note.subNoteMedia}"
                                 app:notesViewModel="@{notesViewModel}"
                                 />
+
                     </FrameLayout>
 
 
@@ -242,6 +257,7 @@
                         android:padding="5dp"
                         android:scaleType="centerCrop"
                         android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
+                        android:contentDescription="@string/reply_title"
                         />
                 <TextView
                         android:text='@{note.replyCount}'
@@ -260,6 +276,7 @@
                         android:padding="7dp"
                         android:scaleType="centerCrop"
                         android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
+                        android:contentDescription="@string/renote"
                         />
                 <TextView
                         android:text='@{note.reNoteCount}'
@@ -282,6 +299,7 @@
                         android:padding="5dp"
                         android:scaleType="centerCrop"
                         android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
+                        android:contentDescription="@string/reaction"
                         />
                 <TextView
                         android:text='@{note.reactionCount.toString()}'
@@ -303,6 +321,7 @@
                         android:padding="8dp"
                         android:scaleType="centerCrop"
                         android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
+                        android:contentDescription="@string/menu_share"
                         />
             </LinearLayout>
         </RelativeLayout>

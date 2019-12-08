@@ -2,7 +2,6 @@
 <layout xmlns:tools="http://schemas.android.com/tools"
         xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <import type="android.view.View"/>
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
         <variable
                 name="poll"

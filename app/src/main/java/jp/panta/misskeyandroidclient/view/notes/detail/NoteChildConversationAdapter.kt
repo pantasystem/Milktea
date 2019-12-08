@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSimpleNoteBinding
+import jp.panta.misskeyandroidclient.view.notes.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData

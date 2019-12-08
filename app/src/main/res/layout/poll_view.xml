@@ -15,9 +15,8 @@
         <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 tools:listitem="@layout/item_choice"
-                tools:itemCount="8"
+                tools:itemCount="2"
                 >
 
         </androidx.recyclerview.widget.RecyclerView>
