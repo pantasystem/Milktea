@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.notes
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
 
@@ -33,6 +34,7 @@ data class Note(
     @SerializedName("user") val user: User,
     @SerializedName("files") val files: List<FileProperty>?,
     //@JsonProperty("fileIds") val mediaIds: List<String?>?,    //v10, v11の互換性が取れない
+    val poll: Poll?,
     @SerializedName("renote") val reNote: Note?,
     val reply: Note?,
     @SerializedName("myReaction") val myReaction: String?

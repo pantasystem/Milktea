@@ -26,4 +26,26 @@ object SafeUnbox {
         return unboxed
     }
 
+    @JvmStatic
+    @InverseMethod("box")
+    fun unbox(boxed: Float?): Float{
+        return boxed?: 0F
+    }
+
+    @JvmStatic
+    fun box(boxed: Float): Float?{
+        return boxed
+    }
+
+    @JvmStatic
+    @InverseMethod("box")
+    fun unbox(boxed: Int?): Int{
+        return boxed?: 0
+    }
+
+    @JvmStatic
+    fun box(boxed: Int): Int?{
+        return boxed
+    }
+
 }

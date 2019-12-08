@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 
 open class PlaneNoteViewData (
     val note: Note,
@@ -97,6 +98,8 @@ open class PlaneNoteViewData (
     }
 
     val myReaction = MutableLiveData<String>(toShowNote.myReaction)
+
+    val poll = if(toShowNote.poll == null) null else PollViewData(toShowNote.poll!!, toShowNote.id)
 
     //reNote先
     val subNote: Note? = toShowNote.reNote

@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.model.users.RequestUser
@@ -91,6 +92,9 @@ interface MisskeyAPI {
 
     @POST("api/notes/global-timeline")
     fun globalTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+
+    @POST("api/notes/polls/vote")
+    fun vote(@Body vote: Vote) : Call<Unit>
 
     @POST("api/notes/search_by_tag")
     fun searchByTag(@Body noteRequest: NoteRequest): Call<List<Note>?>

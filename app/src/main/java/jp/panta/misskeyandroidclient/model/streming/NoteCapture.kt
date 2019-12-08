@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -75,12 +76,15 @@ class NoteCapture(
                 }
                 receivedObject.body.type == "reacted" -> addReaction(id, reaction!!, isMyReaction)
                 receivedObject.body.type == "unreacted" -> removeReaction(id, reaction!!, isMyReaction)
+                receivedObject.body.type == "pollVoted" -> updatePoll(id, receivedObject.body.body?.choice!!, isMyReaction)
                 //else -> Log.d("NoteCapture", "不明なイベント")
             }
 
             //Log.d("NoteCapture", "onReceived: $receivedObject")
         }catch(e: JsonSyntaxException){
             //他のイベントが流れてくるので回避する
+        }catch(e: Exception){
+
         }
 
 
@@ -160,6 +164,14 @@ class NoteCapture(
         synchronized(observeNoteMap){
             observeNoteMap[noteId]?.notes?.forEach {
                 it.takeReaction(reaction, isMyReaction)
+            }
+        }
+    }
+
+    private fun updatePoll(noteId: String, number: Int, isMyReaction: Boolean){
+        synchronized(observeNoteMap){
+            observeNoteMap[noteId]?.notes?.forEach{
+                it.poll?.update(number, isMyReaction)
             }
         }
     }

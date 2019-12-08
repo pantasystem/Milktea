@@ -8,10 +8,13 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -235,5 +238,25 @@ class NotesViewModel(
 
     fun showFile(media: MediaViewData, file: FileViewData){
         targetFile.event = Pair(file, media)
+    }
+
+    fun vote(poll: PollViewData, choice: PollViewData.Choice){
+        if(SafeUnbox.unbox(poll.isVotingMode.value)){
+            misskeyAPI.vote(
+                Vote(
+                    i = connectionInstance.getI()!!,
+                    choice = choice.number,
+                    noteId = poll.noteId
+                )
+            ).enqueue(object : Callback<Unit>{
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+
+                }
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    Log.d(TAG, "投票に失敗しました")
+                }
+            })
+        }
     }
 }
