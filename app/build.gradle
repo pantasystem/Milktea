@@ -99,4 +99,7 @@ dependencies {
     //ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.10.8'
 
+    //PhotoView
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+
 }

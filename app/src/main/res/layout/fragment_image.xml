@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <jp.panta.misskeyandroidclient.view.media.ScaleChangeImageView
+    <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
