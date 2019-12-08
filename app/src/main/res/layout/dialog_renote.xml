@@ -8,6 +8,7 @@
         android:paddingRight="10dp"
         android:paddingLeft="10dp"
         android:paddingBottom="5dp"
+        android:background="?attr/colorSurface"
         >
 
     <LinearLayout
@@ -24,7 +25,8 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/ic_re_note" />
+                app:srcCompat="@drawable/ic_re_note"
+                tools:ignore="ContentDescription" />
 
         <Button
                 style="@style/Widget.AppCompat.Button.Borderless"
