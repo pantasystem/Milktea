@@ -28,6 +28,19 @@ class MainCapture(
         fun followed(user: User)
     }
 
+    abstract class AbsListener : Listener{
+        override fun followed(user: User) {}
+        override fun notification(notification: Notification) {}
+        override fun meUpdated(user: User) {}
+        override fun mention(note: Note) {}
+        override fun messagingMessage(message: Message) {}
+        override fun readAllNotifications() {}
+        override fun renote(note: Note) {}
+        override fun unFollowed(user: User) {}
+        override fun unreadMention(id: String) {}
+        override fun unreadMessagingMessage(message: Message) {}
+    }
+
     private data class Channel<T>(val type: String, val body: Body<T>)
     private data class Body<T>(val id: String,val type: String, val body: T)
 
