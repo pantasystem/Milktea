@@ -46,6 +46,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
         val miApplication = context?.applicationContext as MiApplication
 
         val lm = LinearLayoutManager(context)
+        //lm.stackFromEnd = true
         messages_view.layoutManager = lm
         mLayoutManager = lm
 
@@ -56,16 +57,49 @@ class MessageFragment : Fragment(R.layout.fragment_message){
             val adapter = MessageListAdapter(diffUtilItemCallback)
             messages_view.adapter = adapter
 
+            var messageState: MessageViewModel.State? = null
             messageViewModel.messagesLiveData.observe(viewLifecycleOwner, Observer {
-                adapter.submitList(it)
+                messageState = it
+
+                adapter.submitList(it.messages)
+
             })
 
             messageViewModel.loadInit()
 
+            adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    Log.d(tag, "size:${(messageState?.messages?.size)}, siStateNull:${messageState == null}")
+
+                    when(messageState?.type){
+                        MessageViewModel.State.Type.RECEIVED -> {
+                            //val firstVisiblePosition = lm.findFirstVisibleItemPosition()
+                            val lastVisiblePosition = lm.findLastVisibleItemPosition()
+                            Log.d(tag, "lastVisiblePosition:$lastVisiblePosition, itemCount:$itemCount, positionStart:$positionStart")
+                            if((lastVisiblePosition + itemCount) == positionStart){
+                                lm.scrollToPosition(positionStart)
+                            }
+                        }
+                        MessageViewModel.State.Type.LOAD_INIT ->{
+                            lm.scrollToPosition((messageState?.messages?.size?: 1) - 1)
+                        }
+                        else -> {}
+                    }
+                }
+
+            })
 
         })
         messages_view.addOnScrollListener(scrollListener)
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        Log.d(tag, "終了処理中")
+        mMessageViewModel?.streamingAdapter?.disconnect()
     }
 
     private val diffUtilItemCallback = object : DiffUtil.ItemCallback<MessageViewData>(){
@@ -84,7 +118,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
     private val scrollListener = object : RecyclerView.OnScrollListener(){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             val first =mLayoutManager?.findFirstVisibleItemPosition()
-            Log.d("Scrolled", "first :$first")
+            //Log.d("Scrolled", "first :$first")
 
             if( first == 0 ){
                 //esenter?.getOldMessage()

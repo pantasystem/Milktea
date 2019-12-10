@@ -18,7 +18,8 @@
         <service
                 android:name=".NotificationService"
                 android:enabled="true"
-                android:exported="true"/>
+                android:exported="true"
+                />
 
         <activity android:name=".MediaActivity" />
         <activity android:name=".view.settings.activities.SettingAppearanceActivity" />

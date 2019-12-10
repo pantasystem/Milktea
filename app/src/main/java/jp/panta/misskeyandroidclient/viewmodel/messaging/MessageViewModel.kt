@@ -1,14 +1,20 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.model.streming.MainCapture
+import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MessageViewModel(
     private val connectionInstance: ConnectionInstance,
@@ -17,10 +23,34 @@ class MessageViewModel(
 
 ) : ViewModel(){
 
-    //reversed
-    val messagesLiveData = MutableLiveData<List<MessageViewData>>()
+    class State(
+        val messages: List<MessageViewData>,
+        val type: Type
+    ){
+        enum class Type{
+            LOAD_INIT, LOAD_OLD, LOAD_NEW, RECEIVED
+        }
+    }
+
+    val messagesLiveData = object :MutableLiveData<State>(){
+        override fun onActive() {
+            super.onActive()
+
+        }
+        override fun onInactive() {
+            super.onInactive()
+        }
+    }
     private val builder = RequestMessage.Builder(connectionInstance, messageHistory).apply{
         this.limit = 20
+    }
+
+    private val observerId = UUID.randomUUID().toString()
+    val streamingAdapter =  StreamingAdapter(connectionInstance).apply{
+        val main = MainCapture(connectionInstance, GsonFactory.create())
+        addObserver(observerId, main)
+        main.addListener(MessageObserver())
+        connect()
     }
 
 
@@ -47,7 +77,7 @@ class MessageViewModel(
                         RecipientMessageViewData(it)
                     }
                 }
-                messagesLiveData.postValue(viewDataList)
+                messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
                 isLoading = false
             }
 
@@ -63,7 +93,7 @@ class MessageViewModel(
             return
         }
         isLoading = true
-        val exMessages = messagesLiveData.value
+        val exMessages = messagesLiveData.value?.messages
         val untilId = exMessages?.firstOrNull()?.id
         if(exMessages.isNullOrEmpty() || untilId == null){
             isLoading = false
@@ -88,7 +118,7 @@ class MessageViewModel(
                 val messages = ArrayList<MessageViewData>(exMessages).apply{
                     addAll(0, viewData)
                 }
-                messagesLiveData.postValue(messages)
+                messagesLiveData.postValue(State(messages, State.Type.LOAD_OLD))
                 isLoading = false
             }
 
@@ -104,7 +134,7 @@ class MessageViewModel(
             return
         }
         isLoading = true
-        val exMessages = messagesLiveData.value
+        val exMessages = messagesLiveData.value?.messages
         val sinceId = exMessages?.lastOrNull()?.id
         if(exMessages.isNullOrEmpty() || sinceId == null){
             isLoading = false
@@ -130,12 +160,36 @@ class MessageViewModel(
                 val messages = ArrayList<MessageViewData>(exMessages).apply{
                     addAll(viewData)
                 }
-                messagesLiveData.postValue(messages)
+                messagesLiveData.postValue(State(messages, State.Type.LOAD_NEW))
             }
 
             override fun onFailure(call: Call<List<Message>>, t: Throwable) {
 
             }
         })
+    }
+
+    inner class MessageObserver : MainCapture.AbsListener(){
+        override fun messagingMessage(message: Message) {
+            val messages = messagesLiveData.value?.messages.toArrayList()
+
+            val msg = if(message.userId == connectionInstance.userId){
+                //me
+                SelfMessageViewData(message)
+            }else{
+                RecipientMessageViewData(message)
+            }
+            messages.add(msg)
+
+            messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
+        }
+    }
+
+    fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData>{
+        return if(this == null){
+            ArrayList()
+        }else{
+            ArrayList(this)
+        }
     }
 }
