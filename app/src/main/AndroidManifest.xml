@@ -15,7 +15,12 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MediaActivity"></activity>
+        <service
+                android:name=".NotificationService"
+                android:enabled="true"
+                android:exported="true"/>
+
+        <activity android:name=".MediaActivity" />
         <activity android:name=".view.settings.activities.SettingAppearanceActivity" />
         <activity android:name=".view.settings.activities.SettingMovementActivity" />
         <activity

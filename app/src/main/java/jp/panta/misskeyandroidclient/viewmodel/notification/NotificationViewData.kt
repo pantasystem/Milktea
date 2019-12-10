@@ -4,12 +4,26 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import java.lang.IllegalArgumentException
 
 class NotificationViewData(private val notification: Notification, connectionInstance: ConnectionInstance) {
+    enum class Type(val default: String){
+        FOLLOW("follow"),
+        MENTION("mention"),
+        REPLY("reply"),
+        RENOTE("renote"),
+        QUOTE("quote"),
+        REACTION("reaction"),
+        POLL_VOTE("pollVote"),
+        RECEIVE_FOLLOW_REQUEST("receiveFollowRequest")
+    }
     val id = notification.id
     val noteViewData: PlaneNoteViewData? = if(notification.note == null) null else PlaneNoteViewData(notification.note, connectionInstance)
 
     val statusType: String = notification.type
+    val type: Type? = Type.values().firstOrNull {
+        it.default == notification.type
+    }
 
     val user: User = notification.user
     val avatarIconUrl = notification.user.avatarUrl

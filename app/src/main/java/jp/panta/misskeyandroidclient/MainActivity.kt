@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -124,6 +126,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         test()
 
+        startService(Intent(this, NotificationService::class.java))
     }
 
     private fun init(){
@@ -136,73 +139,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    /*private val replyTargetObserver = Observer<PlaneNoteViewData> {
-        //Log.d("MainActivity", "reply clicked :$it")
-        val intent = Intent(this, NoteEditorActivity::class.java)
-        intent.putExtra(NoteEditorActivity.EXTRA_REPLY_TO_NOTE_ID, it.toShowNote.id)
-        startActivity(intent)
-    }
-
-    private val reNoteTargetObserver = Observer<PlaneNoteViewData>{
-        Log.d("MainActivity", "renote clicked :$it")
-        val dialog = RenoteBottomSheetDialog()
-        dialog.show(supportFragmentManager, "timelineFragment")
-
-    }
-    private val shareTargetObserver = Observer<PlaneNoteViewData> {
-        Log.d("MainActivity", "share clicked :$it")
-        ShareBottomSheetDialog().show(supportFragmentManager, "MainActivity")
-    }
-    private val targetUserObserver = Observer<User>{
-        Log.d("MainActivity", "user clicked :$it")
-    }
-
-    private val statusMessageObserver = Observer<String>{
-        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-    }
-
-    private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData>{
-        val intent = Intent(this, NoteEditorActivity::class.java)
-        intent.putExtra(NoteEditorActivity.EXTRA_QUOTE_TO_NOTE_ID, it.toShowNote.id)
-        startActivity(intent)
-    }
-
-    private val reactionTargetObserver = Observer<PlaneNoteViewData>{
-        Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
-        ReactionSelectionDialog().show(supportFragmentManager, "MainActivity")
-    }
-
-    private val noteTargetObserver = Observer<PlaneNoteViewData>{
-        val intent = Intent(this, NoteDetailActivity::class.java)
-        intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.toShowNote.id)
-        startActivity(intent)
-    }
-
-    private fun initViewModelListener(){
-        mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
-        mNotesViewModel.replyTarget.observe(this, replyTargetObserver)
-
-        mNotesViewModel.reNoteTarget.removeObserver(reNoteTargetObserver)
-        mNotesViewModel.reNoteTarget.observe(this, reNoteTargetObserver)
-
-        mNotesViewModel.shareTarget.removeObserver(shareTargetObserver)
-        mNotesViewModel.shareTarget.observe(this, shareTargetObserver)
-
-        mNotesViewModel.targetUser.removeObserver(targetUserObserver)
-        mNotesViewModel.targetUser.observe(this, targetUserObserver)
-
-        mNotesViewModel.statusMessage.removeObserver(statusMessageObserver)
-        mNotesViewModel.statusMessage.observe(this, statusMessageObserver)
-
-        mNotesViewModel.quoteRenoteTarget.removeObserver(quoteRenoteTargetObserver)
-        mNotesViewModel.quoteRenoteTarget.observe(this, quoteRenoteTargetObserver)
-
-        mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
-        mNotesViewModel.reactionTarget.observe(this, reactionTargetObserver)
-
-        mNotesViewModel.targetNote.removeObserver(noteTargetObserver)
-        mNotesViewModel.targetNote.observe(this, noteTargetObserver)
-    }*/
 
     private val switchAccountButtonObserver = Observer<Int>{
         runOnUiThread{
