@@ -114,4 +114,6 @@
     <string name="quoted_by">さんが引用しました</string>
     <string name="voted_by">さんが投票しました</string>
     <string name="request_follow">さんがフォローリクエストしてます</string>
+
+    <string name="input_message">相手に思いを伝えてください</string>
 </resources>

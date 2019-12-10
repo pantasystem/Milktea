@@ -185,7 +185,7 @@ class MessageViewModel(
         }
     }
 
-    fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData>{
+    private fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData>{
         return if(this == null){
             ArrayList()
         }else{
