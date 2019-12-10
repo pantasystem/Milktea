@@ -39,4 +39,12 @@ data class User(
     @SerializedName("isFollowed") val isFollowed: Boolean
     //JsonProperty("isVerified") val isVerified: Boolean,
     //@JsonProperty("isLocked") val isLocked: Boolean
-): Serializable
+): Serializable{
+    fun getDisplayUserName(): String{
+        return "@" + this.userName + if(this.host == null){
+            ""
+        }else{
+            "@" + this.host
+        }
+    }
+}

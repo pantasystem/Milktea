@@ -55,25 +55,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="AppThemeBlack" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorBlackPrimary</item>
-        <item name="colorPrimaryDark">@color/colorBlackPrimary</item>
-        <item name="colorAccent">@color/colorBlackAccent</item>
-        <item name="android:windowBackground">@color/colorBlackPrimary</item>
-        <item name="colorSurface">@color/colorBlackPrimary</item>
-        <item name="android:textColor">@color/colorBlackTextColor</item>
 
-        <item name="colorBottomNavigationSelected">@color/colorBlackTextColor</item>
-        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
-        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
-        <item name="actionBarSize">53dp</item>
-
-        <item name="colorMessageSelf">@color/colorMessageSelf</item>
-        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
-        <item name="colorSeparator">@color/colorSeparator</item>
-
-
-    </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorDarkPrimary</item>
@@ -92,11 +74,31 @@
         <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
         <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
 
+        <item name="colorMessageSelf">@color/colorMessageSelfDark</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipientDark</item>
+        <item name="colorSeparator">@color/colorSeparatorDark</item>
+        <item name="android:textColorPrimary">@color/colorTextColorPrimaryColorDarkDark</item>
+        <item name="android:textColorSecondary">@color/colorTextColorSecondary</item>
+
+    </style>
+
+    <style name="AppThemeBlack" parent="AppThemeDark">
+        <item name="colorPrimary">@color/colorBlackPrimary</item>
+        <item name="colorPrimaryDark">@color/colorBlackPrimary</item>
+        <item name="colorAccent">@color/colorBlackAccent</item>
+        <item name="android:windowBackground">@color/colorBlackPrimary</item>
+        <item name="colorSurface">@color/colorBlackPrimary</item>
+        <item name="android:textColor">@color/colorBlackTextColor</item>
+
+        <item name="colorBottomNavigationSelected">@color/colorBlackTextColor</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
+        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
+        <item name="actionBarSize">53dp</item>
+
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
         <item name="colorSeparator">@color/colorSeparator</item>
-        <item name="android:textColorPrimary">@color/colorTextColorPrimaryColorDarkDark</item>
-        <item name="android:textColorSecondary">@color/colorTextColorSecondary</item>
+
 
     </style>
 

@@ -15,11 +15,7 @@ data class RequestMessage(
 ){
     class Builder(private val connectionInstance: ConnectionInstance, message: Message){
         val group = message.group
-        val user = if(connectionInstance.userId == message.recipient?.id){
-            message.user
-        }else{
-            message.recipient
-        }
+        val user = message.opponentUser(connectionInstance)
         var limit: Int? = null
         var markAsRead: Boolean? = null
 

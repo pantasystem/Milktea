@@ -87,40 +87,40 @@ class NotificationService : Service() {
             when(notification.type){
                 NotificationViewData.Type.FOLLOW ->{
                     builder.setSmallIcon(R.drawable.ic_follow)
-                    builder.setContentTitle(notification.user.getUserName() + applicationContext.getString(R.string.followed_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.followed_by))
                 }
                 NotificationViewData.Type.MENTION ->{
                     builder.setSmallIcon(R.drawable.ic_mention)
-                    builder.setContentTitle(notification.user.getUserName())
+                    builder.setContentTitle(notification.user.getDisplayUserName())
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
                 }
                 NotificationViewData.Type.REPLY ->{
                     builder.setSmallIcon(R.drawable.ic_reply_black_24dp)
-                    builder.setContentTitle(notification.user.getUserName() + getString(R.string.replied_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.replied_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
                 }
                 NotificationViewData.Type.QUOTE ->{
                     builder.setSmallIcon(R.drawable.ic_format_quote_black_24dp)
-                    builder.setContentTitle(notification.user.getUserName() + getString(R.string.quoted_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.quoted_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
                 }
                 NotificationViewData.Type.POLL_VOTE->{
                     builder.setSmallIcon(R.drawable.ic_poll_black_24dp)
-                    builder.setContentTitle(notification.user.getUserName() + getString(R.string.voted_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.voted_by))
                 }
                 NotificationViewData.Type.REACTION ->{
                     builder.setSmallIcon(R.drawable.ic_reaction_like)
-                    builder.setContentTitle(notification.user.getUserName())
+                    builder.setContentTitle(notification.user.getDisplayUserName())
                     builder.setContentText(SafeUnbox.unbox(notification.reaction))
                 }
                 NotificationViewData.Type.RENOTE ->{
                     builder.setSmallIcon(R.drawable.ic_re_note)
-                    builder.setContentTitle(notification.user.getUserName())
+                    builder.setContentTitle(notification.user.getDisplayUserName())
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
                 }
                 NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST ->{
                     builder.setSmallIcon(R.drawable.ic_supervisor_account_black_24dp)
-                    builder.setContentTitle(notification.user.getUserName() + getString(R.string.request_follow))
+                    builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.request_follow))
 
                 }
                 /*else ->{
@@ -140,7 +140,7 @@ class NotificationService : Service() {
 
         val builder = NotificationCompat.Builder(this, MESSAGE_CHANEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
-            .setContentTitle(message.user?.getUserName())
+            .setContentTitle(message.user?.getDisplayUserName())
             .setContentText(SafeUnbox.unbox(message.text))
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
@@ -166,11 +166,4 @@ class NotificationService : Service() {
 
     }
 
-    private fun User.getUserName(): String{
-        return "@" + this.userName + if(this.host == null){
-            ""
-        }else{
-            "@" + this.host
-        }
-    }
 }

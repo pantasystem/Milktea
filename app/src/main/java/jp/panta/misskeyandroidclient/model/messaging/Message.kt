@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.users.User
@@ -19,4 +20,16 @@ data class Message(
     @SerializedName("fileId") val fileId: String?,
     @SerializedName("file") val file: FileProperty?,
     @SerializedName("isRead") val isRead: Boolean?
-): Serializable
+): Serializable{
+    fun isGroup(): Boolean{
+        return group != null
+    }
+
+    fun opponentUser(connectionInstance: ConnectionInstance) : User?{
+        return if(recipient?.id == connectionInstance.userId){
+            user
+        }else{
+            recipient
+        }
+    }
+}

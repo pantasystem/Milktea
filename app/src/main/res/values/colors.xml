@@ -35,6 +35,9 @@
     <color name="colorTextColorPrimaryColorDarkDark">#FFFFFF</color>
     <color name="colorIconTintDark">#C5C5C5</color>
     <color name="colorTextColorSecondary">#C5C5C5</color>
+    <color name="colorSeparatorDark">#262626</color>
+    <color name="colorMessageSelfDark">#3200B4</color>
+    <color name="colorMessageRecipientDark">#262626</color>
 
     <!--Bread Theme-->
     <color name="colorBreadPrimary">#D9A042</color>

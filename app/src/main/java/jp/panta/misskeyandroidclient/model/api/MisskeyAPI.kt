@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.messaging.MessageAction
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.meta.Meta
@@ -123,4 +124,15 @@ interface MisskeyAPI {
 
     @POST("api/messaging/messages")
     fun getMessages(@Body requestMessage: RequestMessage): Call<List<Message>>
+
+    @POST("api/messaging/messages/create")
+    fun createMessage(@Body messageAction: MessageAction): Call<Message>
+
+    @POST("api/messaging/messages/delete")
+    fun deleteMessage(@Body messageAction: MessageAction): Call<Unit>
+
+    @POST("api/messaging/messages/read")
+    fun readMessage(@Body messageAction: MessageAction): Call<Unit>
+
+
 }
