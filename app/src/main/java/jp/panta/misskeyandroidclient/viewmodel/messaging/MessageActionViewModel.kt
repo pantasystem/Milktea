@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -14,7 +15,7 @@ import java.lang.IllegalArgumentException
 import retrofit2.Callback
 import retrofit2.Response
 
-class MessageEditorViewModel(
+class MessageActionViewModel(
     val connectionInstance: ConnectionInstance,
     val misskeyAPI: MisskeyAPI,
     private val messageHistory: Message
@@ -27,12 +28,13 @@ class MessageEditorViewModel(
         private val messageHistory: Message
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if(modelClass == MessageEditorViewModel::class.java){
-                return MessageEditorViewModel(connectionInstance, miApplication.misskeyAPIService!!, messageHistory) as T
+            if(modelClass == MessageActionViewModel::class.java){
+                return MessageActionViewModel(connectionInstance, miApplication.misskeyAPIService!!, messageHistory) as T
             }
-            throw IllegalArgumentException("use MessageEditorViewModel::class.java")
+            throw IllegalArgumentException("use MessageActionViewModel::class.java")
         }
     }
+
 
     val text = MutableLiveData<String>()
     val file = MutableLiveData<FileProperty>()
@@ -40,12 +42,21 @@ class MessageEditorViewModel(
     fun send(){
         val factory = MessageAction.Factory(connectionInstance, messageHistory)
         val action = factory.actionCreateMessage(text.value, file.value?.id)
+        val tmpText = text.value
+        val tmpFile = file.value
+        text.value = null
+        file.value = null
         misskeyAPI.createMessage(action).enqueue(object : Callback<Message>{
             override fun onResponse(call: Call<Message>, response: Response<Message>) {
-
+                if (response.code() != 200) {
+                    file.postValue(tmpFile)
+                    text.postValue(tmpText)
+                }
             }
             override fun onFailure(call: Call<Message>, t: Throwable) {
-
+                Log.d("MessageActionViewModel", "失敗しました", t)
+                file.postValue(tmpFile)
+                text.postValue(tmpText)
             }
         })
     }

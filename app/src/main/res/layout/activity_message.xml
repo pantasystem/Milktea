@@ -2,9 +2,10 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
         <variable
-                name="editorViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.messaging.MessageEditorViewModel" />
+                name="actionViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
@@ -61,7 +62,7 @@
                     android:inputType="textMultiLine"
                     android:hint="@string/input_message"
                     tools:ignore="Autofill"
-                    android:text="@={editorViewModel.text}"
+                    android:text="@={actionViewModel.text}"
                     />
 
             <LinearLayout
@@ -69,18 +70,10 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     >
-                <ImageButton
-                        android:id="@+id/imageButton8"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:padding="8dp"
-                        app:srcCompat="@drawable/ic_menu_gallery"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        tools:ignore="ContentDescription" />
+
 
                 <ImageButton
-                        android:id="@+id/imageButton9"
+                        android:id="@+id/openDrive"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:padding="8dp"
@@ -88,24 +81,31 @@
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:tint="?attr/colorNoteActionButtonTint"
                         tools:ignore="ContentDescription" />
-                <FrameLayout
-                        android:layout_width="match_parent"
+                <TextView
+                        android:id="@+id/selecting_file_name"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        tools:text="panta.jpg"
+                        android:layout_gravity="center"
+                        android:text="@{SafeUnbox.unbox(actionViewModel.file.name)}"
+                        android:layout_weight="1"
                         >
-                    <ImageButton
-                            android:layout_gravity="end"
-                            android:id="@+id/sendButton"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:padding="8dp"
-                            android:tint="?attr/colorNoteActionButtonTint"
 
-                            app:srcCompat="@drawable/ic_menu_send"
-                            style="@style/Widget.AppCompat.Button.Borderless"
-                            tools:ignore="ContentDescription"
-                            android:onClick="@{()-> editorViewModel.send()}"
-                            />
-                </FrameLayout>
+                </TextView>
+                <ImageButton
+                        android:layout_gravity="end"
+                        android:id="@+id/sendButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="8dp"
+                        android:tint="?attr/colorNoteActionButtonTint"
+
+                        app:srcCompat="@drawable/ic_menu_send"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        tools:ignore="ContentDescription"
+                        android:onClick="@{()-> actionViewModel.send()}"
+                        />
+
 
             </LinearLayout>
         </LinearLayout>

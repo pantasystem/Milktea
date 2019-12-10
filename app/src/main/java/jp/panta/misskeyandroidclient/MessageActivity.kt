@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,8 +9,9 @@ import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageEditorViewModel
+import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageFragment
 import kotlinx.android.synthetic.main.activity_message.*
 
@@ -17,11 +19,18 @@ class MessageActivity : AppCompatActivity() {
 
     companion object{
         const val EXTRA_MESSAGE_HISTORY = "jp.panta.misskeyandroidclient.MessageActivity.extra_message_history"
+
+        const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
+
     }
+
+    private lateinit var mViewModel: MessageActionViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         val binding = DataBindingUtil.setContentView<ActivityMessageBinding>(this, R.layout.activity_message)
+        binding.lifecycleOwner = this
         setSupportActionBar(messageToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -49,9 +58,14 @@ class MessageActivity : AppCompatActivity() {
         }
         setTitle(messageHistory)
 
-        val factory = MessageEditorViewModel.Factory(connectionInstance, application as MiApplication, messageHistory)
-        val messageEditorViewModel = ViewModelProvider(this, factory)[MessageEditorViewModel::class.java]
-        binding.editorViewModel = messageEditorViewModel
+        val factory = MessageActionViewModel.Factory(connectionInstance, application as MiApplication, messageHistory)
+        val messageActionViewModel = ViewModelProvider(this, factory)[MessageActionViewModel::class.java]
+        mViewModel = messageActionViewModel
+        binding.actionViewModel = messageActionViewModel
+
+        binding.openDrive.setOnClickListener {
+            openDriveActivity()
+        }
     }
 
     private fun setTitle(message: Message){
@@ -68,5 +82,25 @@ class MessageActivity : AppCompatActivity() {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun openDriveActivity(){
+        val intent = Intent(this, DriveActivity::class.java)
+        intent.putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 1)
+        startActivityForResult(intent, SELECT_DRIVE_FILE_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode){
+            SELECT_DRIVE_FILE_REQUEST_CODE ->{
+                if(resultCode == Activity.RESULT_OK){
+                    mViewModel.file.value = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>).map{
+                        it as FileProperty
+                    }.firstOrNull()
+                }
+            }
+        }
     }
 }
