@@ -8,8 +8,10 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.view.media.MediaPreviewHelper.setPreview
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
+import java.lang.IllegalArgumentException
 import java.lang.IndexOutOfBoundsException
 import java.lang.NullPointerException
 
@@ -135,52 +137,60 @@ object MediaPreviewHelper{
             this.visibility = View.VISIBLE
 
             Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
-            when(file.type){
-                FileViewData.Type.IMAGE, FileViewData.Type.VIDEO -> {
-                    Glide.with(thumbnailView)
-                        .load(file.thumbnailUrl)
-                        .centerCrop()
-                        .into(thumbnailView)
+            MediaPreviewHelper.setPreview(thumbnailView, playButton, file)
 
-                    when(file.type){
-                        FileViewData.Type.IMAGE ->{
-                            playButton.visibility = View.GONE
-                        }
-                        else ->{
-                            playButton.visibility = View.VISIBLE
-                            Glide.with(playButton)
-                                .load(R.drawable.ic_play_circle_outline_black_24dp)
-                                .centerInside()
-                                .into(playButton)
-                        }
-                    }
-                    //thumbnailView.visibility = View.VISIBLE
-
-                }
-                FileViewData.Type.SOUND -> {
-                    playButton.visibility = View.VISIBLE
-                    Glide.with(playButton.context)
-                        .load(R.drawable.ic_music_note_black_24dp)
-                        .centerInside()
-                        .into(playButton)
-                }
-                else ->{
-                    this.visibility = View.GONE
-                }
-            }
-
-            /*val isHiding = file.isHiding.value?: false
-            if(isHiding){
-                thumbnailView.visibility = View.GONE
-                nsfwMessage.visibility = View.VISIBLE
-            }else{
-                thumbnailView.visibility = View.VISIBLE
-                nsfwMessage.visibility = View.GONE
-            }*/
         }catch(e: IndexOutOfBoundsException){
             this.visibility = View.GONE
         }catch(e: NullPointerException){
             this.visibility = View.GONE
+        }
+    }
+
+    @BindingAdapter("thumbnailView", "playButton", "fileViewData")
+    @JvmStatic
+    fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?){
+        try{
+            this.visibility = View.VISIBLE
+            MediaPreviewHelper.setPreview(thumbnailView, playButton, fileViewData!!)
+
+        }catch(e: Exception){
+            this.visibility = View.GONE
+        }
+    }
+
+    fun setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData){
+        when(fileViewData.type){
+            FileViewData.Type.IMAGE, FileViewData.Type.VIDEO -> {
+                Glide.with(thumbnailView)
+                    .load(fileViewData.thumbnailUrl)
+                    .centerCrop()
+                    .into(thumbnailView)
+
+                when(fileViewData.type){
+                    FileViewData.Type.IMAGE ->{
+                        playButton.visibility = View.GONE
+                    }
+                    else ->{
+                        playButton.visibility = View.VISIBLE
+                        Glide.with(playButton)
+                            .load(R.drawable.ic_play_circle_outline_black_24dp)
+                            .centerInside()
+                            .into(playButton)
+                    }
+                }
+                //thumbnailView.visibility = View.VISIBLE
+
+            }
+            FileViewData.Type.SOUND -> {
+                playButton.visibility = View.VISIBLE
+                Glide.with(playButton.context)
+                    .load(R.drawable.ic_music_note_black_24dp)
+                    .centerInside()
+                    .into(playButton)
+            }
+            else ->{
+                throw IllegalArgumentException("this type 知らねー")
+            }
         }
     }
 

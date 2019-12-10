@@ -21,7 +21,8 @@
                 android:layout_width="65dp" android:layout_height="65dp"
                 android:layout_marginEnd="4dp"
                 app:circleIcon="@{message.avatarIcon}"
-                tools:srcCompat="@drawable/ic_follow"/>
+                tools:srcCompat="@drawable/ic_follow"
+                tools:ignore="ContentDescription" />
 
         <TextView
                 android:id="@+id/user_name"
@@ -61,10 +62,12 @@
                     android:text="@{message.text}"
 
                     />
-            <ImageView
-                    android:id="@+id/message_image"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    />
+            <include layout="@layout/single_media_preview"
+                    android:layout_width="240sp"
+                    android:layout_height="200dp"
+                    android:visibility="@{message.file == null ? View.GONE : View.VISIBLE}"
+
+                    app:fileViewData="@{message.file}"/>
         </LinearLayout>
 
         <TextView

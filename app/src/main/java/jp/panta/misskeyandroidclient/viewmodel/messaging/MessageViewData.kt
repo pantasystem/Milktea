@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
 import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 
 
 abstract class MessageViewData (val message: Message){
@@ -8,7 +9,7 @@ abstract class MessageViewData (val message: Message){
     abstract val name: String
     abstract val avatarIcon: String
     val text = message.text
-    val file = message.file
+    val file = if(message.file == null) null else FileViewData(message.file)
     val isRead = message.isRead
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

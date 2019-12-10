@@ -20,7 +20,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_alignParentEnd="true" tools:srcCompat="@drawable/ic_follow"
                 app:circleIcon="@{message.avatarIcon}"
-                />
+                tools:ignore="ContentDescription" />
         <View
                 android:layout_width="8dp"
                 android:layout_height="8dp"
@@ -43,16 +43,17 @@
                 >
             <TextView
                     android:id="@+id/message_text"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
 
-                    tools:text="セイバーかわいい"
+                    tools:text="セイバーかわaaaaaa"
                     android:text="@{message.text}"
                     />
+            <include layout="@layout/single_media_preview"
+                    android:layout_width="240sp"
+                    android:layout_height="200dp"
+                    android:visibility="@{message.file == null ? View.GONE : View.VISIBLE}"
+                    app:fileViewData="@{message.file}"/>
 
-            <ImageView
-                    android:id="@+id/message_image"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:scaleType="fitCenter" android:adjustViewBounds="true"/>
         </LinearLayout>
         <TextView
                 android:id="@+id/elapsed_time"
