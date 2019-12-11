@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -59,6 +60,7 @@ class UserDetailActivity : AppCompatActivity() {
                 //userTimelinePager.adapter = adapter
                 binding.userTimelinePager.adapter = adapter
                 binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
+                supportActionBar?.title = it.getDisplayUserName()
             })
 
 
@@ -104,5 +106,12 @@ class UserDetailActivity : AppCompatActivity() {
                 else -> throw IllegalArgumentException("こんなものはない！！")
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
