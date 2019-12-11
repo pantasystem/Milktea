@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.util
 
+import android.util.Log
 import android.view.MenuItem
 import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
@@ -13,11 +14,18 @@ abstract class BottomNavigationAdapter(
     @MenuRes val currentMenuRes: Int,
     @IdRes val containerViewId: Int
 ) {
+    companion object{
+        private const val TAG = "BottomNavigationAdapter"
+    }
     private var currentFragmentTag = makeTag(currentMenuRes)
 
     abstract fun getItem(menuItem: MenuItem) : Fragment?
 
     abstract fun menuRetouched(menuItem: MenuItem, fragment: Fragment)
+
+    open fun viewChanged(menuItem: MenuItem, fragment: Fragment){
+        Log.d(TAG, "viewChanged: $currentFragmentTag")
+    }
 
     init{
         initFragment()
@@ -56,10 +64,13 @@ abstract class BottomNavigationAdapter(
 
             val fragment = getItem(menuItem)?: return false
             ft.add(containerViewId, fragment, targetTag)
+            viewChanged(menuItem, fragment)
 
         }else{
             ft.attach(targetFragment)
+            viewChanged(menuItem, targetFragment)
         }
+        currentFragmentTag = targetTag
 
         ft.commit()
         return true
