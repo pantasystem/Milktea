@@ -64,6 +64,7 @@
                     android:textSize="15sp"
                     app:text='@{note.name}'
                     app:emojis='@{note.toShowNote.user.emojis}'
+                    app:clickableLink="@{false}"
 
                     />
             <TextView
@@ -107,6 +108,7 @@
                         app:emojis='@{note.emojis}'
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
+                        app:clickableLink="@{true}"
                         />
 
                 <FrameLayout
@@ -209,6 +211,7 @@
                             app:text='@{note.subNoteText}'
                             app:emojis='@{note.subNoteEmojis}'
                             android:visibility="@{note.subContentFolding? View.GONE : View.VISIBLE }"
+                            app:clickableLink="@{true}"
                             />
 
                     <FrameLayout

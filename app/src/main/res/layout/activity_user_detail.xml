@@ -34,19 +34,19 @@
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
                             app:headerImageUrl="@{userViewModel.user.bannerUrl}"
-                            />
+                            tools:ignore="ContentDescription" />
 
                     <ImageView
                             android:id="@+id/avatarIcon"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
                             android:layout_below="@id/headerView"
-                            android:layout_marginTop="-30dp"
+                            android:layout_marginTop="-50dp"
                             android:layout_marginStart="15dp"
                             app:circleIcon="@{userViewModel.user.avatarUrl}"
                             tools:srcCompat="@drawable/ic_follow"
                             android:layout_marginBottom="8dp"
-                            />
+                            tools:ignore="ContentDescription" />
                     <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -64,7 +64,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom"
                                 style="@style/Widget.AppCompat.Button.Borderless"
-                                app:srcCompat="@drawable/ic_more_horiz_black_24dp" />
+                                app:srcCompat="@drawable/ic_more_horiz_black_24dp"
+                                tools:ignore="ContentDescription" />
 
                         <Button
                                 android:id="@+id/followButton"
@@ -88,6 +89,7 @@
                             android:textStyle="bold"
                             app:text="@{userViewModel.user.name}"
                             app:emojis="@{userViewModel.user.emojis}"
+                            app:clickableLink="@{false}"
 
                             />
                     <TextView
@@ -108,6 +110,7 @@
                             android:layout_alignStart="@id/avatarIcon"
                             app:text="@{userViewModel.user.description}"
                             app:emojis="@{userViewModel.user.emojis}"
+                            app:clickableLink="@{true}"
                             android:layout_below="@id/userName"
                             tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
                             android:layout_marginEnd="8dp"

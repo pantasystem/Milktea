@@ -39,7 +39,7 @@
                         android:layout_height="50dp"
                         app:circleIcon="@{hasReplyToNote.replyTo.avatarUrl}"
                         android:layout_marginEnd="8dp"
-                        />
+                        tools:ignore="ContentDescription" />
 
                 <TextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -63,6 +63,7 @@
                         android:textSize="15sp"
                         app:text='@{hasReplyToNote.replyTo.name}'
                         app:emojis='@{hasReplyToNote.replyTo.toShowNote.user.emojis}'
+                        app:clickableLink="@{false}"
                         />
 
                 <TextView
@@ -107,6 +108,7 @@
                             app:emojis='@{hasReplyToNote.replyTo.emojis}'
                             tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                             android:visibility='@{hasReplyToNote.replyTo.text == null ? View.GONE : View.VISIBLE}'
+                            app:clickableLink="@{true}"
                             />
 
                 </RelativeLayout>
