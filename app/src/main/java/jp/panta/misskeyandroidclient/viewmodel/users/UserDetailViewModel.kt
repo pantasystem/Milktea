@@ -13,11 +13,13 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.IndexOutOfBoundsException
 
 class UserDetailViewModel(
     val connectionInstance: ConnectionInstance,
     val misskeyAPI: MisskeyAPI,
-    val userId: String
+    val userId: String?,
+    val fqcnUserName: String?
 ) : ViewModel(){
     val tag=  "userDetailViewModel"
 
@@ -59,16 +61,30 @@ class UserDetailViewModel(
     }
 
     fun load(){
+        val userNameList = fqcnUserName?.split("@")?.filter{
+            it.isNotBlank()
+        }
+        Log.d(tag, "userNameList:$userNameList, fqcnUserName:$fqcnUserName")
+        val userName = userNameList?.firstOrNull()
+        val host = try{
+            userNameList?.get(1)
+        }catch(e: IndexOutOfBoundsException){
+            null
+        }
         misskeyAPI.showUser(
             RequestUser(
                 i = connectionInstance.getI()!!,
-                userId = userId
+                userId = userId,
+                userName = userName,
+                host = host
             )
         ).enqueue(object : Callback<User>{
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 val user = response.body()
                 if(user != null){
                     this@UserDetailViewModel.user.postValue(user)
+                }else{
+                    Log.d(tag, "ユーザーの読み込みに失敗しました, userId:$userId, userName: $userName, host: $host")
                 }
             }
 

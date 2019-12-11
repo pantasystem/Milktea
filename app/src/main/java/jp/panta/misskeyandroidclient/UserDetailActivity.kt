@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -39,11 +40,13 @@ class UserDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
-        val userId = intent.getStringExtra(EXTRA_USER_ID)
+        val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
+        val userName = intent.data?.getQueryParameter("userName")
+        Log.d("UserDetailActivity", "userName:$userName")
 
         val miApplication = applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
-            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ci, miApplication, userId))[UserDetailViewModel::class.java]
+            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ci, miApplication, userId, userName))[UserDetailViewModel::class.java]
             binding.userViewModel = viewModel
 
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ci, miApplication))[NotesViewModel::class.java]
@@ -51,10 +54,13 @@ class UserDetailActivity : AppCompatActivity() {
                 .initViewModelListener()
 
             viewModel.load()
-            val adapter =UserTimelinePagerAdapter(supportFragmentManager, ci, userId)
-            //userTimelinePager.adapter = adapter
-            binding.userTimelinePager.adapter = adapter
-            binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
+            viewModel.user.observe(this, Observer {
+                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ci, it.id)
+                //userTimelinePager.adapter = adapter
+                binding.userTimelinePager.adapter = adapter
+                binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
+            })
+
 
             viewModel.userName.observe(this, Observer{
                 supportActionBar?.title = it
@@ -63,9 +69,7 @@ class UserDetailActivity : AppCompatActivity() {
 
         })
 
-        /*val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_base, TimelineFragment.newInstance(NoteRequest.Setting(type= NoteType.LOCAL)))
-        ft.commit()*/
+
     }
 
     inner class UserTimelinePagerAdapter(

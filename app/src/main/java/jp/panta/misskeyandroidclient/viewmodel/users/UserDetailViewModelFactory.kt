@@ -9,11 +9,12 @@ import java.lang.IllegalArgumentException
 class UserDetailViewModelFactory(
     val connectionInstance: ConnectionInstance,
     val miApplication: MiApplication,
-    val userId: String
+    val userId: String?,
+    val fqcnUserName: String?
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == UserDetailViewModel::class.java){
-            return UserDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, userId) as T
+            return UserDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, userId, fqcnUserName) as T
         }
         throw IllegalArgumentException("対応していません")
     }

@@ -116,4 +116,6 @@
     <string name="request_follow">さんがフォローリクエストしてます</string>
 
     <string name="input_message">相手に思いを伝えてください</string>
+
+    <string name="manifest_user_name_pattern">"@"\w([\w-]*\w)?(?:@[\w.\-]+\w)?</string>
 </resources>
