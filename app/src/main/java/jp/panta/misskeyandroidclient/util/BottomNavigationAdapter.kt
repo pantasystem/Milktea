@@ -11,7 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 abstract class BottomNavigationAdapter(
     private val bottomNavigationView: BottomNavigationView,
     private val fragmentManager: FragmentManager,
-    @MenuRes val currentMenuRes: Int,
+    @IdRes val currentMenuRes: Int,
     @IdRes val containerViewId: Int
 ) {
     companion object{
@@ -21,7 +21,9 @@ abstract class BottomNavigationAdapter(
 
     abstract fun getItem(menuItem: MenuItem) : Fragment?
 
-    abstract fun menuRetouched(menuItem: MenuItem, fragment: Fragment)
+    open fun menuRetouched(menuItem: MenuItem, fragment: Fragment){
+        Log.d(TAG, "menu retouched menuItemId: ${menuItem.itemId}")
+    }
 
     open fun viewChanged(menuItem: MenuItem, fragment: Fragment){
         Log.d(TAG, "viewChanged: $currentFragmentTag")
@@ -38,7 +40,7 @@ abstract class BottomNavigationAdapter(
         setCurrentFragment(currentMenuRes)
     }
 
-    fun setCurrentFragment(@MenuRes id: Int){
+    fun setCurrentFragment(@IdRes id: Int){
         val menuItem = bottomNavigationView.menu.findItem(id)
         menuItem.isChecked = setFragment(menuItem)
 
@@ -52,22 +54,29 @@ abstract class BottomNavigationAdapter(
 
         if(currentFragmentTag == targetTag && currentFragment != null){
             menuRetouched(menuItem, currentFragment)
+            return true
         }
 
         val ft = fragmentManager.beginTransaction()
 
         if(currentFragment != null){
-            ft.detach(currentFragment)
+            //ft.detach(currentFragment)
+            ft.hide(currentFragment)
         }
 
         if(targetFragment == null){
 
-            val fragment = getItem(menuItem)?: return false
+            val fragment = getItem(menuItem)
+            if(fragment == null){
+                ft.commit()
+                return false
+            }
             ft.add(containerViewId, fragment, targetTag)
             viewChanged(menuItem, fragment)
 
         }else{
-            ft.attach(targetFragment)
+            //ft.attach(targetFragment)
+            ft.show(targetFragment)
             viewChanged(menuItem, targetFragment)
         }
         currentFragmentTag = targetTag
@@ -76,7 +85,7 @@ abstract class BottomNavigationAdapter(
         return true
     }
 
-    private fun makeTag(@MenuRes menuId: Int): String{
+    private fun makeTag(@IdRes menuId: Int): String{
         return "BottomNavigationAdapter:${menuId}"
     }
 }

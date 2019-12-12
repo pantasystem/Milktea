@@ -21,6 +21,7 @@ import com.google.android.material.navigation.NavigationView
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
@@ -39,6 +40,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     lateinit var mNotesViewModel: NotesViewModel
     private lateinit var mAccountViewModel: AccountViewModel
+
+    private var bottomNavigationAdapter: MainBottomNavigationAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,29 +104,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        bottom_navigation.setOnNavigationItemSelectedListener {
-            when(it.itemId){
-                R.id.navigation_home ->{
-                    setFragment("home")
-                    true
-                }
-                R.id.navigation_search ->{
-                    setFragment("search")
-                    true
-                }
-                R.id.navigation_notification ->{
-                    setFragment("notification")
-                    true
-                }
-                R.id.navigation_message_list ->{
-                    setFragment("message")
-                    true
-                }
-                else -> false
-            }
-
-
-        }
         test()
 
         startService(Intent(this, NotificationService::class.java))
@@ -132,13 +112,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun init(){
         val ci = (application as MiApplication).currentConnectionInstanceLiveData.value
         if(ci != null){
-            setFragment("home")
+            //setFragment("home")
             //setHeaderProfile(ci)
+            bottomNavigationAdapter = MainBottomNavigationAdapter()
         }
 
     }
 
 
+    inner class MainBottomNavigationAdapter
+        : BottomNavigationAdapter(bottom_navigation, supportFragmentManager, R.id.navigation_home, R.id.content_main){
+        private val home = bottom_navigation.menu.findItem(R.id.navigation_home)
+        var currentMenuItem: MenuItem? = null
+
+        override fun viewChanged(menuItem: MenuItem, fragment: Fragment) {
+            super.viewChanged(menuItem, fragment)
+            when(menuItem.itemId){
+                R.id.navigation_home -> changeTitle(getString(R.string.menu_home))
+                R.id.navigation_search -> changeTitle(getString(R.string.search))
+                R.id.navigation_notification -> changeTitle(getString(R.string.notification))
+                R.id.navigation_message_list -> changeTitle(getString(R.string.message))
+            }
+            currentMenuItem = menuItem
+        }
+        override fun getItem(menuItem: MenuItem): Fragment? {
+            return when(menuItem.itemId){
+                R.id.navigation_home -> TabFragment()
+                R.id.navigation_search -> SearchTopFragment()
+                R.id.navigation_notification -> NotificationFragment()
+                R.id.navigation_message_list -> MessagingHistoryFragment()
+                else -> null
+            }
+        }
+
+
+    }
 
     private val switchAccountButtonObserver = Observer<Int>{
         runOnUiThread{
@@ -167,78 +175,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //startActivity(Intent(this, AuthActivity::class.java))
     }
 
-    //default "home"
-    private var currentFragmentTag = "home"
-    private fun setFragment(tag: String){
-        setBottomNavigationSelectState(tag)
-        setTitleByTag(tag)
-
-        val ft = supportFragmentManager.beginTransaction()
-
-        val targetFragment = supportFragmentManager.findFragmentByTag(tag)
-        val currentFragment = supportFragmentManager.findFragmentByTag(currentFragmentTag)
-
-
-        //表示しようとしているFragmentが表示(add)したことがない場合
-        if(targetFragment == null){
-            //supportFragmentManager.
-            if(currentFragment != null){
-                //currentをhideする
-                ft.hide(currentFragment)
-            }
-            ft.add(R.id.content_main, newFragmentByTag(tag), tag)
-            currentFragmentTag = tag
-            ft.commit()
-            return
-        }
-
-        //表示しているFragmentと表示しようとしているFragmentが同じ場合
-        if(currentFragmentTag == tag && currentFragment != null){
-            ft.commit()
-            return
-        }
-
-        //表示しているFragmentと表示しようとしているFragmentが別でさらに既に存在している場合
-        if(currentFragmentTag != tag && currentFragment != null){
-            ft.hide(currentFragment)
-            ft.show(targetFragment)
-            currentFragmentTag = tag
-            ft.commit()
-            return
-        }
-
-    }
-
-    private fun setBottomNavigationSelectState(tag: String){
-        when(tag){
-            "home" -> bottom_navigation.menu.findItem(R.id.navigation_home).isChecked = true
-            "search" -> bottom_navigation.menu.findItem(R.id.navigation_search).isChecked = true
-            "notification" -> bottom_navigation.menu.findItem(R.id.navigation_notification).isChecked = true
-            "message" -> bottom_navigation.menu.findItem(R.id.navigation_message_list).isChecked = true
-        }
-    }
-
-    private fun newFragmentByTag(tag: String): Fragment{
-        return when(tag){
-            "home" -> TabFragment()
-            "search" -> SearchTopFragment()
-            "drive" -> DriveFragment()
-            "notification" -> NotificationFragment()
-            "message" -> MessagingHistoryFragment()
-            else -> throw IllegalArgumentException("サポートしていないタグです")
-        }
-    }
-
-    private fun setTitleByTag(tag: String){
-        when(tag){
-            "home" -> changeTitle("Home")
-            "search" -> changeTitle("Search")
-            "drive" -> changeTitle("Drive")
-            "notification" -> changeTitle("Notification")
-            "message" -> changeTitle("Message")
-        }
-    }
-
     private fun setHeaderProfile(activityMainBinding: ActivityMainBinding){
 
 
@@ -255,9 +191,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
-        }else if(currentFragmentTag != "home"){
-            setFragment("home")
-        } else {
+        }else if(bottomNavigationAdapter?.currentMenuItem?.itemId != R.id.navigation_home){
+            bottomNavigationAdapter?.setCurrentFragment(R.id.navigation_home)
+        }else{
             super.onBackPressed()
         }
     }
