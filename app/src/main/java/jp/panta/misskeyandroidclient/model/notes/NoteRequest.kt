@@ -17,6 +17,7 @@ data class NoteRequest(
     @SerializedName("sinceDate") val sinceDate: Long? = null,
     @SerializedName("untilDate") val untilDate: Long? = null,
     @SerializedName("query") val query: String? = null,
+    @SerializedName("tag") val tag: String? = null,
     @SerializedName("includeLocalRenotes") val includeLocalRenotes: Boolean? = null,
     @SerializedName("includeMyRenotes") val includeMyRenotes: Boolean? = null,
     @SerializedName("includeRenotedMyNotes") val includeRenotedMyNotes: Boolean? = null,
@@ -33,6 +34,7 @@ data class NoteRequest(
         val fileType: String? = null,
         val excludeNsfw: Boolean? = null,
         val query: String? = null,
+        val tag: String? = null,
         val noteId: String? = null
 
     ): Serializable{
@@ -64,7 +66,8 @@ data class NoteRequest(
                 includeLocalRenotes = includeLocalRenotes,
                 includeMyRenotes = includeMyRenotes,
                 includeRenotedMyNotes = includeRenotedMyNotes,
-                noteId = noteId
+                noteId = noteId,
+                tag= tag
 
 
             )

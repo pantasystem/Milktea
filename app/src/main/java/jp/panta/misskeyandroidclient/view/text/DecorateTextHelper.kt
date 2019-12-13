@@ -10,15 +10,15 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import java.util.regex.Pattern
 
 object DecorateTextHelper {
-    const val HASH_TAG_PETTERN = """#([^\s.,!?'"#:/\[\]【】@]+)"""
-    const val MENSTION_PETTERN = """@\w([\w-]*\w)?(?:@[\w.\-]+\w)?"""
-    const val WEB_URL_PATTERN = """(https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)"""
+    private const val HASH_TAG_PETTERN = """#([^\s.,!?'"#:/\[\]【】@]+)"""
+    private const val MENSTION_PETTERN = """@\w([\w-]*\w)?(?:@[\w.\-]+\w)?"""
+    private const val WEB_URL_PATTERN = """(https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)"""
 
     const val SCHEME = "misskey:"
 
-    val hashTagPattern = Pattern.compile(HASH_TAG_PETTERN)
-    val mentionPattern = Pattern.compile(MENSTION_PETTERN, Pattern.MULTILINE)
-    val webUrlPattern = Pattern.compile(WEB_URL_PATTERN)
+    private val hashTagPattern = Pattern.compile(HASH_TAG_PETTERN)
+    private val mentionPattern = Pattern.compile(MENSTION_PETTERN, Pattern.MULTILINE)
+    private val webUrlPattern = Pattern.compile(WEB_URL_PATTERN)
 
     @BindingAdapter("text", "emojis", "clickableLink")
     @JvmStatic

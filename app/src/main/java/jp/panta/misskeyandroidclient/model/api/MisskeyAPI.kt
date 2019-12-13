@@ -97,7 +97,7 @@ interface MisskeyAPI {
     @POST("api/notes/polls/vote")
     fun vote(@Body vote: Vote) : Call<Unit>
 
-    @POST("api/notes/search_by_tag")
+    @POST("api/notes/search-by-tag")
     fun searchByTag(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
     //user

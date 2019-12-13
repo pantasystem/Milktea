@@ -15,11 +15,22 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".SearchResultActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                        android:host="search"
+                        android:scheme="misskey" />
+            </intent-filter>
+        </activity>
+
         <service
                 android:name=".NotificationService"
                 android:enabled="true"
-                android:exported="true"
-                />
+                android:exported="true" />
 
         <activity android:name=".MediaActivity" />
         <activity android:name=".view.settings.activities.SettingAppearanceActivity" />
@@ -27,19 +38,15 @@
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings" />
-        <activity android:name=".UserDetailActivity" >
+        <activity android:name=".UserDetailActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
 
-
                 <data
-                        android:scheme="misskey"
                         android:host="user"
-                         />
-
-
-
+                        android:scheme="misskey" />
             </intent-filter>
         </activity>
         <activity android:name=".NoteDetailActivity" />
