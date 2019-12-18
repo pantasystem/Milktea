@@ -62,6 +62,7 @@ abstract class BottomNavigationAdapter(
         if(currentFragment != null){
             //ft.detach(currentFragment)
             ft.hide(currentFragment)
+            currentFragment.setMenuVisibility(false)
         }
 
         if(targetFragment == null){
@@ -71,11 +72,13 @@ abstract class BottomNavigationAdapter(
                 ft.commit()
                 return false
             }
+            fragment.setMenuVisibility(true)
             ft.add(containerViewId, fragment, targetTag)
             viewChanged(menuItem, fragment)
 
         }else{
             //ft.attach(targetFragment)
+            targetFragment.setMenuVisibility(true)
             ft.show(targetFragment)
             viewChanged(menuItem, targetFragment)
         }

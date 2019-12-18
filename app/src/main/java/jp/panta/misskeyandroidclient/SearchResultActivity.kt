@@ -1,7 +1,10 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
@@ -13,6 +16,8 @@ class SearchResultActivity : AppCompatActivity() {
         const val EXTRA_SEARCH_WORLD = "jp.panta.misskeyandroidclient.SearchResultActivity.EXTRA_SEARCH_WORLD"
     }
 
+    var mSearchWord: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -22,6 +27,8 @@ class SearchResultActivity : AppCompatActivity() {
 
         val keyword: String? = intent.getStringExtra(EXTRA_SEARCH_WORLD)
             ?: intent.data?.getQueryParameter("keyword")
+
+        mSearchWord = keyword
 
         if(keyword == null){
             finish()
@@ -50,9 +57,19 @@ class SearchResultActivity : AppCompatActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.search_top_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             android.R.id.home -> finish()
+            R.id.search -> {
+                val intent = Intent(this, SearchActivity::class.java)
+                intent.putExtra(SearchActivity.EXTRA_SEARCH_WORD, mSearchWord)
+                startActivity(intent)
+            }
         }
         return super.onOptionsItemSelected(item)
     }

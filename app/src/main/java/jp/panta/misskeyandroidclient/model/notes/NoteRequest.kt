@@ -67,7 +67,8 @@ data class NoteRequest(
                 includeMyRenotes = includeMyRenotes,
                 includeRenotedMyNotes = includeRenotedMyNotes,
                 noteId = noteId,
-                tag= tag
+                tag= tag,
+                query = query
 
 
             )

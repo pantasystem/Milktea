@@ -54,7 +54,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
             val messageViewModel = ViewModelProvider(this, MessageViewModelFactory(ci, miApplication, messageHistory))[MessageViewModel::class.java]
             mMessageViewModel = messageViewModel
 
-            val adapter = MessageListAdapter(diffUtilItemCallback)
+            val adapter = MessageListAdapter(diffUtilItemCallback, viewLifecycleOwner)
             messages_view.adapter = adapter
 
             var messageState: MessageViewModel.State? = null

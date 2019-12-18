@@ -1,15 +1,15 @@
 package jp.panta.misskeyandroidclient.view.search
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
@@ -32,7 +32,27 @@ class SearchTopFragment : Fragment(){
         search_tab_layout.setupWithViewPager(search_view_pager)
     }
 
-    class SearchPagerAdapter(supportFragmentManager: FragmentManager, private val context: Context) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.search_top_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            //R.id.search ->
+            R.id.search ->{
+                activity?.startActivity(Intent(this.context, SearchActivity::class.java))
+                activity?.overridePendingTransition(0, 0)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+    class SearchPagerAdapter(supportFragmentManager: FragmentManager, context: Context) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         val tabList = listOf(context.getString(R.string.title_featured))
         override fun getCount(): Int {
             return tabList.size

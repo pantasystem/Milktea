@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -15,7 +16,7 @@ import jp.panta.misskeyandroidclient.viewmodel.messaging.SelfMessageViewData
 import java.lang.IllegalArgumentException
 
 
-class MessageListAdapter(diffUtilItemCallback: DiffUtil.ItemCallback<MessageViewData>) : ListAdapter<MessageViewData, MessageListAdapter.MessageViewHolder>(diffUtilItemCallback){
+class MessageListAdapter(diffUtilItemCallback: DiffUtil.ItemCallback<MessageViewData>, val lifecycleOwner: LifecycleOwner) : ListAdapter<MessageViewData, MessageListAdapter.MessageViewHolder>(diffUtilItemCallback){
     abstract class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view)
     class MessageSelfViewHolder(val binding: ItemMessageSelfBinding) : MessageViewHolder(binding.root)
     class MessageRecipientViewHolder(val binding: ItemMessageRecipientBinding) : MessageViewHolder(binding.root)
@@ -51,9 +52,11 @@ class MessageListAdapter(diffUtilItemCallback: DiffUtil.ItemCallback<MessageView
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         if(holder is MessageSelfViewHolder){
             holder.binding.message = getItem(position)
+            holder.binding.lifecycleOwner = lifecycleOwner
             holder.binding.executePendingBindings()
         }else if(holder is MessageRecipientViewHolder){
             holder.binding.message = getItem(position)
+            holder.binding.lifecycleOwner = lifecycleOwner
             holder.binding.executePendingBindings()
         }
     }

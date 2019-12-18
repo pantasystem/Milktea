@@ -43,4 +43,10 @@ class MisskeyAPITest {
         assert(response.body() != null)*/
     }
 
+    @Test
+    fun searchTest(){
+        val response = misskeyAPI.searchNote(NoteRequest(i = SecretConstantTest.i(), query = "おはよう")).execute()
+        Assert.assertEquals(response.code(), 200)
+    }
+
 }
