@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notification.Notification
@@ -24,8 +25,25 @@ class MainCapture(
         fun renote(note: Note)
         fun messagingMessage(message: Message)
         fun meUpdated(user: User)
+
+        /**
+         * フォロー解除したときに呼び出される
+         */
         fun unFollowed(user: User)
+
+        /**
+         * ユーザーにフォローされたときに呼び出される
+         */
         fun followed(user: User)
+
+        /**
+         * ユーザーをフォローしたときに呼び出される
+         */
+        fun follow(user: User)
+
+        fun fileCreated(fileProperty: FileProperty)
+        fun fileDeleted(id: String)
+        fun fileUpdated(fileProperty: FileProperty)
     }
 
     abstract class AbsListener : Listener{
@@ -38,7 +56,11 @@ class MainCapture(
         override fun renote(note: Note) {}
         override fun unFollowed(user: User) {}
         override fun unreadMention(id: String) {}
-        override fun unreadMessagingMessage(message: Message) {}
+        override fun unreadMessagingMessage(message: Message) = Unit
+        override fun follow(user: User) = Unit
+        override fun fileDeleted(id: String) = Unit
+        override fun fileUpdated(fileProperty: FileProperty) = Unit
+        override fun fileCreated(fileProperty: FileProperty) = Unit
     }
 
     private data class Channel<T>(val type: String, val body: Body<T>)
@@ -57,6 +79,7 @@ class MainCapture(
     private val noteType = TypeToken.getParameterized(Channel::class.java, Note::class.java).type
     private val userType = TypeToken.getParameterized(Channel::class.java, User::class.java).type
     private val stringType = TypeToken.getParameterized(Channel::class.java, String::class.java).type
+    private val fileType = TypeToken.getParameterized(Channel::class.java, FileProperty::class.java).type
 
     private var mId: String = UUID.randomUUID().toString()
 
@@ -122,10 +145,23 @@ class MainCapture(
                         //user
                         notifyUser(msg, it::unFollowed)
                     }
+                    "follow"->{
+                        notifyUser(msg, it::follow)
+                    }
                     "followed" ->{
                         //user
                         notifyUser(msg, it::followed)
                     }
+                    "fileUpdated" ->{
+                        notifyFile(msg, it::fileUpdated)
+                    }
+                    "driveFileCreated" ->{
+                        notifyFile(msg, it::fileCreated)
+                    }
+                    "fileDeleted" ->{
+                        notifyId(msg, it::fileDeleted)
+                    }
+
                 }
 
             }
@@ -153,6 +189,17 @@ class MainCapture(
     private fun notifyMessage(msg: String, observer: (Message) -> Unit){
         val message: Channel<Message> = gson.fromJson(msg, messageType)
         observer(message.body.body)
+    }
+
+    private fun notifyId(msg: String, observer: (String)-> Unit){
+        val obj: Channel<String> = gson.fromJson(msg, stringType)
+        val id = obj.body.body
+        observer(id)
+    }
+
+    private fun notifyFile(msg: String, observer: (FileProperty)-> Unit){
+        val fileProperty: Channel<FileProperty> = gson.fromJson(msg, fileType)
+        observer(fileProperty.body.body)
     }
 
     fun addListener(listener: Listener){

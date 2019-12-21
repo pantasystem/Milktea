@@ -10,6 +10,9 @@ class AccountViewModel : ViewModel(){
 
     val switchTargetConnectionInstance = EventBus<ConnectionInstance>()
 
+    val showFollowers = EventBus<Unit>()
+    val showFollowings = EventBus<Unit>()
+
     fun setSwitchTargetConnectionInstance(connectionInstance: ConnectionInstance){
         switchTargetConnectionInstance.event = connectionInstance
     }
@@ -18,5 +21,12 @@ class AccountViewModel : ViewModel(){
         switchAccount.event = switchAccount.event?: 0 + 1
     }
 
+    fun showFollowers(){
+        showFollowers.event = Unit
+    }
+
+    fun showFollowings(){
+        showFollowings.event = Unit
+    }
 
 }

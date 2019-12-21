@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+import jp.panta.misskeyandroidclient.model.users.RequestUser
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runners.Suite
@@ -46,6 +47,18 @@ class MisskeyAPITest {
     @Test
     fun searchTest(){
         val response = misskeyAPI.searchNote(NoteRequest(i = SecretConstantTest.i(), query = "おはよう")).execute()
+        Assert.assertEquals(response.code(), 200)
+    }
+
+    @Test
+    fun followersTest(){
+        val response = misskeyAPI.followers(RequestUser(i = SecretConstantTest.i(), userId = SecretConstantTest.getUserId())).execute()
+        Assert.assertEquals(response.code(), 200)
+    }
+
+    @Test
+    fun followingTest(){
+        val response = misskeyAPI.following(RequestUser(i = SecretConstantTest.i(), userId = SecretConstantTest.getUserId())).execute()
         Assert.assertEquals(response.code(), 200)
     }
 

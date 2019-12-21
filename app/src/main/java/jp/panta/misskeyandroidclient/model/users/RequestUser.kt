@@ -7,5 +7,8 @@ data class RequestUser(
     val userId: String?,
     @SerializedName("username") val userName: String? = null,
     val host: String? = null,
-    val userIds: List<String>? = null
+    val userIds: List<String>? = null,
+    val sinceId: String? = null,
+    val untilId: String? = null,
+    val limit: Int = 21
 )

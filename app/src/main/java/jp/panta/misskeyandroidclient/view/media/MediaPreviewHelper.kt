@@ -189,7 +189,7 @@ object MediaPreviewHelper{
                     .into(playButton)
             }
             else ->{
-                throw IllegalArgumentException("this type 知らねー")
+                throw IllegalArgumentException("this type 知らねー:${fileViewData.type}")
             }
         }
     }

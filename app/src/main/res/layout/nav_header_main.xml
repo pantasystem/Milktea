@@ -69,6 +69,7 @@
                 tools:text="114"
                 android:text="@{ Integer.toString(user.followingCount) }"
                 android:layout_marginEnd="3dp"
+                android:onClick="@{()-> accountViewModel.showFollowings() }"
                 />
 
         <TextView
@@ -79,6 +80,7 @@
                 android:text="@string/following"
                 android:layout_below="@id/userName"
                 android:layout_marginEnd="12dp"
+                android:onClick="@{()-> accountViewModel.showFollowings() }"
                 />
         <TextView
                 android:id="@+id/follower_count"
@@ -89,6 +91,7 @@
                 tools:text="514"
                 android:layout_marginEnd="3dp"
                 android:text="@{ Integer.toString(user.followersCount) }"
+                android:onClick="@{()-> accountViewModel.showFollowers() }"
                 />
         <TextView
                 android:layout_width="wrap_content"
@@ -96,6 +99,7 @@
                 android:layout_toEndOf="@id/follower_count"
                 android:layout_below="@id/userName"
                 android:text="@string/follower"
+                android:onClick="@{()-> accountViewModel.showFollowers() }"
                 />
 
     </RelativeLayout>

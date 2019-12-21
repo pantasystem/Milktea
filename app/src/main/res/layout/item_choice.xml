@@ -31,6 +31,7 @@
                 android:enabled="@{SafeUnbox.unbox(poll.canVote)}"
                 android:onClick="@{()-> notesViewModel.vote(poll, choice)}"
                 android:checked="@{SafeUnbox.unbox(choice.isVoted)}"
+                android:textColor="?android:attr/textColorPrimary"
                 />
 
         <ProgressBar

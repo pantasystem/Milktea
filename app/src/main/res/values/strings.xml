@@ -20,7 +20,7 @@
     <string name="selecting_instance">選択中のインスタンス</string>
     <string name="welcome">ようこそ</string>
     <string name="san">さん</string>
-    <string name="following">フォロー</string>
+    <string name="following">フォロー中</string>
     <string name="follower">フォロワー</string>
     <string name="renote">リノート</string>
     <string name="quote_renote">引用リノート</string>
@@ -118,4 +118,5 @@
     <string name="input_message">相手に思いを伝えてください</string>
 
     <string name="manifest_user_name_pattern">"@"\w([\w-]*\w)?(?:@[\w.\-]+\w)?</string>
+    <string name="followee_state">フォローされています</string>
 </resources>

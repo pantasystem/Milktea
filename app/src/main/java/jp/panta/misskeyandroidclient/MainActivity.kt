@@ -160,12 +160,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         (application as MiApplication).switchAccount(it)
     }
 
+    private val showFollowingsObserver = Observer<Unit>{
+        val intent = Intent(this, FollowFollowerActivity::class.java).apply{
+            putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWING_VIEW_MODE)
+        }
+        startActivity(intent)
+    }
+
+    private val showFollowersObserver = Observer<Unit>{
+        val intent = Intent(this, FollowFollowerActivity::class.java).apply {
+            putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWER_VIEW_MODE)
+        }
+        startActivity(intent)
+    }
+
     private fun initAccountViewModelListener(){
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
 
         mAccountViewModel.switchTargetConnectionInstance.removeObserver(switchAccountObserver)
         mAccountViewModel.switchTargetConnectionInstance.observe(this, switchAccountObserver)
+
+        mAccountViewModel.showFollowings.observe(this, showFollowingsObserver)
+        mAccountViewModel.showFollowers.observe(this, showFollowersObserver)
     }
     fun changeTitle(title: String?){
         toolbar.title = title

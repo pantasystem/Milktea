@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.model.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import retrofit2.Call
@@ -104,6 +105,11 @@ interface MisskeyAPI {
     @POST("api/users/notes")
     fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
+    @POST("api/users/followers")
+    fun followers(@Body userRequest: RequestUser) : Call<List<FollowFollowerUser>>
+
+    @POST("api/users/following")
+    fun following(@Body userRequest: RequestUser) : Call<List<FollowFollowerUser>>
 
     //drive
     @POST("api/drive/files")
