@@ -10,7 +10,7 @@
     <LinearLayout
             android:orientation="vertical" android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:padding="16dp"
             android:background="?attr/colorSurface"
             >
 
@@ -29,6 +29,7 @@
                     app:srcCompat="@drawable/ic_info_black_24dp"
                     android:contentDescription="@string/show_detail"
                     android:layout_gravity="center"
+                    android:tint="?attr/colorNoteActionButtonTint"
                     />
             <Button
                     android:id="@+id/show_detail"
@@ -50,7 +51,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:contentDescription="@string/copy_url"
-                    app:srcCompat="@drawable/ic_content_copy_black_24dp" />
+                    app:srcCompat="@drawable/ic_content_copy_black_24dp"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    />
 
             <Button
                     android:id="@+id/copy_content"
@@ -72,6 +75,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:contentDescription="@string/copy_url"
+                    android:tint="?attr/colorNoteActionButtonTint"
                     app:srcCompat="@drawable/ic_insert_link_black_24dp" />
 
             <Button
@@ -99,6 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:contentDescription="@string/favorite"
+                    android:tint="?attr/colorNoteActionButtonTint"
                     app:srcCompat="@drawable/ic_star_black_24dp" />
 
             <Button
@@ -122,6 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:contentDescription="@string/remove_favorite"
+                    android:tint="?attr/colorNoteActionButtonTint"
                     app:srcCompat="@drawable/ic_star_black_24dp" />
 
             <Button
@@ -152,6 +158,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:contentDescription="@string/remove_note"
+                    android:tint="?attr/colorNoteActionButtonTint"
                     app:srcCompat="@drawable/ic_delete_black_24dp" />
 
             <Button
