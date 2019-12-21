@@ -254,6 +254,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_drive ->{
                 startActivity(Intent(this, DriveActivity::class.java))
             }
+            R.id.nav_favorite ->{
+                startActivity(Intent(this, FavoriteActivity::class.java))
+            }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)

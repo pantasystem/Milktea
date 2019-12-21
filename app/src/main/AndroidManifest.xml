@@ -15,7 +15,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".FollowFollowerActivity"></activity>
+        <activity android:name=".FavoriteActivity"></activity>
+        <activity android:name=".FollowFollowerActivity" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".SearchResultActivity">
             <intent-filter>
