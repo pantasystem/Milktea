@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewData
+import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 
 class FollowFollowerListAdapter(
-    private val viewLifecycleOwner: LifecycleOwner
+    private val viewLifecycleOwner: LifecycleOwner,
+    private val followFollowerViewModel: FollowFollowerViewModel
 ) : ListAdapter<FollowFollowerViewData, FollowFollowerListAdapter.ViewHolder>(
     DiffUtilItemCallback()
 ){
@@ -36,6 +38,7 @@ class FollowFollowerListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.followFollowerUser = getItem(position)
         holder.binding.lifecycleOwner = viewLifecycleOwner
+        holder.binding.followFollowerViewModel = followFollowerViewModel
         holder.binding.executePendingBindings()
     }
 

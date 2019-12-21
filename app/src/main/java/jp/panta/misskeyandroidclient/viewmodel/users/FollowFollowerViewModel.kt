@@ -15,6 +15,8 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.view.SafeUnbox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
@@ -148,15 +150,45 @@ class FollowFollowerViewModel(
     private inner class Listener : MainCapture.AbsListener(){
         override fun follow(user: User) {
             followFollowerViewDataList.value?.forEach{
-                it.isFollowing.postValue(true)
+                if(it.user.id == user.id){
+                    it.isFollowing.postValue(true)
+                }
             }
         }
 
         override fun unFollowed(user: User) {
             followFollowerViewDataList.value?.forEach {
-                it.isFollowing.postValue(false)
+                if(it.user.id == user.id){
+                    it.isFollowing.postValue(false)
+                }
             }
         }
+    }
+
+    fun followOrUnfollow(followFollowerViewData: FollowFollowerViewData){
+
+        if(SafeUnbox.unbox(followFollowerViewData.isFollowing.value)){
+            viewModelScope.launch(Dispatchers.IO){
+                misskeyAPI.unFollowUser(RequestUser(
+                    i = connectionInstance.getI()!!,
+                    userId = followFollowerViewData.user.id
+                )).execute()
+            }
+        }else{
+            viewModelScope.launch(Dispatchers.IO){
+                misskeyAPI.followUser(RequestUser(
+                    i = connectionInstance.getI()!!,
+                    userId = followFollowerViewData.user.id
+                )).execute()
+            }
+
+        }
+
+    }
+
+    val showUserEventBus = EventBus<User>()
+    fun showUser(followFollowerViewData: FollowFollowerViewData){
+        showUserEventBus.event = followFollowerViewData.user
     }
 
     private fun List<FollowFollowerViewData>?.toArrayList() : ArrayList<FollowFollowerViewData>{

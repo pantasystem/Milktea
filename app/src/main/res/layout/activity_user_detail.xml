@@ -144,12 +144,14 @@
                                 android:layout_marginEnd="4dp"
                                 tools:text="20"
                                 android:text="@{Integer.toString(userViewModel.user.followingCount)}"
+                                android:onClick="@{()-> userViewModel.showFollows()}"
                                 />
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/follow"
                                 android:layout_marginEnd="8dp"
+                                android:onClick="@{()-> userViewModel.showFollows()}"
                                 />
                         <TextView
                                 android:layout_width="wrap_content"
@@ -157,10 +159,12 @@
                                 tools:text="40"
                                 android:text="@{Integer.toString(userViewModel.user.followersCount)}"
                                 android:layout_marginEnd="4dp"
+                                android:onClick="@{()-> userViewModel.showFollowers()}"
                                 />
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:onClick="@{()-> userViewModel.showFollowers()}"
                                 android:text="@string/follower"/>
                     </LinearLayout>
 

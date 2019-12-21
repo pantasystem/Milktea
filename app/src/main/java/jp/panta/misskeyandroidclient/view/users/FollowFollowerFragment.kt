@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.view.users
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import kotlinx.android.synthetic.main.fragment_follow_follwer.*
@@ -42,10 +44,8 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
         val type = FollowFollowerViewModel.Type.values()[typeOrdinal]
         val user = arguments?.getSerializable(EXTRA_USER) as User?
 
-        val adapter = FollowFollowerListAdapter(viewLifecycleOwner)
         mLinearLayoutManager = LinearLayoutManager(view.context)
 
-        follow_follower_list.adapter = adapter
         follow_follower_list.layoutManager = mLinearLayoutManager
         follow_follower_list.addOnScrollListener(mScrollListener)
 
@@ -53,16 +53,28 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
         val miApplication = context?.applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
             val followFollowerViewModel = ViewModelProvider(this, FollowFollowerViewModel.Factory(ci, miApplication, user, type))[FollowFollowerViewModel::class.java]
+            mViewModel = followFollowerViewModel
+            val adapter = FollowFollowerListAdapter(viewLifecycleOwner, followFollowerViewModel)
+
+            follow_follower_list.adapter = adapter
             followFollowerViewModel.followFollowerViewDataList.observe(viewLifecycleOwner, Observer {
                 adapter.submitList(it)
             })
 
             followFollowerViewModel.loadInit()
+
+            mViewModel?.isInitializing?.observe(viewLifecycleOwner, Observer {
+                swipe_refresh.isRefreshing = it
+            })
+
+            mViewModel?.showUserEventBus?.observe(viewLifecycleOwner, Observer {
+                val intent = Intent(activity, UserDetailActivity::class.java)
+                intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+                activity?.startActivity(intent)
+            })
         })
 
-        mViewModel?.isInitializing?.observe(viewLifecycleOwner, Observer {
-            swipe_refresh.isRefreshing = it
-        })
+
         swipe_refresh.setOnRefreshListener {
             mViewModel?.loadInit()
         }

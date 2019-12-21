@@ -8,6 +8,9 @@
         <variable
                 name="followFollowerUser"
                 type="jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewData" />
+        <variable
+                name="followFollowerViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView
@@ -40,7 +43,8 @@
                     app:circleIcon="@{SafeUnbox.unbox(followFollowerUser.user.avatarUrl)}"
                     android:layout_marginEnd="8dp"
                     android:layout_below="@id/followeeState"
-                    />
+                    android:onClick="@{()-> followFollowerViewModel.showUser(followFollowerUser) }"
+                    tools:ignore="ContentDescription" />
 
             <TextView
                     android:id="@+id/userName"
@@ -74,6 +78,7 @@
                     android:layout_marginStart='8dp'
                     android:layout_alignTop="@id/userName"
                     app:isFollowing="@{SafeUnbox.unbox(followFollowerUser.isFollowing)}"
+                    android:onClick="@{()-> followFollowerViewModel.followOrUnfollow(followFollowerUser)}"
                     />
             <TextView
                     android:id="@+id/description"

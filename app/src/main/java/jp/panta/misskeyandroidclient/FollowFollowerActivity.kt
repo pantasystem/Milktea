@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import jp.panta.misskeyandroidclient.model.users.User
@@ -27,10 +28,19 @@ class FollowFollowerActivity : AppCompatActivity() {
 
         val user = intent.getSerializableExtra(EXTRA_USER) as User?
 
-        follow_follower_pager.currentItem = intent.getIntExtra(EXTRA_VIEW_CURRENT, FOLLOWER_VIEW_MODE)
         follow_follower_pager.adapter = FollowFollowerPagerAdapter(user)
         follow_follower_tab.setupWithViewPager(follow_follower_pager)
+        follow_follower_pager.currentItem = intent.getIntExtra(EXTRA_VIEW_CURRENT, FOLLOWER_VIEW_MODE)
 
+        supportActionBar?.title = user?.getDisplayUserName()
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     inner class FollowFollowerPagerAdapter(val user: User?) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){

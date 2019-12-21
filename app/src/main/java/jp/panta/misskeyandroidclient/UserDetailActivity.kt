@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -68,6 +69,19 @@ class UserDetailActivity : AppCompatActivity() {
                 supportActionBar?.title = it
             })
             //userTimelineTab.setupWithViewPager()
+            viewModel.showFollowers.observe(this, Observer {
+                val intent = Intent(this, FollowFollowerActivity::class.java)
+                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it)
+                intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWER_VIEW_MODE)
+                startActivity(intent)
+            })
+
+            viewModel.showFollows.observe(this, Observer{
+                val intent = Intent(this, FollowFollowerActivity::class.java)
+                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it)
+                intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWING_VIEW_MODE)
+                startActivity(intent)
+            })
 
         })
 

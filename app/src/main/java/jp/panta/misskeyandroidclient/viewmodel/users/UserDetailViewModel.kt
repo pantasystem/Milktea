@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Call
 import retrofit2.Callback
@@ -59,6 +60,9 @@ class UserDetailViewModel(
             }
         }
     }
+
+    val showFollowers = EventBus<User?>()
+    val showFollows = EventBus<User?>()
 
     fun load(){
         val userNameList = fqcnUserName?.split("@")?.filter{
@@ -123,5 +127,12 @@ class UserDetailViewModel(
         }
     }
 
+    fun showFollows(){
+        showFollows.event = user.value
+    }
+
+    fun showFollowers(){
+        showFollowers.event = user.value
+    }
 
 }

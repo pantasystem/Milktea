@@ -161,6 +161,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private val showFollowingsObserver = Observer<Unit>{
+        closeDrawerWhenOpenedDrawer()
         val intent = Intent(this, FollowFollowerActivity::class.java).apply{
             putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWING_VIEW_MODE)
         }
@@ -168,6 +169,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private val showFollowersObserver = Observer<Unit>{
+        closeDrawerWhenOpenedDrawer()
         val intent = Intent(this, FollowFollowerActivity::class.java).apply {
             putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWER_VIEW_MODE)
         }
@@ -212,6 +214,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             bottomNavigationAdapter?.setCurrentFragment(R.id.navigation_home)
         }else{
             super.onBackPressed()
+        }
+    }
+
+    private fun closeDrawerWhenOpenedDrawer(){
+        if(drawer_layout.isDrawerOpen(GravityCompat.START)){
+            drawer_layout.closeDrawer(GravityCompat.START)
         }
     }
 
