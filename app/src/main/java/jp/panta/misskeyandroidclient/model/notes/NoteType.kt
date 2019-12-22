@@ -1,15 +1,15 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-enum class NoteType{
-    HOME,
-    LOCAL,
-    SOCIAL,
-    GLOBAL,
-    SEARCH,
-    SEARCH_HASH,
-    USER,
-    FAVORITE,
-    FEATURED,
-    DETAIL
+enum class NoteType(val defaultName: String){
+    HOME("Home"),
+    LOCAL("Local"),
+    SOCIAL("Social"),
+    GLOBAL("Global"),
+    SEARCH("Search"),
+    SEARCH_HASH("Hash"),
+    USER("User"),
+    FAVORITE("Favorite"),
+    FEATURED("Featured"),
+    DETAIL("Detail")
     //USER_PINは別
 }

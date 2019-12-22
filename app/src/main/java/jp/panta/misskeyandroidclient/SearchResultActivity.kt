@@ -38,10 +38,9 @@ class SearchResultActivity : AppCompatActivity() {
 
         val isTag = keyword.startsWith("#")
         val request = if(isTag){
-            val tag = keyword.substring(1, keyword.length)
             NoteRequest.Setting(
                 type = NoteType.SEARCH_HASH,
-                tag = tag
+                tag = keyword
             )
         }else{
             NoteRequest.Setting(

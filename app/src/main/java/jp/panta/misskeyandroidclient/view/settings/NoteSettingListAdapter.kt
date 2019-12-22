@@ -16,16 +16,22 @@ import java.io.Serializable
 import java.lang.ClassCastException
 import java.lang.IllegalArgumentException
 
-class NoteSettingListAdapter(diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting>, private val isSelected: Boolean, private val listener: ItemAddOrRemoveButtonClickedListener) : ListAdapter<NoteRequest.Setting, NoteSettingListAdapter.NoteSettingViewHolder>(diffUtil){
+class NoteSettingListAdapter(
+    diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting>,
+    private val isSelected: Boolean,
+    private val listener: ItemAddOrRemoveButtonClickedListener
+) : ListAdapter<NoteRequest.Setting, NoteSettingListAdapter.NoteSettingViewHolder>(diffUtil){
 
     abstract class NoteSettingViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
     inner class NoteSettingViewHolder(private val view: View) : NoteSettingViewHolderBase(view){
         fun onBind(item: NoteRequest.Setting, isSelected: Boolean){
-            view.setting_title.text = TabFragment.localizationTitle(item)
+            view.setting_title.text = item.title
             if(isSelected){
                 view.add_or_remove_icon.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp)
+                view.edit_title.visibility = View.VISIBLE
             }else{
                 view.add_or_remove_icon.setImageResource(R.drawable.ic_add_circle_outline_black_24dp)
+                view.edit_title.visibility = View.GONE
             }
             view.add_or_remove_icon.setOnClickListener {
                 listener.onClick(item)

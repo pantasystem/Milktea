@@ -2,9 +2,7 @@ package jp.panta.misskeyandroidclient.view.settings
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -16,6 +14,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.setMenuTint
 import kotlinx.android.synthetic.main.fragment_tab_setting.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
@@ -55,9 +54,11 @@ class TabSettingFragment : Fragment(){
 
         val selectableTabAdapter = NoteSettingListAdapter(diffUtilCallBack, false, object : NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener{
             override fun onClick(item: NoteRequest.Setting) {
-                when(item.type){
-                    NoteType.SEARCH, NoteType.SEARCH_HASH -> return
+                if(item.type == NoteType.SEARCH || item.type == NoteType.SEARCH_HASH){
+
+                    return
                 }
+
                 val list = mSelectedListLiveData.value?: return
                 //val selectableList = mSelectableListLiveData.value?: return
                 val arrayList = ArrayList<NoteRequest.Setting>(list)
@@ -102,10 +103,27 @@ class TabSettingFragment : Fragment(){
             selectableTabAdapter.submitList(it)
         })
 
-        save_setting.setOnClickListener {
-            saveTabs()
-        }
 
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.tab_setting_menu, menu)
+        context?.setMenuTint(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.save ->{
+                saveTabs()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun saveTabs(){
@@ -146,19 +164,13 @@ class TabSettingFragment : Fragment(){
     }
 
     private fun getDefaultSettings(): List<NoteRequest.Setting>{
-        return NoteType.values().map{
-            if(it == NoteType.SEARCH){
-                NoteRequest.Setting(type = it, query = "検索")
-            }else if(it == NoteType.SEARCH_HASH){
-                NoteRequest.Setting(type = it, query = "#検索")
-            }else if(it == NoteType.USER){
-                NoteRequest.Setting(type = it)
-            }else{
-                NoteRequest.Setting(type = it)
-            }
 
-
+        return NoteType.values().filter{
+            it == NoteType.HOME || it == NoteType.LOCAL || it == NoteType.SOCIAL || it == NoteType.GLOBAL || it == NoteType.FAVORITE
+        }.map{
+            NoteRequest.Setting(type = it)
         }
+
     }
 
     inner class ItemTouchCallBack : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.ACTION_STATE_IDLE){

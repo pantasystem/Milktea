@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import androidx.room.*
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.io.Serializable
@@ -36,7 +37,6 @@ data class NoteRequest(
         val query: String? = null,
         val tag: String? = null,
         val noteId: String? = null
-
     ): Serializable{
         @PrimaryKey(autoGenerate = true)
         var id: Long? = null
@@ -50,6 +50,8 @@ data class NoteRequest(
 
         @Ignore
         var includeRenotedMyNotes: Boolean? = null
+
+        var title: String = type.defaultName
 
         fun buildRequest(connectionInstance: ConnectionInstance, conditions: Conditions): NoteRequest{
             return NoteRequest(
@@ -67,11 +69,27 @@ data class NoteRequest(
                 includeMyRenotes = includeMyRenotes,
                 includeRenotedMyNotes = includeRenotedMyNotes,
                 noteId = noteId,
-                tag= tag,
-                query = query
+                //tag= tag,
+                query = if(type == NoteType.SEARCH){
+                    query?: title
+                }else{
+                    null
+                },
+                tag = if(type == NoteType.SEARCH_HASH){
+                    (tag ?: title).parseTag()
+                }else{
+                    null
+                }
 
 
             )
+        }
+        private fun String.parseTag() : String{
+            return if(this.startsWith("#")){
+                this.substring(1, this.length)
+            }else{
+                this
+            }
         }
     }
 

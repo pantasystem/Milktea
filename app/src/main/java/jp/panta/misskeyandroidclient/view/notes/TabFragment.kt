@@ -19,27 +19,12 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import kotlinx.android.synthetic.main.fragment_tab.*
 
 class TabFragment : Fragment(){
 
-    companion object{
 
-        fun localizationTitle(requestBase: NoteRequest.Setting): String?{
-            return when(requestBase.type){
-                NoteType.HOME -> "Home"
-                NoteType.LOCAL -> "Local"
-                NoteType.SOCIAL -> "Social"
-                NoteType.GLOBAL -> "Global"
-                NoteType.SEARCH, NoteType.SEARCH_HASH -> requestBase.query
-                NoteType.USER -> requestBase.userId
-                NoteType.FAVORITE -> "Favorite"
-                NoteType.FEATURED -> "Featured"
-                NoteType.DETAIL -> "Detail"
-            }
-        }
-
-    }
     private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
 
 
@@ -96,12 +81,18 @@ class TabFragment : Fragment(){
 
         override fun getItem(p0: Int): Fragment {
             Log.d("getItem", "$p0, ${requestBaseList[p0].type}")
-            return TimelineFragment.newInstance(requestBaseList[p0])
+            val item = requestBaseList[p0]
+            val noteId = item.noteId
+            return if(item.type == NoteType.DETAIL && noteId != null){
+                NoteDetailFragment.newInstance(noteId)
+            }else{
+                TimelineFragment.newInstance(item)
+            }
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
             val requestBase = requestBaseList[position]
-            return localizationTitle(requestBase)
+            return requestBase.title
         }
 
     }

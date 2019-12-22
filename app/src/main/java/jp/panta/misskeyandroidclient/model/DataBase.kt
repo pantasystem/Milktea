@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 
-@Database(entities = [ConnectionInstance::class, NoteRequest.Setting::class], version = 21)
+@Database(entities = [ConnectionInstance::class, NoteRequest.Setting::class], version = 22)
 @TypeConverters(NoteRequest.NoteTypeConverter::class)
 abstract class DataBase : RoomDatabase(){
     abstract fun connectionInstanceDao(): ConnectionInstanceDao

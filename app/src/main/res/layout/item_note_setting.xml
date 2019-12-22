@@ -28,7 +28,7 @@
                 android:layout_gravity="center"
                 app:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                 android:layout_marginEnd="4dp"
-                />
+                tools:ignore="ContentDescription" />
 
         <TextView
                 android:id="@+id/setting_title"
@@ -38,6 +38,16 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 tools:text="Home" />
+
+        <ImageView
+                android:id="@+id/edit_title"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_mode_edit_black_24dp"
+                android:layout_marginEnd="4dp"
+                tools:ignore="ContentDescription" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
