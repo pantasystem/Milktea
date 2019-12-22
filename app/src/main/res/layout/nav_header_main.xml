@@ -32,7 +32,8 @@
                 android:layout_gravity="start"
                 android:paddingTop="@dimen/nav_header_vertical_spacing"
                 android:layout_marginTop="20dp"
-                />
+                android:onClick="@{()-> accountViewModel.showProfile(user)}"
+                tools:ignore="ContentDescription" />
 
         <ImageButton
                 android:layout_width="40dp"
@@ -41,7 +42,7 @@
                 android:layout_marginTop="30dp"
                 app:srcCompat="@drawable/ic_menu_black_24dp"
                 android:onClick="@{() -> accountViewModel.showSwitchDialog() }"
-                />
+                tools:ignore="ContentDescription" />
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.account
 
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 
 class AccountViewModel : ViewModel(){
@@ -12,6 +13,8 @@ class AccountViewModel : ViewModel(){
 
     val showFollowers = EventBus<Unit>()
     val showFollowings = EventBus<Unit>()
+
+    val showProfile = EventBus<User>()
 
     fun setSwitchTargetConnectionInstance(connectionInstance: ConnectionInstance){
         switchTargetConnectionInstance.event = connectionInstance
@@ -27,6 +30,10 @@ class AccountViewModel : ViewModel(){
 
     fun showFollowings(){
         showFollowings.event = Unit
+    }
+
+    fun showProfile(user: User){
+        showProfile.event = user
     }
 
 }

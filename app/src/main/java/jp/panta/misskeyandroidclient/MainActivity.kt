@@ -22,6 +22,7 @@ import com.google.android.material.navigation.NavigationView
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
@@ -177,6 +178,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(intent)
     }
 
+    private val showProfileObserver = Observer<User>{
+        closeDrawerWhenOpenedDrawer()
+        val intent = Intent(this, UserDetailActivity::class.java)
+        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+        startActivity(intent)
+    }
     private fun initAccountViewModelListener(){
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
@@ -186,6 +193,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mAccountViewModel.showFollowings.observe(this, showFollowingsObserver)
         mAccountViewModel.showFollowers.observe(this, showFollowersObserver)
+        mAccountViewModel.showProfile.observe(this, showProfileObserver)
     }
     fun changeTitle(title: String?){
         toolbar.title = title
