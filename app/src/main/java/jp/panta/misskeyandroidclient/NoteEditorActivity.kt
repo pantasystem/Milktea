@@ -81,6 +81,7 @@ class NoteEditorActivity : AppCompatActivity() {
                 val intent = Intent(this, PostNoteService::class.java)
                 intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
                 startService(intent)
+                finish()
             })
 
         })
