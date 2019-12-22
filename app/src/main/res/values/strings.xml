@@ -123,4 +123,8 @@
     <string name="block">ブロック</string>
     <string name="unmute">ミュートを解除</string>
     <string name="unblock">ブロックを解除</string>
+
+    <string name="add_to_tab">タブに追加する</string>
+
+    <string name="detail">詳細</string>
 </resources>

@@ -137,6 +137,9 @@ class UserDetailActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
+        if(menu != null){
+            setMenuTint(menu)
+        }
         val block = menu?.findItem(R.id.block)
         val mute = menu?.findItem(R.id.mute)
         val unblock = menu?.findItem(R.id.unblock)
@@ -169,8 +172,20 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.unmute ->{
                 mViewModel?.unmute()
             }
+            R.id.nav_add_to_tab ->{
+                addPageToTab()
+            }
 
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun addPageToTab(){
+        val user = mViewModel?.user?.value
+        if(user != null){
+            (application as MiApplication).addPageToNoteSettings(NoteRequest.Setting(type = NoteType.USER, userId = user.id).apply{
+                title = user.getDisplayUserName()
+            })
+        }
     }
 }

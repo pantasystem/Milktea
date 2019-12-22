@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import kotlinx.android.synthetic.main.activity_search_result.*
 
@@ -16,7 +17,8 @@ class SearchResultActivity : AppCompatActivity() {
         const val EXTRA_SEARCH_WORLD = "jp.panta.misskeyandroidclient.SearchResultActivity.EXTRA_SEARCH_WORLD"
     }
 
-    var mSearchWord: String? = null
+    private var mSearchWord: String? = null
+    private var mIsTag: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +39,7 @@ class SearchResultActivity : AppCompatActivity() {
         supportActionBar?.title = keyword
 
         val isTag = keyword.startsWith("#")
+        mIsTag = isTag
         val request = if(isTag){
             NoteRequest.Setting(
                 type = NoteType.SEARCH_HASH,
@@ -57,7 +60,10 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.search_top_menu, menu)
+        menuInflater.inflate(R.menu.activity_search_menu, menu)
+        if(menu != null){
+            setMenuTint(menu)
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -69,7 +75,25 @@ class SearchResultActivity : AppCompatActivity() {
                 intent.putExtra(SearchActivity.EXTRA_SEARCH_WORD, mSearchWord)
                 startActivity(intent)
             }
+            R.id.nav_search_add_to_tab ->{
+                searchAddToTab()
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun searchAddToTab(){
+        val type = if(SafeUnbox.unbox(mIsTag)){
+            NoteType.SEARCH_HASH
+        }else{
+            NoteType.SEARCH
+        }
+        val word = mSearchWord ?: return
+        (application as MiApplication).addPageToNoteSettings(
+
+            NoteRequest.Setting(type = type).apply{
+                title = word
+            }
+        )
     }
 }

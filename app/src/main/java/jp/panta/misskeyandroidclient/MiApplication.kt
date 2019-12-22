@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
+import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
@@ -144,6 +145,11 @@ class MiApplication : Application(){
     }
 
 
+    fun addPageToNoteSettings(noteRequestSetting: NoteRequest.Setting){
+        GlobalScope.launch(Dispatchers.IO){
+            noteRequestSettingDao?.insert(noteRequestSetting)
+        }
+    }
 
     private fun updateRelationConnectionInstanceProperty(ci: ConnectionInstance){
         try{
