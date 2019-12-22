@@ -119,4 +119,8 @@
 
     <string name="manifest_user_name_pattern">"@"\w([\w-]*\w)?(?:@[\w.\-]+\w)?</string>
     <string name="followee_state">フォローされています</string>
+    <string name="mute">ミュート</string>
+    <string name="block">ブロック</string>
+    <string name="unmute">ミュートを解除</string>
+    <string name="unblock">ブロックを解除</string>
 </resources>

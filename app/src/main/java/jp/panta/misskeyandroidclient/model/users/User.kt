@@ -36,7 +36,12 @@ data class User(
     @SerializedName("emojis") val emojis: List<Emoji>?,
 
     @SerializedName("isFollowing") val isFollowing: Boolean,
-    @SerializedName("isFollowed") val isFollowed: Boolean
+    @SerializedName("isFollowed") val isFollowed: Boolean,
+
+
+    @SerializedName("isBlocking") val isBlocking: Boolean,
+    @SerializedName("isMuted") val isMuted: Boolean
+
     //JsonProperty("isVerified") val isVerified: Boolean,
     //@JsonProperty("isLocked") val isLocked: Boolean
 ): Serializable{

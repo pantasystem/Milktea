@@ -25,6 +25,12 @@ import retrofit2.http.POST
 
 interface MisskeyAPI {
 
+    @POST("api/blocking/create")
+    fun blockUser(@Body requestUser: RequestUser): Call<Unit>
+
+    @POST("api/blocking/delete")
+    fun unblockUser(@Body requestUser: RequestUser): Call<Unit>
+
 
     @POST("api/i")
     fun i(@Body i: I): Call<User>
@@ -140,5 +146,10 @@ interface MisskeyAPI {
     @POST("api/messaging/messages/read")
     fun readMessage(@Body messageAction: MessageAction): Call<Unit>
 
+    @POST("api/mute/create")
+    fun muteUser(@Body requestUser: RequestUser): Call<Unit>
+
+    @POST("api/mute/delete")
+    fun unmuteUser(@Body requestUser: RequestUser): Call<Unit>
 
 }

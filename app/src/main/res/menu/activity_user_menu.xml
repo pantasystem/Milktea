@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+            android:id="@+id/mute"
+            android:title="@string/mute"
+            android:icon="@drawable/ic_visibility_off_black_24dp" />
+    <item
+            android:id="@+id/unmute"
+            android:title="@string/unmute"
+        />
+    <item
+            android:id="@+id/block"
+            android:title="@string/block"
+        />
+    <item
+            android:id="@+id/unblock"
+            android:title="@string/unblock"
+            />
+</menu>

@@ -61,6 +61,20 @@ class UserDetailViewModel(
         }
     }
 
+    val isBlocking = MediatorLiveData<Boolean>().apply{
+        value = user.value?.isBlocking?: false
+        addSource(user){
+            value = it.isBlocking
+        }
+    }
+
+    val isMuted = MediatorLiveData<Boolean>().apply{
+        value = user.value?.isMuted?: false
+        addSource(user){
+            value = it.isMuted
+        }
+    }
+
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
 
@@ -134,5 +148,40 @@ class UserDetailViewModel(
     fun showFollowers(){
         showFollowers.event = user.value
     }
+
+    fun mute(){
+       sendUserIdAndStateChange(misskeyAPI::muteUser, isMuted, true, 204)
+    }
+
+    fun unmute(){
+        sendUserIdAndStateChange(misskeyAPI::unmuteUser, isMuted, false, 204)
+    }
+
+    fun block(){
+        sendUserIdAndStateChange(misskeyAPI::blockUser, isBlocking, true, 200)
+    }
+
+    fun unblock(){
+        sendUserIdAndStateChange(misskeyAPI::unblockUser, isBlocking, false, 200)
+    }
+
+    private fun sendUserIdAndStateChange(apiFunction: (RequestUser)->Call<Unit>, liveData: MediatorLiveData<Boolean>, valueOnSuccess: Boolean, codeOnSuccess: Int){
+        apiFunction(createUserIdOnlyRequest()).enqueue(object :Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if(response.code() == codeOnSuccess){
+                    liveData.postValue(valueOnSuccess)
+                }else{
+                    Log.d(tag, "失敗しました, code:${response.code()}")
+                }
+            }
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+            }
+        })
+    }
+
+    private fun createUserIdOnlyRequest(): RequestUser{
+        return RequestUser(i = connectionInstance.getI()!!, userId = userId)
+    }
+
 
 }

@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -31,6 +32,8 @@ class UserDetailActivity : AppCompatActivity() {
         const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
     }
 
+    private var mViewModel: UserDetailViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -49,6 +52,7 @@ class UserDetailActivity : AppCompatActivity() {
         val miApplication = applicationContext as MiApplication
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
             val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ci, miApplication, userId, userName))[UserDetailViewModel::class.java]
+            mViewModel = viewModel
             binding.userViewModel = viewModel
 
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ci, miApplication))[NotesViewModel::class.java]
@@ -83,7 +87,16 @@ class UserDetailActivity : AppCompatActivity() {
                 startActivity(intent)
             })
 
+            val updateMenu = Observer<Boolean> {
+                invalidateOptionsMenu()
+            }
+            viewModel.isBlocking.observe(this, updateMenu)
+            viewModel.isMuted.observe(this, updateMenu)
+
         })
+
+
+
 
 
     }
@@ -122,9 +135,41 @@ class UserDetailActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activity_user_menu, menu)
+        val block = menu?.findItem(R.id.block)
+        val mute = menu?.findItem(R.id.mute)
+        val unblock = menu?.findItem(R.id.unblock)
+        val unmute = menu?.findItem(R.id.unmute)
+        mute?.isVisible = !(mViewModel?.isMuted?.value?: true)
+        block?.isVisible = !(mViewModel?.isBlocking?.value?: true)
+        unblock?.isVisible = mViewModel?.isBlocking?.value?: false
+        unmute?.isVisible = mViewModel?.isMuted?.value?: false
+        if(mViewModel?.isMine == true){
+            block?.isVisible = false
+            mute?.isVisible = false
+            unblock?.isVisible = false
+            unmute?. isVisible = false
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             android.R.id.home -> finish()
+            R.id.block ->{
+                mViewModel?.block()
+            }
+            R.id.mute ->{
+                mViewModel?.mute()
+            }
+            R.id.unblock ->{
+                mViewModel?.unblock()
+            }
+            R.id.unmute ->{
+                mViewModel?.unmute()
+            }
+
         }
         return super.onOptionsItemSelected(item)
     }
