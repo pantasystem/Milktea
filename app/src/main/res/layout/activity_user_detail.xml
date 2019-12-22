@@ -58,15 +58,6 @@
                             >
 
 
-                        <ImageButton
-                                android:id="@+id/optionButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="bottom"
-                                style="@style/Widget.AppCompat.Button.Borderless"
-                                app:srcCompat="@drawable/ic_more_horiz_black_24dp"
-                                tools:ignore="ContentDescription" />
-
                         <Button
                                 android:id="@+id/followButton"
                                 android:layout_width="wrap_content"

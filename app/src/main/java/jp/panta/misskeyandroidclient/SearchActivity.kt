@@ -25,6 +25,7 @@ class SearchActivity : AppCompatActivity() {
         setSupportActionBar(search_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         mSearchWord = intent.getStringExtra(EXTRA_SEARCH_WORD)
     }
 

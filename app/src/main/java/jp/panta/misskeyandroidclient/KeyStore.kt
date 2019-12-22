@@ -10,6 +10,10 @@ object KeyStore {
         THEME(THEME_WHITE.default)
     }
 
+    fun isNightTheme(key: IntKey): Boolean{
+        return IntKey.THEME_BLACK == key
+                || IntKey.THEME_DARK == key
+    }
     enum class StringKey{
 
     }
