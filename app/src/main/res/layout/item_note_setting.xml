@@ -1,54 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
-        app:cardUseCompatPadding="true"
-        app:cardCornerRadius="10dp"
-        >
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="jp.panta.misskeyandroidclient.R" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
+        <import type="android.view.View"/>
+        <variable
+                name="settingTab"
+                type="jp.panta.misskeyandroidclient.viewmodel.setting.tab.SettingTab" />
+        <variable
+                name="isSelecting"
+                type="Boolean" />
+        <variable
+                name="listener"
+                type="jp.panta.misskeyandroidclient.view.settings.NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener" />
+    </data>
+    <androidx.cardview.widget.CardView
 
-    <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16sp"
+            android:background="?attr/colorSurface"
+            app:cardUseCompatPadding="true"
+            app:cardCornerRadius="10dp"
             >
 
-        <ImageView
-                android:id="@+id/add_or_remove_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
-                android:layout_marginEnd="4dp"
-                tools:ignore="ContentDescription" />
-
-        <TextView
-                android:id="@+id/setting_title"
-                android:layout_width="0dp"
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_weight="1"
-                android:layout_gravity="center"
-                tools:text="Home" />
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16sp"
+                >
 
-        <ImageView
-                android:id="@+id/edit_title"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_mode_edit_black_24dp"
-                android:layout_marginEnd="4dp"
-                tools:ignore="ContentDescription" />
+            <ImageView
+                    android:id="@+id/add_or_remove_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="4dp"
+                    tools:ignore="ContentDescription"
+                    app:srcCompat="@{isSelecting ? R.drawable.ic_add_circle_outline_black_24dp : R.drawable.ic_remove_circle_outline_black_24dp}"
+                    tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
+                    android:onClick="@{()-> listener.onClick(settingTab)}"
+                    />
 
-    </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+            <FrameLayout
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+
+                    >
+                <TextView
+                        android:id="@+id/setting_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        tools:text="Home"
+                        android:visibility="@{isSelecting ? View.VISIBLE : View.GONE}"
+                        android:text="@{SafeUnbox.unbox(settingTab.title)}"
+                        tools:visibility="gone"
+                        />
+                <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{isSelecting ? View.GONE : View.VISIBLE}"
+                        android:text="@={SafeUnbox.unbox(settingTab.title)}"
+                        android:inputType="text"
+                        android:importantForAutofill="no"
+                        tools:ignore="LabelFor" />
+            </FrameLayout>
+
+
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>
+
 

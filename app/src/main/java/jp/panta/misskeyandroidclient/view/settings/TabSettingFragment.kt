@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.setMenuTint
+import jp.panta.misskeyandroidclient.viewmodel.setting.tab.SettingTab
 import kotlinx.android.synthetic.main.fragment_tab_setting.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
@@ -24,9 +25,9 @@ class TabSettingFragment : Fragment(){
 
     private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
 
-    val mSelectedListLiveData = MutableLiveData<List<NoteRequest.Setting>>()
+    val mSelectedListLiveData = MutableLiveData<List<SettingTab>>()
 
-    val mSelectableListLiveData = MutableLiveData<List<NoteRequest.Setting>>()
+    val mSelectableListLiveData = MutableLiveData<List<SettingTab>>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,9 +44,9 @@ class TabSettingFragment : Fragment(){
         val miApplication = context?.applicationContext as MiApplication
 
         val selectedTabAdapter = NoteSettingListAdapter(diffUtilCallBack,true, object : NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener{
-            override fun onClick(item: NoteRequest.Setting) {
+            override fun onClick(item: SettingTab) {
                 val list = mSelectedListLiveData.value?: return
-                val arrayList = ArrayList<NoteRequest.Setting>(list)
+                val arrayList = ArrayList<SettingTab>(list)
                 arrayList.remove(item)
                 mSelectedListLiveData.value = arrayList
                 mSelectableListLiveData.value = notSelectedSettings(arrayList)
@@ -53,7 +54,7 @@ class TabSettingFragment : Fragment(){
         })
 
         val selectableTabAdapter = NoteSettingListAdapter(diffUtilCallBack, false, object : NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener{
-            override fun onClick(item: NoteRequest.Setting) {
+            override fun onClick(item: SettingTab) {
                 if(item.type == NoteType.SEARCH || item.type == NoteType.SEARCH_HASH){
 
                     return
@@ -61,7 +62,7 @@ class TabSettingFragment : Fragment(){
 
                 val list = mSelectedListLiveData.value?: return
                 //val selectableList = mSelectableListLiveData.value?: return
-                val arrayList = ArrayList<NoteRequest.Setting>(list)
+                val arrayList = ArrayList<SettingTab>(list)
                 arrayList.add(item)
                 mSelectedListLiveData.value = arrayList
                 mSelectableListLiveData.value = notSelectedSettings(arrayList)
@@ -84,7 +85,9 @@ class TabSettingFragment : Fragment(){
             val list = if(it.isNullOrEmpty()){
                 defaultTabVisibleSettings()
             }else{
-                it
+                it.map{nrt ->
+                    SettingTab.FromSetting(nrt)
+                }
             }
             val selectableList = notSelectedSettings(list)
             mSelectedListLiveData.postValue(list)
@@ -131,7 +134,9 @@ class TabSettingFragment : Fragment(){
             val miApplication = context?.applicationContext as MiApplication?
             val dao = miApplication?.noteRequestSettingDao?: return@launch
 
-            val selectedList = mSelectedListLiveData.value?: return@launch
+            val selectedList = mSelectedListLiveData.value?.map{
+                it.toSetting()
+            }?.filterNotNull()?: return@launch
             dao.deleteAll()
 
             for(n in 0.until(selectedList.size)){
@@ -143,13 +148,13 @@ class TabSettingFragment : Fragment(){
     }
 
 
-    private fun defaultTabVisibleSettings(): List<NoteRequest.Setting>{
+    private fun defaultTabVisibleSettings(): List<SettingTab>{
         return defaultTabType.map{
-            NoteRequest.Setting(type = it)
+            SettingTab.FromType(it)
         }
     }
 
-    private fun notSelectedSettings(selectedSettings: List<NoteRequest.Setting>): List<NoteRequest.Setting>{
+    private fun notSelectedSettings(selectedSettings: List<SettingTab>): List<SettingTab>{
         return getDefaultSettings().filter{out ->
             if(out.type == NoteType.SEARCH_HASH || out.type == NoteType.SEARCH){
                 true
@@ -163,12 +168,12 @@ class TabSettingFragment : Fragment(){
         }
     }
 
-    private fun getDefaultSettings(): List<NoteRequest.Setting>{
+    private fun getDefaultSettings(): List<SettingTab>{
 
         return NoteType.values().filter{
             it == NoteType.HOME || it == NoteType.LOCAL || it == NoteType.SOCIAL || it == NoteType.GLOBAL || it == NoteType.FAVORITE
         }.map{
-            NoteRequest.Setting(type = it)
+            SettingTab.FromSetting(NoteRequest.Setting(type = it))
         }
 
     }
@@ -184,7 +189,7 @@ class TabSettingFragment : Fragment(){
             val to = target.adapterPosition
             val list = mSelectedListLiveData.value?: return false
 
-            val arrayList = ArrayList<NoteRequest.Setting>(list)
+            val arrayList = ArrayList<SettingTab>(list)
             val data =arrayList.removeAt(from)
             arrayList.add(to, data)
             mSelectedListLiveData.value = arrayList
@@ -197,19 +202,16 @@ class TabSettingFragment : Fragment(){
         }
     }
 
-    private val diffUtilCallBack  =object : DiffUtil.ItemCallback<NoteRequest.Setting>(){
+    private val diffUtilCallBack  =object : DiffUtil.ItemCallback<SettingTab>(){
         override fun areContentsTheSame(
-            oldItem: NoteRequest.Setting,
-            newItem: NoteRequest.Setting
+            oldItem: SettingTab,
+            newItem: SettingTab
         ): Boolean {
-            return oldItem == newItem
+            return oldItem.title.value == newItem.title.value && oldItem.type == newItem.type
         }
 
-        override fun areItemsTheSame(
-            oldItem: NoteRequest.Setting,
-            newItem: NoteRequest.Setting
-        ): Boolean {
-            return oldItem == newItem
+        override fun areItemsTheSame(oldItem: SettingTab, newItem: SettingTab): Boolean {
+            return oldItem.title.value == newItem.title.value
         }
     }
 }

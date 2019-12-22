@@ -12,4 +12,12 @@ object ImageButtonResourceHelper {
             this.setImageResource(resourceId)
         }
     }
+
+    @BindingAdapter("srcCompat")
+    @JvmStatic
+    fun ImageView.srcCompat(resourceId: Int?){
+        if(resourceId != null){
+            this.setImageResource(resourceId)
+        }
+    }
 }

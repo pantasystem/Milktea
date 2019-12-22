@@ -4,12 +4,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.ItemNoteSettingBinding
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
+import jp.panta.misskeyandroidclient.viewmodel.setting.tab.SettingTab
 import kotlinx.android.synthetic.main.item_note_setting.view.*
 import kotlinx.android.synthetic.main.item_note_setting_bound.view.*
 import java.io.Serializable
@@ -17,43 +20,26 @@ import java.lang.ClassCastException
 import java.lang.IllegalArgumentException
 
 class NoteSettingListAdapter(
-    diffUtil: DiffUtil.ItemCallback<NoteRequest.Setting>,
+    diffUtil: DiffUtil.ItemCallback<SettingTab>,
     private val isSelected: Boolean,
     private val listener: ItemAddOrRemoveButtonClickedListener
-) : ListAdapter<NoteRequest.Setting, NoteSettingListAdapter.NoteSettingViewHolder>(diffUtil){
+) : ListAdapter<SettingTab, NoteSettingListAdapter.ViewHolder>(diffUtil){
 
-    abstract class NoteSettingViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
-    inner class NoteSettingViewHolder(private val view: View) : NoteSettingViewHolderBase(view){
-        fun onBind(item: NoteRequest.Setting, isSelected: Boolean){
-            view.setting_title.text = item.title
-            if(isSelected){
-                view.add_or_remove_icon.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp)
-                view.edit_title.visibility = View.VISIBLE
-            }else{
-                view.add_or_remove_icon.setImageResource(R.drawable.ic_add_circle_outline_black_24dp)
-                view.edit_title.visibility = View.GONE
-            }
-            view.add_or_remove_icon.setOnClickListener {
-                listener.onClick(item)
-            }
-        }
+    class ViewHolder(val binding: ItemNoteSettingBinding) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.binding.isSelecting = !isSelected
+        holder.binding.settingTab = getItem(position)
+        holder.binding.listener = listener
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
-    override fun onBindViewHolder(holder: NoteSettingViewHolder, position: Int) {
-        val item = getItem(position)
-        holder.onBind(item, isSelected)
-
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteSettingViewHolder {
-
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_note_setting, parent, false)
-        return NoteSettingViewHolder(view)
-
+        val binding = DataBindingUtil.inflate<ItemNoteSettingBinding>(LayoutInflater.from(parent.context), R.layout.item_note_setting, parent, false)
+        return ViewHolder(binding)
     }
 
     interface ItemAddOrRemoveButtonClickedListener{
-        fun onClick(item: NoteRequest.Setting)
+        fun onClick(item: SettingTab)
     }
 }
