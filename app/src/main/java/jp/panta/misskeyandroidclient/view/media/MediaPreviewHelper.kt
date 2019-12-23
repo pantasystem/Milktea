@@ -143,6 +143,8 @@ object MediaPreviewHelper{
             this.visibility = View.GONE
         }catch(e: NullPointerException){
             this.visibility = View.GONE
+        }catch (e: Exception){
+            Log.d("", "other file")
         }
     }
 
