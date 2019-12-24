@@ -4,6 +4,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
 
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
         <variable
                 name="accountViewData"
                 type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData" />
@@ -32,16 +33,30 @@
                     android:layout_width="65dp" android:layout_height="65dp"
                     tools:srcCompat="@drawable/ic_follow"
                     app:circleIcon="@{accountViewData.user.avatarUrl}"
+                    android:layout_marginEnd="8dp"
+                    tools:ignore="ContentDescription" />
+            <TextView
+                    android:id="@+id/userName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="userName"
+                    android:textSize="18sp"
+                    android:text="@{SafeUnbox.unbox(accountViewData.user.displayUserName)}"
+                    android:layout_toEndOf="@id/history_icon"
+                    android:textStyle="bold"
                     />
             <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_toEndOf="@+id/history_icon"
                     android:textSize="18sp"
-                    android:layout_marginStart="8dp"
-                    tools:text="title"
-                    android:text="@{accountViewData.user.userName}"
+                    tools:text="name"
+                    app:emojis="@{accountViewData.user.emojis}"
+                    app:text="@{accountViewData.user.name}"
+                    app:clickableLink="@{false}"
+                    android:layout_below="@id/userName"
                     />
+
 
 
 
