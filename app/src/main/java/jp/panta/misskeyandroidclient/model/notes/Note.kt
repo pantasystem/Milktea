@@ -6,10 +6,13 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
+import java.util.*
+import kotlin.collections.LinkedHashMap
 
 data class Note(
     val id: String,
     //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date,
+    val createdAt: Date,
     val text: String?,
     val cw: String?,
     val userId: String?,

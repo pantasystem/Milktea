@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 tools:text="候補１"
-                android:text='@{choice.text + " (" + String.valueOf(choice.percentage) + "%)"}'
+                android:text='@{choice.text}'
                 android:enabled="@{SafeUnbox.unbox(poll.canVote)}"
                 android:onClick="@{()-> notesViewModel.vote(poll, choice)}"
                 android:checked="@{SafeUnbox.unbox(choice.isVoted)}"

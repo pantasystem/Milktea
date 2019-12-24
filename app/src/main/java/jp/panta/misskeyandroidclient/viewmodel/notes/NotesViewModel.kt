@@ -104,7 +104,38 @@ class NotesViewModel(
         quoteRenoteTarget.event = reNoteTarget.event
     }
 
-    //直接送信
+    /**
+     * イベントにリアクション送信ボタンを押したことを登録する
+     */
+    fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData){
+        Log.d("NotesViewModel", "connectionInstance: $connectionInstance")
+        val myReaction = planeNoteViewData.myReaction.value
+        if(myReaction != null){
+            viewModelScope.launch(Dispatchers.IO){
+                try{
+                    syncDeleteReaction(planeNoteViewData)
+                }catch(e: Exception){
+                    Log.d(TAG, "error", e)
+                }
+            }
+        }else{
+            reactionTarget.event = planeNoteViewData
+        }
+    }
+
+    //setTargetToReactionが呼び出されている必要がある
+    fun postReaction(reaction: String){
+        val targetNote =  reactionTarget.event
+        if(targetNote != null){
+            postReaction(targetNote, reaction)
+        }
+    }
+
+    /**
+     * リアクションを送信する
+     * @param reaction 既存のリアクションと値が同様の場合は解除のみする
+     * 既に含まれているmyReactionと一致しない場合は一度解除し再送する
+     */
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String){
         val myReaction = planeNoteViewData.myReaction.value
 
@@ -114,13 +145,10 @@ class NotesViewModel(
             Log.d("NotesViewModel", "postReaction(n, n)")
             try{
                 if(myReaction != null){
-                    misskeyAPI.deleteReaction(
-                        DeleteNote(
-                            i = connectionInstance.getI()!!,
-                            noteId = planeNoteViewData.toShowNote.id
-                        )
-                    ).execute()
-
+                    syncDeleteReaction(planeNoteViewData)
+                }
+                if(reaction == myReaction){
+                    return@launch
                 }
                 val res = misskeyAPI.createReaction(CreateReaction(
                     i = connectionInstance.getI()!!,
@@ -135,18 +163,18 @@ class NotesViewModel(
         }
     }
 
-    fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData){
-        Log.d("NotesViewModel", "connectionInstance: $connectionInstance")
-        reactionTarget.event = planeNoteViewData
+    /**
+     * 同期リアクション削除
+     * 既にリアクションが含まれている場合のみ実行される
+     */
+    private fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
+        planeNoteViewData.myReaction.value?: return
+        misskeyAPI.deleteReaction(DeleteNote(
+            i = connectionInstance.getI()?: String(),
+            noteId = planeNoteViewData.toShowNote.id
+        )).execute()
     }
 
-    //setTargetToReactionが呼び出されている必要がある
-    fun postReaction(reaction: String){
-        val targetNote =  reactionTarget.event
-        if(targetNote != null){
-            postReaction(targetNote, reaction)
-        }
-    }
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event){
         note?: return
