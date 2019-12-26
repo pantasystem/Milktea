@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.io.Serializable
 
@@ -12,9 +13,9 @@ data class MessageAction(
     val messageId: String?
 ): Serializable{
     class Factory(val connectionInstance: ConnectionInstance, val message: Message){
-        fun actionCreateMessage(text: String?, fileId: String?): MessageAction{
+        fun actionCreateMessage(text: String?, fileId: String?, encryption: Encryption): MessageAction{
             return MessageAction(
-                connectionInstance.getI(),
+                connectionInstance.getI(encryption),
                 if(message.isGroup()) null else message.opponentUser(connectionInstance)?.id,
                 message.group?.id,
                 text,
@@ -23,9 +24,9 @@ data class MessageAction(
             )
         }
 
-        fun actionDeleteMessage(message: Message): MessageAction{
+        fun actionDeleteMessage(message: Message, encryption: Encryption): MessageAction{
             return MessageAction(
-                connectionInstance.getI(),
+                connectionInstance.getI(encryption),
                 null,
                 null,
                 null,
@@ -34,9 +35,9 @@ data class MessageAction(
             )
         }
 
-        fun actionRead(message: Message): MessageAction{
+        fun actionRead(message: Message, encryption: Encryption): MessageAction{
             return MessageAction(
-                connectionInstance.getI(),
+                connectionInstance.getI(encryption),
                 null,
                 null,
                 null,

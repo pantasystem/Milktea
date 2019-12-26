@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.lang.IllegalArgumentException
 
 
+@Suppress("UNCHECKED_CAST")
 class FileViewModelFactory(
     private val connectionInstance: ConnectionInstance,
     private val miApplication: MiApplication,
@@ -18,7 +19,7 @@ class FileViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == FileViewModel::class.java){
             val misskeyAPI = miApplication.misskeyAPIService!!
-            return FileViewModel(connectionInstance, misskeyAPI, selectedFileViewDataMapLiveData, maxSelectableItemSize, folderId) as T
+            return FileViewModel(connectionInstance, misskeyAPI, selectedFileViewDataMapLiveData, maxSelectableItemSize, folderId, miApplication.encryption) as T
         }
         throw IllegalArgumentException("クラスが一致しない")
     }

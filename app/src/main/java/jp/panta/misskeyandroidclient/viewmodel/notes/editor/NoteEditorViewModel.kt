@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.google.gson.GsonBuilder
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -22,7 +23,8 @@ class NoteEditorViewModel(
     private val misskeyAPI: MisskeyAPI,
     meta: Meta,
     private val replyToNoteId: String? = null,
-    private val quoteToNoteId: String? = null
+    private val quoteToNoteId: String? = null,
+    private val encryption: Encryption
 ) : ViewModel(){
     val hasCw = MutableLiveData<Boolean>(false)
     val cw = MutableLiveData<String>()
@@ -65,7 +67,7 @@ class NoteEditorViewModel(
     val noteTask = MutableLiveData<PostNoteTask>()
 
     fun post(){
-        val noteTask = PostNoteTask(connectionInstance)
+        val noteTask = PostNoteTask(connectionInstance, encryption)
         noteTask.cw = cw.value
         noteTask.files = editorFiles.value
         //noteTask.localOnl

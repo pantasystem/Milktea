@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -18,7 +19,8 @@ import retrofit2.Response
 class MessageActionViewModel(
     val connectionInstance: ConnectionInstance,
     val misskeyAPI: MisskeyAPI,
-    private val messageHistory: Message
+    private val messageHistory: Message,
+    private val encryption: Encryption
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
@@ -29,7 +31,7 @@ class MessageActionViewModel(
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == MessageActionViewModel::class.java){
-                return MessageActionViewModel(connectionInstance, miApplication.misskeyAPIService!!, messageHistory) as T
+                return MessageActionViewModel(connectionInstance, miApplication.misskeyAPIService!!, messageHistory, miApplication.encryption) as T
             }
             throw IllegalArgumentException("use MessageActionViewModel::class.java")
         }
@@ -41,7 +43,7 @@ class MessageActionViewModel(
 
     fun send(){
         val factory = MessageAction.Factory(connectionInstance, messageHistory)
-        val action = factory.actionCreateMessage(text.value, file.value?.id)
+        val action = factory.actionCreateMessage(text.value, file.value?.id, encryption)
         val tmpText = text.value
         val tmpFile = file.value
         text.value = null

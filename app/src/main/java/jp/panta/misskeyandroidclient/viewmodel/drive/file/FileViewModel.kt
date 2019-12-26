@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -18,7 +19,8 @@ class FileViewModel(
     private val misskeyAPI: MisskeyAPI,
     private val selectedFileMapLiveData: MutableLiveData<Map<String, FileViewData>>?,
     private val maxSelectableItemSize: Int,
-    private val folderId: String?
+    folderId: String?,
+    private val encryption: Encryption
 ) : ViewModel(){
 
     val filesLiveData = MutableLiveData<List<FileViewData>>()
@@ -43,7 +45,7 @@ class FileViewModel(
         }
         isLoading = true
         isRefreshing.postValue(true)
-        val request = RequestFile(i = connectionInstance.getI()!!, folderId = currentFolder.value, limit = 20)
+        val request = RequestFile(i = connectionInstance.getI(encryption)!!, folderId = currentFolder.value, limit = 20)
         misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
             override fun onResponse(
                 call: Call<List<FileProperty>>,
@@ -96,7 +98,7 @@ class FileViewModel(
             isLoading = false
             return
         }
-        val request = RequestFile(i = connectionInstance.getI()!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
+        val request = RequestFile(i = connectionInstance.getI(encryption)!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
         misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
             override fun onResponse(
                 call: Call<List<FileProperty>>,

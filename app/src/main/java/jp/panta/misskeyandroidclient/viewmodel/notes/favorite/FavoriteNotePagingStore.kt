@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.favorite
 
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
@@ -12,14 +13,15 @@ import retrofit2.Response
 class FavoriteNotePagingStore(
     override val connectionInstance: ConnectionInstance,
     override val timelineRequestBase: NoteRequest.Setting,
-    misskeyAPI: MisskeyAPI
+    misskeyAPI: MisskeyAPI,
+    private val encryption: Encryption
 ) : NotePagedStore{
 
     val favorites = misskeyAPI::favorites
 
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         return if(request == null){
-            val res =favorites(timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions())).execute()
+            val res =favorites(timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(), encryption)).execute()
             makeResponse(res, false)
         }else{
             makeResponse(favorites(request).execute(), false)
@@ -27,12 +29,12 @@ class FavoriteNotePagingStore(
     }
 
     override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val res = favorites(timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(sinceId = sinceId))).execute()
+        val res = favorites(timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(sinceId = sinceId), encryption)).execute()
         return makeResponse(res, true)
     }
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val res = favorites(timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(untilId))).execute()
+        val res = favorites(timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(untilId), encryption)).execute()
         return makeResponse(res, false)
     }
 

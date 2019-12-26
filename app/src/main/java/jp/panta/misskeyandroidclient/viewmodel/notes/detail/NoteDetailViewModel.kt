@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -17,7 +18,8 @@ class NoteDetailViewModel(
     val connectionInstance: ConnectionInstance,
     val misskeyAPI: MisskeyAPI,
     val noteId: String,
-    val requestBase: NoteRequest.Setting = NoteRequest.Setting(type = NoteType.DETAIL, noteId = noteId)
+    val requestBase: NoteRequest.Setting = NoteRequest.Setting(type = NoteType.DETAIL, noteId = noteId),
+    val encryption: Encryption
 ) : ViewModel(){
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
@@ -26,7 +28,7 @@ class NoteDetailViewModel(
 
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val rawDetail = misskeyAPI.showNote(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions())).execute().body()
+                val rawDetail = misskeyAPI.showNote(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(), encryption)).execute().body()
                     ?:return@launch
                 val detail = NoteDetailViewData(rawDetail, connectionInstance)
                 var list: List<PlaneNoteViewData> = listOf(detail)
@@ -81,7 +83,7 @@ class NoteDetailViewModel(
             noteConversationViewData
         }else{
             conversation.add(next)
-            val children = misskeyAPI.children(NoteRequest(connectionInstance.getI(), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
+            val children = misskeyAPI.children(NoteRequest(connectionInstance.getI(encryption), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
                 PlaneNoteViewData(it,connectionInstance)
             }
             noteConversationViewData.nextChildren = children
@@ -91,7 +93,7 @@ class NoteDetailViewModel(
 
 
     private fun loadConversation(): List<PlaneNoteViewData>?{
-        return misskeyAPI.conversation(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions())).execute().body()?.map{
+        return misskeyAPI.conversation(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(), encryption)).execute().body()?.map{
             PlaneNoteViewData(it, connectionInstance)
         }
     }
@@ -112,7 +114,7 @@ class NoteDetailViewModel(
     }
 
     private fun loadChildren(id: String): List<Note>?{
-        return misskeyAPI.children(NoteRequest(i = connectionInstance.getI()!!, limit = 100, noteId = id)).execute().body()
+        return misskeyAPI.children(NoteRequest(i = connectionInstance.getI(encryption)!!, limit = 100, noteId = id)).execute().body()
     }
 
 

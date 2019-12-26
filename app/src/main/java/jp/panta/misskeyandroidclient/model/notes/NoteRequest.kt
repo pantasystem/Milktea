@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.notes
 import androidx.room.*
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.io.Serializable
 
@@ -53,9 +54,9 @@ data class NoteRequest(
 
         var title: String = type.defaultName
 
-        fun buildRequest(connectionInstance: ConnectionInstance, conditions: Conditions): NoteRequest{
+        fun buildRequest(connectionInstance: ConnectionInstance, conditions: Conditions, encryption: Encryption): NoteRequest{
             return NoteRequest(
-                i = connectionInstance.getI()!!,
+                i = connectionInstance.getI(encryption)!!,
                 userId = userId,
                 withFiles = withFiles,
                 fileType = fileType,

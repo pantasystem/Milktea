@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -14,7 +15,8 @@ import java.lang.IllegalArgumentException
 class NoteTimelineStore(
     override val connectionInstance: ConnectionInstance,
     override val timelineRequestBase: NoteRequest.Setting,
-    misskeyAPI: MisskeyAPI
+    misskeyAPI: MisskeyAPI,
+    private val encryption: Encryption
 ) : NotePagedStore{
 
     private val timelineStore = when(timelineRequestBase.type){
@@ -31,7 +33,7 @@ class NoteTimelineStore(
     }
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){
-            val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions())
+            val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(), encryption)
             timelineStore(req).execute()
         }else{
             timelineStore(request).execute()
@@ -40,14 +42,14 @@ class NoteTimelineStore(
     }
 
     override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(sinceId = sinceId))
+        val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(sinceId = sinceId), encryption)
         val res = timelineStore(req).execute()
         val reversedList = res.body()?.asReversed()
         return makeResponse(reversedList, res)
     }
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(untilId = untilId))
+        val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(untilId = untilId), encryption)
         val res = timelineStore(req).execute()
         return makeResponse(res.body(), res)
     }

@@ -2,12 +2,14 @@ package jp.panta.misskeyandroidclient.model.streming
 
 import android.util.Log
 import com.bumptech.glide.RequestBuilder
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import okhttp3.*
 import okio.ByteString
 
 class StreamingAdapter(
-    private val connectionInstance: ConnectionInstance
+    private val connectionInstance: ConnectionInstance,
+    private val encryption: Encryption
 ){
 
 
@@ -41,7 +43,7 @@ class StreamingAdapter(
     }
 
     fun connect(){
-        val wssUrl = connectionInstance.instanceBaseUrl.replace("https://", "wss://") + "/streaming?i=${connectionInstance.getI()}"
+        val wssUrl = connectionInstance.instanceBaseUrl.replace("https://", "wss://") + "/streaming?i=${connectionInstance.getI(encryption)}"
         val request = Request.Builder()
             .url(wssUrl)
             .build()

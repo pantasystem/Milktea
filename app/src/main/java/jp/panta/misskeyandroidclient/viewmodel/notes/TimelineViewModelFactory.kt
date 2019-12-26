@@ -25,7 +25,7 @@ class TimelineViewModelFactory(
 
             val misskeyAPI = miApplication.misskeyAPIService ?: MisskeyAPIServiceBuilder.build(connectionInstance.instanceBaseUrl)
 
-            return TimelineViewModel(connectionInstance, requestSetting, misskeyAPI, settingStore) as T
+            return TimelineViewModel(connectionInstance, requestSetting, misskeyAPI, settingStore, miApplication.encryption) as T
 
         }
 

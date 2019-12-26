@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.group.Group
 
@@ -19,9 +20,9 @@ data class RequestMessage(
         var limit: Int? = null
         var markAsRead: Boolean? = null
 
-        fun build(sinceId: String?, untilId: String?): RequestMessage{
+        fun build(sinceId: String?, untilId: String?, encryption: Encryption): RequestMessage{
             return RequestMessage(
-                i = connectionInstance.getI()!!,
+                i = connectionInstance.getI(encryption)!!,
                 userId = if(group == null) user?.id else null,
                 groupId = group?.id,
                 limit = limit,

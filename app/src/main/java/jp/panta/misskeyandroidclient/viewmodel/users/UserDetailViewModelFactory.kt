@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.lang.IllegalArgumentException
 
+@Suppress("UNCHECKED_CAST")
 class UserDetailViewModelFactory(
     val connectionInstance: ConnectionInstance,
     val miApplication: MiApplication,
@@ -14,7 +15,7 @@ class UserDetailViewModelFactory(
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == UserDetailViewModel::class.java){
-            return UserDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, userId, fqcnUserName) as T
+            return UserDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, userId, fqcnUserName, miApplication.encryption) as T
         }
         throw IllegalArgumentException("対応していません")
     }

@@ -7,11 +7,13 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
+import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -61,6 +63,8 @@ class MiApplication : Application(){
 
     var isSuccessLoadConnectionInstance = MutableLiveData<Boolean>()
 
+    lateinit var encryption: Encryption
+
 
     override fun onCreate() {
         super.onCreate()
@@ -71,6 +75,8 @@ class MiApplication : Application(){
         connectionInstanceDao = database.connectionInstanceDao()
 
         noteRequestSettingDao = database.noteSettingDao()
+
+        encryption = KeyStoreSystemEncryption(this)
 
         val currentUserId = getCurrentUserId()
 
@@ -117,7 +123,7 @@ class MiApplication : Application(){
     fun switchAccount(ci: ConnectionInstance){
 
         val count = connectionInstancesLiveData.value?.filter{
-            it.userId == ci.userId && it.accessToken == ci.accessToken
+            it.userId == ci.userId && it.getAccessToken(encryption) == ci.getAccessToken(encryption)
         }?.size
         if(count != null && count > 0){
             updateRelationConnectionInstanceProperty(ci)
@@ -204,7 +210,7 @@ class MiApplication : Application(){
                 try{
                     val api = misskeyAPIServiceDomainMap?.get(it.instanceBaseUrl)
 
-                    api?.i(I(it.getI()!!))?.execute()?.body()
+                    api?.i(I(it.getI(encryption)!!))?.execute()?.body()
 
                 }catch(e: Exception){
                     null
@@ -225,7 +231,7 @@ class MiApplication : Application(){
     }
 
     private fun updateCurrentAccount(ci: ConnectionInstance, misskeyAPI: MisskeyAPI?){
-        misskeyAPI?.i(I(i = ci.getI()!!))?.enqueue(object : Callback<User>{
+        misskeyAPI?.i(I(i = ci.getI(encryption)!!))?.enqueue(object : Callback<User>{
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 Log.d("MiApplication", "iを取得しました${response.body()}")
                 currentAccountLiveData.postValue(response.body())

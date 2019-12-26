@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -20,7 +21,8 @@ class UserDetailViewModel(
     val connectionInstance: ConnectionInstance,
     val misskeyAPI: MisskeyAPI,
     val userId: String?,
-    val fqcnUserName: String?
+    val fqcnUserName: String?,
+    val encryption: Encryption
 ) : ViewModel(){
     val tag=  "userDetailViewModel"
 
@@ -91,7 +93,7 @@ class UserDetailViewModel(
         }
         misskeyAPI.showUser(
             RequestUser(
-                i = connectionInstance.getI()!!,
+                i = connectionInstance.getI(encryption)!!,
                 userId = userId,
                 userName = userName,
                 host = host
@@ -115,7 +117,7 @@ class UserDetailViewModel(
     fun changeFollow(){
         val isFollowing = isFollowing.value?: false
         if(isFollowing){
-            misskeyAPI.unFollowUser(RequestUser(connectionInstance.getI()!!, userId = userId)).enqueue(
+            misskeyAPI.unFollowUser(RequestUser(connectionInstance.getI(encryption)!!, userId = userId)).enqueue(
                 object : Callback<User>{
                     override fun onResponse(call: Call<User>, response: Response<User>) {
                         if(response.code() == 200){
@@ -128,7 +130,7 @@ class UserDetailViewModel(
                 }
             )
         }else{
-            misskeyAPI.followUser(RequestUser(connectionInstance.getI()!!, userId = userId)).enqueue(object : Callback<User>{
+            misskeyAPI.followUser(RequestUser(connectionInstance.getI(encryption)!!, userId = userId)).enqueue(object : Callback<User>{
                 override fun onResponse(call: Call<User>, response: Response<User>) {
                     if(response.code() == 200){
                         this@UserDetailViewModel.isFollowing.postValue(true)
@@ -180,7 +182,7 @@ class UserDetailViewModel(
     }
 
     private fun createUserIdOnlyRequest(): RequestUser{
-        return RequestUser(i = connectionInstance.getI()!!, userId = userId)
+        return RequestUser(i = connectionInstance.getI(encryption)!!, userId = userId)
     }
 
 

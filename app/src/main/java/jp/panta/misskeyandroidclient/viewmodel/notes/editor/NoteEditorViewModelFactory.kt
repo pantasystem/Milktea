@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.lang.IllegalArgumentException
 
+@Suppress("UNCHECKED_CAST")
 class NoteEditorViewModelFactory(
     private val connectionInstance: ConnectionInstance,
     private val miApplication: MiApplication,
@@ -16,7 +17,7 @@ class NoteEditorViewModelFactory(
         if(modelClass == NoteEditorViewModel::class.java){
             val meta = miApplication.nowInstanceMeta!!
             val api = miApplication.misskeyAPIService!!
-            return NoteEditorViewModel(connectionInstance, api, meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId) as T
+            return NoteEditorViewModel(connectionInstance, api, meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.encryption) as T
         }
         throw IllegalArgumentException("use NoteEditorViewModel::class.java")
     }

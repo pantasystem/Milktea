@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notification
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notification.Notification
@@ -17,7 +18,8 @@ import kotlin.collections.ArrayList
 
 class NotificationViewModel(
     private val connectionInstance: ConnectionInstance,
-    private val misskeyAPI: MisskeyAPI
+    private val misskeyAPI: MisskeyAPI,
+    private val encryption: Encryption
     //private val noteCapture: NoteCapture
 ) : ViewModel(){
 
@@ -25,7 +27,7 @@ class NotificationViewModel(
     val isLoading = MutableLiveData<Boolean>()
     //loadNewはない
 
-    private val streamingAdapter = StreamingAdapter(connectionInstance)
+    private val streamingAdapter = StreamingAdapter(connectionInstance, encryption)
     private val noteCapture = NoteCapture(connectionInstance.userId)
 
     val noteCaptureId = UUID.randomUUID().toString()
@@ -60,7 +62,7 @@ class NotificationViewModel(
             return
         }
         isLoadingFlag = true
-        val request = NotificationRequest(i = connectionInstance.getI()!!, limit = 20)
+        val request = NotificationRequest(i = connectionInstance.getI(encryption)!!, limit = 20)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
                 call: Call<List<Notification>?>,
@@ -98,7 +100,7 @@ class NotificationViewModel(
             return
         }
 
-        val request = NotificationRequest(i = connectionInstance.getI()!!, limit = 20, untilId = untilId)
+        val request = NotificationRequest(i = connectionInstance.getI(encryption)!!, limit = 20, untilId = untilId)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
                 call: Call<List<Notification>?>,

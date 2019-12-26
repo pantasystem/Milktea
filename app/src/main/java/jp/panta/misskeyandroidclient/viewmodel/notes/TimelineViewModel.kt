@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -22,7 +23,8 @@ class TimelineViewModel(
     val connectionInstance: ConnectionInstance,
     val requestBaseSetting: NoteRequest.Setting,
     misskeyAPI: MisskeyAPI,
-    private val settingStore: SettingStore
+    private val settingStore: SettingStore,
+    encryption: Encryption
 ) : ViewModel(){
 
 
@@ -30,7 +32,7 @@ class TimelineViewModel(
     val tag = "TimelineViewModel"
     val errorState = MediatorLiveData<String>()
 
-    private val streamingAdapter = StreamingAdapter(connectionInstance)
+    private val streamingAdapter = StreamingAdapter(connectionInstance, encryption)
     private val noteCapture = NoteCapture(connectionInstance.userId)
     private val timelineCapture = if(settingStore.isAutoLoadTimeline){
         TimelineCapture(connectionInstance)
@@ -45,11 +47,12 @@ class TimelineViewModel(
     val position = MutableLiveData<Int>()
 
     private val notePagingStore = when(requestBaseSetting.type){
-        NoteType.FAVORITE -> FavoriteNotePagingStore(connectionInstance, requestBaseSetting, misskeyAPI)
+        NoteType.FAVORITE -> FavoriteNotePagingStore(connectionInstance, requestBaseSetting, misskeyAPI, encryption)
         else -> NoteTimelineStore(
             connectionInstance,
             requestBaseSetting,
-            misskeyAPI
+            misskeyAPI,
+            encryption
         )
     }
 

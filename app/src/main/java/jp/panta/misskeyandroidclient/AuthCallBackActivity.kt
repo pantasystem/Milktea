@@ -63,7 +63,9 @@ class AuthCallBackActivity : AppCompatActivity() {
                 if(token == null){
                     Toast.makeText(this, "Please wait.", Toast.LENGTH_LONG).show()
                 }else{
-                    val ci = ConnectionInstance(instanceBaseUrl = instance.domain, accessToken = token.accessToken, userId = token.user.id)
+                    val ci = ConnectionInstance(instanceBaseUrl = instance.domain,  userId = token.user.id).apply{
+                        setAccessToken(token.accessToken, (application as MiApplication).encryption)
+                    }
                     (application as MiApplication).addAccount(ci)
                     finish()
                     /*GlobalScope.launch{

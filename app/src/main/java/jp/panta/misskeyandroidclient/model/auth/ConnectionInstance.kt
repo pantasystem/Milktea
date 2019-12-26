@@ -1,32 +1,85 @@
 package jp.panta.misskeyandroidclient.model.auth
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import jp.panta.misskeyandroidclient.SecretConstant
+import jp.panta.misskeyandroidclient.model.Encryption
 import java.lang.StringBuilder
 import java.security.MessageDigest
 
 @Entity(tableName = "connection_instance")
-data class ConnectionInstance(
+class ConnectionInstance(
     @PrimaryKey
     val userId: String,
-    val instanceBaseUrl: String,
-    val accessToken: String?,
-    val directI: String? = null,
-    val customAppSecret: String? = null
-
+    val instanceBaseUrl: String
 ){
-    fun getI(): String?{
+
+    var encryptedCustomAppSecret: String? = null
+    var encryptedI: String? = null
+    var encryptedAccessToken: String? = null
+
+    @Ignore
+    fun getI(encryption: Encryption): String?{
         //return SecretConstant.i()
-        if(directI != null){
-            return directI
-        }else if(customAppSecret != null && accessToken != null){
-            return sha256(accessToken + customAppSecret)
+        val accessToken = getAccessToken(encryption)
+
+        if(encryptedI != null){
+            return getDirectI(encryption)
+        }else if(encryptedCustomAppSecret != null && accessToken != null){
+            val decrypted = getCustomAppSecret(encryption)
+            return if(decrypted != null){
+                return sha256(accessToken + decrypted)
+            }else{
+                null
+            }
         }else{
             val appSecret = SecretConstant.getInstances()[instanceBaseUrl]?: return null
             return sha256(accessToken + appSecret.appSecret)
         }
 
+    }
+
+    @Ignore
+    fun getDirectI(encryption: Encryption): String?{
+        val i = encryptedI
+        if(i != null){
+            return encryption.decrypt(userId, i)
+        }
+        return null
+    }
+
+    @Ignore
+    fun getCustomAppSecret(encryption: Encryption): String?{
+        val secret = encryptedCustomAppSecret
+        if(secret != null){
+            encryption.decrypt(userId, secret)
+        }
+        return null
+    }
+
+    @Ignore
+    fun setCustomAppSecret(secret: String, encryption: Encryption){
+        encryptedCustomAppSecret = encryption.encrypt(userId, secret)
+    }
+
+    @Ignore
+    fun setDirectI(i: String, encryption: Encryption){
+        encryptedI = encryption.encrypt(userId, i)
+    }
+
+    @Ignore
+    fun setAccessToken(token: String, encryption: Encryption){
+        encryptedAccessToken = encryption.encrypt(userId, token)
+    }
+
+    @Ignore
+    fun getAccessToken(encryption: Encryption): String?{
+        val tmp = encryptedAccessToken
+        if(tmp != null){
+            return encryption.decrypt(userId, tmp)
+        }
+        return null
     }
 
     private fun sha256(input: String) = hashString("SHA-256", input)

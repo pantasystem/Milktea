@@ -7,6 +7,7 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import okhttp3.*
 import okio.BufferedSink
@@ -18,14 +19,15 @@ import java.net.URL
 class OkHttpDriveFileUploader(
     val context: Context,
     val connectionInstance: ConnectionInstance,
-    val gson: Gson
+    val gson: Gson,
+    val encryption: Encryption
 ) : FileUploader{
     override fun upload(uploadFile: UploadFile): FileProperty? {
         return try{
             val client = OkHttpClient()
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("i", connectionInstance.getI()!!)
+                .addFormDataPart("i", connectionInstance.getI(encryption)!!)
                 .addFormDataPart("force", uploadFile.force.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart("file", getFileName(uploadFile.getUri()), createRequestBody(uploadFile.getUri()))

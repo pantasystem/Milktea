@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
@@ -10,10 +11,11 @@ import java.io.Serializable
 import java.util.*
 
 class PostNoteTask(
-    connectionInstance: ConnectionInstance
+    connectionInstance: ConnectionInstance,
+    encryption: Encryption
     //private val fileUploader: FileUploader
 ): Serializable{
-    private val i: String = connectionInstance.getI()!!
+    private val i: String = connectionInstance.getI(encryption)!!
     private var visibleUsers: List<String>? = null
     private var visibility: CreateNote.Visibility? = null
     private var isLocal: Boolean? = null

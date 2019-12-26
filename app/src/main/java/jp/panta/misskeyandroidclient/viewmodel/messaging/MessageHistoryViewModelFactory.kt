@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.lang.IllegalArgumentException
 
+@Suppress("UNCHECKED_CAST")
 class MessageHistoryViewModelFactory(
     private val connectionInstance: ConnectionInstance,
     private val miApplication: MiApplication
@@ -14,7 +15,7 @@ class MessageHistoryViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == MessageHistoryViewModel::class.java){
             val misskeyAPI = miApplication.misskeyAPIService!!
-            return MessageHistoryViewModel(connectionInstance, misskeyAPI) as T
+            return MessageHistoryViewModel(connectionInstance, misskeyAPI, miApplication.encryption) as T
         }
         throw IllegalArgumentException("error")
     }

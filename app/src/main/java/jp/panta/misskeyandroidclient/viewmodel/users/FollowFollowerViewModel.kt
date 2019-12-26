@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
@@ -27,14 +28,16 @@ class FollowFollowerViewModel(
     val connectionInstance: ConnectionInstance,
     val misskeyAPI: MisskeyAPI,
     val user: User?,
-    val type: Type
+    val type: Type,
+    private val encryption: Encryption
 ) : ViewModel(){
     @Suppress("UNCHECKED_CAST")
     class Factory(
         val connectionInstance: ConnectionInstance,
         val miApplication: MiApplication,
         val user: User?,
-        val type: Type
+        val type: Type,
+        val encryption: Encryption
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             val misskeyAPI = miApplication.misskeyAPIService!!
@@ -43,7 +46,8 @@ class FollowFollowerViewModel(
                     connectionInstance,
                     misskeyAPI,
                     user,
-                    type
+                    type,
+                    encryption
                 ) as T
             }
             throw IllegalArgumentException("use FollowFollowerViewModel::class.java")
@@ -65,7 +69,7 @@ class FollowFollowerViewModel(
         misskeyAPI::following
     }
     val streamingAdapter: StreamingAdapter by lazy {
-        StreamingAdapter(connectionInstance).apply{
+        StreamingAdapter(connectionInstance, encryption).apply{
             val mainCapture = MainCapture(connectionInstance, GsonFactory.create())
             mainCapture.addListener(Listener())
             addObserver(UUID.randomUUID().toString(), mainCapture)
@@ -93,7 +97,7 @@ class FollowFollowerViewModel(
             mIsLoading = true
             isInitializing.postValue(true)
             val request = RequestUser(
-                i = connectionInstance.getI()!!,
+                i = connectionInstance.getI(encryption)!!,
                 userId = userId,
                 limit = 30
             )
@@ -126,7 +130,7 @@ class FollowFollowerViewModel(
                 return@launch loadInit()
             }
             val request = RequestUser(
-                i = connectionInstance.getI()!!,
+                i = connectionInstance.getI(encryption)!!,
                 untilId = untilId,
                 userId = userId,
                 limit = 30
@@ -170,14 +174,14 @@ class FollowFollowerViewModel(
         if(SafeUnbox.unbox(followFollowerViewData.isFollowing.value)){
             viewModelScope.launch(Dispatchers.IO){
                 misskeyAPI.unFollowUser(RequestUser(
-                    i = connectionInstance.getI()!!,
+                    i = connectionInstance.getI(encryption)!!,
                     userId = followFollowerViewData.user.id
                 )).execute()
             }
         }else{
             viewModelScope.launch(Dispatchers.IO){
                 misskeyAPI.followUser(RequestUser(
-                    i = connectionInstance.getI()!!,
+                    i = connectionInstance.getI(encryption)!!,
                     userId = followFollowerViewData.user.id
                 )).execute()
             }

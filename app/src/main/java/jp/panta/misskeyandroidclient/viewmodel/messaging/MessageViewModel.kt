@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.GsonFactory
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.messaging.Message
@@ -19,7 +20,8 @@ import kotlin.collections.ArrayList
 class MessageViewModel(
     private val connectionInstance: ConnectionInstance,
     private val misskeyAPI: MisskeyAPI,
-    messageHistory: Message
+    messageHistory: Message,
+    private val encryption: Encryption
 
 ) : ViewModel(){
 
@@ -46,7 +48,7 @@ class MessageViewModel(
     }
 
     private val observerId = UUID.randomUUID().toString()
-    val streamingAdapter =  StreamingAdapter(connectionInstance).apply{
+    val streamingAdapter =  StreamingAdapter(connectionInstance, encryption).apply{
         val main = MainCapture(connectionInstance, GsonFactory.create())
         addObserver(observerId, main)
         main.addListener(MessageObserver())
@@ -62,7 +64,7 @@ class MessageViewModel(
             return
         }
         isLoading = true
-        misskeyAPI.getMessages(builder.build(null, null)).enqueue(object : Callback<List<Message>>{
+        misskeyAPI.getMessages(builder.build(null, null, encryption)).enqueue(object : Callback<List<Message>>{
             override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
                 val rawMessages = response.body()?.asReversed()
                 if(rawMessages == null){
@@ -100,7 +102,7 @@ class MessageViewModel(
             return
         }
 
-        misskeyAPI.getMessages(builder.build(untilId = untilId, sinceId = null)).enqueue(object : Callback<List<Message>>{
+        misskeyAPI.getMessages(builder.build(untilId = untilId, sinceId = null, encryption = encryption)).enqueue(object : Callback<List<Message>>{
             override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
                 val reversedMessages = response.body()?.asReversed()
                 if(reversedMessages == null){
@@ -140,7 +142,7 @@ class MessageViewModel(
             isLoading = false
             return
         }
-        misskeyAPI.getMessages(builder.build(sinceId = sinceId, untilId = null)).enqueue(object : Callback<List<Message>>{
+        misskeyAPI.getMessages(builder.build(sinceId = sinceId, untilId = null, encryption = encryption)).enqueue(object : Callback<List<Message>>{
             override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
                 val rawList = response.body()
                 if(rawList == null){

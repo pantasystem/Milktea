@@ -50,7 +50,7 @@ class NotificationService : Service() {
             connectionInstances.forEach{ci ->
                 Log.d(TAG, "observerを登録しています")
 
-                val adapter = StreamingAdapter(ci)
+                val adapter = StreamingAdapter(ci, (application as MiApplication).encryption)
                 adapter.connect()
                 val mainCapture = MainCapture(ci, mGson)
                 mainCapture.addListener(MainChannelObserver(ci))

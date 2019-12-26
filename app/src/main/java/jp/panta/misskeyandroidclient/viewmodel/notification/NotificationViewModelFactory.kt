@@ -16,7 +16,7 @@ class NotificationViewModelFactory(
             //val noteCapture = miApplication.noteCapture
             val misskeyAPI = miApplication.misskeyAPIService!!
 
-            return NotificationViewModel(connectionInstance, misskeyAPI) as T
+            return NotificationViewModel(connectionInstance, misskeyAPI, miApplication.encryption) as T
         }
         throw ClassCastException("不正なクラス")
     }
