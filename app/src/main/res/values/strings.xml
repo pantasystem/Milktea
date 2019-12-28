@@ -132,4 +132,5 @@
     <string name="sign_in">ログイン</string>
     <string name="user_name">ユーザー名</string>
     <string name="password">パスワード</string>
+    <string name="sign_out">ログアウト</string>
 </resources>

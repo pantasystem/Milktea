@@ -44,6 +44,7 @@
                     android:text="@{SafeUnbox.unbox(accountViewData.user.displayUserName)}"
                     android:layout_toEndOf="@id/history_icon"
                     android:textStyle="bold"
+                    android:layout_toStartOf="@id/logoutButton"
                     />
             <TextView
                     android:id="@+id/name"
@@ -55,8 +56,19 @@
                     app:text="@{accountViewData.user.name}"
                     app:clickableLink="@{false}"
                     android:layout_below="@id/userName"
+                    android:layout_toStartOf="@id/logoutButton"
+
                     />
 
+            <Button
+                    android:id="@+id/logoutButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/sign_out"
+                    android:onClick="@{()-> accountViewModel.signOut(accountViewData) }"
+                    />
 
 
 
