@@ -127,4 +127,9 @@
     <string name="add_to_tab">タブに追加する</string>
 
     <string name="detail">詳細</string>
+
+    <string name="instance_domain">インスタンスドメイン</string>
+    <string name="sign_in">ログイン</string>
+    <string name="user_name">ユーザー名</string>
+    <string name="password">パスワード</string>
 </resources>

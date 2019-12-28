@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.api
 
 import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
@@ -24,6 +25,9 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface MisskeyAPI {
+
+    @POST("api/signin")
+    fun signIn(@Body signIn: SignIn): Call<I>
 
     @POST("api/blocking/create")
     fun blockUser(@Body requestUser: RequestUser): Call<Unit>
