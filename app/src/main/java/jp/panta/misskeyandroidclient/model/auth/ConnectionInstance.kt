@@ -12,8 +12,15 @@ import java.security.MessageDigest
 class ConnectionInstance(
     @PrimaryKey
     val userId: String,
-    val instanceBaseUrl: String
+    val instanceBaseUrl: String,
+    var state: Int = INVALID
 ){
+    companion object{
+        const val INVALID = -114514
+        const val APP_PROVIDER = 0
+        const val ID_PW = 1
+        const val CUSTOM_APP = 2
+    }
 
     var encryptedCustomAppSecret: String? = null
     var encryptedI: String? = null
@@ -24,9 +31,9 @@ class ConnectionInstance(
         //return SecretConstant.i()
         val accessToken = getAccessToken(encryption)
 
-        if(encryptedI != null){
+        if(encryptedI != null && state == ID_PW){
             return getDirectI(encryption)
-        }else if(encryptedCustomAppSecret != null && accessToken != null){
+        }else if(encryptedCustomAppSecret != null && accessToken != null && state == CUSTOM_APP){
             val decrypted = getCustomAppSecret(encryption)
             return if(decrypted != null){
                 return sha256(accessToken + decrypted)
@@ -61,16 +68,19 @@ class ConnectionInstance(
     @Ignore
     fun setCustomAppSecret(secret: String, encryption: Encryption){
         encryptedCustomAppSecret = encryption.encrypt(userId, secret)
+        state = CUSTOM_APP
     }
 
     @Ignore
     fun setDirectI(i: String, encryption: Encryption){
         encryptedI = encryption.encrypt(userId, i)
+        state = ID_PW
     }
 
     @Ignore
     fun setAccessToken(token: String, encryption: Encryption){
         encryptedAccessToken = encryption.encrypt(userId, token)
+        state = APP_PROVIDER
     }
 
     @Ignore
