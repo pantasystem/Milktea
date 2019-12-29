@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,10 +48,19 @@ class CustomAppViewModel(
     val apps = MutableLiveData<List<App>>()
     val account = Transformations.map(currentConnectionInstanceLiveData){ci ->
         loadApps()
-        accounts.value?.firstOrNull {
+        val user = accounts.value?.firstOrNull {
             it.id == ci.userId
         }
+        if(user == null){
+            null
+        }else{
+            AccountViewData(user, ci)
+        }
     }
+
+    val createAppEvent = EventBus<Unit>()
+
+    val startChoosingAppEvent = EventBus<Unit>()
 
 
     private fun loadApps(){
@@ -80,7 +91,36 @@ class CustomAppViewModel(
         })
     }
 
+    fun setApp(id: String){
+        val nowI = currentConnectionInstanceLiveData.value?.getI(encryption)?: return
+        misskeyAPI.myApps(I(nowI)).enqueue(object : Callback<List<App>>{
+            override fun onResponse(call: Call<List<App>>, response: Response<List<App>>) {
+                val list = response.body()?: return
+                apps.postValue(list)
+                val selected = list.firstOrNull {
+                    it.id == id
+                }?: return
 
+                selectedApp.postValue(selected)
+            }
+
+            override fun onFailure(call: Call<List<App>>, t: Throwable) {
+                Log.d(tag, "apps読み込みに失敗", t)
+            }
+        })
+    }
+
+    fun createApp(){
+        createAppEvent.event = Unit
+    }
+
+    fun startChoosingApp(){
+        startChoosingAppEvent.event = Unit
+    }
+
+    fun chooseApp(app: App){
+        selectedApp.value = app
+    }
 
     fun authenticate(){
 

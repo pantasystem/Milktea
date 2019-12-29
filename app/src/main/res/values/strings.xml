@@ -137,7 +137,6 @@
     <string name="add_app">アプリを追加する</string>
     <string name="selected_account">選択中のアカウント</string>
     <string name="selected_app">選択中のアプリ</string>
-    <string name="switch_or_add_account">アカウントを切り替え/追加</string>
     <string name="custom_app">カスタムアプリ</string>
 
     <string name="custom_app_name">アプリケーション名</string>

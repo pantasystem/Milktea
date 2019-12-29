@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+    <data>
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
+        <variable
+                name="viewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.auth.custom.CustomAppCreatorViewModel" />
+    </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
@@ -46,7 +52,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/your_app_name" />
+                            android:hint="@string/your_app_name"
+                            android:text="@={SafeUnbox.unbox(viewModel.appName)}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
@@ -63,7 +70,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/description_of_app_description"
-                            android:inputType="textMultiLine" />
+                            android:inputType="textMultiLine"
+                            android:text="@={SafeUnbox.unbox(viewModel.description)}"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </ScrollView>
@@ -75,6 +83,8 @@
                 android:text="@string/create"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_margin="16dp"/>
+                android:layout_margin="16dp"
+                android:enabled="@{SafeUnbox.unbox(viewModel.isCanBeCreated())}"
+                android:onClick="@{()-> viewModel.create()}"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

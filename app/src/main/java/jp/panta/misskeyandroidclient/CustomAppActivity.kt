@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +20,10 @@ import jp.panta.misskeyandroidclient.viewmodel.auth.custom.CustomAppViewModel
 
 class CustomAppActivity : AppCompatActivity() {
 
+    private val REQUEST_CREATE_APP = 114
+
+    private var mCustomAppViewModel: CustomAppViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -30,42 +36,21 @@ class CustomAppActivity : AppCompatActivity() {
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication.connectionInstanceDao!!))[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
 
-        val accountBinding = DataBindingUtil.inflate<ItemAccountBinding>(
-            LayoutInflater.from(binding.currentAccountView.context),
-            R.layout.item_account,
-            binding.currentAccountView,
-            true
-        )
-        accountBinding.accountViewModel = accountViewModel
-        accountBinding.lifecycleOwner = this
+        binding.addAccount.setOnClickListener {
+            startActivity(Intent(this, AuthActivity::class.java))
+        }
+
         initAccountObserver(accountViewModel)
 
 
-        //accountBinding.lifecycleOwner = this
-
-
-        val appBinding = DataBindingUtil.inflate<ItemAppBinding>(
-            LayoutInflater.from(binding.currentAppView.context),
-            R.layout.item_app,
-            binding.currentAppView,
-            true
-        )
-        appBinding.lifecycleOwner = this
-
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
+        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             val customAppViewModel = ViewModelProvider(this, CustomAppViewModel.Factory(miApplication))[CustomAppViewModel::class.java]
-            customAppViewModel.selectedApp.observe(this, Observer {
-                Log.d("CustomAppActivity", "選択中のアプリ:${it.name}")
-                appBinding.app = it
-            })
-            customAppViewModel.account.observe(this, Observer {account ->
-                if(account != null){
-                    val viewData = AccountViewData(connectionInstance = miApplication.currentConnectionInstanceLiveData.value!!,user =  account)
-                    accountBinding.accountViewData = viewData
-                }
-            })
+            mCustomAppViewModel = customAppViewModel
+            binding.customAppViewModel = customAppViewModel
 
             customAppViewModel.misskeyAPI = miApplication.misskeyAPIService!!
+            initAppObserver(customAppViewModel)
+
 
         })
 
@@ -73,6 +58,23 @@ class CustomAppActivity : AppCompatActivity() {
 
 
     }
+
+    private fun initAppObserver(customAppViewModel: CustomAppViewModel){
+        customAppViewModel.startChoosingAppEvent.removeObserver(startChoosingAppEventObserver)
+        customAppViewModel.startChoosingAppEvent.observe(this, startChoosingAppEventObserver)
+
+        customAppViewModel.createAppEvent.removeObserver(createAppEventObserver)
+        customAppViewModel.createAppEvent.observe(this, createAppEventObserver)
+    }
+
+    private val startChoosingAppEventObserver = Observer<Unit>{
+
+    }
+
+    private val createAppEventObserver = Observer<Unit>{
+        startActivityForResult(Intent(this, CustomAppCreatorActivity::class.java), REQUEST_CREATE_APP)
+    }
+
 
     private fun initAccountObserver(accountViewModel: AccountViewModel){
         accountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
@@ -91,6 +93,17 @@ class CustomAppActivity : AppCompatActivity() {
 
     private val switchAccountObserver = Observer<ConnectionInstance>{
         (application as MiApplication).switchAccount(it)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_CREATE_APP ->{
+                if(resultCode == Activity.RESULT_OK && data != null){
+                    mCustomAppViewModel?.setApp(intent.getStringExtra(CustomAppCreatorActivity.EXTRA_APP_ID))
+                }
+            }
+        }
     }
 
 

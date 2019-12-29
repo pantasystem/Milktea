@@ -46,19 +46,21 @@
                         android:layout_height="wrap_content"
                         android:text="@string/selected_account" />
 
-                <FrameLayout
-                        android:id="@+id/currentAccountView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:layout="@layout/item_account" />
+                <include
+                        android:id="@+id/selectedAccount"
+                        layout="@layout/item_selected_account"
+                        app:accountViewModel="@{accountViewModel}"
+                        app:accountViewData="@{customAppViewModel.account}"
+                        />
 
                 <Button
+                        android:id="@+id/addAccount"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:text="@string/switch_or_add_account"
-                        android:onClick="@{()-> accountViewModel.showSwitchDialog()}"/>
+                        android:text="@string/add_account"
+                        />
 
                 <TextView
                         android:id="@+id/textView20"
@@ -66,16 +68,19 @@
                         android:layout_height="wrap_content"
                         android:text="@string/selected_app" />
 
-                <FrameLayout
-                        android:id="@+id/currentAppView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                <include
+                        android:id="@+id/selectedApp"
+                        layout="@layout/item_selected_custom_app"
+                        app:app="@{customAppViewModel.selectedApp}"
+                        />
 
                 <Button
+                        android:id="@+id/addApp"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/add_app" />
+                        android:text="@string/add_app"
+                        android:onClick="@{()-> customAppViewModel.createApp() }"/>
 
 
             </LinearLayout>

@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="0.5dp"
             app:cardBackgroundColor="?attr/colorSurface"
-            android:onClick="@{()-> customAppViewModel.chooseApp(app)}"
+            android:onClick="@{()-> customAppViewModel.startChoosingApp()}"
             >
         <RelativeLayout
                 android:layout_width="match_parent"
@@ -29,9 +29,19 @@
                     android:layout_height="wrap_content"
                     android:textSize="24sp"
                     tools:text="AppName"
-                    android:text="@{SafeUnbox.unbox(app.name)}"/>
+                    android:text="@{SafeUnbox.unbox(app.name)}"
+                    android:layout_toStartOf="@id/select_app_icon"
+                    android:layout_alignParentStart="true"/>
 
-
+            <ImageView
+                    android:id="@+id/select_app_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/ic_chevron_right_black_24dp"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    tools:ignore="ContentDescription" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
