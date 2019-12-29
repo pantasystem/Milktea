@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="customAppViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.auth.custom.CustomAppViewModel" />
+    </data>
+    <LinearLayout
+            android:orientation="vertical" android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:background="?attr/colorSurface">
+
+
+        <ImageView
+                android:id="@+id/imageView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_expand_more_black_24dp"
+                tools:ignore="ContentDescription"
+                android:tint="?attr/colorNoteActionButtonTint"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/appsView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                />
+        <Button
+                android:id="@+id/addApp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_app"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:onClick="@{()-> customAppViewModel.createApp()}"
+                />
+    </LinearLayout>
+</layout>

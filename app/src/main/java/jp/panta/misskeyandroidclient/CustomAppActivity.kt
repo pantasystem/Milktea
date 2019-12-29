@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.databinding.ItemAccountBinding
 import jp.panta.misskeyandroidclient.databinding.ItemAppBinding
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.view.auth.AppSelectDialog
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.auth.custom.CustomAppViewModel
@@ -68,7 +69,10 @@ class CustomAppActivity : AppCompatActivity() {
     }
 
     private val startChoosingAppEventObserver = Observer<Unit>{
-
+        runOnUiThread {
+            val dialog = AppSelectDialog()
+            dialog.show(supportFragmentManager, "CustomAppActivity")
+        }
     }
 
     private val createAppEventObserver = Observer<Unit>{

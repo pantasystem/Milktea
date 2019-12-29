@@ -62,6 +62,8 @@ class CustomAppViewModel(
 
     val startChoosingAppEvent = EventBus<Unit>()
 
+    val appSelectedEvent = EventBus<App>()
+
 
     private fun loadApps(){
         val nowCn = currentConnectionInstanceLiveData.value?: return
@@ -120,6 +122,7 @@ class CustomAppViewModel(
 
     fun chooseApp(app: App){
         selectedApp.value = app
+        appSelectedEvent.event = app
     }
 
     fun authenticate(){
