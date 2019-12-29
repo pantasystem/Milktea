@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.api
 
 import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.auth.custom.App
+import jp.panta.misskeyandroidclient.model.auth.custom.CreateApp
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FolderProperty
@@ -28,6 +30,13 @@ interface MisskeyAPI {
 
     @POST("api/signin")
     fun signIn(@Body signIn: SignIn): Call<I>
+
+    @POST("api/app/create")
+    fun createApp(@Body createApp: CreateApp): Call<App>
+
+    @POST("api/my/apps")
+    fun myApps(@Body i: I) : Call<List<App>>
+    
 
     @POST("api/blocking/create")
     fun blockUser(@Body requestUser: RequestUser): Call<Unit>

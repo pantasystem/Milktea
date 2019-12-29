@@ -6,4 +6,8 @@
             android:id="@+id/menu_sign_in"
             android:title="@string/sign_in"
             app:showAsAction="ifRoom"/>
+    <item
+            android:id="@+id/menu_custom_app"
+            android:title="@string/custom_app"
+            app:showAsAction="ifRoom"/>
 </menu>

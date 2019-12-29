@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.auth.app
+package jp.panta.misskeyandroidclient.model.auth.custom
 
 data class CreateApp(
     val i: String,

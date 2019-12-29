@@ -93,6 +93,11 @@ class AuthActivity : AppCompatActivity() {
                 startActivity(Intent(this, SignInActivity::class.java))
                 return true
             }
+            R.id.menu_custom_app ->{
+                finish()
+                startActivity(Intent(this, CustomAppActivity::class.java))
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }

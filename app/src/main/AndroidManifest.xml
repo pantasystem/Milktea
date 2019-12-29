@@ -15,7 +15,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".SignInActivity"></activity>
+        <activity android:name=".CustomAppActivity"></activity>
+        <activity android:name=".SignInActivity" />
         <activity android:name=".FavoriteActivity" />
         <activity android:name=".FollowFollowerActivity" />
         <activity android:name=".SearchActivity" />

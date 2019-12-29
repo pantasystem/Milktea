@@ -49,7 +49,7 @@
             <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_toEndOf="@+id/history_icon"
+                    android:layout_toEndOf="@id/history_icon"
                     android:textSize="18sp"
                     tools:text="name"
                     app:emojis="@{accountViewData.user.emojis}"
@@ -57,7 +57,7 @@
                     app:clickableLink="@{false}"
                     android:layout_below="@id/userName"
                     android:layout_toStartOf="@id/logoutButton"
-
+                    android:layout_marginBottom="8dp"
                     />
 
             <Button
@@ -70,6 +70,16 @@
                     android:onClick="@{()-> accountViewModel.signOut(accountViewData) }"
                     />
 
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="misskey.io"
+                    android:layout_below="@id/name"
+                    android:layout_toStartOf="@id/logoutButton"
+                    android:layout_toEndOf="@id/history_icon"
+                    android:textSize="18sp"
+                    android:text="@{SafeUnbox.unbox(accountViewData.connectionInstance.instanceBaseUrl)}"
+                    />
 
 
 
