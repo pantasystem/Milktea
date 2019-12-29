@@ -70,39 +70,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fab.setOnClickListener{
             startActivity(Intent(this, NoteEditorActivity::class.java))
         }
-        //replaceTimelineFragment()
+
         init()
 
-
         val miApplication = application as MiApplication
+
+        mAccountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication.connectionInstanceDao!!))[AccountViewModel::class.java]
+        initAccountViewModelListener()
+        setHeaderProfile(mainBinding)
 
         var init = false
         miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
             if(!init){
                 mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
 
-                mAccountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication.connectionInstanceDao!!))[AccountViewModel::class.java]
                 Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.connectionInstance}")
-
                 init()
-
-                //initViewModelListener()
                 ActionNoteHandler(this, mNotesViewModel).initViewModelListener()
-                initAccountViewModelListener()
-
-                setHeaderProfile(mainBinding)
-
                 init = true
-                //observeTab()
                 Log.d("MainActivity", "初期化処理")
             }
 
         })
 
+
         miApplication.isSuccessLoadConnectionInstance.observe(this, Observer {
             if(!it){
                 startActivity(Intent(this, AuthActivity::class.java))
-                //finish()
             }
         })
 

@@ -31,7 +31,6 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         if(connectionInstances == null){
             Log.w("AccountSwitchDialog", "アカウント達の取得に失敗しました")
             Toast.makeText(this.context, "アカウントの取得に失敗しました", Toast.LENGTH_LONG).show()
-            dismiss()
             return
         }
         val activity = activity

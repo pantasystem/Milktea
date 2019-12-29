@@ -52,24 +52,25 @@ class CustomAppActivity : AppCompatActivity() {
         )
         appBinding.lifecycleOwner = this
 
-        val customAppViewModel = ViewModelProvider(this, CustomAppViewModel.Factory(miApplication))[CustomAppViewModel::class.java]
+        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
+            val customAppViewModel = ViewModelProvider(this, CustomAppViewModel.Factory(miApplication))[CustomAppViewModel::class.java]
+            customAppViewModel.selectedApp.observe(this, Observer {
+                Log.d("CustomAppActivity", "選択中のアプリ:${it.name}")
+                appBinding.app = it
+            })
+            customAppViewModel.account.observe(this, Observer {account ->
+                if(account != null){
+                    val viewData = AccountViewData(connectionInstance = miApplication.currentConnectionInstanceLiveData.value!!,user =  account)
+                    accountBinding.accountViewData = viewData
+                }
+            })
 
-        customAppViewModel.selectedApp.observe(this, Observer {
-            Log.d("CustomAppActivity", "選択中のアプリ:${it.name}")
-            appBinding.app = it
-        })
-        customAppViewModel.account.observe(this, Observer {account ->
-            if(account != null){
-                val viewData = AccountViewData(connectionInstance = miApplication.currentConnectionInstanceLiveData.value!!,user =  account)
-                accountBinding.accountViewData = viewData
-            }
-        })
-
-
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer{
             customAppViewModel.misskeyAPI = miApplication.misskeyAPIService!!
 
         })
+
+
+
 
     }
 
