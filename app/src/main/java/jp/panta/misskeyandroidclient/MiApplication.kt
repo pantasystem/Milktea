@@ -231,7 +231,8 @@ class MiApplication : Application(){
     }
 
     private fun updateCurrentAccount(ci: ConnectionInstance, misskeyAPI: MisskeyAPI?){
-        misskeyAPI?.i(I(i = ci.getI(encryption)!!))?.enqueue(object : Callback<User>{
+        val i = ci.getI(encryption)?: return
+        misskeyAPI?.i(I(i = i))?.enqueue(object : Callback<User>{
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 Log.d("MiApplication", "iを取得しました${response.body()}")
                 currentAccountLiveData.postValue(response.body())

@@ -41,6 +41,8 @@ class SignInViewModel(
 
     var misskeyAPI: MisskeyAPI? = null
 
+    val connectionInstance = MutableLiveData<ConnectionInstance>()
+
     val instanceDomain = MediatorLiveData<String>().apply{
         addSource(this){
             try{
@@ -103,9 +105,10 @@ class SignInViewModel(
                     val ci = ConnectionInstance(user.id, instanceDomain.value!!).apply{
                         setDirectI(i, encryption)
                     }
-                    viewModelScope.launch(Dispatchers.IO){
+                    /*viewModelScope.launch(Dispatchers.IO){
                         connectionInstanceDao.insert(ci)
-                    }
+                    }*/
+                    connectionInstance.postValue(ci)
                     me.postValue(user)
 
                 }

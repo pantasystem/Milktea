@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +14,8 @@ import jp.panta.misskeyandroidclient.databinding.ActivityCustomAppBinding
 import jp.panta.misskeyandroidclient.databinding.ItemAccountBinding
 import jp.panta.misskeyandroidclient.databinding.ItemAppBinding
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.auth.Session
+import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.auth.AppSelectDialog
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
@@ -66,6 +69,12 @@ class CustomAppActivity : AppCompatActivity() {
 
         customAppViewModel.createAppEvent.removeObserver(createAppEventObserver)
         customAppViewModel.createAppEvent.observe(this, createAppEventObserver)
+
+        customAppViewModel.session.removeObserver(sessionObserver)
+        customAppViewModel.session.observe(this, sessionObserver)
+
+        customAppViewModel.isSignInRequired.removeObserver(isSignInRequiredObserver)
+        customAppViewModel.isSignInRequired.observe(this, isSignInRequiredObserver)
     }
 
     private val startChoosingAppEventObserver = Observer<Unit>{
@@ -79,6 +88,17 @@ class CustomAppActivity : AppCompatActivity() {
         startActivityForResult(Intent(this, CustomAppCreatorActivity::class.java), REQUEST_CREATE_APP)
     }
 
+    private val sessionObserver = Observer<Session>{
+        Log.d("CustomAppActivity", "sessionを受信した")
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.url)))
+        finish()
+    }
+
+    private val isSignInRequiredObserver = Observer<Boolean>{
+        if(it){
+            startActivity(Intent(this, SignInActivity::class.java))
+        }
+    }
 
     private fun initAccountObserver(accountViewModel: AccountViewModel){
         accountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)

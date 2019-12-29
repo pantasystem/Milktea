@@ -5,17 +5,26 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.auth.AppSecret
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
+import jp.panta.misskeyandroidclient.model.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.custom.App
+import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
+import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
+import jp.panta.misskeyandroidclient.model.auth.custom.ShowApp
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.IllegalArgumentException
+import java.util.*
 
 @Suppress("UNCHECKED_CAST")
 class CustomAppViewModel(
@@ -23,7 +32,8 @@ class CustomAppViewModel(
     val connectionInstanceDao: ConnectionInstanceDao,
     val accounts: MutableLiveData<List<User>>,
     val encryption: Encryption,
-    var misskeyAPI: MisskeyAPI
+    var misskeyAPI: MisskeyAPI,
+    val customAuthStore: CustomAuthStore
 ) : ViewModel(){
 
     class Factory(
@@ -36,7 +46,8 @@ class CustomAppViewModel(
                     miApplication.connectionInstanceDao!!,
                     miApplication.accountsLiveData,
                     miApplication.encryption,
-                    miApplication.misskeyAPIService!!
+                    miApplication.misskeyAPIService!!,
+                    CustomAuthStore.newInstance(miApplication)
                 ) as T
             }
             throw IllegalArgumentException("use CustomAppViewModel::class.java")
@@ -58,11 +69,28 @@ class CustomAppViewModel(
         }
     }
 
+    val isSignInRequired = Transformations.map(account){
+        it?.connectionInstance?.state != ConnectionInstance.ID_PW
+    }
+
     val createAppEvent = EventBus<Unit>()
 
     val startChoosingAppEvent = EventBus<Unit>()
 
     val appSelectedEvent = EventBus<App>()
+
+    val session = MutableLiveData<Session>()
+
+    val isCanAuthenticated = MediatorLiveData<Boolean>()
+
+    init{
+        isCanAuthenticated.addSource(selectedApp){
+            isCanAuthenticated.value = it != null && account.value != null
+        }
+        isCanAuthenticated.addSource(account){
+            isCanAuthenticated.value = selectedApp.value != null && it != null
+        }
+    }
 
 
     private fun loadApps(){
@@ -72,7 +100,14 @@ class CustomAppViewModel(
             override fun onResponse(call: Call<List<App>>, response: Response<List<App>>) {
                 val resBody = response.body()
                 if(resBody != null){
-                    apps.postValue(resBody)
+                    apps.postValue(resBody.filter{
+                        it.callbackUrl == "misskey://custom_auth_call_back"
+                                && CustomAppDefaultPermission.defaultPermission.all {a ->
+                            it.permission.any{b ->
+                                a == b
+                            }
+                        }
+                    })
                     Log.d(tag, "apps読み込みに成功 domain:${nowCn.instanceBaseUrl}, i:$nowI")
                     if(nowCn.state == ConnectionInstance.CUSTOM_APP){
                         val selected = resBody.firstOrNull {
@@ -98,7 +133,14 @@ class CustomAppViewModel(
         misskeyAPI.myApps(I(nowI)).enqueue(object : Callback<List<App>>{
             override fun onResponse(call: Call<List<App>>, response: Response<List<App>>) {
                 val list = response.body()?: return
-                apps.postValue(list)
+                apps.postValue(list.filter{
+                    it.callbackUrl == "misskey://custom_auth_call_back"
+                            && CustomAppDefaultPermission.defaultPermission.all {a ->
+                        it.permission.any{b ->
+                            a == b
+                        }
+                    }
+                })
                 val selected = list.firstOrNull {
                     it.id == id
                 }?: return
@@ -127,5 +169,51 @@ class CustomAppViewModel(
 
     fun authenticate(){
 
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                val app = selectedApp.value?: return@launch
+                val ci = currentConnectionInstanceLiveData.value?: return@launch
+                val i  = ci.getI(encryption)?: return@launch
+
+                val secret =
+                    if (app.secret != null){
+                        app.secret
+                    }else{
+                        val res = misskeyAPI.showApp(ShowApp(i = i, appId = app.id)).execute()
+                        Log.d(tag, "code:${res.code()}, secret is null:${res.body()?.secret == null}")
+                        res.body()?.secret
+                    }
+
+                secret?: return@launch
+                val api = MisskeyAPIServiceBuilder.buildAuthAPI(ci.instanceBaseUrl)
+                api.generateSession(AppSecret(appSecret = secret)).enqueue(object : Callback<Session>{
+                    override fun onResponse(call: Call<Session>, response: Response<Session>) {
+                        val body = response.body()
+                        Log.d(tag, "受信:$body")
+                        if(body == null){
+                            Log.d(tag, "失敗しましたSessionがNull")
+                            return
+                        }
+                        val calendar = Calendar.getInstance()
+                        calendar.add(Calendar.MINUTE, 3)
+                        val bridge = CustomAuthBridge(
+                            secret = secret,
+                            instanceDomain = ci.instanceBaseUrl,
+                            session = body,
+                            enabledDateEnd = calendar.time
+                        )
+                        customAuthStore.setCustomAuthBridge(bridge)
+                        session.postValue(response.body())
+                    }
+
+                    override fun onFailure(call: Call<Session>, t: Throwable) {
+                        Log.e(tag, "error", t)
+                    }
+                })
+
+            }catch(e: Exception){
+                Log.e(tag, "認証中にエラー", e)
+            }
+        }
     }
 }

@@ -15,7 +15,19 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".CustomAppCreatorActivity"></activity>
+        <activity android:name=".CustomAppAuthCallbackActivity">
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                        android:host="custom_auth_call_back"
+                        android:scheme="misskey" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".CustomAppCreatorActivity" />
         <activity android:name=".CustomAppActivity" />
         <activity android:name=".SignInActivity" />
         <activity android:name=".FavoriteActivity" />

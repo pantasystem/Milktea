@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.auth
 
+import android.util.Log
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -60,7 +61,7 @@ class ConnectionInstance(
     fun getCustomAppSecret(encryption: Encryption): String?{
         val secret = encryptedCustomAppSecret
         if(secret != null){
-            encryption.decrypt(userId, secret)
+            return encryption.decrypt(userId, secret)
         }
         return null
     }
@@ -80,7 +81,7 @@ class ConnectionInstance(
     @Ignore
     fun setAccessToken(token: String, encryption: Encryption){
         encryptedAccessToken = encryption.encrypt(userId, token)
-        state = APP_PROVIDER
+        //state = APP_PROVIDER
     }
 
     @Ignore
@@ -110,6 +111,6 @@ class ConnectionInstance(
     }
 
     override fun toString(): String {
-        return "{userId:$userId, instanceBaseUrl:$instanceBaseUrl}"
+        return "{userId:$userId, instanceBaseUrl:$instanceBaseUrl, state:$state}"
     }
 }

@@ -54,7 +54,7 @@ class CustomAppCreatorViewModel(
         val obj = CreateApp(i = i,
             name = appName.value!!,
             description = description.value?: "",
-            callbackUrl = "misskey://auth_call_back",
+            callbackUrl = "misskey://custom_auth_call_back",
             permission = CustomAppDefaultPermission.defaultPermission
         )
 

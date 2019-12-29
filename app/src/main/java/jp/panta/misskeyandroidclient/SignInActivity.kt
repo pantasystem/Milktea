@@ -29,10 +29,15 @@ class SignInActivity : AppCompatActivity() {
             Log.d("", "インスタンスの有効性: $it")
         })
 
-        viewModel.me.observe(this, Observer {
+        /*viewModel.me.observe(this, Observer {
             if(it != null){
                 finish()
             }
+        })*/
+
+        viewModel.connectionInstance.observe(this, Observer {
+            (application as MiApplication).addAccount(it)
+            finish()
         })
     }
 }

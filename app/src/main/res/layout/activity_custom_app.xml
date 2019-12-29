@@ -3,6 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
         <variable
                 name="customAppViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.auth.custom.CustomAppViewModel" />
@@ -95,7 +96,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_margin="16dp"/>
+                android:layout_margin="16dp"
+                android:enabled="@{SafeUnbox.unbox(customAppViewModel.isCanAuthenticated)}"
+                android:onClick="@{()-> customAppViewModel.authenticate()}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

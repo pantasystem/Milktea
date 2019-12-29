@@ -145,4 +145,7 @@
     <string name="your_app_name">あなたのアプリの名前</string>
     <string name="description_of_app_description">認証時に表示されます</string>
     <string name="create">作成</string>
+
+    <string name="auth_failed">認証に失敗しました</string>
+    <string name="expired">有効期限切れです</string>
 </resources>
