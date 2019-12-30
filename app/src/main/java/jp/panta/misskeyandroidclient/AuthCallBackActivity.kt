@@ -63,23 +63,18 @@ class AuthCallBackActivity : AppCompatActivity() {
                 if(token == null){
                     Toast.makeText(this, "Please wait.", Toast.LENGTH_LONG).show()
                 }else{
-                    val ci = ConnectionInstance(instanceBaseUrl = instance.domain,  userId = token.user.id).apply{
+                    val miApplication = application as MiApplication
+                    val ci = miApplication.connectionInstancesLiveData.value?.firstOrNull {
+                        it.userId == token.user.id
+                    }?.apply{
+                        state = ConnectionInstance.APP_PROVIDER
+                        setAccessToken(token.accessToken, miApplication.encryption)
+                    }?: ConnectionInstance(instanceBaseUrl = instance.domain,  userId = token.user.id).apply{
                         setAccessToken(token.accessToken, (application as MiApplication).encryption)
                     }
-                    (application as MiApplication).addAccount(ci)
+                    miApplication.addAccount(ci)
                     finish()
-                    /*GlobalScope.launch{
-                        try{
-                            (application as MiApplication).connectionInstanceDao?.insert(ci)
-                            runOnUiThread {
-                                //startActivity(Intent(this@AuthCallBackActivity, MainActivity::class.java))
-                                finish()
-                            }
-                        }catch(e: Exception){
-                            Log.d("AuthActivity", "エラー", e)
-                        }
 
-                    }*/
                 }
             }
 

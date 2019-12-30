@@ -61,7 +61,12 @@ class CustomAppAuthCallbackActivity : AppCompatActivity() {
         binding.authOk.setOnClickListener {
             val token = mAccessToken?: return@setOnClickListener
             val miApplication = application as MiApplication
-            val ci = ConnectionInstance(instanceBaseUrl = bridge.instanceDomain, userId = token.user.id).apply{
+            val ci = miApplication.connectionInstancesLiveData.value?.firstOrNull {
+                it.userId == token.user.id
+            }?.apply{
+                setCustomAppSecret(bridge.secret, miApplication.encryption)
+                setAccessToken(token.accessToken, miApplication.encryption)
+            }?: ConnectionInstance(instanceBaseUrl = bridge.instanceDomain, userId = token.user.id).apply{
                 setCustomAppSecret(bridge.secret, miApplication.encryption)
                 setAccessToken(token.accessToken, miApplication.encryption)
             }
