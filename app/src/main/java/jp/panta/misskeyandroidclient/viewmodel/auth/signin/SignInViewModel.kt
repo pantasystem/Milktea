@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.auth.signin
 
+import android.util.Log
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
@@ -10,7 +12,6 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
-import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -20,15 +21,21 @@ import java.lang.IllegalArgumentException
 
 
 class SignInViewModel(
-    val connectionInstanceDao: ConnectionInstanceDao,
-    val encryption: Encryption
+    val connectionInstances: MutableLiveData<List<ConnectionInstance>>,
+    val encryption: Encryption,
+    val mode: Int
 ) : ViewModel(){
+    companion object{
+        private const val TAG = "SignInViewModel"
+        const val MODE_OVERWRITE = 0
+        const val MODE_ADD = 1
+    }
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val connectionInstanceDao: ConnectionInstanceDao, val encryption: Encryption) : ViewModelProvider.Factory{
+    class Factory(val miApplication: MiApplication, val mode: Int) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == SignInViewModel::class.java){
-                return SignInViewModel(connectionInstanceDao, encryption) as T
+                return SignInViewModel(miApplication.connectionInstancesLiveData, miApplication.encryption, mode) as T
             }
             throw IllegalArgumentException("use SignInViewModel::class.java")
         }
@@ -43,8 +50,15 @@ class SignInViewModel(
 
     val connectionInstance = MutableLiveData<ConnectionInstance>()
 
-    val instanceDomain = MediatorLiveData<String>().apply{
-        addSource(this){
+    val instanceDomain = MediatorLiveData<String>()
+
+    //val i = MutableLiveData<String>()
+    val isValidityOfAuth = MutableLiveData<Boolean>(false)
+
+    //val me = MutableLiveData<User?>()
+
+    init{
+        instanceDomain.observeForever {
             try{
                 misskeyAPI = MisskeyAPIServiceBuilder.build(it)
             }catch(e: Exception){
@@ -63,14 +77,10 @@ class SignInViewModel(
         }
     }
 
-    val i = MutableLiveData<String>()
-    val isValidityOfAuth = MutableLiveData<Boolean>(false)
-
-    val me = MutableLiveData<User?>()
-
     fun signIn(){
         val un = userName.value
         val pw = password.value
+        val domain = instanceDomain.value?: return
         if(un != null && pw != null){
             misskeyAPI?.signIn(SignIn(
                 username = un,
@@ -82,8 +92,9 @@ class SignInViewModel(
                         isValidityOfAuth.postValue(false)
                     }else{
                         isValidityOfAuth.postValue(true)
-                        i.postValue(res.i)
-                        loadMeAndAdd()
+                        //i.postValue(res.i)
+                        Log.d(TAG, "認証に成功しました")
+                        makeConnectionInstance(domain = domain, i = res)
                     }
                 }
 
@@ -94,29 +105,43 @@ class SignInViewModel(
         }
     }
 
-    private fun loadMeAndAdd(){
-        val i =  i.value?: return
-        misskeyAPI?.i(I(i))?.enqueue(object : Callback<User>{
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                val user = response.body()
-                if(user == null){
-                    me.postValue(null)
-                }else{
-                    val ci = ConnectionInstance(user.id, instanceDomain.value!!).apply{
-                        setDirectI(i, encryption)
-                    }
-                    /*viewModelScope.launch(Dispatchers.IO){
-                        connectionInstanceDao.insert(ci)
-                    }*/
-                    connectionInstance.postValue(ci)
-                    me.postValue(user)
 
+    private fun makeConnectionInstance(domain: String, i: I){
+        viewModelScope.launch(Dispatchers.IO){
+            try{
+                val res = misskeyAPI?.i(i)?.execute()
+                if(res == null){
+                    Log.e(TAG, "Retrofitが初期されていない")
+                    return@launch
                 }
+                val user = res.body()
+                if(user == null){
+                    Log.d(TAG, "api/iの取得に失敗した, code:${res.code()}, error:${res.errorBody()?.string()}")
+                    return@launch
+                }
+
+                val connectionInstance = if(mode == MODE_OVERWRITE){
+                    ConnectionInstance(instanceBaseUrl = domain, userId = user.id).apply{
+                        setDirectI(i.i, encryption)
+                    }
+                }else{
+                    connectionInstances.value?.firstOrNull {ex ->
+                        ex.userId == user.id
+                    }?.apply{
+                        val exState = state
+                        setDirectI(i.i, encryption)
+                        state = exState
+                    }?: ConnectionInstance(instanceBaseUrl = domain, userId = user.id).apply{
+                        setDirectI(i.i, encryption)
+                    }
+                }
+                this@SignInViewModel.connectionInstance.postValue(connectionInstance)
+            }catch(e: Exception){
+                Log.e(TAG, "ConnectionInstance作成中にエラーが発生しました", e)
             }
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                me.postValue(null)
-            }
-        })
+
+        }
+
     }
 
 }

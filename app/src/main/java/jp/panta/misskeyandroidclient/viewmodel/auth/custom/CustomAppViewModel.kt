@@ -29,7 +29,6 @@ import java.util.*
 @Suppress("UNCHECKED_CAST")
 class CustomAppViewModel(
     val currentConnectionInstanceLiveData: MutableLiveData<ConnectionInstance>,
-    val connectionInstanceDao: ConnectionInstanceDao,
     val accounts: MutableLiveData<List<User>>,
     val encryption: Encryption,
     var misskeyAPI: MisskeyAPI,
@@ -43,7 +42,6 @@ class CustomAppViewModel(
             if(modelClass == CustomAppViewModel::class.java){
                 return CustomAppViewModel(
                     miApplication.currentConnectionInstanceLiveData,
-                    miApplication.connectionInstanceDao!!,
                     miApplication.accountsLiveData,
                     miApplication.encryption,
                     miApplication.misskeyAPIService!!,
@@ -69,9 +67,7 @@ class CustomAppViewModel(
         }
     }
 
-    val isSignInRequired = Transformations.map(account){
-        it?.connectionInstance?.state != ConnectionInstance.ID_PW
-    }
+    val isSignInRequiredEvent = EventBus<Boolean>()
 
     val createAppEvent = EventBus<Unit>()
 
@@ -89,6 +85,11 @@ class CustomAppViewModel(
         }
         isCanAuthenticated.addSource(account){
             isCanAuthenticated.value = selectedApp.value != null && it != null
+        }
+
+        currentConnectionInstanceLiveData.observeForever {
+            Log.d(tag, "directI:${it.getDirectI(encryption)}")
+            isSignInRequiredEvent.event = it.getDirectI(encryption) == null
         }
     }
 
@@ -173,7 +174,11 @@ class CustomAppViewModel(
             try{
                 val app = selectedApp.value?: return@launch
                 val ci = currentConnectionInstanceLiveData.value?: return@launch
-                val i  = ci.getI(encryption)?: return@launch
+                val i  = ci.getDirectI(encryption)
+                if(i == null){
+                    isSignInRequiredEvent.event = true
+                    return@launch
+                }
 
                 val secret =
                     if (app.secret != null){

@@ -6,6 +6,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -34,6 +37,8 @@ class CustomAppActivity : AppCompatActivity() {
         val binding = DataBindingUtil.setContentView<ActivityCustomAppBinding>(this, R.layout.activity_custom_app)
         binding.lifecycleOwner = this
         setSupportActionBar(binding.customAppToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = getString(R.string.custom_app)
 
         val miApplication = applicationContext as MiApplication
 
@@ -73,8 +78,8 @@ class CustomAppActivity : AppCompatActivity() {
         customAppViewModel.session.removeObserver(sessionObserver)
         customAppViewModel.session.observe(this, sessionObserver)
 
-        customAppViewModel.isSignInRequired.removeObserver(isSignInRequiredObserver)
-        customAppViewModel.isSignInRequired.observe(this, isSignInRequiredObserver)
+        customAppViewModel.isSignInRequiredEvent.removeObserver(isSignInRequiredObserver)
+        customAppViewModel.isSignInRequiredEvent.observe(this, isSignInRequiredObserver)
     }
 
     private val startChoosingAppEventObserver = Observer<Unit>{
@@ -96,7 +101,15 @@ class CustomAppActivity : AppCompatActivity() {
 
     private val isSignInRequiredObserver = Observer<Boolean>{
         if(it){
-            startActivity(Intent(this, SignInActivity::class.java))
+            Log.d("CustomAppActivity", "認証が必要なためSignInActivityを起動します")
+            runOnUiThread {
+                Toast.makeText(this, getString(R.string.auth_required), Toast.LENGTH_LONG).show()
+                val intent = Intent(this, SignInActivity::class.java)
+                intent.putExtra(SignInActivity.EXTRA_MODE, SignInActivity.MODE_ADD)
+                intent.putExtra(SignInActivity.EXTRA_INSTANCE_DOMAIN, mCustomAppViewModel?.currentConnectionInstanceLiveData?.value?.instanceBaseUrl?: "")
+                intent.putExtra(SignInActivity.EXTRA_USER_NAME, mCustomAppViewModel?.account?.value?.user?.userName?: "")
+                startActivity(intent)
+            }
         }
     }
 
@@ -128,6 +141,26 @@ class CustomAppActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activity_custom_app_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            android.R.id.home -> finish()
+            R.id.menu_auth ->{
+                startActivity(Intent(this, AuthActivity::class.java))
+                finish()
+            }
+            R.id.menu_sign_in ->{
+                startActivity(Intent(this, SignInActivity::class.java))
+                finish()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 

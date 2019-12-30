@@ -195,7 +195,8 @@ class MiApplication : Application(){
             ?.enqueue(object : Callback<Meta>{
                 override fun onResponse(call: Call<Meta>, response: Response<Meta>) {
                     nowInstanceMeta = response.body()
-                    Log.d("MiApplication", "$nowInstanceMeta")
+                    //Log.d("MiApplication", "$nowInstanceMeta")
+                    Log.d("MiApplication", "metaを取得, code:${response.code()}")
                 }
                 override fun onFailure(call: Call<Meta>, t: Throwable) {
                     Log.w("MiApplication", "metaの取得に失敗した", t)

@@ -27,11 +27,12 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_auth)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        this.title = "インスタンスを選択"
+
 
         val binding: ActivityAuthBinding = DataBindingUtil.setContentView(this, R.layout.activity_auth)
         setSupportActionBar(binding.authToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        this.title = getString(R.string.auth)
         val viewModel = ViewModelProvider(viewModelStore, AuthViewModelFactory()).get(AuthViewModel::class.java)
         binding.lifecycleOwner = this
 

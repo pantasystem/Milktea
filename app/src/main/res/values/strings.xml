@@ -148,4 +148,10 @@
 
     <string name="auth_failed">認証に失敗しました</string>
     <string name="expired">有効期限切れです</string>
+
+    <string name="auth_required">認証が必要です</string>
+    <string name="invalid_url">無効なURLです</string>
+    <string name="invalid_pw_id">無効なパスワード・ID</string>
+
+    <string name="auth">認証</string>
 </resources>

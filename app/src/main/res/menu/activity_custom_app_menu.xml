@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+            android:id="@+id/menu_auth"
+            android:title="@string/auth"
+            app:showAsAction="ifRoom"/>
+    <item
+            android:id="@+id/menu_sign_in"
+            android:title="@string/sign_in"
+            app:showAsAction="ifRoom"/>
+</menu>
