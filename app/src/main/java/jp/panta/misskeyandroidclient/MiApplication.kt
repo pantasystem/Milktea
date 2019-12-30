@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
@@ -40,6 +41,8 @@ class MiApplication : Application(){
         private set
 
     var noteRequestSettingDao: NoteRequestSettingDao? = null
+
+    lateinit var reactionHistoryDao: ReactionHistoryDao
     //var currentUserId: String? = null
 
     //private val misskeyAPIService = MisskeyAPIServiceBuilder.build(nowInstance)
@@ -75,6 +78,8 @@ class MiApplication : Application(){
         connectionInstanceDao = database.connectionInstanceDao()
 
         noteRequestSettingDao = database.noteSettingDao()
+
+        reactionHistoryDao = database.reactionHistoryDao()
 
         encryption = KeyStoreSystemEncryption(this)
 

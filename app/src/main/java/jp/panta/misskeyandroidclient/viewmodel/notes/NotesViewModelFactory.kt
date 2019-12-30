@@ -10,7 +10,7 @@ import java.lang.ClassCastException
 class NotesViewModelFactory(private val connectionInstance: ConnectionInstance, private val miApplication: MiApplication) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NotesViewModel::class.java){
-            return NotesViewModel(connectionInstance, miApplication.misskeyAPIService!!, miApplication.encryption) as T
+            return NotesViewModel(connectionInstance, miApplication.misskeyAPIService!!, miApplication.encryption, miApplication.reactionHistoryDao) as T
         }
         throw ClassCastException("知らないこだなぁ～？？？")
     }

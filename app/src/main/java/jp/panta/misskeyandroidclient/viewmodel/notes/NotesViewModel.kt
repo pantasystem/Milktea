@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
@@ -26,7 +28,8 @@ import java.io.File
 class NotesViewModel(
     ci: ConnectionInstance,
     api: MisskeyAPI,
-    private val encryption: Encryption
+    private val encryption: Encryption,
+    private val reactionHistoryDao: ReactionHistoryDao
 ) : ViewModel(){
     private val TAG = "NotesViewModel"
     var connectionInstance = ci
@@ -157,6 +160,9 @@ class NotesViewModel(
                     reaction = reaction,
                     noteId = planeNoteViewData.toShowNote.id
                 )).execute()
+                if(res.code() in 200 until 300){
+                    syncAddReactionHistory(reaction)
+                }
                 Log.d("NotesViewModel", "結果: $res")
             }catch(e: Exception){
                 Log.e("NotesViewModel", "postReaction error", e)
@@ -177,6 +183,14 @@ class NotesViewModel(
         )).execute()
     }
 
+    private fun syncAddReactionHistory(reaction: String){
+        try{
+            val domain = connectionInstance.instanceBaseUrl
+            reactionHistoryDao.insert(ReactionHistory(instanceDomain = domain, reaction = reaction))
+        }catch(e: Exception){
+            Log.e(TAG, "reaction追加中にエラー発生", e)
+        }
+    }
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event){
         note?: return
