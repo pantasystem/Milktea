@@ -1,35 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp"
         android:background="?attr/colorSurface"
         >
 
-    <ImageView
-            android:id="@+id/bottom_sheet_behavior_icon"
+
+    <com.google.android.material.tabs.TabLayout
+            android:id="@+id/reaction_choices_tab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:tabMode="scrollable"
+            app:tabTextColor="?android:attr/textColor"
+            android:layout_toStartOf="@id/reaction_input_keyboard"
+            >
+
+
+    </com.google.android.material.tabs.TabLayout>
+    <ImageButton
+            android:id="@+id/reaction_input_keyboard"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:src="@drawable/ic_keyboard_black_24dp"
             android:tint="?attr/colorNoteActionButtonTint"
-            app:srcCompat="@drawable/ic_expand_less_black_24dp"
             tools:ignore="ContentDescription" />
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/reaction_preview_list"
+    <androidx.viewpager.widget.ViewPager
+            android:id="@+id/reaction_choices_view_pager"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp">
+            android:layout_height="match_parent"
+            android:layout_below="@id/reaction_choices_tab"/>
 
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <EditText
-            android:id="@+id/editText"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:ems="10"
-            android:hint="@string/input_custom_emoji"
-            android:inputType="textPersonName" />
-</LinearLayout>
+</RelativeLayout>

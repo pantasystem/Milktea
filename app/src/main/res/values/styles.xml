@@ -111,7 +111,7 @@
     </style>
 
 
-    <style name="ReactionTabStyle" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">10sp</item>
+    <style name="ReactionTabStyle" parent="Widget.Design.TabLayout">
+        <item name="android:textColor">?android:attr/textColor</item>
     </style>
 </resources>

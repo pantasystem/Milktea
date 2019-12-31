@@ -8,7 +8,8 @@ data class Emoji(
     val host: String?,
     val url: String?,
     val uri: String?,
-    val type: String?
+    val type: String?,
+    val category: String?
     //val aliases: List<String>
 
 ): Serializable{

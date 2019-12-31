@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="reaction_choices_columns">12</integer>
+    <integer name="reaction_choices_columns">10</integer>
 </resources>

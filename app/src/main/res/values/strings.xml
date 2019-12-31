@@ -154,4 +154,7 @@
     <string name="invalid_pw_id">無効なパスワード・ID</string>
 
     <string name="auth">認証</string>
+
+    <string name="often_use">よく使う</string>
+    <string name="all">全て</string>
 </resources>
