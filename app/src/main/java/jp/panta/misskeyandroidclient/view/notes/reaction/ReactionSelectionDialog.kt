@@ -19,6 +19,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesFragment
+import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.dialog_select_reaction.*
@@ -79,6 +80,14 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         reaction_choices_view_pager.adapter = pagerAdapter
         reaction_choices_tab.setupWithViewPager(reaction_choices_view_pager)
+
+        reaction_input_keyboard.setOnClickListener {
+
+            /*val dialog = ReactionInputDialog()
+            dialog.show(childFragmentManager, "ReactionSelectionDialog")*/
+            dismiss()
+            notesViewModel.showInputReactionEvent.event = Unit
+        }
 
 
     }

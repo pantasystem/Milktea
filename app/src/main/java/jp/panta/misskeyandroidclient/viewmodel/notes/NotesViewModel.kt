@@ -58,6 +58,8 @@ class NotesViewModel(
 
     val targetFile = EventBus<Pair<FileViewData, MediaViewData>>()
 
+    val showInputReactionEvent = EventBus<Unit>()
+
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
         Log.d("NotesViewModel", "登録しました: $note")

@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
+import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
@@ -72,13 +73,17 @@ class ActionNoteHandler(
 
     private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{
         Log.d("ActionNoteHandler", "${it.first.fileProperty}")
-        val currentItem = it.first
         val list = it.second.files.map{fv ->
             fv.fileProperty
         }
         val intent = MediaActivity.newIntent(activity, ArrayList(list), 0)
         activity.startActivity(intent)
         //val intent =
+    }
+
+    private val reactionInputObserver = Observer<Unit>{
+        val dialog = ReactionInputDialog()
+        dialog.show(activity.supportFragmentManager, "")
     }
 
     fun initViewModelListener(){
@@ -108,5 +113,8 @@ class ActionNoteHandler(
 
         mNotesViewModel.targetFile.removeObserver(fileTargetObserver)
         mNotesViewModel.targetFile.observe(activity, fileTargetObserver)
+
+        mNotesViewModel.showInputReactionEvent.removeObserver(reactionInputObserver)
+        mNotesViewModel.showInputReactionEvent.observe(activity, reactionInputObserver)
     }
 }

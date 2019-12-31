@@ -19,6 +19,7 @@
             app:reactionStringView="@{reactionStringPreview}"
             app:reaction="@{reaction}"
             android:onClick="@{ ()-> notesViewModel.postReaction(reaction) }"
+            android:background="?attr/colorSurface"
             >
 
         <ImageView
@@ -28,7 +29,7 @@
                 android:layout_gravity="center"
                 tools:srcCompat="@mipmap/ic_launcher"
                 android:layout_marginEnd="4dp"
-                />
+                tools:ignore="ContentDescription" />
         <TextView
                 android:id="@+id/reactionStringPreview"
                 android:layout_width="wrap_content"
