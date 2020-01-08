@@ -19,6 +19,7 @@ import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.view.notes.editor.PollEditorFragment
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
+import jp.panta.misskeyandroidclient.view.notes.editor.VisibilitySelectionDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
@@ -82,6 +83,12 @@ class NoteEditorActivity : AppCompatActivity() {
                 intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
                 startService(intent)
                 finish()
+            })
+
+            viewModel.showVisibilitySelectionEvent.observe(this, Observer {
+                Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
+                val dialog = VisibilitySelectionDialog()
+                dialog.show(supportFragmentManager, "NoteEditor")
             })
 
         })
@@ -196,45 +203,6 @@ class NoteEditorActivity : AppCompatActivity() {
         }
     }
 
-    private fun getDocumentFile(data: Intent): File {
-        val strDocId = DocumentsContract.getDocumentId(data.data)
 
-        val strSplittedDocId = strDocId.split(":")
-        Log.d("EditNoteActivity", "strSplittedDocId $strSplittedDocId")
-        val strId = strSplittedDocId[strSplittedDocId.size - 1]
-
-        val crsCursor = contentResolver.query(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            arrayOf(MediaStore.MediaColumns.DATA),
-            "_id=?",
-            arrayOf(strId),
-            null
-        )
-        crsCursor?.moveToFirst()
-        val filePath = crsCursor?.getString(0)
-        crsCursor?.close()
-        Log.d("EditNoteActivity", "filePath $filePath")
-        return File(filePath)
-    }
-
-
-    private fun getMediaFile(data: Intent): File?{
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(data.data!!, projection, null, null, null, null)
-
-        val path: String?
-        if(cursor != null){
-            if(cursor.moveToFirst()){
-                path = cursor.getString(0)
-            }else{
-                path = null
-            }
-            cursor.close()
-
-        }else{
-            path = null
-        }
-        return if(path == null) null else File(path)
-    }
 
 }

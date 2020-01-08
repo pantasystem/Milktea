@@ -14,6 +14,8 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.meta.Meta
+import jp.panta.misskeyandroidclient.model.notes.CreateNote
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import java.io.File
@@ -26,6 +28,9 @@ class NoteEditorViewModel(
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption
 ) : ViewModel(){
+
+
+
     val hasCw = MutableLiveData<Boolean>(false)
     val cw = MutableLiveData<String>()
     val text = MutableLiveData<String>("")
@@ -60,7 +65,9 @@ class NoteEditorViewModel(
         }
     }
 
-    val visibility = MutableLiveData<String>()
+    val visibility = MutableLiveData<PostNoteTask.Visibility>(PostNoteTask.Visibility.PUBLIC)
+    val showVisibilitySelectionEvent = EventBus<Unit>()
+    val visibilitySelectedEvent = EventBus<Unit>()
 
     val poll = MutableLiveData<PollEditor?>()
 
@@ -70,13 +77,11 @@ class NoteEditorViewModel(
         val noteTask = PostNoteTask(connectionInstance, encryption)
         noteTask.cw = cw.value
         noteTask.files = editorFiles.value
-        //noteTask.localOnl
-        //noteTask.noExtractEmojis =
         noteTask.text =text.value
         noteTask.poll = poll.value?.buildCreatePoll()
         noteTask.renoteId = quoteToNoteId
         noteTask.replyId = replyToNoteId
-        //noteTask.setVisibility()
+        noteTask.setVisibility(visibility.value)
         this.noteTask.postValue(noteTask)
     }
 
@@ -156,6 +161,15 @@ class NoteEditorViewModel(
         if(p != null){
             poll.value = null
         }
+    }
+
+    fun showVisibilitySelection(){
+        showVisibilitySelectionEvent.event = Unit
+    }
+
+    fun setVisibility(visibility: PostNoteTask.Visibility){
+        this.visibility.value = visibility
+        this.visibilitySelectedEvent.event = Unit
     }
 
 

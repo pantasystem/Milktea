@@ -29,6 +29,7 @@
             <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginStart="100dp"
                     >
 
                 <Button
@@ -169,8 +170,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:tint="?attr/colorNoteActionButtonTint"
-                    app:srcCompat="@drawable/ic_language_black_24dp"
-                    tools:ignore="ContentDescription" />
+                    tools:src="@drawable/ic_language_black_24dp"
+                    tools:ignore="ContentDescription"
+                    app:noteVisibility="@{viewModel.visibility}"
+                    android:onClick="@{()-> viewModel.showVisibilitySelection()}"/>
         </LinearLayout>
 
         <LinearLayout
