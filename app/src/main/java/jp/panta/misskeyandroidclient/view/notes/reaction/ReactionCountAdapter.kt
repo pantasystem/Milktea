@@ -11,8 +11,27 @@ import jp.panta.misskeyandroidclient.databinding.ItemReactionBinding
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
-class ReactionCountAdapter(diffUtilCallBack: DiffUtil.ItemCallback<Pair<String, Int>>, private val note: PlaneNoteViewData, private val notesViewModel: NotesViewModel) : ListAdapter<Pair<String, Int>, ReactionCountAdapter.ReactionHolder>(diffUtilCallBack){
+class ReactionCountAdapter(private val note: PlaneNoteViewData, private val notesViewModel: NotesViewModel) : ListAdapter<Pair<String, Int>, ReactionCountAdapter.ReactionHolder>(
+    reactionDiffUtilItemCallback){
     class ReactionHolder(val binding: ItemReactionBinding): RecyclerView.ViewHolder(binding.root)
+
+    companion object{
+        private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<Pair<String, Int>>(){
+            override fun areContentsTheSame(
+                oldItem: Pair<String, Int>,
+                newItem: Pair<String, Int>
+            ): Boolean {
+                return oldItem == newItem
+            }
+
+            override fun areItemsTheSame(
+                oldItem: Pair<String, Int>,
+                newItem: Pair<String, Int>
+            ): Boolean {
+                return oldItem.first == newItem.first
+            }
+        }
+    }
 
     override fun onBindViewHolder(holder: ReactionHolder, position: Int) {
         val item =  getItem(position)

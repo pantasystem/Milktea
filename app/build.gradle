@@ -74,7 +74,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
@@ -102,4 +102,5 @@ dependencies {
     //PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
 
+    implementation 'com.google.android:flexbox:2.0.1'
 }

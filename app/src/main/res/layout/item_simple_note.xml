@@ -250,7 +250,7 @@
                 android:orientation="horizontal"
                 android:layout_below="@+id/reaction_view"
                 android:layout_toEndOf="@+id/avatarIcon"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 >
 
             <ImageButton

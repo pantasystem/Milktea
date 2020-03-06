@@ -13,7 +13,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBinding
 import jp.panta.misskeyandroidclient.getAppTheme
-import jp.panta.misskeyandroidclient.setStyle
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 
 class VisibilitySelectionDialog : BottomSheetDialogFragment(){

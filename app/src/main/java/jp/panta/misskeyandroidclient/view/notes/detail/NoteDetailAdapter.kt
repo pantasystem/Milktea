@@ -11,10 +11,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemConversationBinding
 import jp.panta.misskeyandroidclient.databinding.ItemDetailNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
+import jp.panta.misskeyandroidclient.view.notes.TimelineListAdapter
 import jp.panta.misskeyandroidclient.view.notes.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -82,16 +84,13 @@ class NoteDetailAdapter(
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val note = getItem(position)
-        val reactionAdapter = createReactionAdapter(note)
-        val layoutManager = LinearLayoutManager(holder.itemView.context)
+        //val reactionAdapter = createReactionAdapter(note)
+        //val layoutManager = LinearLayoutManager(holder.itemView.context)
         when(holder){
             is NoteHolder ->{
                 holder.binding.note = note
                 holder.binding.notesViewModel = notesViewModel
-                holder.binding.simpleNote.reactionView.apply{
-                    this.layoutManager = layoutManager
-                    adapter = reactionAdapter
-                }
+                setReactionCounter(note, holder.binding.simpleNote.reactionView)
                 if(note.poll != null){
                     holder.binding.simpleNote.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)
                     holder.binding.simpleNote.poll.layoutManager = LinearLayoutManager(holder.binding.root.context)
@@ -102,10 +101,7 @@ class NoteDetailAdapter(
             is DetailNoteHolder ->{
                 holder.binding.note = note as NoteDetailViewData
                 holder.binding.notesViewModel = notesViewModel
-                holder.binding.reactionView.apply{
-                    this.layoutManager = layoutManager
-                    adapter = reactionAdapter
-                }
+                setReactionCounter(note, holder.binding.reactionView)
 
                 if(note.poll != null){
                     holder.binding.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)
@@ -118,10 +114,10 @@ class NoteDetailAdapter(
                 Log.d("NoteDetailAdapter", "conversation: ${(note as NoteConversationViewData).conversation.value?.size}")
                 holder.binding.childrenViewData = note
                 holder.binding.notesViewModel = notesViewModel
-                holder.binding.childNote.reactionView.layoutManager = layoutManager
-                holder.binding.childNote.reactionView.adapter = reactionAdapter
+                setReactionCounter(note, holder.binding.childNote.reactionView)
+
                 holder.binding.noteDetailViewModel = noteDetailViewModel
-                val adapter = NoteChildConversationAdapter(notesViewModel, reactionAdapter)
+                val adapter = NoteChildConversationAdapter(notesViewModel, viewLifecycleOwner)
                 holder.binding.conversationView.adapter = adapter
                 holder.binding.conversationView.layoutManager = LinearLayoutManager(holder.itemView.context)
                 note.conversation.observe(viewLifecycleOwner, Observer {
@@ -138,23 +134,36 @@ class NoteDetailAdapter(
         }
 
     }
+    private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView){
 
-    private val reactionCountAdapterDiffUtilItemCallback = object : DiffUtil.ItemCallback<Pair<String, Int>>(){
-        override fun areContentsTheSame(
-            oldItem: Pair<String, Int>,
-            newItem: Pair<String, Int>
-        ): Boolean {
-            return oldItem == newItem
+        val reactionList = note.reactionCounts.value?.toList()?: emptyList()
+        val adapter = ReactionCountAdapter(note, notesViewModel)
+        reactionView.adapter = adapter
+
+        adapter.submitList(reactionList)
+
+        val observer = Observer<LinkedHashMap<String, Int>> {
+            adapter.submitList(it.toList())
+        }
+        note.reactionCounts.observe(viewLifecycleOwner, observer)
+
+        val exLayoutManager = reactionView.layoutManager
+        if(exLayoutManager !is FlexboxLayoutManager){
+            val flexBoxLayoutManager = FlexboxLayoutManager(reactionView.context)
+            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
+            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
+            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
+            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+            reactionView.layoutManager = flexBoxLayoutManager
         }
 
-        override fun areItemsTheSame(
-            oldItem: Pair<String, Int>,
-            newItem: Pair<String, Int>
-        ): Boolean {
-            return oldItem.first == newItem.first
+        if(reactionList.isNotEmpty()){
+            reactionView.visibility = View.VISIBLE
         }
+
     }
+
     private fun createReactionAdapter(note: PlaneNoteViewData): ReactionCountAdapter{
-        return ReactionCountAdapter(reactionCountAdapterDiffUtilItemCallback, note, notesViewModel)
+        return ReactionCountAdapter(note, notesViewModel)
     }
 }

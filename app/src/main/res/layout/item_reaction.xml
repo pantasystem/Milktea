@@ -26,6 +26,7 @@
             app:reactionStringView="@{reactionText}"
             app:reaction="@{reaction.first}"
             android:layout_marginEnd="5dp"
+            android:layout_marginBottom="4dp"
             tools:background="@drawable/shape_normal_reaction_backgruond"
 
             app:reactionNote="@{note}"
