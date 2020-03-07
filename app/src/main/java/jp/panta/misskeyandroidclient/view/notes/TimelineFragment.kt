@@ -7,6 +7,7 @@ import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -17,10 +18,11 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 
-class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view){
+class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop{
 
     companion object{
         private const val EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.setting"
@@ -196,6 +198,12 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
             }
 
+        }
+    }
+
+    override fun showTop() {
+        if(lifecycle.currentState == Lifecycle.State.RESUMED){
+            mLinearLayoutManager.scrollToPosition(0)
         }
     }
 

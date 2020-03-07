@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
@@ -20,7 +21,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewMode
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
 import kotlinx.android.synthetic.main.fragment_notification.*
 
-class NotificationFragment : Fragment(R.layout.fragment_notification){
+class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
 
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
@@ -69,9 +70,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val firstVisibleItemPosition = mLinearLayoutManager?.findFirstVisibleItemPosition()?: -1
-            val endVisibleItemPosition = mLinearLayoutManager?.findLastVisibleItemPosition()?: -1
-            val itemCount = mLinearLayoutManager?.itemCount?: -1
+            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
+            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
+            val itemCount = mLinearLayoutManager.itemCount
 
 
             if(firstVisibleItemPosition == 0){
@@ -81,7 +82,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
             if(endVisibleItemPosition == (itemCount - 1)){
                 Log.d("", "後ろ")
                 //mTimelineViewModel?.getOldTimeline()
-                mViewModel?.loadOld()
+                mViewModel.loadOld()
 
             }
 
@@ -102,5 +103,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification){
         ): Boolean {
             return oldItem.id == newItem.id
         }
+    }
+
+    override fun showTop() {
+        mLinearLayoutManager.scrollToPosition(0)
     }
 }

@@ -1,11 +1,12 @@
 package jp.panta.misskeyandroidclient
 
-import android.app.ActivityManager
-import android.content.Context
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Messenger
 import android.util.Log
-import android.util.TypedValue
 
 import android.view.Menu
 import android.view.MenuItem
@@ -24,8 +25,8 @@ import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
+import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
-import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var mNotesViewModel: NotesViewModel
     private lateinit var mAccountViewModel: AccountViewModel
 
-    private var bottomNavigationAdapter: MainBottomNavigationAdapter? = null
+    private var mBottomNavigationAdapter: MainBottomNavigationAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +72,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(Intent(this, NoteEditorActivity::class.java))
         }
 
-        init()
 
         val miApplication = application as MiApplication
 
@@ -85,7 +85,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
 
                 Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.connectionInstance}")
-                init()
                 ActionNoteHandler(this, mNotesViewModel).initViewModelListener()
                 init = true
                 Log.d("MainActivity", "初期化処理")
@@ -103,17 +102,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         test()
 
         startService(Intent(this, NotificationService::class.java))
-    }
-
-    private fun init(){
-        val ci = (application as MiApplication).currentConnectionInstanceLiveData.value
-        if(ci != null){
-            //setFragment("home")
-            //setHeaderProfile(ci)
-            bottomNavigationAdapter = MainBottomNavigationAdapter()
-        }
+        mBottomNavigationAdapter = MainBottomNavigationAdapter()
 
     }
+
 
 
     inner class MainBottomNavigationAdapter
@@ -138,6 +130,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.navigation_notification -> NotificationFragment()
                 R.id.navigation_message_list -> MessagingHistoryFragment()
                 else -> null
+            }
+        }
+
+        override fun menuRetouched(menuItem: MenuItem, fragment: Fragment) {
+            if(fragment is ScrollableTop){
+                fragment.showTop()
             }
         }
 
@@ -213,8 +211,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
-        }else if(bottomNavigationAdapter?.currentMenuItem?.itemId != R.id.navigation_home){
-            bottomNavigationAdapter?.setCurrentFragment(R.id.navigation_home)
+        }else if(mBottomNavigationAdapter?.currentMenuItem?.itemId != R.id.navigation_home){
+            mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_home)
         }else{
             super.onBackPressed()
         }
@@ -266,5 +264,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return false
+    }
+
+    val notificationServiceConnection = object : ServiceConnection{
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+            val messenger = Messenger(p1)
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
     }
 }

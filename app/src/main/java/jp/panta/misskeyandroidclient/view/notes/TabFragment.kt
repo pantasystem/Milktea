@@ -19,14 +19,16 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import kotlinx.android.synthetic.main.fragment_tab.*
 
-class TabFragment : Fragment(){
+class TabFragment : Fragment(), ScrollableTop{
 
 
     private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
 
+    private lateinit var mPagerAdapter: TimelinePagerAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //return super.onCreateView(inflater, container, savedInstanceState)
@@ -57,13 +59,16 @@ class TabFragment : Fragment(){
                 setting.includeRenotedMyNotes = includeRenotedMyNotes
             }
 
-            val adapter = TimelinePagerAdapter(activity?.supportFragmentManager, settings)
-            viewPager.adapter = adapter
+            mPagerAdapter = TimelinePagerAdapter(activity?.supportFragmentManager, settings)
+            viewPager.adapter = mPagerAdapter
             tabLayout.setupWithViewPager(viewPager)
 
             if(settings.size <= 1){
                 tabLayout.visibility = View.GONE
                 elevationView.visibility = View.VISIBLE
+            }else{
+                tabLayout.visibility = View.VISIBLE
+                elevationView.visibility = View.GONE
             }
         })
     }
@@ -75,6 +80,9 @@ class TabFragment : Fragment(){
     }
 
     class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, val requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+
+        val scrollableTopFragments = ArrayList<ScrollableTop>()
+
         override fun getCount(): Int {
             return requestBaseList.size
         }
@@ -83,11 +91,15 @@ class TabFragment : Fragment(){
             Log.d("getItem", "$p0, ${requestBaseList[p0].type}")
             val item = requestBaseList[p0]
             val noteId = item.noteId
-            return if(item.type == NoteType.DETAIL && noteId != null){
+            val fragment =  if(item.type == NoteType.DETAIL && noteId != null){
                 NoteDetailFragment.newInstance(noteId)
             }else{
                 TimelineFragment.newInstance(item)
             }
+            if(fragment is ScrollableTop){
+                scrollableTopFragments.add(fragment)
+            }
+            return fragment
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
@@ -96,4 +108,16 @@ class TabFragment : Fragment(){
         }
 
     }
+
+    override fun showTop() {
+        showTopCurrentFragment()
+    }
+
+    private fun showTopCurrentFragment(){
+        mPagerAdapter.scrollableTopFragments.forEach{
+            it.showTop()
+        }
+    }
+
+
 }
