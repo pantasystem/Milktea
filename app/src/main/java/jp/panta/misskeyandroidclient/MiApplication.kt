@@ -85,7 +85,7 @@ class MiApplication : Application(){
 
         val currentUserId = getCurrentUserId()
 
-        GlobalScope.launch{
+        GlobalScope.launch(Dispatchers.IO){
             try{
                 val connectionInstances = connectionInstanceDao!!.findAll()
                 this@MiApplication.connectionInstancesLiveData.postValue(connectionInstances)
@@ -212,7 +212,7 @@ class MiApplication : Application(){
     private fun updateAccounts(instances: List<ConnectionInstance>){
 
         val a = instances.map{
-            GlobalScope.async {
+            GlobalScope.async(Dispatchers.IO) {
                 try{
                     val api = misskeyAPIServiceDomainMap?.get(it.instanceBaseUrl)
 
@@ -223,7 +223,7 @@ class MiApplication : Application(){
                 }
             }
         }
-        GlobalScope.launch{
+        GlobalScope.launch(Dispatchers.IO){
             try{
                 Log.d("MiApplication", "Accountsの取得を開始します")
                 val notNullUsers = a.awaitAll().filterNotNull()
