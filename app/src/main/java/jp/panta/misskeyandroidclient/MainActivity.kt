@@ -99,7 +99,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        test()
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter()
@@ -191,10 +190,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toolbar.title = title
     }
 
-    private fun test(){
-        //startActivity(Intent(this, AuthActivity::class.java))
-    }
-
     private fun setHeaderProfile(activityMainBinding: ActivityMainBinding){
 
 
@@ -266,13 +261,5 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return false
     }
 
-    val notificationServiceConnection = object : ServiceConnection{
-        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            val messenger = Messenger(p1)
-        }
 
-        override fun onServiceDisconnected(p0: ComponentName?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-    }
 }
