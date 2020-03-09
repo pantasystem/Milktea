@@ -125,7 +125,7 @@ class MiApplication : Application(){
 
     }
 
-    fun switchAccount(ci: ConnectionInstance){
+    fun switchCurrentAccount(ci: ConnectionInstance){
 
         val count = connectionInstancesLiveData.value?.filter{
             it.userId == ci.userId && it.getAccessToken(encryption) == ci.getAccessToken(encryption)

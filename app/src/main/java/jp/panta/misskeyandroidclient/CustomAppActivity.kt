@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -14,14 +13,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityCustomAppBinding
-import jp.panta.misskeyandroidclient.databinding.ItemAccountBinding
-import jp.panta.misskeyandroidclient.databinding.ItemAppBinding
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.Session
-import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.auth.AppSelectDialog
-import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.auth.custom.CustomAppViewModel
 
@@ -129,7 +124,7 @@ class CustomAppActivity : AppCompatActivity() {
     }
 
     private val switchAccountObserver = Observer<ConnectionInstance>{
-        (application as MiApplication).switchAccount(it)
+        (application as MiApplication).switchCurrentAccount(it)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

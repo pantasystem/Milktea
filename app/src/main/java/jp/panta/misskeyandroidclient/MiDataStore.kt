@@ -1,5 +1,9 @@
 package jp.panta.misskeyandroidclient
 
-interface MiDataStore {
+import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 
+interface MiDataStore {
+    fun switchCurrentAccount()
+
+    fun addAccount(ci: ConnectionInstance)
 }

@@ -4,6 +4,7 @@ import androidx.room.*
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.app.Account
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.io.Serializable
 
@@ -37,7 +38,8 @@ data class NoteRequest(
         val excludeNsfw: Boolean? = null,
         val query: String? = null,
         val tag: String? = null,
-        val noteId: String? = null
+        val noteId: String? = null,
+        var accountId: String? = null
     ): Serializable{
         @PrimaryKey(autoGenerate = true)
         var id: Long? = null
@@ -91,6 +93,11 @@ data class NoteRequest(
             }else{
                 this
             }
+        }
+
+        @Ignore
+        fun setAccount(account: Account){
+            accountId = account.id
         }
     }
 

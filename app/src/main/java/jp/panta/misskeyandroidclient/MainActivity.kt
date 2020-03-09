@@ -1,11 +1,7 @@
 package jp.panta.misskeyandroidclient
 
-import android.content.ComponentName
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
-import android.os.Messenger
 import android.util.Log
 
 import android.view.Menu
@@ -150,7 +146,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private val switchAccountObserver = Observer<ConnectionInstance>{
-        (application as MiApplication).switchAccount(it)
+        (application as MiApplication).switchCurrentAccount(it)
     }
 
     private val showFollowingsObserver = Observer<Unit>{
