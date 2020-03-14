@@ -1,10 +1,9 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import androidx.room.*
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.app.Account
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import java.io.Serializable
 
