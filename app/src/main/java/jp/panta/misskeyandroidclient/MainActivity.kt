@@ -89,7 +89,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
 
-        miApplication.isSuccessLoadConnectionInstance.observe(this, Observer {
+
+        miApplication.isSuccessCurrentAccount.observe(this, Observer {
             if(!it){
                 startActivity(Intent(this, AuthActivity::class.java))
             }

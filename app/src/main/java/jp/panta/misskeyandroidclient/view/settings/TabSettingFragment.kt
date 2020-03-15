@@ -18,7 +18,6 @@ import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.viewmodel.setting.tab.SettingTab
 import kotlinx.android.synthetic.main.fragment_tab_setting.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class TabSettingFragment : Fragment(){
@@ -81,7 +80,7 @@ class TabSettingFragment : Fragment(){
         selectable_tab_list.adapter = selectableTabAdapter
 
 
-        miApplication.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {
+        miApplication.mNoteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {
             val list = if(it.isNullOrEmpty()){
                 defaultTabVisibleSettings()
             }else{
@@ -132,7 +131,7 @@ class TabSettingFragment : Fragment(){
     private fun saveTabs(){
         GlobalScope.launch{
             val miApplication = context?.applicationContext as MiApplication?
-            val dao = miApplication?.noteRequestSettingDao?: return@launch
+            val dao = miApplication?.mNoteRequestSettingDao?: return@launch
 
             val selectedList = mSelectedListLiveData.value?.map{
                 it.toSetting()

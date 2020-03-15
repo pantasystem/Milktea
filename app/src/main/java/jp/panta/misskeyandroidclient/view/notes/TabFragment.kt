@@ -1,7 +1,5 @@
 package jp.panta.misskeyandroidclient.view.notes
 
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -16,7 +14,6 @@ import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.SecretConstant
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -48,7 +45,7 @@ class TabFragment : Fragment(), ScrollableTop{
         val includeLocalRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
-        miApp.noteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {settingList ->
+        miApp.mNoteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer { settingList ->
             val settings = if(settingList.isNullOrEmpty()){
                 makeDefaultNoteSetting(defaultTabType)
             }else settingList

@@ -25,5 +25,7 @@ interface NoteRequestSettingDao {
     @Query("delete from setting")
     fun deleteAll()
 
+    @Delete
+    fun deleteAll(list: List<NoteRequest.Setting>)
 
 }
