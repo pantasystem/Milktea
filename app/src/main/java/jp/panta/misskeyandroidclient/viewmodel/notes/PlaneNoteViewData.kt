@@ -1,16 +1,18 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 
 open class PlaneNoteViewData (
     val note: Note,
-    val connectionInstance: ConnectionInstance
+    val account: Account
 ) : NoteViewData{
 
     val id = note.id
@@ -28,7 +30,7 @@ open class PlaneNoteViewData (
             }
         }
 
-    val isMyNote = connectionInstance.userId == toShowNote.user.id
+    val isMyNote = account.id == toShowNote.user.id
 
     val statusMessage: String?
         get(){

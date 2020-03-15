@@ -17,13 +17,14 @@ import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import java.lang.Exception
 import kotlin.collections.HashMap
 
 
 //基本的な情報はここを返して扱われる
-class MiApplication : Application(){
+class MiApplication : Application(), MiCore {
     companion object{
         const val CURRENT_USER_ID = "jp.panta.misskeyandroidclient.MiApplication.CurrentUserId"
         const val TAG = "MiApplication"
@@ -40,7 +41,6 @@ class MiApplication : Application(){
     lateinit var reactionHistoryDao: ReactionHistoryDao
 
 
-    val accounts = MutableLiveData<List<AccountRelation>>()
 
 
     var nowInstanceMeta: Meta? = null
@@ -54,7 +54,9 @@ class MiApplication : Application(){
 
     // private var mConnectionInstance: ConnectionInstance? = null
 
-    val currentAccount = MutableLiveData<AccountRelation>()
+    override val accounts = MutableLiveData<List<AccountRelation>>()
+
+    override val currentAccount = MutableLiveData<AccountRelation>()
 
 
     var isSuccessCurrentAccount = MutableLiveData<Boolean>()
@@ -92,7 +94,7 @@ class MiApplication : Application(){
         }
     }
 
-    fun addAndChangeAccount(account: Account) {
+    override fun addAndChangeAccount(account: Account) {
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mAccountDao.insert(account)
@@ -103,7 +105,7 @@ class MiApplication : Application(){
         }
     }
 
-    fun logoutAccount(account: Account) {
+    override fun logoutAccount(account: Account) {
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mAccountDao.delete(account)
@@ -116,7 +118,7 @@ class MiApplication : Application(){
 
 
 
-    fun addPageInCurrentAccount(noteRequestSetting: NoteRequest.Setting){
+    override fun addPageInCurrentAccount(noteRequestSetting: NoteRequest.Setting){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mNoteRequestSettingDao.insert(noteRequestSetting)
@@ -127,7 +129,7 @@ class MiApplication : Application(){
         }
     }
 
-    fun addAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
+    override fun addAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mNoteRequestSettingDao.insertAll(noteRequestSettings)
@@ -138,7 +140,7 @@ class MiApplication : Application(){
         }
     }
 
-    fun removePageInCurrentAccount(noteRequestSetting: NoteRequest.Setting){
+    override fun removePageInCurrentAccount(noteRequestSetting: NoteRequest.Setting){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 noteRequestSetting.id?.let {
@@ -151,7 +153,7 @@ class MiApplication : Application(){
         }
     }
 
-    fun removeAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
+    override fun removeAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mNoteRequestSettingDao.insertAll(noteRequestSettings)
@@ -162,7 +164,7 @@ class MiApplication : Application(){
         }
     }
 
-    fun putConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation){
+    override fun putConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mConnectionInformationDao.insert(ci)
@@ -173,7 +175,18 @@ class MiApplication : Application(){
         }
     }
 
-    fun removeConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation){
+    override fun removeConnectSetting(connectionInformation: EncryptedConnectionInformation) {
+        GlobalScope.launch(Dispatchers.IO){
+            try{
+                mConnectionInformationDao.delete(connectionInformation)
+                loadAndInitializeAccounts()
+            }catch(e: Exception){
+                Log.e(TAG, "", e)
+            }
+        }
+    }
+
+    override fun removeConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mConnectionInformationDao.insert(ci)

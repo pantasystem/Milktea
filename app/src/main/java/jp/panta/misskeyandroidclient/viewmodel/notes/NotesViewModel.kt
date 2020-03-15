@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
@@ -26,13 +27,13 @@ import retrofit2.Response
 import java.io.File
 
 class NotesViewModel(
-    ci: ConnectionInstance,
+    var accountRelation: AccountRelation,
     api: MisskeyAPI,
     private val encryption: Encryption,
     private val reactionHistoryDao: ReactionHistoryDao
 ) : ViewModel(){
     private val TAG = "NotesViewModel"
-    var connectionInstance = ci
+    //var accountRelation.getCurrentConnectionInformation()? = ci
     var misskeyAPI = api
 
     val statusMessage = EventBus<String>()
@@ -89,7 +90,7 @@ class NotesViewModel(
     fun postRenote(){
         val renoteId = reNoteTarget.event?.toShowNote?.id
         if(renoteId != null){
-            val request = CreateNote(i = connectionInstance.getI(encryption)!!, text = null, renoteId = renoteId)
+            val request = CreateNote(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, text = null, renoteId = renoteId)
             misskeyAPI.create(request).enqueue(object : Callback<CreateNote.Response>{
                 override fun onResponse(
                     call: Call<CreateNote.Response>,
@@ -115,7 +116,7 @@ class NotesViewModel(
      * イベントにリアクション送信ボタンを押したことを登録する
      */
     fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData){
-        Log.d("NotesViewModel", "connectionInstance: $connectionInstance")
+        //Log.d("NotesViewModel", "accountRelation.getCurrentConnectionInformation()?: $accountRelation.getCurrentConnectionInformation()?")
         val myReaction = planeNoteViewData.myReaction.value
         if(myReaction != null){
             viewModelScope.launch(Dispatchers.IO){
@@ -158,7 +159,7 @@ class NotesViewModel(
                     return@launch
                 }
                 val res = misskeyAPI.createReaction(CreateReaction(
-                    i = connectionInstance.getI(encryption)!!,
+                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                     reaction = reaction,
                     noteId = planeNoteViewData.toShowNote.id
                 )).execute()
@@ -180,15 +181,15 @@ class NotesViewModel(
     private fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
         planeNoteViewData.myReaction.value?: return
         misskeyAPI.deleteReaction(DeleteNote(
-            i = connectionInstance.getI(encryption)!!,
+            i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
             noteId = planeNoteViewData.toShowNote.id
         )).execute()
     }
 
     private fun syncAddReactionHistory(reaction: String){
         try{
-            val domain = connectionInstance.instanceBaseUrl
-            reactionHistoryDao.insert(ReactionHistory(instanceDomain = domain, reaction = reaction))
+            val domain = accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl
+            reactionHistoryDao.insert(ReactionHistory(instanceDomain = domain!!, reaction = reaction))
         }catch(e: Exception){
             Log.e(TAG, "reaction追加中にエラー発生", e)
         }
@@ -199,7 +200,7 @@ class NotesViewModel(
 
         misskeyAPI.createFavorite(
             NoteRequest(
-                i = connectionInstance.getI(encryption)!!,
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 noteId = note.toShowNote.id
             )
         ).enqueue(object : Callback<Unit>{
@@ -220,7 +221,7 @@ class NotesViewModel(
 
         misskeyAPI.deleteFavorite(
             NoteRequest(
-                i = connectionInstance.getI(encryption)!!,
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 noteId = note.toShowNote.id
             )
         ).enqueue(object : Callback<Unit>{
@@ -239,7 +240,7 @@ class NotesViewModel(
     fun removeNoteFromShareTarget(){
         val note = shareTarget.event
 
-        val isNowCurrentAccount = note?.connectionInstance?.userId == connectionInstance.userId
+        val isNowCurrentAccount = note?.account?.id == accountRelation.account.id
 
         if(note != null && isNowCurrentAccount){
             removeNote(note)
@@ -248,7 +249,7 @@ class NotesViewModel(
     fun removeNote(planeNoteViewData: PlaneNoteViewData){
         misskeyAPI.delete(
             DeleteNote(
-                i = connectionInstance.getI(encryption)!!,
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 noteId = planeNoteViewData.toShowNote.id
             )
         ).enqueue(object : Callback<Unit>{
@@ -266,7 +267,7 @@ class NotesViewModel(
     }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
-        misskeyAPI.noteState(NoteRequest(i = connectionInstance.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.id))
+        misskeyAPI.noteState(NoteRequest(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.id))
             .enqueue(object : Callback<State>{
                 override fun onResponse(call: Call<State>, response: Response<State>) {
                     val nowNoteId = shareTarget.event?.toShowNote?.id
@@ -290,7 +291,7 @@ class NotesViewModel(
         if(SafeUnbox.unbox(poll.canVote.value)){
             misskeyAPI.vote(
                 Vote(
-                    i = connectionInstance.getI(encryption)!!,
+                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                     choice = choice.number,
                     noteId = poll.noteId
                 )

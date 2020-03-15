@@ -71,23 +71,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val miApplication = application as MiApplication
 
-        mAccountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication.connectionInstanceDao!!))[AccountViewModel::class.java]
+        mAccountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         initAccountViewModelListener()
         setHeaderProfile(mainBinding)
 
         var init = false
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
+        miApplication.currentAccount.observe(this, Observer {
             if(!init){
                 mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
 
-                Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.connectionInstance}")
+                Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.accountRelation}")
                 ActionNoteHandler(this, mNotesViewModel).initViewModelListener()
                 init = true
                 Log.d("MainActivity", "初期化処理")
             }
-
         })
-
 
 
         miApplication.isSuccessCurrentAccount.observe(this, Observer {

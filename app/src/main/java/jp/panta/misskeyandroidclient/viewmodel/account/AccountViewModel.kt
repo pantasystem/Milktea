@@ -7,19 +7,20 @@ import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class AccountViewModel(
-    val connectionInstanceDao: ConnectionInstanceDao
+    val miCore: MiCore
 ) : ViewModel(){
 
-    class Factory(val connectionInstanceDao: ConnectionInstanceDao) : ViewModelProvider.Factory{
+    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == AccountViewModel::class.java){
-                return AccountViewModel(connectionInstanceDao) as T
+                return AccountViewModel(miCore) as T
             }
             throw IllegalArgumentException("use AccountViewModel::class.java")
         }
@@ -56,7 +57,7 @@ class AccountViewModel(
 
     fun signOut(accountViewData: AccountViewData){
         viewModelScope.launch(Dispatchers.IO){
-            connectionInstanceDao.delete(accountViewData.connectionInstance)
+            miCore.logoutAccount(accountViewData.accountRelation.account)
         }
     }
 
