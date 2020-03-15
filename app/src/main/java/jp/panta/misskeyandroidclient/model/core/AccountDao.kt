@@ -18,6 +18,6 @@ abstract class AccountDao{
     abstract fun delete(account: Account)
 
     @Query("select * from account left join connection_information on accountId = account.id and accountId = :account")
-    abstract fun findSettingByAccountId(account: String): List<AccountRelation>
+    abstract fun findSettingByAccountId(account: String): AccountRelation?
 
 }

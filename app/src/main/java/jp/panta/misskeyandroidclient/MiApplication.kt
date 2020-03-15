@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
@@ -12,17 +14,19 @@ import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
+import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.core.AccountDao
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.streming.NoteCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
-import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.viewmodel.core.AccountStore
+import jp.panta.misskeyandroidclient.viewmodel.core.ConnectionInformationStore
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotePageStore
 import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -32,26 +36,32 @@ import java.lang.IllegalArgumentException
 
 
 //基本的な情報はここを返して扱われる
-class MiApplication : Application(){
+class MiApplication : Application(), AccountStore, ConnectionInformationStore, NotePageStore{
     companion object{
         const val CURRENT_USER_ID = "jp.panta.misskeyandroidclient.MiApplication.CurrentUserId"
     }
 
-    var connectionInstanceDao: ConnectionInstanceDao? = null
-        private set
+    /*var connectionInstanceDao: ConnectionInstanceDao? = null
+        private set*/
+    private var mAccountDao: AccountDao? = null
 
     var noteRequestSettingDao: NoteRequestSettingDao? = null
 
     lateinit var reactionHistoryDao: ReactionHistoryDao
+
+    override val currentAccount: LiveData<AccountRelation> = MutableLiveData<AccountRelation>()
+
+    override val accounts: LiveData<List<AccountRelation>> = MutableLiveData<List<AccountRelation>>()
+
     //var currentUserId: String? = null
 
     //private val misskeyAPIService = MisskeyAPIServiceBuilder.build(nowInstance)
-    val currentConnectionInstanceLiveData = MutableLiveData<ConnectionInstance>()
+    //val currentConnectionInstanceLiveData = MutableLiveData<ConnectionInstance>()
 
-    val connectionInstancesLiveData = MutableLiveData<List<ConnectionInstance>>()
+    //val connectionInstancesLiveData = MutableLiveData<List<ConnectionInstance>>()
 
-    val currentAccountLiveData = MutableLiveData<User>()
-    val accountsLiveData = MutableLiveData<List<User>>()
+    //val currentAccountLiveData = MutableLiveData<User>()
+    //val accountsLiveData = MutableLiveData<List<User>>()
 
     var nowInstanceMeta: Meta? = null
 
@@ -60,7 +70,7 @@ class MiApplication : Application(){
     var misskeyAPIService: MisskeyAPI? = null
         private set
 
-    private var misskeyAPIServiceDomainMap: Map<String, MisskeyAPI>? = null
+    //private var misskeyAPIServiceDomainMap: Map<String, MisskeyAPI>? = null
 
     private var mConnectionInstance: ConnectionInstance? = null
 
@@ -75,7 +85,8 @@ class MiApplication : Application(){
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database").fallbackToDestructiveMigration().build()
-        connectionInstanceDao = database.connectionInstanceDao()
+        //connectionInstanceDao = database.connectionInstanceDao()
+        mAccountDao = database.accountDao()
 
         noteRequestSettingDao = database.noteSettingDao()
 
@@ -87,73 +98,53 @@ class MiApplication : Application(){
 
         GlobalScope.launch(Dispatchers.IO){
             try{
-                val connectionInstances = connectionInstanceDao!!.findAll()
-                this@MiApplication.connectionInstancesLiveData.postValue(connectionInstances)
-                Log.d("MiApplication", "connectionInstances: $connectionInstances")
+                //val connectionInstances = connectionInstanceDao!!.findAll()
+                val accountList = mAccountDao?.findAllSetting()
+                (accounts as MutableLiveData).postValue(accountList?: emptyList())
+                //this@MiApplication.connectionInstancesLiveData.postValue(connectionInstances)
+                Log.d("MiApplication", "accounts: ${accounts.value}")
 
-                misskeyAPIServiceDomainMap = connectionInstances?.map{
-                    it.instanceBaseUrl to MisskeyAPIServiceBuilder.build(it.instanceBaseUrl)
-                }?.toMap()
+
 
                 val current = if(currentUserId == null){
-                    connectionInstanceDao?.findAll()?.firstOrNull()
+                    accountList?.firstOrNull()
                 }else{
-                    connectionInstanceDao!!.findByUserId(currentUserId)
-                        ?: connectionInstanceDao?.findAll()?.firstOrNull()
+                    mAccountDao?.findSettingByAccountId(currentUserId)
                 }
 
                 if(current == null){
                     Log.w("MiApplication", "接続可能なアカウントを発見不能")
                     isSuccessLoadConnectionInstance.postValue(false)
                 }else{
-                    updateRelationConnectionInstanceProperty(current)
+                    //updateRelationConnectionInstanceProperty(current)
                 }
             }catch(e: Exception){
                 isSuccessLoadConnectionInstance.postValue(false)
             }
         }
 
-        connectionInstancesLiveData.observeForever {
-            updateAccounts(it)
-        }
 
-        currentConnectionInstanceLiveData.observeForever {
-            updateCurrentAccount(it, misskeyAPIService)
-        }
 
 
 
     }
 
-    fun switchCurrentAccount(ci: ConnectionInstance){
-
-        val count = connectionInstancesLiveData.value?.filter{
-            it.userId == ci.userId && it.getAccessToken(encryption) == ci.getAccessToken(encryption)
-        }?.size
-        if(count != null && count > 0){
-            updateRelationConnectionInstanceProperty(ci)
-        }else{
-            throw IllegalArgumentException("対象のアカウントが存在しませんこのメソッドは無効です")
-        }
-
-    }
-
-    fun addAccount(ci: ConnectionInstance){
+    override fun add(account: Account) {
         GlobalScope.launch(Dispatchers.IO){
-            try{
-                connectionInstanceDao?.insert(ci)
-                val connectionInstances = connectionInstanceDao?.findAll()
-                misskeyAPIServiceDomainMap = connectionInstances?.map{
-                    it.instanceBaseUrl to MisskeyAPIServiceBuilder.build(it.instanceBaseUrl)
-                }?.toMap()
+            mAccountDao?.insert(account)
 
-                updateRelationConnectionInstanceProperty(ci)
-                connectionInstancesLiveData.postValue(connectionInstanceDao?.findAll())
-            }catch(e: Exception){
-                Log.e("MiViewModel", "アカウントを追加することに失敗しました", e)
-            }
         }
     }
+
+    override fun remove(account: Account) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun changeCurrent(account: Account) {
+
+    }
+
+
 
 
     fun addPageToNoteSettings(noteRequestSetting: NoteRequest.Setting){
@@ -162,27 +153,7 @@ class MiApplication : Application(){
         }
     }
 
-    private fun updateRelationConnectionInstanceProperty(ci: ConnectionInstance){
-        try{
-            setCurrentUserId(ci.userId)
-            //misskeyAPIService = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
-            var service = misskeyAPIServiceDomainMap?.get(ci.instanceBaseUrl)
-            if(service == null){
-                Log.e("MiApplication","MisskeyAPIServiceを発見できなかった")
-                service = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
-            }
-            misskeyAPIService = service
 
-            mConnectionInstance = ci
-            currentConnectionInstanceLiveData.postValue(ci)
-            setMeta()
-            isSuccessLoadConnectionInstance.postValue(true)
-        }catch(e: Exception){
-            Log.e("MiApplication", "初期化中に致命的なエラー", e)
-            isSuccessLoadConnectionInstance.postValue(false)
-        }
-
-    }
 
     private fun setCurrentUserId(userId: String){
         sharedPreferences.edit().apply{
@@ -195,59 +166,6 @@ class MiApplication : Application(){
         return sharedPreferences.getString(CURRENT_USER_ID, null)
     }
 
-    private fun setMeta(){
-        misskeyAPIService?.getMeta(RequestMeta())
-            ?.enqueue(object : Callback<Meta>{
-                override fun onResponse(call: Call<Meta>, response: Response<Meta>) {
-                    nowInstanceMeta = response.body()
-                    //Log.d("MiApplication", "$nowInstanceMeta")
-                    Log.d("MiApplication", "metaを取得, code:${response.code()}")
-                }
-                override fun onFailure(call: Call<Meta>, t: Throwable) {
-                    Log.w("MiApplication", "metaの取得に失敗した", t)
-                }
-            })
-    }
 
-    private fun updateAccounts(instances: List<ConnectionInstance>){
-
-        val a = instances.map{
-            GlobalScope.async(Dispatchers.IO) {
-                try{
-                    val api = misskeyAPIServiceDomainMap?.get(it.instanceBaseUrl)
-
-                    api?.i(I(it.getI(encryption)!!))?.execute()?.body()
-
-                }catch(e: Exception){
-                    null
-                }
-            }
-        }
-        GlobalScope.launch(Dispatchers.IO){
-            try{
-                Log.d("MiApplication", "Accountsの取得を開始します")
-                val notNullUsers = a.awaitAll().filterNotNull()
-                accountsLiveData.postValue(notNullUsers)
-            }catch(e: Exception){
-                Log.d("MiApplication", "Account取得中にエラー発生", e)
-            }
-
-        }
-
-    }
-
-    private fun updateCurrentAccount(ci: ConnectionInstance, misskeyAPI: MisskeyAPI?){
-        val i = ci.getI(encryption)?: return
-        misskeyAPI?.i(I(i = i))?.enqueue(object : Callback<User>{
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                Log.d("MiApplication", "iを取得しました${response.body()}")
-                currentAccountLiveData.postValue(response.body())
-            }
-
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                Log.d("MiApplication", "iの取得に失敗しました")
-            }
-        })
-    }
 
 }

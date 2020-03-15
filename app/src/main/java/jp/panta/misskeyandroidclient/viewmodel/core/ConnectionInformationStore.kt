@@ -1,0 +1,3 @@
+package jp.panta.misskeyandroidclient.viewmodel.core
+
+interface ConnectionInformationStore
