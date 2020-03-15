@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.databinding.DataBindingUtil
@@ -64,11 +63,11 @@ class CustomAppAuthCallbackActivity : AppCompatActivity() {
             val ci = miApplication.connectionInstancesLiveData.value?.firstOrNull {
                 it.userId == token.user.id
             }?.apply{
-                setCustomAppSecret(bridge.secret, miApplication.encryption)
-                setAccessToken(token.accessToken, miApplication.encryption)
+                setCustomAppSecret(bridge.secret, miApplication.mEncryption)
+                setAccessToken(token.accessToken, miApplication.mEncryption)
             }?: ConnectionInstance(instanceBaseUrl = bridge.instanceDomain, userId = token.user.id).apply{
-                setCustomAppSecret(bridge.secret, miApplication.encryption)
-                setAccessToken(token.accessToken, miApplication.encryption)
+                setCustomAppSecret(bridge.secret, miApplication.mEncryption)
+                setAccessToken(token.accessToken, miApplication.mEncryption)
             }
             miApplication.addAccount(ci)
             finish()

@@ -17,7 +17,7 @@ abstract class AccountDao{
     @Delete
     abstract fun delete(account: Account)
 
-    @Query("select * from account left join connection_information on accountId = account.id and accountId = :accountId left join setting on account.id = setting.accountId")
+    @Query("select * from account left join connection_information on connection_information.accountId = account.id left join setting on account.id = setting.accountId where connection_information.accountId = :accountId")
     abstract fun findSettingByAccountId(accountId: String): AccountRelation?
 
 }

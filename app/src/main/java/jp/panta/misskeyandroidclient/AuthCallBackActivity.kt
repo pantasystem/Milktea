@@ -1,13 +1,11 @@
 package jp.panta.misskeyandroidclient
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import jp.panta.misskeyandroidclient.databinding.ActivityAuthBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityAuthCallBackBinding
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
@@ -15,8 +13,6 @@ import jp.panta.misskeyandroidclient.model.auth.AuthStorage
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.UserKey
 import kotlinx.android.synthetic.main.activity_auth_call_back.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -68,9 +64,9 @@ class AuthCallBackActivity : AppCompatActivity() {
                         it.userId == token.user.id
                     }?.apply{
                         state = ConnectionInstance.APP_PROVIDER
-                        setAccessToken(token.accessToken, miApplication.encryption)
+                        setAccessToken(token.accessToken, miApplication.mEncryption)
                     }?: ConnectionInstance(instanceBaseUrl = instance.domain,  userId = token.user.id).apply{
-                        setAccessToken(token.accessToken, (application as MiApplication).encryption)
+                        setAccessToken(token.accessToken, (application as MiApplication).mEncryption)
                     }
                     miApplication.addAccount(ci)
                     finish()

@@ -3,9 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable
-                name="user"
-                type="jp.panta.misskeyandroidclient.model.users.User" />
+
         <variable
                 name="accountViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
@@ -28,11 +26,11 @@
                 android:layout_height="60dp"
                 tools:srcCompat="@mipmap/ic_launcher_round"
                 android:id="@+id/imageView"
-                app:circleIcon="@{user.avatarUrl}"
+                app:circleIcon="@{accountViewModel.user.avatarUrl}"
                 android:layout_gravity="start"
                 android:paddingTop="@dimen/nav_header_vertical_spacing"
                 android:layout_marginTop="20dp"
-                android:onClick="@{()-> accountViewModel.showProfile(user)}"
+                android:onClick="@{()-> accountViewModel.showProfile(accountViewModel.user)}"
                 tools:ignore="ContentDescription" />
 
         <ImageButton
@@ -46,7 +44,7 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{user.name}"
+                android:text="@{accountViewModel.user.name}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:layout_below="@id/imageView"
                 android:id="@+id/name"
@@ -57,9 +55,9 @@
                 android:id="@+id/userName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{user.userName}"
+                android:text="@{accountViewModel.user.userName}"
                 android:layout_below="@id/name"
-                tools:text="userName"
+                tools:text="accountViewModel.userName"
                 />
 
         <TextView
@@ -68,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/userName"
                 tools:text="114"
-                android:text="@{ Integer.toString(user.followingCount) }"
+                android:text="@{ Integer.toString(accountViewModel.user.followingCount) }"
                 android:layout_marginEnd="3dp"
                 android:onClick="@{()-> accountViewModel.showFollowings() }"
                 />
@@ -91,7 +89,7 @@
                 android:layout_toEndOf="@id/following"
                 tools:text="514"
                 android:layout_marginEnd="3dp"
-                android:text="@{ Integer.toString(user.followersCount) }"
+                android:text="@{ Integer.toString(accountViewModel.user.followersCount) }"
                 android:onClick="@{()-> accountViewModel.showFollowers() }"
                 />
         <TextView

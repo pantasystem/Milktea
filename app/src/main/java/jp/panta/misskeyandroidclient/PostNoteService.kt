@@ -26,7 +26,7 @@ class PostNoteService : IntentService("PostNoteService") {
             Log.e(tag, "ConnectionInstanceの取得に失敗しました")
             return
         }
-        val uploader = OkHttpDriveFileUploader(applicationContext, ci, GsonBuilder().create(), miApplication.encryption)
+        val uploader = OkHttpDriveFileUploader(applicationContext, ci, GsonBuilder().create(), miApplication.mEncryption)
         val createNote = noteTask.execute(uploader)
         if(createNote == null){
             Log.d(tag, "ファイルのアップロードに失敗しました")

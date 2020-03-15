@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.viewmodel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
@@ -34,5 +36,9 @@ interface MiCore{
     fun putConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation)
 
     fun removeConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation)
+
+    fun getMisskeyAPI(ci: EncryptedConnectionInformation): MisskeyAPI
+
+    fun getEncryption(): Encryption
 
 }

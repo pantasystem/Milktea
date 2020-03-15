@@ -31,7 +31,7 @@ class MessageActionViewModel(
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == MessageActionViewModel::class.java){
-                return MessageActionViewModel(connectionInstance, miApplication.misskeyAPIService!!, messageHistory, miApplication.encryption) as T
+                return MessageActionViewModel(connectionInstance, miApplication.misskeyAPIService!!, messageHistory, miApplication.mEncryption) as T
             }
             throw IllegalArgumentException("use MessageActionViewModel::class.java")
         }

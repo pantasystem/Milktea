@@ -1,12 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 
-class HistoryViewData (connectionInstance: ConnectionInstance, val message: Message){
+class HistoryViewData (account: Account, val message: Message){
     val id = message.id
     val isGroup = message.group != null
-    val partner = if(message.recipient?.id == connectionInstance.userId){
+    val partner = if(message.recipient?.id == account.id){
         message.user
     }else{
         message.recipient

@@ -45,10 +45,11 @@ class TabFragment : Fragment(), ScrollableTop{
         val includeLocalRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
-        miApp.mNoteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer { settingList ->
-            val settings = if(settingList.isNullOrEmpty()){
+        miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
+            var settings = accountRelation.pages
+            settings = if(settings.isNullOrEmpty()){
                 makeDefaultNoteSetting(defaultTabType)
-            }else settingList
+            }else settings
 
             settings.forEach{setting ->
                 setting.includeLocalRenotes = includeLocalRenotes
@@ -68,6 +69,7 @@ class TabFragment : Fragment(), ScrollableTop{
                 elevationView.visibility = View.GONE
             }
         })
+
     }
 
     private fun makeDefaultNoteSetting(list: List<NoteType>): List<NoteRequest.Setting>{

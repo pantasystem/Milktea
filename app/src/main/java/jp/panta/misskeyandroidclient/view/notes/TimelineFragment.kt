@@ -67,20 +67,18 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.addOnScrollListener(mScrollListener)
         list_view.layoutManager = mLinearLayoutManager
 
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
-            val factory = TimelineViewModelFactory(ci, mSetting!!, miApplication, SettingStore(PreferenceManager.getDefaultSharedPreferences(context)))
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
+            val factory = TimelineViewModelFactory(accountRelation, mSetting!!, miApplication, SettingStore(PreferenceManager.getDefaultSharedPreferences(context)))
             val vm = mViewModel
-
-            //TimelineViewModelは必ず参照がnullになるか接続先の情報に更新があったときのみ初期化する
-            if(vm == null || vm.connectionInstance != ci){
-                Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, CI非一致:${vm?.connectionInstance != ci}")
-                mViewModel = ViewModelProvider(this, factory).get("$ci",TimelineViewModel::class.java)
+            if(vm == null || vm.accountRelation != accountRelation){
+                //Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, CI非一致:${vm?.connectionInstance != ci}")
+                mViewModel = ViewModelProvider(this, factory).get("$accountRelation",TimelineViewModel::class.java)
                 mViewModel?.loadInit()
 
-                val notesViewModelFactory = NotesViewModelFactory(ci, miApplication)
+                val notesViewModelFactory = NotesViewModelFactory(accountRelation, miApplication)
                 mNotesViewModel = ViewModelProvider(activity!!, notesViewModelFactory).get(NotesViewModel::class.java)
-                mNotesViewModel?.connectionInstance = ci
-                mNotesViewModel?.misskeyAPI = miApplication.misskeyAPIService!!
+                mNotesViewModel?.accountRelation = accountRelation
+                mNotesViewModel?.misskeyAPI = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
 
 
             }
@@ -126,9 +124,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 })
             }
 
-
-
         })
+
 
     }
 

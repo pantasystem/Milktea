@@ -16,7 +16,7 @@ class MessageViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == MessageViewModel::class.java){
             val misskeyAPI = miApplication.misskeyAPIService!!
-            return MessageViewModel(connectionInstance, misskeyAPI, messageHistory, miApplication.encryption) as T
+            return MessageViewModel(connectionInstance, misskeyAPI, messageHistory, miApplication.mEncryption) as T
         }
         throw IllegalArgumentException("use MessageViewModel::class.java")
     }

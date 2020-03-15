@@ -18,7 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.navigation.NavigationView
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -144,8 +144,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private val switchAccountObserver = Observer<ConnectionInstance>{
-        (application as MiApplication).switchCurrentAccount(it)
+    private val switchAccountObserver = Observer<AccountRelation>{
+        (application as MiApplication).addAndChangeAccount(it.account)
     }
 
     private val showFollowingsObserver = Observer<Unit>{
@@ -187,14 +187,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setHeaderProfile(activityMainBinding: ActivityMainBinding){
 
-
         DataBindingUtil.bind<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
         val headerBinding = DataBindingUtil.getBinding<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
         headerBinding?.accountViewModel = mAccountViewModel
 
-        (application as MiApplication).currentAccountLiveData.observe(this, Observer {
-            headerBinding?.user = it
-        })
     }
 
     override fun onBackPressed() {

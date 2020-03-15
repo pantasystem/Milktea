@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
@@ -35,7 +34,7 @@ class SignInViewModel(
     class Factory(val miApplication: MiApplication, val mode: Int) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == SignInViewModel::class.java){
-                return SignInViewModel(miApplication.connectionInstancesLiveData, miApplication.encryption, mode) as T
+                return SignInViewModel(miApplication.connectionInstancesLiveData, miApplication.mEncryption, mode) as T
             }
             throw IllegalArgumentException("use SignInViewModel::class.java")
         }

@@ -1,12 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.notification
 
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.lang.IllegalArgumentException
 
-class NotificationViewData(private val notification: Notification, connectionInstance: ConnectionInstance) {
+class NotificationViewData(private val notification: Notification, account: Account) {
     enum class Type(val default: String){
         FOLLOW("follow"),
         MENTION("mention"),
@@ -18,7 +18,7 @@ class NotificationViewData(private val notification: Notification, connectionIns
         RECEIVE_FOLLOW_REQUEST("receiveFollowRequest")
     }
     val id = notification.id
-    val noteViewData: PlaneNoteViewData? = if(notification.note == null) null else PlaneNoteViewData(notification.note, connectionInstance)
+    val noteViewData: PlaneNoteViewData? = if(notification.note == null) null else PlaneNoteViewData(notification.note, account)
 
     val statusType: String = notification.type
     val type: Type? = Type.values().firstOrNull {

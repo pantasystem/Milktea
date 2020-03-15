@@ -1,12 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 
 interface NotePagedStore {
     val timelineRequestBase: NoteRequest.Setting
-    val connectionInstance: ConnectionInstance
+    val accountRelation: AccountRelation
 
     fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?>
     fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?>

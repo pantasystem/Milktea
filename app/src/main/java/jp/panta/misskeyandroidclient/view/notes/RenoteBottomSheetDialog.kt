@@ -1,18 +1,13 @@
 package jp.panta.misskeyandroidclient.view.notes
 
 import android.app.Dialog
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModelFactory
 import kotlinx.android.synthetic.main.dialog_renote.view.*
 
 class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
@@ -24,12 +19,12 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         dialog.setContentView(view)
 
         val miApplication = context?.applicationContext as MiApplication
-        val cn = miApplication.currentConnectionInstanceLiveData.value
+        val accountRelation = miApplication.currentAccount.value
          //val requestSetting =
 
         val activity = activity
-        if(activity != null && cn != null){
-            val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(cn, miApplication)).get(NotesViewModel::class.java)
+        if(activity != null && accountRelation != null){
+            val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(accountRelation, miApplication)).get(NotesViewModel::class.java)
 
             view.renote.setOnClickListener{
                 notesViewModel.postRenote()

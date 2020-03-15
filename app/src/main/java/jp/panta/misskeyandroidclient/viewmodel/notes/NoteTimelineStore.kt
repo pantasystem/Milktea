@@ -3,7 +3,8 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
@@ -13,7 +14,7 @@ import java.lang.Exception
 import java.lang.IllegalArgumentException
 
 class NoteTimelineStore(
-    override val connectionInstance: ConnectionInstance,
+    override val accountRelation: AccountRelation,
     override val timelineRequestBase: NoteRequest.Setting,
     misskeyAPI: MisskeyAPI,
     private val encryption: Encryption
@@ -33,7 +34,7 @@ class NoteTimelineStore(
     }
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){
-            val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(), encryption)
+            val req = timelineRequestBase.buildRequest(accountRelation.getCurrentConnectionInformation()!!, NoteRequest.Conditions(), encryption)
             timelineStore(req).execute()
         }else{
             timelineStore(request).execute()
@@ -42,14 +43,14 @@ class NoteTimelineStore(
     }
 
     override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(sinceId = sinceId), encryption)
+        val req = timelineRequestBase.buildRequest(accountRelation.getCurrentConnectionInformation()!!, NoteRequest.Conditions(sinceId = sinceId), encryption)
         val res = timelineStore(req).execute()
         val reversedList = res.body()?.asReversed()
         return makeResponse(reversedList, res)
     }
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val req = timelineRequestBase.buildRequest(connectionInstance, NoteRequest.Conditions(untilId = untilId), encryption)
+        val req = timelineRequestBase.buildRequest(accountRelation.getCurrentConnectionInformation()!!, NoteRequest.Conditions(untilId = untilId), encryption)
         val res = timelineStore(req).execute()
         return makeResponse(res.body(), res)
     }
@@ -61,9 +62,9 @@ class NoteTimelineStore(
         return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
             try{
                 if(it.reply == null){
-                    PlaneNoteViewData(it, connectionInstance)
+                    PlaneNoteViewData(it, accountRelation.account)
                 }else{
-                    HasReplyToNoteViewData(it, connectionInstance)
+                    HasReplyToNoteViewData(it, accountRelation.account)
                 }
             }catch(e: Exception){
                 Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)

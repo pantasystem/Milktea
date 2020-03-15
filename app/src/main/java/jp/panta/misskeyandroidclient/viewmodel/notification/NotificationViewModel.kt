@@ -5,11 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,11 +17,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class NotificationViewModel(
-    private val connectionInstance: ConnectionInstance,
-    private val misskeyAPI: MisskeyAPI,
-    private val encryption: Encryption
+    private val miCore: MiCore
     //private val noteCapture: NoteCapture
 ) : ViewModel(){
+    private val encryption = miCore.getEncryption()
+
 
     private var isLoadingFlag = false
     val isLoading = MutableLiveData<Boolean>()

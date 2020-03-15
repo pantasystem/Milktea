@@ -1,18 +1,17 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import android.preference.PreferenceManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class TimelineViewModelFactory(
-    private val connectionInstance: ConnectionInstance,
+    private val accountRelation: AccountRelation,
     private val requestSetting: NoteRequest.Setting,
     private val miApplication: MiApplication,
     private val settingStore: SettingStore
@@ -23,9 +22,9 @@ class TimelineViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == TimelineViewModel::class.java){
 
-            val misskeyAPI = miApplication.misskeyAPIService ?: MisskeyAPIServiceBuilder.build(connectionInstance.instanceBaseUrl)
+            val misskeyAPI = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
 
-            return TimelineViewModel(connectionInstance, requestSetting, misskeyAPI, settingStore, miApplication.encryption) as T
+            return TimelineViewModel(accountRelation, requestSetting, misskeyAPI, settingStore, miApplication.mEncryption) as T
 
         }
 

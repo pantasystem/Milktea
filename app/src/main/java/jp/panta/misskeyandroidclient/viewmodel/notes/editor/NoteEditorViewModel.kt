@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import com.google.gson.GsonBuilder
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
@@ -21,7 +21,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import java.io.File
 
 class NoteEditorViewModel(
-    private val connectionInstance: ConnectionInstance,
+    private val accountRelation: AccountRelation,
     private val misskeyAPI: MisskeyAPI,
     meta: Meta,
     private val replyToNoteId: String? = null,
@@ -74,7 +74,7 @@ class NoteEditorViewModel(
     val noteTask = MutableLiveData<PostNoteTask>()
 
     fun post(){
-        val noteTask = PostNoteTask(connectionInstance, encryption)
+        val noteTask = PostNoteTask(accountRelation.getCurrentConnectionInformation()!!, encryption)
         noteTask.cw = cw.value
         noteTask.files = editorFiles.value
         noteTask.text =text.value

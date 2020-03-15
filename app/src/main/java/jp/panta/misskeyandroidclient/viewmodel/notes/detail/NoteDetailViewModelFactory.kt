@@ -14,7 +14,7 @@ class NoteDetailViewModelFactory(
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NoteDetailViewModel::class.java){
-            return NoteDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, noteId, encryption = miApplication.encryption) as T
+            return NoteDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, noteId, encryption = miApplication.mEncryption) as T
         }
         throw  IllegalArgumentException("use NoteDetailViewModel::class.java")
     }

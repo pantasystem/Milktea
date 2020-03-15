@@ -17,7 +17,7 @@ class NoteEditorViewModelFactory(
         if(modelClass == NoteEditorViewModel::class.java){
             val meta = miApplication.nowInstanceMeta!!
             val api = miApplication.misskeyAPIService!!
-            return NoteEditorViewModel(connectionInstance, api, meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.encryption) as T
+            return NoteEditorViewModel(connectionInstance, api, meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.mEncryption) as T
         }
         throw IllegalArgumentException("use NoteEditorViewModel::class.java")
     }

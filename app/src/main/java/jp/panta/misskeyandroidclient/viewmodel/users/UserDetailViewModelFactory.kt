@@ -15,7 +15,7 @@ class UserDetailViewModelFactory(
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == UserDetailViewModel::class.java){
-            return UserDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, userId, fqcnUserName, miApplication.encryption) as T
+            return UserDetailViewModel(connectionInstance, miApplication.misskeyAPIService!!, userId, fqcnUserName, miApplication.mEncryption) as T
         }
         throw IllegalArgumentException("対応していません")
     }

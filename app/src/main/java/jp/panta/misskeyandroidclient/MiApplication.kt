@@ -47,8 +47,8 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    var misskeyAPIService: MisskeyAPI? = null
-        private set
+    /*var misskeyAPIService: MisskeyAPI? = null
+        private set*/
 
     //private var misskeyAPIServiceDomainMap: Map<String, MisskeyAPI>? = null
 
@@ -61,7 +61,7 @@ class MiApplication : Application(), MiCore {
 
     var isSuccessCurrentAccount = MutableLiveData<Boolean>()
 
-    lateinit var encryption: Encryption
+    lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIMap = HashMap<String, MisskeyAPI>()
@@ -81,7 +81,7 @@ class MiApplication : Application(), MiCore {
 
         reactionHistoryDao = database.reactionHistoryDao()
 
-        encryption = KeyStoreSystemEncryption(this)
+        mEncryption = KeyStoreSystemEncryption(this)
 
 
         GlobalScope.launch(Dispatchers.IO){
@@ -212,8 +212,6 @@ class MiApplication : Application(), MiCore {
                 setCurrentUserId(it.account.id)
                 val ci = it.getCurrentConnectionInformation()
                     ?:return
-                misskeyAPIService = MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
-                nowInstanceMeta = misskeyAPIService?.getMeta(RequestMeta())?.execute()?.body()
 
                 loadInstanceMetaAndSetupAPI(ci)
             }?: return
@@ -239,11 +237,17 @@ class MiApplication : Application(), MiCore {
         return meta
     }
 
-    private fun getMisskeyAPI(connectionInformation: EncryptedConnectionInformation): MisskeyAPI{
-        val api = mMisskeyAPIMap[connectionInformation.instanceBaseUrl]
-            ?: MisskeyAPIServiceBuilder.build(connectionInformation.instanceBaseUrl)
-        mMisskeyAPIMap[connectionInformation.instanceBaseUrl] = api
-        return api
+    override fun getMisskeyAPI(ci: EncryptedConnectionInformation): MisskeyAPI{
+        synchronized(mMisskeyAPIMap){
+            val api = mMisskeyAPIMap[ci.instanceBaseUrl]
+                ?: MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
+            mMisskeyAPIMap[ci.instanceBaseUrl] = api
+            return api
+        }
+    }
+
+    override fun getEncryption(): Encryption {
+        return mEncryption
     }
     @Deprecated("新データ構造移行に伴い使用禁止")
     fun addPageToNoteSettings(noteRequestSetting: NoteRequest.Setting){

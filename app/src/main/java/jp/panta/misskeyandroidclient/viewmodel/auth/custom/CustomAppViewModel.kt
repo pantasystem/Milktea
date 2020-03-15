@@ -9,7 +9,6 @@ import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.AppSecret
 import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
@@ -43,7 +42,7 @@ class CustomAppViewModel(
                 return CustomAppViewModel(
                     miApplication.currentConnectionInstanceLiveData,
                     miApplication.accountsLiveData,
-                    miApplication.encryption,
+                    miApplication.mEncryption,
                     miApplication.misskeyAPIService!!,
                     CustomAuthStore.newInstance(miApplication)
                 ) as T

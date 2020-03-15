@@ -6,20 +6,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NoteDetailViewModel(
-    val connectionInstance: ConnectionInstance,
-    val misskeyAPI: MisskeyAPI,
+    val miCore: MiCore,
+    val accountRelation: AccountRelation = miCore.currentAccount.value!!,
+    val connectionInformation: EncryptedConnectionInformation = accountRelation.getCurrentConnectionInformation()!!,
+    val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(connectionInformation),
     val noteId: String,
     val requestBase: NoteRequest.Setting = NoteRequest.Setting(type = NoteType.DETAIL, noteId = noteId),
-    val encryption: Encryption
+    val encryption: Encryption = miCore.getEncryption()
 ) : ViewModel(){
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
@@ -28,9 +32,9 @@ class NoteDetailViewModel(
 
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val rawDetail = misskeyAPI.showNote(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(), encryption)).execute().body()
+                val rawDetail = misskeyAPI.showNote(requestBase.buildRequest(connectionInformation, NoteRequest.Conditions(), encryption)).execute().body()
                     ?:return@launch
-                val detail = NoteDetailViewData(rawDetail, connectionInstance)
+                val detail = NoteDetailViewData(rawDetail, accountRelation.account)
                 var list: List<PlaneNoteViewData> = listOf(detail)
                 notes.postValue(list)
 
@@ -83,8 +87,8 @@ class NoteDetailViewModel(
             noteConversationViewData
         }else{
             conversation.add(next)
-            val children = misskeyAPI.children(NoteRequest(connectionInstance.getI(encryption), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
-                PlaneNoteViewData(it,connectionInstance)
+            val children = misskeyAPI.children(NoteRequest(connectionInformation.getI(encryption), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
+                PlaneNoteViewData(it,accountRelation.account)
             }
             noteConversationViewData.nextChildren = children
             getChildrenToIterate(noteConversationViewData, conversation)
@@ -93,8 +97,8 @@ class NoteDetailViewModel(
 
 
     private fun loadConversation(): List<PlaneNoteViewData>?{
-        return misskeyAPI.conversation(requestBase.buildRequest(connectionInstance, NoteRequest.Conditions(), encryption)).execute().body()?.map{
-            PlaneNoteViewData(it, connectionInstance)
+        return misskeyAPI.conversation(requestBase.buildRequest(connectionInformation, NoteRequest.Conditions(), encryption)).execute().body()?.map{
+            PlaneNoteViewData(it, accountRelation.account)
         }
     }
 
@@ -102,11 +106,11 @@ class NoteDetailViewModel(
         return loadChildren(id = noteId)?.filter{
             it.reNote?.id != noteId
         }?.map{
-            val planeNoteViewData = PlaneNoteViewData(it, connectionInstance)
+            val planeNoteViewData = PlaneNoteViewData(it, accountRelation.account)
             val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->
-                PlaneNoteViewData(n, connectionInstance)
+                PlaneNoteViewData(n, accountRelation.account)
             }
-            NoteConversationViewData(it, childInChild, connectionInstance).apply{
+            NoteConversationViewData(it, childInChild, accountRelation.account).apply{
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }
         }
@@ -114,7 +118,7 @@ class NoteDetailViewModel(
     }
 
     private fun loadChildren(id: String): List<Note>?{
-        return misskeyAPI.children(NoteRequest(i = connectionInstance.getI(encryption)!!, limit = 100, noteId = id)).execute().body()
+        return misskeyAPI.children(NoteRequest(i = connectionInformation.getI(encryption)!!, limit = 100, noteId = id)).execute().body()
     }
 
 

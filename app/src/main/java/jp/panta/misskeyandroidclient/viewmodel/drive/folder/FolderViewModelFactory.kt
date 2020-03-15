@@ -11,7 +11,7 @@ class FolderViewModelFactory(private val connectionInstance: ConnectionInstance,
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == FolderViewModel::class.java){
             val api = miApplication.misskeyAPIService!!
-            return FolderViewModel(connectionInstance, api, folderId, miApplication.encryption) as T
+            return FolderViewModel(connectionInstance, api, folderId, miApplication.mEncryption) as T
         }
         throw IllegalArgumentException("FolderViewModel::class.javaを指定してください")
     }

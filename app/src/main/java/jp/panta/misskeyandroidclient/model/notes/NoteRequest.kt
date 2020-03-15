@@ -4,7 +4,7 @@ import androidx.room.*
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import java.io.Serializable
 
 data class NoteRequest(
@@ -55,9 +55,9 @@ data class NoteRequest(
 
         var title: String = type.defaultName
 
-        fun buildRequest(connectionInstance: ConnectionInstance, conditions: Conditions, encryption: Encryption): NoteRequest{
+        fun buildRequest(connectionInformation: EncryptedConnectionInformation, conditions: Conditions, encryption: Encryption): NoteRequest{
             return NoteRequest(
-                i = connectionInstance.getI(encryption)!!,
+                i = connectionInformation.getI(encryption)!!,
                 userId = userId,
                 withFiles = withFiles,
                 fileType = fileType,

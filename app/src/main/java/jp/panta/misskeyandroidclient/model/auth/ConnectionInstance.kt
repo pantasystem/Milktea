@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import java.lang.StringBuilder
 import java.security.MessageDigest
 
-@Entity(tableName = "connection_instance")
+/*@Entity(tableName = "connection_instance")
 class ConnectionInstance(
     @PrimaryKey
     val userId: String,
@@ -113,4 +113,4 @@ class ConnectionInstance(
     override fun toString(): String {
         return "{userId:$userId, instanceBaseUrl:$instanceBaseUrl, state:$state}"
     }
-}
+}*/

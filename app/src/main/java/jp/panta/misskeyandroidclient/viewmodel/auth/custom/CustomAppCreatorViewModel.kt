@@ -25,7 +25,7 @@ class CustomAppCreatorViewModel(
     class Factory(val connectionInstance: ConnectionInstance?, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == CustomAppCreatorViewModel::class.java){
-                return CustomAppCreatorViewModel(connectionInstance, miApplication.misskeyAPIService, miApplication.encryption) as T
+                return CustomAppCreatorViewModel(connectionInstance, miApplication.misskeyAPIService, miApplication.mEncryption) as T
             }
             throw IllegalArgumentException("use CustomAppCreatorViewModel::class.java")
         }

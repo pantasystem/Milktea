@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -20,7 +20,7 @@ import java.lang.IndexOutOfBoundsException
 import java.util.*
 
 class TimelineViewModel(
-    val connectionInstance: ConnectionInstance,
+    val accountRelation: AccountRelation,
     val requestBaseSetting: NoteRequest.Setting,
     misskeyAPI: MisskeyAPI,
     private val settingStore: SettingStore,
@@ -32,10 +32,10 @@ class TimelineViewModel(
     val tag = "TimelineViewModel"
     val errorState = MediatorLiveData<String>()
 
-    private val streamingAdapter = StreamingAdapter(connectionInstance, encryption)
-    private val noteCapture = NoteCapture(connectionInstance.userId)
+    private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
+    private val noteCapture = NoteCapture(accountRelation.account.id)
     private val timelineCapture = if(settingStore.isAutoLoadTimeline){
-        TimelineCapture(connectionInstance)
+        TimelineCapture(accountRelation.account)
     }else{
         null
     }
@@ -47,9 +47,9 @@ class TimelineViewModel(
     val position = MutableLiveData<Int>()
 
     private val notePagingStore = when(requestBaseSetting.type){
-        NoteType.FAVORITE -> FavoriteNotePagingStore(connectionInstance, requestBaseSetting, misskeyAPI, encryption)
+        NoteType.FAVORITE -> FavoriteNotePagingStore(accountRelation, requestBaseSetting, misskeyAPI, encryption)
         else -> NoteTimelineStore(
-            connectionInstance,
+            accountRelation,
             requestBaseSetting,
             misskeyAPI,
             encryption
