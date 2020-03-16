@@ -145,7 +145,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private val switchAccountObserver = Observer<AccountRelation>{
-        (application as MiApplication).addAndChangeAccount(it.account)
+        Log.d(this.javaClass.simpleName, "アカウントを切り替えようとしている")
+        (application as MiApplication).switchAccount(it.account)
     }
 
     private val showFollowingsObserver = Observer<Unit>{

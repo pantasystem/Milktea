@@ -6,6 +6,7 @@ import androidx.room.*
 abstract class AccountDao{
 
     //@Query("select * from account left join connection_information on account.id = connection_information.accountId left join setting on account.id = setting.accountId")
+    @Transaction
     @Query("select * from account")
     abstract fun findAllSetting(): List<AccountRelation>
     
@@ -16,7 +17,10 @@ abstract class AccountDao{
     abstract fun delete(account: Account)
 
     //@Query("select * from account left join connection_information on connection_information.accountId = account.id left join setting on account.id = setting.accountId where connection_information.accountId = :accountId")
+    @Transaction
     @Query("select * from account where account.id = :accountId")
     abstract fun findSettingByAccountId(accountId: String): AccountRelation?
 
+    @Query("select * from account where account.id = :accountId")
+    abstract fun findAccount(accountId: String): Account?
 }

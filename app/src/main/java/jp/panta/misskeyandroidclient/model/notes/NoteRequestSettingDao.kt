@@ -28,4 +28,7 @@ interface NoteRequestSettingDao {
     @Delete
     fun deleteAll(list: List<NoteRequest.Setting>)
 
+    @Query("delete from setting where accountId = :accountId")
+    fun clearByAccount(accountId: String)
+
 }

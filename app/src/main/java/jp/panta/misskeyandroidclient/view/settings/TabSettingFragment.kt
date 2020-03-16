@@ -136,20 +136,23 @@ class TabSettingFragment : Fragment(){
         GlobalScope.launch{
             val miApplication = context?.applicationContext as MiApplication?
             //val dao = miApplication?.mNoteRequestSettingDao?: return@launch
-            exSettings?.let{
+            /*exSettings?.let{
                 miApplication?.removeAllPagesInCurrentAccount(it)
-            }
+            }*/
 
-            val selectedList = mSelectedListLiveData.value?.map{
+            val selectedList = mSelectedListLiveData.value?.mapNotNull {
                 it.toSetting()
-            }?.filterNotNull()?: return@launch
+            } ?: return@launch
 
-
-            for(n in 0.until(selectedList.size)){
-                selectedList[n].id = n.toLong()
+            selectedList.forEach {
+                it.id = null
             }
+
+            /*for(n in selectedList.indices){
+                selectedList[n].id = n.toLong()
+            }*/
             //dao.insertAll(selectedList)
-            miApplication?.addAllPagesInCurrentAccount(selectedList)
+            miApplication?.replaceAllPagesInCurrentAccount(selectedList)
             Log.d("TabSettingFragment", "設定完了")
         }
     }

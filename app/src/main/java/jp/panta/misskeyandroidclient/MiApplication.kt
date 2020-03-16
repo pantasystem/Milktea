@@ -89,15 +89,16 @@ class MiApplication : Application(), MiCore {
                 //val connectionInstances = connectionInstanceDao!!.findAll()
                 loadAndInitializeAccounts()
             }catch(e: Exception){
+                Log.e(TAG, "load account error", e)
                 isSuccessCurrentAccount.postValue(false)
             }
         }
     }
 
-    override fun addAndChangeAccount(account: Account) {
+    override fun switchAccount(account: Account) {
         GlobalScope.launch(Dispatchers.IO){
             try{
-                mAccountDao.insert(account)
+
                 setCurrentUserId(account.id)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
@@ -131,14 +132,17 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun addAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
+    override fun replaceAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 noteRequestSettings.forEach{
                     it.accountId = currentAccount.value?.account?.id
                 }
-                mNoteRequestSettingDao.insertAll(noteRequestSettings)
-                loadAndInitializeAccounts()
+                currentAccount.value?.let {
+                    mNoteRequestSettingDao.clearByAccount(it.account.id)
+                    mNoteRequestSettingDao.insertAll(noteRequestSettings)
+                    loadAndInitializeAccounts()
+                }
             }catch(e: Exception){
                 Log.e(TAG, "", e)
             }
@@ -161,7 +165,7 @@ class MiApplication : Application(), MiCore {
     override fun removeAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
         GlobalScope.launch(Dispatchers.IO){
             try{
-                mNoteRequestSettingDao.insertAll(noteRequestSettings)
+                mNoteRequestSettingDao.deleteAll(noteRequestSettings)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "", e)
@@ -172,8 +176,12 @@ class MiApplication : Application(), MiCore {
     override fun putConnectionInfo(account: Account, ci: EncryptedConnectionInformation){
         GlobalScope.launch(Dispatchers.IO){
             try{
-                mAccountDao.insert(account)
+                Log.d(TAG, "putConnectionInfo")
+                val result = mAccountDao.insert(account)
+                Log.d(this.javaClass.simpleName, "add account result:$result")
+                //ci.accountId = account.id
                 mConnectionInformationDao.add(ci)
+                setCurrentUserId(account.id)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "", e)
@@ -211,6 +219,9 @@ class MiApplication : Application(), MiCore {
                 it.account.id == getCurrentUserId()
             }?: tmpAccounts.firstOrNull()
 
+            current
+                ?: Log.e(this.javaClass.simpleName, "load account error")
+            Log.d(this.javaClass.simpleName, "load account relation result : $current")
 
             isSuccessCurrentAccount.postValue(current?.getCurrentConnectionInformation() != null)
 
@@ -241,6 +252,7 @@ class MiApplication : Application(), MiCore {
             mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = it
         }
         nowInstanceMeta = meta
+        Log.d(TAG, "load meta result ${meta?.let{"成功"}?: "失敗"} ")
 
         return meta
     }

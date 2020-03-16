@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import androidx.room.*
+import androidx.room.ForeignKey.CASCADE
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.Account
@@ -27,7 +28,7 @@ data class NoteRequest(
 
 ): Serializable{
 
-    @Entity(tableName = "setting")
+    @Entity(tableName = "setting", foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = CASCADE)])
     data class Setting(
         @TypeConverters(NoteTypeConverter::class) val type: NoteType,
         val userId: String? = null,

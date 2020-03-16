@@ -2,6 +2,8 @@ package jp.panta.misskeyandroidclient.model.core
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
+import androidx.room.ForeignKey.NO_ACTION
 import androidx.room.Ignore
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
@@ -21,7 +23,7 @@ import java.util.*
  */
 @Entity(
     tableName = "connection_information",
-    foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class)],
+    foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = CASCADE, onUpdate = NO_ACTION)],
     primaryKeys = ["accountId", "encryptedI", "instanceBaseUrl"]
 )
 data class EncryptedConnectionInformation(

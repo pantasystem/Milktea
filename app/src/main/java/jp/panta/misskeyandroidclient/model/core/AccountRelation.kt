@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.core
 
+import android.util.Log
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -24,7 +25,12 @@ class AccountRelation{
                 it.updatedAt.time
             }
         }catch(e: UninitializedPropertyAccessException){
+            Log.d("AccountRelation", "error", e)
             null
         }
+    }
+
+    override fun toString(): String {
+        return "AccountRelation(account=$account, connectionInformationList=$connectionInformationList, pages=$pages)"
     }
 }

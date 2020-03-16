@@ -19,7 +19,7 @@ interface MiCore{
 
     val currentAccount: MutableLiveData<AccountRelation>
 
-    fun addAndChangeAccount(account: Account)
+    fun switchAccount(account: Account)
 
     fun logoutAccount(account: Account)
 
@@ -27,7 +27,7 @@ interface MiCore{
 
     fun addPageInCurrentAccount(noteRequestSetting: NoteRequest.Setting)
 
-    fun addAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>)
+    fun replaceAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>)
 
     fun removePageInCurrentAccount(noteRequestSetting: NoteRequest.Setting)
 

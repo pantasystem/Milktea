@@ -68,7 +68,7 @@ class CustomAppAuthCallbackActivity : AppCompatActivity() {
             miApplication.accounts.value?.firstOrNull {
                 it.account.id == token.user.id
             }?.let{ ac ->
-                miApplication.addAndChangeAccount(ac.account)
+                miApplication.switchAccount(ac.account)
             }
             finish()
         }

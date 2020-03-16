@@ -123,7 +123,7 @@ class CustomAppActivity : AppCompatActivity() {
     }
 
     private val switchAccountObserver = Observer<AccountRelation>{
-        (application as MiApplication).addAndChangeAccount(it.account)
+        (application as MiApplication).switchAccount(it.account)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

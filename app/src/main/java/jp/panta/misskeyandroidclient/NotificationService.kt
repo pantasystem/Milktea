@@ -59,15 +59,18 @@ class NotificationService : Service() {
     private fun startObserve(){
 
         (applicationContext as MiApplication).accounts.observeForever {accountRelations ->
-            accountRelations.forEach{ar ->
+            accountRelations?.forEach{ar ->
                 Log.d(TAG, "observerを登録しています")
 
-                val adapter = StreamingAdapter(ar.getCurrentConnectionInformation(), (application as MiApplication).getEncryption())
-                adapter.connect()
-                val mainCapture = MainCapture(mGson)
-                mainCapture.addListener(MainChannelObserver(ar.account))
-                val id = UUID.randomUUID().toString()
-                adapter.addObserver(id, mainCapture)
+                ar.getCurrentConnectionInformation()?.let{ ci ->
+                    val adapter = StreamingAdapter(ci, (application as MiApplication).getEncryption())
+                    adapter.connect()
+                    val mainCapture = MainCapture(mGson)
+                    mainCapture.addListener(MainChannelObserver(ar.account))
+                    val id = UUID.randomUUID().toString()
+                    adapter.addObserver(id, mainCapture)
+                }
+
             }
         }
     }
