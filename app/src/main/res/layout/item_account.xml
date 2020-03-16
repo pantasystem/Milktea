@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:onClick="@{()-> accountViewModel.setSwitchTargetConnectionInstance(accountViewData.connectionInstance)}"
+                android:onClick="@{()-> accountViewModel.setSwitchTargetConnectionInstance(accountViewData.accountRelation)}"
                 >
 
             <ImageView
@@ -78,7 +78,7 @@
                     android:layout_toStartOf="@id/logoutButton"
                     android:layout_toEndOf="@id/history_icon"
                     android:textSize="18sp"
-                    android:text="@{SafeUnbox.unbox(accountViewData.connectionInstance.instanceBaseUrl)}"
+                    android:text="@{SafeUnbox.unbox(accountViewData.accountRelation.currentConnectionInformation.instanceBaseUrl)}"
                     />
 
 

@@ -3,8 +3,6 @@ package jp.panta.misskeyandroidclient.model
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstanceDao
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountDao
 import jp.panta.misskeyandroidclient.model.core.ConnectionInformationDao
@@ -15,7 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryCount
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 
-@Database(entities = [EncryptedConnectionInformation::class, NoteRequest.Setting::class, ReactionHistory::class, Account::class], version = 29)
+@Database(entities = [EncryptedConnectionInformation::class, NoteRequest.Setting::class, ReactionHistory::class, Account::class], version = 30)
 @TypeConverters(NoteRequest.NoteTypeConverter::class, DateConverter::class)
 abstract class DataBase : RoomDatabase(){
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao

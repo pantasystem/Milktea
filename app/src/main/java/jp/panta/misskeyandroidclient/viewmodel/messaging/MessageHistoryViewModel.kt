@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
@@ -20,10 +20,11 @@ import retrofit2.Response
 import java.lang.Exception
 
 class MessageHistoryViewModel(
-    private val connectionInstance: ConnectionInstance,
+    private val accountRelation: AccountRelation,
     private val misskeyAPI: MisskeyAPI,
     private val encryption: Encryption
 ) : ViewModel(){
+    val connectionInformation = accountRelation.getCurrentConnectionInformation()
     val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
     val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
     val historyGroupAndUserLiveData = MutableLiveData<List<HistoryViewData>>()
@@ -36,8 +37,8 @@ class MessageHistoryViewModel(
         isRefreshing.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val groupRequest = RequestMessageHistory(i = connectionInstance.getI(encryption)!!, group = true, limit = 100)
-                val userRequest = RequestMessageHistory(i = connectionInstance.getI(encryption)!!, group = false, limit = 100)
+                val groupRequest = RequestMessageHistory(i = connectionInformation?.getI(encryption)!!, group = true, limit = 100)
+                val userRequest = RequestMessageHistory(i = connectionInformation.getI(encryption)!!, group = false, limit = 100)
 
                 val groupHistory = misskeyAPI.getMessageHistory(groupRequest).execute().body()
                 val userHistory = misskeyAPI.getMessageHistory(userRequest).execute().body()
@@ -47,13 +48,13 @@ class MessageHistoryViewModel(
                 }
                 else{
                     ArrayList(groupHistory.map{
-                        HistoryViewData(connectionInstance, it)
+                        HistoryViewData(accountRelation.account, it)
                     })
                 }
 
                 if(userHistory != null){
                     history.addAll(userHistory.map{
-                        HistoryViewData(connectionInstance, it)
+                        HistoryViewData(accountRelation.account, it)
                     })
                 }
                 historyGroupAndUserLiveData.postValue(history)
@@ -70,13 +71,13 @@ class MessageHistoryViewModel(
 
     fun loadGroup(){
         isRefreshing.postValue(true)
-        val request = RequestMessageHistory(i = connectionInstance.getI(encryption)!!, group = true, limit = 100)
+        val request = RequestMessageHistory(i = connectionInformation?.getI(encryption)!!, group = true, limit = 100)
         misskeyAPI.getMessageHistory(request).enqueue(object : Callback<List<Message>>{
             override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
                 val list = response.body()
                 if(list != null){
                     historyGroupLiveData.postValue(list.map{
-                        HistoryViewData(connectionInstance, it)
+                        HistoryViewData(accountRelation.account, it)
                     })
                 }
                 isRefreshing.postValue(false)
@@ -91,13 +92,13 @@ class MessageHistoryViewModel(
 
     fun loadUser(){
         isRefreshing.postValue(true)
-        val request = RequestMessageHistory(i = connectionInstance.getI(encryption)!!, group = false, limit = 100)
+        val request = RequestMessageHistory(i = connectionInformation?.getI(encryption)!!, group = false, limit = 100)
         misskeyAPI.getMessageHistory(request).enqueue(object : Callback<List<Message>>{
             override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
                 val list = response.body()
                 if(list!= null){
                     historyUserLiveData.postValue(list.map{
-                        HistoryViewData(connectionInstance, it)
+                        HistoryViewData(accountRelation.account, it)
                     })
                 }
                 isRefreshing.postValue(false)

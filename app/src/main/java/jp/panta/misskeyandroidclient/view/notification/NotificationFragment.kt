@@ -34,11 +34,11 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
         val miApplication = context?.applicationContext as MiApplication
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
-            val factory = NotificationViewModelFactory(ci, miApplication)
-            mViewModel = ViewModelProvider(this, factory).get("$ci",NotificationViewModel::class.java)
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
+            val factory = NotificationViewModelFactory(ar, miApplication)
+            mViewModel = ViewModelProvider(this, factory).get("$ar",NotificationViewModel::class.java)
 
-            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ci, miApplication)).get(NotesViewModel::class.java)
+            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
 
 
             val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, viewLifecycleOwner)

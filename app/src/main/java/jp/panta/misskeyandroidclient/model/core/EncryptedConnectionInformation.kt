@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.Instance
 import jp.panta.misskeyandroidclient.model.auth.custom.App
+import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
 import jp.panta.misskeyandroidclient.model.users.User
 import java.lang.StringBuilder
 import java.security.MessageDigest
@@ -28,7 +29,8 @@ data class EncryptedConnectionInformation(
     val instanceBaseUrl: String,
     val encryptedI: String,
     val viaName: String?,
-    val createdAt: Date = Date()
+    val createdAt: Date = Date(),
+    val isDirect: Boolean = false
 ){
     var updatedAt: Date = Date()
 
@@ -70,7 +72,18 @@ data class EncryptedConnectionInformation(
                 accountId = user.id,
                 instanceBaseUrl = instanceDomain,
                 encryptedI = encryption.encrypt(user.id, i),
-                viaName = null
+                viaName = null,
+                isDirect = true
+            )
+        }
+
+        fun create(accessToken: AccessToken, customAuthBridge: CustomAuthBridge): EncryptedConnectionInformation{
+            val i = sha256(accessToken.accessToken + customAuthBridge.secret)
+            return EncryptedConnectionInformation(
+                accountId = accessToken.user.id,
+                instanceBaseUrl = customAuthBridge.instanceDomain,
+                encryptedI = encryption.encrypt(accessToken.user.id, i),
+                viaName = customAuthBridge.viaName
             )
         }
 

@@ -14,6 +14,7 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
         private const val SESSION_URL = "jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore.SESSION_URL"
         private const val INSTANCE_DOMAIN = "jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore.INSTANCE_DOMAIN"
         private const val ENABLED_DATE_END = "jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore.ENABLED_DATE_END"
+        private const val VIA_NAME = "jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore.VIA_NAME"
 
 
 
@@ -42,11 +43,13 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
             val sessionUrl = it.getString(SESSION_URL, null)?: return null
             val instanceDomain = it.getString(INSTANCE_DOMAIN, null)?: return null
             val enabledDate = Date(it.getLong(ENABLED_DATE_END, 0))
+            val viaName: String? = it.getString(VIA_NAME, null)
             CustomAuthBridge(
                 secret = secret,
                 session = Session(url = sessionUrl, token = sessionToken),
                 instanceDomain = instanceDomain,
-                enabledDateEnd = enabledDate
+                enabledDateEnd = enabledDate,
+                viaName = viaName
             )
         }
     }

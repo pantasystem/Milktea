@@ -9,7 +9,7 @@ import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.gson.GsonBuilder
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
@@ -58,14 +58,14 @@ class NotificationService : Service() {
 
     private fun startObserve(){
 
-        (applicationContext as MiApplication).connectionInstancesLiveData.observeForever {connectionInstances ->
-            connectionInstances.forEach{ci ->
+        (applicationContext as MiApplication).accounts.observeForever {accountRelations ->
+            accountRelations.forEach{ar ->
                 Log.d(TAG, "observerを登録しています")
 
-                val adapter = StreamingAdapter(ci, (application as MiApplication).mEncryption)
+                val adapter = StreamingAdapter(ar.getCurrentConnectionInformation(), (application as MiApplication).getEncryption())
                 adapter.connect()
-                val mainCapture = MainCapture(ci, mGson)
-                mainCapture.addListener(MainChannelObserver(ci))
+                val mainCapture = MainCapture(mGson)
+                mainCapture.addListener(MainChannelObserver(ar.account))
                 val id = UUID.randomUUID().toString()
                 adapter.addObserver(id, mainCapture)
             }
@@ -73,14 +73,14 @@ class NotificationService : Service() {
     }
 
     private inner class MainChannelObserver(
-        val connectionInstance: ConnectionInstance
+        val account: Account
     ) : MainCapture.AbsListener(){
         override fun notification(notification: Notification) {
             Handler(Looper.getMainLooper()).post{
                 Log.d(TAG, "notification,:$notification")
                 //val miApplication = applicationContext as MiApplication
                 if(isShowNotification){
-                    showNotification(NotificationViewData(notification, connectionInstance))
+                    showNotification(NotificationViewData(notification, account))
                 }
             }
         }
@@ -88,7 +88,7 @@ class NotificationService : Service() {
         override fun messagingMessage(message: Message) {
             Handler(Looper.getMainLooper()).post{
                 Log.d(TAG, "message: $message")
-                if(connectionInstance.userId != message.userId){
+                if(account.id != message.userId){
                     showMessageNotification(message)
                 }
             }

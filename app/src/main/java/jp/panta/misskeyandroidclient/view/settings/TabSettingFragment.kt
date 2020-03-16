@@ -28,6 +28,8 @@ class TabSettingFragment : Fragment(){
 
     val mSelectableListLiveData = MutableLiveData<List<SettingTab>>()
 
+    var exSettings: List<NoteRequest.Setting>? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -80,18 +82,20 @@ class TabSettingFragment : Fragment(){
         selectable_tab_list.adapter = selectableTabAdapter
 
 
-        miApplication.mNoteRequestSettingDao?.findAll()?.observe(viewLifecycleOwner, Observer {
-            val list = if(it.isNullOrEmpty()){
+
+
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer { ar ->
+            val list = if(ar.pages.isNullOrEmpty()){
                 defaultTabVisibleSettings()
             }else{
-                it.map{nrt ->
+                ar.pages.map{nrt ->
                     SettingTab.FromSetting(nrt)
                 }
             }
+            exSettings = ar.pages
             val selectableList = notSelectedSettings(list)
             mSelectedListLiveData.postValue(list)
             mSelectableListLiveData.postValue(selectableList)
-
         })
 
 
@@ -131,17 +135,21 @@ class TabSettingFragment : Fragment(){
     private fun saveTabs(){
         GlobalScope.launch{
             val miApplication = context?.applicationContext as MiApplication?
-            val dao = miApplication?.mNoteRequestSettingDao?: return@launch
+            //val dao = miApplication?.mNoteRequestSettingDao?: return@launch
+            exSettings?.let{
+                miApplication?.removeAllPagesInCurrentAccount(it)
+            }
 
             val selectedList = mSelectedListLiveData.value?.map{
                 it.toSetting()
             }?.filterNotNull()?: return@launch
-            dao.deleteAll()
+
 
             for(n in 0.until(selectedList.size)){
                 selectedList[n].id = n.toLong()
             }
-            dao.insertAll(selectedList)
+            //dao.insertAll(selectedList)
+            miApplication?.addAllPagesInCurrentAccount(selectedList)
             Log.d("TabSettingFragment", "設定完了")
         }
     }

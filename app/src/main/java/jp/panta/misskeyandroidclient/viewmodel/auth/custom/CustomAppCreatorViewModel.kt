@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CreateApp
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,14 +18,14 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class CustomAppCreatorViewModel(
-    val connectionInstance: ConnectionInstance?,
+    val connectionInformation: EncryptedConnectionInformation?,
     val misskeyAPI: MisskeyAPI?,
     val encryption: Encryption
 ) : ViewModel(){
-    class Factory(val connectionInstance: ConnectionInstance?, val miApplication: MiApplication) : ViewModelProvider.Factory{
+    class Factory(val connectionInformation: EncryptedConnectionInformation?, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == CustomAppCreatorViewModel::class.java){
-                return CustomAppCreatorViewModel(connectionInstance, miApplication.misskeyAPIService, miApplication.mEncryption) as T
+                return CustomAppCreatorViewModel(connectionInformation, connectionInformation?.let{miApplication.getMisskeyAPI(it)}, miApplication.getEncryption()) as T
             }
             throw IllegalArgumentException("use CustomAppCreatorViewModel::class.java")
         }
@@ -44,10 +44,10 @@ class CustomAppCreatorViewModel(
     val app = MutableLiveData<App>()
 
     fun create(){
-        val i = connectionInstance?.getI(encryption)
-        if(i == null){
-            return
-        }
+        val i = connectionInformation?.getI(encryption)
+            ?: return
+
+
         if(isCanBeCreated.value == false){
             return
         }

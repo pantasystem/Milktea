@@ -10,8 +10,9 @@ import jp.panta.misskeyandroidclient.databinding.ActivityAuthCallBackBinding
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.AuthStorage
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.UserKey
+import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import kotlinx.android.synthetic.main.activity_auth_call_back.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -60,15 +61,11 @@ class AuthCallBackActivity : AppCompatActivity() {
                     Toast.makeText(this, "Please wait.", Toast.LENGTH_LONG).show()
                 }else{
                     val miApplication = application as MiApplication
-                    val ci = miApplication.connectionInstancesLiveData.value?.firstOrNull {
-                        it.userId == token.user.id
-                    }?.apply{
-                        state = ConnectionInstance.APP_PROVIDER
-                        setAccessToken(token.accessToken, miApplication.mEncryption)
-                    }?: ConnectionInstance(instanceBaseUrl = instance.domain,  userId = token.user.id).apply{
-                        setAccessToken(token.accessToken, (application as MiApplication).mEncryption)
-                    }
-                    miApplication.addAccount(ci)
+
+                    val creator = EncryptedConnectionInformation.Creator(miApplication.getEncryption())
+                    val ci = creator.create(token, instance)
+
+                    miApplication.putConnectionInfo(Account(token.user.id) ,ci)
                     finish()
 
                 }

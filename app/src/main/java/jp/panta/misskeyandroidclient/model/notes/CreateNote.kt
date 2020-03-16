@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import java.lang.IllegalArgumentException
 

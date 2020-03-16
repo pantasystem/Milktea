@@ -70,7 +70,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
             val factory = TimelineViewModelFactory(accountRelation, mSetting!!, miApplication, SettingStore(PreferenceManager.getDefaultSharedPreferences(context)))
             val vm = mViewModel
-            if(vm == null || vm.accountRelation != accountRelation){
+            if(vm == null || vm.accountRelation.getCurrentConnectionInformation() != accountRelation.getCurrentConnectionInformation()){
                 //Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, CI非一致:${vm?.connectionInstance != ci}")
                 mViewModel = ViewModelProvider(this, factory).get("$accountRelation",TimelineViewModel::class.java)
                 mViewModel?.loadInit()

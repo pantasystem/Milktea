@@ -17,16 +17,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NoteDetailViewModel(
+    val accountRelation: AccountRelation,
     val miCore: MiCore,
-    val accountRelation: AccountRelation = miCore.currentAccount.value!!,
-    val connectionInformation: EncryptedConnectionInformation = accountRelation.getCurrentConnectionInformation()!!,
-    val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(connectionInformation),
     val noteId: String,
     val requestBase: NoteRequest.Setting = NoteRequest.Setting(type = NoteType.DETAIL, noteId = noteId),
     val encryption: Encryption = miCore.getEncryption()
 ) : ViewModel(){
 
+    private val connectionInformation: EncryptedConnectionInformation = accountRelation.getCurrentConnectionInformation()!!
+    private val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(connectionInformation)
+
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
+
 
     fun loadDetail(){
 

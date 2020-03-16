@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.SafeUnbox

@@ -13,8 +13,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityCustomAppBinding
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.Session
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.auth.AppSelectDialog
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
@@ -37,7 +37,7 @@ class CustomAppActivity : AppCompatActivity() {
 
         val miApplication = applicationContext as MiApplication
 
-        val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication.connectionInstanceDao!!))[AccountViewModel::class.java]
+        val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
 
         binding.addAccount.setOnClickListener {
@@ -47,15 +47,14 @@ class CustomAppActivity : AppCompatActivity() {
         initAccountObserver(accountViewModel)
 
 
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
+
+        miApplication.currentAccount.observe(this, Observer{
             val customAppViewModel = ViewModelProvider(this, CustomAppViewModel.Factory(miApplication))[CustomAppViewModel::class.java]
             mCustomAppViewModel = customAppViewModel
             binding.customAppViewModel = customAppViewModel
 
-            customAppViewModel.misskeyAPI = miApplication.misskeyAPIService!!
+            customAppViewModel.misskeyAPI = miApplication.getMisskeyAPI(it)
             initAppObserver(customAppViewModel)
-
-
         })
 
 
@@ -101,8 +100,8 @@ class CustomAppActivity : AppCompatActivity() {
                 Toast.makeText(this, getString(R.string.auth_required), Toast.LENGTH_LONG).show()
                 val intent = Intent(this, SignInActivity::class.java)
                 intent.putExtra(SignInActivity.EXTRA_MODE, SignInActivity.MODE_ADD)
-                intent.putExtra(SignInActivity.EXTRA_INSTANCE_DOMAIN, mCustomAppViewModel?.currentConnectionInstanceLiveData?.value?.instanceBaseUrl?: "")
-                intent.putExtra(SignInActivity.EXTRA_USER_NAME, mCustomAppViewModel?.account?.value?.user?.userName?: "")
+                intent.putExtra(SignInActivity.EXTRA_INSTANCE_DOMAIN, mCustomAppViewModel?.currentAccountRelation?.value?.getCurrentConnectionInformation()?.instanceBaseUrl?: "")
+                intent.putExtra(SignInActivity.EXTRA_USER_NAME, mCustomAppViewModel?.account?.value?.user?.value?.userName?: "")
                 startActivity(intent)
             }
         }
@@ -123,8 +122,8 @@ class CustomAppActivity : AppCompatActivity() {
         }
     }
 
-    private val switchAccountObserver = Observer<ConnectionInstance>{
-        (application as MiApplication).switchCurrentAccount(it)
+    private val switchAccountObserver = Observer<AccountRelation>{
+        (application as MiApplication).addAndChangeAccount(it.account)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
@@ -59,8 +58,9 @@ class SignInActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.connectionInstance.observe(this, Observer {
-            miApplication.addAccount(it)
+        viewModel.connectionInformation.observe(this, Observer {
+
+            miApplication.putConnectionInfo(it.first, it.second)
 
             finish()
         })

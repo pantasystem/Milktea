@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
 import com.google.gson.annotations.SerializedName
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.users.User
@@ -25,8 +25,8 @@ data class Message(
         return group != null
     }
 
-    fun opponentUser(connectionInstance: ConnectionInstance) : User?{
-        return if(recipient?.id == connectionInstance.userId){
+    fun opponentUser(account: Account) : User?{
+        return if(recipient?.id == account.id){
             user
         }else{
             recipient

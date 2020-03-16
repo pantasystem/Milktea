@@ -31,14 +31,14 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
 
         val miApplication  = context?.applicationContext as MiApplication
 
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer{cn ->
-            val folderViewModelFactory = FolderViewModelFactory(cn, miApplication, null)
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer{ ar ->
+            val folderViewModelFactory = FolderViewModelFactory(ar, miApplication, null)
             val folderViewModel = ViewModelProvider(this, folderViewModelFactory).get(FolderViewModel::class.java)
             mFolderViewModel = folderViewModel
 
             val activity = activity
                 ?:return@Observer
-            val driveViewModelFactory = DriveViewModelFactory(cn ,miApplication, 0)
+            val driveViewModelFactory = DriveViewModelFactory(0)
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {
                 folderViewModel.currentFolder.postValue(it.id)
@@ -88,9 +88,9 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()?: -1
-            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()?: -1
-            val itemCount = mLinearLayoutManager.itemCount?: -1
+            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
+            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
+            val itemCount = mLinearLayoutManager.itemCount
 
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")

@@ -61,7 +61,7 @@ class MiApplication : Application(), MiCore {
 
     var isSuccessCurrentAccount = MutableLiveData<Boolean>()
 
-    lateinit var mEncryption: Encryption
+    private lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIMap = HashMap<String, MisskeyAPI>()
@@ -98,6 +98,7 @@ class MiApplication : Application(), MiCore {
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mAccountDao.insert(account)
+                setCurrentUserId(account.id)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.d(TAG, "add or change account error", e)
@@ -121,6 +122,7 @@ class MiApplication : Application(), MiCore {
     override fun addPageInCurrentAccount(noteRequestSetting: NoteRequest.Setting){
         GlobalScope.launch(Dispatchers.IO){
             try{
+                noteRequestSetting.accountId = currentAccount.value?.account?.id
                 mNoteRequestSettingDao.insert(noteRequestSetting)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
@@ -132,6 +134,9 @@ class MiApplication : Application(), MiCore {
     override fun addAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
         GlobalScope.launch(Dispatchers.IO){
             try{
+                noteRequestSettings.forEach{
+                    it.accountId = currentAccount.value?.account?.id
+                }
                 mNoteRequestSettingDao.insertAll(noteRequestSettings)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
@@ -164,10 +169,11 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun putConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation){
+    override fun putConnectionInfo(account: Account, ci: EncryptedConnectionInformation){
         GlobalScope.launch(Dispatchers.IO){
             try{
-                mConnectionInformationDao.insert(ci)
+                mAccountDao.insert(account)
+                mConnectionInformationDao.add(ci)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "", e)
@@ -234,6 +240,8 @@ class MiApplication : Application(), MiCore {
         meta?.let{
             mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = it
         }
+        nowInstanceMeta = meta
+
         return meta
     }
 
@@ -246,15 +254,21 @@ class MiApplication : Application(), MiCore {
         }
     }
 
+    override fun getMisskeyAPI(accountRelation: AccountRelation?): MisskeyAPI?{
+        val ci = accountRelation?.getCurrentConnectionInformation()?: return null
+        return getMisskeyAPI(ci)
+    }
+
     override fun getEncryption(): Encryption {
         return mEncryption
     }
-    @Deprecated("新データ構造移行に伴い使用禁止")
+    /*@Deprecated("新データ構造移行に伴い使用禁止")
     fun addPageToNoteSettings(noteRequestSetting: NoteRequest.Setting){
         GlobalScope.launch(Dispatchers.IO){
-            mNoteRequestSettingDao?.insert(noteRequestSetting)
+            noteRequestSetting.accountId = currentAccount.value?.account?.id
+            mNoteRequestSettingDao.insert(noteRequestSetting)
         }
-    }
+    }*/
 
 
 

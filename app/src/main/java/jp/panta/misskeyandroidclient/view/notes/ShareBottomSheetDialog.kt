@@ -33,7 +33,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
         dataBinding.executePendingBindings()
         dataBinding.lifecycleOwner = this
 
-        dataBinding.showDetail?.setOnClickListener {
+        dataBinding.showDetail.setOnClickListener {
             viewModel.setTargetToNote()
             dismiss()
         }

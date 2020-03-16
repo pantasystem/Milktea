@@ -52,8 +52,8 @@ class DriveActivity : AppCompatActivity() {
         }
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
-            val viewModel = ViewModelProvider(this, DriveViewModelFactory(it, miApplication, maxSize)).get(DriveViewModel::class.java)
+        miApplication.currentAccount.observe(this, Observer {
+            val viewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
             mViewModel = viewModel
 
             if(selectedItem != null){

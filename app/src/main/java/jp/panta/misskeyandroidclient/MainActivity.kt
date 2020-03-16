@@ -189,6 +189,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         DataBindingUtil.bind<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
         val headerBinding = DataBindingUtil.getBinding<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))
+        headerBinding?.lifecycleOwner = this
+        mAccountViewModel
         headerBinding?.accountViewModel = mAccountViewModel
 
     }

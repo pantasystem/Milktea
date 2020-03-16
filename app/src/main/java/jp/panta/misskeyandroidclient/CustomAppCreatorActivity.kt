@@ -7,7 +7,6 @@ import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.databinding.ActivityCustomAppBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityCustomAppCreatorBinding
 import jp.panta.misskeyandroidclient.viewmodel.auth.custom.CustomAppCreatorViewModel
 
@@ -26,7 +25,7 @@ class CustomAppCreatorActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val miApplication = applicationContext as MiApplication
-        val ci = miApplication.currentConnectionInstanceLiveData.value
+        val ci = miApplication.currentAccount.value?.getCurrentConnectionInformation()
 
         val viewModel =  ViewModelProvider(this, CustomAppCreatorViewModel.Factory(ci, miApplication))[CustomAppCreatorViewModel::class.java]
         binding.viewModel = viewModel

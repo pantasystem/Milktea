@@ -11,10 +11,10 @@ class AccountRelation{
     @Embedded
     lateinit var account: Account
 
-    @Relation(parentColumn = "id", entityColumn = "accountId")
+    @Relation(parentColumn = "id", entityColumn = "accountId", entity = EncryptedConnectionInformation::class)
     lateinit var connectionInformationList: List<EncryptedConnectionInformation>
 
-    @Relation(parentColumn = "id", entityColumn = "accountId")
+    @Relation(parentColumn = "id", entityColumn = "accountId", entity = NoteRequest.Setting::class)
     lateinit var pages: List<NoteRequest.Setting>
 
     @Ignore

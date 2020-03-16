@@ -89,8 +89,8 @@ class SearchResultActivity : AppCompatActivity() {
             NoteType.SEARCH
         }
         val word = mSearchWord ?: return
-        (application as MiApplication).addPageToNoteSettings(
 
+        (application as MiApplication).addPageInCurrentAccount(
             NoteRequest.Setting(type = type).apply{
                 title = word
             }

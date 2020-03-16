@@ -98,6 +98,7 @@
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
         <item name="colorSeparator">@color/colorSeparator</item>
+        <item name="android:navigationBarColor">@color/navigationDarkColor</item>
 
 
     </style>

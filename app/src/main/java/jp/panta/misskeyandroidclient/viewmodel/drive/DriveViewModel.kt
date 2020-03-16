@@ -3,15 +3,12 @@ package jp.panta.misskeyandroidclient.viewmodel.drive
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
 import java.util.*
 
 class DriveViewModel(
-    private val connectionInstance: ConnectionInstance,
-    private val misskeyAPI: MisskeyAPI,
     val selectableMaxSize: Int
 ) : ViewModel(){
 

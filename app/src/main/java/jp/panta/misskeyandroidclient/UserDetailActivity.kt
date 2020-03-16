@@ -13,7 +13,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
@@ -49,18 +49,18 @@ class UserDetailActivity : AppCompatActivity() {
         Log.d("UserDetailActivity", "userName:$userName")
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
-            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ci, miApplication, userId, userName))[UserDetailViewModel::class.java]
+        miApplication.currentAccount.observe(this, Observer {ar ->
+            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel
             binding.userViewModel = viewModel
 
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ci, miApplication))[NotesViewModel::class.java]
+            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
             ActionNoteHandler(this, notesViewModel)
                 .initViewModelListener()
 
             viewModel.load()
             viewModel.user.observe(this, Observer {
-                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ci, it.id)
+                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar.account, it.id)
                 //userTimelinePager.adapter = adapter
                 binding.userTimelinePager.adapter = adapter
                 binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
@@ -102,7 +102,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     inner class UserTimelinePagerAdapter(
         fm: FragmentManager,
-        val connectionInstance: ConnectionInstance,
+        val account: Account,
         val userId: String
     ) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
@@ -182,7 +182,7 @@ class UserDetailActivity : AppCompatActivity() {
     private fun addPageToTab(){
         val user = mViewModel?.user?.value
         if(user != null){
-            (application as MiApplication).addPageToNoteSettings(NoteRequest.Setting(type = NoteType.USER, userId = user.id).apply{
+            (application as MiApplication).addPageInCurrentAccount(NoteRequest.Setting(type = NoteType.USER, userId = user.id).apply{
                 title = user.getDisplayUserName()
             })
         }

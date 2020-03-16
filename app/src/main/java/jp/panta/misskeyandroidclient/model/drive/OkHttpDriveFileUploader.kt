@@ -8,7 +8,7 @@ import android.webkit.MimeTypeMap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import okhttp3.*
 import okio.BufferedSink
 import okio.Okio
@@ -18,7 +18,7 @@ import java.net.URL
 
 class OkHttpDriveFileUploader(
     val context: Context,
-    val connectionInstance: ConnectionInstance,
+    val connectionInformation: EncryptedConnectionInformation,
     val gson: Gson,
     val encryption: Encryption
 ) : FileUploader{
@@ -27,7 +27,7 @@ class OkHttpDriveFileUploader(
             val client = OkHttpClient()
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("i", connectionInstance.getI(encryption)!!)
+                .addFormDataPart("i", connectionInformation.getI(encryption)!!)
                 .addFormDataPart("force", uploadFile.force.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart("file", getFileName(uploadFile.getUri()), createRequestBody(uploadFile.getUri()))
@@ -40,7 +40,7 @@ class OkHttpDriveFileUploader(
 
             val requestBody = requestBodyBuilder.build()
 
-            val request = Request.Builder().url(URL("${connectionInstance.instanceBaseUrl}/api/drive/files/create")).post(requestBody).build()
+            val request = Request.Builder().url(URL("${connectionInformation.instanceBaseUrl}/api/drive/files/create")).post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code()
             if(code < 300){

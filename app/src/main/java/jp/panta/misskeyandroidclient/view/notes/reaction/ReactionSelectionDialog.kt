@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.view.notes.reaction
 
-import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,22 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesFragment
-import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.dialog_select_reaction.*
-import kotlinx.android.synthetic.main.dialog_select_reaction.view.*
-import kotlinx.android.synthetic.main.fragment_reaction_choices.*
-import kotlinx.android.synthetic.main.item_detail_note.*
 
 class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
@@ -45,13 +35,13 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         val activity = activity
         val miApplication = context?.applicationContext as MiApplication
-        val cn  = miApplication.currentConnectionInstanceLiveData.value
+        val ar  = miApplication.currentAccount.value
         /*val emojis = miApplication.nowInstanceMeta?.emojis?.map{
             ":${it.name}:"
         }*/
         activity?: return
-        cn?: return
-        val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(cn, miApplication)).get(NotesViewModel::class.java)
+        ar?: return
+        val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
         mNoteViewModel = notesViewModel
 
         notesViewModel.submittedNotesOnReaction.observe(activity, Observer {

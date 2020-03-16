@@ -36,7 +36,8 @@ class MessageActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val messageHistory = intent?.getSerializableExtra(EXTRA_MESSAGE_HISTORY) as Message?
-        val connectionInstance = (applicationContext as MiApplication).currentConnectionInstanceLiveData.value
+        val accountRelation = (applicationContext as MiApplication).currentAccount.value
+
 
         if(messageHistory == null){
             Log.e("MessageActivity", "EXTRA_MESSAGE_HISTORY must not null")
@@ -44,8 +45,8 @@ class MessageActivity : AppCompatActivity() {
             return
         }
 
-        if(connectionInstance == null){
-            Log.d("MessageActivity", "connectionInstance not found")
+        if(accountRelation == null){
+            Log.d("MessageActivity", "ac not found")
             finish()
             return
         }
@@ -58,7 +59,7 @@ class MessageActivity : AppCompatActivity() {
         }
         setTitle(messageHistory)
 
-        val factory = MessageActionViewModel.Factory(connectionInstance, application as MiApplication, messageHistory)
+        val factory = MessageActionViewModel.Factory(accountRelation, application as MiApplication, messageHistory)
         val messageActionViewModel = ViewModelProvider(this, factory)[MessageActionViewModel::class.java]
         mViewModel = messageActionViewModel
         binding.actionViewModel = messageActionViewModel
@@ -69,11 +70,11 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun setTitle(message: Message){
-        val ci = (applicationContext as MiApplication).currentConnectionInstanceLiveData.value ?: return
+        val ac = (applicationContext as MiApplication).currentAccount.value ?: return
         supportActionBar?.title = if(message.isGroup()){
             message.group?.name
         }else{
-            message.opponentUser(ci)?.getDisplayUserName()
+            message.opponentUser(ac.account)?.getDisplayUserName()
         }
     }
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import retrofit2.Call
@@ -12,11 +12,13 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class FolderViewModel(
-    val connectionInstance: ConnectionInstance,
+    val accountRelation: AccountRelation,
     val misskeyAPI: MisskeyAPI,
     folderId: String?,
     private val encryption: Encryption
 ) : ViewModel(){
+
+    val connectionInformation = accountRelation.getCurrentConnectionInformation()
 
     val foldersLiveData = MutableLiveData<List<FolderViewData>>()
 
@@ -33,7 +35,7 @@ class FolderViewModel(
         isLoading = true
 
         isRefreshing.postValue(true)
-        misskeyAPI.getFolders(RequestFolder(i = connectionInstance.getI(encryption)!!, folderId = currentFolder.value, limit = 20)).enqueue(object : Callback<List<FolderProperty>>{
+        misskeyAPI.getFolders(RequestFolder(i = connectionInformation?.getI(encryption)!!, folderId = currentFolder.value, limit = 20)).enqueue(object : Callback<List<FolderProperty>>{
             override fun onResponse(
                 call: Call<List<FolderProperty>>,
                 response: Response<List<FolderProperty>>
@@ -74,7 +76,7 @@ class FolderViewModel(
             return
         }
 
-        val request = RequestFolder(i = connectionInstance.getI(encryption)!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
+        val request = RequestFolder(i = connectionInformation?.getI(encryption)!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
         misskeyAPI.getFolders(request).enqueue(object : Callback<List<FolderProperty>>{
             override fun onResponse(
                 call: Call<List<FolderProperty>>,

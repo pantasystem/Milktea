@@ -60,10 +60,10 @@ class FileFragment : Fragment(R.layout.fragment_file){
         files_view.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {
             val activity = activity?: return@Observer
 
-            val driveViewModelFactory = DriveViewModelFactory(it, miApplication, maxSize)
+            val driveViewModelFactory = DriveViewModelFactory(maxSize)
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
 
             val factory  = FileViewModelFactory(it, miApplication, driveViewModel.selectedFilesMapLiveData, maxSelectableItemSize = driveViewModel.selectableMaxSize, folderId = folderId)
@@ -111,9 +111,9 @@ class FileFragment : Fragment(R.layout.fragment_file){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()?: -1
-            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()?: -1
-            val itemCount = mLinearLayoutManager.itemCount?: -1
+            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
+            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
+            val itemCount = mLinearLayoutManager.itemCount
 
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")

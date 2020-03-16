@@ -38,8 +38,8 @@ class NoteDetailActivity : AppCompatActivity() {
         mNoteId = noteId
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ci, miApplication))[NotesViewModel::class.java]
+        miApplication.currentAccount.observe(this, Observer {ac ->
+            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ac, miApplication))[NotesViewModel::class.java]
             ActionNoteHandler(this, notesViewModel).initViewModelListener()
             val ft = supportFragmentManager.beginTransaction()
             ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId))
@@ -71,7 +71,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
 
     private fun addToTab(){
-        (application as MiApplication).addPageToNoteSettings(NoteRequest.Setting(type = NoteType.DETAIL, noteId = mNoteId).apply{
+        (application as MiApplication).addPageInCurrentAccount(NoteRequest.Setting(type = NoteType.DETAIL, noteId = mNoteId).apply{
             title = getString(R.string.detail)
         })
     }

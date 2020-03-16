@@ -7,5 +7,6 @@ data class CustomAuthBridge(
     val secret: String,
     val instanceDomain: String,
     val session: Session,
-    val enabledDateEnd: Date
+    val enabledDateEnd: Date,
+    val viaName: String?
 )

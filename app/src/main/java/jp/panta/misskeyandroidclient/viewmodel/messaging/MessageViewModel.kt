@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
@@ -18,7 +18,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MessageViewModel(
-    private val connectionInstance: ConnectionInstance,
+    private val accountRelation: AccountRelation,
     private val misskeyAPI: MisskeyAPI,
     messageHistory: Message,
     private val encryption: Encryption
@@ -33,6 +33,7 @@ class MessageViewModel(
             LOAD_INIT, LOAD_OLD, LOAD_NEW, RECEIVED
         }
     }
+    val connectionInformation = accountRelation.getCurrentConnectionInformation()
 
     val messagesLiveData = object :MutableLiveData<State>(){
         override fun onActive() {
@@ -43,13 +44,13 @@ class MessageViewModel(
             super.onInactive()
         }
     }
-    private val builder = RequestMessage.Builder(connectionInstance, messageHistory).apply{
+    private val builder = RequestMessage.Builder(accountRelation, messageHistory).apply{
         this.limit = 20
     }
 
     private val observerId = UUID.randomUUID().toString()
-    val streamingAdapter =  StreamingAdapter(connectionInstance, encryption).apply{
-        val main = MainCapture(connectionInstance, GsonFactory.create())
+    val streamingAdapter =  StreamingAdapter(connectionInformation, encryption).apply{
+        val main = MainCapture(GsonFactory.create())
         addObserver(observerId, main)
         main.addListener(MessageObserver())
         connect()
@@ -72,7 +73,7 @@ class MessageViewModel(
                     return
                 }
                 val viewDataList = rawMessages.map{
-                    if(it.user?.id == connectionInstance.userId){
+                    if(it.user?.id == accountRelation.account.id){
                         //me
                         SelfMessageViewData(it)
                     }else{
@@ -110,7 +111,7 @@ class MessageViewModel(
                     return
                 }
                 val viewData = reversedMessages.map{
-                    if(it.userId == connectionInstance.userId){
+                    if(it.userId == accountRelation.account.id){
                         SelfMessageViewData(it)
                     }else{
                         RecipientMessageViewData(it)
@@ -151,7 +152,7 @@ class MessageViewModel(
                 }
 
                 val viewData = rawList.map{
-                    if(it.userId == connectionInstance.userId){
+                    if(it.userId == accountRelation.account.id){
                         //me
                         SelfMessageViewData(it)
                     }else{
@@ -175,7 +176,7 @@ class MessageViewModel(
         override fun messagingMessage(message: Message) {
             val messages = messagesLiveData.value?.messages.toArrayList()
 
-            val msg = if(message.userId == connectionInstance.userId){
+            val msg = if(message.userId == accountRelation.account.id){
                 //me
                 SelfMessageViewData(message)
             }else{

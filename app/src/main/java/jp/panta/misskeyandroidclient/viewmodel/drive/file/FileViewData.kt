@@ -61,7 +61,7 @@ class FileViewData(
         result = 31 * result + (userId?.hashCode() ?: 0)
         result = 31 * result + (comment?.hashCode() ?: 0)
         result = 31 * result + (isSensitive?.hashCode() ?: 0)
-        result = 31 * result + (url?.hashCode() ?: 0)
+        result = 31 * result + (url.hashCode())
         result = 31 * result + (thumbnailUrl?.hashCode() ?: 0)
         result = 31 * result + (attachedNoteIds?.hashCode() ?: 0)
         result = 31 * result + (folderId?.hashCode() ?: 0)

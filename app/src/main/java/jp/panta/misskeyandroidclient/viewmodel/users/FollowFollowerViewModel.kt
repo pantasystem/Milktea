@@ -10,7 +10,7 @@ import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.users.FollowFollowerUser
@@ -25,7 +25,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class FollowFollowerViewModel(
-    val connectionInstance: ConnectionInstance,
+    val accountRelation: AccountRelation,
     val misskeyAPI: MisskeyAPI,
     val user: User?,
     val type: Type,
@@ -33,17 +33,17 @@ class FollowFollowerViewModel(
 ) : ViewModel(){
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val connectionInstance: ConnectionInstance,
+        val accountRelation: AccountRelation,
         val miApplication: MiApplication,
         val user: User?,
         val type: Type,
         val encryption: Encryption
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            val misskeyAPI = miApplication.misskeyAPIService!!
+            val misskeyAPI = miApplication.getMisskeyAPI(accountRelation)!!
             if(modelClass == FollowFollowerViewModel::class.java){
                 return FollowFollowerViewModel(
-                    connectionInstance,
+                    accountRelation,
                     misskeyAPI,
                     user,
                     type,
@@ -61,7 +61,7 @@ class FollowFollowerViewModel(
 
     val tag = "FollowFollowerViewModel"
 
-    val userId = user?.id?: connectionInstance.userId
+    val userId = user?.id?: accountRelation.account.id
 
     val store = if(type == Type.FOLLOWER){
         misskeyAPI::followers
@@ -69,8 +69,8 @@ class FollowFollowerViewModel(
         misskeyAPI::following
     }
     val streamingAdapter: StreamingAdapter by lazy {
-        StreamingAdapter(connectionInstance, encryption).apply{
-            val mainCapture = MainCapture(connectionInstance, GsonFactory.create())
+        StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption).apply{
+            val mainCapture = MainCapture(GsonFactory.create())
             mainCapture.addListener(Listener())
             addObserver(UUID.randomUUID().toString(), mainCapture)
         }
@@ -97,7 +97,7 @@ class FollowFollowerViewModel(
             mIsLoading = true
             isInitializing.postValue(true)
             val request = RequestUser(
-                i = connectionInstance.getI(encryption)!!,
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 userId = userId,
                 limit = 30
             )
@@ -130,7 +130,7 @@ class FollowFollowerViewModel(
                 return@launch loadInit()
             }
             val request = RequestUser(
-                i = connectionInstance.getI(encryption)!!,
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 untilId = untilId,
                 userId = userId,
                 limit = 30
@@ -174,14 +174,14 @@ class FollowFollowerViewModel(
         if(SafeUnbox.unbox(followFollowerViewData.isFollowing.value)){
             viewModelScope.launch(Dispatchers.IO){
                 misskeyAPI.unFollowUser(RequestUser(
-                    i = connectionInstance.getI(encryption)!!,
+                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                     userId = followFollowerViewData.user.id
                 )).execute()
             }
         }else{
             viewModelScope.launch(Dispatchers.IO){
                 misskeyAPI.followUser(RequestUser(
-                    i = connectionInstance.getI(encryption)!!,
+                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                     userId = followFollowerViewData.user.id
                 )).execute()
             }

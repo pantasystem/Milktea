@@ -24,7 +24,7 @@ class TimelineViewModelFactory(
 
             val misskeyAPI = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
 
-            return TimelineViewModel(accountRelation, requestSetting, misskeyAPI, settingStore, miApplication.mEncryption) as T
+            return TimelineViewModel(accountRelation, requestSetting, misskeyAPI, settingStore, miApplication.getEncryption()) as T
 
         }
 

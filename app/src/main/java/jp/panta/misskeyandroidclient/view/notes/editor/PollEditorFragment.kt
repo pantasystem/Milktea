@@ -42,7 +42,7 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
         choices.layoutManager = layoutManager
         val miApplication = context?.applicationContext as MiApplication
 
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {
             val viewModel = ViewModelProvider(activity, NoteEditorViewModelFactory(it, miApplication)).get(NoteEditorViewModel::class.java)
             val poll = viewModel.poll.value ?: return@Observer
             mBinding.pollEditor = poll

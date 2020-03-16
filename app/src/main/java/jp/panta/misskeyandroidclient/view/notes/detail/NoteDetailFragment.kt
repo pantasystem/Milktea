@@ -35,9 +35,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
         noteId?: throw IllegalArgumentException("noteId must not null")
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer {ci ->
-            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ci, miApplication))[NotesViewModel::class.java]
-            val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ci, miApplication, noteId))[NoteDetailViewModel::class.java]
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
+            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
+            val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ar, miApplication, noteId))[NoteDetailViewModel::class.java]
 
             noteDetailViewModel.loadDetail()
             val adapter = NoteDetailAdapter(

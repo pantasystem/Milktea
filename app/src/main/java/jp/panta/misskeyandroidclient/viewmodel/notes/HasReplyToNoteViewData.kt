@@ -2,11 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import java.lang.IllegalArgumentException
 
-class HasReplyToNoteViewData(note: Note, connectionInstance: ConnectionInstance)  : PlaneNoteViewData(note, connectionInstance){
+class HasReplyToNoteViewData(note: Note, account: Account)  : PlaneNoteViewData(note, account){
     val reply = note.reply
 
     /*val replyToAvatarUrl = reply?.user?.avatarUrl
@@ -26,7 +26,7 @@ class HasReplyToNoteViewData(note: Note, connectionInstance: ConnectionInstance)
     val replyTo = if(reply == null){
         throw IllegalArgumentException("replyがnullですPlaneNoteViewDataを利用してください")
     }else{
-        PlaneNoteViewData(reply, connectionInstance)
+        PlaneNoteViewData(reply, account)
     }
 
 

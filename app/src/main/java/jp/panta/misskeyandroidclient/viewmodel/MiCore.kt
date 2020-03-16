@@ -33,11 +33,13 @@ interface MiCore{
 
     fun removeAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>)
 
-    fun putConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation)
+    fun putConnectionInfo(account: Account, ci: EncryptedConnectionInformation)
 
     fun removeConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation)
 
     fun getMisskeyAPI(ci: EncryptedConnectionInformation): MisskeyAPI
+
+    fun getMisskeyAPI(accountRelation: AccountRelation?): MisskeyAPI?
 
     fun getEncryption(): Encryption
 

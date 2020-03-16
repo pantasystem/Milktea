@@ -79,7 +79,7 @@
                     android:layout_toStartOf="@id/moreAccount"
                     android:layout_toEndOf="@id/history_icon"
                     android:textSize="18sp"
-                    android:text="@{SafeUnbox.unbox(accountViewData.connectionInstance.instanceBaseUrl)}"
+                    android:text="@{SafeUnbox.unbox(accountViewData.accountRelation.currentConnectionInformation.instanceBaseUrl)}"
                     />
 
 

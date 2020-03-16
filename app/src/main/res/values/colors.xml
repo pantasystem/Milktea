@@ -38,6 +38,7 @@
     <color name="colorSeparatorDark">#262626</color>
     <color name="colorMessageSelfDark">#3200B4</color>
     <color name="colorMessageRecipientDark">#262626</color>
+    <color name="navigationDarkColor">#1B1A1A</color>
 
     <!--Bread Theme-->
     <color name="colorBreadPrimary">#D9A042</color>

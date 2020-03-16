@@ -21,12 +21,13 @@ class PostNoteService : IntentService("PostNoteService") {
             return
         }
         val miApplication = applicationContext as MiApplication
-        val ci = miApplication.currentConnectionInstanceLiveData.value
+        val ci = miApplication.currentAccount.value?.getCurrentConnectionInformation()
         if(ci == null){
             Log.e(tag, "ConnectionInstanceの取得に失敗しました")
             return
         }
-        val uploader = OkHttpDriveFileUploader(applicationContext, ci, GsonBuilder().create(), miApplication.mEncryption)
+
+        val uploader = OkHttpDriveFileUploader(applicationContext, ci, GsonBuilder().create(), miApplication.getEncryption())
         val createNote = noteTask.execute(uploader)
         if(createNote == null){
             Log.d(tag, "ファイルのアップロードに失敗しました")
@@ -34,7 +35,7 @@ class PostNoteService : IntentService("PostNoteService") {
         }
 
         Log.d(tag, "createNote: $createNote")
-        val result = miApplication.misskeyAPIService?.create(createNote)?.execute()
+        val result = miApplication.getMisskeyAPI(ci).create(createNote).execute()
 
         if(result?.code() == 200){
             Log.d(tag, "ノートの投稿に成功しました")

@@ -8,12 +8,12 @@ import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.AppSecret
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
 import jp.panta.misskeyandroidclient.model.auth.custom.ShowApp
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
@@ -27,10 +27,10 @@ import java.util.*
 
 @Suppress("UNCHECKED_CAST")
 class CustomAppViewModel(
-    val currentConnectionInstanceLiveData: MutableLiveData<ConnectionInstance>,
-    val accounts: MutableLiveData<List<User>>,
+    val currentAccountRelation: MutableLiveData<AccountRelation>,
+    //val accounts: MutableLiveData<List<AccountRelation>>,
     val encryption: Encryption,
-    var misskeyAPI: MisskeyAPI,
+    var misskeyAPI: MisskeyAPI?,
     val customAuthStore: CustomAuthStore
 ) : ViewModel(){
 
@@ -40,10 +40,9 @@ class CustomAppViewModel(
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == CustomAppViewModel::class.java){
                 return CustomAppViewModel(
-                    miApplication.currentConnectionInstanceLiveData,
-                    miApplication.accountsLiveData,
-                    miApplication.mEncryption,
-                    miApplication.misskeyAPIService!!,
+                    miApplication.currentAccount,
+                    miApplication.getEncryption(),
+                    miApplication.getMisskeyAPI(miApplication.currentAccount.value)!!,
                     CustomAuthStore.newInstance(miApplication)
                 ) as T
             }
@@ -54,15 +53,18 @@ class CustomAppViewModel(
     //val accounts =
     val selectedApp = MutableLiveData<App>()
     val apps = MutableLiveData<List<App>>()
-    val account = Transformations.map(currentConnectionInstanceLiveData){ci ->
+    val account = Transformations.map(currentAccountRelation){ accountRelation ->
         loadApps()
-        val user = accounts.value?.firstOrNull {
-            it.id == ci.userId
-        }
-        if(user == null){
+
+        if(accountRelation == null){
             null
         }else{
-            AccountViewData(user, ci)
+            AccountViewData(MutableLiveData<User>(), accountRelation).also{ avd ->
+                loadI(
+                    avd
+                )
+            }
+
         }
     }
 
@@ -78,6 +80,7 @@ class CustomAppViewModel(
 
     val isCanAuthenticated = MediatorLiveData<Boolean>()
 
+
     init{
         isCanAuthenticated.addSource(selectedApp){
             isCanAuthenticated.value = it != null && account.value != null
@@ -86,17 +89,40 @@ class CustomAppViewModel(
             isCanAuthenticated.value = selectedApp.value != null && it != null
         }
 
-        currentConnectionInstanceLiveData.observeForever {
-            Log.d(tag, "directI:${it.getDirectI(encryption)}")
-            isSignInRequiredEvent.event = it.getDirectI(encryption) == null
+        currentAccountRelation.observeForever {
+            //Log.d(tag, "directI:${it.getDirectI(encryption)}")
+            isSignInRequiredEvent.event = it.connectionInformationList.firstOrNull { ci ->
+                ci.isDirect
+            } == null
         }
     }
 
 
+    private fun loadI(target: AccountViewData){
+        val ar = target.accountRelation
+        val i = ar.connectionInformationList.firstOrNull {
+            it.isDirect
+        }?.getI(encryption)?: return
+
+        misskeyAPI?.i(I(i))?.enqueue(object : Callback<User>{
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                val me = response.body()
+                target.user.postValue(me)
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                Log.d(this@CustomAppViewModel.javaClass.name, "i load error", t)
+            }
+        })
+    }
+
     private fun loadApps(){
-        val nowCn = currentConnectionInstanceLiveData.value?: return
-        val nowI = nowCn.getI(encryption)?: return
-        misskeyAPI.myApps(I(nowI)).enqueue(object : Callback<List<App>>{
+        val pwCn = currentAccountRelation.value?.connectionInformationList?.firstOrNull {
+            it.isDirect
+        }?: return
+        val current = currentAccountRelation.value?.getCurrentConnectionInformation()
+        val nowI = pwCn.getI(encryption)?: return
+        misskeyAPI?.myApps(I(nowI))?.enqueue(object : Callback<List<App>>{
             override fun onResponse(call: Call<List<App>>, response: Response<List<App>>) {
                 val resBody = response.body()
                 if(resBody != null){
@@ -108,16 +134,16 @@ class CustomAppViewModel(
                             }
                         }
                     })
-                    Log.d(tag, "apps読み込みに成功 domain:${nowCn.instanceBaseUrl}, i:$nowI")
-                    if(nowCn.state == ConnectionInstance.CUSTOM_APP){
-                        val selected = resBody.firstOrNull {
-                            it.secret == nowCn.getCustomAppSecret(encryption)
-                        }?: return
+                    Log.d(tag, "apps読み込みに成功 domain:${pwCn.instanceBaseUrl}, i:$nowI")
 
-                        selectedApp.postValue(selected)
-                    }
+                    val selected = resBody.firstOrNull {
+                        it.name  == current?.viaName
+                    }?: return
+
+                    selectedApp.postValue(selected)
+
                 }else{
-                    Log.d(tag, "apps読み込みに失敗, code:${response.code()}, domain:${nowCn.instanceBaseUrl}, i:$nowI, errorMsg: ${call.request().url().toString()}")
+                    Log.d(tag, "apps読み込みに失敗, code:${response.code()}, domain:${pwCn.instanceBaseUrl}, i:$nowI, errorMsg: ${call.request().url().toString()}")
                 }
 
             }
@@ -129,8 +155,10 @@ class CustomAppViewModel(
     }
 
     fun setApp(id: String){
-        val nowI = currentConnectionInstanceLiveData.value?.getI(encryption)?: return
-        misskeyAPI.myApps(I(nowI)).enqueue(object : Callback<List<App>>{
+        val i = currentAccountRelation.value?.connectionInformationList?.firstOrNull {
+            it.isDirect
+        }?.getI(encryption)?: return
+        misskeyAPI?.myApps(I(i))?.enqueue(object : Callback<List<App>>{
             override fun onResponse(call: Call<List<App>>, response: Response<List<App>>) {
                 val list = response.body()?: return
                 apps.postValue(list.filter{
@@ -172,8 +200,10 @@ class CustomAppViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try{
                 val app = selectedApp.value?: return@launch
-                val ci = currentConnectionInstanceLiveData.value?: return@launch
-                val i  = ci.getDirectI(encryption)
+                val ci = currentAccountRelation.value?.connectionInformationList?.firstOrNull {
+                    it.isDirect
+                }?: return@launch
+                val i  = ci.getI(encryption)
                 if(i == null){
                     isSignInRequiredEvent.event = true
                     return@launch
@@ -183,9 +213,9 @@ class CustomAppViewModel(
                     if (app.secret != null){
                         app.secret
                     }else{
-                        val res = misskeyAPI.showApp(ShowApp(i = i, appId = app.id)).execute()
-                        Log.d(tag, "code:${res.code()}, secret is null:${res.body()?.secret == null}")
-                        res.body()?.secret
+                        val res = misskeyAPI?.showApp(ShowApp(i = i, appId = app.id))?.execute()
+                        Log.d(tag, "code:${res?.code()}, secret is null:${res?.body()?.secret == null}")
+                        res?.body()?.secret
                     }
 
                 secret?: return@launch
@@ -204,7 +234,8 @@ class CustomAppViewModel(
                             secret = secret,
                             instanceDomain = ci.instanceBaseUrl,
                             session = body,
-                            enabledDateEnd = calendar.time
+                            enabledDateEnd = calendar.time,
+                            viaName = app.name
                         )
                         customAuthStore.setCustomAuthBridge(bridge)
                         session.postValue(response.body())

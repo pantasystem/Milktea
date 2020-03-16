@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
@@ -17,7 +17,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MessageActionViewModel(
-    val connectionInstance: ConnectionInstance,
+    val accountRelation: AccountRelation,
     val misskeyAPI: MisskeyAPI,
     private val messageHistory: Message,
     private val encryption: Encryption
@@ -25,13 +25,13 @@ class MessageActionViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val connectionInstance: ConnectionInstance,
+        val accountRelation: AccountRelation,
         val miApplication: MiApplication,
         private val messageHistory: Message
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == MessageActionViewModel::class.java){
-                return MessageActionViewModel(connectionInstance, miApplication.misskeyAPIService!!, messageHistory, miApplication.mEncryption) as T
+                return MessageActionViewModel(accountRelation, miApplication.getMisskeyAPI(accountRelation)!!, messageHistory, miApplication.getEncryption()) as T
             }
             throw IllegalArgumentException("use MessageActionViewModel::class.java")
         }
@@ -42,7 +42,7 @@ class MessageActionViewModel(
     val file = MutableLiveData<FileProperty>()
 
     fun send(){
-        val factory = MessageAction.Factory(connectionInstance, messageHistory)
+        val factory = MessageAction.Factory(accountRelation, messageHistory)
         val action = factory.actionCreateMessage(text.value, file.value?.id, encryption)
         val tmpText = text.value
         val tmpFile = file.value

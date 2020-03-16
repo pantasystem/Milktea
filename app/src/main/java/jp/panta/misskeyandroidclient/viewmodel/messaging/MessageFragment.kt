@@ -50,8 +50,8 @@ class MessageFragment : Fragment(R.layout.fragment_message){
         messages_view.layoutManager = lm
         mLayoutManager = lm
 
-        miApplication.currentConnectionInstanceLiveData.observe(viewLifecycleOwner, Observer{ci ->
-            val messageViewModel = ViewModelProvider(this, MessageViewModelFactory(ci, miApplication, messageHistory))[MessageViewModel::class.java]
+        miApplication.currentAccount.observe(viewLifecycleOwner, Observer{ accountRelation ->
+            val messageViewModel = ViewModelProvider(this, MessageViewModelFactory(accountRelation, miApplication, messageHistory))[MessageViewModel::class.java]
             mMessageViewModel = messageViewModel
 
             val adapter = MessageListAdapter(diffUtilItemCallback, viewLifecycleOwner)

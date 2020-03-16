@@ -25,8 +25,8 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.favorite)
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {ci ->
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ci, miApplication))[NotesViewModel::class.java]
+        miApplication.currentAccount.observe(this, Observer {ac ->
+            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ac, miApplication))[NotesViewModel::class.java]
             val fragment = TimelineFragment.newInstance(
                 NoteRequest.Setting(
                     type = NoteType.FAVORITE

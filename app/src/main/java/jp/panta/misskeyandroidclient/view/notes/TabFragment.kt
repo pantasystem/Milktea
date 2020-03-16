@@ -113,9 +113,14 @@ class TabFragment : Fragment(), ScrollableTop{
     }
 
     private fun showTopCurrentFragment(){
-        mPagerAdapter.scrollableTopFragments.forEach{
-            it.showTop()
+        try{
+            mPagerAdapter.scrollableTopFragments.forEach{
+                it.showTop()
+            }
+        }catch(e: UninitializedPropertyAccessException){
+
         }
+
     }
 
 

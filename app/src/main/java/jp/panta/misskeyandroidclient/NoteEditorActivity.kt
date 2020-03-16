@@ -56,7 +56,7 @@ class NoteEditorActivity : AppCompatActivity() {
         binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentConnectionInstanceLiveData.observe(this, Observer {
+        miApplication.currentAccount.observe(this, Observer {
             val factory = NoteEditorViewModelFactory(it, miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId)
             val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
             mViewModel = viewModel

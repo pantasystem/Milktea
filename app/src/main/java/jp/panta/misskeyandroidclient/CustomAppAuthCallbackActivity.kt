@@ -8,9 +8,10 @@ import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.databinding.ActivityCustomAppCallbackBinding
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
-import jp.panta.misskeyandroidclient.model.auth.ConnectionInstance
 import jp.panta.misskeyandroidclient.model.auth.UserKey
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
+import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import retrofit2.Call
 import java.util.*
 import retrofit2.Callback
@@ -60,16 +61,15 @@ class CustomAppAuthCallbackActivity : AppCompatActivity() {
         binding.authOk.setOnClickListener {
             val token = mAccessToken?: return@setOnClickListener
             val miApplication = application as MiApplication
-            val ci = miApplication.connectionInstancesLiveData.value?.firstOrNull {
-                it.userId == token.user.id
-            }?.apply{
-                setCustomAppSecret(bridge.secret, miApplication.mEncryption)
-                setAccessToken(token.accessToken, miApplication.mEncryption)
-            }?: ConnectionInstance(instanceBaseUrl = bridge.instanceDomain, userId = token.user.id).apply{
-                setCustomAppSecret(bridge.secret, miApplication.mEncryption)
-                setAccessToken(token.accessToken, miApplication.mEncryption)
+
+            val creator = EncryptedConnectionInformation.Creator(miApplication.getEncryption())
+            val ci = creator.create(token, bridge)
+            miApplication.putConnectionInfo(Account(token.user.id),ci)
+            miApplication.accounts.value?.firstOrNull {
+                it.account.id == token.user.id
+            }?.let{ ac ->
+                miApplication.addAndChangeAccount(ac.account)
             }
-            miApplication.addAccount(ci)
             finish()
         }
 
