@@ -66,7 +66,7 @@ class NotificationService : Service() {
                     val adapter = StreamingAdapter(ci, (application as MiApplication).getEncryption())
                     adapter.connect()
                     val mainCapture = MainCapture(mGson)
-                    mainCapture.addListener(MainChannelObserver(ar.account))
+                    mainCapture.putListener(MainChannelObserver(ar.account))
                     val id = UUID.randomUUID().toString()
                     adapter.addObserver(id, mainCapture)
                 }

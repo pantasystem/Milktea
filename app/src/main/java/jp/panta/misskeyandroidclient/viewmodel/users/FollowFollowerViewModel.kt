@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
@@ -71,7 +70,7 @@ class FollowFollowerViewModel(
     val streamingAdapter: StreamingAdapter by lazy {
         StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption).apply{
             val mainCapture = MainCapture(GsonFactory.create())
-            mainCapture.addListener(Listener())
+            mainCapture.putListener(Listener())
             addObserver(UUID.randomUUID().toString(), mainCapture)
         }
 

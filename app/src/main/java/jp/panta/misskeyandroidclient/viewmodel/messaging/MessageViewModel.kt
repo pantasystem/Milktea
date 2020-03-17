@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.GsonFactory
@@ -52,7 +51,7 @@ class MessageViewModel(
     val streamingAdapter =  StreamingAdapter(connectionInformation, encryption).apply{
         val main = MainCapture(GsonFactory.create())
         addObserver(observerId, main)
-        main.addListener(MessageObserver())
+        main.putListener(MessageObserver())
         connect()
     }
 

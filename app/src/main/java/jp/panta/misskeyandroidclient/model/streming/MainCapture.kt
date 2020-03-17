@@ -90,7 +90,7 @@ class MainCapture(
 
     override var streamingAdapter: StreamingAdapter? = null
 
-    private val listeners = ArrayList<Listener>()
+    private val listeners = HashMap<String, Listener>()
 
     private val notificationType = TypeToken.getParameterized(Channel::class.java, Notification::class.java).type
     private val messageType = TypeToken.getParameterized(Channel::class.java, Message::class.java).type
@@ -123,66 +123,70 @@ class MainCapture(
             if(id != mId){
                 return
             }
-            listeners.forEach{
-                when(type){
-                    "notification" ->{
-                        //notification
-                        notifyNotification(msg, it::notification)
-                    }
-                    "readAllNotifications" ->{
-                        //null
-                        it.readAllNotifications()
-                    }
+            synchronized(listeners){
+                listeners.forEach{
+                    val listener = it.value
+                    when(type){
+                        "notification" ->{
+                            //notification
+                            notifyNotification(msg, listener::notification)
+                        }
+                        "readAllNotifications" ->{
+                            //null
+                            listener.readAllNotifications()
+                        }
 
-                    "unreadMessagingMessage" ->{
-                        //message
-                        notifyMessage(msg, it::unreadMessagingMessage)
-                    }
-                    "mention" ->{
-                        //note
-                        notifyNote(msg, it::mention)
-                    }
-                    "unreadMention" ->{
-                        //id
-                        val data: Channel<String> = gson.fromJson(msg, stringType)
-                        it.unreadMention(data.body.body)
-                    }
-                    "renote" ->{
-                        //note
-                        notifyNote(msg, it::renote)
-                    }
-                    "messagingMessage" ->{
-                        //message
-                        notifyMessage(msg, it::messagingMessage)
-                    }
-                    "meUpdated" ->{
-                        //user
-                        notifyUser(msg, it::meUpdated)
-                    }
-                    "unfollow" ->{
-                        //user
-                        notifyUser(msg, it::unFollowed)
-                    }
-                    "follow"->{
-                        notifyUser(msg, it::follow)
-                    }
-                    "followed" ->{
-                        //user
-                        notifyUser(msg, it::followed)
-                    }
-                    "fileUpdated" ->{
-                        notifyFile(msg, it::fileUpdated)
-                    }
-                    "driveFileCreated" ->{
-                        notifyFile(msg, it::fileCreated)
-                    }
-                    "fileDeleted" ->{
-                        notifyId(msg, it::fileDeleted)
+                        "unreadMessagingMessage" ->{
+                            //message
+                            notifyMessage(msg, listener::unreadMessagingMessage)
+                        }
+                        "mention" ->{
+                            //note
+                            notifyNote(msg, listener::mention)
+                        }
+                        "unreadMention" ->{
+                            //id
+                            val data: Channel<String> = gson.fromJson(msg, stringType)
+                            listener.unreadMention(data.body.body)
+                        }
+                        "renote" ->{
+                            //note
+                            notifyNote(msg, listener::renote)
+                        }
+                        "messagingMessage" ->{
+                            //message
+                            notifyMessage(msg, listener::messagingMessage)
+                        }
+                        "meUpdated" ->{
+                            //user
+                            notifyUser(msg, listener::meUpdated)
+                        }
+                        "unfollow" ->{
+                            //user
+                            notifyUser(msg, listener::unFollowed)
+                        }
+                        "follow"->{
+                            notifyUser(msg, listener::follow)
+                        }
+                        "followed" ->{
+                            //user
+                            notifyUser(msg, listener::followed)
+                        }
+                        "fileUpdated" ->{
+                            notifyFile(msg, listener::fileUpdated)
+                        }
+                        "driveFileCreated" ->{
+                            notifyFile(msg, listener::fileCreated)
+                        }
+                        "fileDeleted" ->{
+                            notifyId(msg, listener::fileDeleted)
+                        }
+
                     }
 
                 }
-
             }
+
 
         }catch(e: Exception){
             Log.e("MainCapture", "error", e)
@@ -220,11 +224,21 @@ class MainCapture(
         observer(fileProperty.body.body)
     }
 
-    fun addListener(listener: Listener){
-        listeners.add(listener)
+    fun putListener(listener: Listener){
+        synchronized(listeners){
+            listeners[listener.id] = listener
+        }
+    }
+
+    fun removeListener(listener: Listener){
+        synchronized(listeners){
+            listeners.remove(listener.id)
+        }
     }
 
     fun clearListener(){
-        listeners.clear()
+        synchronized(listeners){
+            listeners.clear()
+        }
     }
 }
