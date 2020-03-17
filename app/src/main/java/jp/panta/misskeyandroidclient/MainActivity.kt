@@ -163,7 +163,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + getString(R.string.followed_by)
             else -> "もうわかんねぇなこれ"
         }
-        Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG).show()
+        val snackBar = Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG)
+        snackBar.setAction(R.string.show){
+            mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_notification)
+        }
+        snackBar.show()
+
     }
 
     private val switchAccountButtonObserver = Observer<Int>{

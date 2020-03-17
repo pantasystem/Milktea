@@ -168,4 +168,6 @@
     <string name="visibility_public_local_only">公開(ローカルのみ)</string>
     <string name="visibility_home_local_only">ホーム(ローカルのみ)</string>
     <string name="visibility_follower_local_only">フォロワー(ローカルのみ)</string>
+
+    <string name="show">表示</string>
 </resources>
