@@ -15,6 +15,7 @@ class MainCapture(
     val gson: Gson
 ) : Observer{
     interface Listener{
+        val id: String
         fun notification(notification: Notification)
         fun readAllNotifications()
         fun unreadMessagingMessage(message: Message)
@@ -45,6 +46,8 @@ class MainCapture(
     }
 
     abstract class AbsListener : Listener{
+        override val id: String = UUID.randomUUID().toString()
+
         override fun followed(user: User) {}
         override fun notification(notification: Notification) {}
         override fun meUpdated(user: User) {}
@@ -59,6 +62,23 @@ class MainCapture(
         override fun fileDeleted(id: String) = Unit
         override fun fileUpdated(fileProperty: FileProperty) = Unit
         override fun fileCreated(fileProperty: FileProperty) = Unit
+
+        override fun hashCode(): Int {
+            return id.hashCode()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as AbsListener
+
+            if (id != other.id) return false
+
+            return true
+        }
+
+
     }
 
     private data class Channel<T>(val type: String, val body: Body<T>)

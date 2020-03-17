@@ -6,6 +6,10 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
+import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.ObservableOnSubscribe
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
@@ -17,9 +21,13 @@ import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notification.Notification
+import jp.panta.misskeyandroidclient.model.streming.MainCapture
+import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import java.lang.Exception
+import java.util.*
 import kotlin.collections.HashMap
 
 
@@ -66,6 +74,9 @@ class MiApplication : Application(), MiCore {
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIMap = HashMap<String, MisskeyAPI>()
 
+    private val mStreamingAccountMap = HashMap<Account, StreamingAdapter>()
+    private val mMainCaptureAccountMap = HashMap<Account, MainCapture>()
+
     override fun onCreate() {
         super.onCreate()
 
@@ -111,6 +122,10 @@ class MiApplication : Application(), MiCore {
         GlobalScope.launch(Dispatchers.IO){
             try{
                 mAccountDao.delete(account)
+                synchronized(mStreamingAccountMap){
+                    val streaming = mStreamingAccountMap[account]
+                    streaming?.disconnect()
+                }
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "logout error", e)
@@ -274,15 +289,6 @@ class MiApplication : Application(), MiCore {
     override fun getEncryption(): Encryption {
         return mEncryption
     }
-    /*@Deprecated("新データ構造移行に伴い使用禁止")
-    fun addPageToNoteSettings(noteRequestSetting: NoteRequest.Setting){
-        GlobalScope.launch(Dispatchers.IO){
-            noteRequestSetting.accountId = currentAccount.value?.account?.id
-            mNoteRequestSettingDao.insert(noteRequestSetting)
-        }
-    }*/
-
-
 
     private fun setCurrentUserId(userId: String){
         sharedPreferences.edit().apply{
@@ -293,6 +299,33 @@ class MiApplication : Application(), MiCore {
 
     private fun getCurrentUserId(): String?{
         return sharedPreferences.getString(CURRENT_USER_ID, null)
+    }
+
+    fun getMainCapture(account: AccountRelation): MainCapture{
+        val ci = account.getCurrentConnectionInformation()
+
+        var streaming = synchronized(mStreamingAccountMap){
+            mStreamingAccountMap[account.account]
+        }
+
+        val mainCapture = synchronized(mMainCaptureAccountMap){
+            mMainCaptureAccountMap[account.account]
+        }?: MainCapture(GsonFactory.create())
+
+        if(streaming == null){
+            streaming = StreamingAdapter(ci, getEncryption())
+            streaming.addObserver(UUID.randomUUID().toString(), mainCapture)
+            streaming.connect()
+
+            synchronized(mStreamingAccountMap){
+                mStreamingAccountMap[account.account] = streaming
+            }
+            synchronized(mMainCaptureAccountMap){
+                mMainCaptureAccountMap[account.account] = mainCapture
+            }
+        }
+
+        return mainCapture
     }
 
 

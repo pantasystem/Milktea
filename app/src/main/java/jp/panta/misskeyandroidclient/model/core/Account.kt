@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
  * @param id 対となるUserのuserId
  */
 @Entity
-class Account(
+data class Account(
     @PrimaryKey(autoGenerate = false)
     val id: String
 )
