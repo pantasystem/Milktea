@@ -24,20 +24,25 @@ class NotificationService : Service() {
         private const val TAG = "NotificationService"
         private const val NOTIFICATION_CHANNEL_ID = "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
         private const val MESSAGE_CHANEL_ID = "jp.panta.misskeyandroidclient.NotificationService.MESSAGE_CHANEL_ID"
+        private const val GROUP_KEY = "NotificationService.GROUP_KEY"
 
+        const val SUBSCRIBE_ALL_NOTIFICATIONS = 0
         const val START_PUSH_NOTIFICATION = 4
         const val STOP_PUSH_NOTIFICATION = 5
     }
     private val mGson = GsonBuilder().create()
-    private lateinit var mClientMessageHandler: ClientMessageHandler
-    private lateinit var mMessenger: Messenger
+    //private lateinit var mClientMessageHandler: ClientMessageHandler
+    //private lateinit var mMessenger: Messenger
 
+    private lateinit var mBinder: NotificationBinder
     private var mNotificationManager: NotificationManager? = null
 
     var isShowNotification: Boolean = true
 
+    private val mStopNotificationAccountMap = HashMap<String, Account>()
+
     override fun onBind(intent: Intent): IBinder? {
-        return mMessenger.binder
+        return mBinder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -48,9 +53,9 @@ class NotificationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        mClientMessageHandler = ClientMessageHandler(this)
-        mMessenger = Messenger(mClientMessageHandler)
-
+        //mClientMessageHandler = ClientMessageHandler(this)
+        //mMessenger = Messenger(mClientMessageHandler)
+        mBinder = NotificationBinder()
     }
 
     private fun startObserve(){
@@ -77,11 +82,18 @@ class NotificationService : Service() {
     ) : MainCapture.AbsListener(){
         override fun notification(notification: Notification) {
             Handler(Looper.getMainLooper()).post{
-                Log.d(TAG, "notification,:$notification")
                 //val miApplication = applicationContext as MiApplication
-                if(isShowNotification){
-                    showNotification(NotificationViewData(notification, account))
+                synchronized(mStopNotificationAccountMap){
+
+                    if(mStopNotificationAccountMap[account.id] == null){
+                        Log.d(TAG, "notification,:$notification")
+                        showNotification(NotificationViewData(notification, account))
+                    }else{
+                        Log.d(TAG, "通知を表示しなかった")
+                    }
+
                 }
+
             }
         }
 
@@ -204,7 +216,6 @@ E/MQSEventManagerDelegate: failed to get MQSService.
                 val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
                 channel.description = description
                 notificationManager.createNotificationChannel(channel)
-
             }
         }
         return notificationManager
@@ -216,17 +227,41 @@ E/MQSEventManagerDelegate: failed to get MQSService.
     }
 
 
+    fun subscribeNotifications(){
+        cancelAllNotification()
+    }
 
-    private class ClientMessageHandler(service: NotificationService) : Handler(){
+    fun stopShowPushNotification(account: Account){
+        synchronized(mStopNotificationAccountMap){
+            mStopNotificationAccountMap[account.id] = account
+            Log.d(TAG, "指定のアカウントのプッシュ通知を表示しない")
+        }
+    }
+
+    fun startShowPushNotification(account: Account){
+        synchronized(mStopNotificationAccountMap){
+            mStopNotificationAccountMap.remove(account.id)
+            Log.d(TAG, "プッシュ通知の表示を再開する")
+
+        }
+    }
+
+    /*class ClientMessageHandler(service: NotificationService) : Handler(){
 
         private val mService: WeakReference<NotificationService> = WeakReference(service)
+
+        fun getService(): NotificationService?{
+            return mService.get()
+        }
 
         // client（Activity）などからメッセージを受信したとき
         override fun handleMessage(msg: android.os.Message?) {
             super.handleMessage(msg)
 
             when(msg?.what){
-
+                SUBSCRIBE_ALL_NOTIFICATIONS ->{
+                    mService.get()?.cancelAllNotification()
+                }
                 STOP_PUSH_NOTIFICATION ->{
                     mService.get()?.isShowNotification = false
                 }
@@ -238,6 +273,12 @@ E/MQSEventManagerDelegate: failed to get MQSService.
             //msg?.replyTo?.send()
 
         }
+    }*/
+
+    inner class NotificationBinder : Binder() {
+
+        fun getService() = this@NotificationService
     }
+
 
 }

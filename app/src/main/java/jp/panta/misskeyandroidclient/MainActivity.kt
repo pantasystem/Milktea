@@ -1,7 +1,11 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 
 import android.view.Menu
@@ -47,6 +51,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var mBottomNavigationAdapter: MainBottomNavigationAdapter? = null
 
     private var mNotificationSubscribeViewModel: NotificationSubscribeViewModel? = null
+
+    private var mNotificationService: NotificationService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -164,9 +170,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             else -> "もうわかんねぇなこれ"
         }
         val snackBar = Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG)
-        snackBar.setAction(R.string.show){
+        /*snackBar.setAction(R.string.show){
             mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_notification)
-        }
+        }*/
         snackBar.show()
 
     }
@@ -289,6 +295,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.closeDrawer(GravityCompat.START)
         return false
     }
+    override fun onStart() {
+        super.onStart()
 
+        bindService(Intent(this, NotificationService::class.java), notificationServiceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onResume(){
+        super.onResume()
+        (application as MiApplication?)?.currentAccount?.value?.let{
+            mNotificationService?.stopShowPushNotification(it.account)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (application as MiApplication?)?.currentAccount?.value?.let{
+            mNotificationService?.startShowPushNotification(it.account)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        mNotificationService = null
+        unbindService(notificationServiceConnection)
+    }
+
+    private val notificationServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+            val binder = p1 as NotificationService.NotificationBinder?
+            mNotificationService = binder?.getService()
+            (application as MiApplication?)?.currentAccount?.value?.let{
+                mNotificationService?.stopShowPushNotification(it.account)
+            }
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            mNotificationService = null
+        }
+
+
+    }
 
 }
