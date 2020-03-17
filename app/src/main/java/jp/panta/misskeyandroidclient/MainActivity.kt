@@ -16,9 +16,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -32,6 +34,7 @@ import jp.panta.misskeyandroidclient.view.settings.activities.TabSettingActivity
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
@@ -41,6 +44,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var mAccountViewModel: AccountViewModel
 
     private var mBottomNavigationAdapter: MainBottomNavigationAdapter? = null
+
+    private var mNotificationSubscribeViewModel: NotificationSubscribeViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +90,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 init = true
                 Log.d("MainActivity", "初期化処理")
             }
+            val factory = NotificationSubscribeViewModel.Factory(it, miApplication)
+            mNotificationSubscribeViewModel = ViewModelProvider(this, factory).get("${it.account}", NotificationSubscribeViewModel::class.java)
+            mNotificationSubscribeViewModel?.currentNotification?.observe(this, notificationObserver)
         })
 
 
@@ -134,6 +142,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
+    }
+
+    private val notificationObserver = Observer<Notification>{ notify: Notification? ->
+        notify?: return@Observer
+
+        //Log.d("MainActivity")
+        Snackbar.make(app_bar_base, "通知が来ました", Snackbar.LENGTH_LONG).show()
     }
 
     private val switchAccountButtonObserver = Observer<Int>{

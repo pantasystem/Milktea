@@ -5,7 +5,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".MainActivity"
+        android:id="@+id/app_bar_base">
 
     <com.google.android.material.appbar.AppBarLayout
             android:layout_height="wrap_content"

@@ -301,7 +301,7 @@ class MiApplication : Application(), MiCore {
         return sharedPreferences.getString(CURRENT_USER_ID, null)
     }
 
-    fun getMainCapture(account: AccountRelation): MainCapture{
+    override fun getMainCapture(account: AccountRelation): MainCapture{
         val ci = account.getCurrentConnectionInformation()
 
         var streaming = synchronized(mStreamingAccountMap){

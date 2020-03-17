@@ -25,11 +25,8 @@ class NotificationService : Service() {
         private const val NOTIFICATION_CHANNEL_ID = "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
         private const val MESSAGE_CHANEL_ID = "jp.panta.misskeyandroidclient.NotificationService.MESSAGE_CHANEL_ID"
 
-        const val MSG_NOTIFICATION = 0
-
-        const val MSG_ACTION_CANCEL_NOTIFICATION = 1
-        const val MSG_SHOW_NOTIFICATION = 2
-        const val MSG_DO_NOT_SHOW_NOTIFICATION = 3
+        const val START_PUSH_NOTIFICATION = 4
+        const val STOP_PUSH_NOTIFICATION = 5
     }
     private val mGson = GsonBuilder().create()
     private lateinit var mClientMessageHandler: ClientMessageHandler
@@ -218,12 +215,6 @@ E/MQSEventManagerDelegate: failed to get MQSService.
         mNotificationManager?.cancelAll()
     }
 
-    private fun sendNotificationToClient(notification: Notification){
-        val message = Message()
-        message.obj = notification
-        message.what = MSG_NOTIFICATION
-        mMessenger.send(message)
-    }
 
 
     private class ClientMessageHandler(service: NotificationService) : Handler(){
@@ -235,13 +226,11 @@ E/MQSEventManagerDelegate: failed to get MQSService.
             super.handleMessage(msg)
 
             when(msg?.what){
-                MSG_ACTION_CANCEL_NOTIFICATION ->{
-                    mService.get()?.cancelAllNotification()
-                }
-                MSG_DO_NOT_SHOW_NOTIFICATION ->{
+
+                STOP_PUSH_NOTIFICATION ->{
                     mService.get()?.isShowNotification = false
                 }
-                MSG_SHOW_NOTIFICATION ->{
+                START_PUSH_NOTIFICATION->{
                     mService.get()?.isShowNotification = true
                 }
             }

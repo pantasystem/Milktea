@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -42,5 +43,7 @@ interface MiCore{
     fun getMisskeyAPI(accountRelation: AccountRelation?): MisskeyAPI?
 
     fun getEncryption(): Encryption
+
+    fun getMainCapture(account: AccountRelation): MainCapture
 
 }

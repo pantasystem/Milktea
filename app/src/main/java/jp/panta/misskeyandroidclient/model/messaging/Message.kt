@@ -6,10 +6,11 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
+import java.util.*
 
 data class Message(
     @SerializedName("id") val id: String,
-    @SerializedName("createdAt") val createdAt: String,
+    @SerializedName("createdAt") val createdAt: Date,
     @SerializedName("text") val text: String?,
     @SerializedName("userId") val userId: String?,
     @SerializedName("user") val user: User?,
