@@ -35,6 +35,7 @@ import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
@@ -147,8 +148,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val notificationObserver = Observer<Notification>{ notify: Notification? ->
         notify?: return@Observer
 
+        val account = (application as MiApplication).currentAccount.value?: return@Observer
+        val viewData = NotificationViewData(notify, account.account)
         //Log.d("MainActivity")
-        Snackbar.make(app_bar_base, "通知が来ました", Snackbar.LENGTH_LONG).show()
+        val name = notify.user.name?: notify.user.userName
+        val msg = when(viewData.type){
+            NotificationViewData.Type.FOLLOW ->  name + getString(R.string.followed_by)
+            NotificationViewData.Type.MENTION -> name + getString(R.string.mention_by)
+            NotificationViewData.Type.REPLY -> name + getString(R.string.replied_by)
+            NotificationViewData.Type.RENOTE -> name + getString(R.string.renoted_by)
+            NotificationViewData.Type.QUOTE -> name + getString(R.string.quoted_by)
+            NotificationViewData.Type.REACTION -> name + getString(R.string.reacted_by)
+            NotificationViewData.Type.POLL_VOTE -> name + getString(R.string.voted_by)
+            NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + getString(R.string.followed_by)
+            else -> "もうわかんねぇなこれ"
+        }
+        Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG).show()
     }
 
     private val switchAccountButtonObserver = Observer<Int>{
