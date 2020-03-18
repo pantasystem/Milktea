@@ -14,9 +14,7 @@ import java.lang.ref.WeakReference
 
 class EmojiSpan(view: View) : ReplacementSpan(){
     val weakReference: WeakReference<View> = WeakReference(view)
-    private var imageDrawable: GifDrawable? = null
-
-    //これ何？
+    private var imageDrawable: Drawable? = null
 
 
 
@@ -75,33 +73,35 @@ class EmojiSpan(view: View) : ReplacementSpan(){
         }
     }
 
-    /*val target = object : CustomTarget<Bitmap>(){
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-            val view = weakReference.get()
-            if(view != null){
-                imageDrawable = BitmapDrawable(view.context.resources, resource)
-                //view.invalidate()
-                imageDrawable?.callback = Animated()
-            }
-        }
-        override fun onLoadCleared(placeholder: Drawable?) {
-        }
-    }*/
-    val target = object : CustomTarget<GifDrawable>(){
+
+    val target = object : CustomTarget<Drawable>(){
         override fun onResourceReady(
-            resource: GifDrawable,
-            transition: Transition<in GifDrawable>?
+            resource: Drawable,
+            transition: Transition<in Drawable>?
         ) {
             weakReference.get()?.let{
                 imageDrawable = resource
                 imageDrawable?.callback = Animated()
-                imageDrawable?.start()
+                if(resource is GifDrawable){
+                    resource.start()
+                }
             }
         }
         override fun onLoadCleared(placeholder: Drawable?) {
-            if(imageDrawable is GifDrawable){
-                //imageDrawable?.stop()
+
+        }
+    }
+
+    val bitmapTarget = object : CustomTarget<Bitmap>(){
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+            weakReference.get()?.let{ view ->
+                imageDrawable = BitmapDrawable(view.context.resources, resource)
+                view.invalidate()
             }
+        }
+
+        override fun onLoadCleared(placeholder: Drawable?) {
+
         }
     }
 }

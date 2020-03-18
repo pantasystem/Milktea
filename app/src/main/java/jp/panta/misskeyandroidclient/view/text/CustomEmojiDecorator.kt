@@ -40,16 +40,16 @@ class CustomEmojiDecorator{
                  */
                 if(emoji.isSvg()){
                     GlideApp.with(view.context)
-                        .`as`(GifDrawable::class.java)
+                        .`as`(Bitmap::class.java)
                         //.listener(SvgSoftwareLayerSetter())
                         //.transition(withCrossFade())
                         .load(emoji.url?: emoji.url)
-                        .into(span.target)
+                        .into(span.bitmapTarget)
 
 
                 }else{
                     Glide.with(view)
-                        .asGif()
+                        .asDrawable()
                         .load(emoji.url)
                         .into(span.target)
                 }
