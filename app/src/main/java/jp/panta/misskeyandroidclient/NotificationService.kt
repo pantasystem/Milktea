@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.*
@@ -18,6 +16,7 @@ import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import java.lang.ref.WeakReference
 import java.util.*
+import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData.Type.*
 
 class NotificationService : Service() {
     companion object{
@@ -110,41 +109,44 @@ class NotificationService : Service() {
     private fun showNotification(notification: NotificationViewData){
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             builder.setSmallIcon(R.mipmap.ic_launcher)
+
             when(notification.type){
-                NotificationViewData.Type.FOLLOW ->{
+                FOLLOW ->{
                     //builder.setSmallIcon(R.drawable.ic_follow)
                     builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.followed_by))
+
                 }
-                NotificationViewData.Type.MENTION ->{
+                MENTION ->{
                     //builder.setSmallIcon(R.drawable.ic_mention)
                     builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.mention_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
+
                 }
-                NotificationViewData.Type.REPLY ->{
+                REPLY ->{
                     //builder.setSmallIcon(R.drawable.ic_reply_black_24dp)
                     builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.replied_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
                 }
-                NotificationViewData.Type.QUOTE ->{
+                QUOTE ->{
                     //builder.setSmallIcon(R.drawable.ic_format_quote_black_24dp)
                     builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.quoted_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
                 }
-                NotificationViewData.Type.POLL_VOTE->{
+                POLL_VOTE->{
                     //builder.setSmallIcon(R.drawable.ic_poll_black_24dp)
                     builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.voted_by))
                 }
-                NotificationViewData.Type.REACTION ->{
+                REACTION ->{
                     //builder.setSmallIcon(R.drawable.ic_reaction_like)
                     builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.reacted_by))
                     builder.setContentText(SafeUnbox.unbox(notification.reaction))
                 }
-                NotificationViewData.Type.RENOTE ->{
+                RENOTE ->{
                     // builder.setSmallIcon(R.drawable.ic_re_note)
                     builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.renoted_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
                 }
-                NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST ->{
+                RECEIVE_FOLLOW_REQUEST ->{
                     /*
                     E/AndroidRuntime: FATAL EXCEPTION: main
     Process: jp.panta.misskeyandroidclient, PID: 27540
@@ -186,11 +188,34 @@ E/MQSEventManagerDelegate: failed to get MQSService.
 
             }
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
+
+        val pendingIntent = TaskStackBuilder.create(this)
+            .addNextIntentWithParentStack(makeResultActivityIntent(notification))
+            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        builder.setContentIntent(pendingIntent)
+
         mNotificationManager = with(makeNotificationManager(NOTIFICATION_CHANNEL_ID)){
             notify(5, builder.build())
             this
         }
 
+    }
+
+    private fun makeResultActivityIntent(notificationViewData: NotificationViewData): Intent{
+        return when(notificationViewData.type){
+            FOLLOW, RECEIVE_FOLLOW_REQUEST->{
+                Intent(this, UserDetailActivity::class.java).apply{
+                    putExtra(UserDetailActivity.EXTRA_USER_ID, notificationViewData.user.id)
+                }
+            }
+            MENTION, REPLY, RENOTE, QUOTE, REACTION, POLL_VOTE ->{
+                Intent(this, NoteDetailActivity::class.java).apply{
+                    putExtra(NoteDetailActivity.EXTRA_NOTE_ID, notificationViewData.noteViewData?.id)
+                }
+            }
+            else -> Intent(this, MainActivity::class.java)
+        }
     }
 
     private fun showMessageNotification(message: Message){

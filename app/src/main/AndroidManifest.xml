@@ -56,7 +56,10 @@
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings" />
-        <activity android:name=".UserDetailActivity">
+        <activity
+                android:name=".UserDetailActivity"
+                android:parentActivityName=".MainActivity"
+                >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -67,7 +70,10 @@
                         android:scheme="misskey" />
             </intent-filter>
         </activity>
-        <activity android:name=".NoteDetailActivity" />
+        <activity
+                android:name=".NoteDetailActivity"
+                android:parentActivityName=".MainActivity"
+                />
 
         <service
                 android:name=".PostNoteService"
