@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.meta
 
+import androidx.room.Ignore
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 
 data class Meta(
@@ -39,5 +41,10 @@ data class Meta(
     @SerializedName("swPublickey") val swPublickey: String?,
     @SerializedName("ToSUrl") val toSUrl: String?,
     @SerializedName("uri") val uri: String?,
-    @SerializedName("version") val version: String?
-)
+    @SerializedName("version") val version: String
+){
+    @Ignore
+    fun getVersion(): Version{
+        return Version(version)
+    }
+}
