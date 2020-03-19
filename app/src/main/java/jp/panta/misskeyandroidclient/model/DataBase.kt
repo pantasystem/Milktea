@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryCount
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 
-@Database(entities = [EncryptedConnectionInformation::class, NoteRequest.Setting::class, ReactionHistory::class, Account::class], version = 33)
+@Database(entities = [EncryptedConnectionInformation::class, NoteRequest.Setting::class, ReactionHistory::class, Account::class], version = 34)
 @TypeConverters(NoteRequest.NoteTypeConverter::class, DateConverter::class)
 abstract class DataBase : RoomDatabase(){
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao

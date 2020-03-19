@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.MIGRATION_33_34
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
@@ -79,7 +80,9 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
-        val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database").fallbackToDestructiveMigration().build()
+        val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database")
+            .addMigrations(MIGRATION_33_34)
+            .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()
 
