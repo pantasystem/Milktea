@@ -51,7 +51,7 @@ class MiApplication : Application(), MiCore {
 
 
 
-    var nowInstanceMeta: Meta? = null
+    //private var nowInstanceMeta: Meta? = null
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -259,6 +259,13 @@ class MiApplication : Application(), MiCore {
         }
     }
 
+    override fun getCurrentInstanceMeta(): Meta?{
+        return synchronized(mMetaInstanceUrlMap){
+            currentAccount.value?.account?.id?.let{ id ->
+                mMetaInstanceUrlMap[id]
+            }
+        }
+    }
 
     private fun loadInstanceMetaAndSetupAPI(connectionInformation: EncryptedConnectionInformation): Meta?{
         val meta = mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl]
@@ -266,7 +273,7 @@ class MiApplication : Application(), MiCore {
         meta?.let{
             mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = it
         }
-        nowInstanceMeta = meta
+        //nowInstanceMeta = meta
         Log.d(TAG, "load meta result ${meta?.let{"成功"}?: "失敗"} ")
 
         return meta

@@ -81,7 +81,7 @@ class ReactionChoicesFragment : Fragment(){
 
     private fun showDefault(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
-        val emojis = miApplication.nowInstanceMeta?.emojis
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis
         if(emojis == null){
             Log.d(TAG, "emojiの取得に失敗しましたインスタンスの初期化に失敗しているのかな？ emojis is null")
             return
@@ -102,7 +102,7 @@ class ReactionChoicesFragment : Fragment(){
     private fun showFrequency(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
         val ar = miApplication.currentAccount.value?: return
-        val emojis = miApplication.nowInstanceMeta?.emojis
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis
         if(emojis == null){
             Log.d(TAG, "emojiの取得に失敗しました")
             return
@@ -120,7 +120,7 @@ class ReactionChoicesFragment : Fragment(){
 
     private fun showCategoryBy(category: String, adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
-        val emojis = miApplication.nowInstanceMeta?.emojis?.filter{
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.filter{
             it.category == category
         }?.map{
             ":${it.name}:"

@@ -36,7 +36,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
         val activity = activity
         val miApplication = context?.applicationContext as MiApplication
         val ar  = miApplication.currentAccount.value
-        /*val emojis = miApplication.nowInstanceMeta?.emojis?.map{
+        /*val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"
         }*/
         activity?: return
@@ -57,10 +57,10 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
         /*val ft = childFragmentManager.beginTransaction()
         ft.replace(R.id.reactionChoicesContainer, ReactionChoicesFragment())
         ft.commit()*/
-        /*miApplication.nowInstanceMeta?.emojis?.groupBy {
+        /*miApplication.getCurrentInstanceMeta()?.emojis?.groupBy {
 
         }*/
-        val category = miApplication.nowInstanceMeta?.emojis?.filter {
+        val category = miApplication.getCurrentInstanceMeta()?.emojis?.filter {
             !it.category.isNullOrBlank()
         }?.groupBy {
             it.category?: ""

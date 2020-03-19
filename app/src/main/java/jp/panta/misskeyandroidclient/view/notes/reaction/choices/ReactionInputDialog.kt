@@ -27,7 +27,7 @@ class ReactionInputDialog : BottomSheetDialogFragment(){
         super.onViewCreated(view, savedInstanceState)
 
         val miApplication = view.context.applicationContext as MiApplication
-        val emojis = miApplication.nowInstanceMeta?.emojis?.map{
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"
         }?: return
         val activity = activity?: return

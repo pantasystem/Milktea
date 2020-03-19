@@ -46,7 +46,7 @@ object ReactionViewHelper {
         //Log.d("ReactionViewHelper", "reaction $reaction")
         if(reaction.startsWith(":") && reaction.endsWith(":")){
             val miApplication = context.applicationContext as MiApplication
-            val emoji = miApplication.nowInstanceMeta?.emojis?.firstOrNull{
+            val emoji = miApplication.getCurrentInstanceMeta()?.emojis?.firstOrNull{
                 it.name == reaction.replace(":", "")
             }
 

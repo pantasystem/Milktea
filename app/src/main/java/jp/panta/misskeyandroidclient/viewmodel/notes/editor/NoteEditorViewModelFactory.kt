@@ -15,7 +15,7 @@ class NoteEditorViewModelFactory(
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NoteEditorViewModel::class.java){
-            val meta = miApplication.nowInstanceMeta!!
+            val meta = miApplication.getCurrentInstanceMeta()!!
             val api = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
             return NoteEditorViewModel(accountRelation, api, meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.getEncryption()) as T
         }
