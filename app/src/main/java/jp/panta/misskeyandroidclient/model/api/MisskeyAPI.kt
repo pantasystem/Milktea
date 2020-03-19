@@ -10,6 +10,10 @@ import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
+import jp.panta.misskeyandroidclient.model.list.CreateList
+import jp.panta.misskeyandroidclient.model.list.ListId
+import jp.panta.misskeyandroidclient.model.list.ListUserOperation
+import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
@@ -54,6 +58,27 @@ interface MisskeyAPI {
     //users
     @POST("api/users/show")
     fun showUser(@Body requestUser: RequestUser): Call<User>
+
+    @POST("api/users/lists/list")
+    fun userList(@Body i: I): Call<List<UserList>>
+
+    @POST("api/users/lists/show")
+    fun showList(@Body listId: ListId): Call<UserList>
+
+    @POST("api/lists/create")
+    fun createList(@Body createList: CreateList): Call<UserList>
+
+    @POST("api/lists/delete")
+    fun deleteList(@Body listId: ListId): Call<Unit>
+
+    @POST("api/lists/update")
+    fun updateList(@Body createList: CreateList): Call<Unit>
+
+    @POST("api/lists/push")
+    fun pushUserToList(@Body listUserOperation: ListUserOperation): Call<Unit>
+
+    @POST("api/lists/pull")
+    fun pullUserFromList(@Body listUserOperation: ListUserOperation): Call<Unit>
 
     @POST("api/following/delete")
     fun unFollowUser(@Body requestUser: RequestUser): Call<User>

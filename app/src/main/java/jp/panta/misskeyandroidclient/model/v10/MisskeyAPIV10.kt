@@ -11,6 +11,10 @@ import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
+import jp.panta.misskeyandroidclient.model.list.CreateList
+import jp.panta.misskeyandroidclient.model.list.ListId
+import jp.panta.misskeyandroidclient.model.list.ListUserOperation
+import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
@@ -113,4 +117,18 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI) : MisskeyAPI{
     override fun vote(vote: Vote): Call<Unit> = misskey.vote(vote)
 
     override fun userListTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.userListTimeline(noteRequest)
+
+    override fun createList(createList: CreateList): Call<UserList> = misskey.createList(createList)
+
+    override fun deleteList(listId: ListId): Call<Unit> = misskey.deleteList(listId)
+
+    override fun showList(listId: ListId): Call<UserList> = misskey.showList(listId)
+
+    override fun updateList(createList: CreateList): Call<Unit> = misskey.updateList(createList)
+
+    override fun userList(i: I): Call<List<UserList>> = misskey.userList(i)
+
+    override fun pullUserFromList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pullUserFromList(listUserOperation)
+
+    override fun pushUserToList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pushUserToList(listUserOperation)
 }
