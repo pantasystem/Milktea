@@ -1,8 +1,11 @@
 package jp.panta.misskeyandroidclient.model.v12
 
+import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
+import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaToAdd
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -10,17 +13,20 @@ import retrofit2.http.POST
 interface MisskeyAPIV12Diff {
 
     @POST("api/antennas/create")
-    fun createAntenna(@Body antenna: Antenna): Call<Unit>
+    fun createAntenna(@Body antennaToAdd: AntennaToAdd): Call<Antenna>
 
     @POST("api/antennas/delete")
-    fun deleteAntenna(@Body antenna: Antenna): Call<Unit>
+    fun deleteAntenna(@Body query: AntennaQuery): Call<Unit>
 
     @POST("api/antennas/notes")
     fun antennasNotes(@Body noteRequest: NoteRequest): Call<List<Note>>
 
     @POST("api/antennas/show")
-    fun showAntenna(@Body antenna: Antenna): Call<Unit>
+    fun showAntenna(@Body antennaQuery: AntennaQuery): Call<Antenna>
 
     @POST("api/antennas/update")
-    fun updateAntenna(@Body antenna: Antenna): Call<Unit>
+    fun updateAntenna(@Body antennaToAdd: AntennaToAdd): Call<Antenna>
+
+    @POST("api/antennas/list")
+    fun getAntennas(query: AntennaQuery): Call<List<Antenna>>
 }
