@@ -25,7 +25,8 @@ data class NoteRequest(
     @SerializedName("includeMyRenotes") val includeMyRenotes: Boolean? = null,
     @SerializedName("includeRenotedMyNotes") val includeRenotedMyNotes: Boolean? = null,
     @SerializedName("noteId") val noteId: String? = null,
-    @SerializedName("antennaId") val antennaId: String? = null
+    @SerializedName("antennaId") val antennaId: String? = null,
+    @SerializedName("listId") val listId: String? = null
 
 ): Serializable{
 
@@ -41,7 +42,8 @@ data class NoteRequest(
         val tag: String? = null,
         val noteId: String? = null,
         var accountId: String? = null,
-        var antennaId: String? = null
+        var antennaId: String? = null,
+        var listId: String? = null
     ): Serializable{
         @PrimaryKey(autoGenerate = true)
         var id: Long? = null
@@ -75,6 +77,7 @@ data class NoteRequest(
                 includeRenotedMyNotes = includeRenotedMyNotes,
                 noteId = noteId,
                 antennaId = antennaId,
+                listId = listId,
                 //tag= tag,
                 query = if(type == NoteType.SEARCH){
                     query?: title

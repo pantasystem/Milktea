@@ -123,6 +123,8 @@ interface MisskeyAPI {
     @POST("api/notes/search-by-tag")
     fun searchByTag(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
+    @POST("api/notes/user-list-timeline")
+    fun userListTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
     //user
     @POST("api/users/notes")
     fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>

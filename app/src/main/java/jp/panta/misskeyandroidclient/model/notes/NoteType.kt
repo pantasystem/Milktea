@@ -10,6 +10,7 @@ enum class NoteType(val defaultName: String){
     USER("User"),
     FAVORITE("Favorite"),
     FEATURED("Featured"),
-    DETAIL("Detail")
+    DETAIL("Detail"),
+    USER_LIST("List")
     //USER_PINは別
 }

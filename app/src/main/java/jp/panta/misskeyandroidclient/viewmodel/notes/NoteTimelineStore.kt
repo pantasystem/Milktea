@@ -31,6 +31,7 @@ class NoteTimelineStore(
         NoteType.FEATURED -> misskeyAPI::featured
         NoteType.FAVORITE -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
         NoteType.DETAIL -> throw IllegalArgumentException("use NoteDetailFragment")
+        NoteType.USER_LIST -> misskeyAPI::userListTimeline
     }
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){

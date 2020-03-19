@@ -6,10 +6,7 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
-import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.MIGRATION_33_34
-import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
 import jp.panta.misskeyandroidclient.model.api.Version
@@ -82,6 +79,7 @@ class MiApplication : Application(), MiCore {
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database")
             .addMigrations(MIGRATION_33_34)
+            .addMigrations(MIGRATION_34_35)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()

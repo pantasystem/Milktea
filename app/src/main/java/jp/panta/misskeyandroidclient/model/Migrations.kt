@@ -8,3 +8,9 @@ val MIGRATION_33_34 = object : Migration(33, 34){
         database.execSQL("alter table setting add antennaId TEXT")
     }
 }
+
+val MIGRATION_34_35 = object : Migration(34, 35){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("alter table setting add listId TEXT")
+    }
+}
