@@ -6,14 +6,12 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
+import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.*
 import jp.panta.misskeyandroidclient.model.meta.Meta
@@ -21,7 +19,6 @@ import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -72,7 +69,7 @@ class MiApplication : Application(), MiCore {
     private lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
-    private val mMisskeyAPIMap = HashMap<String, MisskeyAPI>()
+    private val mMisskeyAPIUrlMap = HashMap<String, Pair<Version?, MisskeyAPI>>()
 
     private val mStreamingAccountMap = HashMap<Account, StreamingAdapter>()
     private val mMainCaptureAccountMap = HashMap<Account, MainCapture>()
@@ -253,6 +250,8 @@ class MiApplication : Application(), MiCore {
             currentAccount.postValue(current)
             accounts.postValue(tmpAccounts)
 
+            setUpMetaMap(tmpAccounts)
+
         }catch(e: Exception){
             isSuccessCurrentAccount.postValue(false)
             Log.e(TAG, "load and initialize error", e)
@@ -261,30 +260,56 @@ class MiApplication : Application(), MiCore {
 
     override fun getCurrentInstanceMeta(): Meta?{
         return synchronized(mMetaInstanceUrlMap){
-            currentAccount.value?.account?.id?.let{ id ->
-                mMetaInstanceUrlMap[id]
+            currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ url ->
+                mMetaInstanceUrlMap[url]
             }
         }
     }
 
-    private fun loadInstanceMetaAndSetupAPI(connectionInformation: EncryptedConnectionInformation): Meta?{
-        val meta = mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl]
-            ?: getMisskeyAPI(connectionInformation).getMeta(RequestMeta()).execute().body()
-        meta?.let{
-            mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = it
+    private fun setUpMetaMap(accounts: List<AccountRelation>){
+        try{
+            accounts.forEach{ ac ->
+                ac.getCurrentConnectionInformation()?.let{ ci ->
+                    loadInstanceMetaAndSetupAPI(ci)
+                }
+            }
+        }catch(e: Exception){
+            Log.e(TAG, "meta取得中にエラー発生", e)
         }
-        //nowInstanceMeta = meta
+    }
+
+
+    private fun loadInstanceMetaAndSetupAPI(connectionInformation: EncryptedConnectionInformation): Meta?{
+        val meta = synchronized(mMisskeyAPIUrlMap){
+            mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl]
+        } ?: MisskeyGetMeta.getMeta(connectionInformation.instanceBaseUrl).execute().body()
+
+
         Log.d(TAG, "load meta result ${meta?.let{"成功"}?: "失敗"} ")
+
+        meta?: return null
+
+        synchronized(mMetaInstanceUrlMap){
+            mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = meta
+        }
+        synchronized(mMisskeyAPIUrlMap){
+            val versionAndApi = mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl]
+            if(versionAndApi?.first != meta.getVersion()){
+                val newApi = MisskeyAPIServiceBuilder.build(connectionInformation.instanceBaseUrl, meta.getVersion())
+                mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl] = Pair(meta.getVersion(), newApi)
+            }
+        }
+
 
         return meta
     }
 
     override fun getMisskeyAPI(ci: EncryptedConnectionInformation): MisskeyAPI{
-        synchronized(mMisskeyAPIMap){
-            val api = mMisskeyAPIMap[ci.instanceBaseUrl]
-                ?: MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl)
-            mMisskeyAPIMap[ci.instanceBaseUrl] = api
-            return api
+        synchronized(mMisskeyAPIUrlMap){
+            val api = mMisskeyAPIUrlMap[ci.instanceBaseUrl]
+                ?: Pair(null, MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl))
+            mMisskeyAPIUrlMap[ci.instanceBaseUrl] = api
+            return api.second
         }
     }
 
