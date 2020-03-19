@@ -111,4 +111,6 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI) : MisskeyAPI{
     override fun userNotes(noteRequest: NoteRequest): Call<List<Note>?> = misskey.userNotes(noteRequest)
 
     override fun vote(vote: Vote): Call<Unit> = misskey.vote(vote)
+
+    override fun userListTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.userListTimeline(noteRequest)
 }

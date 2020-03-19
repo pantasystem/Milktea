@@ -127,4 +127,6 @@ open class MisskeyAPIV12(val misskey: MisskeyAPI, private val misskeyAPIV12Diff:
 
     override fun updateAntenna(antennaToAdd: AntennaToAdd): Call<Antenna> = misskeyAPIV12Diff.updateAntenna(antennaToAdd)
 
+    override fun userListTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.userListTimeline(noteRequest)
+
 }
