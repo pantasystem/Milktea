@@ -14,12 +14,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.view.users.PinNoteFragment
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
@@ -34,6 +36,10 @@ class UserDetailActivity : AppCompatActivity() {
 
     private var mViewModel: UserDetailViewModel? = null
 
+    private var mAccountRelation: AccountRelation? = null
+
+    private var mUserId: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -45,11 +51,13 @@ class UserDetailActivity : AppCompatActivity() {
 
 
         val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
+        mUserId = userId
         val userName = intent.data?.getQueryParameter("userName")
         Log.d("UserDetailActivity", "userName:$userName")
 
         val miApplication = applicationContext as MiApplication
         miApplication.currentAccount.observe(this, Observer {ar ->
+            mAccountRelation = ar
             val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel
             binding.userViewModel = viewModel
@@ -91,6 +99,8 @@ class UserDetailActivity : AppCompatActivity() {
             }
             viewModel.isBlocking.observe(this, updateMenu)
             viewModel.isMuted.observe(this, updateMenu)
+
+            invalidateOptionsMenu()
 
         })
 
@@ -136,9 +146,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
-        if(menu != null){
-            setMenuTint(menu)
-        }
+
         val block = menu?.findItem(R.id.block)
         val mute = menu?.findItem(R.id.mute)
         val unblock = menu?.findItem(R.id.unblock)
@@ -153,6 +161,21 @@ class UserDetailActivity : AppCompatActivity() {
             unblock?.isVisible = false
             unmute?. isVisible = false
         }
+
+        val tab = menu?.findItem(R.id.nav_add_to_tab)
+        val page = mAccountRelation?.pages?.firstOrNull {
+            it.userId == mUserId
+        }
+        if(page == null){
+            tab?.setIcon(R.drawable.ic_add_black_24dp)
+        }else{
+            tab?.setIcon(R.drawable.ic_remove_black_24dp)
+        }
+
+        menu?.let{
+            setMenuTint(it)
+        }
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -181,10 +204,19 @@ class UserDetailActivity : AppCompatActivity() {
 
     private fun addPageToTab(){
         val user = mViewModel?.user?.value
-        if(user != null){
+        user?: return
+
+        val page = mAccountRelation?.pages?.firstOrNull {
+            it.userId == mUserId && mUserId != null
+        }
+        val isAdded = page != null
+        if(isAdded){
+            (application as MiCore).removePageInCurrentAccount(page!!)
+        }else{
             (application as MiApplication).addPageInCurrentAccount(NoteRequest.Setting(type = NoteType.USER, userId = user.id).apply{
                 title = user.getDisplayUserName()
             })
         }
+
     }
 }

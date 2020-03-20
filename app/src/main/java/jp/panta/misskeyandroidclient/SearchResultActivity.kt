@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.Observer
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.android.synthetic.main.activity_search_result.*
 
 class SearchResultActivity : AppCompatActivity() {
@@ -19,6 +22,8 @@ class SearchResultActivity : AppCompatActivity() {
 
     private var mSearchWord: String? = null
     private var mIsTag: Boolean? = null
+
+    private var mAccountRelation: AccountRelation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,11 +62,23 @@ class SearchResultActivity : AppCompatActivity() {
         ft.replace(R.id.search_result_base, timelineFragment)
         ft.commit()
 
+        (application as MiCore).currentAccount.observe(this, Observer { ar ->
+            mAccountRelation = ar
+            invalidateOptionsMenu()
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_search_menu, menu)
         if(menu != null){
+            val item = menu.findItem(R.id.nav_search_add_to_tab)
+
+            if(isAddedPage()){
+                item.setIcon(R.drawable.ic_remove_black_24dp)
+            }else{
+                item.setIcon(R.drawable.ic_add_black_24dp)
+            }
             setMenuTint(menu)
         }
         return super.onCreateOptionsMenu(menu)
@@ -83,17 +100,37 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun searchAddToTab(){
-        val type = if(SafeUnbox.unbox(mIsTag)){
+        val type = getType()
+        val word = mSearchWord ?: return
+
+        val miCore = application as MiCore
+        val page = getSamePage()
+        if(page == null){
+            miCore.addPageInCurrentAccount(
+                NoteRequest.Setting(type = type).apply{
+                    title = word
+                }
+            )
+        }else{
+            miCore.removePageInCurrentAccount(page)
+        }
+    }
+
+    private fun isAddedPage(): Boolean{
+        return getSamePage() != null
+    }
+
+    private fun getSamePage(): NoteRequest.Setting?{
+        return mAccountRelation?.pages?.firstOrNull {
+            it.type == getType() && (it.query == mSearchWord || it.tag == mSearchWord || it.title == mSearchWord)
+        }
+    }
+
+    private fun getType(): NoteType{
+        return if(SafeUnbox.unbox(mIsTag)){
             NoteType.SEARCH_HASH
         }else{
             NoteType.SEARCH
         }
-        val word = mSearchWord ?: return
-
-        (application as MiApplication).addPageInCurrentAccount(
-            NoteRequest.Setting(type = type).apply{
-                title = word
-            }
-        )
     }
 }
