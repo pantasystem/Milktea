@@ -52,4 +52,8 @@ data class User(
             "@" + this.host
         }
     }
+
+    fun getDisplayName(): String{
+        return name?: userName
+    }
 }

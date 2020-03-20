@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        package="jp.panta.misskeyandroidclient">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="jp.panta.misskeyandroidclient" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-            android:name=".MiApplication"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/AppTheme"
-            tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".CustomAppAuthCallbackActivity">
-            <intent-filter tools:ignore="AppLinkUrlError">
+        android:name=".MiApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning" >
+
+        <activity android:name=".CustomAppAuthCallbackActivity" >
+            <intent-filter tools:ignore="AppLinkUrlError" >
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                        android:host="custom_auth_call_back"
-                        android:scheme="misskey" />
+                    android:host="custom_auth_call_back"
+                    android:scheme="misskey" />
             </intent-filter>
         </activity>
         <activity android:name=".CustomAppCreatorActivity" />
@@ -33,75 +34,73 @@
         <activity android:name=".FavoriteActivity" />
         <activity android:name=".FollowFollowerActivity" />
         <activity android:name=".SearchActivity" />
-        <activity android:name=".SearchResultActivity">
+        <activity android:name=".SearchResultActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
-                        android:host="search"
-                        android:scheme="misskey" />
+                    android:host="search"
+                    android:scheme="misskey" />
             </intent-filter>
         </activity>
 
         <service
-                android:name=".NotificationService"
-                android:enabled="true"
-                android:exported="true" />
+            android:name=".NotificationService"
+            android:enabled="true"
+            android:exported="false" />
 
         <activity android:name=".MediaActivity" />
         <activity android:name=".view.settings.activities.SettingAppearanceActivity" />
         <activity android:name=".view.settings.activities.SettingMovementActivity" />
         <activity
-                android:name=".SettingsActivity"
-                android:label="@string/title_activity_settings" />
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
         <activity
-                android:name=".UserDetailActivity"
-                android:parentActivityName=".MainActivity"
-                >
+            android:name=".UserDetailActivity"
+            android:parentActivityName=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
-                        android:host="user"
-                        android:scheme="misskey" />
+                    android:host="user"
+                    android:scheme="misskey" />
             </intent-filter>
         </activity>
         <activity
-                android:name=".NoteDetailActivity"
-                android:parentActivityName=".MainActivity"
-                />
+            android:name=".NoteDetailActivity"
+            android:parentActivityName=".MainActivity" />
 
         <service
-                android:name=".PostNoteService"
-                android:exported="false" />
+            android:name=".PostNoteService"
+            android:exported="false" />
 
         <activity android:name=".MessageActivity" />
         <activity android:name=".DriveActivity" />
         <activity android:name=".view.settings.activities.TabSettingActivity" />
         <activity
-                android:name=".NoteEditorActivity"
-                android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".AuthCallBackActivity">
-            <intent-filter tools:ignore="AppLinkUrlError">
+            android:name=".NoteEditorActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".AuthCallBackActivity" >
+            <intent-filter tools:ignore="AppLinkUrlError" >
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                        android:host="auth_call_back"
-                        android:scheme="misskey" />
+                    android:host="auth_call_back"
+                    android:scheme="misskey" />
             </intent-filter>
         </activity>
         <activity android:name=".AuthActivity" />
         <activity
-                android:name=".MainActivity"
-                android:label="@string/app_name"
-                android:windowSoftInputMode="adjustPan">
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

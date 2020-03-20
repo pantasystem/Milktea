@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <variable
+                name="listUserViewData"
+                type="jp.panta.misskeyandroidclient.viewmodel.list.ListUserViewData" />
+    </data>
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0.5dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="0dp">
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                >
+
+            <ImageView
+                    android:id="@+id/avatarIcon"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    tools:ignore="ContentDescription"
+                    android:layout_marginEnd="8dp"
+                    tools:src="@drawable/ic_follow"
+                    app:circleIcon="@{listUserViewData.user.avatarUrl}"
+                    />
+
+            <TextView
+                    android:id="@+id/userName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayUserName())}"
+                    tools:text="userName"
+                    android:layout_toEndOf="@id/avatarIcon"
+                    android:singleLine="true"
+                    android:layout_alignEnd="@id/removeButton"
+                     />
+
+            <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/userName"
+                    android:layout_toEndOf="@id/avatarIcon"
+                    tools:text="name"
+                    android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayName())}"
+                    android:singleLine="true"
+                    android:layout_alignEnd="@id/removeButton"
+                    />
+
+            <ImageButton
+                    android:id="@+id/removeButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/ic_clear_black_24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    tools:ignore="ContentDescription,PrivateResource"
+                    style="@style/Widget.AppCompat.Button.Borderless"/>
+
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</layout>
