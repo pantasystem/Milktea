@@ -11,10 +11,7 @@ import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
-import jp.panta.misskeyandroidclient.model.list.CreateList
-import jp.panta.misskeyandroidclient.model.list.ListId
-import jp.panta.misskeyandroidclient.model.list.ListUserOperation
-import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.model.list.*
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
@@ -124,7 +121,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI) : MisskeyAPI{
 
     override fun showList(listId: ListId): Call<UserList> = misskey.showList(listId)
 
-    override fun updateList(createList: CreateList): Call<Unit> = misskey.updateList(createList)
+    override fun updateList(createList: UpdateList): Call<Unit> = misskey.updateList(createList)
 
     override fun userList(i: I): Call<List<UserList>> = misskey.userList(i)
 

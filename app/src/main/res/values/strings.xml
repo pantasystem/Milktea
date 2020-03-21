@@ -170,4 +170,6 @@
     <string name="visibility_follower_local_only">フォロワー(ローカルのみ)</string>
 
     <string name="show">表示</string>
+    <string name="user_list">ユーザー一覧</string>
+    <string name="update_list_user">リストを編集する</string>
 </resources>
