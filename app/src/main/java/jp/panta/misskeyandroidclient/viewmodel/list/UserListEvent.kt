@@ -10,7 +10,7 @@ data class UserListEvent(
     val userListId: String,
 
     //push user, pull user
-    val user: User? = null,
+    val userId: String? = null,
 
     //create
     val userList: UserList? = null,

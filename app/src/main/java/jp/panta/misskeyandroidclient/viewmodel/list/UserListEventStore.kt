@@ -17,24 +17,24 @@ class UserListEventStore (
         private val eventSubject = PublishSubject.create<UserListEvent>()
     }
 
-    fun onPullUser(userListId: String, user: User){
+    fun onPullUser(userListId: String, userId: String){
         eventSubject.onNext(
             UserListEvent(
                 type = PULL_USER,
                 account = accountRelation.account,
                 userListId = userListId,
-                user = user
+                userId = userId
             )
         )
     }
 
-    fun onPushUser(userListId: String, user: User){
+    fun onPushUser(userListId: String, userId: String){
         eventSubject.onNext(
             UserListEvent(
                 type = PUSH_USER,
                 account = accountRelation.account,
                 userListId = userListId,
-                user = user
+                userId = userId
             )
         )
     }
@@ -46,7 +46,7 @@ class UserListEventStore (
                 account = accountRelation.account,
                 userListId = userList.id,
                 userList = userList,
-                user = null
+                userId = null
             )
         )
     }

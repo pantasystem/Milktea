@@ -31,17 +31,17 @@ class UserListOperateViewModel(
 
     private val mPublisher = UserListEventStore(misskeyAPI, accountRelation)
 
-    fun pushUser(userList: UserList, user: User){
+    fun pushUser(userList: UserList, userId: String){
         misskeyAPI.pushUserToList(
             ListUserOperation(
                 i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 listId = userList.id,
-                userId = user.id
+                userId = userId
             )
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){
-                    mPublisher.onPushUser(userList.id, user)
+                    mPublisher.onPushUser(userList.id, userId)
                 }
             }
 
@@ -51,17 +51,19 @@ class UserListOperateViewModel(
         })
     }
 
-    fun pullUser(userList: UserList, user: User){
+    fun pullUser(userListId: String, userId: String){
         misskeyAPI.pullUserFromList(
             ListUserOperation(
                 i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                listId = userList.id,
-                userId = user.id
+                listId = userListId,
+                userId = userId
             )
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){
-                    mPublisher.onPullUser(userList.id, user)
+                    mPublisher.onPullUser(userListId, userId)
+                }else{
+                    Log.d(tag, "pull user failure: $response")
                 }
             }
 

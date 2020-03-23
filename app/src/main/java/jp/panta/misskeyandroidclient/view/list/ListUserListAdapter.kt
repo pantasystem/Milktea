@@ -11,9 +11,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListUserBinding
 import jp.panta.misskeyandroidclient.viewmodel.list.ListUserViewData
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
+import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 
 class ListUserListAdapter(
     private val userListDetailViewModel: UserListDetailViewModel,
+    private val userListOperateViewModel: UserListOperateViewModel,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<ListUserViewData, ListUserListAdapter.VH>(ItemCallback()){
     class VH(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)
@@ -37,6 +39,7 @@ class ListUserListAdapter(
         holder.binding.listUserViewData = getItem(position)
         holder.binding.userListDetailViewModel = userListDetailViewModel
         holder.binding.lifecycleOwner = lifecycleOwner
+        holder.binding.userListOperateViewModel = userListOperateViewModel
         holder.binding.executePendingBindings()
     }
 

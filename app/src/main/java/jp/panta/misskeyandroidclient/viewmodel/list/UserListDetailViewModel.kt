@@ -94,14 +94,14 @@ class UserListDetailViewModel(
         override fun onNext(t: UserListEvent) {
             when(t.type){
                 UserListEvent.Type.PUSH_USER ->{
-                    t.user?.let{ u ->
-                        mUserMap[u.id] = ListUserViewData(u.id)
+                    t.userId?.let{ id ->
+                        mUserMap[id] = ListUserViewData(id)
                         adaptUsers()
                     }
                 }
                 UserListEvent.Type.PULL_USER ->{
-                    t.user?.let{ u ->
-                        mUserMap.remove(u.id)
+                    t.userId?.let{ id ->
+                        mUserMap.remove(id)
                         adaptUsers()
                     }
                 }

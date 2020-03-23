@@ -71,10 +71,10 @@ interface MisskeyAPI {
     @POST("api/lists/update")
     fun updateList(@Body createList: UpdateList): Call<Unit>
 
-    @POST("api/lists/push")
+    @POST("api/users/lists/push")
     fun pushUserToList(@Body listUserOperation: ListUserOperation): Call<Unit>
 
-    @POST("api/lists/pull")
+    @POST("api/users/lists/pull")
     fun pullUserFromList(@Body listUserOperation: ListUserOperation): Call<Unit>
 
     @POST("api/following/delete")
