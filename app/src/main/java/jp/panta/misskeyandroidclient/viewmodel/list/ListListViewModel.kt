@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -38,9 +40,14 @@ class ListListViewModel(
 
     private val mUserListIdMap = LinkedHashMap<String, UserList>()
 
-    val updateUserListEvent = EventBus<UserList>()
 
     val showUserDetailEvent = EventBus<UserList>()
+
+    private val mPublisher = UserListEventStore(misskeyAPI, accountRelation).getEventStream()
+
+    init{
+        mPublisher.subscribe(UserListEventObserver())
+    }
 
 
     fun loadListList(){
@@ -66,28 +73,7 @@ class ListListViewModel(
         })
     }
 
-    fun updateUserList(userList: UserList?, name: String?){
-        name?: return
-        userList?: return
-        misskeyAPI.updateList(
-            UpdateList(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                name = name,
-                listId = userList.id
-            )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
 
-                    onUserListUpdated(userList.id, name)
-                }
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.e(TAG, "update user list error", t)
-            }
-        })
-    }
 
     /**
      * 他Activityで変更を加える場合onActivityResultで呼び出し変更を適応する
@@ -112,13 +98,7 @@ class ListListViewModel(
         userListList.postValue(mUserListIdMap.values.toList())
     }
 
-    fun setUpdateUserList(userList: UserList?){
-        updateUserListEvent.event = userList
-    }
 
-    fun addToTab(userList: UserList?){
-
-    }
 
     fun showUserListDetail(userList: UserList?){
         userList?.let{ ul ->
@@ -126,4 +106,27 @@ class ListListViewModel(
         }
     }
 
+    inner class UserListEventObserver : Observer<UserListEvent>{
+        override fun onComplete() = Unit
+        override fun onError(e: Throwable){
+            Log.e("UserListViewModel", "error", e)
+        }
+
+        override fun onSubscribe(d: Disposable) = Unit
+
+        override fun onNext(t: UserListEvent) {
+            when(t.type){
+                UserListEvent.Type.UPDATED_NAME ->{
+                    onUserListUpdated(t.userListId, t.name!!)
+                }
+                UserListEvent.Type.CREATE ->{
+                    mUserListIdMap[t.userListId] = t.userList!!
+                    userListList.postValue(mUserListIdMap.values.toList())
+                }
+                else ->{
+
+                }
+            }
+        }
+    }
 }

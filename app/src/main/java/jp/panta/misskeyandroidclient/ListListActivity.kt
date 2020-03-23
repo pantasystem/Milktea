@@ -50,31 +50,7 @@ class ListListActivity : AppCompatActivity() {
         })
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == USER_LIST_ACTIVITY_RESULT_CODE){
-            if(resultCode != RESULT_OK || data == null){
-                return
-            }
-
-            val listId = intent.getStringExtra(EXTRA_USER_LIST_ID)
-            val name = intent.getStringExtra(EXTRA_USER_LIST_NAME)
-            when(intent.action){
-                ACTION_USER_LIST_CREATED ->{
-                    val createdAt = intent.getSerializableExtra(EXTRA_CREATED_AT) as Date
-                    val userIdList = intent.getStringArrayExtra(EXTRA_USER_ID_ARRAY).toList()
-                    // created処理
-                    mListListViewModel?.onUserListCreated(listId, createdAt, name, userIdList)
-                }
-                ACTION_USER_LIST_UPDATED ->{
-                    // updated処理
-                    mListListViewModel?.onUserListUpdated(listId, name)
-                }
-            }
-        }
-
-    }
 
     private fun setUpObservers(){
         mListListViewModel?.showUserDetailEvent?.removeObserver(showUserListDetail)

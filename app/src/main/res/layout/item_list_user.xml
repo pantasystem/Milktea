@@ -69,7 +69,6 @@
                     android:layout_centerVertical="true"
                     tools:ignore="ContentDescription,PrivateResource"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:onClick="@{()-> userListDetailViewModel.pullUser(listUserViewData.user)}"
                     android:tint="?attr/colorNoteActionButtonTint"
                     />
 

@@ -13,6 +13,9 @@
         <variable
                 name="listListViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel" />
+        <variable
+                name="userListOperateViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -66,7 +69,6 @@
                     android:tint="?attr/colorNoteActionButtonTint"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:onClick="@{()-> listListViewModel.setUpdateUserList(list) }"
                     />
 
 

@@ -2,6 +2,8 @@ package jp.panta.misskeyandroidclient.viewmodel.list
 
 import android.util.Log
 import androidx.lifecycle.*
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
@@ -38,6 +40,11 @@ class UserListDetailViewModel(
 
     private val mUserMap = LinkedHashMap<String, ListUserViewData>()
 
+    private val mPublisher = UserListEventStore(misskeyAPI, accountRelation).getEventStream()
+
+    init{
+        mPublisher.subscribe(UserListObserver())
+    }
 
     fun load(){
         misskeyAPI.showList(
@@ -58,28 +65,6 @@ class UserListDetailViewModel(
         })
     }
 
-    fun updateName(name: String){
-        misskeyAPI.updateList(
-            UpdateList(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                listId = listId,
-                name = name
-            )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
-                    val exUserList = userList.value?: return
-                    userList.postValue(
-                        exUserList.copy(name = name)
-                    )
-                }
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.e(tag, "update error", t)
-            }
-        })
-    }
 
     private fun loadUsers(userIds: List<String>){
 
@@ -105,55 +90,43 @@ class UserListDetailViewModel(
     }
 
 
-    fun pushUser(userId: String){
-        misskeyAPI.pushUserToList(
-            ListUserOperation(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                userId = userId,
-                listId = listId
-            )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
-                    val viewData = ListUserViewData(userId)
-                    mUserMap[userId] = viewData
-                    misskeyAPI.showUser(
-                        RequestUser(
-                            i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                            userId = userId
-                        )
-                    ).enqueue(viewData.accept)
-                    listUsers.postValue(mUserMap.values.toList())
+    inner class UserListObserver : Observer<UserListEvent>{
+        override fun onNext(t: UserListEvent) {
+            when(t.type){
+                UserListEvent.Type.PUSH_USER ->{
+                    t.user?.let{ u ->
+                        mUserMap[u.id] = ListUserViewData(u.id)
+                        adaptUsers()
+                    }
+                }
+                UserListEvent.Type.PULL_USER ->{
+                    t.user?.let{ u ->
+                        mUserMap.remove(u.id)
+                        adaptUsers()
+                    }
+                }
+                UserListEvent.Type.UPDATED_NAME ->{
+                    userList.postValue(t.userList)
+                }
+
+                else -> {
+
                 }
             }
+        }
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.e(tag, "push user error", t)
-            }
-        })
+        override fun onComplete() = Unit
+        override fun onSubscribe(d: Disposable) = Unit
+
+
+        override fun onError(e: Throwable) {
+            Log.e(tag, "error", e)
+        }
 
     }
 
-    fun pullUser(user: User?){
-        user?: return
-        misskeyAPI.pullUserFromList(
-            ListUserOperation(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                userId = user.id,
-                listId = listId
-            )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
-                    mUserMap.remove(user.id)
-                    listUsers.postValue(mUserMap.values.toList())
-                }
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.e(tag, "pull user error", t)
-            }
-        })
+    private fun adaptUsers(){
+        listUsers.postValue(mUserMap.values.toList())
     }
 
 }
