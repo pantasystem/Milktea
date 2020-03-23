@@ -26,7 +26,8 @@
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp">
+                android:padding="8dp"
+                android:onClick="@{()-> listListViewModel.showUserListDetail(list)}">
 
             <TextView
                     android:id="@+id/listTitle"
@@ -65,6 +66,7 @@
                     android:tint="?attr/colorNoteActionButtonTint"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
+                    android:onClick="@{()-> listListViewModel.setUpdateUserList(list) }"
                     />
 
 

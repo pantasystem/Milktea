@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.list.CreateList
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -39,7 +38,9 @@ class ListListViewModel(
 
     private val mUserListIdMap = LinkedHashMap<String, UserList>()
 
-    val updateUserList = EventBus<UserList>()
+    val updateUserListEvent = EventBus<UserList>()
+
+    val showUserDetailEvent = EventBus<UserList>()
 
 
     fun loadListList(){
@@ -109,6 +110,20 @@ class ListListViewModel(
         )
         mUserListIdMap[createdUser.id] = createdUser
         userListList.postValue(mUserListIdMap.values.toList())
+    }
+
+    fun setUpdateUserList(userList: UserList?){
+        updateUserListEvent.event = userList
+    }
+
+    fun addToTab(userList: UserList?){
+
+    }
+
+    fun showUserListDetail(userList: UserList?){
+        userList?.let{ ul ->
+            showUserDetailEvent.event = ul
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
@@ -44,6 +45,8 @@ class ListListActivity : AppCompatActivity() {
                 listAdapter.submitList(userListList)
             })
             mListListViewModel?.loadListList()
+
+            setUpObservers()
         })
     }
 
@@ -71,5 +74,16 @@ class ListListActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun setUpObservers(){
+        mListListViewModel?.showUserDetailEvent?.removeObserver(showUserListDetail)
+        mListListViewModel?.showUserDetailEvent?.observe(this, showUserListDetail)
+    }
+
+    private val showUserListDetail = Observer<UserList>{ ul ->
+        val intent = Intent(this, UserListDetailActivity::class.java)
+        intent.putExtra(UserListDetailActivity.EXTRA_LIST_ID, ul.id)
+        startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
     }
 }

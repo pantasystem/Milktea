@@ -14,9 +14,12 @@ import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
+import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.activity_user_list_detail.*
 
 class UserListDetailActivity : AppCompatActivity() {
@@ -43,6 +46,9 @@ class UserListDetailActivity : AppCompatActivity() {
         mListId = listId
         val miCore = application as MiCore
         miCore.currentAccount.observe(this, Observer{ ar ->
+            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
+            ActionNoteHandler(this, notesViewModel).initViewModelListener()
+
             mAccountRelation = ar
             val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ar, listId, miCore))[UserListDetailViewModel::class.java]
             mUserListDetailViewModel = userListDetailViewModel
@@ -98,9 +104,6 @@ class UserListDetailActivity : AppCompatActivity() {
 
     }
 
-    private fun showCreateUserListDialog(){
-
-    }
 
     private fun toggleAddToTab(){
         val page = mAccountRelation?.pages?.firstOrNull {
@@ -112,7 +115,9 @@ class UserListDetailActivity : AppCompatActivity() {
                 NoteRequest.Setting(
                     type = NoteType.USER_LIST,
                     listId = mListId
-                )
+                ).apply{
+                    title = mUserListName
+                }
             )
         }else{
             miCore.removePageInCurrentAccount(page)

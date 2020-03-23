@@ -83,10 +83,17 @@ class UserListDetailViewModel(
 
     private fun loadUsers(userIds: List<String>){
 
+        Log.d(tag, "load users $userIds")
         mUserMap.clear()
 
         val listUserViewDataList = userIds.map{ userId ->
-            ListUserViewData(userId)
+            ListUserViewData(userId).apply{
+                misskeyAPI.showUser(
+                    RequestUser(
+                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                    userId = userId
+                ))
+            }
         }
 
         mUserMap.putAll(
@@ -94,15 +101,7 @@ class UserListDetailViewModel(
                 it.userId to it
             }
         )
-        listUserViewDataList.forEach { viewData ->
-            misskeyAPI.showUser(
-                RequestUser(
-                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                    userId = viewData.userId
-                )
-            ).enqueue(viewData.accept)
-        }
-
+        listUsers.postValue(mUserMap.values.toList())
     }
 
 

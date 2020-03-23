@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.view.list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -12,6 +13,9 @@ import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 import kotlinx.android.synthetic.main.fragment_list_user_list.*
 
 class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
+    companion object{
+
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -26,7 +30,7 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
             viewModel.listUsers.observe(viewLifecycleOwner, Observer{
                 adapter.submitList(it)
             })
-            viewModel.load()
+            //viewModel.load()
         })
     }
 }
