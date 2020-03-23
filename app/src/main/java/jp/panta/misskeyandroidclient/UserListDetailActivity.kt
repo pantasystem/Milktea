@@ -96,6 +96,9 @@ class UserListDetailActivity : AppCompatActivity() {
                     updatedResultFinish(mUserListDetailViewModel?.userList?.value?.name)
                 }
             }
+            R.id.action_add_user ->{
+
+            }
         }
         return super.onOptionsItemSelected(item)
     }
