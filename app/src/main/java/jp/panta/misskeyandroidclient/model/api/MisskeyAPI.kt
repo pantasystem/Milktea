@@ -56,6 +56,9 @@ interface MisskeyAPI {
     @POST("api/users/show")
     fun showUser(@Body requestUser: RequestUser): Call<User>
 
+    @POST("api/users/search")
+    fun searchUser(@Body requestUser: RequestUser): Call<List<User>>
+
     @POST("api/users/lists/list")
     fun userList(@Body i: I): Call<List<UserList>>
 

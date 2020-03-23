@@ -10,5 +10,6 @@ data class RequestUser(
     val userIds: List<String>? = null,
     val sinceId: String? = null,
     val untilId: String? = null,
-    val limit: Int = 21
+    val limit: Int = 21,
+    val query: String? = null
 )

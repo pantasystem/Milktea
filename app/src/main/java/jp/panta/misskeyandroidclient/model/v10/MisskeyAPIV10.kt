@@ -101,6 +101,8 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI) : MisskeyAPI{
 
     override fun showUser(requestUser: RequestUser): Call<User> = misskey.showUser(requestUser)
 
+    override fun searchUser(requestUser: RequestUser): Call<List<User>> = misskey.searchUser(requestUser)
+
     override fun signIn(signIn: SignIn): Call<I> = misskey.signIn(signIn)
 
     override fun unFollowUser(requestUser: RequestUser): Call<User> = misskey.unFollowUser(requestUser)

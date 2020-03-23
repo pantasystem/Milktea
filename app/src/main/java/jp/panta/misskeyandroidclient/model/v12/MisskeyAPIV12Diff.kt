@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.model.v12
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaToAdd
@@ -28,5 +30,8 @@ interface MisskeyAPIV12Diff {
     fun updateAntenna(@Body antennaToAdd: AntennaToAdd): Call<Antenna>
 
     @POST("api/antennas/list")
-    fun getAntennas(query: AntennaQuery): Call<List<Antenna>>
+    fun getAntennas(@Body query: AntennaQuery): Call<List<Antenna>>
+
+    @POST("api/users/search-by-username-and-host")
+    fun searchByUserNameAndHost(@Body requestUser: RequestUser): Call<List<User>>
 }

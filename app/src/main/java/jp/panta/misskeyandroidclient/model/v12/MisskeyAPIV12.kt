@@ -29,6 +29,7 @@ import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaToAdd
 import retrofit2.Call
+import retrofit2.http.Body
 
 open class MisskeyAPIV12(val misskey: MisskeyAPI, private val misskeyAPIV12Diff: MisskeyAPIV12Diff) : MisskeyAPI, MisskeyAPIV12Diff{
     override fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
@@ -104,6 +105,8 @@ open class MisskeyAPIV12(val misskey: MisskeyAPI, private val misskeyAPIV12Diff:
 
     override fun showUser(requestUser: RequestUser): Call<User> = misskey.showUser(requestUser)
 
+    override fun searchUser(requestUser: RequestUser): Call<List<User>> = misskey.searchUser(requestUser)
+
     override fun signIn(signIn: SignIn): Call<I> = misskey.signIn(signIn)
 
     override fun unFollowUser(requestUser: RequestUser): Call<User> = misskey.unFollowUser(requestUser)
@@ -144,6 +147,6 @@ open class MisskeyAPIV12(val misskey: MisskeyAPI, private val misskeyAPIV12Diff:
 
     override fun pushUserToList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pushUserToList(listUserOperation)
 
-
+    override fun searchByUserNameAndHost(requestUser: RequestUser) = misskeyAPIV12Diff.searchByUserNameAndHost(requestUser)
 
 }
