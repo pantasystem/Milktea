@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.viewmodel.list.ListUserViewData
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 
 class ListUserListAdapter(
-    val userListDetailViewModel: UserListDetailViewModel,
+    private val userListDetailViewModel: UserListDetailViewModel,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<ListUserViewData, ListUserListAdapter.VH>(ItemCallback()){
     class VH(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)

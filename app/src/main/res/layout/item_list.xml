@@ -9,6 +9,10 @@
         <variable
                 name="list"
                 type="jp.panta.misskeyandroidclient.model.list.UserList" />
+
+        <variable
+                name="listListViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -30,7 +34,7 @@
                     android:layout_height="wrap_content"
                     tools:text="かわいいどうぶつたち"
                     android:textSize="20sp"
-                    android:text="@{SafeUnbox.unbox(list.name)"
+                    android:text="@{SafeUnbox.unbox(list.name)}"
                     android:layout_centerVertical="true"
                     android:layout_toStartOf="@id/addToTabButton"
                     android:layout_marginEnd="8dp"

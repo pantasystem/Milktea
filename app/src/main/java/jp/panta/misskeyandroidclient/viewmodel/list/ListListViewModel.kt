@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.CreateList
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -37,6 +38,8 @@ class ListListViewModel(
     val userListList = MutableLiveData<List<UserList>>()
 
     private val mUserListIdMap = LinkedHashMap<String, UserList>()
+
+    val updateUserList = EventBus<UserList>()
 
 
     fun loadListList(){

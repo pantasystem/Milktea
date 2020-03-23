@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.list.ListListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
+import kotlinx.android.synthetic.main.content_list_list.*
 import java.util.*
 
 class ListListActivity : AppCompatActivity() {
@@ -30,8 +33,17 @@ class ListListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_list_list)
 
         val miCore = application as MiCore
+
+        val layoutManager = LinearLayoutManager(this)
         miCore.currentAccount.observe(this, Observer{
             mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(it, miCore))[ListListViewModel::class.java]
+            val listAdapter = ListListAdapter(mListListViewModel!!, this)
+            listListView.adapter = listAdapter
+            listListView.layoutManager = layoutManager
+            mListListViewModel?.userListList?.observe(this, Observer{ userListList ->
+                listAdapter.submitList(userListList)
+            })
+            mListListViewModel?.loadListList()
         })
     }
 
