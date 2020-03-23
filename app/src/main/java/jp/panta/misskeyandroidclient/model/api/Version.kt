@@ -30,7 +30,11 @@ class Version : Comparable<Version>{
 
     constructor(version: String){
         subVersions = version.split(".").map{
-            Integer.parseInt(it)
+            try{
+                Integer.parseInt(it)
+            }catch(e: NumberFormatException){
+                0
+            }
         }
     }
 
