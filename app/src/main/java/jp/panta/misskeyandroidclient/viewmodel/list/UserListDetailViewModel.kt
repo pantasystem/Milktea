@@ -106,7 +106,7 @@ class UserListDetailViewModel(
                     }
                 }
                 UserListEvent.Type.UPDATED_NAME ->{
-                    userList.postValue(t.userList)
+                    userList.postValue(userList.value?.copy(name = t.name!!))
                 }
 
                 else -> {

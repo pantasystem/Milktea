@@ -62,12 +62,12 @@ class UserListEventStore (
         )
     }
 
-    fun onUpdateUserList(userList: UserList, name: String){
+    fun onUpdateUserList(listId: String, name: String){
         eventSubject.onNext(
             UserListEvent(
                 type = UPDATED_NAME,
                 account = accountRelation.account,
-                userListId = userList.id,
+                userListId = listId,
                 name = name
             )
         )

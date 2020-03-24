@@ -171,6 +171,8 @@
 
     <string name="show">表示</string>
     <string name="user_list">ユーザー一覧</string>
-    <string name="update_list_user">リストを編集する</string>
+    <string name="update_user_list">リストを編集する</string>
     <string name="add_user">ユーザーを加える</string>
+    <string name="list_name">リスト名</string>
+    <string name="create_user_list">リストを作成する</string>
 </resources>

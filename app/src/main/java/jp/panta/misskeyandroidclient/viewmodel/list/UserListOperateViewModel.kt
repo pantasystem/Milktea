@@ -73,17 +73,19 @@ class UserListOperateViewModel(
         })
     }
 
-    fun rename(userList: UserList, name: String){
+    fun rename(listId: String, name: String){
+        Log.d(tag, "update listId:$listId, name:$name")
         misskeyAPI.updateList(
             UpdateList(
                 i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 name = name,
-                listId = userList.id
+                listId = listId
             )
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Log.d(tag, "update list, response:$response")
                 if(response.code() in 200 until 300){
-                    mPublisher.onUpdateUserList(userList, name)
+                    mPublisher.onUpdateUserList(listId, name)
                 }
             }
 

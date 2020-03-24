@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Dialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,6 +18,7 @@ import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.list.DialogUserListEditor
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
@@ -104,7 +106,9 @@ class UserListDetailActivity : AppCompatActivity() {
     }
 
     private fun showEditUserListDialog(){
-
+        val listId = mListId?: return
+        val dialog = DialogUserListEditor.newInstance(listId, mUserListName)
+        dialog.show(supportFragmentManager, "")
     }
 
 
