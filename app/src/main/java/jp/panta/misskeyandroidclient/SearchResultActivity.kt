@@ -75,9 +75,9 @@ class SearchResultActivity : AppCompatActivity() {
             val item = menu.findItem(R.id.nav_search_add_to_tab)
 
             if(isAddedPage()){
-                item.setIcon(R.drawable.ic_remove_black_24dp)
+                item.setIcon(R.drawable.ic_remove_to_tab_24px)
             }else{
-                item.setIcon(R.drawable.ic_add_black_24dp)
+                item.setIcon(R.drawable.ic_add_to_tab_24px)
             }
             setMenuTint(menu)
         }

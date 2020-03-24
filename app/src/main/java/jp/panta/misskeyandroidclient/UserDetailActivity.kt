@@ -167,9 +167,9 @@ class UserDetailActivity : AppCompatActivity() {
             it.userId == mUserId
         }
         if(page == null){
-            tab?.setIcon(R.drawable.ic_add_black_24dp)
+            tab?.setIcon(R.drawable.ic_add_to_tab_24px)
         }else{
-            tab?.setIcon(R.drawable.ic_remove_black_24dp)
+            tab?.setIcon(R.drawable.ic_remove_to_tab_24px)
         }
 
         menu?.let{

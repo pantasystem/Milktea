@@ -17,9 +17,9 @@ object ListListPagedFlagHelper {
             it.id == list.id
         }
         if(isPaged){
-            this.setImageResource(R.drawable.ic_remove_black_24dp)
+            this.setImageResource(R.drawable.ic_remove_to_tab_24px)
         }else{
-            this.setImageResource(R.drawable.ic_add_black_24dp)
+            this.setImageResource(R.drawable.ic_add_to_tab_24px)
         }
 
     }

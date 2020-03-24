@@ -75,9 +75,9 @@ class UserListDetailActivity : AppCompatActivity() {
             it.listId == mListId && mListId != null
         }
         if(page == null){
-            addToTabItem?.setIcon(R.drawable.ic_add_black_24dp)
+            addToTabItem?.setIcon(R.drawable.ic_add_to_tab_24px)
         }else{
-            addToTabItem?.setIcon(R.drawable.ic_remove_black_24dp)
+            addToTabItem?.setIcon(R.drawable.ic_remove_to_tab_24px)
         }
         menu?.let{
             setMenuTint(it)
