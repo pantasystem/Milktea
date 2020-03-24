@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.*
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,6 +31,8 @@ class UserListOperateViewModel(
     private val tag = this.javaClass.simpleName
 
     private val mPublisher = UserListEventStore(misskeyAPI, accountRelation)
+
+    val updateUserListEvent = EventBus<UserList>()
 
     fun pushUser(userList: UserList, userId: String){
         misskeyAPI.pushUserToList(
@@ -128,6 +131,12 @@ class UserListOperateViewModel(
                 }
             }
         )
+    }
+
+    fun showUserListUpdateDialog(userList: UserList?){
+        userList?.let{ ul ->
+            updateUserListEvent.event = ul
+        }
     }
 
 }

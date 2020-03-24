@@ -12,6 +12,8 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
@@ -23,13 +25,14 @@ import kotlin.collections.LinkedHashMap
 class ListListViewModel(
     val accountRelation: AccountRelation,
     val misskeyAPI: MisskeyAPI,
-    val encryption: Encryption
+    val encryption: Encryption,
+    val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val accountRelation: AccountRelation, val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return ListListViewModel(accountRelation, miCore.getMisskeyAPI(accountRelation)!!, miCore.getEncryption()) as T
+            return ListListViewModel(accountRelation, miCore.getMisskeyAPI(accountRelation)!!, miCore.getEncryption(), miCore) as T
         }
     }
 
@@ -103,6 +106,23 @@ class ListListViewModel(
     fun showUserListDetail(userList: UserList?){
         userList?.let{ ul ->
             showUserDetailEvent.event = ul
+        }
+    }
+
+    fun toggleTab(userList: UserList?){
+        userList?.let{ ul ->
+            val exPage = accountRelation.pages.firstOrNull {
+                it.listId == ul.id
+            }
+            if(exPage == null){
+                val setting = NoteRequest.Setting(
+                    NoteType.USER_LIST
+                )
+                setting.title = ul.name
+                miCore.addPageInCurrentAccount(setting)
+            }else{
+                miCore.removePageInCurrentAccount(exPage)
+            }
         }
     }
 
