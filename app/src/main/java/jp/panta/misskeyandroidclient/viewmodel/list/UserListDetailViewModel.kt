@@ -77,7 +77,7 @@ class UserListDetailViewModel(
                     RequestUser(
                     i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                     userId = userId
-                ))
+                )).enqueue(this.accept)
             }
         }
 

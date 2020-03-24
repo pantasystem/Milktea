@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.list
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.Observer
@@ -40,6 +41,14 @@ class ListListViewModel(
         private const val TAG = "ListListViewModel"
     }
     val userListList = MutableLiveData<List<UserList>>()
+
+    val pagedUserList = Transformations.map(userListList){ ulList ->
+        ulList.filter{ ul ->
+            accountRelation.pages.any {
+                it.listId == ul.id
+            }
+        }
+    }
 
     private val mUserListIdMap = LinkedHashMap<String, UserList>()
 
@@ -116,7 +125,8 @@ class ListListViewModel(
             }
             if(exPage == null){
                 val setting = NoteRequest.Setting(
-                    NoteType.USER_LIST
+                    NoteType.USER_LIST,
+                    listId = ul.id
                 )
                 setting.title = ul.name
                 miCore.addPageInCurrentAccount(setting)

@@ -7,9 +7,7 @@
         <variable
                 name="listUserViewData"
                 type="jp.panta.misskeyandroidclient.viewmodel.list.ListUserViewData" />
-        <variable
-                name="user"
-                type="jp.panta.misskeyandroidclient.model.users.User" />
+
         <variable
                 name="userListDetailViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel" />
@@ -37,14 +35,14 @@
                     tools:ignore="ContentDescription"
                     android:layout_marginEnd="8dp"
                     tools:src="@drawable/ic_follow"
-                    app:circleIcon="@{user.avatarUrl}"
+                    app:circleIcon="@{listUserViewData.user.avatarUrl}"
                     />
 
             <TextView
                     android:id="@+id/userName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{SafeUnbox.unbox(user.getDisplayUserName())}"
+                    android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayUserName())}"
                     tools:text="userName"
                     android:layout_toEndOf="@id/avatarIcon"
                     android:singleLine="true"
@@ -58,7 +56,7 @@
                     android:layout_below="@id/userName"
                     android:layout_toEndOf="@id/avatarIcon"
                     tools:text="name"
-                    android:text="@{SafeUnbox.unbox(user.getDisplayName())}"
+                    android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayName())}"
                     android:singleLine="true"
                     android:layout_toStartOf="@id/removeButton"
                     />

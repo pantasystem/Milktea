@@ -57,7 +57,8 @@
                     android:layout_marginEnd="8dp"
                     android:layout_centerVertical="true"
                     android:onClick="@{ ()-> listListViewModel.toggleTab(list) }"
-
+                    app:list="@{list}"
+                    app:pagedList="@{listListViewModel.pagedUserList}"
                     />
 
             <ImageButton

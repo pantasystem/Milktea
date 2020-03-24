@@ -15,8 +15,9 @@ class ListUserViewData (val userId: String){
 
     val accept = object : Callback<User>{
         override fun onResponse(call: Call<User>, response: Response<User>) {
-            Log.d(TAG, "load user success user:${response.body()}")
-            user.postValue(response.body())
+            val responseUser = response.body()
+            Log.d(TAG, "load user success user:$responseUser")
+            user.postValue(responseUser)
         }
 
         override fun onFailure(call: Call<User>, t: Throwable) {

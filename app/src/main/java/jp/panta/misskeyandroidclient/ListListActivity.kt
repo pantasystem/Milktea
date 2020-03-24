@@ -39,9 +39,9 @@ class ListListActivity : AppCompatActivity() {
         val miCore = application as MiCore
 
         val layoutManager = LinearLayoutManager(this)
-        miCore.currentAccount.observe(this, Observer{
-            mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(it, miCore))[ListListViewModel::class.java]
-            val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(it, miCore))[UserListOperateViewModel::class.java]
+        miCore.currentAccount.observe(this, Observer{ ar ->
+            mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(ar, miCore))[ListListViewModel::class.java]
+            val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(ar, miCore))[UserListOperateViewModel::class.java]
             mListOperateViewModel = userListOperateViewModel
             val listAdapter =
                 ListListAdapter(

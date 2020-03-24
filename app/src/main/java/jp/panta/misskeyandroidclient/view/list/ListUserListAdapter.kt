@@ -25,6 +25,7 @@ class ListUserListAdapter(
             newItem: ListUserViewData
         ): Boolean {
             return oldItem.userId == newItem.userId
+                    && oldItem.user.value == newItem.user.value
         }
 
         override fun areItemsTheSame(
