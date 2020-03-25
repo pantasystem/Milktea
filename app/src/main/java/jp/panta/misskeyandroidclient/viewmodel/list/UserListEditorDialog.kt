@@ -10,23 +10,23 @@ import jp.panta.misskeyandroidclient.model.list.CreateList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.android.synthetic.main.dialog_user_list_editor.view.*
 
-class DialogUserListEditor : AppCompatDialogFragment(){
+class UserListEditorDialog : AppCompatDialogFragment(){
 
     companion object{
         private const val EXTRA_MODE = "jp.panta.misskeyandroidclient.viewmodel.list.EXTRA_MODE"
         private const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.viewmodel.list.EXTRA_LIST_ID"
         private const val EXTRA_LIST_NAME = "jp.panta.misskeyandroidclient.viewmodel.list.EXTRA_LIST_NAME"
 
-        fun newInstance(): DialogUserListEditor{
-            return DialogUserListEditor().apply{
+        fun newInstance(): UserListEditorDialog{
+            return UserListEditorDialog().apply{
                 arguments = Bundle().apply{
                     putInt(EXTRA_MODE, Mode.CREATE.ordinal)
                 }
             }
         }
 
-        fun newInstance(listId: String, nowName: String): DialogUserListEditor{
-            return DialogUserListEditor().apply{
+        fun newInstance(listId: String, nowName: String): UserListEditorDialog{
+            return UserListEditorDialog().apply{
                 arguments = Bundle().apply{
                     putInt(EXTRA_MODE, Mode.UPDATE.ordinal)
                     putString(EXTRA_LIST_ID, listId)

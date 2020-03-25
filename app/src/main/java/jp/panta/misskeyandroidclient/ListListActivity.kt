@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.view.list.ListListAdapter
-import jp.panta.misskeyandroidclient.viewmodel.list.DialogUserListEditor
+import jp.panta.misskeyandroidclient.viewmodel.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 import kotlinx.android.synthetic.main.activity_list_list.*
@@ -60,7 +60,7 @@ class ListListActivity : AppCompatActivity() {
         })
 
         addListButton.setOnClickListener {
-            val dialog = DialogUserListEditor.newInstance()
+            val dialog = UserListEditorDialog.newInstance()
             dialog.show(supportFragmentManager, "")
         }
     }
@@ -82,7 +82,7 @@ class ListListActivity : AppCompatActivity() {
     }
 
     private val showListUpdateDialogObserver = Observer<UserList>{ ul ->
-        val dialog = DialogUserListEditor.newInstance(ul.id, ul.name)
+        val dialog = UserListEditorDialog.newInstance(ul.id, ul.name)
         dialog.show(supportFragmentManager, "")
     }
 }

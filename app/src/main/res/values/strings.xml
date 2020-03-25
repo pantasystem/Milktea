@@ -175,4 +175,5 @@
     <string name="add_user">ユーザーを加える</string>
     <string name="list_name">リスト名</string>
     <string name="create_user_list">リストを作成する</string>
+    <string name="at_mark">\@</string>
 </resources>
