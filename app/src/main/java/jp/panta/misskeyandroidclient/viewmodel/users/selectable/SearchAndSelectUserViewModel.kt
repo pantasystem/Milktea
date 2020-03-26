@@ -45,16 +45,14 @@ class SearchAndSelectUserViewModel(
 
     val searchResultUsers = MediatorLiveData<List<SelectableUserViewData>>()
 
-    val mSearchResultTargetUsersMap = LinkedHashMap<String, SelectableUserViewData>()
+    private val mSearchResultTargetUsersMap = LinkedHashMap<String, SelectableUserViewData>()
+    private val mSelectedUsersMap = HashMap<String, SelectableUserViewData>()
 
-    val selectedUsers = Transformations.map(searchResultUsers){
-        it.filter{ su ->
-            su.isSelected
-        }
-    }
+    val selectedUsers = MutableLiveData<List<SelectableUserViewData>>()
 
     val isSelectable = Transformations.map(selectedUsers){
-        it.size < selectableSize
+        //it.size <= selectableSize
+        true
     }
 
 
@@ -65,11 +63,15 @@ class SearchAndSelectUserViewModel(
         searchResultUsers.addSource(host){
             search()
         }
+
     }
 
     fun search(){
+        Log.d(TAG, "検索を開始します")
+
         val userName = this.userName.value?: return
         val host = this.host.value
+
 
         val request = RequestUser(
             i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
@@ -111,6 +113,18 @@ class SearchAndSelectUserViewModel(
 
         synchronized(mSearchResultTargetUsersMap){
             mSearchResultTargetUsersMap[toggled.user.id] = toggled
+        }
+
+        synchronized(mSelectedUsersMap){
+            if(toggled.isSelected){
+                mSelectedUsersMap[toggled.user.id] = toggled
+            }else{
+                mSelectedUsersMap.remove(toggled.user.id)
+            }
+        }
+
+        synchronized(mSelectedUsersMap){
+            selectedUsers.postValue(mSelectedUsersMap.values.toList())
         }
 
         synchronized(mSearchResultTargetUsersMap){

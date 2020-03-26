@@ -27,6 +27,8 @@ class UserListDetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_LIST_ID"
+
+        private const val ADD_USER_REQUEST_CODE = 252
     }
 
     private var mAccountRelation: AccountRelation? = null
@@ -98,7 +100,7 @@ class UserListDetailActivity : AppCompatActivity() {
                 }
             }
             R.id.action_add_user ->{
-
+                startActivityForResult(Intent(this, SearchAndSelectUserActivity::class.java), 252)
             }
         }
         return super.onOptionsItemSelected(item)
