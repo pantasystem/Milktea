@@ -178,4 +178,5 @@
     <string name="at_mark">\@</string>
 
     <string name="host">ホスト</string>
+    <string name="select_user">ユーザー選択</string>
 </resources>

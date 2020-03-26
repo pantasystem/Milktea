@@ -19,7 +19,8 @@
             <androidx.appcompat.widget.Toolbar
                     android:id="@+id/searchAndSelectUsersToolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"/>
+                    android:layout_height="?attr/actionBarSize"
+                    app:title="@string/select_user"/>
         </com.google.android.material.appbar.AppBarLayout>
         <androidx.constraintlayout.widget.ConstraintLayout
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
