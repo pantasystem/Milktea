@@ -51,8 +51,8 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
                 selectableUsersAdapter.submitList(list)
             })
 
-            searchAndSelectUserViewModel.userName.observe(this, Observer{
-                Log.d("SearchAndSelectUser", "input userName :$it")
+            searchAndSelectUserViewModel.isSelectable.observe(this, Observer {
+                Log.d("Search", "選択可能:$it")
             })
 
         })

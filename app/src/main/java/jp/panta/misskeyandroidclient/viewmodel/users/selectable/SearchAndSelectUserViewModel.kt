@@ -50,9 +50,8 @@ class SearchAndSelectUserViewModel(
 
     val selectedUsers = MutableLiveData<List<SelectableUserViewData>>()
 
-    val isSelectable = Transformations.map(selectedUsers){
-        //it.size <= selectableSize
-        true
+    val isSelectable = Transformations.map(searchResultUsers){
+        mSelectedUsersMap.size < selectableSize
     }
 
 
