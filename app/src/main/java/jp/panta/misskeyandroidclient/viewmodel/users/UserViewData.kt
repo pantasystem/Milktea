@@ -34,7 +34,10 @@ class UserViewData{
 
     val accept = object : Callback<User>{
         override fun onResponse(call: Call<User>, response: Response<User>) {
-            user.postValue(response.body())
+            val user = response.body()
+            if(user != null){
+                this@UserViewData.user.postValue(user)
+            }
         }
 
         override fun onFailure(call: Call<User>, t: Throwable) {

@@ -18,7 +18,8 @@ class SearchAndSelectUserViewModel(
     val accountRelation: AccountRelation,
     val misskeyAPI: MisskeyAPI,
     val encryption: Encryption,
-    val selectableSize: Int
+    val selectableSize: Int,
+    selectedUserIds: List<String> = emptyList()
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
@@ -52,7 +53,7 @@ class SearchAndSelectUserViewModel(
     val selectedUsers = MutableLiveData<List<SelectableUserViewData>>()
 
     val isSelectable = Transformations.map(searchResultUsers){
-        mSelectedUsersMap.size < selectableSize
+        mSelectedUsersMap.size  < selectableSize
     }
 
 
@@ -63,6 +64,16 @@ class SearchAndSelectUserViewModel(
         searchResultUsers.addSource(host){
             search()
         }
+
+        mSelectedUsersMap.putAll(
+            selectedUserIds.map{ userId ->
+                val uvd = UserViewData(userId)
+                uvd.setApi(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, misskeyAPI)
+                userId to SelectableUserViewData(uvd, true)
+            }
+        )
+
+        selectedUsers.postValue(mSelectedUsersMap.values.toList())
 
     }
 
@@ -86,7 +97,8 @@ class SearchAndSelectUserViewModel(
                     mSearchResultTargetUsersMap.clear()
                     mSearchResultTargetUsersMap.putAll(response.body()?.map{
                         it.id to SelectableUserViewData(
-                            UserViewData(it)
+                            UserViewData(it),
+                            mSelectedUsersMap[it.id] != null
                         )
                     }?.toMap()?: emptyMap())
                 }

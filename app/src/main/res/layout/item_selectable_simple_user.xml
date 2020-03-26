@@ -41,7 +41,7 @@
                     android:textSize="18sp"
                     android:layout_toStartOf="@id/userSelectCheckBox"
                     android:layout_marginBottom="8dp"
-                    android:text="@{selectableUser.user.user.displayUserName}"/>
+                    android:text="@{SafeUnbox.unbox(selectableUser.user.user.displayUserName)}"/>
             <TextView
                     android:id="@+id/nameSub"
                     android:layout_width="match_parent"
@@ -63,8 +63,8 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart='8dp'
                     android:onClick="@{() -> selectUserViewModel.toggleSelect(selectableUser)}"
-                    android:enabled="@{selectableUser.selected || SafeUnbox.unbox(selectUserViewModel.isSelectable)}"
-                    android:checked="@{selectableUser.selected}"/>
+                    android:enabled="@{SafeUnbox.unbox(selectableUser.selected) || SafeUnbox.unbox(selectUserViewModel.isSelectable)}"
+                    android:checked="@{SafeUnbox.unbox(selectableUser.selected)}"/>
 
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
