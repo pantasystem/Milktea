@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.SearchByUserAndHost
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -84,7 +85,9 @@ class SearchAndSelectUserViewModel(
                 synchronized(mSearchResultTargetUsersMap){
                     mSearchResultTargetUsersMap.clear()
                     mSearchResultTargetUsersMap.putAll(response.body()?.map{
-                        it.id to SelectableUserViewData(it)
+                        it.id to SelectableUserViewData(
+                            UserViewData(it)
+                        )
                     }?.toMap()?: emptyMap())
                 }
                 synchronized(mSearchResultTargetUsersMap){
@@ -105,20 +108,20 @@ class SearchAndSelectUserViewModel(
     fun toggleSelect(selectableUser: SelectableUserViewData?){
         selectableUser?: return
         val user = synchronized(mSearchResultTargetUsersMap){
-            mSearchResultTargetUsersMap[selectableUser.user.id]
+            mSearchResultTargetUsersMap[selectableUser.user.userId]
         }?: return
 
         val toggled = user.copy(isSelected = !user.isSelected)
 
         synchronized(mSearchResultTargetUsersMap){
-            mSearchResultTargetUsersMap[toggled.user.id] = toggled
+            mSearchResultTargetUsersMap[toggled.user.userId] = toggled
         }
 
         synchronized(mSelectedUsersMap){
             if(toggled.isSelected){
-                mSelectedUsersMap[toggled.user.id] = toggled
+                mSelectedUsersMap[toggled.user.userId] = toggled
             }else{
-                mSelectedUsersMap.remove(toggled.user.id)
+                mSelectedUsersMap.remove(toggled.user.userId)
             }
         }
 

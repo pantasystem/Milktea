@@ -30,7 +30,7 @@
                     android:layout_marginEnd="8dp"
                     tools:src="@drawable/ic_person_add_black_24dp"
                     tools:ignore="ContentDescription"
-                    app:circleIcon="@{selectableUser.user.avatarUrl}"/>
+                    app:circleIcon="@{selectableUser.user.user.avatarUrl}"/>
             <TextView
                     android:id="@+id/nameMain"
                     android:layout_toEndOf="@id/avatarIcon"
@@ -41,7 +41,7 @@
                     android:textSize="18sp"
                     android:layout_toStartOf="@id/userSelectCheckBox"
                     android:layout_marginBottom="8dp"
-                    android:text="@{selectableUser.user.displayUserName}"/>
+                    android:text="@{selectableUser.user.user.displayUserName}"/>
             <TextView
                     android:id="@+id/nameSub"
                     android:layout_width="match_parent"
@@ -50,8 +50,8 @@
                     android:layout_below="@id/nameMain"
                     android:layout_toStartOf="@id/userSelectCheckBox"
                     tools:text="name"
-                    app:text="@{selectableUser.user.displayName}"
-                    app:emojis="@{selectableUser.user.emojis}"
+                    app:text="@{selectableUser.user.user.displayName}"
+                    app:emojis="@{selectableUser.user.user.emojis}"
                     app:clickableLink="@{false}"
                     />
 

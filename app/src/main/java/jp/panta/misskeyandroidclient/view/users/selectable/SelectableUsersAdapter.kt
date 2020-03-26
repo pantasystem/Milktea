@@ -30,7 +30,7 @@ class SelectableUsersAdapter(
             oldItem: SelectableUserViewData,
             newItem: SelectableUserViewData
         ): Boolean {
-            return oldItem.user.id == newItem.user.id
+            return oldItem.user.userId == newItem.user.userId
         }
     }
 
