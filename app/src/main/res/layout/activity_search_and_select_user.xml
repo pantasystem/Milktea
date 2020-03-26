@@ -93,5 +93,10 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <include
+                android:id="@+id/selectedUsersView"
+                layout="@layout/bottom_sheet_selected_users"
+                />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

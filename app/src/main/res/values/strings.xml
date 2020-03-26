@@ -179,4 +179,5 @@
 
     <string name="host">ホスト</string>
     <string name="select_user">ユーザー選択</string>
+    <string name="selecting_users">選択中のユーザー</string>
 </resources>

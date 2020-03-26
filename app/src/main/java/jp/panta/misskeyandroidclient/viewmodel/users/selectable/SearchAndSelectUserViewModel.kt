@@ -56,6 +56,10 @@ class SearchAndSelectUserViewModel(
         mSelectedUsersMap.size  < selectableSize
     }
 
+    val selectedUsersSize = Transformations.map(selectedUsers){
+        it.size
+    }
+
 
     init{
         searchResultUsers.addSource(userName){
