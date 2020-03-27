@@ -105,7 +105,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         miApplication.isSuccessCurrentAccount.observe(this, Observer {
             if(!it){
-                startActivity(Intent(this, AuthActivity::class.java))
+                if(SecretConstant.getInstances().isEmpty()){
+                    startActivity(Intent(this, SignInActivity::class.java))
+                }else{
+                    startActivity(Intent(this, AuthActivity::class.java))
+                }
+
+                finish()
             }
         })
 

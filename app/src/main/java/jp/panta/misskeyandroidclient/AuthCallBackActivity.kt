@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -66,6 +67,7 @@ class AuthCallBackActivity : AppCompatActivity() {
                     val ci = creator.create(token, instance)
 
                     miApplication.putConnectionInfo(Account(token.user.id) ,ci)
+                    startActivity(Intent(this, MainActivity::class.java))
                     finish()
 
                 }

@@ -63,6 +63,7 @@ class SignInActivity : AppCompatActivity() {
 
             miApplication.putConnectionInfo(it.first, it.second)
 
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
         })
 
