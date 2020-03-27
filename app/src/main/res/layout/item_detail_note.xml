@@ -295,7 +295,7 @@
                 <ImageButton
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        app:srcCompat="@{note.myReaction != null ? R.drawable.ic_remove_circle_outline_black_24dp : R.drawable.ic_add_circle_outline_black_24dp}"
+                        app:isReacted="@{note.myReaction != null}"
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                         android:id="@+id/imageButton3"
                         style="?android:attr/borderlessButtonStyle"

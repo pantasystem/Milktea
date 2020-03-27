@@ -20,4 +20,20 @@ object ImageButtonResourceHelper {
             this.setImageResource(resourceId)
         }
     }
+
+    @BindingAdapter("srcResourceFrom")
+    @JvmStatic
+    fun ImageButton.srcResourceFrom(resourceId: Int?){
+        resourceId?.let{
+            this.setImageResource(resourceId)
+        }
+    }
+
+    @BindingAdapter("srcResourceFrom")
+    @JvmStatic
+    fun ImageView.srcResourceFrom(resourceId: Int?){
+        if(resourceId != null){
+            this.setImageResource(resourceId)
+        }
+    }
 }

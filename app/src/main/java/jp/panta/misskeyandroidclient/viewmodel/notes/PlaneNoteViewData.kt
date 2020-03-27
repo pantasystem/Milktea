@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.core.Account
@@ -71,7 +72,7 @@ open class PlaneNoteViewData (
 
     //true　折り畳み
     val contentFolding = MutableLiveData<Boolean>(cw != null)
-    val contentFoldingStatusMessage = Transformations.map(contentFolding){
+    val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding){
         if(it) "もっと見る: ${text?.length}文字" else "隠す"
     }
 

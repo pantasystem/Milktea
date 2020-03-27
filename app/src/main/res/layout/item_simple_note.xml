@@ -84,7 +84,7 @@
                 tools:text="展開する"
                 android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
                 android:textColor="?attr/colorAccent"
-                android:text="@{SafeUnbox.unbox(note.contentFoldingStatusMessage)}"
+                android:text="@{note.contentFoldingStatusMessage}"
                 android:onClick="@{()-> note.changeContentFolding() }"
             />
         <RelativeLayout
@@ -296,7 +296,7 @@
             <ImageButton
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    app:srcCompat="@{note.myReaction != null ? R.drawable.ic_remove_circle_outline_black_24dp : R.drawable.ic_add_circle_outline_black_24dp}"
+                    app:isReacted="@{note.myReaction != null}"
                     tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                     android:id="@+id/imageButton3"
                     style="?android:attr/borderlessButtonStyle"
