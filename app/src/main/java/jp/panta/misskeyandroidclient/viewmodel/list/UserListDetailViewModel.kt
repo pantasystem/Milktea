@@ -95,7 +95,9 @@ class UserListDetailViewModel(
             when(t.type){
                 UserListEvent.Type.PUSH_USER ->{
                     t.userId?.let{ id ->
-                        mUserMap[id] = ListUserViewData(id)
+                        val newUser = ListUserViewData(id)
+                        mUserMap[id] = newUser
+                        loadAndPutUser(newUser)
                         adaptUsers()
                     }
                 }
@@ -123,6 +125,14 @@ class UserListDetailViewModel(
             Log.e(tag, "error", e)
         }
 
+    }
+
+    private fun loadAndPutUser(user: ListUserViewData){
+        misskeyAPI.showUser(
+            RequestUser(
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                userId = user.userId
+            )).enqueue(user.accept)
     }
 
     private fun adaptUsers(){
