@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+        >
     <data>
         <variable name="note" type="jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData"/>
         <import type="android.view.View"/>
@@ -39,6 +39,7 @@
                     android:layout_height="wrap_content" android:id="@+id/textView2"
                     android:padding="5dp"
                     android:visibility='@{note.statusMessage == null ? View.GONE : View.VISIBLE}'
+                    android:onClick="@{()-> notesViewModel.setTargetToUser(note.toShowNote.user)}"
             />
             <include
                     android:id="@+id/simpleNote"

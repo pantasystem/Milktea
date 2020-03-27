@@ -36,13 +36,13 @@ open class PlaneNoteViewData (
         get(){
             if(note.reply != null){
                 //reply
-                return "${toShowNote.user.name}が返信しました"
+                return "${toShowNote.user.getDisplayUserName()}が返信しました"
             }else if(note.reNoteId == null && (note.text != null || note.files != null)){
                 //Note
                 return null
             }else if(note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()){
                 //reNote
-                return "${note.user.name}がリノートしました"
+                return "${toShowNote.user.getDisplayUserName()}がリノートしました"
 
             }else if(note.reNoteId != null && (note.text != null || note.files != null)){
                 //quote

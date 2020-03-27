@@ -34,6 +34,14 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 >
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/statusView"
+                    android:text="@{SafeUnbox.unboxString(note.statusMessage)}"
+                    android:visibility="@{note.statusMessage == null ? View.GONE : View.VISIBLE}"
+                    tools:text="パン太さんができました"
+                    android:layout_marginBottom="8dp"/>
             <ImageView
                     android:id="@+id/avatarIcon"
                     android:layout_width="50dp"
@@ -41,7 +49,8 @@
                     android:layout_marginEnd="8dp"
                     app:circleIcon='@{note.avatarUrl}'
                     tools:srcCompat="@android:drawable/sym_def_app_icon"
-                    android:contentDescription="@string/avataricon"/>
+                    android:contentDescription="@string/avataricon"
+                    android:layout_below="@id/statusView"/>
 
             <TextView
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -50,7 +59,7 @@
                     android:id="@+id/userName"
                     android:textStyle="bold"
                     android:textSize="15sp"
-
+                    android:layout_below="@id/statusView"
                     android:layout_marginEnd="8dp"
                     />
             <TextView
