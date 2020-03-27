@@ -102,13 +102,15 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     }
 
     private fun setResultFinish(){
-        val intent = Intent()
         val selectedDiff = mSearchAndSelectUserViewModel?.getSelectedUserIdsChangedDiff()
         if(selectedDiff == null){
             setResult(Activity.RESULT_CANCELED)
             finish()
             return
         }
+        val intent = Intent()
+
+        Log.d("SearchAndSelectAC", "新たに追加:${selectedDiff.added}, 削除:${selectedDiff.removed}")
         intent.putExtra(EXTRA_SELECTED_USER_IDS, selectedDiff.selected.toTypedArray())
         intent.putExtra(EXTRA_ADDED_USER_IDS, selectedDiff.added.toTypedArray())
         intent.putExtra(EXTRA_REMOVED_USER_IDS, selectedDiff.removed.toTypedArray())

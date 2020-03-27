@@ -134,6 +134,8 @@ class SearchAndSelectUserViewModel(
         selectableUser?: return
         val user = synchronized(mSearchResultTargetUsersMap){
             mSearchResultTargetUsersMap[selectableUser.user.userId]
+        }?: synchronized(mSelectedUsersMap){
+            mSelectedUsersMap[selectableUser.user.userId]
         }?: return
 
         val toggled = user.copy(isSelected = !user.isSelected)
@@ -163,10 +165,13 @@ class SearchAndSelectUserViewModel(
     fun getSelectedUserIdsChangedDiff(): ChangeDiff{
         val exSelected = selectedUserIds.toSet()
 
-        val selected = (selectedUsers.value?.map{
+        val selected = (selectedUsers.value?.filter{
+            it.isSelected
+        }?.map{
             it.user.userId
         }?: emptyList()).toSet()
 
+        Log.d(TAG, "selected:$selected, ex:$exSelected")
         val added = selected.filter{ s ->
             !exSelected.contains(s)
         }

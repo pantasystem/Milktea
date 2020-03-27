@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
@@ -19,6 +20,7 @@ import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
+import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.activity_user_list_detail.*
@@ -26,14 +28,16 @@ import kotlinx.android.synthetic.main.activity_user_list_detail.*
 class UserListDetailActivity : AppCompatActivity() {
 
     companion object {
+        private const val TAG = "UserListDetailActivity"
         const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_LIST_ID"
 
-        private const val ADD_USER_REQUEST_CODE = 252
+        private const val SELECT_USER_REQUEST_CODE = 252
     }
 
     private var mAccountRelation: AccountRelation? = null
     private var mListId: String? = null
     private var mUserListDetailViewModel: UserListDetailViewModel? = null
+    private var mUserListOperateViewModelProvider: UserListOperateViewModel? = null
 
     private var mIsNameUpdated: Boolean = false
     private var mUserListName: String = ""
@@ -55,6 +59,8 @@ class UserListDetailActivity : AppCompatActivity() {
             mAccountRelation = ar
             val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ar, listId, miCore))[UserListDetailViewModel::class.java]
             mUserListDetailViewModel = userListDetailViewModel
+
+            mUserListOperateViewModelProvider = ViewModelProvider(this, UserListOperateViewModel.Factory(ar, miCore))[UserListOperateViewModel::class.java]
 
             userListDetailViewModel.userList.observe(this, Observer<UserList>{ ul ->
                 supportActionBar?.title = ul.name
@@ -100,10 +106,35 @@ class UserListDetailActivity : AppCompatActivity() {
                 }
             }
             R.id.action_add_user ->{
-                startActivityForResult(Intent(this, SearchAndSelectUserActivity::class.java), 252)
+                val intent = Intent(this, SearchAndSelectUserActivity::class.java)
+                val selected = mUserListDetailViewModel?.listUsers?.value?.map{
+                    it.userId
+                }?.toTypedArray()?: return false
+                intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, selected)
+                startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        Log.d(TAG, "onActivityResult: reqCode:$requestCode, resultCode:$resultCode")
+        if(requestCode == SELECT_USER_REQUEST_CODE){
+            if(resultCode == RESULT_OK){
+                val added = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
+                val removed = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
+                Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
+                val userList = mUserListDetailViewModel?.userList?.value?: return
+                added?.forEach{
+                    mUserListOperateViewModelProvider?.pushUser(userList, it)
+                }
+                removed?.forEach{
+                    mUserListOperateViewModelProvider?.pullUser(userList.id, it)
+                }
+            }
+        }
     }
 
     private fun showEditUserListDialog(){
@@ -184,6 +215,7 @@ class UserListDetailActivity : AppCompatActivity() {
             return titles[position]
         }
     }
+
 
 
 
