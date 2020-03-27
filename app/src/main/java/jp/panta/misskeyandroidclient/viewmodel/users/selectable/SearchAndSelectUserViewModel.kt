@@ -19,21 +19,28 @@ class SearchAndSelectUserViewModel(
     val misskeyAPI: MisskeyAPI,
     val encryption: Encryption,
     val selectableSize: Int,
-    selectedUserIds: List<String> = emptyList()
+    val selectedUserIds: List<String> = emptyList()
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val accountRelation: AccountRelation, val miCore: MiCore, val selectableSize: Int) : ViewModelProvider.Factory{
+    class Factory(val accountRelation: AccountRelation, val miCore: MiCore, val selectableSize: Int, val selectedUserIds: List<String>) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             val misskeyAPI = miCore.getMisskeyAPI(accountRelation)!!
             return SearchAndSelectUserViewModel(
                 accountRelation,
                 misskeyAPI,
                 miCore.getEncryption(),
-                selectableSize
+                selectableSize,
+                selectedUserIds
             ) as T
         }
     }
+
+    data class ChangeDiff(
+        val selected: List<String>,
+        val added: List<String>,
+        val removed: List<String>
+    )
 
     companion object{
         private const val TAG = "SearchAndSelectUserVM"
@@ -72,7 +79,9 @@ class SearchAndSelectUserViewModel(
         mSelectedUsersMap.putAll(
             selectedUserIds.map{ userId ->
                 val uvd = UserViewData(userId)
-                uvd.setApi(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, misskeyAPI)
+                accountRelation.getCurrentConnectionInformation()?.getI(encryption)?.let{ i ->
+                    uvd.setApi(i, misskeyAPI)
+                }
                 userId to SelectableUserViewData(uvd, true)
             }
         )
@@ -149,5 +158,22 @@ class SearchAndSelectUserViewModel(
             searchResultUsers.postValue(mSearchResultTargetUsersMap.values.toList())
         }
 
+    }
+
+    fun getSelectedUserIdsChangedDiff(): ChangeDiff{
+        val exSelected = selectedUserIds.toSet()
+
+        val selected = (selectedUsers.value?.map{
+            it.user.userId
+        }?: emptyList()).toSet()
+
+        val added = selected.filter{ s ->
+            !exSelected.contains(s)
+        }
+
+        val removed = exSelected.filter{ ex ->
+            !selected.contains(ex)
+        }
+        return ChangeDiff(selected.toList(), added, removed)
     }
 }
