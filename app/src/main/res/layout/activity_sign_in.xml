@@ -38,18 +38,32 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" >
-                <com.google.android.material.textfield.TextInputLayout
+                <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
                         android:layout_marginBottom="16dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputInstanceDomain"
-                            android:layout_width="match_parent"
+                    <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:hint="@string/instance_domain"
-                            android:text="@={SafeUnbox.unbox(viewModel.instanceDomain)}"
-                            android:inputType="textEmailAddress"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                            android:text="@string/https"
+                            android:textSize="20sp"
+                            />
+                    <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/inputInstanceDomain"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/instance_domain"
+                                android:text="@={viewModel.instanceDomain}"
+                                android:inputType="textEmailAddress"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
 
                 <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
@@ -61,7 +75,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/user_name"
-                            android:text="@={SafeUnbox.unbox(viewModel.userName)}"/>
+                            android:text="@={viewModel.userName}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -75,7 +89,7 @@
                             android:layout_height="wrap_content"
                             android:hint="@string/password"
                             android:inputType="textPassword"
-                            android:text="@={SafeUnbox.unbox(viewModel.password)}"/>
+                            android:text="@={viewModel.password}"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 

@@ -48,7 +48,6 @@ class SignInViewModel(
     val connectionInformation = MutableLiveData<Pair<Account, EncryptedConnectionInformation>>()
 
     val instanceDomain = MediatorLiveData<String>()
-
     //val i = MutableLiveData<String>()
     val isValidityOfAuth = MutableLiveData<Boolean>(false)
 
@@ -57,7 +56,7 @@ class SignInViewModel(
     init{
         instanceDomain.observeForever {
             try{
-                misskeyAPI = MisskeyAPIServiceBuilder.build(it)
+                misskeyAPI = MisskeyAPIServiceBuilder.build("https://$it")
             }catch(e: Exception){
                 isValidDomain.postValue(false)
             }
@@ -77,7 +76,7 @@ class SignInViewModel(
     fun signIn(){
         val un = userName.value
         val pw = password.value
-        val domain = instanceDomain.value?: return
+        val domain = "https://" + (instanceDomain.value?: return)
         if(un == null || pw == null)
             return
 
