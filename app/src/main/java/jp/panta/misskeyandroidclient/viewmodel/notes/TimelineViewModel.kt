@@ -317,8 +317,11 @@ class TimelineViewModel(
 
 
 
-    val timelineObserver = object : TimelineCapture.Observer{
+    private val timelineObserver = object : TimelineCapture.Observer{
         override fun onReceived(note: PlaneNoteViewData) {
+            if(isLoadingFlag){
+                return
+            }
             noteCapture.add(note)
             val notes = timelineLiveData.value?.notes
             val list = if(notes == null){
