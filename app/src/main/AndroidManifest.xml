@@ -61,7 +61,7 @@
                 android:label="@string/title_activity_settings" />
         <activity
                 android:name=".UserDetailActivity"
-                android:parentActivityName=".MainActivity">
+                >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -73,8 +73,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".NoteDetailActivity"
-                android:parentActivityName=".MainActivity" />
+                android:name=".NoteDetailActivity" />
 
         <service
                 android:name=".PostNoteService"

@@ -99,6 +99,9 @@ open class PlaneNoteViewData (
     }
 
     val myReaction = MutableLiveData<String>(toShowNote.myReaction)
+    val isReacted = Transformations.map(myReaction){
+        !it.isNullOrBlank()
+    }
 
     val poll = if(toShowNote.poll == null) null else PollViewData(toShowNote.poll!!, toShowNote.id)
 
