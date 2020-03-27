@@ -15,6 +15,7 @@
         <variable
                 name="listener"
                 type="jp.panta.misskeyandroidclient.view.settings.NoteSettingListAdapter.ItemAddOrRemoveButtonClickedListener" />
+
     </data>
     <androidx.cardview.widget.CardView
 
@@ -43,7 +44,7 @@
                     android:layout_gravity="center"
                     android:layout_marginEnd="4dp"
                     tools:ignore="ContentDescription"
-                    app:srcCompat="@{isSelecting ? R.drawable.ic_add_circle_outline_black_24dp : R.drawable.ic_remove_circle_outline_black_24dp}"
+                    app:srcCompat="@{SafeUnbox.unboxBool(isSelecting) ? R.drawable.ic_add_circle_outline_black_24dp : R.drawable.ic_remove_circle_outline_black_24dp}"
                     tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                     android:onClick="@{()-> listener.onClick(settingTab)}"
                     />
@@ -63,15 +64,15 @@
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
                         tools:text="Home"
-                        android:visibility="@{isSelecting ? View.VISIBLE : View.GONE}"
-                        android:text="@{SafeUnbox.unbox(settingTab.title)}"
+                        android:visibility="@{SafeUnbox.unboxBool(isSelecting) ? View.VISIBLE : View.GONE}"
+                        android:text="@{SafeUnbox.unboxString(settingTab.title)}"
                         tools:visibility="gone"
                         />
                 <EditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="@{isSelecting ? View.GONE : View.VISIBLE}"
-                        android:text="@={SafeUnbox.unbox(settingTab.title)}"
+                        android:text="@={SafeUnbox.unboxString(settingTab.title)}"
                         android:inputType="text"
                         android:importantForAutofill="no"
                         tools:ignore="LabelFor" />

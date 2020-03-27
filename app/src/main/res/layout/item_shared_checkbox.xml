@@ -5,6 +5,7 @@
         <variable
                 name="item"
                 type="jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <LinearLayout
             android:orientation="horizontal"
@@ -28,8 +29,8 @@
                 android:id="@+id/shared_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="@={item.choice}"
-                android:enabled="@{item.enabled}"
+                android:checked="@={SafeUnbox.unboxBool(item.choice)}"
+                android:enabled="@{SafeUnbox.unboxBool(item.enabled)}"
                 />
     </LinearLayout>
 </layout>

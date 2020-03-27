@@ -13,6 +13,7 @@
         <variable
                 name="noteDetailViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -59,7 +60,7 @@
                     android:layout_margin="4dp"
                     android:textColor="?attr/colorAccent"
                     android:text="@string/show_conversation"
-                    android:visibility="@{childrenViewData.hasConversation ? View.VISIBLE : View.GONE }"
+                    android:visibility="@{SafeUnbox.unboxBool(childrenViewData.hasConversation) ? View.VISIBLE : View.GONE }"
                     android:onClick="@{()-> noteDetailViewModel.loadNewConversation(childrenViewData) }"
                     />
 
@@ -71,7 +72,7 @@
                     android:layout_margin="4dp"
                     android:textColor="?attr/colorAccent"
                     android:text="@string/show_reply"
-                    android:visibility="@{childrenViewData.hasConversation ? View.GONE : View.VISIBLE}"
+                    android:visibility="@{SafeUnbox.unboxBool(childrenViewData.hasConversation) ? View.GONE : View.VISIBLE}"
                     android:onClick="@{()-> notesViewModel.setTargetToNote(childrenViewData)}"
                     />
 

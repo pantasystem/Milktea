@@ -16,6 +16,7 @@
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <LinearLayout
             android:layout_width="wrap_content"
@@ -40,7 +41,7 @@
                 android:layout_width="21dp"
                 android:layout_height="21dp"
                 android:layout_marginEnd="4dp"
-                />
+                tools:ignore="ContentDescription" />
         <TextView
                 android:id="@+id/reactionText"
                 android:layout_width="wrap_content"
@@ -57,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="20"
-                android:text='@{reaction.second.toString()}'
+                android:text='@{String.valueOf(SafeUnbox.unboxInt(reaction.second))}'
                 android:layout_gravity="center"
                 android:textSize="15sp"
 

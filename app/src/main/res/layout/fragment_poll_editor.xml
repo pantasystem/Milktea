@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+        >
     <data>
         <variable
                 name="pollEditor"
@@ -8,6 +8,7 @@
         <variable
                 name="noteEditorViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
@@ -68,7 +69,7 @@
                 android:text="@string/multiple_answer"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/spinner2"
-                android:checked="@={pollEditor.isMutable}"
+                android:checked="@={SafeUnbox.unboxBool(pollEditor.isMutable)}"
                 />
 
 

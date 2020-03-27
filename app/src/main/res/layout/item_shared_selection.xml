@@ -6,6 +6,7 @@
         <variable
                 name="selection"
                 type="jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <LinearLayout
             android:orientation="vertical" android:layout_width="match_parent"
@@ -37,7 +38,7 @@
                 android:id="@+id/selectionList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{selection.isSelecting ? View.VISIBLE : View.GONE }"
+                android:visibility="@{SafeUnbox.unboxBool(selection.isSelecting) ? View.VISIBLE : View.GONE }"
 
                 />
 

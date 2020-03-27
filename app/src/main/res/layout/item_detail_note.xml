@@ -6,6 +6,7 @@
         <import type="android.view.View"/>
 
 
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
 
 
         <import type="jp.panta.misskeyandroidclient.R"/>
@@ -98,7 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/contentFoldingButton"
-                    android:visibility="@{note.contentFolding ? View.GONE : View.VISIBLE }"
+                    android:visibility="@{SafeUnbox.unboxBool(note.contentFolding) ? View.GONE : View.VISIBLE }"
                     >
                 <TextView
                         android:id="@id/text"
@@ -211,7 +212,7 @@
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                             app:text='@{note.subNoteText}'
                             app:emojis='@{note.subNoteEmojis}'
-                            android:visibility="@{note.subContentFolding? View.GONE : View.VISIBLE }"
+                            android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
                             app:clickableLink="@{true}"
                             />
 
@@ -283,7 +284,7 @@
                         android:contentDescription="@string/renote"
                         />
                 <TextView
-                        android:text='@{note.reNoteCount}'
+                        android:text='@{String.valueOf(SafeUnbox.unboxString(note.reNoteCount))}'
                         android:visibility='@{note.reNoteCount == null ? View.INVISIBLE : View.VISIBLE}'
 
                         android:layout_width="50dp"
@@ -306,9 +307,9 @@
                         android:contentDescription="@string/reaction"
                         />
                 <TextView
-                        android:text='@{note.reactionCount.toString()}'
+                        android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
 
-                        android:visibility="@{note.reactionCount == 0 ? View.INVISIBLE : View.VISIBLE}"
+                        android:visibility="@{SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE}"
 
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"

@@ -39,8 +39,8 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="@{SafeUnbox.unbox(poll.totalVoteCount)}"
-                android:progress="@{SafeUnbox.unbox(choice.voteCount)}"
+                android:max="@{SafeUnbox.unboxInt(poll.totalVoteCount)}"
+                android:progress="@{SafeUnbox.unboxInt(choice.voteCount)}"
                 tools:max="200"
                 tools:progress="50"
                 />

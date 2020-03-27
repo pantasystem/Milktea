@@ -4,6 +4,7 @@
         <variable
                 name="item"
                 type="jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
@@ -19,8 +20,8 @@
                 android:layout_weight="1"
                 tools:text="Switch"
                 android:text="@{item.title}"
-                android:checked="@={item.choice}"
-                android:enabled="@{item.enabled}"
+                android:checked="@={SafeUnbox.unboxBool(item.choice)}"
+                android:enabled="@{SafeUnbox.unboxBool(item.enabled)}"
                 />
     </LinearLayout>
 </layout>

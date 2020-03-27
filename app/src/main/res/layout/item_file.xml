@@ -11,6 +11,7 @@
         <variable
                 name="fileViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -46,13 +47,13 @@
                             android:id="@+id/thumbnailMain"
                             android:layout_width="65dp"
                             android:layout_height="65dp"
-                             />
+                            tools:ignore="ContentDescription" />
                     <ImageView
                             android:id="@+id/thumbnailMask"
                             android:layout_width="65dp"
                             android:layout_height="65dp"
                             tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
-                        />
+                            tools:ignore="ContentDescription" />
 
                 </FrameLayout>
 
@@ -107,10 +108,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:visibility='@{fileViewModel.isSelectable ? View.VISIBLE : View.GONE }'
+                    android:visibility='@{SafeUnbox.unboxBool(fileViewModel.isSelectable) ? View.VISIBLE : View.GONE }'
                     android:onClick='@{()-> fileViewModel.changeSelectItemState(fileViewData) }'
-                    android:checked="@{fileViewData.isSelect}"
-                    android:enabled="@{fileViewData.isEnabledSelect}"
+                    android:checked="@{SafeUnbox.unboxBool(fileViewData.isSelect)}"
+                    android:enabled="@{SafeUnbox.unboxBool(fileViewData.isEnabledSelect)}"
                     />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

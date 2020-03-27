@@ -2,6 +2,9 @@ package jp.panta.misskeyandroidclient.view
 
 import androidx.databinding.InverseMethod
 
+/**
+ * オーバーロードがわからないバカAndroidStudioのDataBindingのせいで名前を変更した関数を追加する
+ */
 object SafeUnbox {
 
     @JvmStatic
@@ -47,5 +50,26 @@ object SafeUnbox {
     fun box(boxed: Int): Int?{
         return boxed
     }
+
+    @JvmStatic
+    @InverseMethod("boxString")
+    fun unboxString(boxed: String?) = boxed?: ""
+
+    @JvmStatic
+    fun boxString(unboxed: String): String? = unboxed
+
+    @JvmStatic
+    @InverseMethod("boxInt")
+    fun unboxInt(boxed: Int?) = boxed?: 0
+
+    @JvmStatic
+    fun boxInt(unboxed: Int): Int? = unboxed
+
+    @JvmStatic
+    @InverseMethod("boxBool")
+    fun unboxBool(boxed: Boolean?) = boxed?: false
+
+    @JvmStatic
+    fun boxBool(unboxed: Boolean): Boolean? = unboxed
 
 }

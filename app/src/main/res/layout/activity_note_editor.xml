@@ -7,6 +7,7 @@
                 name="viewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
         <import type="android.view.View"/>
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -38,7 +39,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerHorizontal="true"
-                        android:clickable="@{viewModel.isPostAvailable}"
+                        android:clickable="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
                         android:onClick="@{()-> viewModel.post()}"
                         android:text="@string/post" />
 
@@ -70,7 +71,8 @@
 
             <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    tools:ignore="UselessParent">
 
                 <LinearLayout
                         android:layout_width="match_parent"
@@ -85,8 +87,8 @@
                             android:inputType="text"
                             android:text="@={viewModel.cw}"
                             android:hint="@string/cw_hint"
-                            android:visibility="@{viewModel.hasCw ? View.VISIBLE : View.GONE}"
-                            />
+                            android:visibility="@{SafeUnbox.unboxBool(viewModel.hasCw) ? View.VISIBLE : View.GONE}"
+                            android:importantForAutofill="no" />
 
                     <EditText
                             android:id="@+id/editText2"
@@ -99,7 +101,8 @@
                             android:text="@={viewModel.text}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar" />
+                            app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar"
+                            android:importantForAutofill="no" />
 
                     <FrameLayout
                             android:id="@+id/edit_poll"
@@ -191,7 +194,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/frameLayout"
                 android:padding="5dp"
-                android:visibility="@{viewModel.totalImageCount == 0 ? View.GONE : View.VISIBLE}"
+                android:visibility="@{SafeUnbox.unboxInt(viewModel.totalImageCount) == 0 ? View.GONE : View.VISIBLE}"
                 >
 
             <androidx.recyclerview.widget.RecyclerView
@@ -208,7 +211,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text='@{viewModel.totalImageCount.toString() + "/" + "4"}'
+                    android:text='@{String.valueOf(SafeUnbox.unboxInt(viewModel.totalImageCount)) + "/" + "4"}'
 
                     tools:text="3/4"/>
         </LinearLayout>

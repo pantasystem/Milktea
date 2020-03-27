@@ -84,7 +84,7 @@
                 tools:text="展開する"
                 android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
                 android:textColor="?attr/colorAccent"
-                android:text="@{note.contentFoldingStatusMessage}"
+                android:text="@{SafeUnbox.unboxString(note.contentFoldingStatusMessage)}"
                 android:onClick="@{()-> note.changeContentFolding() }"
             />
         <RelativeLayout
@@ -197,7 +197,7 @@
                         tools:text="展開する"
                         android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
                         android:textColor="?attr/colorAccent"
-                        android:text="@{note.subContentFoldingStatusMessage}"
+                        android:text="@{SafeUnbox.unboxString(note.subContentFoldingStatusMessage)}"
                         android:onClick="@{()-> note.changeSubContentFolding() }"
 
                         />
@@ -307,9 +307,9 @@
                     android:contentDescription="@string/reaction"
                     />
             <TextView
-                    android:text='@{note.reactionCount.toString()}'
+                    android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
 
-                    android:visibility="@{note.reactionCount == 0 ? View.INVISIBLE : View.VISIBLE}"
+                    android:visibility="@{SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE}"
 
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
