@@ -14,6 +14,9 @@
     <color name="colorMessageSelf">#FFA95B</color>
     <color name="colorMessageRecipient">#FFFFFF</color>
     <color name="colorSeparator">#BEBEBE</color>
+    <color name="navigationColor">#C6C3C3</color>
+    <color name="colorTextColorPrimary">#000000</color>
+    <color name="colorTextColorSecondaryLight">#2B2B2B</color>
 
     <!--Black Theme-->
     <color name="colorBlackPrimary">#000000</color>

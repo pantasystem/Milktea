@@ -14,8 +14,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:tabMode="scrollable"
-            app:tabTextColor="?android:attr/textColor"
             android:layout_toStartOf="@id/reaction_input_keyboard"
+            app:tabTextColor="?attr/colorNoteActionButtonTint"
+
             >
 
 

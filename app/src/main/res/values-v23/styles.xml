@@ -11,11 +11,11 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/navigationColor</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSurface">@color/colorLightSurface</item>
 
-        <item name="actionBarSize">50dp</item>
+        <item name="actionBarSize">53dp</item>
 
         <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
         <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
@@ -28,6 +28,15 @@
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
 
         <item name="colorSeparator">@color/colorSeparator</item>
+
+
+
+        <item name="android:textColorPrimary">@color/colorTextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/colorTextColorSecondaryLight</item>
+
+        <item name="android:navigationBarColor">@color/navigationColor</item>
+
+
 
     </style>
 
