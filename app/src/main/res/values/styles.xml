@@ -44,8 +44,7 @@
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
         <item name="colorSeparator">@color/colorSeparator</item>
 
-        <item name="android:textColorPrimary">@color/colorTextColorPrimary</item>
-        <item name="android:textColorSecondary">@color/colorTextColorSecondaryLight</item>
+
 
     </style>
 

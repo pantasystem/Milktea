@@ -31,8 +31,7 @@
 
 
 
-        <item name="android:textColorPrimary">@color/colorTextColorPrimary</item>
-        <item name="android:textColorSecondary">@color/colorTextColorSecondaryLight</item>
+
 
         <item name="android:navigationBarColor">@color/navigationColor</item>
 
