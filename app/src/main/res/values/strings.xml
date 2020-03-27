@@ -183,4 +183,9 @@
     <string name="https">https://</string>
     <string name="conversation">会話</string>
     <string name="add_address">宛先を追加</string>
+
+    <string name="indefinite_period">無期限</string>
+    <string name="date_and_time_specification">日時指定</string>
+    <string name="elapsed_time">経過時間</string>
+
 </resources>

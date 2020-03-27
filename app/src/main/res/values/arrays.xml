@@ -20,8 +20,8 @@
     </string-array>
 
     <string-array name="deadline_choices">
-        <item>無期限</item>
-        <item>日時指定</item>
-        <item>経過指定</item>
+        <item>@string/indefinite_period</item>
+        <item>@string/date_and_time_specification</item>
+        <item>@string/elapsed_time</item>
     </string-array>
 </resources>
