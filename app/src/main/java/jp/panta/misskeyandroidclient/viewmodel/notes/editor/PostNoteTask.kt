@@ -27,7 +27,7 @@ class PostNoteTask(
     }
 
     private val i: String = connectionInformation.getI(encryption)!!
-    private var visibleUsers: List<String>? = null
+    private var visibleUserIds: List<String>? = null
     private var visibility: CreateNote.Visibility? = null
     private var isLocal: Boolean? = null
     var files: List<FileNoteEditorData>? = null
@@ -54,12 +54,12 @@ class PostNoteTask(
             Visibility.PUBLIC, Visibility.PUBLIC_LOCAL_ONLY -> CreateNote.Visibility.PUBLIC
             Visibility.HOME, Visibility.HOME_LOCAL_ONLY -> CreateNote.Visibility.HOME
             Visibility.FOLLOWERS, Visibility.FOLLOWERS_LOCAL_ONLY -> CreateNote.Visibility.FOLLOWERS
-            Visibility.SPECIFIED -> CreateNote.Visibility.SPECIFED
+            Visibility.SPECIFIED -> CreateNote.Visibility.SPECIFIED
         }
         //require(canLocalVisibility == isLocal) { "" }
         this.visibility = v
         this.isLocal = isLocalVisibility
-        this.visibleUsers = visibilityUsers
+        this.visibleUserIds = visibilityUsers
     }
     
     fun execute(fileUploader: FileUploader): CreateNote?{
@@ -72,7 +72,7 @@ class PostNoteTask(
             CreateNote(
                 i = i,
                 visibility = visibility?.name?.toLowerCase(Locale.ENGLISH)?: "public",
-                visibleUserIds = visibleUsers,
+                visibleUserIds = visibleUserIds,
                 text = text,
                 cw =cw,
                 viaMobile = viaMobile,

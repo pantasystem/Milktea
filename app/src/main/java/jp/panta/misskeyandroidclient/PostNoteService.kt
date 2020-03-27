@@ -37,7 +37,7 @@ class PostNoteService : IntentService("PostNoteService") {
         Log.d(tag, "createNote: $createNote")
         val result = miApplication.getMisskeyAPI(ci).create(createNote).execute()
 
-        if(result?.code() == 200){
+        if(result?.code() in 200 until 300){
             Log.d(tag, "ノートの投稿に成功しました")
         }else{
             Log.d(tag, "ノートの投稿に失敗しました")

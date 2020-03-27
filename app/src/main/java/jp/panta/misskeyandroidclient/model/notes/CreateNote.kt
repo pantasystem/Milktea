@@ -27,7 +27,7 @@ data class CreateNote(
         PUBLIC(true),
         HOME(true),
         FOLLOWERS(true),
-        SPECIFED(false)
+        SPECIFIED(false)
 
     }
 }
