@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +35,7 @@ class NoteEditorActivity : AppCompatActivity() {
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
         const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
+        const val SELECT_USER_REQUEST_CODE = 810
     }
     private var mViewModel: NoteEditorViewModel? = null
 
@@ -100,6 +102,10 @@ class NoteEditorActivity : AppCompatActivity() {
         selectFileFromLocal.setOnClickListener {
             showFileManager()
         }
+
+        binding.addAddress.setOnClickListener {
+            startSearchAndSelectUser()
+        }
     }
 
     private fun setPollFragment(){
@@ -153,6 +159,16 @@ class NoteEditorActivity : AppCompatActivity() {
         }
     }
 
+    private fun startSearchAndSelectUser(){
+        val selectedUserIds = mViewModel?.address?.value?.map{
+            it.userId
+        }?.toTypedArray()?: emptyArray()
+
+        val intent = Intent(this, SearchAndSelectUserActivity::class.java)
+        intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, selectedUserIds)
+        startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -198,6 +214,13 @@ class NoteEditorActivity : AppCompatActivity() {
                     showFileManager()
                 }else{
                     Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
+                }
+            }
+            SELECT_USER_REQUEST_CODE ->{
+                if(resultCode == RESULT_OK && data != null){
+                    val added = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
+                    val removed = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
+                    mViewModel?.setAddress(added, removed)
                 }
             }
         }

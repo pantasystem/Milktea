@@ -182,4 +182,5 @@
     <string name="selecting_users">選択中のユーザー</string>
     <string name="https">https://</string>
     <string name="conversation">会話</string>
+    <string name="add_address">宛先を追加</string>
 </resources>

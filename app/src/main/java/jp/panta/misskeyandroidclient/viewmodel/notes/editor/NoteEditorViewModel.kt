@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
+import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import java.io.File
 
 class NoteEditorViewModel(
@@ -69,6 +70,12 @@ class NoteEditorViewModel(
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
+    val address = MutableLiveData<List<UserViewData>>()
+
+    val isSpecified = Transformations.map(visibility){
+        it == PostNoteTask.Visibility.SPECIFIED
+    }
+
     val poll = MutableLiveData<PollEditor?>()
 
     val noteTask = MutableLiveData<PostNoteTask>()
@@ -81,7 +88,9 @@ class NoteEditorViewModel(
         noteTask.poll = poll.value?.buildCreatePoll()
         noteTask.renoteId = quoteToNoteId
         noteTask.replyId = replyToNoteId
-        noteTask.setVisibility(visibility.value)
+        noteTask.setVisibility(visibility.value, address.value?.map{
+            it.userId
+        })
         this.noteTask.postValue(noteTask)
     }
 
@@ -179,6 +188,27 @@ class NoteEditorViewModel(
         }else{
             ArrayList<FileNoteEditorData>(this)
         }
+    }
+
+    fun setAddress(added: Array<String>, removed: Array<String>){
+        val list = address.value?.let{
+            ArrayList(it)
+        }?: ArrayList()
+
+        list.addAll(
+            added.map{
+                UserViewData(it).apply{
+                    setApi(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, misskeyAPI)
+                }
+            }
+        )
+
+        list.removeAll { uv ->
+            removed.any{
+                uv.userId == it
+            }
+        }
+        address.postValue(list)
     }
 
 

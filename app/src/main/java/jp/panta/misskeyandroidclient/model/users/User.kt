@@ -56,4 +56,8 @@ data class User(
     fun getDisplayName(): String{
         return name?: userName
     }
+
+    fun getShortDisplayName(): String{
+        return "@" + this.userName
+    }
 }
