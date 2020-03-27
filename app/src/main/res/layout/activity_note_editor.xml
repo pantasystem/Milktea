@@ -78,6 +78,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/addressUsersView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="@{SafeUnbox.unboxBool(viewModel.isSpecified()) ? View.VISIBLE : View.GONE}"
+
+                            tools:layout_height="50dp"/>
                     <Button
                             android:id="@+id/addAddress"
                             android:layout_width="wrap_content"

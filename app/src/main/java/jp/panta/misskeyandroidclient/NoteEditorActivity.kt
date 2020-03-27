@@ -16,11 +16,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.view.notes.editor.PollEditorFragment
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.view.notes.editor.VisibilitySelectionDialog
+import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
@@ -57,6 +59,15 @@ class NoteEditorActivity : AppCompatActivity() {
 
         binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
+        val userChipAdapter = UserChipListAdapter(this)
+        binding.addressUsersView.adapter = userChipAdapter
+        val flexBoxLayoutManager = FlexboxLayoutManager(this)
+        flexBoxLayoutManager.flexDirection = FlexDirection.ROW
+        flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
+        flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
+        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+        binding.addressUsersView.layoutManager = flexBoxLayoutManager
+
         val miApplication = applicationContext as MiApplication
         miApplication.currentAccount.observe(this, Observer {
             val factory = NoteEditorViewModelFactory(it, miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId)
@@ -91,6 +102,10 @@ class NoteEditorActivity : AppCompatActivity() {
                 Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
                 val dialog = VisibilitySelectionDialog()
                 dialog.show(supportFragmentManager, "NoteEditor")
+            })
+
+            viewModel.address.observe(this, Observer{
+                userChipAdapter.submitList(it)
             })
 
         })

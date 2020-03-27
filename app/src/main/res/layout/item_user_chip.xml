@@ -11,16 +11,18 @@
             android:background="@drawable/shape_chip"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
+            android:layout_margin="4dp"
             android:orientation="horizontal"
             tools:ignore="UseCompoundDrawables">
         <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 tools:src="@drawable/ic_person_black_24dp"
                 app:circleIcon="@{userViewData.user.avatarUrl}"
                 tools:ignore="ContentDescription"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="4dp"/>
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
