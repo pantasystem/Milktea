@@ -11,10 +11,14 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.streming.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NoteDetailViewModel(
     val accountRelation: AccountRelation,
@@ -26,8 +30,45 @@ class NoteDetailViewModel(
 
     private val connectionInformation: EncryptedConnectionInformation = accountRelation.getCurrentConnectionInformation()!!
     private val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(connectionInformation)
+    private val streamingAdapter = StreamingAdapter(connectionInformation, encryption)
 
-    val notes = MutableLiveData<List<PlaneNoteViewData>>()
+    private val noteCapture = NoteCapture(accountRelation.account.id)
+
+    val notes = object : MutableLiveData<List<PlaneNoteViewData>>(){
+        override fun onActive() {
+            super.onActive()
+
+            startStreaming()
+        }
+
+        override fun onInactive() {
+            super.onInactive()
+
+            stopStreaming()
+        }
+    }
+
+    private val mNoteDetailId = UUID.randomUUID().toString()
+
+    private fun startStreaming(){
+        if(!streamingAdapter.isConnect){
+            streamingAdapter.connect()
+        }
+        streamingAdapter.addObserver(mNoteDetailId, noteCapture)
+        notes.value?.let{
+            noteCapture.addAll(it)
+        }
+    }
+
+    private fun stopStreaming(){
+        notes.value?.let{
+            noteCapture.removeAll(it)
+        }
+        streamingAdapter.observerMap.remove(mNoteDetailId)
+        if(streamingAdapter.isConnect){
+            streamingAdapter.disconnect()
+        }
+    }
 
 
     fun loadDetail(){
@@ -54,6 +95,7 @@ class NoteDetailViewModel(
                     }
                     notes.postValue(list)
                 }
+                noteCapture.addAll(list)
 
             }catch (e: Exception){
 
