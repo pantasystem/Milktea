@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -15,11 +16,14 @@ import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollChoice
+import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import kotlinx.android.synthetic.main.fragment_poll_editor.*
+import java.util.*
 
 class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
-    lateinit var mBinding: FragmentPollEditorBinding
+    private lateinit var mBinding: FragmentPollEditorBinding
+    private var mPollEditor: PollEditor? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +49,7 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer {
             val viewModel = ViewModelProvider(activity, NoteEditorViewModelFactory(it, miApplication)).get(NoteEditorViewModel::class.java)
             val poll = viewModel.poll.value ?: return@Observer
+            mPollEditor = poll
             mBinding.pollEditor = poll
             mBinding.noteEditorViewModel = viewModel
 
@@ -54,5 +59,26 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
                 adapter.submitList(list)
             })
         })
+
+        val deadLineType = view.context.resources.getStringArray(R.array.deadline_choices)
+        mBinding.deadLineType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, id: Long) {
+                if(deadLineType[position] == getString(R.string.indefinite_period)){
+                    mPollEditor?.deadLineType?.value = PollEditor.DeadLineType.INDEFINITE_PERIOD
+                }else{
+                    mPollEditor?.deadLineType?.value = PollEditor.DeadLineType.DATE_AND_TIME
+                    val time = mPollEditor?.expiresAt?.value
+                    if(time == null){
+                        val c = Calendar.getInstance()
+                        c.add(Calendar.DATE, 1)
+
+                        mPollEditor?.expiresAt?.value = c.time
+                    }
+
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) = Unit
+        }
     }
 }

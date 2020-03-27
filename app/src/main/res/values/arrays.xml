@@ -22,6 +22,5 @@
     <string-array name="deadline_choices">
         <item>@string/indefinite_period</item>
         <item>@string/date_and_time_specification</item>
-        <item>@string/elapsed_time</item>
     </string-array>
 </resources>
