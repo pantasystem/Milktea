@@ -13,7 +13,8 @@ object ReactionResourceMap {
         "love" to R.drawable.ic_reaction_love,
         "pudding" to R.drawable.ic_reaction_pudding,
         "rip" to R.drawable.ic_reaction_rip,
-        "surprise" to R.drawable.ic_reaction_surprise
+        "surprise" to R.drawable.ic_reaction_surprise,
+        "star" to R.drawable.ic_star
 
     )
 }
