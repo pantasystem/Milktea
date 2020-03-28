@@ -62,6 +62,19 @@
 
                 />
         <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:layout_toEndOf="@id/name"
+                android:layout_marginStart="8dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                app:elapsedTime="@{note.toShowNote.createdAt}"
+                android:textColor="?attr/colorAccent"
+                android:layout_alignParentEnd="true"
+                android:gravity="end"
+                tools:text="16分前"/>
+        <TextView
                 android:id="@+id/cw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
