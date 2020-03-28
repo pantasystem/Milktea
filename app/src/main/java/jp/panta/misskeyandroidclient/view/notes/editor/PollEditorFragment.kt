@@ -80,5 +80,13 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
             override fun onNothingSelected(p0: AdapterView<*>?) = Unit
         }
+
+        mBinding.dateButton.setOnClickListener {
+            // date picker
+        }
+
+        mBinding.timeButton.setOnClickListener {
+            // time picker
+        }
     }
 }

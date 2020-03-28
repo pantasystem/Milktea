@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.util.eventbus
 
+import android.os.Handler
 import android.util.Log
 import androidx.arch.core.internal.SafeIterableMap
 import androidx.lifecycle.Lifecycle
@@ -7,7 +8,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 
-class EventBus <T>{
+class EventBus <T>(val limitMilliTime: Long = 500){
+    private val mHandler = Handler()
+
+    private var isLimiting: Boolean = false
+
     private val mObservers = HashMap<Observer<T>, ObserverWrapper>()
 
     var event: T? = null
@@ -23,7 +28,7 @@ class EventBus <T>{
             //mObservers[observer] = wrapper
             val beforeObserver = mObservers[observer]
             mObservers[observer] = wrapper
-            if(beforeObserver != null){
+            if(beforeObserver == null){
                 lifecycleOwner.lifecycle.addObserver(wrapper)
             }
         }
@@ -50,7 +55,15 @@ class EventBus <T>{
                 val next = iterator.next().value
                 when {
                     next.isActive() -> {
-                        next.observer.onChanged(e)
+                        if(!isLimiting){
+                            next.observer.onChanged(e)
+                            isLimiting = true
+                            mHandler.postDelayed({
+                                isLimiting = false
+                            }, limitMilliTime)
+                        }else{
+                            Log.d("EventBus", "リミッター制限中")
+                        }
                     }
                     /*next.lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.DESTROYED) -> {
 

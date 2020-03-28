@@ -80,6 +80,9 @@ class NoteEditorViewModel(
 
     val noteTask = MutableLiveData<PostNoteTask>()
 
+    val showDatePacker = EventBus<Unit>()
+    val showTimePacker = EventBus<Unit>()
+
     fun post(){
         val noteTask = PostNoteTask(accountRelation.getCurrentConnectionInformation()!!, encryption)
         noteTask.cw = cw.value
