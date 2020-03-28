@@ -187,4 +187,10 @@
     <string name="indefinite_period">無期限</string>
     <string name="date_and_time_specification">日時指定</string>
 
+    <string name="y">年</string>
+    <string name="h">時間</string>
+    <string name="m">分</string>
+    <string name="s">秒</string>
+
+
 </resources>
