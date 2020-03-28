@@ -55,15 +55,16 @@ class EventBus <T>(val limitMilliTime: Long = 500){
                 val next = iterator.next().value
                 when {
                     next.isActive() -> {
-                        if(!isLimiting){
-                            next.observer.onChanged(e)
+                        /*if(!isLimiting){
                             isLimiting = true
-                            mHandler.postDelayed({
-                                isLimiting = false
-                            }, limitMilliTime)
+                            next.observer.onChanged(e)
+                            //mHandler.removeCallbacks(limiterRelease)
+                            //mHandler.postDelayed(limiterRelease, limitMilliTime)
                         }else{
                             Log.d("EventBus", "リミッター制限中")
-                        }
+                        }*/
+                        next.observer.onChanged(e)
+
                     }
                     /*next.lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.DESTROYED) -> {
 
@@ -93,5 +94,9 @@ class EventBus <T>(val limitMilliTime: Long = 500){
             }
 
         }
+    }
+
+    private val limiterRelease = Runnable{
+        isLimiting = false
     }
 }
