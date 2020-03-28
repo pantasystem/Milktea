@@ -15,7 +15,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollChoice
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import kotlinx.android.synthetic.main.fragment_poll_editor.*
 import java.util.*
@@ -24,6 +23,7 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
     private lateinit var mBinding: FragmentPollEditorBinding
     private var mPollEditor: PollEditor? = null
+    private var mNoteEditorViewModel: NoteEditorViewModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +48,7 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer {
             val viewModel = ViewModelProvider(activity, NoteEditorViewModelFactory(it, miApplication)).get(NoteEditorViewModel::class.java)
+            mNoteEditorViewModel = viewModel
             val poll = viewModel.poll.value ?: return@Observer
             mPollEditor = poll
             mBinding.pollEditor = poll
@@ -83,10 +84,12 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
         mBinding.dateButton.setOnClickListener {
             // date picker
+            mNoteEditorViewModel?.showPollDatePicker?.event = Unit
         }
 
         mBinding.timeButton.setOnClickListener {
             // time picker
+            mNoteEditorViewModel?.showPollTimePicker?.event = Unit
         }
     }
 }

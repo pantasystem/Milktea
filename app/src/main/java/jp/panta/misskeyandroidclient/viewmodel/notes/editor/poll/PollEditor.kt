@@ -48,11 +48,16 @@ class PollEditor {
             it != null && it.isNotBlank()
         }?.filterNotNull()
 
+        val expiresAt = if(deadLineType.value == DeadLineType.DATE_AND_TIME){
+            this.expiresAt.value
+        }else{
+            null
+        }
         if(choices != null && choices.size >= 2){
             return CreatePoll(
                 choices,
                 isMutable.value?: false,
-                null
+                expiresAt?.time
             )
         }
         return null
