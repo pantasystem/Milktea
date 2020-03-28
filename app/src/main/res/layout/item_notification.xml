@@ -93,7 +93,7 @@
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="16分前"
+                        tools:text="16min"
                         android:singleLine="true"
                         app:elapsedTime="@{notification.notification.createdAt}"
                         android:layout_gravity="center"/>
