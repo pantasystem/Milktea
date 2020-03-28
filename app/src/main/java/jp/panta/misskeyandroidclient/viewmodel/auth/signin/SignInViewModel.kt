@@ -55,11 +55,14 @@ class SignInViewModel(
 
     init{
         instanceDomain.observeForever {
-            try{
-                misskeyAPI = MisskeyAPIServiceBuilder.build("https://$it")
-            }catch(e: Exception){
-                isValidDomain.postValue(false)
+            viewModelScope.launch{
+                try{
+                    misskeyAPI = MisskeyAPIServiceBuilder.build("https://$it")
+                }catch(e: Exception){
+                    isValidDomain.postValue(false)
+                }
             }
+
             misskeyAPI?.getMeta(RequestMeta(false))?.enqueue(object : Callback<Meta?>{
                 override fun onResponse(call: Call<Meta?>, response: Response<Meta?>) {
                     isValidDomain.postValue(
