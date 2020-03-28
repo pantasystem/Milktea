@@ -80,6 +80,9 @@ class NoteEditorViewModel(
 
     val noteTask = MutableLiveData<PostNoteTask>()
 
+    val showPollDatePicker = EventBus<Unit>()
+    val showPollTimePicker = EventBus<Unit>()
+
     fun post(){
         val noteTask = PostNoteTask(accountRelation.getCurrentConnectionInformation()!!, encryption)
         noteTask.cw = cw.value

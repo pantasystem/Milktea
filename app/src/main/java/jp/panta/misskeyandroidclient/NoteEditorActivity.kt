@@ -1,13 +1,10 @@
 package jp.panta.misskeyandroidclient
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.DocumentsContract
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -19,15 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.view.notes.editor.PollEditorFragment
-import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
-import jp.panta.misskeyandroidclient.view.notes.editor.VisibilitySelectionDialog
+import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import kotlinx.android.synthetic.main.activity_note_editor.*
-import java.io.File
 
 class NoteEditorActivity : AppCompatActivity() {
 
@@ -108,6 +101,13 @@ class NoteEditorActivity : AppCompatActivity() {
                 userChipAdapter.submitList(it)
             })
 
+            viewModel.showPollTimePicker.observe(this, Observer{
+                PollTimePickerDialog().show(supportFragmentManager, "TimePicker")
+            })
+
+            viewModel.showPollDatePicker.observe(this, Observer {
+                PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
+            })
         })
 
         selectFileFromDrive.setOnClickListener {
