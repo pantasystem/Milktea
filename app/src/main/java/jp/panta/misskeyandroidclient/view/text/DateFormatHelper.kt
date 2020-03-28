@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.view.text
 
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -35,7 +36,7 @@ object DateFormatHelper {
                 SimpleElapsedTime.TimeUnit.YEAR -> context.getString(R.string.year_ago)
                 SimpleElapsedTime.TimeUnit.MONTH -> context.getString(R.string.month_ago)
                 SimpleElapsedTime.TimeUnit.DATE -> context.getString(R.string.date_ago)
-                SimpleElapsedTime.TimeUnit.HOUR -> context.getString(R.string.minute_ago)
+                SimpleElapsedTime.TimeUnit.HOUR -> context.getString(R.string.hour_ago)
                 SimpleElapsedTime.TimeUnit.MINUTE -> context.getString(R.string.minute_ago)
                 SimpleElapsedTime.TimeUnit.SECOND -> context.getString(R.string.second_ago)
                 SimpleElapsedTime.TimeUnit.NOW -> context.getString(R.string.now)

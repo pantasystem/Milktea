@@ -35,6 +35,7 @@
                     app:notificationReactionStringView="@{reactionString}"
                     app:notificationType="@{notification.statusType}"
                     app:notificationReaction="@{notification.reaction}"
+                    android:orientation="horizontal"
 
                     >
 
@@ -45,7 +46,8 @@
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
                         tools:srcCompat="@drawable/ic_follow"
-                        android:tint="?attr/colorNoteActionButtonTint"/>
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        tools:ignore="ContentDescription" />
 
                 <ImageView
                         android:id="@+id/reactionImage"
@@ -55,7 +57,7 @@
                         android:layout_marginEnd="8dp"
                         tools:srcCompat="@drawable/ic_reaction_like"
 
-                        />
+                        tools:ignore="ContentDescription" />
                 <TextView
                         android:id="@+id/reactionString"
                         android:layout_width="wrap_content"
@@ -76,17 +78,25 @@
                         app:circleIcon="@{notification.avatarIconUrl}"
                         android:onClick="@{()-> notesViewModel.setTargetToUser(notification.user)}"
 
-                />
+                        tools:ignore="ContentDescription" />
 
 
 
                 <TextView
                         android:id="@+id/userName"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="@{notification.userName}"
-                        tools:text="name" />
+                        tools:text="name"
+                        android:layout_weight="1"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="16分前"
+                        android:singleLine="true"
+                        app:elapsedTime="@{notification.notification.createdAt}"
+                        android:layout_gravity="center"/>
             </LinearLayout>
             <FrameLayout
                     android:layout_width="match_parent"

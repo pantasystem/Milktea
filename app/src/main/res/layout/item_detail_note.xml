@@ -67,7 +67,6 @@
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/userName"
                     tools:text="36秒前"
-                    android:textColor="?attr/colorAccent"
                     android:layout_below="@id/statusView"
                     android:textSize="15sp"
                     android:layout_alignParentEnd="true"

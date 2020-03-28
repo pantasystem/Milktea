@@ -6,7 +6,7 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.lang.IllegalArgumentException
 
-class NotificationViewData(private val notification: Notification, account: Account) {
+class NotificationViewData(val notification: Notification, account: Account) {
     enum class Type(val default: String){
         FOLLOW("follow"),
         MENTION("mention"),
