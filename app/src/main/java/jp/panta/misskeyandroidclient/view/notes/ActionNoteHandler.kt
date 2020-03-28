@@ -76,7 +76,10 @@ class ActionNoteHandler(
         val list = it.second.files.map{fv ->
             fv.fileProperty
         }
-        val intent = MediaActivity.newIntent(activity, ArrayList(list), 0)
+        val index = it.second.files.indexOfFirst { fv ->
+            fv.id == it.first.id
+        }
+        val intent = MediaActivity.newIntent(activity, ArrayList(list), index)
         activity.startActivity(intent)
         //val intent =
     }
