@@ -31,7 +31,7 @@ fun AppCompatActivity.setTheme(){
 
 fun Context.setMenuTint(menu: Menu){
     val typedValue = TypedValue()
-    theme.resolveAttribute(android.R.attr.textColorSecondary, typedValue, true)
+    theme.resolveAttribute(R.attr.colorNoteActionButtonTint, typedValue, true)
     0.until(menu.size()).forEach{
         val item = menu.getItem(it)
         item.icon?.setTint(typedValue.data)
