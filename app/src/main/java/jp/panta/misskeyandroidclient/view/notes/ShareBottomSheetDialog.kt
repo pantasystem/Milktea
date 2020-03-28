@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.databinding.DataBindingUtil
@@ -14,17 +15,16 @@ import jp.panta.misskeyandroidclient.databinding.FragmentShareBottomSheetBinding
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 
 class ShareBottomSheetDialog : BottomSheetDialogFragment(){
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog =  super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.fragment_share_bottom_sheet, null)
+        dialog.setContentView(view)
         val dataBinding = DataBindingUtil.bind<FragmentShareBottomSheetBinding>(view)
         dialog.setContentView(view)
-
         if(dataBinding == null){
             Log.e("ShareBottomSheetDialog", "Bindingを取得するのに失敗しました")
             dismiss()
-            return
+            return dialog
         }
         val viewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
         val note = viewModel.shareTarget.event
@@ -64,7 +64,8 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
                 dismiss()
                 return@setOnClickListener
             }
-            clipboardManager.primaryClip = ClipData.newPlainText("", "${note.note.uri}")
+            val baseUrl = viewModel.accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl
+            clipboardManager.primaryClip = ClipData.newPlainText("", "$baseUrl/notes/${note.id}")
             dismiss()
 
         }
@@ -73,6 +74,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
             viewModel.removeNoteFromShareTarget()
             dismiss()
         }
-
+        return dialog
     }
+
 }

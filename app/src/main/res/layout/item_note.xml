@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content" android:id="@+id/textView2"
                     android:padding="5dp"
                     android:visibility='@{note.statusMessage == null ? View.GONE : View.VISIBLE}'
-                    android:onClick="@{()-> notesViewModel.setTargetToUser(note.toShowNote.user)}"
+                    android:onClick="@{()-> notesViewModel.setTargetToUser(note.note.user)}"
             />
             <include
                     android:id="@+id/simpleNote"

@@ -7,12 +7,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.SafeUnbox
+import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.activity_search_result.*
 
 class SearchResultActivity : AppCompatActivity() {
@@ -57,12 +61,15 @@ class SearchResultActivity : AppCompatActivity() {
             )
         }
 
+
         val timelineFragment = TimelineFragment.newInstance(request)
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.search_result_base, timelineFragment)
         ft.commit()
 
         (application as MiCore).currentAccount.observe(this, Observer { ar ->
+            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
+            ActionNoteHandler(this, notesViewModel)
             mAccountRelation = ar
             invalidateOptionsMenu()
         })

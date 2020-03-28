@@ -67,7 +67,7 @@ class MediaActivity : AppCompatActivity() {
             it as FileProperty?
         }?.filterNotNull()
 
-        //val filePropertyListCurrentIndex = intent.getIntExtra(EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, 0)
+        val filePropertyListCurrentIndex = intent.getIntExtra(EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, 0)
 
         val extraUri: String? = intent.getStringExtra(EXTRA_URI)
         val uri = if(extraUri.isNullOrBlank()) null else Uri.parse(extraUri)
@@ -92,6 +92,8 @@ class MediaActivity : AppCompatActivity() {
 
         val pagerAdapter = MediaPagerAdapter(list)
         mediaViewPager.adapter = pagerAdapter
+
+        mediaViewPager.currentItem = filePropertyListCurrentIndex
     }
 
 
