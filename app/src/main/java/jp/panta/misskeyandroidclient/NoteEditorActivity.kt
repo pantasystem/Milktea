@@ -16,10 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.view.notes.editor.PollDatePickerDialog
-import jp.panta.misskeyandroidclient.view.notes.editor.PollEditorFragment
-import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
-import jp.panta.misskeyandroidclient.view.notes.editor.VisibilitySelectionDialog
+import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
@@ -105,7 +102,7 @@ class NoteEditorActivity : AppCompatActivity() {
             })
 
             viewModel.showPollTimePicker.observe(this, Observer{
-
+                PollTimePickerDialog().show(supportFragmentManager, "TimePicker")
             })
 
             viewModel.showPollDatePicker.observe(this, Observer {
