@@ -73,7 +73,8 @@
                 android:textColor="?attr/colorAccent"
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
-                tools:text="16分前"/>
+                tools:text="16分前"
+                />
         <TextView
                 android:id="@+id/cw"
                 android:layout_width="wrap_content"

@@ -63,6 +63,17 @@
                     android:layout_marginEnd="8dp"
                     />
             <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/userName"
+                    tools:text="36秒前"
+                    android:textColor="?attr/colorAccent"
+                    android:layout_below="@id/statusView"
+                    android:textSize="15sp"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="end"
+                    />
+            <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_below="@id/userName"
@@ -227,7 +238,7 @@
                             android:id="@+id/subNoteMediaPreview"
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
-                            tools:layout_height="100dp"
+                            tools:layout_height="50dp"
                             android:layout_below="@id/subNoteText"
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                             >
@@ -251,6 +262,7 @@
                     android:layout_below="@id/contentMain"
                     android:layout_marginTop="8dp"
                     tools:visibility="visible"
+                    tools:layout_height="50dp"
 
                     />
 
