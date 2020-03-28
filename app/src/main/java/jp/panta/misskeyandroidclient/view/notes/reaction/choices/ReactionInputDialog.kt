@@ -1,36 +1,36 @@
 package jp.panta.misskeyandroidclient.view.notes.reaction.choices
 
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.view.Gravity
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import kotlinx.android.synthetic.main.dialog_reaction_input.view.*
 
-class ReactionInputDialog : BottomSheetDialogFragment(){
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_reaction_input, container, false)
-    }
+class ReactionInputDialog : AppCompatDialogFragment(){
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog =  super.onCreateDialog(savedInstanceState)
+        val view = View.inflate(dialog.context, R.layout.dialog_reaction_input, null)
+        dialog.setContentView(view)
+
+        val lp = dialog.window?.attributes
+        lp?.gravity = Gravity.BOTTOM
 
         val miApplication = view.context.applicationContext as MiApplication
         val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"
-        }?: return
-        val activity = activity?: return
+        }?: return dialog
+        val activity = activity?: return dialog
         val notesViewModel = ViewModelProvider(activity)[NotesViewModel::class.java]
         val adapter = ReactionAutoCompleteArrayAdapter(emojis, notesViewModel, view.context)
         view.input_reaction.setAdapter(adapter)
@@ -50,8 +50,9 @@ class ReactionInputDialog : BottomSheetDialogFragment(){
             }
             false
         }
-
+        return dialog
     }
+
 
 
 }
