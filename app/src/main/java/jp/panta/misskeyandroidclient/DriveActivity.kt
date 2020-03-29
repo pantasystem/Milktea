@@ -46,9 +46,9 @@ class DriveActivity : AppCompatActivity() {
         }
 
         if(maxSize > -1){
-            supportActionBar?.title = "ファイルを選択"
+            supportActionBar?.title = getString(R.string.select_file)
         }else{
-            supportActionBar?.title = "ドライブ"
+            supportActionBar?.title = getString(R.string.drive)
         }
 
         val miApplication = applicationContext as MiApplication

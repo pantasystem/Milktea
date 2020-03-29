@@ -53,7 +53,7 @@
     <string name="tab_selected">追加済み</string>
     <string name="tab_selectable">以下から追加</string>
     <string name="title_featured">ハイライト</string>
-    <string name="drive">drive</string>
+    <string name="drive">ドライブ</string>
 
     <string name="file">File</string>
     <string name="folder">Folder</string>
@@ -196,6 +196,6 @@
     <string name="minute_ago">分前</string>
     <string name="second_ago">秒前</string>
 
-
+    <string name="select_file">ファイル選択</string>
 
 </resources>
