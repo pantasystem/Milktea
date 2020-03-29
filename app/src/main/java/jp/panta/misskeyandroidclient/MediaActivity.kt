@@ -121,9 +121,7 @@ class MediaActivity : AppCompatActivity() {
             }
         }
         if(uri != null){
-            val mime = MimeTypeMap.getSingleton()
-            val mimeType = mime.getExtensionFromMimeType(contentResolver.getType(uri))
-            return if(mimeType?.contains("image") == true){
+            return if(contentResolver.getType(uri)?.contains("image") == true){
                 ImageFragment.newInstance(uri)
             }else{
                 PlayerFragment.newInstance(uri)
