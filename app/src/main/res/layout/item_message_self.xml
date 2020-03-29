@@ -63,7 +63,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
                 tools:text="10秒前"
-                android:visibility="gone"
+                app:elapsedTime="@{message.message.createdAt}"
                 />
 
     </RelativeLayout>

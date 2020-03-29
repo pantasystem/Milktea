@@ -20,7 +20,7 @@ class HistoryViewData (account: Account, val message: Message){
 
 
     val title = if(isGroup){
-        "#${message.group?.name}"
+        "${message.group?.name}"
     }else{
         val host = partner?.host
         "@${partner?.userName}" + if(host != null) "@$host" else ""
