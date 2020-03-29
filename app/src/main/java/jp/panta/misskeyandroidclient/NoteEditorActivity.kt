@@ -148,7 +148,7 @@ class NoteEditorActivity : AppCompatActivity() {
 
     private fun showFileManager(){
         if(checkPermission()){
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             startActivityForResult(intent, SELECT_LOCAL_FILE_REQUEST_CODE)
