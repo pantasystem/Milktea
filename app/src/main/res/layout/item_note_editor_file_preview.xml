@@ -22,7 +22,9 @@
                 android:padding="8dp"
 
                 app:setSimpleImageUri="@{fileNoteEditorData.url}"
-                tools:srcCompat="@mipmap/ic_launcher_round" />
+                tools:srcCompat="@mipmap/ic_launcher_round"
+                android:onClick="@{ ()-> noteEditorViewModel.showPreviewFile(fileNoteEditorData)}"
+                tools:ignore="ContentDescription" />
         <CheckBox
                 android:id="@+id/checkBox"
                 android:layout_width="wrap_content"

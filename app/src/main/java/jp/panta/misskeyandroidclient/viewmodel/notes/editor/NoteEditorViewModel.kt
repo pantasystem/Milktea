@@ -83,6 +83,8 @@ class NoteEditorViewModel(
     val showPollDatePicker = EventBus<Unit>()
     val showPollTimePicker = EventBus<Unit>()
 
+    val showPreviewFileEvent = EventBus<FileNoteEditorData>()
+
     fun post(){
         val noteTask = PostNoteTask(accountRelation.getCurrentConnectionInformation()!!, encryption)
         noteTask.cw = cw.value
@@ -212,6 +214,10 @@ class NoteEditorViewModel(
             }
         }
         address.postValue(list)
+    }
+
+    fun showPreviewFile(previewImage: FileNoteEditorData){
+        showPreviewFileEvent.event = previewImage
     }
 
 

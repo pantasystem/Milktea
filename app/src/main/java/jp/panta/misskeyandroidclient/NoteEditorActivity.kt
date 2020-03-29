@@ -108,6 +108,14 @@ class NoteEditorActivity : AppCompatActivity() {
             viewModel.showPollDatePicker.observe(this, Observer {
                 PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
             })
+            viewModel.showPreviewFileEvent.observe(this, Observer{ file ->
+                file.fileProperty?.let{ fp ->
+                    startActivity(MediaActivity.newIntent(this, fp))
+                }
+                file.uploadFile?.getUri()?.let{ uri ->
+                    startActivity(MediaActivity.newIntent(this, uri))
+                }
+            })
         })
 
         selectFileFromDrive.setOnClickListener {

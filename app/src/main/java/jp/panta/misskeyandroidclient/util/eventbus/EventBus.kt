@@ -28,7 +28,7 @@ class EventBus <T>(val limitMilliTime: Long = 500){
             //mObservers[observer] = wrapper
             val beforeObserver = mObservers[observer]
             mObservers[observer] = wrapper
-            if(beforeObserver == null){
+            if(beforeObserver != null){
                 lifecycleOwner.lifecycle.addObserver(wrapper)
             }
         }
@@ -36,9 +36,7 @@ class EventBus <T>(val limitMilliTime: Long = 500){
 
     fun removeObserver(observer: Observer<T>){
         val removed = mObservers[observer]
-        if(removed != null){
-            removed.onStateChanged(removed.lifecycleOwner, Lifecycle.Event.ON_DESTROY)
-        }
+        removed?.onStateChanged(removed.lifecycleOwner, Lifecycle.Event.ON_DESTROY)
     }
 
     /*fun postEvent(e: T?){
