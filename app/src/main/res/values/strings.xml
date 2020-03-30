@@ -136,6 +136,7 @@
     <string name="user_name">ユーザー名</string>
     <string name="password">パスワード</string>
     <string name="sign_out">ログアウト</string>
+    <string name="token">トークン</string>
 
     <string name="add_app">アプリを追加する</string>
     <string name="selected_account">選択中のアカウント</string>

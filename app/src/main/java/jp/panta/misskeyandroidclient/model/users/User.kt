@@ -28,7 +28,7 @@ data class User(
     @SerializedName("pinnedNoteIds") val pinnedNoteIds: List<String>?,
     @SerializedName("pinnedNotes") val pinnedNotes: List<Note>?,
     //("twitter") val twitter: Any?,
-    //erty("twoFactorEnabled") val twoFactorEnabled: Any?,
+    val twoFactorEnabled: Boolean,
     @SerializedName("isAdmin") val isAdmin: Boolean,
     @SerializedName("avatarUrl") val avatarUrl: String?,
     @SerializedName("bannerUrl") val bannerUrl: String?,

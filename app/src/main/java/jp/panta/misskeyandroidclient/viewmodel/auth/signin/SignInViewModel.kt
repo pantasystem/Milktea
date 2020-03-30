@@ -11,6 +11,8 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.meta.RequestMeta
+import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +43,9 @@ class SignInViewModel(
     val userName = MutableLiveData<String>()
     val password = MutableLiveData<String>()
 
+    val user = MediatorLiveData<User>()
+    val token = MutableLiveData<String>()
+
     val isValidDomain = MutableLiveData<Boolean>(false)
 
     var misskeyAPI: MisskeyAPI? = null
@@ -52,6 +57,9 @@ class SignInViewModel(
     val isValidityOfAuth = MutableLiveData<Boolean>(false)
 
     //val me = MutableLiveData<User?>()
+    val isNeed2FA = Transformations.map(user){
+        it?.twoFactorEnabled == true
+    }
 
     init{
         instanceDomain.observeForever {
@@ -74,11 +82,29 @@ class SignInViewModel(
                 }
             })
         }
+
+        user.addSource(userName){
+            misskeyAPI?.showUser(RequestUser(
+                i = null,
+                userName = it,
+                userId = null
+            ))?.enqueue(object : Callback<User>{
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    user.postValue(response.body())
+                }
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    user.postValue(null)
+                }
+            })
+        }
     }
 
     fun signIn(){
         val un = userName.value
         val pw = password.value
+        val isNeedToken = isNeed2FA.value
+        val token = token.value
+
         val domain = "https://" + (instanceDomain.value?: return)
         if(un == null || pw == null)
             return
@@ -86,7 +112,13 @@ class SignInViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val i = misskeyAPI?.signIn(SignIn(
                 username = un,
-                password = pw)
+                password = pw,
+                token = if(isNeedToken == true){
+                        token
+                    }else{
+                        null
+                    }
+                )
             )?.execute()?.body()
             isValidityOfAuth.postValue(i != null)
 

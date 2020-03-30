@@ -7,6 +7,7 @@
         <variable
                 name="viewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.auth.signin.SignInViewModel" />
+        <import type="android.view.View" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -90,6 +91,21 @@
                             android:hint="@string/password"
                             android:inputType="textPassword"
                             android:text="@={viewModel.password}"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="16dp"
+                        android:visibility="@{SafeUnbox.unboxBool(viewModel.isNeed2FA()) ? View.VISIBLE : View.GONE }">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputToken"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/token"
+                            android:inputType="textEmailAddress"
+                            android:text="@={viewModel.token}"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
