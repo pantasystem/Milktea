@@ -60,11 +60,13 @@ class SignInActivity : AppCompatActivity() {
         })
 
         viewModel.connectionInformation.observe(this, Observer {
-
+            miApplication.currentAccount.observe(this, Observer {
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            })
             miApplication.putConnectionInfo(it.first, it.second)
 
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+
         })
 
     }
