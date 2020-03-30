@@ -69,7 +69,7 @@ class SearchResultActivity : AppCompatActivity() {
 
         (application as MiCore).currentAccount.observe(this, Observer { ar ->
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel)
+            ActionNoteHandler(this, notesViewModel).initViewModelListener()
             mAccountRelation = ar
             invalidateOptionsMenu()
         })
