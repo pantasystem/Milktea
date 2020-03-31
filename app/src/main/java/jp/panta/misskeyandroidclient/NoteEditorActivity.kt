@@ -72,33 +72,6 @@ class NoteEditorActivity : AppCompatActivity() {
             binding.inputMain.setAdapter(adapter)
             val tokenizer = CustomEmojiTokenizer()
             binding.inputMain.setTokenizer(tokenizer)
-            /*binding.inputMain.setOnItemClickListener { _, _, i, _ ->
-                val emoji = adapter.suggestions[i]
-                val start = tokenizer.start?: return@setOnItemClickListener
-                val constraint = adapter.constraint?: return@setOnItemClickListener
-
-                val text = mViewModel?.text?.value?: return@setOnItemClickListener
-                binding.inputMain.setText(
-                    text.replaceRange(start - 1, start + constraint.length - 2, emoji)
-                )
-
-
-                Log.d("NoteEditorActivity", "入力補完クリック: emoji:$emoji")
-            }*/
-            /*binding.inputMain.addTextChangedListener(object : TextWatcher{
-                override fun afterTextChanged(p0: Editable?) {
-                    Log.d("TextWatcher", "afterTextChanged: $p0")
-                }
-
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    Log.d("TextWatcher", "beforeTextChanged text:$p0, start:$p1, count:$p2, after$p3")
-                }
-
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    Log.d("TextWatcher", "onTextChanged text:$p0, start:$p1, before:$p2, count:$p3")
-                }
-            })*/
-
 
         }
 
