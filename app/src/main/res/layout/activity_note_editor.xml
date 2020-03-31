@@ -105,8 +105,8 @@
                             android:visibility="@{SafeUnbox.unboxBool(viewModel.hasCw) ? View.VISIBLE : View.GONE}"
                             android:importantForAutofill="no" />
 
-                    <EditText
-                            android:id="@+id/editText2"
+                    <MultiAutoCompleteTextView
+                            android:id="@+id/inputMain"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ems="10"
@@ -117,7 +117,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar"
-                            android:importantForAutofill="no" />
+                            />
 
                     <FrameLayout
                             android:id="@+id/edit_poll"

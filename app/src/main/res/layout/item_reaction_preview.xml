@@ -18,7 +18,6 @@
             app:reactionImageView="@{reactionImagePreview}"
             app:reactionStringView="@{reactionStringPreview}"
             app:reaction="@{reaction}"
-            android:onClick="@{ ()-> notesViewModel.postReaction(reaction) }"
             android:background="?attr/colorSurface"
             >
 

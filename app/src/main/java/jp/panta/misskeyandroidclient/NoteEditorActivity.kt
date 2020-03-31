@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -62,6 +64,44 @@ class NoteEditorActivity : AppCompatActivity() {
         binding.addressUsersView.layoutManager = flexBoxLayoutManager
 
         val miApplication = applicationContext as MiApplication
+
+        miApplication.getCurrentInstanceMeta()?.emojis?.map{
+            ":${it.name}:"
+        }?.let{ emojis ->
+            val adapter = CustomEmojiCompleteAdapter(emojis, this)
+            binding.inputMain.setAdapter(adapter)
+            val tokenizer = CustomEmojiTokenizer()
+            binding.inputMain.setTokenizer(tokenizer)
+            /*binding.inputMain.setOnItemClickListener { _, _, i, _ ->
+                val emoji = adapter.suggestions[i]
+                val start = tokenizer.start?: return@setOnItemClickListener
+                val constraint = adapter.constraint?: return@setOnItemClickListener
+
+                val text = mViewModel?.text?.value?: return@setOnItemClickListener
+                binding.inputMain.setText(
+                    text.replaceRange(start - 1, start + constraint.length - 2, emoji)
+                )
+
+
+                Log.d("NoteEditorActivity", "入力補完クリック: emoji:$emoji")
+            }*/
+            /*binding.inputMain.addTextChangedListener(object : TextWatcher{
+                override fun afterTextChanged(p0: Editable?) {
+                    Log.d("TextWatcher", "afterTextChanged: $p0")
+                }
+
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    Log.d("TextWatcher", "beforeTextChanged text:$p0, start:$p1, count:$p2, after$p3")
+                }
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    Log.d("TextWatcher", "onTextChanged text:$p0, start:$p1, before:$p2, count:$p3")
+                }
+            })*/
+
+
+        }
+
         miApplication.currentAccount.observe(this, Observer {
             val factory = NoteEditorViewModelFactory(it, miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId)
             val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
