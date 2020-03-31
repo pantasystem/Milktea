@@ -63,6 +63,7 @@ class MiApplication : Application(), MiCore {
 
 
     var isSuccessCurrentAccount = MutableLiveData<Boolean>()
+    var connectionStatus = MutableLiveData<ConnectionStatus>()
 
     private lateinit var mEncryption: Encryption
 
@@ -235,21 +236,30 @@ class MiApplication : Application(), MiCore {
             current
                 ?: Log.e(this.javaClass.simpleName, "load account error")
             Log.d(this.javaClass.simpleName, "load account relation result : $current")
+            ConnectionStatus.ACCOUNT_ERROR
 
             isSuccessCurrentAccount.postValue(current?.getCurrentConnectionInformation() != null)
 
-            current?.let{
-                setCurrentUserId(it.account.id)
-                val ci = it.getCurrentConnectionInformation()
-                    ?:return
+            if(current == null){
+                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
+                return
+            }
 
-                loadInstanceMetaAndSetupAPI(ci)
-            }?: return
+            val i = current.getCurrentConnectionInformation()?.getI(getEncryption())
+            if(i == null){
+                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
+                return
+            }
 
-            // setting networks
+            val meta = loadInstanceMetaAndSetupAPI(current.getCurrentConnectionInformation()!!)
+
+            if(meta == null){
+                connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
+            }
 
             currentAccount.postValue(current)
             accounts.postValue(tmpAccounts)
+            connectionStatus.postValue(ConnectionStatus.SUCCESS)
 
             setUpMetaMap(tmpAccounts)
 

@@ -199,4 +199,5 @@
 
     <string name="select_file">ファイル選択</string>
 
+    <string name="network_error">接続できません</string>
 </resources>

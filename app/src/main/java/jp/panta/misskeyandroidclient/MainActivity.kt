@@ -10,6 +10,7 @@ import android.util.Log
 
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -24,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
@@ -103,15 +105,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
 
-        miApplication.isSuccessCurrentAccount.observe(this, Observer {
-            if(!it){
-                if(SecretConstant.getInstances().isEmpty()){
-                    startActivity(Intent(this, SignInActivity::class.java))
-                }else{
-                    startActivity(Intent(this, AuthActivity::class.java))
-                }
+        miApplication.connectionStatus.observe(this, Observer{ status ->
+            when(status){
+                ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
+                ConnectionStatus.ACCOUNT_ERROR ->{
+                    if(SecretConstant.getInstances().isEmpty()){
+                        startActivity(Intent(this, SignInActivity::class.java))
+                    }else{
+                        startActivity(Intent(this, AuthActivity::class.java))
+                    }
 
-                finish()
+                    finish()
+                }
+                ConnectionStatus.NETWORK_ERROR ->{
+                    Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()
+                }
+                else -> Log.d("MainActivity", "not initialized")
             }
         })
 
