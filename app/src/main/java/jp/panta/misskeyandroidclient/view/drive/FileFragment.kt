@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
@@ -80,7 +81,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
                 refresh.isRefreshing = isRefreshing
             })
 
-            val adapter = FileListAdapter(fileDiffUtilCallback, viewModel,viewLifecycleOwner)
+            val adapter = FileListAdapter(fileDiffUtilCallback, viewModel,driveViewModel, viewLifecycleOwner)
             files_view.adapter = adapter
 
             viewModel.filesLiveData.observe(viewLifecycleOwner, Observer {files ->
@@ -97,6 +98,15 @@ class FileFragment : Fragment(R.layout.fragment_file){
         files_view.addOnScrollListener(mScrollListener)
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val a = activity
+        if(a is DriveActivity){
+            a.setCurrentFragment(DriveActivity.Type.FILE)
+        }
+
+    }
     private val fileDiffUtilCallback = object : DiffUtil.ItemCallback<FileViewData>(){
         override fun areContentsTheSame(oldItem: FileViewData, newItem: FileViewData): Boolean {
             return oldItem == newItem

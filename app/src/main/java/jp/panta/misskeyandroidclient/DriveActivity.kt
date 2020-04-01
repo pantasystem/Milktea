@@ -25,9 +25,14 @@ class DriveActivity : AppCompatActivity() {
         const val EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
         const val EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE = "jp.panta.misskeyandroiclient.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE"
     }
+    enum class Type{
+        FOLDER, FILE
+    }
 
     private var mViewModel: DriveViewModel? = null
     private var mMenuOpen: MenuItem? = null
+
+    private var mCurrentFragmentType: Type = Type.FOLDER
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,12 +75,24 @@ class DriveActivity : AppCompatActivity() {
                 supportActionBar?.title = "選択済み ${selected.size}/${maxSize}"
                 mMenuOpen?.isEnabled = selected.isNotEmpty() && selected.size <= maxSize
             })
+
+            viewModel.openFileEvent.observe(this, Observer {
+                // TODO ファイルの詳細を開く
+            })
         })
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()
             ft.add(R.id.content_main, DriveFragment())
             ft.commit()
+        }
+
+        addItemButton.setOnClickListener {
+            if(mCurrentFragmentType == Type.FILE){
+                // TODO ファイル追加用の画面を開く
+            }else{
+                // TODO フォルダ追加用の画面を開く
+            }
         }
     }
 
@@ -131,5 +148,10 @@ class DriveActivity : AppCompatActivity() {
             return oldItem.id == newItem.id
 
         }
+    }
+
+    fun setCurrentFragment(type: Type){
+        mCurrentFragmentType = type
+        Log.d("DriveActivity", "currentFragmentType:$type")
     }
 }

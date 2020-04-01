@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
@@ -74,6 +75,14 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val ac = activity
+        if(ac is DriveActivity){
+            ac.setCurrentFragment(DriveActivity.Type.FOLDER)
+        }
+    }
     private val diffUtilItemCallback = object : DiffUtil.ItemCallback<FolderViewData>(){
         override fun areContentsTheSame(oldItem: FolderViewData, newItem: FolderViewData): Boolean {
             return oldItem == newItem

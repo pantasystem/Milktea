@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
 import java.util.*
@@ -16,6 +17,7 @@ class DriveViewModel(
 
     val hierarchyDirectory = MutableLiveData<List<Directory>>()
 
+    val openFileEvent = EventBus<FileProperty>()
     //val selectedFilesMap = HashMap<String, FileViewData>()
     val selectedFilesMapLiveData = if(selectableMaxSize > -1){
         MutableLiveData<Map<String, FileViewData>>()
@@ -89,6 +91,10 @@ class DriveViewModel(
         val newDirs = dirs.subList(0, index + 1)
         currentDirectory.postValue(current)
         hierarchyDirectory.postValue(newDirs)
+    }
+
+    fun openFile(fileProperty: FileProperty){
+        openFileEvent.event = fileProperty
     }
 
 

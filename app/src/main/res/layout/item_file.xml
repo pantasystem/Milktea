@@ -11,6 +11,9 @@
         <variable
                 name="fileViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel" />
+        <variable
+                name="driveViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel" />
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
@@ -42,6 +45,7 @@
                         app:fileThumbnailMain="@{thumbnailMain}"
                         app:fileThumbnailMask="@{thumbnailMask}"
                         app:thumbnailFileViewData="@{fileViewData}"
+                        android:onClick="@{()-> driveViewModel.openFile(fileViewData.file)}"
                         >
                     <ImageView
                             android:id="@+id/thumbnailMain"
