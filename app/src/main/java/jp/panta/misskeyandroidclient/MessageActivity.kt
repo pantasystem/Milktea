@@ -11,6 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.view.notes.editor.CustomEmojiCompleteAdapter
+import jp.panta.misskeyandroidclient.view.notes.editor.CustomEmojiTokenizer
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageFragment
 import kotlinx.android.synthetic.main.activity_message.*
@@ -66,6 +69,14 @@ class MessageActivity : AppCompatActivity() {
 
         binding.openDrive.setOnClickListener {
             openDriveActivity()
+        }
+
+        val miCore = application as MiCore
+        miCore.getCurrentInstanceMeta()?.emojis?.map{
+            ":${it.name}:"
+        }?.let{ emojis ->
+            binding.inputMessage.setTokenizer(CustomEmojiTokenizer())
+            binding.inputMessage.setAdapter(CustomEmojiCompleteAdapter(emojis, this))
         }
     }
 
