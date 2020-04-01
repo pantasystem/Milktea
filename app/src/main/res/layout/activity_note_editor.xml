@@ -94,7 +94,7 @@
                             android:drawableStart="@drawable/ic_add_black_24dp"
                             />
 
-                    <EditText
+                    <MultiAutoCompleteTextView
                             android:id="@+id/cw"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -103,7 +103,7 @@
                             android:text="@={viewModel.cw}"
                             android:hint="@string/cw_hint"
                             android:visibility="@{SafeUnbox.unboxBool(viewModel.hasCw) ? View.VISIBLE : View.GONE}"
-                            android:importantForAutofill="no" />
+                            />
 
                     <MultiAutoCompleteTextView
                             android:id="@+id/inputMain"

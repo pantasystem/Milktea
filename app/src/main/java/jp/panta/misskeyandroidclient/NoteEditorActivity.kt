@@ -68,11 +68,11 @@ class NoteEditorActivity : AppCompatActivity() {
         miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"
         }?.let{ emojis ->
-            val adapter = CustomEmojiCompleteAdapter(emojis, this)
-            binding.inputMain.setAdapter(adapter)
-            val tokenizer = CustomEmojiTokenizer()
-            binding.inputMain.setTokenizer(tokenizer)
+            binding.inputMain.setAdapter(CustomEmojiCompleteAdapter(emojis, this))
+            binding.inputMain.setTokenizer(CustomEmojiTokenizer())
 
+            binding.cw.setAdapter(CustomEmojiCompleteAdapter(emojis, this))
+            binding.cw.setTokenizer(CustomEmojiTokenizer())
         }
 
         miApplication.currentAccount.observe(this, Observer {
