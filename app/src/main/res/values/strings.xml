@@ -16,17 +16,17 @@
     <string name="search">Search</string>
     <string name="notification">Notification</string>
     <string name="message">Message</string>
-    <string name="start_auth">認証する</string>
-    <string name="selecting_instance">選択中のインスタンス</string>
-    <string name="welcome">ようこそ</string>
-    <string name="san">さん</string>
-    <string name="following">フォロー中</string>
-    <string name="follower">フォロワー</string>
-    <string name="renote">リノート</string>
-    <string name="quote_renote">引用リノート</string>
-    <string name="discovery">discovery</string>
-    <string name="renote_was">renoteしました</string>
-    <string name="input_custom_emoji">絵文字/カスタム絵文字を入力</string>
+    <string name="start_auth">Authenticate</string>
+    <string name="selecting_instance">Selected instance</string>
+    <string name="welcome">Welcome</string>
+    <string name="san">san</string>
+    <string name="following">Following</string>
+    <string name="follower">Follower</string>
+    <string name="renote">Renote</string>
+    <string name="quote_renote">Quote renote</string>
+    <string name="discovery">Discovery</string>
+    <string name="renote_was">Renote</string>
+    <string name="input_custom_emoji">Emoji / custom emoji</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->
@@ -43,163 +43,165 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="setting">設定</string>
-    <string name="nav_like">お気に入り</string>
-    <string name="nav_list">リスト</string>
-    <string name="nav_cloud">ドライブ</string>
-    <string name="nav_setting_tab">タブを設定</string>
-    <string name="add_search">検索を追加する</string>
-    <string name="save_setting">設定を保存する</string>
-    <string name="tab_selected">追加済み</string>
-    <string name="tab_selectable">以下から追加</string>
-    <string name="title_featured">ハイライト</string>
-    <string name="drive">ドライブ</string>
+    <string name="setting">Setting</string>
+    <string name="nav_like">Favorite</string>
+    <string name="nav_list">List</string>
+    <string name="nav_cloud">Drive</string>
+    <string name="nav_setting_tab">Set tab</string>
+    <string name="add_search">Add search</string>
+    <string name="save_setting">Save settings</string>
+    <string name="tab_selected">added</string>
+    <string name="tab_selectable">Add from below</string>
+    <string name="title_featured">Highlights</string>
+    <string name="drive">Drive</string>
 
     <string name="file">File</string>
     <string name="folder">Folder</string>
-    <string name="add_account">アカウントを追加</string>
-    <string name="post">投稿</string>
-    <string name="please_speak">お気持ちを表明してください</string>
-    <string name="open">開く</string>
-    <string name="multiple_answer">複数回答可能</string>
-    <string name="add_choice">解答を追加</string>
-    <string name="cw_hint">内容への注釈(オプション)</string>
-    <string name="show_reply">返信を表示する</string>
-    <string name="show_conversation">会話を表示する</string>
-    <string name="copy_url">URLをコピー</string>
-    <string name="copy_content">内容をコピー</string>
-    <string name="show_detail">詳細</string>
-    <string name="favorite">お気に入り</string>
-    <string name="remove_favorite">お気に入りを解除</string>
-    <string name="remove">削除</string>
+    <string name="add_account">Add account</string>
+    <string name="post">Post</string>
+    <string name="please_speak">Please express your feelings.</string>
+    <string name="open">Open</string>
+    <string name="multiple_answer">Multiple answers</string>
+    <string name="add_choice">Add answer</string>
+    <string name="cw_hint">Annotation of content(Option)</string>
+    <string name="show_reply">Show replies</string>
+    <string name="show_conversation">View conversation</string>
+    <string name="copy_url">Copy url</string>
+    <string name="copy_content">Copy content</string>
+    <string name="show_detail">detail</string>
+    <string name="favorite">favorite</string>
+    <string name="remove_favorite">Remove favorites</string>
+    <string name="remove">Remove</string>
 
-    <string name="pin">ピン</string>
-    <string name="media">メディア</string>
-    <string name="follow">フォロー</string>
+    <string name="pin">Pin</string>
+    <string name="media">Media</string>
+    <string name="follow">Follow</string>
 
-    <string name="include_local_renotes">ローカルの投稿のRenoteをタイムラインに表示する</string>
-    <string name="include_renoted_my_notes">自分の投稿のRenoteをタイムラインに表示する</string>
-    <string name="include_my_renotes">自分の行ったRenoteをタイムラインに表示する</string>
-    <string name="auto_load_timeline">タイムラインを自動で読み込む</string>
-    <string name="timeline">タイムライン</string>
+    <string name="include_local_renotes">Display local posts Renote on timeline</string>
+    <string name="include_renoted_my_notes">Display your post"'"s Renote on the timeline</string>
+    <string name="include_my_renotes">Display your Renote on the timeline</string>
+    <string name="auto_load_timeline">Load timeline automatically</string>
+    <string name="timeline">Timeline</string>
 
-    <string name="capture_note_when_stopped">停止時もノートをキャプチャーする</string>
-    <string name="auto_load_when_stopped">停止時もタイムラインを自動で読み込む</string>
-    <string name="sync">同期</string>
+    <string name="capture_note_when_stopped">Capture notes when stopped</string>
+    <string name="auto_load_when_stopped">Automatically read timeline even when stopped</string>
+    <string name="sync">Sync</string>
 
-    <string name="movement">動き</string>
-    <string name="remove_note">ノートを削除する</string>
+    <string name="movement">movement</string>
+    <string name="remove_note">Delete notes</string>
 
-    <string name="hide_removed_note">削除されたノートを非表示にする</string>
+    <string name="hide_removed_note">Hide deleted notes</string>
 
-    <string name="appearance">見た目</string>
-    <string name="theme">テーマ</string>
-    <string name="theme_white">ホワイト</string>
-    <string name="theme_black">ブラック</string>
-    <string name="theme_dark">ダーク</string>
-    <string name="theme_bread">パンケーキ</string>
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="theme_white">White</string>
+    <string name="theme_black">Black</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_bread">Pancake</string>
 
     <string name="title_activity_media">MediaActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
-    <string name="nsfw_message">回覧注意</string>
+    <string name="nsfw_message">Browsing attention</string>
 
-    <string name="thumbnail">サムネイル</string>
-    <string name="play_media">メディアを再生する</string>
+    <string name="thumbnail">Thumbnail</string>
+    <string name="play_media">Play</string>
     <string name="avataricon">avatarIcon</string>
     <string name="reaction">reaction</string>
-    <string name="followed_by">さんがフォローしました</string>
-    <string name="replied_by">さんが返信しました</string>
-    <string name="quoted_by">さんが引用しました</string>
-    <string name="voted_by">さんが投票しました</string>
+    <string name="followed_by">followed</string>
+    <string name="replied_by">replied</string>
+    <string name="quoted_by">quoted</string>
+    <string name="voted_by">poll voted</string>
     <string name="request_follow">さんがフォローリクエストしてます</string>
     <string name="mention_by">さんがメンションしました</string>
-    <string name="reacted_by">さんがリアクションをしました</string>
-    <string name="renoted_by">さんがリノートしました</string>
+    <string name="reacted_by">reacted</string>
+    <string name="renoted_by">renoted</string>
 
-    <string name="input_message">相手に思いを伝えてください</string>
+    <string name="input_message">Tell the other person what you think</string>
 
     <string name="manifest_user_name_pattern">"@"\w([\w-]*\w)?(?:@[\w.\-]+\w)?</string>
-    <string name="followee_state">フォローされています</string>
-    <string name="mute">ミュート</string>
-    <string name="block">ブロック</string>
-    <string name="unmute">ミュートを解除</string>
-    <string name="unblock">ブロックを解除</string>
+    <string name="followee_state">Followed</string>
+    <string name="mute">Mute</string>
+    <string name="block">Block</string>
+    <string name="unmute">Unmute</string>
+    <string name="unblock">Unblock</string>
 
-    <string name="add_to_tab">タブに追加する</string>
+    <string name="add_to_tab">Add to tab</string>
 
-    <string name="detail">詳細</string>
+    <string name="detail">Detail</string>
 
-    <string name="instance_domain">インスタンスドメイン</string>
-    <string name="sign_in">ログイン</string>
-    <string name="user_name">ユーザー名</string>
-    <string name="password">パスワード</string>
-    <string name="sign_out">ログアウト</string>
-    <string name="token">トークン</string>
+    <string name="instance_domain">Instance domain</string>
+    <string name="sign_in">Login</string>
+    <string name="user_name">User name</string>
+    <string name="password">Password</string>
+    <string name="sign_out">Logout</string>
+    <string name="token">Token</string>
 
-    <string name="add_app">アプリを追加する</string>
-    <string name="selected_account">選択中のアカウント</string>
-    <string name="selected_app">選択中のアプリ</string>
-    <string name="custom_app">カスタムアプリ</string>
+    <string name="add_app">Add app</string>
+    <string name="selected_account">Selected account</string>
+    <string name="selected_app">Selected app</string>
+    <string name="custom_app">Custom app</string>
 
-    <string name="custom_app_name">アプリケーション名</string>
-    <string name="custom_app_description">アプリケーションの概要</string>
+    <string name="custom_app_name">App name</string>
+    <string name="custom_app_description">Application overview</string>
 
-    <string name="your_app_name">あなたのアプリの名前</string>
-    <string name="description_of_app_description">認証時に表示されます</string>
-    <string name="create">作成</string>
+    <string name="your_app_name">custom app name</string>
+    <string name="description_of_app_description">Displayed during authentication</string>
+    <string name="create">Create</string>
 
-    <string name="auth_failed">認証に失敗しました</string>
-    <string name="expired">有効期限切れです</string>
+    <string name="auth_failed">Failed</string>
+    <string name="expired">Expired</string>
 
-    <string name="auth_required">認証が必要です</string>
-    <string name="invalid_url">無効なURLです</string>
-    <string name="invalid_pw_id">無効なパスワード・ID</string>
+    <string name="auth_required">Authentication required</string>
+    <string name="invalid_url">Invalid URL</string>
+    <string name="invalid_pw_id">Invalid password / ID</string>
 
-    <string name="auth">認証</string>
+    <string name="auth">Authentication</string>
 
-    <string name="often_use">よく使う</string>
-    <string name="all">全て</string>
+    <string name="often_use">Often use</string>
+    <string name="all">All</string>
 
-    <string name="visibility_public">公開</string>
-    <string name="visibility_home">ホーム</string>
-    <string name="visibility_follower">フォロワー</string>
-    <string name="visibility_specified">ダイレクト</string>
-    <string name="visibility_public_local_only">公開(ローカルのみ)</string>
-    <string name="visibility_home_local_only">ホーム(ローカルのみ)</string>
-    <string name="visibility_follower_local_only">フォロワー(ローカルのみ)</string>
+    <string name="visibility_public">Public</string>
+    <string name="visibility_home">Home</string>
+    <string name="visibility_follower">Follower</string>
+    <string name="visibility_specified">Direct</string>
+    <string name="visibility_public_local_only">Public(local only)</string>
+    <string name="visibility_home_local_only">Home(local only)</string>
+    <string name="visibility_follower_local_only">Follower(local only)</string>
 
-    <string name="show">表示</string>
-    <string name="user_list">ユーザー一覧</string>
-    <string name="update_user_list">リストを編集する</string>
-    <string name="add_user">ユーザーを加える</string>
-    <string name="list_name">リスト名</string>
-    <string name="create_user_list">リストを作成する</string>
+    <string name="show">Show</string>
+    <string name="user_list">User list</string>
+    <string name="update_user_list">Edit list</string>
+    <string name="add_user">Add user</string>
+    <string name="list_name">List name</string>
+    <string name="create_user_list">Create list</string>
     <string name="at_mark">\@</string>
 
-    <string name="host">ホスト</string>
-    <string name="select_user">ユーザー選択</string>
-    <string name="selecting_users">選択中のユーザー</string>
+    <string name="host">Host</string>
+    <string name="select_user">Select user</string>
+    <string name="selecting_users">selecting user</string>
     <string name="https">https://</string>
-    <string name="conversation">会話</string>
-    <string name="add_address">宛先を追加</string>
+    <string name="conversation">Conversation</string>
+    <string name="add_address">Add address</string>
 
-    <string name="indefinite_period">無期限</string>
-    <string name="date_and_time_specification">日時指定</string>
+    <string name="indefinite_period">Indefinite period</string>
+    <string name="date_and_time_specification">Date and time specification</string>
 
-    <string name="future">未来</string>
-    <string name="now">今</string>
-    <string name="year_ago">年前</string>
-    <string name="month_ago">ヶ月前</string>
-    <string name="date_ago">日前</string>
-    <string name="hour_ago">時間前</string>
-    <string name="minute_ago">分前</string>
-    <string name="second_ago">秒前</string>
+    <string name="future">Future</string>
+    <string name="now">Now</string>
+    <string name="year_ago">Year</string>
+    <string name="month_ago">Month</string>
+    <string name="date_ago">Day</string>
+    <string name="hour_ago">Time</string>
+    <string name="minute_ago">Minute</string>
+    <string name="second_ago">Second</string>
 
-    <string name="select_file">ファイル選択</string>
+    <string name="select_file">Select file</string>
 
-    <string name="network_error">接続できません</string>
+    <string name="network_error">Network error</string>
 
-    <string name="folder_name">フォルダ名</string>
+    <string name="folder_name">Folder name</string>
+    <string name="selected">Selected</string>
+
 </resources>

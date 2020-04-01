@@ -85,7 +85,7 @@ class DriveActivity : AppCompatActivity() {
             })
 
             driveViewModel.selectedFilesMapLiveData?.observe(this, Observer{ selected ->
-                supportActionBar?.title = "選択済み ${selected.size}/${maxSize}"
+                supportActionBar?.title = "${getString(R.string.selected)} ${selected.size}/${maxSize}"
                 mMenuOpen?.isEnabled = selected.isNotEmpty() && selected.size <= maxSize
             })
 
