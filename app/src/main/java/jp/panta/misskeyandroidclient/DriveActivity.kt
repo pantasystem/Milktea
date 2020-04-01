@@ -86,7 +86,7 @@ class DriveActivity : AppCompatActivity() {
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
         //openMenu?.isCheckable = true
         //openMenu?.isEnabled = false
-        openMenu?.isVisible = maxSize > -1
+        openMenu?.isVisible = maxSize > 0
 
         return super.onCreateOptionsMenu(menu)
     }
