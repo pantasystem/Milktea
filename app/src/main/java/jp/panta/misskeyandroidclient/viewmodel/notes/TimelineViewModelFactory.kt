@@ -15,16 +15,13 @@ class TimelineViewModelFactory(
     private val requestSetting: NoteRequest.Setting,
     private val miApplication: MiApplication,
     private val settingStore: SettingStore
-    //private val noteCapture: NoteCapture,
-    //private val timelineCapture: TimelineCapture?
 ) : ViewModelProvider.Factory{
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == TimelineViewModel::class.java){
 
-            val misskeyAPI = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
 
-            return TimelineViewModel(accountRelation, requestSetting, misskeyAPI, settingStore, miApplication.getEncryption()) as T
+            return TimelineViewModel(accountRelation, requestSetting, miApplication, settingStore, miApplication.getEncryption()) as T
 
         }
 

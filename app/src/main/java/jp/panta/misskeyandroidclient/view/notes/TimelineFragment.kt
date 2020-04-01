@@ -78,8 +78,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 val notesViewModelFactory = NotesViewModelFactory(accountRelation, miApplication)
                 mNotesViewModel = ViewModelProvider(activity!!, notesViewModelFactory).get(NotesViewModel::class.java)
                 mNotesViewModel?.accountRelation = accountRelation
-                mNotesViewModel?.misskeyAPI = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
-
 
             }
 

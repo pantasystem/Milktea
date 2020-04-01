@@ -62,7 +62,7 @@ class MiApplication : Application(), MiCore {
     override val currentAccount = MutableLiveData<AccountRelation>()
 
 
-    var isSuccessCurrentAccount = MutableLiveData<Boolean>()
+    //var isSuccessCurrentAccount = MutableLiveData<Boolean>()
     var connectionStatus = MutableLiveData<ConnectionStatus>()
 
     private lateinit var mEncryption: Encryption
@@ -100,7 +100,7 @@ class MiApplication : Application(), MiCore {
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "load account error", e)
-                isSuccessCurrentAccount.postValue(false)
+                //isSuccessCurrentAccount.postValue(false)
             }
         }
     }
@@ -238,7 +238,7 @@ class MiApplication : Application(), MiCore {
             Log.d(this.javaClass.simpleName, "load account relation result : $current")
             ConnectionStatus.ACCOUNT_ERROR
 
-            isSuccessCurrentAccount.postValue(current?.getCurrentConnectionInformation() != null)
+            //isSuccessCurrentAccount.postValue(current?.getCurrentConnectionInformation() != null)
 
             if(current == null){
                 connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
@@ -264,8 +264,8 @@ class MiApplication : Application(), MiCore {
             setUpMetaMap(tmpAccounts)
 
         }catch(e: Exception){
-            isSuccessCurrentAccount.postValue(false)
-            Log.e(TAG, "load and initialize error", e)
+            //isSuccessCurrentAccount.postValue(false)
+            Log.e(TAG, "初期読み込みに失敗しまちた", e)
         }
     }
 
@@ -291,28 +291,47 @@ class MiApplication : Application(), MiCore {
 
 
     private fun loadInstanceMetaAndSetupAPI(connectionInformation: EncryptedConnectionInformation): Meta?{
-        val meta = synchronized(mMisskeyAPIUrlMap){
-            mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl]
-        } ?: MisskeyGetMeta.getMeta(connectionInformation.instanceBaseUrl).execute().body()
+        try{
+            val meta = synchronized(mMisskeyAPIUrlMap){
+                try{
+                    mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl]
+                }catch(e: Exception){
+                    Log.d(TAG, "metaマップからの取得に失敗したでち")
+                    null
+                }
+            } ?: try{
+                MisskeyGetMeta.getMeta(connectionInformation.instanceBaseUrl).execute().body()
+            }catch(e: Exception){
+                Log.d(TAG, "metaをオンラインから取得するのに失敗したでち")
+                connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
 
-
-        Log.d(TAG, "load meta result ${meta?.let{"成功"}?: "失敗"} ")
-
-        meta?: return null
-
-        synchronized(mMetaInstanceUrlMap){
-            mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = meta
-        }
-        synchronized(mMisskeyAPIUrlMap){
-            val versionAndApi = mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl]
-            if(versionAndApi?.first != meta.getVersion()){
-                val newApi = MisskeyAPIServiceBuilder.build(connectionInformation.instanceBaseUrl, meta.getVersion())
-                mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl] = Pair(meta.getVersion(), newApi)
+                null
             }
+
+
+            Log.d(TAG, "load meta result ${meta?.let{"成功"}?: "失敗"} ")
+
+            meta?: return null
+
+            synchronized(mMetaInstanceUrlMap){
+                mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = meta
+            }
+            synchronized(mMisskeyAPIUrlMap){
+                val versionAndApi = mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl]
+                if(versionAndApi?.first != meta.getVersion()){
+                    val newApi = MisskeyAPIServiceBuilder.build(connectionInformation.instanceBaseUrl, meta.getVersion())
+                    mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl] = Pair(meta.getVersion(), newApi)
+                }
+            }
+            return meta
+
+        }catch(e: Exception){
+            Log.e(TAG, "metaの読み込み一連処理に失敗したでち", e)
+            connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
+            return null
         }
 
 
-        return meta
     }
 
     override fun getMisskeyAPI(ci: EncryptedConnectionInformation): MisskeyAPI{

@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotePagedStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Response
@@ -13,11 +14,11 @@ import retrofit2.Response
 class FavoriteNotePagingStore(
     override val accountRelation: AccountRelation,
     override val timelineRequestBase: NoteRequest.Setting,
-    misskeyAPI: MisskeyAPI,
+    miCore: MiCore,
     private val encryption: Encryption
 ) : NotePagedStore{
 
-    val favorites = misskeyAPI::favorites
+    val favorites = miCore.getMisskeyAPI(accountRelation)!!::favorites
 
     private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 

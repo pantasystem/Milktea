@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
@@ -27,13 +28,12 @@ import java.io.File
 
 class NotesViewModel(
     var accountRelation: AccountRelation,
-    api: MisskeyAPI,
-    private val encryption: Encryption,
+    val miCore: MiCore,
     private val reactionHistoryDao: ReactionHistoryDao
 ) : ViewModel(){
     private val TAG = "NotesViewModel"
     //var accountRelation.getCurrentConnectionInformation()? = ci
-    var misskeyAPI = api
+    val encryption = miCore.getEncryption()
 
     val statusMessage = EventBus<String>()
 
@@ -90,7 +90,7 @@ class NotesViewModel(
         val renoteId = reNoteTarget.event?.toShowNote?.id
         if(renoteId != null){
             val request = CreateNote(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, text = null, renoteId = renoteId)
-            misskeyAPI.create(request).enqueue(object : Callback<CreateNote.Response>{
+            miCore.getMisskeyAPI(accountRelation)?.create(request)?.enqueue(object : Callback<CreateNote.Response>{
                 override fun onResponse(
                     call: Call<CreateNote.Response>,
                     response: Response<CreateNote.Response>
@@ -157,12 +157,12 @@ class NotesViewModel(
                 if(reaction == myReaction){
                     return@launch
                 }
-                val res = misskeyAPI.createReaction(CreateReaction(
+                val res = miCore.getMisskeyAPI(accountRelation)?.createReaction(CreateReaction(
                     i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                     reaction = reaction,
                     noteId = planeNoteViewData.toShowNote.id
-                )).execute()
-                if(res.code() in 200 until 300){
+                ))?.execute()
+                if(res?.code() in 200 until 300){
                     syncAddReactionHistory(reaction)
                 }
                 Log.d("NotesViewModel", "結果: $res")
@@ -179,10 +179,10 @@ class NotesViewModel(
      */
     private fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
         planeNoteViewData.myReaction.value?: return
-        misskeyAPI.deleteReaction(DeleteNote(
+        miCore.getMisskeyAPI(accountRelation)?.deleteReaction(DeleteNote(
             i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
             noteId = planeNoteViewData.toShowNote.id
-        )).execute()
+        ))?.execute()
     }
 
     private fun syncAddReactionHistory(reaction: String){
@@ -197,12 +197,12 @@ class NotesViewModel(
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event){
         note?: return
 
-        misskeyAPI.createFavorite(
+        miCore.getMisskeyAPI(accountRelation)?.createFavorite(
             NoteRequest(
                 i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 noteId = note.toShowNote.id
             )
-        ).enqueue(object : Callback<Unit>{
+        )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 Log.d(TAG, "お気に入りに追加しました")
                 statusMessage.event = "お気に入りに追加しました"
@@ -218,12 +218,12 @@ class NotesViewModel(
     fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event){
         note?: return
 
-        misskeyAPI.deleteFavorite(
+        miCore.getMisskeyAPI(accountRelation)?.deleteFavorite(
             NoteRequest(
                 i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 noteId = note.toShowNote.id
             )
-        ).enqueue(object : Callback<Unit>{
+        )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 Log.d(TAG, "お気に入りから削除しました")
                 statusMessage.event = "お気に入りから削除しました"
@@ -246,12 +246,12 @@ class NotesViewModel(
         }
     }
     fun removeNote(planeNoteViewData: PlaneNoteViewData){
-        misskeyAPI.delete(
+        miCore.getMisskeyAPI(accountRelation)?.delete(
             DeleteNote(
                 i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                 noteId = planeNoteViewData.toShowNote.id
             )
-        ).enqueue(object : Callback<Unit>{
+        )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 Log.d(TAG, "削除に成功しました")
                 if(response.code() == 204){
@@ -266,8 +266,8 @@ class NotesViewModel(
     }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
-        misskeyAPI.noteState(NoteRequest(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.id))
-            .enqueue(object : Callback<State>{
+        miCore.getMisskeyAPI(accountRelation)?.noteState(NoteRequest(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.id))
+            ?.enqueue(object : Callback<State>{
                 override fun onResponse(call: Call<State>, response: Response<State>) {
                     val nowNoteId = shareTarget.event?.toShowNote?.id
                     if(nowNoteId == planeNoteViewData.toShowNote.id){
@@ -288,13 +288,13 @@ class NotesViewModel(
 
     fun vote(poll: PollViewData, choice: PollViewData.Choice){
         if(SafeUnbox.unbox(poll.canVote.value)){
-            misskeyAPI.vote(
+            miCore.getMisskeyAPI(accountRelation)?.vote(
                 Vote(
                     i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
                     choice = choice.number,
                     noteId = poll.noteId
                 )
-            ).enqueue(object : Callback<Unit>{
+            )?.enqueue(object : Callback<Unit>{
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if(response.code() == 204){
                         Log.d(TAG, "投票に成功しました")

@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,7 +23,7 @@ import java.util.*
 class TimelineViewModel(
     val accountRelation: AccountRelation,
     val requestBaseSetting: NoteRequest.Setting,
-    misskeyAPI: MisskeyAPI,
+    miCore: MiCore,
     private val settingStore: SettingStore,
     encryption: Encryption
 ) : ViewModel(){
@@ -47,11 +48,11 @@ class TimelineViewModel(
     val position = MutableLiveData<Int>()
 
     private val notePagingStore = when(requestBaseSetting.type){
-        NoteType.FAVORITE -> FavoriteNotePagingStore(accountRelation, requestBaseSetting, misskeyAPI, encryption)
+        NoteType.FAVORITE -> FavoriteNotePagingStore(accountRelation, requestBaseSetting, miCore, encryption)
         else -> NoteTimelineStore(
             accountRelation,
             requestBaseSetting,
-            misskeyAPI,
+            miCore,
             encryption
         )
     }
