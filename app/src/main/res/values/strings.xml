@@ -200,4 +200,6 @@
     <string name="select_file">ファイル選択</string>
 
     <string name="network_error">接続できません</string>
+
+    <string name="folder_name">フォルダ名</string>
 </resources>

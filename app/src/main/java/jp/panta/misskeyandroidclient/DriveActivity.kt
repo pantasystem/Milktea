@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -20,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
+import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -104,7 +104,7 @@ class DriveActivity : AppCompatActivity() {
             if(mCurrentFragmentType == Type.FILE){
                 showFileManager()
             }else{
-                // TODO フォルダ追加用の画面を開く
+                createDirectoryDialog()
             }
         }
     }
@@ -140,6 +140,11 @@ class DriveActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun createDirectoryDialog(){
+
+        CreateFolderDialog().show(supportFragmentManager, "CreateFolder")
     }
 
     private fun showFileManager(){
