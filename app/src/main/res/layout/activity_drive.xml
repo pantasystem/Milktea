@@ -62,6 +62,7 @@
             android:focusable="true"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
+            android:tint="#FFFFFF"
             />
 
 

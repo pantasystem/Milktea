@@ -1,12 +1,18 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FileUploader
+import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class DriveViewModel(
@@ -95,6 +101,17 @@ class DriveViewModel(
 
     fun openFile(fileProperty: FileProperty){
         openFileEvent.event = fileProperty
+    }
+
+    fun uploadFile(uploadFile: UploadFile, fileUploader: FileUploader){
+        uploadFile.folderId = currentDirectory.value?.id
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                fileUploader.upload(uploadFile)
+            }catch(e: Exception){
+                Log.d("DriveViewModel", "ファイルアップロードに失敗した")
+            }
+        }
     }
 
 

@@ -1,18 +1,28 @@
 package jp.panta.misskeyandroidclient
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.drive.Directory
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
@@ -24,12 +34,15 @@ class DriveActivity : AppCompatActivity() {
         const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
         const val EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
         const val EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE = "jp.panta.misskeyandroiclient.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE"
+
+        private const val OPEN_DOCUMENT_RESULT_CODE = 113
+        private const val READ_STORAGE_PERMISSION_REQUEST_CODE = 112
     }
     enum class Type{
         FOLDER, FILE
     }
 
-    private var mViewModel: DriveViewModel? = null
+    private var mDriveViewModel: DriveViewModel? = null
     private var mMenuOpen: MenuItem? = null
 
     private var mCurrentFragmentType: Type = Type.FOLDER
@@ -58,25 +71,25 @@ class DriveActivity : AppCompatActivity() {
 
         val miApplication = applicationContext as MiApplication
         miApplication.currentAccount.observe(this, Observer {
-            val viewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
-            mViewModel = viewModel
+            val driveViewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
+            mDriveViewModel = driveViewModel
 
             if(selectedItem != null){
-                viewModel.setSelectedFileList(selectedItem)
+                driveViewModel.setSelectedFileList(selectedItem)
             }
-            val adapter = DirListAdapter(diffUtilItemCallback, viewModel)
+            val adapter = DirListAdapter(diffUtilItemCallback, driveViewModel)
             dirListView.adapter = adapter
-            viewModel.hierarchyDirectory.observe(this, Observer {dir ->
+            driveViewModel.hierarchyDirectory.observe(this, Observer { dir ->
                 Log.d("DriveActivity", "更新がありました: $dir")
                 adapter.submitList(dir)
             })
 
-            viewModel.selectedFilesMapLiveData?.observe(this, Observer{selected ->
+            driveViewModel.selectedFilesMapLiveData?.observe(this, Observer{ selected ->
                 supportActionBar?.title = "選択済み ${selected.size}/${maxSize}"
                 mMenuOpen?.isEnabled = selected.isNotEmpty() && selected.size <= maxSize
             })
 
-            viewModel.openFileEvent.observe(this, Observer {
+            driveViewModel.openFileEvent.observe(this, Observer {
                 // TODO ファイルの詳細を開く
             })
         })
@@ -89,7 +102,7 @@ class DriveActivity : AppCompatActivity() {
 
         addItemButton.setOnClickListener {
             if(mCurrentFragmentType == Type.FILE){
-                // TODO ファイル追加用の画面を開く
+                showFileManager()
             }else{
                 // TODO フォルダ追加用の画面を開く
             }
@@ -112,8 +125,8 @@ class DriveActivity : AppCompatActivity() {
         when(item?.itemId){
             android.R.id.home -> finish()
             R.id.action_open ->{
-                val ids = mViewModel?.getSelectedFileIds()
-                val files = mViewModel?.getSelectedFileList()
+                val ids = mDriveViewModel?.getSelectedFileIds()
+                val files = mDriveViewModel?.getSelectedFileList()
                 if(ids != null && files != null){
                     intent.putStringArrayListExtra(EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID, ArrayList(ids))
                     intent.putExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FileProperty>(files))
@@ -129,13 +142,60 @@ class DriveActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun showFileManager(){
+        if(checkPermissions()){
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.type = "*/*"
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            startActivityForResult(intent, OPEN_DOCUMENT_RESULT_CODE)
+        }else{
+            requestPermission()
+        }
+    }
+
+    private fun checkPermissions(): Boolean{
+        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        return permissionCheck == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermission(){
+        if(! checkPermissions()){
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                READ_STORAGE_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == OPEN_DOCUMENT_RESULT_CODE){
+            if(resultCode == RESULT_OK){
+                data?.data?.let{ uri ->
+                    uploadFile(uri)
+                }
+            }
+        }
+        if(requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE && resultCode == RESULT_OK){
+            showFileManager()
+        }
+    }
+
+    private fun uploadFile(uri: Uri){
+        val miCore = application as MiCore
+        miCore.currentAccount.value?.getCurrentConnectionInformation()?.let{ ci ->
+            val uploader = OkHttpDriveFileUploader(this, ci, GsonFactory.create(), miCore.getEncryption())
+            mDriveViewModel?.uploadFile(UploadFile(uri, true), uploader)
+        }
+
+    }
+
     override fun onBackPressed() {
-        val size = mViewModel?.hierarchyDirectory?.value?.size
+        val size = mDriveViewModel?.hierarchyDirectory?.value?.size
         if(size != null && size > 1){
-            mViewModel?.moveParentDirectory()
+            mDriveViewModel?.moveParentDirectory()
             return
         }
-        mViewModel
+        mDriveViewModel
         super.onBackPressed()
     }
 
