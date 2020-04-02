@@ -68,7 +68,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
 
             val factory  = FileViewModelFactory(it, miApplication, driveViewModel.selectedFilesMapLiveData, maxSelectableItemSize = driveViewModel.selectableMaxSize, folderId = folderId)
-            val viewModel  = ViewModelProvider(this, factory).get(FileViewModel::class.java)
+            val viewModel  = ViewModelProvider(activity, factory).get(FileViewModel::class.java)
 
 
 

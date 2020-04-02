@@ -26,6 +26,10 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.drive.Directory
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
 import kotlinx.android.synthetic.main.activity_drive.*
 
 class DriveActivity : AppCompatActivity() {
@@ -43,6 +47,9 @@ class DriveActivity : AppCompatActivity() {
     }
 
     private var mDriveViewModel: DriveViewModel? = null
+    private var mFileViewModel: FileViewModel? = null
+    private var mFolderViewModel: FolderViewModel? = null
+
     private var mMenuOpen: MenuItem? = null
 
     private var mCurrentFragmentType: Type = Type.FOLDER
@@ -73,6 +80,16 @@ class DriveActivity : AppCompatActivity() {
         miApplication.currentAccount.observe(this, Observer {
             val driveViewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
             mDriveViewModel = driveViewModel
+            mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
+                it,
+                miApplication,
+                driveViewModel.selectedFilesMapLiveData,
+                maxSelectableItemSize = driveViewModel.selectableMaxSize,
+                folderId = null)
+            )[FileViewModel::class.java]
+            mFolderViewModel = ViewModelProvider(this, FolderViewModelFactory(
+                it, miApplication, null
+            ))[FolderViewModel::class.java]
 
             if(selectedItem != null){
                 driveViewModel.setSelectedFileList(selectedItem)
@@ -189,7 +206,7 @@ class DriveActivity : AppCompatActivity() {
         val miCore = application as MiCore
         miCore.currentAccount.value?.getCurrentConnectionInformation()?.let{ ci ->
             val uploader = OkHttpDriveFileUploader(this, ci, GsonFactory.create(), miCore.getEncryption())
-            mDriveViewModel?.uploadFile(UploadFile(uri, true), uploader)
+            mFileViewModel?.uploadFile(UploadFile(uri, true), uploader)
         }
 
     }

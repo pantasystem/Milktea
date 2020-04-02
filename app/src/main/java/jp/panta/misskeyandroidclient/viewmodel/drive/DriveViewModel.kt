@@ -103,20 +103,5 @@ class DriveViewModel(
         openFileEvent.event = fileProperty
     }
 
-    fun uploadFile(uploadFile: UploadFile, fileUploader: FileUploader){
-        uploadFile.folderId = currentDirectory.value?.id
-        viewModelScope.launch(Dispatchers.IO) {
-            try{
-                fileUploader.upload(uploadFile)
-            }catch(e: Exception){
-                Log.d("DriveViewModel", "ファイルアップロードに失敗した")
-            }
-        }
-    }
-
-    fun createFolder(folderName: String){
-
-    }
-
 
 }

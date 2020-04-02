@@ -5,10 +5,7 @@ import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CreateApp
 import jp.panta.misskeyandroidclient.model.auth.custom.ShowApp
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.FolderProperty
-import jp.panta.misskeyandroidclient.model.drive.RequestFile
-import jp.panta.misskeyandroidclient.model.drive.RequestFolder
+import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.list.*
 import jp.panta.misskeyandroidclient.model.messaging.Message
@@ -166,6 +163,9 @@ interface MisskeyAPI {
 
     @POST("api/drive/folders")
     fun getFolders(@Body folderRequest: RequestFolder): Call<List<FolderProperty>>
+
+    @POST("api/drive/folders/create")
+    fun createFolder(@Body createFolder: CreateFolder): Call<Unit>
 
 
     //meta

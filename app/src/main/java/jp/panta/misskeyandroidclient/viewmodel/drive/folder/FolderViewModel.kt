@@ -1,10 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive.folder
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.drive.CreateFolder
 import jp.panta.misskeyandroidclient.model.drive.FolderProperty
 import jp.panta.misskeyandroidclient.model.drive.RequestFolder
 import retrofit2.Call
@@ -104,5 +106,28 @@ class FolderViewModel(
                 isLoading = false
             }
         })
+    }
+
+    fun createFolder(folderName: String){
+        if(folderName.isNotBlank()){
+            misskeyAPI.createFolder(CreateFolder(
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                name = folderName,
+                parentId = currentFolder.value
+            )).enqueue(object : Callback<Unit>{
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if(response.code() in 200 until 300){
+                        Log.d("FolderViewModel", "success create folder: $folderName")
+                    }else{
+                        Log.d("FolderViewModel", "failure create folder: $folderName")
+                    }
+                }
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    Log.e("FolderViewModel", "error create folder", t)
+                }
+            })
+        }
+
     }
 }

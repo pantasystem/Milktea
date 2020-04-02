@@ -4,11 +4,16 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.drive.RequestFile
+import jp.panta.misskeyandroidclient.model.drive.UploadFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -189,6 +194,18 @@ class FileViewModel(
             it.isEnabledSelect.postValue(true)
         }
     }
+
+    fun uploadFile(uploadFile: UploadFile, fileUploader: FileUploader){
+        uploadFile.folderId = currentFolder.value
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                fileUploader.upload(uploadFile)
+            }catch(e: Exception){
+                Log.d("DriveViewModel", "ファイルアップロードに失敗した")
+            }
+        }
+    }
+
 
 
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
@@ -9,7 +8,7 @@
             android:id="@+id/titleView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="フォルダを作成"
+            android:text="@string/create_folder"
             android:textSize="24sp"
             android:textColor="?android:attr/textColorPrimary"
             android:layout_marginBottom="8dp"
