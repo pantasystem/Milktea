@@ -113,8 +113,8 @@
     <string name="replied_by">replied</string>
     <string name="quoted_by">quoted</string>
     <string name="voted_by">poll voted</string>
-    <string name="request_follow">さんがフォローリクエストしてます</string>
-    <string name="mention_by">さんがメンションしました</string>
+    <string name="request_follow">following request</string>
+    <string name="mention_by">mentioned</string>
     <string name="reacted_by">reacted</string>
     <string name="renoted_by">renoted</string>
 
