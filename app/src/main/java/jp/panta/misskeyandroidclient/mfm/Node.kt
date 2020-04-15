@@ -5,7 +5,7 @@ class Node(
     val endTag: Tag,
     val parentNode: Node?
 
-) {
+): Element {
     /**
      * タグを除いた内側の文字列インデックス
      */
