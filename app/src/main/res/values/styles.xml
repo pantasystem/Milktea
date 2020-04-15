@@ -117,4 +117,5 @@
     <style name="ReactionTabStyle" parent="Widget.Design.TabLayout">
         <item name="android:textColor">?android:attr/textColor</item>
     </style>
+    <style name="LicensePageTheme" parent="Theme.AppCompat.Light.DarkActionBar"/>
 </resources>

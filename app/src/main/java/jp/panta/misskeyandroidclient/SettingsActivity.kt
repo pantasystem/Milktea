@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.view.settings.activities.SettingAppearanceActivity
 import jp.panta.misskeyandroidclient.view.settings.activities.SettingMovementActivity
@@ -52,10 +53,21 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, it))
         })
 
+        val licenseActivitySetting = MoveSettingActivityPanel(
+            titleStringRes = R.string.license,
+            activity = OssLicensesMenuActivity::class.java,
+            context = this
+        )
+        licenseActivitySetting.startActivityEventBus.observe(this, Observer {
+            val intent = Intent(this, it)
+            intent.putExtra("title", getString(R.string.license))
+            startActivity(intent)
+        })
+
         val group = Group(
             titleStringRes = null,
             context = this,
-            items = listOf(movementSetting, tabSetting, appearanceSetting)
+            items = listOf(movementSetting, tabSetting, appearanceSetting, licenseActivitySetting)
         )
 
         val adapter = SettingAdapter(this)

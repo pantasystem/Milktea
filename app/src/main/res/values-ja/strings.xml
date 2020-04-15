@@ -207,5 +207,7 @@
     <string name="more">さらに</string>
 
     <string name="delete_and_edit">削除して編集</string>
+    <string name="license">ライセンス</string>
+
 
 </resources>

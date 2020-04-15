@@ -16,6 +16,12 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity
+                android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+                android:theme="@style/LicensePageTheme" />
+        <activity
+                android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+                android:theme="@style/LicensePageTheme" />
         <activity android:name=".SearchAndSelectUserActivity"/>
         <activity android:name=".UserListDetailActivity" />
         <activity android:name=".ListListActivity" />
