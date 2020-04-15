@@ -117,7 +117,7 @@ object ReactionViewHelper {
         if(emoji == null){
             reactionImageTypeView.visibility = View.GONE
             reactionTextTypeView.visibility = View.VISIBLE
-            reactionTextTypeView.text = reaction
+            reactionTextTypeView.text = textReaction
         }else{
             reactionImageTypeView.visibility = View.VISIBLE
             reactionTextTypeView.visibility = View.GONE
