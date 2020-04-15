@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.NoteDetailActivity
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
@@ -89,6 +90,15 @@ class ActionNoteHandler(
         dialog.show(activity.supportFragmentManager, "")
     }
 
+    private val openNoteEditor = Observer<Note?>{ note ->
+        val intent = Intent(activity, NoteEditorActivity::class.java).apply{
+            if(note != null){
+                putExtra(NoteEditorActivity.EXTRA_NOTE, note)
+            }
+        }
+        activity.startActivity(intent)
+    }
+
     fun initViewModelListener(){
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
         mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
@@ -119,5 +129,8 @@ class ActionNoteHandler(
 
         mNotesViewModel.showInputReactionEvent.removeObserver(reactionInputObserver)
         mNotesViewModel.showInputReactionEvent.observe(activity, reactionInputObserver)
+
+        mNotesViewModel.openNoteEditor.removeObserver(openNoteEditor)
+        mNotesViewModel.openNoteEditor.observe(activity, openNoteEditor)
     }
 }

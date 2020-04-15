@@ -1,22 +1,23 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PollEditor {
-    val defaultChoices = listOf(
-        PollChoice(),
-        PollChoice()
-    )
-
+class PollEditor(val poll: Poll? = null) {
+    private val exChoices = poll?.choices?.map {
+        PollChoice(it)
+    } ?: listOf(
+            PollChoice(),
+            PollChoice()
+        )
     enum class DeadLineType{
         INDEFINITE_PERIOD,
         DATE_AND_TIME
     }
-    val choices = MutableLiveData<List<PollChoice>>(defaultChoices)
+    val choices = MutableLiveData<List<PollChoice>>(exChoices)
     val isMutable = MutableLiveData<Boolean>()
 
     val expiresAt = MutableLiveData<Date>()
@@ -62,4 +63,5 @@ class PollEditor {
         }
         return null
     }
+
 }

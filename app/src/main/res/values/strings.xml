@@ -206,4 +206,6 @@
     <string name="selected">Selected</string>
     <string name="more">More</string>
 
+    <string name="delete_and_edit">Delete and edit</string>
+
 </resources>

@@ -88,6 +88,13 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
             viewModel.removeNoteFromShareTarget()
             dismiss()
         }
+
+        dataBinding.deleteAndEditNoteButton.setOnClickListener {
+            note?.let{ n ->
+                viewModel.removeAndEditNote(n)
+            }
+            dismiss()
+        }
         return dialog
     }
 

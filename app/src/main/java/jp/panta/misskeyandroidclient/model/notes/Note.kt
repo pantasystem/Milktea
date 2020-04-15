@@ -24,9 +24,10 @@ data class Note(
 
     val viaMobile: Boolean?,
     val visibility: String?,
+    val localOnly: Boolean?,
 
-    @SerializedName("visibilityUserIds")
-    val visibilityUserIds: List<String?>?,
+    @SerializedName("visibleUserIds")
+    val visibleUserIds: List<String>?,
 
     val url: String?,
     val uri: String?,

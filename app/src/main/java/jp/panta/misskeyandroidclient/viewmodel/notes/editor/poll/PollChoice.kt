@@ -1,11 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll
 
 import androidx.lifecycle.MutableLiveData
+import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import java.util.*
 
-class PollChoice {
+class PollChoice(val choice: Poll.Choice? = null) {
     val id = UUID.randomUUID().toString()
-    var text = MutableLiveData<String>()
+    var text = MutableLiveData<String>(choice?.text)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
@@ -29,6 +30,7 @@ class NoteEditorActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
         const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
+        const val EXTRA_NOTE = "jp.panta.misskeyandroidclient.EXTRA_NOTE"
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
         const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
@@ -50,6 +52,8 @@ class NoteEditorActivity : AppCompatActivity() {
 
         val replyToNoteId: String? = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)
         val quoteToNoteId: String? = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)
+
+        val note: Note? = intent.getSerializableExtra(EXTRA_NOTE) as Note?
 
 
         binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -76,7 +80,7 @@ class NoteEditorActivity : AppCompatActivity() {
         }
 
         miApplication.currentAccount.observe(this, Observer {
-            val factory = NoteEditorViewModelFactory(it, miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId)
+            val factory = NoteEditorViewModelFactory(it, miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, note = note)
             val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
             mViewModel = viewModel
             binding.viewModel = viewModel

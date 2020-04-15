@@ -16,14 +16,14 @@ class PostNoteTask(
     //private val fileUploader: FileUploader
 ): Serializable{
 
-    enum class Visibility{
-        PUBLIC,
-        HOME,
-        FOLLOWERS,
-        SPECIFIED,
-        PUBLIC_LOCAL_ONLY,
-        HOME_LOCAL_ONLY,
-        FOLLOWERS_LOCAL_ONLY
+    enum class Visibility(val visibility: String, val isLocalOnly: Boolean){
+        PUBLIC("public", false),
+        HOME("home", false),
+        FOLLOWERS("followers", false),
+        SPECIFIED("specified", false),
+        PUBLIC_LOCAL_ONLY("public", true),
+        HOME_LOCAL_ONLY("home", true),
+        FOLLOWERS_LOCAL_ONLY("followers", true)
     }
 
     private val i: String = connectionInformation.getI(encryption)!!

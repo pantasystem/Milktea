@@ -6,20 +6,19 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.google.gson.GsonBuilder
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.meta.Meta
-import jp.panta.misskeyandroidclient.model.notes.CreateNote
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NoteEditorViewModel(
     private val accountRelation: AccountRelation,
@@ -27,20 +26,25 @@ class NoteEditorViewModel(
     meta: Meta,
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
-    private val encryption: Encryption
+    private val encryption: Encryption,
+    val note: Note? = null
 ) : ViewModel(){
 
 
 
-    val hasCw = MutableLiveData<Boolean>(false)
-    val cw = MutableLiveData<String>()
-    val text = MutableLiveData<String>("")
+    val hasCw = MutableLiveData<Boolean>(note?.cw != null)
+    val cw = MutableLiveData<String>(note?.cw)
+    val text = MutableLiveData<String>(note?.text)
     val maxTextLength = meta.maxNoteTextLength?: 1500
-    val textRemaining = Transformations.map(text){
-        maxTextLength - it.length
+    val textRemaining = Transformations.map(text){ t: String? ->
+        maxTextLength - (t?.length?: 0)
     }
 
-    val editorFiles = MediatorLiveData<List<FileNoteEditorData>>()
+    val editorFiles = MediatorLiveData<List<FileNoteEditorData>>().apply{
+        this.postValue(note?.files?.map{
+            FileNoteEditorData(it)
+        }?: emptyList())
+    }
 
     val totalImageCount = MediatorLiveData<Int>().apply{
 
@@ -66,17 +70,27 @@ class NoteEditorViewModel(
         }
     }
 
-    val visibility = MutableLiveData<PostNoteTask.Visibility>(PostNoteTask.Visibility.PUBLIC)
+    val visibility = MutableLiveData<PostNoteTask.Visibility>(PostNoteTask.Visibility.values().firstOrNull {
+        it.visibility == note?.visibility?.toLowerCase(Locale.US) && it.isLocalOnly == note.localOnly?: false
+    }?: PostNoteTask.Visibility.PUBLIC)
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
-    val address = MutableLiveData<List<UserViewData>>()
+    val address = MutableLiveData<List<UserViewData>>(
+        note?.visibleUserIds?.map{ userId ->
+            UserViewData(userId).apply{
+                setApi(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, misskeyAPI)
+            }
+        }
+    )
 
     val isSpecified = Transformations.map(visibility){
         it == PostNoteTask.Visibility.SPECIFIED
     }
 
-    val poll = MutableLiveData<PollEditor?>()
+    val poll = MutableLiveData<PollEditor?>(note?.poll?.let{
+        PollEditor(it)
+    })
 
     val noteTask = MutableLiveData<PostNoteTask>()
 

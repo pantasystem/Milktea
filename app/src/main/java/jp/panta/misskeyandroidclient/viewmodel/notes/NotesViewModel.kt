@@ -60,6 +60,8 @@ class NotesViewModel(
 
     val showInputReactionEvent = EventBus<Unit>()
 
+    val openNoteEditor = EventBus<Note?>()
+
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
         Log.d("NotesViewModel", "登録しました: $note")
@@ -261,6 +263,25 @@ class NotesViewModel(
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
                 Log.d(TAG, "削除に失敗しました")
+            }
+        })
+    }
+
+    fun removeAndEditNote(planeNoteViewData: PlaneNoteViewData){
+        miCore.getMisskeyAPI(accountRelation)?.delete(
+            DeleteNote(
+                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                noteId = planeNoteViewData.toShowNote.id
+            )
+        )?.enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if(response.code() in 200 until 300){
+                    openNoteEditor.event = planeNoteViewData.toShowNote
+                }
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e(TAG, "削除に失敗しました", t)
             }
         })
     }
