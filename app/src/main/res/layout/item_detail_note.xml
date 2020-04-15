@@ -344,7 +344,7 @@
                         android:padding="4dp"
                         android:scaleType="centerCrop"
                         android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
-                        android:contentDescription="@string/menu_share"
+                        android:contentDescription="@string/more"
                         />
             </LinearLayout>
         </RelativeLayout>
