@@ -331,7 +331,7 @@
                     />
             <ImageButton
                     android:layout_width="40dp"
-                    android:layout_height="40dp" app:srcCompat="@drawable/ic_menu_share"
+                    android:layout_height="40dp" app:srcCompat="@drawable/ic_more_horiz_black_24dp"
                     android:id="@+id/imageButton4"
                     style="?android:attr/borderlessButtonStyle"
                     android:tint="?attr/colorNoteActionButtonTint"
