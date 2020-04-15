@@ -23,9 +23,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="5dp"
-            app:reactionImageView="@{reactionImage}"
-            app:reactionStringView="@{reactionText}"
+            app:reactionImageTypeView="@{reactionImage}"
+            app:reactionTextTypeView="@{reactionText}"
             app:reaction="@{reaction.first}"
+            app:note="@{note}"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="4dp"
             tools:background="@drawable/shape_normal_reaction_backgruond"
@@ -38,8 +39,8 @@
             >
         <ImageView
                 android:id="@+id/reactionImage"
-                android:layout_width="21dp"
-                android:layout_height="21dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginEnd="4dp"
                 tools:ignore="ContentDescription" />
         <TextView

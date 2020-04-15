@@ -2,31 +2,21 @@ package jp.panta.misskeyandroidclient.view.notes.reaction
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.PictureDrawable
-import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.request.RequestOptions
-import com.caverock.androidsvg.SVG
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.emoji.ConstantEmoji
-import jp.panta.misskeyandroidclient.util.svg.SvgDecoder
-import jp.panta.misskeyandroidclient.util.svg.SvgDrawableTranscoder
-import jp.panta.misskeyandroidclient.util.svg.SvgSoftwareLayerSetter
-import kotlinx.android.synthetic.main.item_reaction.view.*
-import  com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
-import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionViewHelper.setReaction
+import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
+import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
 object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")
@@ -41,6 +31,14 @@ object ReactionViewHelper {
     fun FrameLayout.setReaction(reactionImageView: ImageView, reactionStringView: TextView, reaction: String){
         setReaction(this.context, reactionImageView, reactionStringView, reaction)
     }
+
+    /*private var emojiHandler: Handler? = null
+    private val emojiThread = Thread{
+        Looper.prepare()
+        emojiHandler = Handler()
+
+        Looper.loop()
+    }.run()*/
 
     fun setReaction(context: Context, reactionImageView: ImageView, reactionStringView: TextView, reaction: String) {
         //Log.d("ReactionViewHelper", "reaction $reaction")
@@ -101,6 +99,41 @@ object ReactionViewHelper {
             reactionStringView.text = reaction
             reactionImageView.visibility = View.GONE
             reactionStringView.visibility = View.VISIBLE
+        }
+
+    }
+
+    @JvmStatic
+    @BindingAdapter("reactionTextTypeView", "reactionImageTypeView", "reaction", "note")
+    fun LinearLayout.setReactionCount(reactionTextTypeView: TextView, reactionImageTypeView: ImageView,reaction: String, note: PlaneNoteViewData){
+        val textReaction = ReactionResourceMap.reactionMap[reaction]?: reaction
+        val metaEmojis = (this.context.applicationContext as MiApplication).getCurrentInstanceMeta()?.emojis
+        val emoji = note.emojis?.firstOrNull{
+            textReaction.replace(":", "") == it.name
+        }?: metaEmojis?.firstOrNull{
+            textReaction.replace(":", "") == it.name
+        }
+
+        if(emoji == null){
+            reactionImageTypeView.visibility = View.GONE
+            reactionTextTypeView.visibility = View.VISIBLE
+            reactionTextTypeView.text = reaction
+        }else{
+            reactionImageTypeView.visibility = View.VISIBLE
+            reactionTextTypeView.visibility = View.GONE
+
+            if(emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true|| emoji.uri?.contains("svg") == true){
+
+                GlideApp.with(context)
+                    .`as`(Bitmap::class.java)
+                    .load(emoji.url?: emoji.url)
+                    .into(reactionImageTypeView)
+            }else{
+                Glide.with(reactionImageTypeView.context)
+                    .load(emoji.url?: emoji.uri)
+                    .centerCrop()
+                    .into(reactionImageTypeView)
+            }
         }
 
     }
