@@ -5,6 +5,7 @@ import androidx.databinding.ObservableArrayList
 import androidx.databinding.ObservableList
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -36,7 +37,7 @@ class NoteCapture(
     private data class CaptureRequestBody(private val id: String)
 
     private data class NoteUpdated(override val type: String, val body: Body<NoteUpdatedBody>): StreamingAction
-    private data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?)
+    private data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?, val emoji: Emoji?)
 
     //noteId : NoteEvent
     private val observeNoteMap = HashMap<String, NoteEvent>()
@@ -74,7 +75,7 @@ class NoteCapture(
                 receivedObject.body.type == "deleted" -> noteRemovedListeners.forEach{
                     it.onRemoved(id)
                 }
-                receivedObject.body.type == "reacted" -> addReaction(id, reaction!!, isMyReaction)
+                receivedObject.body.type == "reacted" -> addReaction(id, reaction!!, receivedObject.body.body.emoji, isMyReaction)
                 receivedObject.body.type == "unreacted" -> removeReaction(id, reaction!!, isMyReaction)
                 receivedObject.body.type == "pollVoted" -> updatePoll(id, receivedObject.body.body?.choice!!, isMyReaction)
                 //else -> Log.d("NoteCapture", "不明なイベント")
@@ -152,10 +153,10 @@ class NoteCapture(
         return CaptureRequest(type = "unsubNote", body = CaptureRequestBody(noteId))
     }
 
-    private fun addReaction(noteId: String, reaction: String, isMyReaction: Boolean){
+    private fun addReaction(noteId: String, reaction: String, emoji: Emoji?, isMyReaction: Boolean){
         synchronized(observeNoteMap){
             observeNoteMap[noteId]?.notes?.forEach {
-                it.addReaction(reaction, isMyReaction)
+                it.addReaction(reaction, emoji, isMyReaction)
             }
         }
     }

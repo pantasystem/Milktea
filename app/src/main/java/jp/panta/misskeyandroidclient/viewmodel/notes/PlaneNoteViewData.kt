@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
@@ -81,6 +82,10 @@ open class PlaneNoteViewData (
 
     val emojis = toShowNote.emojis
 
+    val emojiMap = HashMap<String, Emoji>(toShowNote.emojis?.map{
+        it.name to it
+    }?.toMap()?: mapOf())
+
     val files = toShowNote.files?: emptyList()
     val media = MediaViewData(files)
 
@@ -125,13 +130,17 @@ open class PlaneNoteViewData (
     val subNoteMedia =
         MediaViewData(subNoteFiles)
 
-    fun addReaction(reaction: String, isMyReaction: Boolean = false){
+    fun addReaction(reaction: String, emoji: Emoji?, isMyReaction: Boolean = false){
         val reactions = reactionCounts.value?: LinkedHashMap()
         val existingReactionCount = reactions[reaction]
         if(existingReactionCount == null){
             reactions[reaction] = 1
         }else{
             reactions[reaction] = existingReactionCount + 1
+        }
+
+        if(emoji != null){
+            emojiMap[emoji.name] = emoji
         }
 
         if(isMyReaction){

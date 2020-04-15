@@ -108,9 +108,7 @@ object ReactionViewHelper {
     fun LinearLayout.setReactionCount(reactionTextTypeView: TextView, reactionImageTypeView: ImageView,reaction: String, note: PlaneNoteViewData){
         val textReaction = ReactionResourceMap.reactionMap[reaction]?: reaction
         val metaEmojis = (this.context.applicationContext as MiApplication).getCurrentInstanceMeta()?.emojis
-        val emoji = note.emojis?.firstOrNull{
-            textReaction.replace(":", "") == it.name
-        }?: metaEmojis?.firstOrNull{
+        val emoji = note.emojiMap[textReaction.replace(":", "")]?: metaEmojis?.firstOrNull{
             textReaction.replace(":", "") == it.name
         }
 
