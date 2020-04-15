@@ -86,6 +86,27 @@
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:text="@string/copy_url" />
         </LinearLayout>
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+            >
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/share"
+                    app:srcCompat="@drawable/ic_menu_share"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                />
+            <Button
+                    android:id="@+id/share_note"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:text="@string/share" />
+        </LinearLayout>
         <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

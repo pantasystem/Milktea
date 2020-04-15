@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.content.Intent.ACTION_SEND
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -45,6 +47,18 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
 
         dataBinding.addFavorite.setOnClickListener{
             viewModel.addFavorite()
+            dismiss()
+        }
+
+        dataBinding.shareNote.setOnClickListener{
+            val baseUrl = viewModel.accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl
+            val url = "$baseUrl/notes/${note?.id}"
+            val intent = Intent().apply{
+                action = ACTION_SEND
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, url)
+            }
+            startActivity(Intent.createChooser(intent, getString(R.string.share)))
             dismiss()
         }
 
