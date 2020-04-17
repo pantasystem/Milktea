@@ -13,7 +13,8 @@ enum class TagType(val tagClass: TagClass) {
     JUMP(TagClass.ANIMATION),
     CODE(TagClass.CODE),
     SEARCH(TagClass.SEARCH),
-    TITLE(TagClass.TITLE)
+    TITLE(TagClass.TITLE),
+    ROOT(TagClass.STANDARD)
 }
 
 enum class TagClass(val weight: Int){
