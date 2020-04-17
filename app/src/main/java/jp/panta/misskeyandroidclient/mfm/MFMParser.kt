@@ -51,8 +51,10 @@ object MFMParser{
             //'(' to ::parseExpansion, //横伸縮
             '`' to ::parseCode, //コード
             '>' to ::parseQuote, //引用
+            '*' to ::parseTypeStar,  // 横伸縮対称揺れ, 太字
             '【' to ::parseTitle,//タイトル
-            '*' to ::parseTypeStar  // 横伸縮対称揺れ, 太字
+            '[' to ::parseTitle
+
         )
 
         /**
@@ -221,33 +223,30 @@ object MFMParser{
                 val c = sourceText[ position - 1 ]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
                 if( (c != '\r' && c != '\n') && parent.tag != TagType.QUOTE){
+                    println("直前の文字が改行コードではないかつ、親が引用コードではない")
                     return null
                 }
-                if( parent.tag.tagClass.weight < TagType.QUOTE.tagClass.weight){
+                if( parent.tag.tagClass.weight < TagType.QUOTE.tagClass.weight && parent.tag != TagType.ROOT){
+                    println("親ノードのほうが小さい")
                     return null
                 }
             }
             val quotePattern = Pattern.compile("""^>(?:[ ]?)([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
             val matcher = quotePattern.matcher(sourceText.substring(position, parent.insideEnd))
 
-            val inside = StringBuilder()
-            var nodeEnd = position
 
-            while(true){
-                if(!matcher.find()) break
-                nodeEnd = matcher.end()
-                if(inside.isNotEmpty()){
-                    inside.append('\n')
-                }
-                inside.append(matcher.group(1))
+            if(!matcher.find()){
+                return null
             }
+            val nodeEnd = matcher.end()
+            println(matcher.group(1))
 
 
             // > の後に何もない場合キャンセルする
             if(nodeEnd + position <= position){
                 return null
             }
-
+            ///println("inside:$inside")
 
             return Node(
                 start = position,
@@ -260,7 +259,22 @@ object MFMParser{
         }
 
         private fun parseTitle(): Node?{
-            return null
+            val pattern = Pattern.compile("""\A[【\[](.+?)[】\]]\n$""")
+            val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find()){
+                return null
+            }
+            if(parent.tag != TagType.ROOT){
+                return null
+            }
+            return Node(
+                start = position,
+                end = position + matcher.end(),
+                tag = TagType.TITLE,
+                insideStart = position + matcher.start(1),
+                insideEnd = position + matcher.end(1),
+                parentNode = parent
+            )
         }
 
 

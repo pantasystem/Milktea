@@ -13,7 +13,7 @@ class MFMParserTest{
 
     @Test
     fun quoteTest(){
-        val text = "> Hello quote\n\r>> Hello world"
+        val text = "> Hello quote\n>>>>> Hello world"
         println(text)
         val node = MFMParser.parse(text)
         println(node)
@@ -78,5 +78,11 @@ class MFMParserTest{
         val text = "```code<i>aaaa</i>```"
         val node = MFMParser.parse(text)
         println(node)
+    }
+
+    @Test
+    fun testTitle(){
+        val text = "[title]\n【title2】\n"
+        println(MFMParser.parse(text))
     }
 }
