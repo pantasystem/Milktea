@@ -26,4 +26,12 @@ class MFMParserTest{
         val node = MFMParser.parse(text)
         println(node)
     }
+
+    @Test
+    fun doubleSpaceTest(){
+        val text = ">  "
+        println(text)
+        val node = MFMParser.parse(text)
+        println(node)
+    }
 }

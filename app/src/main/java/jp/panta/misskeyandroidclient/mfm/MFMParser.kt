@@ -63,22 +63,17 @@ object MFMParser{
             if((tagStart - finallyDetected) > 0){
                 val text = sourceText.substring(finallyDetected, tagStart)
                 parent.childNodes.add(Text(text))
-                println("pos:$position recoveryBeforeText finallyDetected:$finallyDetected ,tagStart:$tagStart, text:$text")
             }
         }
 
         fun parse(){
-            println("parent:$parent")
             while(position < end){
                 val parser = beginningOfStartTag[sourceText[position]]
 
                 if(parser == null){
                     // 何にも該当しない場合は繰り上げる
-                    println(sourceText[position] + " parser not pos:$position")
-
                     position ++
                 }else{
-                    println(sourceText[position] + " found pos:$position")
 
                     // Nodeを取り出すときにpositionが変化することがあるので、その前にタグの始点を記録する
                     val tagStart = position
@@ -89,9 +84,6 @@ object MFMParser{
                         // positionは基本的にはNodeの開始地点のままなので発見したNodeの終了地点にする
                         position = node.end
 
-                        //test
-
-                        //end test
 
                         // Nodeの直前のNodeに含まれないLeafの回収作業を行う
                         recoveryBeforeText(node.start)
@@ -111,7 +103,6 @@ object MFMParser{
 
 
                     }else{
-                        println("やっぱりNodeじゃなかったっぽい")
                         position ++
                     }
                 }
@@ -149,43 +140,30 @@ object MFMParser{
                 val c = sourceText[ position - 1 ]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
                 if( (c != '\r' && c != '\n') && parent.tag != TagType.QUOTE){
-                    println("E:直前の文字が改行コードではないかつ、親が引用コードではない, c:$c, parentTag:$${parent.tag}, pos:$position now:${sourceText[position]}")
                     return null
                 }
             }
             val quotePattern = Pattern.compile("""^>(?:[ ]?)([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
             val matcher = quotePattern.matcher(sourceText.substring(position, parent.insideEnd))
-            println("pos:${position} source inside:${sourceText.substring(position, parent.insideEnd)}")
 
             val inside = StringBuilder()
             var nodeEnd = position
-            /*if(matcher.find()){
-                nodeEnd = matcher.end()
-                println("nodeEnd:${nodeEnd + position}, nodeEndText:${sourceText[nodeEnd - 1 + position]}")
-                if(inside.isNotEmpty()){
-                    inside.append('\n')
-                }
-                inside.append(matcher.group(1))
-            }*/
+
             while(true){
                 if(!matcher.find()) break
                 nodeEnd = matcher.end()
                 if(inside.isNotEmpty()){
                     inside.append('\n')
-                    println("改行コードを追加")
                 }
                 inside.append(matcher.group(1))
             }
 
 
             // > の後に何もない場合キャンセルする
-            println("check:${nodeEnd + position}, pos:$position")
             if(nodeEnd + position <= position){
-                println("E: >の後に何もない")
                 return null
             }
 
-            println("pos:$position inside:${inside.toString().replace("\n", "改行")}")
 
             val node =  Node(
                 start = position,
@@ -195,9 +173,6 @@ object MFMParser{
                 insideEnd = position + nodeEnd,
                 parentNode = parent
             )
-            println("pos:$position start:${node.start} end:${node.end}, insideStart:${node.insideStart}, insideEnd:${node.insideEnd}")
-//            println("pos:$position nodeEndChar - 1:${sourceText[node.end]}, node.insideEnd - 1 text:${sourceText[node.insideEnd]}")
-            println("pos:$position, insideText:${sourceText.substring(node.insideStart, node.insideEnd)}")
             return node
         }
 
