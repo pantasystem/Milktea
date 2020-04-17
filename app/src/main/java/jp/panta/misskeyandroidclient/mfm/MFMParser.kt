@@ -44,13 +44,14 @@ object MFMParser{
          * 第一段階としてタグの先頭の文字に該当するかを検証する
          * キャンセルされたときはここからやり直される
          */
-        val beginningOfStartTag = mapOf(
+        private val parserMap = mapOf(
             '<' to ::parseBlock, //斜体、小文字、中央揃え、横伸縮、左右反転、回転、飛び跳ねる
             '~' to ::parseStrike, //打消し線
             '(' to ::parseExpansion, //横伸縮
             '`' to ::parseCode, //コード
             '>' to ::parseQuote, //引用
-            '【' to ::parseTitle//タイトル
+            '【' to ::parseTitle,//タイトル
+            '*' to ::parseTypeStar  // 横伸縮対称揺れ, 太字
         )
 
         /**
@@ -68,7 +69,7 @@ object MFMParser{
 
         fun parse(){
             while(position < end){
-                val parser = beginningOfStartTag[sourceText[position]]
+                val parser = parserMap[sourceText[position]]
 
                 if(parser == null){
                     // 何にも該当しない場合は繰り上げる
@@ -117,8 +118,41 @@ object MFMParser{
          * タグの開始位置や終了位置、内部要素の開始、終了位置は正規表現とMatcherを利用し現在のポジションと合わせ相対的に求める
          */
 
-        private fun parseBlock(): Node?{
+        private fun parseTypeStar(): Node?{
             return null
+        }
+
+        private fun parseBold(): Node?{
+            return null
+        }
+
+        private fun parseBlock(): Node?{
+            val pattern = Pattern.compile("""\A<([a-z]+)>(.+?)</\1>""", Pattern.DOTALL)
+            val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find()){
+                return null
+            }else{
+                val tagName = matcher.group(1)
+                val nodeInside = matcher.group(2)
+
+                val tag = MFMContract.blockTypeTagNameMap[tagName]?: return null
+
+                // Parentより自分のほうが重い又は同じタグの場合無効
+                if(parent.tag.tagClass.weight < tag.tagClass.weight || parent.tag == tag){
+                    return null
+                }
+
+                return Node(
+                    start = position,
+                    end = position + matcher.end(),
+                    tag = tag,
+                    insideStart = position + tagName.length + 2,
+                    insideEnd = position + matcher.end(2),
+                    parentNode = parent
+                )
+
+
+            }
         }
 
         private fun parseStrike(): Node?{
@@ -140,6 +174,9 @@ object MFMParser{
                 val c = sourceText[ position - 1 ]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
                 if( (c != '\r' && c != '\n') && parent.tag != TagType.QUOTE){
+                    return null
+                }
+                if( parent.tag.tagClass.weight < TagType.QUOTE.tagClass.weight){
                     return null
                 }
             }
@@ -165,7 +202,7 @@ object MFMParser{
             }
 
 
-            val node =  Node(
+            return Node(
                 start = position,
                 end = nodeEnd + position,
                 tag = TagType.QUOTE,
@@ -173,7 +210,6 @@ object MFMParser{
                 insideEnd = position + nodeEnd,
                 parentNode = parent
             )
-            return node
         }
 
         private fun parseTitle(): Node?{

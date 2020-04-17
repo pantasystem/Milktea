@@ -5,4 +5,13 @@ package jp.panta.misskeyandroidclient.mfm
  */
 object MFMContract {
 
+    val blockTypeTagNameMap = mapOf(
+        "i" to TagType.ITALIC,
+        "small" to TagType.SMALL,
+        "center" to TagType.CENTER
+        /*"flip" to TagType.FLIP_HORIZONTAL,
+        "spin" to TagType.SPIN,
+        "motion" to TagType.MOTION,
+        "jump" to TagType.JUMP*/
+    )
 }

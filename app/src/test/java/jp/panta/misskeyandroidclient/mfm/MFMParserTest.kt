@@ -34,4 +34,29 @@ class MFMParserTest{
         val node = MFMParser.parse(text)
         println(node)
     }
+
+    @Test
+    fun testBlock(){
+        val text = "<i>test<small>小さい文字のテスト</small></i>"
+        println(text)
+        val node = MFMParser.parse(text)
+        println(node)
+    }
+
+    @Test
+    fun testBlockInQuoteTest(){
+        val text = "<i>\n> must error\n </i>"
+        println(text)
+        val node = MFMParser.parse(text)
+        println(node)
+    }
+
+    @Test
+    fun testSameBlockNest(){
+        val text = "<i><i>error</i></i>"
+        val node = MFMParser.parse(text)
+        println(node)
+    }
+
+
 }
