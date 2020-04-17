@@ -59,4 +59,24 @@ class MFMParserTest{
     }
 
 
+    @Test
+    fun testStrike(){
+        val text = "~~strike~~ <i>~~nest strike~~</i>"
+        val node = MFMParser.parse(text)
+        println(node)
+    }
+
+    @Test
+    fun testBold(){
+        val text = "**bold** ~~**bold strike**~~ **bold**"
+        val node = MFMParser.parse(text)
+        println(node)
+    }
+
+    @Test
+    fun testCode(){
+        val text = "```code<i>aaaa</i>```"
+        val node = MFMParser.parse(text)
+        println(node)
+    }
 }

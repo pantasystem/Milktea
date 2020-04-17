@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.mfm
 
+import jp.panta.misskeyandroidclient.PostNoteService.Companion.tag
 import java.util.regex.Pattern
 
 object MFMParser{
@@ -47,7 +48,7 @@ object MFMParser{
         private val parserMap = mapOf(
             '<' to ::parseBlock, //斜体、小文字、中央揃え、横伸縮、左右反転、回転、飛び跳ねる
             '~' to ::parseStrike, //打消し線
-            '(' to ::parseExpansion, //横伸縮
+            //'(' to ::parseExpansion, //横伸縮
             '`' to ::parseCode, //コード
             '>' to ::parseQuote, //引用
             '【' to ::parseTitle,//タイトル
@@ -76,8 +77,6 @@ object MFMParser{
                     position ++
                 }else{
 
-                    // Nodeを取り出すときにpositionが変化することがあるので、その前にタグの始点を記録する
-                    val tagStart = position
                     val node = parser.invoke()
                     // nodeが実際に存在したとき
                     if(node != null){
@@ -109,7 +108,6 @@ object MFMParser{
                 }
             }
             //parent.endTag.start == position -> true
-            //println(sourceText.substring(finallyDetected, parent.end))
             recoveryBeforeText(parent.insideEnd)
 
         }
@@ -119,11 +117,32 @@ object MFMParser{
          */
 
         private fun parseTypeStar(): Node?{
-            return null
-        }
+            val boldPattern = Pattern.compile("""\A\*\*(.+?)\*\*""")
+            val animationPattern = Pattern.compile("""\A\*\*\*(.+?)\*\*\*""")
+            val currentInside = sourceText.substring(position, parent.insideEnd)
 
-        private fun parseBold(): Node?{
-            return null
+            if(animationPattern.matcher(currentInside).find()){
+                // アニメーションはサポートしていないため終了
+                return null
+            }
+
+            val matcher = boldPattern.matcher(currentInside)
+            if(!matcher.find()){
+                return null
+            }
+            if(parent.tag.tagClass.weight < TagType.BOLD.tagClass.weight || parent.tag == TagType.BOLD){
+                return null
+            }
+
+
+            return Node(
+                start = position,
+                end = position + matcher.end(),
+                tag = TagType.BOLD,
+                insideStart = position + 2,
+                insideEnd = position + matcher.end() - 2,
+                parentNode = parent
+            )
         }
 
         private fun parseBlock(): Node?{
@@ -133,7 +152,6 @@ object MFMParser{
                 return null
             }else{
                 val tagName = matcher.group(1)
-                val nodeInside = matcher.group(2)
 
                 val tag = MFMContract.blockTypeTagNameMap[tagName]?: return null
 
@@ -156,15 +174,44 @@ object MFMParser{
         }
 
         private fun parseStrike(): Node?{
-            return null
+            val pattern = Pattern.compile("""\A~~(.+?)~~""")
+            val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find()){
+                return null
+            }
+            if(parent.tag.tagClass.weight < TagType.STRIKE.tagClass.weight || parent.tag == TagType.STRIKE){
+                return null
+            }
+
+            return Node(
+                start = position,
+                end = position + matcher.end(),
+                tag = TagType.STRIKE,
+                insideStart = position + matcher.start(1),
+                insideEnd = position + matcher.start(1) + matcher.group(1).length,
+                parentNode = parent
+            )
         }
 
-        private fun parseExpansion(): Node?{
-            return null
-        }
+
 
         private fun parseCode(): Node?{
-            return null
+            val pattern = Pattern.compile("""\A```(.*)```""")
+            val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find()){
+                return null
+            }
+            if(parent.tag != TagType.ROOT){
+                return null
+            }
+            return Node(
+                start = position,
+                end = position + matcher.end(),
+                tag = TagType.CODE,
+                insideStart = position + matcher.start(1),
+                insideEnd = position + matcher.end(1),
+                parentNode = parent
+            )
         }
 
         private fun parseQuote(): Node?{
