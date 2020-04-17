@@ -8,6 +8,7 @@ class StringIndexTest {
     fun substringTest(){
         val text = "0123456789"
         println(text.substring(0, 9))
+        println(text.substring(0, text.length))
     }
 
     @Test

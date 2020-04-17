@@ -11,4 +11,7 @@ open class Node(
 ): Element {
 
     val childNodes = ArrayList<Element>()
+    override fun toString(): String {
+        return "Node(type: $tag, childNodes=$childNodes)"
+    }
 }

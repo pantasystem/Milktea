@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.mfm
 
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object MFMParser{
 
     fun parse(text: String): Node{
+        println("textSize:${text.length}")
         val root = Root(text)
         NodeParser(text, root).parse()
         return root
@@ -63,17 +63,22 @@ object MFMParser{
             if((tagStart - finallyDetected) > 0){
                 val text = sourceText.substring(finallyDetected, tagStart)
                 parent.childNodes.add(Text(text))
+                println("pos:$position recoveryBeforeText finallyDetected:$finallyDetected ,tagStart:$tagStart, text:$text")
             }
         }
 
         fun parse(){
-            val parser = beginningOfStartTag[sourceText[position]]
-            val i = position
-            while(i < end){
+            println("parent:$parent")
+            while(position < end){
+                val parser = beginningOfStartTag[sourceText[position]]
+
                 if(parser == null){
                     // 何にも該当しない場合は繰り上げる
+                    println(sourceText[position] + " parser not pos:$position")
+
                     position ++
                 }else{
+                    println(sourceText[position] + " found pos:$position")
 
                     // Nodeを取り出すときにpositionが変化することがあるので、その前にタグの始点を記録する
                     val tagStart = position
@@ -81,14 +86,20 @@ object MFMParser{
                     // nodeが実際に存在したとき
                     if(node != null){
 
+                        // positionは基本的にはNodeの開始地点のままなので発見したNodeの終了地点にする
+                        position = node.end
+
+                        //test
+
+                        //end test
+
                         // Nodeの直前のNodeに含まれないLeafの回収作業を行う
-                        recoveryBeforeText(tagStart)
+                        recoveryBeforeText(node.start)
 
                         // 新たに発見したnodeの一番最後の外側の文字を記録する
                         finallyDetected = node.end
 
-                        // positionは基本的にはNodeの開始地点のままなので発見したNodeの終了地点にする
-                        position = node.end
+
 
                         // 発見したNodeを追加する
                         parent.childNodes.add(node)
@@ -99,11 +110,15 @@ object MFMParser{
                         NodeParser(sourceText, parent = node).parse()
 
 
+                    }else{
+                        println("やっぱりNodeじゃなかったっぽい")
+                        position ++
                     }
                 }
             }
             //parent.endTag.start == position -> true
-            recoveryBeforeText(position)
+            //println(sourceText.substring(finallyDetected, parent.end))
+            recoveryBeforeText(parent.insideEnd)
 
         }
 
@@ -134,14 +149,56 @@ object MFMParser{
                 val c = sourceText[ position - 1 ]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
                 if( (c != '\r' && c != '\n') && parent.tag != TagType.QUOTE){
+                    println("E:直前の文字が改行コードではないかつ、親が引用コードではない, c:$c, parentTag:$${parent.tag}, pos:$position now:${sourceText[position]}")
                     return null
                 }
             }
-            val pattern = Pattern.compile("""""")
-            val matcher = pattern.matcher("")
+            val quotePattern = Pattern.compile("""^>(?:[ ]?)([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
+            val matcher = quotePattern.matcher(sourceText.substring(position, parent.insideEnd))
+            println("pos:${position} source inside:${sourceText.substring(position, parent.insideEnd)}")
+
+            val inside = StringBuilder()
+            var nodeEnd = position
+            /*if(matcher.find()){
+                nodeEnd = matcher.end()
+                println("nodeEnd:${nodeEnd + position}, nodeEndText:${sourceText[nodeEnd - 1 + position]}")
+                if(inside.isNotEmpty()){
+                    inside.append('\n')
+                }
+                inside.append(matcher.group(1))
+            }*/
+            while(true){
+                if(!matcher.find()) break
+                nodeEnd = matcher.end()
+                if(inside.isNotEmpty()){
+                    inside.append('\n')
+                    println("改行コードを追加")
+                }
+                inside.append(matcher.group(1))
+            }
 
 
-            return null
+            // > の後に何もない場合キャンセルする
+            println("check:${nodeEnd + position}, pos:$position")
+            if(nodeEnd + position <= position){
+                println("E: >の後に何もない")
+                return null
+            }
+
+            println("pos:$position inside:${inside.toString().replace("\n", "改行")}")
+
+            val node =  Node(
+                start = position,
+                end = nodeEnd + position,
+                tag = TagType.QUOTE,
+                insideStart = position + 1, // >を排除する
+                insideEnd = position + nodeEnd,
+                parentNode = parent
+            )
+            println("pos:$position start:${node.start} end:${node.end}, insideStart:${node.insideStart}, insideEnd:${node.insideEnd}")
+//            println("pos:$position nodeEndChar - 1:${sourceText[node.end]}, node.insideEnd - 1 text:${sourceText[node.insideEnd]}")
+            println("pos:$position, insideText:${sourceText.substring(node.insideStart, node.insideEnd)}")
+            return node
         }
 
         private fun parseTitle(): Node?{
