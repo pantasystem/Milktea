@@ -1,9 +1,13 @@
 package jp.panta.misskeyandroidclient.mfm
 
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
 class MFMParserTest{
+
+
 
     @Test
     fun mfmLessSimpleText(){
@@ -108,5 +112,40 @@ class MFMParserTest{
     fun linkTest2(){
         val text = "> <i>[みすきーあいおーはこちら](https://misskey.io)italic</i>quote\n root"
         println(MFMParser.parse(text))
+    }
+
+    @Test
+    fun emojiTest(){
+        val emojis = listOf(
+            Emoji(
+                null,
+                "kawaii",
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            Emoji(
+                null,
+                "ai",
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            Emoji(
+                null,
+                "misskey",
+                null,
+                null,
+                null,
+                null,
+                null
+            )
+        )
+        val text = "Hello world **:ai:は:kawaii::misskey:**"
+        println(MFMParser.parse(text, emojis))
     }
 }

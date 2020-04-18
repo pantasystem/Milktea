@@ -1,13 +1,18 @@
 package jp.panta.misskeyandroidclient.mfm
 
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import java.util.regex.Pattern
 
 object MFMParser{
 
-    fun parse(text: String): Node{
+    fun parse(text: String, emojis: List<Emoji> = emptyList()): Node{
         println("textSize:${text.length}")
         val root = Root(text)
-        NodeParser(text, root).parse()
+        NodeParser(text, root,
+            emojis.map{
+                it.name to it
+            }.toMap()
+        ).parse()
         return root
     }
 
@@ -23,6 +28,7 @@ object MFMParser{
     class NodeParser(
         val sourceText: String,
         val parent: Node,
+        val emojiNameMap: Map<String, Emoji>,
         val start: Int = parent.insideStart,
         val end: Int = parent.insideEnd
     ){
@@ -54,7 +60,8 @@ object MFMParser{
             '【' to listOf(::parseTitle),//タイトル
             '[' to listOf(::parseTitle, ::parseLink, ::parseSearch),
             '?' to listOf(::parseLink),
-            'S' to listOf(::parseSearch)
+            'S' to listOf(::parseSearch),
+            ':' to listOf(::parseEmoji)
 
         )
 
@@ -105,7 +112,7 @@ object MFMParser{
                         // 新たに発見した子NodeのためにNodeParserを作成する
                         // 新たに発見した子Nodeの内側を捜索するのでparentは新たに発見した子Nodeになる
                         if(node is Node){
-                            NodeParser(sourceText, parent = node).parse()
+                            NodeParser(sourceText, parent = node, emojiNameMap = emojiNameMap).parse()
                         }
 
 
@@ -330,6 +337,24 @@ object MFMParser{
             )
         }
 
+        private val emojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+-_]+):""")
+        private fun parseEmoji(): EmojiElement?{
+            val matcher = emojiPattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight){
+                return null
+            }
+            val emoji: Emoji = emojiNameMap[matcher.group(1)]
+                ?: return null
+
+            return EmojiElement(
+                emoji,
+                matcher.group(1),
+                start = position + matcher.start(),
+                end = position + matcher.end(),
+                insideStart = position + matcher.start(1),
+                insideEnd = position + matcher.end(1)
+            )
+        }
 
     }
 }

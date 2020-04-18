@@ -18,7 +18,8 @@ enum class ElementType(val elementClass: ElementClass) {
     MOTION(ElementClass.ANIMATION),
     SMALL(ElementClass.STANDARD),
     LINK(ElementClass.LINK),
-    TEXT(ElementClass.TEXT)
+    TEXT(ElementClass.TEXT),
+    EMOJI(ElementClass.EMOJI)
 }
 
 enum class ElementClass(val weight: Int){
@@ -29,5 +30,6 @@ enum class ElementClass(val weight: Int){
     SEARCH(0),
     TITLE(1),
     LINK(0),
-    TEXT(0)
+    TEXT(0),
+    EMOJI(0)
 }

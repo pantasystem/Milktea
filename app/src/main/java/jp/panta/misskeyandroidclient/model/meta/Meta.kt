@@ -47,4 +47,8 @@ data class Meta(
     fun getVersion(): Version{
         return Version(version)
     }
+
+    val emojiNameMap: Map<String, Emoji> = emojis?.map{
+        it.name to it
+    }?.toMap()?: emptyMap()
 }
