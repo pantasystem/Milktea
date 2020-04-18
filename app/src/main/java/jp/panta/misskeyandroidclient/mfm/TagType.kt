@@ -16,7 +16,8 @@ enum class TagType(val tagClass: TagClass) {
     TITLE(TagClass.TITLE),
     ROOT(TagClass.STANDARD),
     MOTION(TagClass.ANIMATION),
-    SMALL(TagClass.STANDARD)
+    SMALL(TagClass.STANDARD),
+    LINK(TagClass.LINK)
 }
 
 enum class TagClass(val weight: Int){
@@ -26,4 +27,5 @@ enum class TagClass(val weight: Int){
     CODE(0),
     SEARCH(0),
     TITLE(1),
+    LINK(0)
 }

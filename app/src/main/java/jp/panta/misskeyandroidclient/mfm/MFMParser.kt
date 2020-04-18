@@ -45,15 +45,15 @@ object MFMParser{
          * 第一段階としてタグの先頭の文字に該当するかを検証する
          * キャンセルされたときはここからやり直される
          */
-        private val parserMap = mapOf(
-            '<' to ::parseBlock, //斜体、小文字、中央揃え、横伸縮、左右反転、回転、飛び跳ねる
-            '~' to ::parseStrike, //打消し線
+        private val parserMap: Map<Char, List<()-> Node?>> = mapOf(
+            '<' to listOf(::parseBlock), //斜体、小文字、中央揃え、横伸縮、左右反転、回転、飛び跳ねる
+            '~' to listOf(::parseStrike), //打消し線
             //'(' to ::parseExpansion, //横伸縮
-            '`' to ::parseCode, //コード
-            '>' to ::parseQuote, //引用
-            '*' to ::parseTypeStar,  // 横伸縮対称揺れ, 太字
-            '【' to ::parseTitle,//タイトル
-            '[' to ::parseTitle
+            '`' to listOf(::parseCode), //コード
+            '>' to listOf(::parseQuote), //引用
+            '*' to listOf(::parseTypeStar),  // 横伸縮対称揺れ, 太字
+            '【' to listOf(::parseTitle),//タイトル
+            '[' to listOf(::parseTitle)
 
         )
 
@@ -79,7 +79,9 @@ object MFMParser{
                     position ++
                 }else{
 
-                    val node = parser.invoke()
+                    val node = parser.mapNotNull {
+                        it.invoke()
+                    }.firstOrNull()
                     // nodeが実際に存在したとき
                     if(node != null){
 
@@ -258,6 +260,10 @@ object MFMParser{
             )
         }
 
+        private val titlePattern = Pattern.compile("""\A[【\[](.+?)[】\]]\n$""")
+        private val searchPattern = Pattern.compile("""\A(.+?) (\[Search]|検索|\[検索]|Search)$""")
+        private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp|http)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
+
         private fun parseTitle(): Node?{
             val pattern = Pattern.compile("""\A[【\[](.+?)[】\]]\n$""")
             val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
@@ -276,6 +282,21 @@ object MFMParser{
                 parentNode = parent
             )
         }
+
+        private fun parseSearch(): Node?{
+            val pattern = Pattern.compile("""\A(.+?) (\[Search]|検索|\[検索]|Search)$""")
+            return null
+        }
+
+        /**
+         * 他のタグと違いリンクとされる途中で検出されるので一度ポジションを戻せるところまで戻し再計算する必要がある
+         */
+        private fun parseLink(): Node?{
+
+            val pattern = Pattern.compile("""\[(.+?)]\((https?|ftp|http)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
+            return null
+        }
+
 
 
     }
