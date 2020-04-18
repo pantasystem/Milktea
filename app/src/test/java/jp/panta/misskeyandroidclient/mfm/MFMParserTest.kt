@@ -85,4 +85,28 @@ class MFMParserTest{
         val text = "[title]\n【title2】\n"
         println(MFMParser.parse(text))
     }
+
+    @Test
+    fun search1Test(){
+        val text = "検索実装できた？ Search"
+        println(MFMParser.parse(text))
+    }
+
+    @Test
+    fun search2Test(){
+        val text = "hogehogehoge~~~\n検索実装できた？ [検索]\n testtest"
+        println(MFMParser.parse(text))
+    }
+
+    @Test
+    fun linkTest(){
+        val text = "awefawef[みすきーあいおーはこちら](https://misskey.io)awefwaef"
+        println(MFMParser.parse(text))
+    }
+
+    @Test
+    fun linkTest2(){
+        val text = "> <i>[みすきーあいおーはこちら](https://misskey.io)italic</i>quote\n root"
+        println(MFMParser.parse(text))
+    }
 }

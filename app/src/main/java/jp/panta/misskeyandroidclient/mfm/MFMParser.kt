@@ -44,7 +44,7 @@ object MFMParser{
          * 第一段階としてタグの先頭の文字に該当するかを検証する
          * キャンセルされたときはここからやり直される
          */
-        private val parserMap: Map<Char, List<()-> Node?>> = mapOf(
+        private val parserMap: Map<Char, List<()-> Element?>> = mapOf(
             '<' to listOf(::parseBlock), //斜体、小文字、中央揃え、横伸縮、左右反転、回転、飛び跳ねる
             '~' to listOf(::parseStrike), //打消し線
             //'(' to ::parseExpansion, //横伸縮
@@ -52,7 +52,9 @@ object MFMParser{
             '>' to listOf(::parseQuote), //引用
             '*' to listOf(::parseTypeStar),  // 横伸縮対称揺れ, 太字
             '【' to listOf(::parseTitle),//タイトル
-            '[' to listOf(::parseTitle)
+            '[' to listOf(::parseTitle, ::parseLink, ::parseSearch),
+            '?' to listOf(::parseLink),
+            'S' to listOf(::parseSearch)
 
         )
 
@@ -102,7 +104,9 @@ object MFMParser{
 
                         // 新たに発見した子NodeのためにNodeParserを作成する
                         // 新たに発見した子Nodeの内側を捜索するのでparentは新たに発見した子Nodeになる
-                        NodeParser(sourceText, parent = node).parse()
+                        if(node is Node){
+                            NodeParser(sourceText, parent = node).parse()
+                        }
 
 
                     }else{
@@ -260,12 +264,11 @@ object MFMParser{
         }
 
         private val titlePattern = Pattern.compile("""\A[【\[](.+?)[】\]]\n$""")
-        private val searchPattern = Pattern.compile("""\A(.+?) (\[Search]|検索|\[検索]|Search)$""")
+        private val searchPattern = Pattern.compile("""^(.+?) (\[Search]|検索|\[検索]|Search)$""", Pattern.MULTILINE)
         private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp|http)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
 
         private fun parseTitle(): Node?{
-            val pattern = Pattern.compile("""\A[【\[](.+?)[】\]]\n$""")
-            val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
+            val matcher = titlePattern.matcher(sourceText.substring(position, parent.insideEnd))
             if(!matcher.find()){
                 return null
             }
@@ -282,20 +285,50 @@ object MFMParser{
             )
         }
 
-        private fun parseSearch(): Node?{
-            val pattern = Pattern.compile("""\A(.+?) (\[Search]|検索|\[検索]|Search)$""")
-            return null
-        }
-
         /**
-         * 他のタグと違いリンクとされる途中で検出されるので一度ポジションを戻せるところまで戻し再計算する必要がある
+         * 他の要素と違いタグの要素の検出ポイントより以前から要素が始まっているので現在のポイントより前を検索することになる。
+         * 要素が見つかれば他の要素のルールと同じく要素の末端が次のポジションになる
+         * 戻るポイントは基本的には検索済みであるが要素は発見されなかった場所なので無視してしまうリスクは限りなくゼロに近い。
          */
-        private fun parseLink(): Node?{
+        private fun parseSearch(): Search?{
 
-            val pattern = Pattern.compile("""\[(.+?)]\((https?|ftp|http)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
-            return null
+            val targetText = sourceText.substring(finallyDetected, parent.insideEnd)
+            val matcher = searchPattern.matcher(targetText)
+            if(!matcher.find() || parent.elementType != ElementType.ROOT){
+                return null
+            }
+
+            return Search(
+                text = matcher.group(1),
+                start = matcher.start(),
+                end = matcher.end(),
+                insideStart = matcher.start(1),
+                insideEnd = matcher.end(1)
+            )
         }
 
+
+        private fun parseLink(): Link?{
+
+            val targetText = sourceText.substring(position, parent.insideEnd)
+            val matcher = linkPattern.matcher(targetText)
+            if(!matcher.find()){
+                return null
+            }
+
+            if(parent.elementType.elementClass.weight <= ElementClass.LINK.weight){
+                return null
+            }
+
+            return Link(
+                text = matcher.group(1),
+                start = position + matcher.start(),
+                end = position + matcher.end(),
+                insideStart = position + matcher.start(1),
+                insideEnd = position + matcher.end(1),
+                url = matcher.group(2) + matcher.group(3)
+            )
+        }
 
 
     }
