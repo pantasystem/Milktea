@@ -1,17 +1,17 @@
 package jp.panta.misskeyandroidclient.mfm
 
 open class Node(
-    val start: Int,
-    val end: Int,
-    val insideStart: Int,
-    val insideEnd: Int,
-    val tag: TagType,
+    override val start: Int,
+    override val end: Int,
+    override val insideStart: Int,
+    override val insideEnd: Int,
+    override val elementType: ElementType,
     val parentNode: Node?
 
 ): Element {
 
-    val childNodes = ArrayList<Element>()
+    val childElements = ArrayList<Element>()
     override fun toString(): String {
-        return "Node(type: $tag, childNodes=$childNodes)"
+        return "Node(type: $elementType, childNodes=$childElements)"
     }
 }

@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.mfm
 
-import jp.panta.misskeyandroidclient.PostNoteService.Companion.tag
 import java.util.regex.Pattern
 
 object MFMParser{
@@ -66,7 +65,7 @@ object MFMParser{
             // 文字数が０より多いとき
             if((tagStart - finallyDetected) > 0){
                 val text = sourceText.substring(finallyDetected, tagStart)
-                parent.childNodes.add(Text(text))
+                parent.childElements.add(Text(text, finallyDetected))
             }
         }
 
@@ -98,7 +97,7 @@ object MFMParser{
 
 
                         // 発見したNodeを追加する
-                        parent.childNodes.add(node)
+                        parent.childElements.add(node)
 
 
                         // 新たに発見した子NodeのためにNodeParserを作成する
@@ -134,7 +133,7 @@ object MFMParser{
             if(!matcher.find()){
                 return null
             }
-            if(parent.tag.tagClass.weight < TagType.BOLD.tagClass.weight || parent.tag == TagType.BOLD){
+            if(parent.elementType.elementClass.weight < ElementType.BOLD.elementClass.weight || parent.elementType == ElementType.BOLD){
                 return null
             }
 
@@ -142,7 +141,7 @@ object MFMParser{
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                tag = TagType.BOLD,
+                elementType = ElementType.BOLD,
                 insideStart = position + 2,
                 insideEnd = position + matcher.end() - 2,
                 parentNode = parent
@@ -160,14 +159,14 @@ object MFMParser{
                 val tag = MFMContract.blockTypeTagNameMap[tagName]?: return null
 
                 // Parentより自分のほうが重い又は同じタグの場合無効
-                if(parent.tag.tagClass.weight < tag.tagClass.weight || parent.tag == tag){
+                if(parent.elementType.elementClass.weight < tag.elementClass.weight || parent.elementType == tag){
                     return null
                 }
 
                 return Node(
                     start = position,
                     end = position + matcher.end(),
-                    tag = tag,
+                    elementType = tag,
                     insideStart = position + tagName.length + 2,
                     insideEnd = position + matcher.end(2),
                     parentNode = parent
@@ -183,14 +182,14 @@ object MFMParser{
             if(!matcher.find()){
                 return null
             }
-            if(parent.tag.tagClass.weight < TagType.STRIKE.tagClass.weight || parent.tag == TagType.STRIKE){
+            if(parent.elementType.elementClass.weight < ElementType.STRIKE.elementClass.weight || parent.elementType == ElementType.STRIKE){
                 return null
             }
 
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                tag = TagType.STRIKE,
+                elementType = ElementType.STRIKE,
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.start(1) + matcher.group(1).length,
                 parentNode = parent
@@ -205,13 +204,13 @@ object MFMParser{
             if(!matcher.find()){
                 return null
             }
-            if(parent.tag != TagType.ROOT){
+            if(parent.elementType != ElementType.ROOT){
                 return null
             }
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                tag = TagType.CODE,
+                elementType = ElementType.CODE,
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.end(1),
                 parentNode = parent
@@ -224,11 +223,11 @@ object MFMParser{
             if(position > 0){
                 val c = sourceText[ position - 1 ]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
-                if( (c != '\r' && c != '\n') && parent.tag != TagType.QUOTE){
+                if( (c != '\r' && c != '\n') && parent.elementType != ElementType.QUOTE){
                     println("直前の文字が改行コードではないかつ、親が引用コードではない")
                     return null
                 }
-                if( parent.tag.tagClass.weight < TagType.QUOTE.tagClass.weight && parent.tag != TagType.ROOT){
+                if( parent.elementType.elementClass.weight < ElementType.QUOTE.elementClass.weight && parent.elementType != ElementType.ROOT){
                     println("親ノードのほうが小さい")
                     return null
                 }
@@ -253,7 +252,7 @@ object MFMParser{
             return Node(
                 start = position,
                 end = nodeEnd + position,
-                tag = TagType.QUOTE,
+                elementType = ElementType.QUOTE,
                 insideStart = position + 1, // >を排除する
                 insideEnd = position + nodeEnd,
                 parentNode = parent
@@ -270,13 +269,13 @@ object MFMParser{
             if(!matcher.find()){
                 return null
             }
-            if(parent.tag != TagType.ROOT){
+            if(parent.elementType != ElementType.ROOT){
                 return null
             }
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                tag = TagType.TITLE,
+                elementType = ElementType.TITLE,
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.end(1),
                 parentNode = parent
