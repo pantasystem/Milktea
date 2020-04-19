@@ -9,4 +9,7 @@ class Mention(
     val host: String?
 ) : Element{
     override val elementType: ElementType = ElementType.MENTION
+    override fun toString(): String {
+        return "Mention(elementType=$elementType, text=$text, host=$host)"
+    }
 }

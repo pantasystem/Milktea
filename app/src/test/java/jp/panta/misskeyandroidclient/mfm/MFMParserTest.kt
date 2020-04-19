@@ -148,4 +148,22 @@ class MFMParserTest{
         val text = "Hello world **:ai:は:kawaii::misskey:**"
         println(MFMParser.parse(text, emojis))
     }
+
+    @Test
+    fun hashTagTest(){
+        val text = "#Hello world #こんにちは,#これはハッシュタグに入らないよ"
+        println(MFMParser.parse(text))
+    }
+
+    @Test
+    fun nestedHashTagTest(){
+        val text = "<i>#Hello world</i>"
+        println(MFMParser.parse(text))
+    }
+
+    @Test
+    fun mentionTest(){
+        val text = "@Panta@misskey.io\nhogehoge @Panta"
+        println(MFMParser.parse(text))
+    }
 }

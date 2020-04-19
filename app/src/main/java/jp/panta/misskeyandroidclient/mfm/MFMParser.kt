@@ -402,6 +402,9 @@ object MFMParser{
         private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
         private fun parseUrl(): Link?{
             val matcher = urlPattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find()){
+                return null
+            }
             return if(matcher.nullableGroup(1) == "http"){
                 Link(
                     matcher.group(),
