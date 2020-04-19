@@ -6,13 +6,14 @@ import java.util.regex.Pattern
 
 object MFMParser{
 
-    fun parse(text: String, emojis: List<Emoji> = emptyList()): Node{
+    fun parse(text: String?, emojis: List<Emoji>? = emptyList()): Root?{
+        text?: return null
         println("textSize:${text.length}")
         val root = Root(text)
         NodeParser(text, root,
-            emojis.map{
+            emojis?.map{
                 it.name to it
-            }.toMap()
+            }?.toMap()?: emptyMap()
         ).parse()
         return root
     }

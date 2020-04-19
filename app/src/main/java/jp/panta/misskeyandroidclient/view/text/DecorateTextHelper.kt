@@ -6,7 +6,10 @@ import android.text.util.Linkify
 import android.util.Patterns
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import jp.panta.misskeyandroidclient.mfm.MFMDecorator
+import jp.panta.misskeyandroidclient.mfm.Root
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import org.w3c.dom.Node
 import java.util.regex.Pattern
 
 object DecorateTextHelper {
@@ -52,5 +55,13 @@ object DecorateTextHelper {
         })
         textView.linksClickable = true
         textView.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    @BindingAdapter("textNode")
+    @JvmStatic
+    fun TextView.decorate(node: Root?){
+        node?: return
+        this.movementMethod = LinkMovementMethod.getInstance()
+        this.text = MFMDecorator.decorate(this, node)
     }
 }

@@ -32,6 +32,7 @@ import java.lang.IllegalArgumentException
 class UserDetailActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
+        const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_NAME"
     }
 
     private var mViewModel: UserDetailViewModel? = null
@@ -53,6 +54,7 @@ class UserDetailActivity : AppCompatActivity() {
         val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
         mUserId = userId
         val userName = intent.data?.getQueryParameter("userName")
+            ?: intent.getStringExtra(EXTRA_USER_NAME)
         Log.d("UserDetailActivity", "userName:$userName")
 
         val miApplication = applicationContext as MiApplication

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -79,6 +80,7 @@ open class PlaneNoteViewData (
 
 
     val text = toShowNote.text
+    val textNode = MFMParser.parse(toShowNote.text, toShowNote.emojis)
 
     val emojis = toShowNote.emojis
 
