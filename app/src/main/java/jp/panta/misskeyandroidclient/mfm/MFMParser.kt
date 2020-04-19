@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.mfm
 
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object MFMParser{
@@ -61,7 +62,10 @@ object MFMParser{
             '[' to listOf(::parseTitle, ::parseLink, ::parseSearch),
             '?' to listOf(::parseLink),
             'S' to listOf(::parseSearch),
-            ':' to listOf(::parseEmoji)
+            ':' to listOf(::parseEmoji),
+            '@' to listOf(::parseMention),
+            '#' to listOf(::parseHashTag),
+            'h' to listOf(::parseUrl)
 
         )
 
@@ -272,7 +276,7 @@ object MFMParser{
 
         private val titlePattern = Pattern.compile("""\A[【\[](.+?)[】\]]\n$""")
         private val searchPattern = Pattern.compile("""^(.+?) (\[Search]|検索|\[検索]|Search)$""", Pattern.MULTILINE)
-        private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp|http)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
+        private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
 
         private fun parseTitle(): Node?{
             val matcher = titlePattern.matcher(sourceText.substring(position, parent.insideEnd))
@@ -356,5 +360,99 @@ object MFMParser{
             )
         }
 
+        private val mentionPattern = Pattern.compile("""\A@([\w._\-]+)(@[\w._\-]+)?""")
+        private fun parseMention(): Mention?{
+            if(!beforeSpaceCheck()){
+                return null
+            }
+            val matcher = mentionPattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight){
+                return null
+            }
+            return Mention(
+                position + matcher.start(),
+                position + matcher.end(),
+                position + matcher.start(),
+                position + matcher.end(),
+                text = matcher.group(),
+                host = matcher.nullableGroup(2)
+            )
+        }
+
+        private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
+        private fun parseHashTag(): HashTag?{
+            if(!beforeSpaceCheck()){
+                return null
+            }
+            val matcher = hashTagPattern.matcher(sourceText.substring(position, parent.insideEnd))
+            if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight){
+                return null
+            }
+
+            return HashTag(
+                position + matcher.start(),
+                position + matcher.end(),
+                position + matcher.start(),
+                position + matcher.end(),
+                matcher.group()
+            )
+
+        }
+
+        private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+        private fun parseUrl(): Link?{
+            val matcher = urlPattern.matcher(sourceText.substring(position, parent.insideEnd))
+            return if(matcher.nullableGroup(1) == "http"){
+                Link(
+                    matcher.group(),
+                    position + matcher.start(),
+                    position + matcher.end(),
+                    position + matcher.start(),
+                    position + matcher.end(),
+                    matcher.group()
+                )
+            }else {
+                Link(
+                    matcher.nullableGroup(3)?: matcher.group(),
+                    position + matcher.start(),
+                    position + matcher.end(),
+                    position + (matcher.nullableStart(3)?: matcher.start()),
+                    position + (matcher.nullableEnd(3)?: matcher.end()),
+                    url = matcher.group()
+                )
+            }
+        }
+
+        private val spaceCRLFPattern = Pattern.compile("""\s""")
+        private fun beforeSpaceCheck(): Boolean{
+            return position <= parent.insideStart || spaceCRLFPattern.matcher(sourceText[ position - 1].toString()).find()
+
+        }
+
     }
+
+    private fun Matcher.nullableGroup(group: Int): String?{
+        return try{
+            this.group(group)
+        }catch(e: Exception){
+            null
+        }
+    }
+
+    private fun Matcher.nullableStart(group: Int): Int?{
+        return try{
+            this.start(group)
+        }catch(e: Exception){
+            null
+        }
+    }
+
+    private fun Matcher.nullableEnd(group: Int): Int?{
+        return try{
+            this.end(group)
+        }catch(e: Exception){
+            null
+        }
+    }
+
 }

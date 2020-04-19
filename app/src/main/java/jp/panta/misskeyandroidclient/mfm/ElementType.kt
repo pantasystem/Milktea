@@ -19,7 +19,9 @@ enum class ElementType(val elementClass: ElementClass) {
     SMALL(ElementClass.STANDARD),
     LINK(ElementClass.LINK),
     TEXT(ElementClass.TEXT),
-    EMOJI(ElementClass.EMOJI)
+    EMOJI(ElementClass.EMOJI),
+    MENTION(ElementClass.LINK),
+    HASH_TAG(ElementClass.LINK)
 }
 
 enum class ElementClass(val weight: Int){
