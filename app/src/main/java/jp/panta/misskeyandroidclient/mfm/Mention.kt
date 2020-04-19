@@ -5,9 +5,9 @@ class Mention(
     override val end: Int,
     override val insideStart: Int,
     override val insideEnd: Int,
-    val text: String,
+    override val text: String,
     val host: String?
-) : Element{
+) : Leaf(){
     override val elementType: ElementType = ElementType.MENTION
     override fun toString(): String {
         return "Mention(elementType=$elementType, text=$text, host=$host)"

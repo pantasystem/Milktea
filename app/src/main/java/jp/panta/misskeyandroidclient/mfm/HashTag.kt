@@ -5,8 +5,8 @@ class HashTag(
     override val end: Int,
     override val insideStart: Int,
     override val insideEnd: Int,
-    val text: String
-) : Element{
+    override val text: String
+) : Leaf(){
     override val elementType: ElementType = ElementType.HASH_TAG
     override fun toString(): String {
         return "HashTag(elementType=$elementType, tag=$text)"
