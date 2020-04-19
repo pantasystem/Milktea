@@ -166,4 +166,10 @@ class MFMParserTest{
         val text = "@Panta@misskey.io\nhogehoge @Panta"
         println(MFMParser.parse(text))
     }
+
+    @Test
+    fun urlTest(){
+        val text = "https://misskey.io http://misskey.io hogehttps://misskey.io"
+        println(MFMParser.parse(text))
+    }
 }
