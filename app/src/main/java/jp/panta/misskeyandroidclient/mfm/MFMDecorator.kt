@@ -3,12 +3,12 @@ package jp.panta.misskeyandroidclient.mfm
 import android.app.SearchManager
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.SpannedString
-import android.text.style.ClickableSpan
+import android.text.*
+import android.text.style.*
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
@@ -82,6 +82,7 @@ object MFMDecorator {
                         else -> null
                     }
                 is Node ->{
+                    decorateNode()
                     spannableStringBuilder
                 }
                 else -> null
@@ -145,6 +146,48 @@ object MFMDecorator {
                 },0, text.length, 0
             )
             return spanned
+        }
+
+        /**
+         * 最後に一度だけ実行すること
+         */
+        private fun decorateNode(){
+            fun setSpan(any: Any){
+                spannableStringBuilder.setSpan(any, 0, spannableStringBuilder.length, 0)
+            }
+
+            if(parent is Node){
+                when(parent.elementType){
+                    ElementType.QUOTE ->{
+                        setSpan(QuoteSpan())
+                    }
+                    ElementType.BOLD ->{
+                        setSpan(StyleSpan(Typeface.BOLD))
+                    }
+                    ElementType.ITALIC ->{
+                        setSpan(StyleSpan(Typeface.ITALIC))
+                    }
+                    ElementType.CENTER ->{
+                        setSpan(AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER))
+                    }
+                    ElementType.STRIKE ->{
+                        setSpan(StrikethroughSpan())
+                    }
+                    ElementType.CODE ->{
+                        setSpan(BackgroundColorSpan(Color.parseColor("#e3e2e1")))
+                    }
+                    ElementType.TITLE ->{
+                        setSpan(RelativeSizeSpan(1.5F))
+                    }
+                    ElementType.SMALL ->{
+                        setSpan(RelativeSizeSpan(0.6F))
+                    }
+                    else ->{
+                        Log.d("MFMDecorator", "error:${parent.elementType}")
+                    }
+                }
+            }
+
         }
 
 
