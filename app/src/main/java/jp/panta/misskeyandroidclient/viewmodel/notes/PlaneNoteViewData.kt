@@ -71,6 +71,7 @@ open class PlaneNoteViewData (
     val avatarUrl = toShowNote.user.avatarUrl
 
     val cw = toShowNote.cw
+    val cwNode = MFMParser.parse(toShowNote.cw, toShowNote.emojis)
 
     //true　折り畳み
     val contentFolding = MutableLiveData<Boolean>(cw != null)
@@ -120,9 +121,11 @@ open class PlaneNoteViewData (
     val subNoteName = subNote?.user?.name
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteText = subNote?.text
+    val subNoteTextNode = MFMParser.parse(subNote?.text, subNote?.emojis)
     val subNoteEmojis = subNote?.emojis
 
     val subCw = subNote?.cw
+    val subCwNode = MFMParser.parse(subNote?.cw, subNote?.emojis)
     //true　折り畳み
     val subContentFolding = MutableLiveData<Boolean>( subCw != null )
     val subContentFoldingStatusMessage = Transformations.map(subContentFolding){

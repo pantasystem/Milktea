@@ -79,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="cwcwcwwcwcw"
-                android:text="@{note.cw}"
+                app:textNode="@{note.cwNode}"
                 android:layout_toEndOf="@+id/avatarIcon"
                 android:layout_below="@+id/userName"
                 android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
@@ -191,7 +191,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="cwcwcwwcwcw"
-                        android:text="@{SafeUnbox.unbox(note.subCw)}"
+                        app:textNode="@{note.subCwNode}"
                         android:layout_below="@+id/subNoteUserName"
                         android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                         />
@@ -217,10 +217,8 @@
                         android:textSize="15sp"
                         android:id="@+id/subNoteText"
                         tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
-                        app:text='@{SafeUnbox.unbox(note.subNoteText)}'
-                        app:emojis='@{note.subNoteEmojis}'
+                        app:textNode="@{note.subNoteTextNode}"
                         android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
-                        app:clickableLink="@{true}"
                         />
 
                 <FrameLayout
