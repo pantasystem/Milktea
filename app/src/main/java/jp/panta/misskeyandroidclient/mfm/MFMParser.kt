@@ -136,8 +136,8 @@ object MFMParser{
          */
 
         private fun parseTypeStar(): Node?{
-            val boldPattern = Pattern.compile("""\A\*\*(.+?)\*\*""")
-            val animationPattern = Pattern.compile("""\A\*\*\*(.+?)\*\*\*""")
+            val boldPattern = Pattern.compile("""\A\*\*(.+?)\*\*""", Pattern.DOTALL)
+            val animationPattern = Pattern.compile("""\A\*\*\*(.+?)\*\*\*""", Pattern.DOTALL)
             val currentInside = sourceText.substring(position, parent.insideEnd)
 
             if(animationPattern.matcher(currentInside).find()){
@@ -193,7 +193,7 @@ object MFMParser{
         }
 
         private fun parseStrike(): Node?{
-            val pattern = Pattern.compile("""\A~~(.+?)~~""")
+            val pattern = Pattern.compile("""\A~~(.+?)~~""", Pattern.DOTALL)
             val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
             if(!matcher.find()){
                 return null
@@ -215,7 +215,7 @@ object MFMParser{
 
 
         private fun parseCode(): Node?{
-            val pattern = Pattern.compile("""\A```(.*)```""")
+            val pattern = Pattern.compile("""\A```(.*)```""", Pattern.DOTALL)
             val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
             if(!matcher.find()){
                 return null
