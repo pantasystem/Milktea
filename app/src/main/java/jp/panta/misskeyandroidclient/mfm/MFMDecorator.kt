@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchResultActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
@@ -19,6 +20,7 @@ import jp.panta.misskeyandroidclient.view.text.EmojiSpan
 import java.lang.ref.WeakReference
 
 object MFMDecorator {
+    private val br = System.getProperty("line.separator")
 
 
     fun decorate(textView: TextView, node: Root): Spanned{
@@ -120,7 +122,7 @@ object MFMDecorator {
             val intent = Intent(Intent.ACTION_SEARCH)
             intent.setClassName("com.google.android.googlequicksearchbox",  "com.google.android.googlequicksearchbox.SearchActivity")
             intent.putExtra(SearchManager.QUERY, search.text)
-            return makeClickableSpan(search.text, intent)
+            return makeClickableSpan("${search.text}  ${(textView.get()?.context?.getString(R.string.search)?: "Search")}", intent)
         }
 
         private fun decorateMention(mention: Mention): Spanned?{
@@ -188,7 +190,9 @@ object MFMDecorator {
                         setSpan(BackgroundColorSpan(Color.parseColor("#e3e2e1")))
                     }
                     ElementType.TITLE ->{
+                        spannableStringBuilder.append("\n")
                         setSpan(RelativeSizeSpan(1.5F))
+                        setSpan(AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER))
                     }
                     ElementType.SMALL ->{
                         setSpan(RelativeSizeSpan(0.6F))
