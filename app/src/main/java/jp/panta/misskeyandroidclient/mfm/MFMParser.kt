@@ -60,7 +60,7 @@ object MFMParser{
             '>' to listOf(::parseQuote), //引用
             '*' to listOf(::parseTypeStar),  // 横伸縮対称揺れ, 太字
             '【' to listOf(::parseTitle),//タイトル
-            '[' to listOf(::parseTitle, ::parseLink, ::parseSearch),
+            '[' to listOf(::parseSearch, ::parseLink, ::parseTitle),
             '?' to listOf(::parseLink),
             'S' to listOf(::parseSearch),
             ':' to listOf(::parseEmoji),
@@ -275,7 +275,8 @@ object MFMParser{
             )
         }
 
-        private val titlePattern = Pattern.compile("""\A[【\[](.+?)[】\]]\n$""")
+        private val titlePattern = Pattern.compile("""\A[【\[](.+?)[】\]](\n|\z)""")
+
         private val searchPattern = Pattern.compile("""^(.+?) (\[Search]|検索|\[検索]|Search)$""", Pattern.MULTILINE)
         private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
 
