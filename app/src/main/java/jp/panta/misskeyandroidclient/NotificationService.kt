@@ -207,11 +207,13 @@ E/MQSEventManagerDelegate: failed to get MQSService.
             FOLLOW, RECEIVE_FOLLOW_REQUEST->{
                 Intent(this, UserDetailActivity::class.java).apply{
                     putExtra(UserDetailActivity.EXTRA_USER_ID, notificationViewData.user.id)
+                    putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }
             MENTION, REPLY, RENOTE, QUOTE, REACTION, POLL_VOTE ->{
                 Intent(this, NoteDetailActivity::class.java).apply{
                     putExtra(NoteDetailActivity.EXTRA_NOTE_ID, notificationViewData.noteViewData?.id)
+                    putExtra(NoteDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }
             else -> Intent(this, MainActivity::class.java)

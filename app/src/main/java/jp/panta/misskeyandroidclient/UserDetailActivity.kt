@@ -19,20 +19,19 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
-import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.view.users.PinNoteFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
-import kotlinx.android.synthetic.main.activity_user_detail.*
 import java.lang.IllegalArgumentException
 
 class UserDetailActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
         const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_NAME"
+        const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
     }
 
     private var mViewModel: UserDetailViewModel? = null
@@ -40,6 +39,7 @@ class UserDetailActivity : AppCompatActivity() {
     private var mAccountRelation: AccountRelation? = null
 
     private var mUserId: String? = null
+    private var mIsMainActive: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +56,7 @@ class UserDetailActivity : AppCompatActivity() {
         val userName = intent.data?.getQueryParameter("userName")
             ?: intent.getStringExtra(EXTRA_USER_NAME)
         Log.d("UserDetailActivity", "userName:$userName")
+        mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
         val miApplication = applicationContext as MiApplication
         miApplication.currentAccount.observe(this, Observer {ar ->
@@ -183,7 +184,9 @@ class UserDetailActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
-            android.R.id.home -> finish()
+            android.R.id.home -> {
+                finishAndGoToMainActivity()
+            }
             R.id.block ->{
                 mViewModel?.block()
             }
@@ -203,6 +206,19 @@ class UserDetailActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finishAndGoToMainActivity()
+    }
+
+    private fun finishAndGoToMainActivity(){
+        if(!mIsMainActive){
+            startActivity(Intent(this, MainActivity::class.java))
+        }
+        finish()
+    }
+
 
     private fun addPageToTab(){
         val user = mViewModel?.user?.value
