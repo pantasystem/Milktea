@@ -187,7 +187,8 @@ object MFMDecorator {
                         setSpan(StrikethroughSpan())
                     }
                     ElementType.CODE ->{
-                        setSpan(BackgroundColorSpan(Color.parseColor("#e3e2e1")))
+                        setSpan(BackgroundColorSpan(Color.parseColor("#000000")))
+                        setSpan(ForegroundColorSpan(Color.WHITE))
                     }
                     ElementType.TITLE ->{
                         spannableStringBuilder.append("\n")
