@@ -7,6 +7,7 @@ import android.util.Patterns
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.mfm.MFMDecorator
+import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.mfm.Root
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import org.w3c.dom.Node
@@ -61,6 +62,17 @@ object DecorateTextHelper {
     @JvmStatic
     fun TextView.decorate(node: Root?){
         node?: return
+        this.movementMethod = LinkMovementMethod.getInstance()
+        this.text = MFMDecorator.decorate(this, node)
+    }
+
+    @BindingAdapter("sourceText", "emojis")
+    @JvmStatic
+    fun TextView.decorateWithLowPerformance(sourceText: String?, emojis: List<Emoji>?){
+        sourceText?: return
+        emojis?: return
+        val node = MFMParser.parse(sourceText, emojis)
+            ?: return
         this.movementMethod = LinkMovementMethod.getInstance()
         this.text = MFMDecorator.decorate(this, node)
     }

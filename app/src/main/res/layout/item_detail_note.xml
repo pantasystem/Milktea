@@ -92,7 +92,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="cwcwcwwcwcw"
-                    android:text="@{note.cw}"
+                    app:textNode="@{note.cwNode}"
                     android:layout_below="@id/avatarIcon"
                     android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                     />
@@ -123,11 +123,9 @@
                         android:id="@id/text"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        app:text='@{note.text}'
-                        app:emojis='@{note.emojis}'
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
-                        app:clickableLink="@{true}"
+                        app:textNode="@{note.textNode}"
                         />
 
                 <FrameLayout
@@ -201,9 +199,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:text="cwcwcwwcwcw"
-                            android:text="@{note.subCw}"
                             android:layout_below="@+id/subNoteUserName"
                             android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
+                            app:textNode="@{note.subCwNode}"
                             />
 
 
@@ -227,10 +225,8 @@
                             android:textSize="15sp"
                             android:id="@+id/subNoteText"
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
-                            app:text='@{note.subNoteText}'
-                            app:emojis='@{note.subNoteEmojis}'
                             android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
-                            app:clickableLink="@{true}"
+                            app:textNode="@{note.subNoteTextNode}"
                             />
 
                     <FrameLayout
