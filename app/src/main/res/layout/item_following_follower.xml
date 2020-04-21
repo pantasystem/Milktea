@@ -88,8 +88,7 @@
                     android:layout_toEndOf="@id/avatarIcon"
                     tools:text="description"
                     app:emojis="@{followFollowerUser.user.emojis}"
-                    app:clickableLink="@{true}"
-                    app:text="@{SafeUnbox.unbox(followFollowerUser.user.description)}"
+                    app:sourceText="@{SafeUnbox.unbox(followFollowerUser.user.description)}"
                     android:maxLines="2"
                     android:ellipsize="end"
                     />

@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.messaging
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
@@ -20,7 +21,8 @@ data class Message(
     @SerializedName("group") val group: Group?,
     @SerializedName("fileId") val fileId: String?,
     @SerializedName("file") val file: FileProperty?,
-    @SerializedName("isRead") val isRead: Boolean?
+    @SerializedName("isRead") val isRead: Boolean?,
+    val emojis: List<Emoji>?
 ): Serializable{
     fun isGroup(): Boolean{
         return group != null

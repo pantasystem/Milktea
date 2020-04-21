@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
+import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 
@@ -27,6 +28,7 @@ class HistoryViewData (account: Account, val message: Message){
     }
 
     val text = message.text
+    val textNode = MFMParser.parse(message.text, message.emojis)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

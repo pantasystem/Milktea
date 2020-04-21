@@ -28,7 +28,7 @@
                     android:layout_width="65dp" android:layout_height="65dp"
                     tools:srcCompat="@drawable/ic_follow"
                     app:circleIcon="@{historyViewData.historyIcon}"
-                    />
+                    tools:ignore="ContentDescription" />
             <TextView
                     android:id="@+id/history_title"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -46,14 +46,14 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
                     tools:text="message"
-                    android:text="@{historyViewData.text}"
+                    app:textNode="@{historyViewData.textNode}"
                     />
             <ImageView
                     android:id="@+id/message_image"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_below="@+id/history_message"
                     android:layout_toEndOf="@+id/history_icon"
-                    />
+                    tools:ignore="ContentDescription" />
             <TextView
                     android:id="@+id/updated_at"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
