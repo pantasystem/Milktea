@@ -16,12 +16,13 @@ import jp.panta.misskeyandroidclient.SearchResultActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
 import jp.panta.misskeyandroidclient.view.text.EmojiSpan
+import java.lang.ref.WeakReference
 
 object MFMDecorator {
 
 
     fun decorate(textView: TextView, node: Root): Spanned{
-        return Visitor(textView, node, node).decorate()
+        return Visitor(WeakReference(textView), node, node).decorate()
             ?: SpannedString(node.sourceText)
     }
 
@@ -29,7 +30,7 @@ object MFMDecorator {
      * VisitorパターンのVisitorとは少し違う
      */
     class Visitor(
-        val textView: TextView,
+        val textView: WeakReference<TextView>,
         val root: Root,
         val parent: Element
     ){
@@ -92,19 +93,22 @@ object MFMDecorator {
 
         private fun decorateEmoji(emojiElement: EmojiElement): Spanned?{
             val spanned = SpannableString(emojiElement.text)
-            val emojiSpan = EmojiSpan(textView)
-            spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
-            if(emojiElement.emoji.isSvg()){
-                GlideApp.with(textView.context)
-                    .`as`(Bitmap::class.java)
-                    .load(emojiElement.emoji.url?: emojiElement.emoji.url)
-                    .into(emojiSpan.bitmapTarget)
-            }else{
-                Glide.with(textView)
-                    .asDrawable()
-                    .load(emojiElement.emoji.url)
-                    .into(emojiSpan.target)
+            textView.get()?.let{ textView ->
+                val emojiSpan = EmojiSpan(textView)
+                spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
+                if(emojiElement.emoji.isSvg()){
+                    GlideApp.with(textView.context)
+                        .`as`(Bitmap::class.java)
+                        .load(emojiElement.emoji.url?: emojiElement.emoji.url)
+                        .into(emojiSpan.bitmapTarget)
+                }else{
+                    Glide.with(textView)
+                        .asDrawable()
+                        .load(emojiElement.emoji.url)
+                        .into(emojiSpan.target)
+                }
             }
+
             return spanned
         }
 
@@ -120,9 +124,12 @@ object MFMDecorator {
         }
 
         private fun decorateMention(mention: Mention): Spanned?{
-            val intent = Intent(textView.context, UserDetailActivity::class.java)
-            intent.putExtra(UserDetailActivity.EXTRA_USER_NAME, mention.text)
-            return makeClickableSpan(mention.text, intent)
+            return textView.get()?.let{ textView ->
+                val intent = Intent(textView.context, UserDetailActivity::class.java)
+                intent.putExtra(UserDetailActivity.EXTRA_USER_NAME, mention.text)
+                makeClickableSpan(mention.text, intent)
+            }?: closeErrorElement(mention)
+
         }
 
         private fun decorateLink(link: Link): Spanned?{
@@ -131,9 +138,12 @@ object MFMDecorator {
 
 
         private fun decorateHashTag(hashTag: HashTag): Spanned?{
-            val intent = Intent(textView.context, SearchResultActivity::class.java)
-            intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, hashTag.text)
-            return makeClickableSpan(hashTag.text, intent)
+            return textView.get()?.let{ textView ->
+                val intent = Intent(textView.context, SearchResultActivity::class.java)
+                intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, hashTag.text)
+                makeClickableSpan(hashTag.text, intent)
+            }?: closeErrorElement(hashTag)
+
         }
 
         private fun makeClickableSpan(text: String, intent: Intent): SpannableString{
@@ -141,7 +151,8 @@ object MFMDecorator {
             spanned.setSpan(
                 object : ClickableSpan(){
                     override fun onClick(p0: View) {
-                        textView.context.startActivity(intent)
+                        textView.get()?.context?.startActivity(intent)
+
                     }
                 },0, text.length, 0
             )
@@ -181,6 +192,9 @@ object MFMDecorator {
                     }
                     ElementType.SMALL ->{
                         setSpan(RelativeSizeSpan(0.6F))
+                    }
+                    ElementType.ROOT ->{
+
                     }
                     else ->{
                         Log.d("MFMDecorator", "error:${parent.elementType}")
