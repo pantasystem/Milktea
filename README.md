@@ -2,7 +2,11 @@
 MisskeyのAndroidクライアント
 
 ## Description
-これはMisskeyのAndroidクライアントリリース版はまだない
+これはMisskeyのAndroidのクライアント
+
+## How to install
+Playストアにはまだ出していないので以下からapkをダウンロード＆インストールする<br>
+[releases](https://github.com/Kinoshita0623/MisskeyAndroidClient/releases)<br>
 
 ## How to build
 
