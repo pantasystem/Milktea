@@ -1,10 +1,12 @@
 package jp.panta.misskeyandroidclient.view.media
 
+import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
@@ -149,7 +151,13 @@ object MediaPreviewHelper{
                     fvd.fileProperty
                 }))
                 intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, fileIndex)
-                context.startActivity(intent)
+                if(context is Activity){
+                    val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(context, thumbnailView, "image")
+                    context.startActivity(intent, compat.toBundle())
+
+                }else{
+                    context.startActivity(intent)
+                }
             }
         }catch(e: IndexOutOfBoundsException){
             this.visibility = View.GONE
