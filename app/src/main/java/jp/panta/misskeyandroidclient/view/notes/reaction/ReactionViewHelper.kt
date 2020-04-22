@@ -85,15 +85,12 @@ object ReactionViewHelper {
 
         }
 
-        val reactionResourceId = ReactionResourceMap.reactionDrawableMap[reaction]
-        if(reactionResourceId != null){
+        val constantReaction = ReactionResourceMap.reactionMap[reaction]
+        if(constantReaction != null){
 
-            Glide.with(reactionImageView)
-                .load(reactionResourceId)
-                .centerCrop()
-                .into(reactionImageView)
-            reactionImageView.visibility = View.VISIBLE
-            reactionStringView.visibility = View.GONE
+            reactionStringView.text = constantReaction
+            reactionImageView.visibility = View.GONE
+            reactionStringView.visibility = View.VISIBLE
         }else{
             //Log.d("ReactionViewHelper", "どれにも当てはまらなかった")
             reactionStringView.text = reaction

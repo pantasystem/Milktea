@@ -35,7 +35,7 @@
                             android:layout_height="140dp"
                             app:headerImageUrl="@{userViewModel.user.bannerUrl}"
                             tools:ignore="ContentDescription"
-                            android:transitionName="user"/>
+                            />
 
                     <ImageView
                             android:id="@+id/avatarIcon"
@@ -47,7 +47,8 @@
                             app:circleIcon="@{userViewModel.user.avatarUrl}"
                             tools:srcCompat="@drawable/ic_follow"
                             android:layout_marginBottom="8dp"
-                            tools:ignore="ContentDescription" />
+                            tools:ignore="ContentDescription"
+                            android:transitionName="user"/>
                     <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
