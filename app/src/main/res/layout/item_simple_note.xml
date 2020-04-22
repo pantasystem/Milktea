@@ -34,8 +34,8 @@
                 android:layout_marginEnd="8dp"
                 app:circleIcon='@{note.avatarUrl}'
                 tools:srcCompat="@android:drawable/sym_def_app_icon"
-                android:onClick="@{()-> notesViewModel.setTargetToUser(note.toShowNote.user)}"
                 android:contentDescription="@string/avataricon"
+                app:transitionDestinationUser="@{note.toShowNote.user}"
                 />
 
         <TextView
@@ -167,6 +167,7 @@
                         android:layout_marginEnd="5dp"
                         app:circleIcon='@{note.subNoteAvatarUrl}'
                         android:contentDescription="@string/avataricon"
+                        app:transitionDestinationUser="@{note.subNote.user}"
                         />
 
                 <TextView
