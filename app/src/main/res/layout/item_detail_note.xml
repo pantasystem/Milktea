@@ -127,21 +127,18 @@
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                         app:textNode="@{note.textNode}"
                         />
-
-                <FrameLayout
+                <include
                         android:id="@+id/mediaPreview"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
                         android:layout_below="@id/text"
                         android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                         tools:visibility="gone"
-                        >
-                    <include layout="@layout/media_preview"
-                            app:media="@{note.media}"
-                            app:notesViewModel="@{notesViewModel}"
+                        layout="@layout/media_preview"
+                        app:media="@{note.media}"
+                        app:notesViewModel="@{notesViewModel}"
 
-                            />
-                </FrameLayout>
+                        />
 
                 <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/poll"
@@ -231,21 +228,17 @@
                             android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
                             app:textNode="@{note.subNoteTextNode}"
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
-
-                    <FrameLayout
+                    <include
+                            layout="@layout/media_preview"
+                            app:media="@{note.subNoteMedia}"
+                            app:notesViewModel="@{notesViewModel}"
                             android:id="@+id/subNoteMediaPreview"
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
                             android:layout_below="@id/subNoteText"
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
-                            tools:layout_height="50dp">
+                            tools:layout_height="50dp"/>
 
-                        <include
-                                layout="@layout/media_preview"
-                                app:media="@{note.subNoteMedia}"
-                                app:notesViewModel="@{notesViewModel}" />
-
-                    </FrameLayout>
 
 
                 </RelativeLayout>

@@ -1,12 +1,15 @@
 package jp.panta.misskeyandroidclient.view.media
 
+import android.content.Intent
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.MediaPreviewBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.view.media.MediaPreviewHelper.setPreview
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
@@ -139,6 +142,15 @@ object MediaPreviewHelper{
             Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
             MediaPreviewHelper.setPreview(thumbnailView, playButton, file)
 
+            thumbnailView.setOnClickListener {
+                val context = it.context
+                val intent = Intent(context, MediaActivity::class.java)
+                intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY_LIST, ArrayList(mediaViewData.files.map{ fvd ->
+                    fvd.fileProperty
+                }))
+                intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, fileIndex)
+                context.startActivity(intent)
+            }
         }catch(e: IndexOutOfBoundsException){
             this.visibility = View.GONE
         }catch(e: NullPointerException){
@@ -218,6 +230,7 @@ object MediaPreviewHelper{
             }
         }
     }
+
 
 
 

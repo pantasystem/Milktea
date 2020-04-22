@@ -118,22 +118,23 @@
                     android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
 
                     />
-
-            <FrameLayout
+            <include
                     android:id="@+id/mediaPreview"
+
+                    layout="@layout/media_preview"
+                    app:media="@{note.media}"
+                    app:notesViewModel="@{notesViewModel}"
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
                     android:layout_below="@id/text"
                     android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                     tools:visibility="visible"
                     tools:layout_height="100dp"
-                    >
-                <include layout="@layout/media_preview"
-                        app:media="@{note.media}"
-                        app:notesViewModel="@{notesViewModel}"
 
-                        />
-            </FrameLayout>
+                    />
+
+
+
 
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/poll"
@@ -222,21 +223,16 @@
                         app:textNode="@{note.subNoteTextNode}"
                         android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
                         />
-
-                <FrameLayout
+                <include layout="@layout/media_preview"
+                        app:notesViewModel="@{notesViewModel}"
+                        app:media="@{note.subNoteMedia}"
                         android:id="@+id/subNoteMediaPreview"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
                         android:layout_below="@id/subNoteText"
                         android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                         tools:layout_height="100dp"
-                        >
-                    <include layout="@layout/media_preview"
-                            app:notesViewModel="@{notesViewModel}"
-                            app:media="@{note.subNoteMedia}"
-
-                            />
-                </FrameLayout>
+                        />
 
 
 

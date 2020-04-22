@@ -55,7 +55,6 @@
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.GONE : View.VISIBLE }"
-                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileOne) }"
                         />
                 <ImageButton
                         android:id="@+id/actionButtonTopLeft"
@@ -102,7 +101,6 @@
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
-                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileThree) }"
                         />
 
                 <ImageButton
@@ -156,7 +154,6 @@
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.GONE : View.VISIBLE }"
-                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileTwo) }"
                         />
                 <ImageButton
                         android:id="@+id/actionButtonTopRight"
@@ -200,7 +197,6 @@
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_reaction_laugh"
                         android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.GONE : View.VISIBLE}"
-                        android:onClick="@{()-> notesViewModel.showFile(media, media.fileFour) }"
                         />
                 <ImageButton
                         android:id="@+id/actionButtonBottomRight"
