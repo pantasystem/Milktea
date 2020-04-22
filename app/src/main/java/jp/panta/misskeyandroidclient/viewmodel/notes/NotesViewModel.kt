@@ -56,6 +56,8 @@ class NotesViewModel(
 
     val targetNote = EventBus<PlaneNoteViewData>()
 
+    val showNoteEvent = EventBus<Note>()
+
     val targetFile = EventBus<Pair<FileViewData, MediaViewData>>()
 
     val showInputReactionEvent = EventBus<Unit>()
@@ -86,6 +88,10 @@ class NotesViewModel(
     }
     fun setTargetToNote(note: PlaneNoteViewData){
         targetNote.event = note
+    }
+
+    fun setShowNote(note: Note){
+        showNoteEvent.event = note
     }
 
     fun postRenote(){

@@ -73,6 +73,7 @@
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"
+                android:onClick="@{()-> notesViewModel.setShowNote(note.toShowNote)}"
                 />
         <TextView
                 android:id="@+id/cw"
@@ -155,7 +156,7 @@
                     android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                     android:id="@+id/subNote"
                     android:background="@drawable/shape_rounded_square_line"
-
+                    android:onClick="@{ ()-> notesViewModel.setShowNote(note.subNote)}"
 
                     >
                 <ImageView

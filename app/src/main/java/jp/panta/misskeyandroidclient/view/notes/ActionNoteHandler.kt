@@ -72,6 +72,11 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
+    private val showNoteEventObserver = Observer<Note>{
+        val intent = Intent(activity, NoteDetailActivity::class.java)
+        intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.id)
+        activity.startActivity(intent)
+    }
     private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{
         Log.d("ActionNoteHandler", "${it.first.fileProperty}")
         val list = it.second.files.map{fv ->
@@ -132,5 +137,8 @@ class ActionNoteHandler(
 
         mNotesViewModel.openNoteEditor.removeObserver(openNoteEditor)
         mNotesViewModel.openNoteEditor.observe(activity, openNoteEditor)
+
+        mNotesViewModel.showNoteEvent.removeObserver(showNoteEventObserver)
+        mNotesViewModel.showNoteEvent.observe(activity, showNoteEventObserver)
     }
 }
