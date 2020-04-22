@@ -31,4 +31,7 @@ object ReactionResourceMap {
         "surprise" to "\uD83D\uDE2E", // 😮
         "star" to "⭐" // ⭐
     )
+
+    val defaultReaction = listOf("angry", "confused", "congrats", "hmm", "laugh", "like", "love", "pudding", "rip", "surprise", "star")
+
 }
