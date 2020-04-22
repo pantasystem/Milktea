@@ -9,11 +9,9 @@ import jp.panta.misskeyandroidclient.model.core.ConnectionInformationDao
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryCount
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.*
 
-@Database(entities = [EncryptedConnectionInformation::class, NoteRequest.Setting::class, ReactionHistory::class, Account::class], version = 35)
+@Database(entities = [EncryptedConnectionInformation::class, NoteRequest.Setting::class, ReactionHistory::class, Account::class, ReactionUserSetting::class], version = 36)
 @TypeConverters(NoteRequest.NoteTypeConverter::class, DateConverter::class)
 abstract class DataBase : RoomDatabase(){
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
@@ -21,5 +19,6 @@ abstract class DataBase : RoomDatabase(){
     abstract fun accountDao(): AccountDao
     abstract fun noteSettingDao(): NoteRequestSettingDao
     abstract fun reactionHistoryDao(): ReactionHistoryDao
+    abstract fun reactionUserSettingDao(): ReactionUserSettingDao
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
 }

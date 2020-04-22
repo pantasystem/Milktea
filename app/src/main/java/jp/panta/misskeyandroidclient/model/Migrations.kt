@@ -14,3 +14,9 @@ val MIGRATION_34_35 = object : Migration(34, 35){
         database.execSQL("alter table setting add listId TEXT")
     }
 }
+
+val MIGRATION_35_36 = object : Migration(35, 36){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("create table reaction_user_setting(reaction text, instance_domain text, weight integer, primary key(reaction, instance_domain))")
+    }
+}

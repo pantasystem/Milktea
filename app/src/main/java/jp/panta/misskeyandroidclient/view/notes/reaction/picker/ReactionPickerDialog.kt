@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
+import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 
@@ -23,6 +24,8 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ar!!, miApplication))[NotesViewModel::class.java]
         val defaultEmojiReactionsMap = ReactionResourceMap.reactionMap
+        val adapter = ReactionChoicesAdapter(notesViewModel)
+        adapter.submitList(ReactionResourceMap.defaultReaction)
         return dialog
     }
 }

@@ -81,6 +81,7 @@ class MiApplication : Application(), MiCore {
         val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database")
             .addMigrations(MIGRATION_33_34)
             .addMigrations(MIGRATION_34_35)
+            .addMigrations(MIGRATION_35_36)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()
