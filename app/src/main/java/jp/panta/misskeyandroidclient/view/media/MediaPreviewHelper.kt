@@ -144,7 +144,7 @@ object MediaPreviewHelper{
             Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
             MediaPreviewHelper.setPreview(thumbnailView, playButton, file)
 
-            thumbnailView.setOnClickListener {
+            val listener = View.OnClickListener {
                 val context = it.context
                 val intent = Intent(context, MediaActivity::class.java)
                 intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY_LIST, ArrayList(mediaViewData.files.map{ fvd ->
@@ -159,6 +159,8 @@ object MediaPreviewHelper{
                     context.startActivity(intent)
                 }
             }
+            thumbnailView.setOnClickListener(listener)
+            playButton.setOnClickListener(listener)
         }catch(e: IndexOutOfBoundsException){
             this.visibility = View.GONE
         }catch(e: NullPointerException){

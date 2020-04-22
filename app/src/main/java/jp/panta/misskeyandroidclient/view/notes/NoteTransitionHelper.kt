@@ -15,8 +15,8 @@ object NoteTransitionHelper {
     @BindingAdapter("clickedView", "transitionDestinationNote")
     fun View.transitionNoteDetail(clickedView: View?, transitionDestinationNote: Note?){
         transitionDestinationNote?: return
-        clickedView?: return
-        clickedView.setOnClickListener {
+        val clicked = clickedView?: this
+        clicked.setOnClickListener {
             val context = this.context
             val intent = Intent(context, NoteDetailActivity::class.java)
             intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, transitionDestinationNote.id)
