@@ -1,15 +1,16 @@
 # Milktea
 MisskeyのAndroidクライアント
 
-## Description
+## 説明
 これはMisskeyのAndroidのクライアント
 
-## How to install
+## インストール方法
 Playストアにはまだ出していないので以下からapkをダウンロード＆インストールする<br>
 [releases](https://github.com/Kinoshita0623/MisskeyAndroidClient/releases)<br>
 
-## How to build
+## ビルドするには
 
+プロジェクトをgit cloneします。 
 以下のクラスを
 app/src/java/jp/panta/misskeyandroidclient直下に作成する
 AppSecretはインスタンスのドメイン/devで作成することができます
