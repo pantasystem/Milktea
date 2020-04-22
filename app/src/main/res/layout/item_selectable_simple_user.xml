@@ -30,7 +30,8 @@
                     android:layout_marginEnd="8dp"
                     tools:src="@drawable/ic_person_add_black_24dp"
                     tools:ignore="ContentDescription"
-                    app:circleIcon="@{selectableUser.user.user.avatarUrl}"/>
+                    app:circleIcon="@{selectableUser.user.user.avatarUrl}"
+                    app:transitionDestinationUser="@{selectableUser.user.user}"/>
             <TextView
                     android:id="@+id/nameMain"
                     android:layout_toEndOf="@id/avatarIcon"

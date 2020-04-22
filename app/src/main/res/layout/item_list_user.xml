@@ -36,6 +36,7 @@
                     android:layout_marginEnd="8dp"
                     tools:src="@drawable/ic_follow"
                     app:circleIcon="@{listUserViewData.user.avatarUrl}"
+                    app:transitionDestinationUser="@{listUserViewData.user}"
                     />
 
             <TextView

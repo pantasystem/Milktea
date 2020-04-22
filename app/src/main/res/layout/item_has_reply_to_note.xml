@@ -40,7 +40,8 @@
                         app:circleIcon="@{hasReplyToNote.replyTo.avatarUrl}"
                         android:layout_marginEnd="8dp"
                         tools:ignore="ContentDescription"
-                        android:onClick="@{()-> notesViewModel.setTargetToUser(hasReplyToNote.replyTo.note.user)}"/>
+                        app:transitionDestinationUser="@{hasReplyToNote.replyTo.toShowNote.user}"
+                    />
 
                 <TextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"

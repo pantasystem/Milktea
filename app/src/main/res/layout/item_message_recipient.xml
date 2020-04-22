@@ -22,7 +22,8 @@
                 android:layout_marginEnd="4dp"
                 app:circleIcon="@{message.avatarIcon}"
                 tools:srcCompat="@drawable/ic_follow"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                app:transitionDestinationUser="@{message.message.user}"/>
 
         <TextView
                 android:id="@+id/user_name"
