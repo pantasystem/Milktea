@@ -157,40 +157,43 @@
 
 
                 <RelativeLayout
-                        android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_below="@+id/poll"
-                        android:paddingTop="8dp"
-                        android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                         android:id="@+id/subNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/poll"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/shape_rounded_square_line"
+                        android:padding="8dp"
 
-
-                        >
+                        android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'>
                     <ImageView
                             android:id="@+id/subAvatarIcon"
-                            android:layout_width="20dp" android:layout_height="20dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
                             android:layout_marginEnd="5dp"
-                            app:circleIcon='@{note.subNoteAvatarUrl}'
                             android:contentDescription="@string/avataricon"
-                            />
+                            app:circleIcon='@{note.subNoteAvatarUrl}' />
 
                     <TextView
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:id="@+id/subNoteUserName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
                             android:layout_toEndOf="@+id/subAvatarIcon"
                             android:text='@{note.subNoteUserName, default="@subUserId"}'
-                            android:id="@+id/subNoteUserName"
-                            android:textStyle="bold"
                             android:textSize="15sp"
 
-                            android:layout_marginEnd="8dp"
-                            />
+                            android:textStyle="bold" />
+
                     <TextView
-                            android:layout_toEndOf="@id/subNoteUserName"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text='@{note.subNoteName, default="SubName SubName"}'
-                            android:textStyle="italic"
                             android:id="@+id/subNoteName"
-                            android:textSize="15sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/subNoteUserName"
                             android:singleLine="true"
+                            android:text='@{note.subNoteName, default="SubName SubName"}'
+                            android:textSize="15sp"
+                            android:textStyle="italic"
 
                             />
 
@@ -198,11 +201,10 @@
                             android:id="@+id/subCw"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="cwcwcwwcwcw"
                             android:layout_below="@+id/subNoteUserName"
                             android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                             app:textNode="@{note.subCwNode}"
-                            />
+                            tools:text="cwcwcwwcwcw" />
 
 
                     <TextView
@@ -212,38 +214,38 @@
                             android:layout_below="@+id/subCw"
                             android:layout_marginStart="5dp"
                             android:layout_marginBottom="5dp"
-                            tools:text="展開する"
-                            android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
-                            android:textColor="?attr/colorAccent"
-                            android:text="@{note.subContentFoldingStatusMessage}"
                             android:onClick="@{()-> note.changeSubContentFolding() }"
+                            android:text="@{note.subContentFoldingStatusMessage}"
+                            android:textColor="?attr/colorAccent"
+                            android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
+                            tools:text="展開する"
 
                             />
+
                     <TextView
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:id="@+id/subNoteText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_below="@+id/subContentFoldingButton"
                             android:textSize="15sp"
-                            android:id="@+id/subNoteText"
-                            tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                             android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
                             app:textNode="@{note.subNoteTextNode}"
-                            />
+                            tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
 
                     <FrameLayout
                             android:id="@+id/subNoteMediaPreview"
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
-                            tools:layout_height="50dp"
                             android:layout_below="@id/subNoteText"
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
-                            >
-                        <include layout="@layout/media_preview"
+                            tools:layout_height="50dp">
+
+                        <include
+                                layout="@layout/media_preview"
                                 app:media="@{note.subNoteMedia}"
-                                app:notesViewModel="@{notesViewModel}"
-                                />
+                                app:notesViewModel="@{notesViewModel}" />
 
                     </FrameLayout>
-
 
 
                 </RelativeLayout>

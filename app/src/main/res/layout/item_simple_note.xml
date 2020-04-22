@@ -151,9 +151,10 @@
             <RelativeLayout
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_below="@+id/poll"
-                    android:paddingTop="8dp"
+                    android:padding="8dp"
                     android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                     android:id="@+id/subNote"
+                    android:background="@drawable/shape_rounded_square_line"
 
 
                     >
