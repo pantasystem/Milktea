@@ -23,7 +23,8 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
 
-
+            app:transitionDestinationNote="@{note.toShowNote}"
+            app:clickedView="@{elapsedTime}"
             >
 
         <ImageView
@@ -73,7 +74,7 @@
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"
-                android:onClick="@{()-> notesViewModel.setShowNote(note.toShowNote)}"
+                android:id="@+id/elapsedTime"
                 />
         <TextView
                 android:id="@+id/cw"
@@ -157,8 +158,8 @@
                     android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                     android:id="@+id/subNote"
                     android:background="@drawable/shape_rounded_square_line"
-                    android:onClick="@{ ()-> notesViewModel.setShowNote(note.subNote)}"
-
+                    app:transitionDestinationNote="@{note.subNote}"
+                    app:clickedView="@{subNote}"
                     >
                 <ImageView
                         android:id="@+id/subAvatarIcon"
