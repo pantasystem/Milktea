@@ -7,7 +7,7 @@ import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import jp.panta.misskeyandroidclient.view.settings.ReactionSettingActivity
+import jp.panta.misskeyandroidclient.view.settings.activities.ReactionSettingActivity
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.view.settings.activities.SettingAppearanceActivity
 import jp.panta.misskeyandroidclient.view.settings.activities.SettingMovementActivity

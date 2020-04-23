@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.view.settings
+package jp.panta.misskeyandroidclient.view.settings.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

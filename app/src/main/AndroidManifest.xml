@@ -16,7 +16,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".view.settings.ReactionSettingActivity"/>
+        <activity android:name=".view.settings.activities.ReactionSettingActivity"/>
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
                 android:theme="@style/LicensePageTheme" />

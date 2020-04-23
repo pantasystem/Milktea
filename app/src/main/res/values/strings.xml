@@ -88,7 +88,7 @@
     <string name="auto_load_when_stopped">Automatically read timeline even when stopped</string>
     <string name="sync">Sync</string>
 
-    <string name="movement">movement</string>
+    <string name="movement">Movement</string>
     <string name="remove_note">Delete notes</string>
 
     <string name="hide_removed_note">Hide deleted notes</string>
@@ -109,7 +109,7 @@
     <string name="thumbnail">Thumbnail</string>
     <string name="play_media">Play</string>
     <string name="avataricon">avatarIcon</string>
-    <string name="reaction">reaction</string>
+    <string name="reaction">Reaction</string>
     <string name="followed_by">followed</string>
     <string name="replied_by">replied</string>
     <string name="quoted_by">quoted</string>
@@ -208,5 +208,7 @@
 
     <string name="delete_and_edit">Delete and edit</string>
     <string name="license">License</string>
+    <string name="standard_reaction">Standard reaction</string>
+    <string name="set_the_reaction_displayed_in_the_reaction_picker">Set the reaction displayed in the reaction picker</string>
 
 </resources>

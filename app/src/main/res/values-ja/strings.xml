@@ -208,6 +208,8 @@
 
     <string name="delete_and_edit">削除して編集</string>
     <string name="license">ライセンス</string>
+    <string name="standard_reaction">定型リアクション</string>
+    <string name="set_the_reaction_displayed_in_the_reaction_picker">リアクションピッカーに表示されるリアクションを設定します。</string>
 
 
 </resources>
