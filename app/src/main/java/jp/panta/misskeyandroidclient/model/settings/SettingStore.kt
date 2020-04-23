@@ -25,6 +25,16 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             return fromBooleanEnum(KeyStore.BooleanKey.HIDE_REMOVED_NOTE)
         }
 
+    var reactionPickerType: ReactionPickerType
+        get(){
+            return ReactionPickerType.values()[sharedPreferences.getInt("ReactionPickerType", 0)]
+        }
+        set(value) {
+            val editor = sharedPreferences.edit()
+            editor.putInt("ReactionPickerType", value.ordinal)
+            editor.apply()
+        }
+
     private fun fromBooleanEnum(key: KeyStore.BooleanKey): Boolean{
         return sharedPreferences.getBoolean(key.name, key.default)
     }

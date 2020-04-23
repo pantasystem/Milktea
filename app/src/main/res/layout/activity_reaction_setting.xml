@@ -57,7 +57,8 @@
                     android:id="@+id/reactionSettingField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/set_the_reaction_displayed_in_the_reaction_picker"/>
+                    android:hint="@string/set_the_reaction_displayed_in_the_reaction_picker"
+                    />
 
             <TextView
                     android:layout_width="match_parent"

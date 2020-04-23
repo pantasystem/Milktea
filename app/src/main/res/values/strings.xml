@@ -213,5 +213,6 @@
     <string name="reaction_picker">Reaction picker</string>
     <string name="list_picker">List picker</string>
     <string name="simple_picker">Simple picker</string>
+    <string name="enter_reaction">Enter reaction</string>
 
 </resources>

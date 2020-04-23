@@ -213,5 +213,6 @@
     <string name="reaction_picker">リアクションピッカー</string>
     <string name="list_picker">リストピッカー</string>
     <string name="simple_picker">シンプルピッカー</string>
+    <string name="enter_reaction">リアクションを入力</string>
 
 </resources>

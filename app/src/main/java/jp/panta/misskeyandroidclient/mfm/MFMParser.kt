@@ -343,7 +343,7 @@ object MFMParser{
             )
         }
 
-        private val emojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+-_]+):""")
+        private val emojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
         private fun parseEmoji(): EmojiElement?{
             val matcher = emojiPattern.matcher(sourceText.substring(position, parent.insideEnd))
             if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight){
