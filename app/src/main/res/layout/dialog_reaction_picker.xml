@@ -11,7 +11,7 @@
             android:layout_height="wrap_content"/>
 
     <AutoCompleteTextView
-            android:id="@+id/input_reaction"
+            android:id="@+id/reactionField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/input_custom_emoji"
