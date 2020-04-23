@@ -20,4 +20,13 @@ class StringIndexTest {
         }
         println("終了後:$counter")
     }
+
+    @Test
+    fun emojiCharTest(){
+        val text = "☺️"
+        println(text.length)
+        text.forEach{
+            println(it)
+        }
+    }
 }

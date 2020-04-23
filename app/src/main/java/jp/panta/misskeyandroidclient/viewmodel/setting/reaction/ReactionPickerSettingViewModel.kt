@@ -33,7 +33,7 @@ class ReactionPickerSettingViewModel(
     val reactionPickerType = MutableLiveData<ReactionPickerType>()
 
     private val mEmojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
-    private val mDefaultReactionPattern = Pattern.compile("""([a-z]+)""")
+    private val mDefaultReactionPattern = Pattern.compile("""([a-z^\S]+)""")
 
     init{
         loadSetReactions()
@@ -51,7 +51,7 @@ class ReactionPickerSettingViewModel(
                     settingReactions = ReactionResourceMap.defaultReaction
                 }
                 settingReactions.forEach{ reaction ->
-                    reactionSettingsBuilder.append(reaction)
+                    reactionSettingsBuilder.append("$reaction ")
                 }
                 reactionSettingsText.postValue(
                     reactionSettingsBuilder.toString()
@@ -71,6 +71,7 @@ class ReactionPickerSettingViewModel(
         }?.toMap()?: emptyMap()
         val defaultReactions = ReactionResourceMap.reactionMap
         val fieldReactions = reactionSettingsText.value?: ""
+        Log.d("ReactionPickerSettingVM", "設定したリアクション:$fieldReactions")
         val reactionInitials = ReactionResourceMap.defaultReaction.map{
             it.first()
         }.toSet()
@@ -123,25 +124,36 @@ class ReactionPickerSettingViewModel(
                                         weight = reactionUserSettings.size
                                     )
                                 )
-                                // 強制的に加算される分を加味して一つ減らす
-                                position += matcher.end() - 1
                             }
+                            // 強制的に加算される分を加味して一つ減らす
+                            position += matcher.end() - 1
+
                         }
                     }
                     else -> {
-                        // emoji
-                        reactionUserSettings.add(
-                            ReactionUserSetting(
-                                reaction = c.toString(),
-                                instanceDomain = instance,
-                                weight = reactionUserSettings.size
+                        if(mDefaultReactionPattern.matcher(c.toString()).find()){
+                            // emoji
+                            reactionUserSettings.add(
+                                ReactionUserSetting(
+                                    reaction = c.toString(),
+                                    instanceDomain = instance,
+                                    weight = reactionUserSettings.size
+                                )
                             )
-                        )
+                        }
+
                     }
                 }
             }
             position ++
         }
         Log.d("ReactionPickerSettingVM", "selected: $reactionUserSettings")
+        viewModelScope.launch(Dispatchers.IO){
+            try{
+                reactionUserSettingDao.insertAll(reactionUserSettings)
+            }catch(e: Exception){
+                Log.e("ReactionPickerSettingVM", "save error", e)
+            }
+        }
     }
 }
