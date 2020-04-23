@@ -17,6 +17,6 @@ val MIGRATION_34_35 = object : Migration(34, 35){
 
 val MIGRATION_35_36 = object : Migration(35, 36){
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("create table reaction_user_setting(reaction text, instance_domain text, weight integer, primary key(reaction, instance_domain))")
+        database.execSQL("create table 'reaction_user_setting'('reaction' TEXT not null, 'instance_domain' TEXT not null, 'weight' INTEGER not null, primary key('reaction', 'instance_domain'))")
     }
 }

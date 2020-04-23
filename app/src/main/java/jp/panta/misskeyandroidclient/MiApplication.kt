@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -42,6 +43,8 @@ class MiApplication : Application(), MiCore {
     private lateinit var mConnectionInformationDao: ConnectionInformationDao
 
     lateinit var reactionHistoryDao: ReactionHistoryDao
+
+    lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
 
 
@@ -91,6 +94,8 @@ class MiApplication : Application(), MiCore {
         mConnectionInformationDao = database.connectionInformationDao()
 
         reactionHistoryDao = database.reactionHistoryDao()
+
+        reactionUserSettingDao = database.reactionUserSettingDao()
 
         mEncryption = KeyStoreSystemEncryption(this)
 
