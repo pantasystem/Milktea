@@ -210,5 +210,8 @@
     <string name="license">License</string>
     <string name="standard_reaction">Standard reaction</string>
     <string name="set_the_reaction_displayed_in_the_reaction_picker">Set the reaction displayed in the reaction picker</string>
+    <string name="reaction_picker">Reaction picker</string>
+    <string name="list_picker">List picker</string>
+    <string name="simple_picker">Simple picker</string>
 
 </resources>

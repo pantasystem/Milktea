@@ -23,4 +23,8 @@
         <item>@string/indefinite_period</item>
         <item>@string/date_and_time_specification</item>
     </string-array>
+    <string-array name="reaction_picker_type">
+        <item>@string/list_picker</item>
+        <item>@string/simple_picker</item>
+    </string-array>
 </resources>
