@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
@@ -33,6 +34,10 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ar!!, miApplication))[NotesViewModel::class.java]
         val adapter = ReactionChoicesAdapter(notesViewModel)
         view.reactionsView.adapter = adapter
+
+        notesViewModel.submittedNotesOnReaction.observe(activity!!, Observer{
+            dismiss()
+        })
         
         view.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
         adapter.submitList(ReactionResourceMap.defaultReaction)
