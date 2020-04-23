@@ -3,7 +3,9 @@ package jp.panta.misskeyandroidclient.viewmodel.setting.reaction
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSetting
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
@@ -20,8 +22,11 @@ class ReactionPickerSettingViewModel(
     private val miCore: MiCore
 ) : ViewModel(){
 
-    class Factory{
-
+    @Suppress("UNCHECKED_CAST")
+    class Factory(val ar: AccountRelation, val miApplication: MiApplication) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, miApplication) as T
+        }
     }
 
     val reactionSettingsText = MutableLiveData<String>()
