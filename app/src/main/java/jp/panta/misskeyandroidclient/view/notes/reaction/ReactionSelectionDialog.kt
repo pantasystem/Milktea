@@ -88,28 +88,35 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         private val categoryList = category.toList()
         override fun getCount(): Int {
-            return 2 + categoryList.size
+            return 3 + categoryList.size
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
             return when(position){
                 0 ->{
-                    getString(R.string.often_use)
+                    getString(R.string.user)
                 }
                 1 ->{
+                    getString(R.string.often_use)
+                }
+                2 ->{
                     getString(R.string.all)
                 }
+
                 else ->{
-                    categoryList[position - 2]
+                    categoryList[position - 3]
                 }
             }
         }
         override fun getItem(position: Int): Fragment {
             return when(position){
                 0 ->{
-                    ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.FREQUENCY)
+                    ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.USER)
                 }
                 1 ->{
+                    ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.FREQUENCY)
+                }
+                2 ->{
                     ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.DEFAULT)
                 }
                 else ->{

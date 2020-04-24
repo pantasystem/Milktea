@@ -42,7 +42,8 @@ class ReactionChoicesFragment : Fragment(){
     enum class Type{
         DEFAULT,
         FREQUENCY,
-        CATEGORY
+        CATEGORY,
+        USER
     }
 
     override fun onCreateView(
@@ -78,6 +79,9 @@ class ReactionChoicesFragment : Fragment(){
             Type.CATEGORY ->{
                 val category = arguments?.getString(EXTRA_CATEGORY)?: return
                 showCategoryBy(category, adapter)
+            }
+            Type.USER ->{
+                showUserSettings(adapter)
             }
         }
 
@@ -130,6 +134,23 @@ class ReactionChoicesFragment : Fragment(){
             ":${it.name}:"
         }
         adapter.submitList(emojis)
+    }
+
+    private fun showUserSettings(adapter: ReactionChoicesAdapter){
+        val miApplication = context?.applicationContext as MiApplication
+        GlobalScope.launch(Dispatchers.IO){
+            try{
+                val instance = miApplication.currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl!!
+                val reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance)?.map{
+                    it.reaction
+                }?: ReactionResourceMap.defaultReaction
+                Handler(Looper.getMainLooper()).post{
+                    adapter.submitList(reactions)
+                }
+            }catch(e: Exception){
+                Log.e("ReactionChoicesFragment", "load error", e)
+            }
+        }
     }
 
 }

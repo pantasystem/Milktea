@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.*
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
@@ -43,7 +44,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         })
         
         view.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
-        adapter.submitList(ReactionResourceMap.defaultReaction)
+        //adapter.submitList(ReactionResourceMap.defaultReaction)
 
         GlobalScope.launch(Dispatchers.IO){
             var reactionSettings = miApplication.reactionUserSettingDao.findByInstanceDomain(

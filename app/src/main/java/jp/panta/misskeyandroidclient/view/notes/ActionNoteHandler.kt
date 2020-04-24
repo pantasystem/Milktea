@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.view.notes
 
 import android.content.Intent
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,9 +13,12 @@ import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
+import jp.panta.misskeyandroidclient.view.notes.reaction.picker.ReactionPickerDialog
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
@@ -23,6 +28,7 @@ class ActionNoteHandler(
     val activity: AppCompatActivity,
     val mNotesViewModel: NotesViewModel
 ) {
+    val settingStore = SettingStore(PreferenceManager.getDefaultSharedPreferences(activity))
     /*init{
         initViewModelListener()
     }*/
@@ -63,7 +69,14 @@ class ActionNoteHandler(
 
     private val reactionTargetObserver = Observer<PlaneNoteViewData>{
         Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
-        ReactionSelectionDialog().show(activity.supportFragmentManager, "MainActivity")
+        when(settingStore.reactionPickerType){
+            ReactionPickerType.LIST ->{
+                ReactionSelectionDialog().show(activity.supportFragmentManager, "MainActivity")
+            }
+            ReactionPickerType.SIMPLE ->{
+                ReactionPickerDialog().show(activity.supportFragmentManager, "Activity")
+            }
+        }
     }
 
     private val noteTargetObserver = Observer<PlaneNoteViewData>{
