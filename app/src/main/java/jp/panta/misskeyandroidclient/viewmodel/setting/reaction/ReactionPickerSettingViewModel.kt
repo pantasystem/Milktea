@@ -10,7 +10,9 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSetting
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +23,7 @@ class ReactionPickerSettingViewModel(
     private val accountRelation: AccountRelation,
     private val reactionUserSettingDao: ReactionUserSettingDao,
     private val miCore: MiCore
-) : ViewModel(){
+) : ViewModel(), ReactionSelection{
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val ar: AccountRelation, val miApplication: MiApplication) : ViewModelProvider.Factory{
@@ -30,10 +32,12 @@ class ReactionPickerSettingViewModel(
         }
     }
 
-    val reactionSettingsText = MutableLiveData<String>()
     val reactionPickerType = MutableLiveData<ReactionPickerType>()
     val reactionSettingsList = MutableLiveData<List<ReactionUserSetting>>()
+    val reactionSelectEvent = EventBus<ReactionUserSetting>()
+
     private var mExistingSettingList: List<ReactionUserSetting>? = null
+    private val mReactionSettingReactionNameMap = LinkedHashMap<String, ReactionUserSetting>()
 
 
     private val mEmojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
@@ -54,6 +58,10 @@ class ReactionPickerSettingViewModel(
                 if(settingReactions.isEmpty()){
                     settingReactions = ReactionResourceMap.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
                 }
+                mReactionSettingReactionNameMap.clear()
+                mReactionSettingReactionNameMap.putAll(settingReactions.map{
+                    it.reaction to it
+                })
                 reactionSettingsList.postValue(settingReactions)
 
 
@@ -84,6 +92,29 @@ class ReactionPickerSettingViewModel(
                 Log.e("ReactionPickerSettingVM", "save error", e)
             }
         }
+    }
+
+    // delete reaction
+    override fun selectReaction(reaction: String) {
+        mReactionSettingReactionNameMap[reaction]?.let{
+            reactionSelectEvent.event = it
+        }
+    }
+
+    fun deleteReaction(reaction: String) {
+        mReactionSettingReactionNameMap.remove(reaction)
+        reactionSettingsList.postValue(
+            mReactionSettingReactionNameMap.values.toList()
+        )
+    }
+
+    fun addReaction(reaction: String){
+        mReactionSettingReactionNameMap[reaction] = ReactionUserSetting(
+            reaction,
+            accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!,
+            mReactionSettingReactionNameMap.size
+        )
+        reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
     }
 
     private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting{

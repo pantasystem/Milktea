@@ -2,14 +2,17 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
+import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
+import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.setting.reaction.ReactionPickerSettingViewModel
 
@@ -29,21 +32,53 @@ class ReactionSettingActivity : AppCompatActivity() {
 
         val miApplication = applicationContext as MiApplication
         mCustomEmojiDecorator = CustomEmojiDecorator()
+        val flexBoxLayoutManager = FlexboxLayoutManager(this)
+        flexBoxLayoutManager.flexDirection = FlexDirection.ROW
+        flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
+        flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
+        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+        binding.reactionSettingListView.layoutManager = flexBoxLayoutManager
+
         miApplication.currentAccount.observe(this, Observer {
             mEmojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
             mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
             binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel!!
+            val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel!!)
+            binding.reactionSettingListView.adapter = reactionsAdapter
+
+            mReactionPickerSettingViewModel?.reactionSettingsList?.observe(this, Observer { list ->
+                reactionsAdapter.submitList(list.map{ rus ->
+                    rus.reaction
+                })
+            })
+
+            mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this, Observer { rus ->
+                mReactionPickerSettingViewModel?.deleteReaction(rus.reaction)
+            })
         })
 
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
-            ":${it.name}:"
-        }?: emptyList()
-        val customEmojiAutoCompleteAdapter =
-            CustomEmojiCompleteAdapter(
-                emojis,
-                this
-            )
-        binding.reactionSettingField.setAdapter(customEmojiAutoCompleteAdapter)
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map(::formatReaction)?: emptyList()
+        val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter( emojis, this)
+        binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
+        binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
+            mReactionPickerSettingViewModel?.addReaction(reactionAutoCompleteArrayAdapter.suggestions[position])
+            binding.reactionSettingField.setText("")
+        }
+        binding.reactionSettingField.setOnEditorActionListener { textView, _, keyEvent ->
+            val text = textView.text
+            if(keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER && text != null){
+                if(keyEvent.action == KeyEvent.ACTION_UP){
+                    if(text.isNotBlank()){
+                        mReactionPickerSettingViewModel?.addReaction(text.toString())
+                        binding.reactionSettingField.setText("")
+
+                    }
+                }
+                return@setOnEditorActionListener true
+            }
+            false
+        }
+
 
 
     }
@@ -51,5 +86,9 @@ class ReactionSettingActivity : AppCompatActivity() {
     override fun onStop(){
         super.onStop()
         mReactionPickerSettingViewModel?.save()
+    }
+
+    private fun formatReaction(customEmoji: Emoji): String{
+        return ":${customEmoji.name}:"
     }
 }
