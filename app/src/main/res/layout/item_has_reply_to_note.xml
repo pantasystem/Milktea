@@ -17,10 +17,11 @@
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
             android:layout_marginTop="0.5dp"
-            app:cardUseCompatPadding="false"
+            app:cardUseCompatPadding="true"
             app:cardCornerRadius="0dp"
             android:elevation="0dp"
-            app:cardBackgroundColor="?attr/colorSurface"
+            app:setCardViewSurfaceColor="@{null}"
+
             >
         <LinearLayout
                 android:orientation="vertical" android:layout_width="match_parent"

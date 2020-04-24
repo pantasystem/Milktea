@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.preference.PreferenceManager
 import android.util.Log
 
 import android.view.Menu
@@ -20,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
@@ -27,6 +29,7 @@ import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notification.Notification
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -44,6 +47,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscrib
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -322,6 +326,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onStart()
 
         bindService(Intent(this, NotificationService::class.java), notificationServiceConnection, Context.BIND_AUTO_CREATE)
+        setBackgroundImage()
     }
 
     override fun onResume(){
@@ -359,6 +364,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
+    }
+
+    private fun setBackgroundImage(){
+        val path = SettingStore(PreferenceManager.getDefaultSharedPreferences(this)).backgroundImagePath
+        Glide.with(this)
+            .load(path)
+            .into(backgroundImage)
     }
 
 }

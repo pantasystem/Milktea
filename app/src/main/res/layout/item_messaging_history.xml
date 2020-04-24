@@ -14,7 +14,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0.5dp"
-            app:cardBackgroundColor="?attr/colorSurface"
+            app:setCardViewSurfaceColor="@{null}"
+
             >
         <RelativeLayout
                 android:layout_width="match_parent"
