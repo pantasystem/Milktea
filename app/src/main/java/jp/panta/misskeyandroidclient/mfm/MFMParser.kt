@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.mfm
 
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import java.net.URLDecoder
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -416,9 +417,12 @@ object MFMParser{
             if(!matcher.find()){
                 return null
             }
+            fun decodeUrl(url: String): String{
+                return URLDecoder.decode(url.replace("%20", "+"), "UTF-8")
+            }
             return if(matcher.nullableGroup(1) == "http"){
                 Link(
-                    matcher.group(),
+                    decodeUrl(matcher.group()),
                     position + matcher.start(),
                     position + matcher.end(),
                     position + matcher.start(),
@@ -427,7 +431,7 @@ object MFMParser{
                 )
             }else {
                 Link(
-                    matcher.nullableGroup(3)?: matcher.group(),
+                    decodeUrl(matcher.nullableGroup(3)?: matcher.group()),
                     position + matcher.start(),
                     position + matcher.end(),
                     position + (matcher.nullableStart(3)?: matcher.start()),
