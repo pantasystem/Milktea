@@ -221,5 +221,6 @@
     <string name="note_opacity">Note opacity</string>
     <string name="transparent">Transparent</string>
     <string name="opaque">Opaque</string>
+    <string name="background_image">Background image</string>
 
 </resources>

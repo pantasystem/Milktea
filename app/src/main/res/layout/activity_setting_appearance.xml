@@ -29,11 +29,59 @@
                     android:id="@+id/setting_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/background_image"
+                    android:layout_marginTop="8dp"/>
+
+            <ImageView
+                    android:id="@+id/backgroundImagePreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="fitCenter"
+                    tools:ignore="ContentDescription"
+                    tools:src="@drawable/img_background_test" />
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                <ImageButton
+                        android:id="@+id/attachedBackgroundImageFile"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/ic_attach_file_black_24dp"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        tools:ignore="ContentDescription" />
+                <TextView
+                        android:id="@+id/background_image_path"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        tools:text="content://src/image.jpg"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"/>
+                <ImageButton
+                        android:id="@+id/delete_background_image"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_delete_black_24dp"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        android:layout_gravity="end|center_vertical"
+                        tools:ignore="ContentDescription" />
+
+            </LinearLayout>
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/note_opacity"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:layout_marginTop="16dp"
                     />
 

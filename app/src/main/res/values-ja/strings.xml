@@ -221,5 +221,6 @@
     <string name="note_opacity">ノートの不透明度</string>
     <string name="transparent">透明</string>
     <string name="opaque">不透明</string>
+    <string name="background_image">背景画像</string>
 
 </resources>

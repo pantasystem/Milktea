@@ -1,20 +1,34 @@
 package jp.panta.misskeyandroidclient.view.settings.activities
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.util.Log
 import android.view.MenuItem
 import android.widget.SeekBar
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import jp.panta.misskeyandroidclient.KeyStore
-import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.setTheme
+import com.bumptech.glide.Glide
+import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
 import kotlinx.android.synthetic.main.activity_setting_appearance.*
 
 class SettingAppearanceActivity : AppCompatActivity() {
+
+    companion object{
+        const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
+        const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
+    }
+
+    private  lateinit var mSettingStore: SettingStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +67,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
             themeChoices,
             this
         )
+        mSettingStore = SettingStore(PreferenceManager.getDefaultSharedPreferences(this))
         //val group = Group(null, listOf(themeSelection), this)
         val adapter = SettingAdapter(this)
         setting_list.layoutManager = LinearLayoutManager(this)
@@ -71,13 +86,83 @@ class SettingAppearanceActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
         })
         noteOpacitySeekBar.progress = miApplication.colorSettingStore.surfaceColorOpaque
+        setBackgroundImagePath(mSettingStore.backgroundImagePath)
+        attachedBackgroundImageFile.setOnClickListener {
+            // show file manager
+            showFileManager()
+        }
+
+        delete_background_image.setOnClickListener{
+            setBackgroundImagePath(null)
+        }
 
     }
 
+
+
+    private fun showFileManager(){
+        if(checkPermission()){
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.type = "*/*"
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            startActivityForResult(intent, SELECT_LOCAL_FILE_REQUEST_CODE)
+        }else{
+            requestPermission()
+        }
+    }
+
+    private fun checkPermission(): Boolean{
+        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        return permissionCheck == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermission(){
+        if(! checkPermission()){
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                READ_STORAGE_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode){
+            SELECT_LOCAL_FILE_REQUEST_CODE ->{
+                if(resultCode == RESULT_OK){
+                    Log.d("NoteEditorActivity", "選択した")
+
+                    val uri = data?.data
+                    uri?.let{
+                        setBackgroundImagePath(uri.toString())
+                    }
+
+                }
+            }
+            READ_STORAGE_PERMISSION_REQUEST_CODE ->{
+                if(resultCode == RESULT_OK){
+                    showFileManager()
+                }else{
+                    Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
+                }
+            }
+
+        }
+    }
+
+    private fun setBackgroundImagePath(path: String?){
+        background_image_path.text = path?: ""
+        Glide.with(this)
+            .load(path)
+            .into(backgroundImagePreview)
+
+        mSettingStore.backgroundImagePath = path
+
     }
 }

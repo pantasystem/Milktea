@@ -35,6 +35,16 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             editor.apply()
         }
 
+    var backgroundImagePath: String?
+        get(){
+            return sharedPreferences.getString("BackgroundImage", null)
+        }
+        set(value) {
+            val edit = sharedPreferences.edit()
+            edit.putString("BackgroundImage", value)
+            edit.apply()
+        }
+
     private fun fromBooleanEnum(key: KeyStore.BooleanKey): Boolean{
         return sharedPreferences.getBoolean(key.name, key.default)
     }
