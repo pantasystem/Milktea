@@ -215,5 +215,7 @@
     <string name="simple_picker">Simple picker</string>
     <string name="enter_reaction">Enter reaction</string>
     <string name="click_to_delete_the_reaction">Click to delete the reaction</string>
+    <string name="confirm_delete_reaction">Confirm reaction deletion</string>
+    <string name="delete_reaction">Delete reaction</string>
 
 </resources>

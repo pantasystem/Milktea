@@ -1,8 +1,11 @@
 package jp.panta.misskeyandroidclient.view.settings.activities
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +16,8 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
+import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
@@ -26,6 +31,7 @@ class ReactionSettingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         //setContentView(R.layout.activity_reaction_setting)
         val binding = DataBindingUtil.setContentView<ActivityReactionSettingBinding>(this, R.layout.activity_reaction_setting)
         binding.lifecycleOwner = this
@@ -58,7 +64,7 @@ class ReactionSettingActivity : AppCompatActivity() {
             })
 
             mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this, Observer { rus ->
-                mReactionPickerSettingViewModel?.deleteReaction(rus.reaction)
+                showConfirmDeleteReactionDialog(rus.reaction)
             })
         })
 
@@ -83,6 +89,10 @@ class ReactionSettingActivity : AppCompatActivity() {
             }
             false
         }
+
+        /*binding.reactionPickerType.setOnItemClickListener { _, _, position,_ ->
+            mReactionPickerSettingViewModel?.reactionPickerType?.value = ReactionPickerType.values()[position]
+        }*/
 
 
 
@@ -115,5 +125,18 @@ class ReactionSettingActivity : AppCompatActivity() {
     }
     private fun formatReaction(customEmoji: Emoji): String{
         return ":${customEmoji.name}:"
+    }
+
+    private fun showConfirmDeleteReactionDialog(reaction: String){
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.confirm_delete_reaction))
+            .setMessage(getString(R.string.delete_reaction) + " $reaction")
+            .setNegativeButton(android.R.string.cancel) { _, _->
+
+            }
+            .setPositiveButton(android.R.string.ok){ _, _ ->
+                mReactionPickerSettingViewModel?.deleteReaction(reaction)
+            }
+            .show()
     }
 }
