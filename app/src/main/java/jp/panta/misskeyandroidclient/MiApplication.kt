@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -76,10 +77,14 @@ class MiApplication : Application(), MiCore {
     private val mStreamingAccountMap = HashMap<Account, StreamingAdapter>()
     private val mMainCaptureAccountMap = HashMap<Account, MainCapture>()
 
+    lateinit var colorSettingStore: ColorSettingStore
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        colorSettingStore = ColorSettingStore(sharedPreferences)
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database")
             .addMigrations(MIGRATION_33_34)
