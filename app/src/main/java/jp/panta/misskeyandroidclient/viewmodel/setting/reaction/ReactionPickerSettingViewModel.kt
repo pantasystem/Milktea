@@ -117,6 +117,14 @@ class ReactionPickerSettingViewModel(
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
     }
 
+    fun putSortedList(list: List<ReactionUserSetting>){
+        mReactionSettingReactionNameMap.clear()
+        mReactionSettingReactionNameMap.putAll(list.map{
+            it.reaction to it
+        })
+        reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
+    }
+
     private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting{
         return ReactionUserSetting(reaction, accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!, index)
     }

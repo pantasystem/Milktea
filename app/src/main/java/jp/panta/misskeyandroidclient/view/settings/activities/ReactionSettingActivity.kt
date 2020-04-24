@@ -6,6 +6,8 @@ import android.view.KeyEvent
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -39,6 +41,9 @@ class ReactionSettingActivity : AppCompatActivity() {
         flexBoxLayoutManager.alignItems = AlignItems.STRETCH
         binding.reactionSettingListView.layoutManager = flexBoxLayoutManager
 
+        val touchHelper = ItemTouchHelper(ItemTouchCallback())
+        touchHelper.attachToRecyclerView(binding.reactionSettingListView)
+        binding.reactionSettingListView.addItemDecoration(touchHelper)
         miApplication.currentAccount.observe(this, Observer {
             mEmojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
             mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
@@ -88,6 +93,26 @@ class ReactionSettingActivity : AppCompatActivity() {
         mReactionPickerSettingViewModel?.save()
     }
 
+    inner class ItemTouchCallback : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT, ItemTouchHelper.ACTION_STATE_IDLE){
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val from = viewHolder.adapterPosition
+            val to = target.adapterPosition
+            val exList = mReactionPickerSettingViewModel?.reactionSettingsList?.value?: emptyList()
+            val list = ArrayList(exList)
+            val d = list.removeAt(from)
+            list.add(to, d)
+            //mReactionPickerSettingViewModel?.reactionSettingsList?.postValue(list)
+            mReactionPickerSettingViewModel?.putSortedList(list)
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
+
+    }
     private fun formatReaction(customEmoji: Emoji): String{
         return ":${customEmoji.name}:"
     }
