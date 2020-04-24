@@ -64,8 +64,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        finishAndGoToMainActivity()
-
+        finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

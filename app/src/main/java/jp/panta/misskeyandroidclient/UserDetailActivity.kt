@@ -209,7 +209,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        finishAndGoToMainActivity()
+        finish()
     }
 
     private fun finishAndGoToMainActivity(){
