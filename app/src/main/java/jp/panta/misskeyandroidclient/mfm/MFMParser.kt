@@ -235,7 +235,6 @@ object MFMParser{
 
         private fun parseQuote(): Node?{
 
-            // 直前の文字がある場合
             if(position > 0){
                 val c = sourceText[ position - 1 ]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
@@ -275,12 +274,22 @@ object MFMParser{
             )
         }
 
-        private val titlePattern = Pattern.compile("""\A[【\[](.+?)[】\]](\n|\z)""")
+        private val titlePattern = Pattern.compile("""\A[【\[]([^\s.,!?'"#:/\[\]【】@]+)[】\]](\n|\z)""")
 
         private val searchPattern = Pattern.compile("""^(.+?) (\[Search]|検索|\[検索]|Search)$""", Pattern.MULTILINE)
         private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
 
         private fun parseTitle(): Node?{
+            if(position > 0){
+                val c = sourceText[ position - 1 ]
+                // 直前の文字が改行コードではないかつ、親が引用コードではない
+                if( (c != '\r' && c != '\n') ){
+                    return null
+                }
+                if( parent.elementType != ElementType.ROOT){
+                    return null
+                }
+            }
             val matcher = titlePattern.matcher(sourceText.substring(position, parent.insideEnd))
             if(!matcher.find()){
                 return null

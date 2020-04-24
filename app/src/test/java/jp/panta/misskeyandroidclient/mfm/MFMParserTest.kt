@@ -91,6 +91,18 @@ class MFMParserTest{
     }
 
     @Test
+    fun testMustErrorTitle2(){
+        val text = "[yes][no]"
+        println(MFMParser.parse(text))
+    }
+
+    @Test
+    fun testErrorTitle(){
+        val text = "[aa[inner]aa]"
+        println(MFMParser.parse(text))
+    }
+
+    @Test
     fun search1Test(){
         val text = "検索実装できた？ Search"
         println(MFMParser.parse(text))
