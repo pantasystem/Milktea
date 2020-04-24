@@ -141,9 +141,12 @@ class ReactionChoicesFragment : Fragment(){
         GlobalScope.launch(Dispatchers.IO){
             try{
                 val instance = miApplication.currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl!!
-                val reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance)?.map{
+                var reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance)?.map{
                     it.reaction
                 }?: ReactionResourceMap.defaultReaction
+                if(reactions.isEmpty()){
+                    reactions = ReactionResourceMap.defaultReaction
+                }
                 Handler(Looper.getMainLooper()).post{
                     adapter.submitList(reactions)
                 }
