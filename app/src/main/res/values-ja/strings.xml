@@ -218,5 +218,8 @@
     <string name="confirm_delete_reaction">リアクション削除の確認</string>
     <string name="delete_reaction">リアクションを削除します</string>
     <string name="user">ユーザー</string>
+    <string name="note_opacity">ノートの不透明度</string>
+    <string name="transparent">透明</string>
+    <string name="opaque">不透明</string>
 
 </resources>

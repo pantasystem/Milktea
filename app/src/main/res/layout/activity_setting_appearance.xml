@@ -15,8 +15,50 @@
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme" />
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/setting_list"
+
+    <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/setting_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/note_opacity"
+                    android:textSize="24sp"
+                    android:layout_marginTop="16dp"
+                    />
+
+            <SeekBar
+                    android:id="@+id/noteOpacitySeekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="255"
+                    android:progress="255" />
+            <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:text="@string/transparent"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/opaque"
+                        android:layout_gravity="end"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

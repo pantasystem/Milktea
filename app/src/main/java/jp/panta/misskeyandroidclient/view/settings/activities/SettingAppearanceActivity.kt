@@ -3,8 +3,10 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.SeekBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.KeyStore
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
@@ -56,6 +58,19 @@ class SettingAppearanceActivity : AppCompatActivity() {
         setting_list.layoutManager = LinearLayoutManager(this)
         setting_list.adapter = adapter
         adapter.submitList(listOf(themeSelection))
+
+        val miApplication = applicationContext as MiApplication
+
+        noteOpacitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                miApplication.colorSettingStore.surfaceColorOpaque = progress
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        })
+        noteOpacitySeekBar.progress = miApplication.colorSettingStore.surfaceColorOpaque
 
     }
 

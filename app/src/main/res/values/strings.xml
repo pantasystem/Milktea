@@ -218,5 +218,8 @@
     <string name="confirm_delete_reaction">Confirm reaction deletion</string>
     <string name="delete_reaction">Delete reaction</string>
     <string name="user">User</string>
+    <string name="note_opacity">Note opacity</string>
+    <string name="transparent">Transparent</string>
+    <string name="opaque">Opaque</string>
 
 </resources>

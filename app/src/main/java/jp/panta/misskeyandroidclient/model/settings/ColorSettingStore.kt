@@ -15,9 +15,12 @@ class ColorSettingStore(private val sharedPreferences: SharedPreferences) {
             return mSurfaceColorOpaque?: sharedPreferences.getInt(SURFACE_COLOR_OPAQUE_KEY, 0xff)
         }
         set(value) {
-            val e = sharedPreferences.edit()
-            e.putInt(SURFACE_COLOR_OPAQUE_KEY, value)
-            e.apply()
+            if(value in 0..255){
+                val e = sharedPreferences.edit()
+                e.putInt(SURFACE_COLOR_OPAQUE_KEY, value)
+                e.apply()
+            }
+
         }
 
 
