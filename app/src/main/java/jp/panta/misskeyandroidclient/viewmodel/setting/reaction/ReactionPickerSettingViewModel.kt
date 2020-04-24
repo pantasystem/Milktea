@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.room.Transaction
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSetting
@@ -31,6 +32,9 @@ class ReactionPickerSettingViewModel(
 
     val reactionSettingsText = MutableLiveData<String>()
     val reactionPickerType = MutableLiveData<ReactionPickerType>()
+    val reactionSettingsList = MutableLiveData<List<ReactionUserSetting>>()
+    private var mExistingSettingList: List<ReactionUserSetting>? = null
+
 
     private val mEmojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
     private val mDefaultReactionPattern = Pattern.compile("""([a-z^\S]+)""")
@@ -42,20 +46,15 @@ class ReactionPickerSettingViewModel(
     private fun loadSetReactions(){
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val reactionSettingsBuilder = StringBuilder()
-                var settingReactions = reactionUserSettingDao
+                val rawSettings = reactionUserSettingDao
                     .findByInstanceDomain(accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!)
-                    ?.map{ it.reaction }
-                    ?: ReactionResourceMap.defaultReaction
+                mExistingSettingList = rawSettings?: emptyList()
+                var settingReactions = rawSettings
+                    ?: ReactionResourceMap.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
                 if(settingReactions.isEmpty()){
-                    settingReactions = ReactionResourceMap.defaultReaction
+                    settingReactions = ReactionResourceMap.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
                 }
-                settingReactions.forEach{ reaction ->
-                    reactionSettingsBuilder.append("$reaction ")
-                }
-                reactionSettingsText.postValue(
-                    reactionSettingsBuilder.toString()
-                )
+                reactionSettingsList.postValue(settingReactions)
 
 
             }catch(e: Exception){
@@ -63,97 +62,31 @@ class ReactionPickerSettingViewModel(
             }
         }
     }
+
     fun save(){
-        val instance = accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!
-
-        val instanceEmojis = miCore.getCurrentInstanceMeta()?.emojis?.map{
-            it.name to it
-        }?.toMap()?: emptyMap()
-        val defaultReactions = ReactionResourceMap.reactionMap
-        val fieldReactions = reactionSettingsText.value?: ""
-        Log.d("ReactionPickerSettingVM", "設定したリアクション:$fieldReactions")
-        val reactionInitials = ReactionResourceMap.defaultReaction.map{
-            it.first()
-        }.toSet()
-
-        val reactionUserSettings = ArrayList<ReactionUserSetting>()
-        var position = 0
-        var beforeCheckPosition = position
-        var isCheckingConstantReaction = false
-        var checkingTextBuilder = StringBuilder()
-        while(position < fieldReactions.length){
-            val c = fieldReactions[position]
-            if(isCheckingConstantReaction){
-                checkingTextBuilder.append(c)
-                val checking = checkingTextBuilder.toString()
-                if(!mDefaultReactionPattern.matcher(checking).find()){
-                    position = beforeCheckPosition + 1
-                    checkingTextBuilder = StringBuilder()
-                    isCheckingConstantReaction = false
-                    continue
-                }
-                if(defaultReactions[checking] != null){
-                    isCheckingConstantReaction = false
-                    checkingTextBuilder = StringBuilder()
-                    reactionUserSettings.add(
-                        ReactionUserSetting(
-                            reaction = checking,
-                            instanceDomain = instance,
-                            weight = reactionUserSettings.size
-                        )
-                    )
-                }
-            }else{
-                when {
-                    reactionInitials.contains(c) -> {
-                        // constant reaction
-                        isCheckingConstantReaction = true
-                        beforeCheckPosition = position
-                        checkingTextBuilder.append(c)
-                    }
-                    c == ':' -> {
-                        // custom emoji
-                        val matcher = mEmojiPattern.matcher(fieldReactions.substring(position, fieldReactions.length))
-                        if(matcher.find()){
-                            val reaction = matcher.group(1)
-                            if(instanceEmojis[reaction] != null){
-                                reactionUserSettings.add(
-                                    ReactionUserSetting(
-                                        reaction = matcher.group(),
-                                        instanceDomain = instance,
-                                        weight = reactionUserSettings.size
-                                    )
-                                )
-                            }
-                            // 強制的に加算される分を加味して一つ減らす
-                            position += matcher.end() - 1
-
-                        }
-                    }
-                    else -> {
-                        if(mDefaultReactionPattern.matcher(c.toString()).find()){
-                            // emoji
-                            reactionUserSettings.add(
-                                ReactionUserSetting(
-                                    reaction = c.toString(),
-                                    instanceDomain = instance,
-                                    weight = reactionUserSettings.size
-                                )
-                            )
-                        }
-
-                    }
-                }
-            }
-            position ++
+        val userSettings = this.reactionSettingsList.value
+        userSettings?.forEachIndexed { index, reactionUserSetting ->
+            reactionUserSetting.weight = index
         }
-        Log.d("ReactionPickerSettingVM", "selected: $reactionUserSettings")
+        val ex = mExistingSettingList?: emptyList()
+        val removed = ex.filter{ out ->
+            userSettings?.any{ inner ->
+                out.instanceDomain == inner.instanceDomain && out.reaction == inner.reaction
+            } == false
+        }
         viewModelScope.launch(Dispatchers.IO){
             try{
-                reactionUserSettingDao.insertAll(reactionUserSettings)
+                reactionUserSettingDao.deleteAll(removed)
+                userSettings?.let{
+                    reactionUserSettingDao.insertAll(userSettings)
+                }
             }catch(e: Exception){
                 Log.e("ReactionPickerSettingVM", "save error", e)
             }
         }
+    }
+
+    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting{
+        return ReactionUserSetting(reaction, accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!, index)
     }
 }

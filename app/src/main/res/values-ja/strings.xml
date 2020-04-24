@@ -214,5 +214,6 @@
     <string name="list_picker">リストピッカー</string>
     <string name="simple_picker">シンプルピッカー</string>
     <string name="enter_reaction">リアクションを入力</string>
+    <string name="click_to_delete_the_reaction">クリッックでリアクションを削除します。</string>
 
 </resources>

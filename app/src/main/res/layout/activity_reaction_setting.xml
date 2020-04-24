@@ -59,12 +59,21 @@
                         android:textSize="20sp"
                         android:text="@string/standard_reaction"
                         android:textColor="?android:textColorPrimary"/>
-                <MultiAutoCompleteTextView
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/reactionSettingListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/click_to_delete_the_reaction"
+                        android:layout_marginBottom="8dp"
+                    />
+                <AutoCompleteTextView
                         android:id="@+id/reactionSettingField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/set_the_reaction_displayed_in_the_reaction_picker"
-                        android:text="@={reactionPickerSettingViewModel.reactionSettingsText}"
+                        android:hint="@string/enter_reaction"
                         />
 
                 <TextView

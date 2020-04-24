@@ -13,5 +13,5 @@ data class ReactionUserSetting(
 
     @ColumnInfo(name = "instance_domain")
     val instanceDomain: String,
-    val weight: Int
+    var weight: Int
 )
