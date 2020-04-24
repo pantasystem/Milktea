@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -22,6 +23,8 @@ import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.setting.reaction.ReactionPickerSettingViewModel
+import kotlinx.android.synthetic.main.activity_reaction_setting.*
+import java.lang.IllegalArgumentException
 
 class ReactionSettingActivity : AppCompatActivity() {
 
@@ -66,6 +69,10 @@ class ReactionSettingActivity : AppCompatActivity() {
             mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this, Observer { rus ->
                 showConfirmDeleteReactionDialog(rus.reaction)
             })
+
+            binding.reactionPickerType.setSelection(mReactionPickerSettingViewModel?.reactionPickerType?.ordinal?: 0)
+
+
         })
 
         val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map(::formatReaction)?: emptyList()
@@ -88,6 +95,21 @@ class ReactionSettingActivity : AppCompatActivity() {
                 return@setOnEditorActionListener true
             }
             false
+        }
+
+
+        binding.reactionPickerType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                val pickerType = when(p2){
+                    0 -> ReactionPickerType.LIST
+                    1 -> ReactionPickerType.SIMPLE
+                    else -> throw IllegalArgumentException("error")
+                }
+                mReactionPickerSettingViewModel?.setReactionPickerType(pickerType)
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
         }
 
         /*binding.reactionPickerType.setOnItemClickListener { _, _, position,_ ->

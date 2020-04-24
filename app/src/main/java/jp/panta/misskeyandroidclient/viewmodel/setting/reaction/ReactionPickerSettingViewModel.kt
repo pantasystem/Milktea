@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.reaction
 
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSetting
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -22,17 +24,22 @@ import java.util.regex.Pattern
 class ReactionPickerSettingViewModel(
     private val accountRelation: AccountRelation,
     private val reactionUserSettingDao: ReactionUserSettingDao,
+    private val settingStore: SettingStore,
     private val miCore: MiCore
 ) : ViewModel(), ReactionSelection{
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val ar: AccountRelation, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, miApplication) as T
+            val settingStore = SettingStore(
+                PreferenceManager.getDefaultSharedPreferences(miApplication)
+            )
+            return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, settingStore, miApplication) as T
         }
     }
 
-    val reactionPickerType = MutableLiveData<ReactionPickerType>()
+    var reactionPickerType = settingStore.reactionPickerType
+        private set
     val reactionSettingsList = MutableLiveData<List<ReactionUserSetting>>()
     val reactionSelectEvent = EventBus<ReactionUserSetting>()
 
@@ -123,6 +130,11 @@ class ReactionPickerSettingViewModel(
             it.reaction to it
         })
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
+    }
+
+    fun setReactionPickerType(type: ReactionPickerType){
+        settingStore.reactionPickerType = type
+        reactionPickerType = type
     }
 
     private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting{
