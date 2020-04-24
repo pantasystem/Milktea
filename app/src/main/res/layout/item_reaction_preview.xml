@@ -6,9 +6,7 @@
         <variable
                 name="reaction"
                 type="java.lang.String" />
-        <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+
     </data>
 
     <LinearLayout

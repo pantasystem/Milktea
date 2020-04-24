@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
+import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import kotlinx.android.synthetic.main.fragment_reaction_choices.view.*
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +60,10 @@ class ReactionChoicesFragment : Fragment(){
 
         val columns = view.context.resources.getInteger(R.integer.reaction_choices_columns)
 
-        val adapter = ReactionChoicesAdapter(notesViewModel)
+        val adapter =
+            ReactionChoicesAdapter(
+                notesViewModel
+            )
         val layoutManager = GridLayoutManager(view.context, columns)
 
         view.reactions_view.layoutManager = layoutManager

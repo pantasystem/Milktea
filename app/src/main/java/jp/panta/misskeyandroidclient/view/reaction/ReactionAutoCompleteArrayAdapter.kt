@@ -1,7 +1,6 @@
-package jp.panta.misskeyandroidclient.view.notes.editor
+package jp.panta.misskeyandroidclient.view.reaction
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,22 +11,13 @@ import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionPreviewBinding
 
-class CustomEmojiCompleteAdapter(
-    private val emojis: List<String>,
+class ReactionAutoCompleteArrayAdapter(
+    private val reactions: List<String>,
     private val context: Context
-) : BaseAdapter(), Filterable {
+) : BaseAdapter(), Filterable{
 
     var suggestions = listOf<String>()
         private set
-
-    /**
-     * 入力中のテキスト
-     */
-    var constraint: CharSequence? = null
-        private set
-
-
-    private var mInputtingLatestStart: Int? = null
 
     override fun getCount(): Int {
         return suggestions.size
@@ -52,7 +42,6 @@ class CustomEmojiCompleteAdapter(
         }else{
             binding = view.tag as ItemReactionPreviewBinding
         }
-
         binding.reaction = getItem(position)
 
         return binding.root
@@ -60,17 +49,13 @@ class CustomEmojiCompleteAdapter(
 
     private val mFilter = object : Filter(){
         override fun performFiltering(constraint: CharSequence?): FilterResults {
-            this@CustomEmojiCompleteAdapter.constraint = constraint
-            suggestions = listOf()
-
             suggestions = listOf()
 
             if(constraint != null){
-                suggestions = emojis.filter{
+                suggestions = reactions.filter{
                     it.contains(constraint)
                 }
             }
-            Log.d("EmojiAutoComplete", "constraint:$constraint, suggestions:$suggestions")
 
             val results = FilterResults()
             results.values = suggestions
@@ -90,6 +75,4 @@ class CustomEmojiCompleteAdapter(
     override fun getFilter(): Filter {
         return mFilter
     }
-
-
 }

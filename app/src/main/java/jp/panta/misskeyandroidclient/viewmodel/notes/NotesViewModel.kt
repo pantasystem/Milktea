@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
@@ -30,7 +31,7 @@ class NotesViewModel(
     var accountRelation: AccountRelation,
     val miCore: MiCore,
     private val reactionHistoryDao: ReactionHistoryDao
-) : ViewModel(){
+) : ViewModel(), ReactionSelection{
     private val TAG = "NotesViewModel"
     //var accountRelation.getCurrentConnectionInformation()? = ci
     val encryption = miCore.getEncryption()
@@ -136,6 +137,10 @@ class NotesViewModel(
         }else{
             reactionTarget.event = planeNoteViewData
         }
+    }
+
+    override fun selectReaction(reaction: String) {
+        postReaction(reaction)
     }
 
     //setTargetToReactionが呼び出されている必要がある

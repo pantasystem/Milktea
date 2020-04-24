@@ -11,12 +11,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionPreviewBinding
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 
-class ReactionPreviewAdapter(diffUtilCallBack: DiffUtil.ItemCallback<String>, private val notesViewModel: NotesViewModel) : ListAdapter<String, ReactionPreviewAdapter.ReactionPreviewViewHolder>(diffUtilCallBack){
+class ReactionPreviewAdapter(diffUtilCallBack: DiffUtil.ItemCallback<String>) : ListAdapter<String, ReactionPreviewAdapter.ReactionPreviewViewHolder>(diffUtilCallBack){
     class ReactionPreviewViewHolder(val binding: ItemReactionPreviewBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onBindViewHolder(holder: ReactionPreviewViewHolder, position: Int) {
         holder.binding.reaction = getItem(position)
-        holder.binding.notesViewModel = notesViewModel
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReactionPreviewViewHolder {

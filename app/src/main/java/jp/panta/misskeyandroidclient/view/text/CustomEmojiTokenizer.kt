@@ -1,6 +1,5 @@
-package jp.panta.misskeyandroidclient.view.notes.editor
+package jp.panta.misskeyandroidclient.view.text
 
-import android.text.Spanned
 import android.util.Log
 import android.widget.MultiAutoCompleteTextView
 

@@ -6,9 +6,9 @@
         <variable
                 name="reaction"
                 type="String" />
-        <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+       <variable
+                name="reactionSelection"
+                type="jp.panta.misskeyandroidclient.model.reaction.ReactionSelection" />
     </data>
     <FrameLayout
             android:layout_width="40dp"
@@ -17,7 +17,7 @@
             app:reactionImageView="@{reactionImagePreview}"
             app:reactionStringView="@{reactionStringPreview}"
             app:reaction="@{reaction}"
-            android:onClick="@{ ()-> notesViewModel.postReaction(reaction) }"
+            android:onClick="@{ ()-> reactionSelection.selectReaction(reaction) }"
             >
         <ImageView
                 android:id="@+id/reactionImagePreview"

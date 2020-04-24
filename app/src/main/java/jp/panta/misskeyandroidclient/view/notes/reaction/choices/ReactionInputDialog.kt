@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import kotlinx.android.synthetic.main.dialog_reaction_input.view.*
 
@@ -32,7 +32,11 @@ class ReactionInputDialog : AppCompatDialogFragment(){
         }?: return dialog
         val activity = activity?: return dialog
         val notesViewModel = ViewModelProvider(activity)[NotesViewModel::class.java]
-        val adapter = ReactionAutoCompleteArrayAdapter(emojis, notesViewModel, view.context)
+        val adapter =
+            ReactionAutoCompleteArrayAdapter(
+                emojis,
+                view.context
+            )
         view.input_reaction.setAdapter(adapter)
         view.input_reaction.setOnItemClickListener { _, _, position, _ ->
             val reaction = adapter.suggestions[position]

@@ -5,8 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -20,6 +18,8 @@ import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.view.notes.editor.*
+import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
+import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
@@ -72,10 +72,20 @@ class NoteEditorActivity : AppCompatActivity() {
         miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"
         }?.let{ emojis ->
-            binding.inputMain.setAdapter(CustomEmojiCompleteAdapter(emojis, this))
+            binding.inputMain.setAdapter(
+                CustomEmojiCompleteAdapter(
+                    emojis,
+                    this
+                )
+            )
             binding.inputMain.setTokenizer(CustomEmojiTokenizer())
 
-            binding.cw.setAdapter(CustomEmojiCompleteAdapter(emojis, this))
+            binding.cw.setAdapter(
+                CustomEmojiCompleteAdapter(
+                    emojis,
+                    this
+                )
+            )
             binding.cw.setTokenizer(CustomEmojiTokenizer())
         }
 

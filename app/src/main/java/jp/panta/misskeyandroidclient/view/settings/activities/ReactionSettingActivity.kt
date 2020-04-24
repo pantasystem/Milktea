@@ -9,8 +9,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.view.notes.editor.CustomEmojiCompleteAdapter
-import jp.panta.misskeyandroidclient.view.notes.editor.CustomEmojiTokenizer
+import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.setting.reaction.ReactionPickerSettingViewModel
 
@@ -39,9 +38,12 @@ class ReactionSettingActivity : AppCompatActivity() {
         val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"
         }?: emptyList()
-        val customEmojiAutoCompleteAdapter = CustomEmojiCompleteAdapter(emojis, this)
+        val customEmojiAutoCompleteAdapter =
+            CustomEmojiCompleteAdapter(
+                emojis,
+                this
+            )
         binding.reactionSettingField.setAdapter(customEmojiAutoCompleteAdapter)
-        binding.reactionSettingField.setTokenizer(CustomEmojiTokenizer())
 
 
     }

@@ -12,8 +12,8 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
-import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionAutoCompleteArrayAdapter
-import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesAdapter
+import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
+import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.dialog_reaction_picker.view.*
@@ -32,7 +32,10 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         val ar = miApplication.currentAccount.value
 
         val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ar!!, miApplication))[NotesViewModel::class.java]
-        val adapter = ReactionChoicesAdapter(notesViewModel)
+        val adapter =
+            ReactionChoicesAdapter(
+                notesViewModel
+            )
         view.reactionsView.adapter = adapter
 
         notesViewModel.submittedNotesOnReaction.observe(activity!!, Observer{
@@ -61,7 +64,11 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             ":${it.name}:"
         }?: emptyList()
         
-        val autoCompleteAdapter = ReactionAutoCompleteArrayAdapter(emojis, notesViewModel, view.context)
+        val autoCompleteAdapter =
+            ReactionAutoCompleteArrayAdapter(
+                emojis,
+                view.context
+            )
         view.reactionField.setAdapter(autoCompleteAdapter)
         view.reactionField.setOnItemClickListener { _, _, i, _ ->
             val reaction = autoCompleteAdapter.suggestions[i]
