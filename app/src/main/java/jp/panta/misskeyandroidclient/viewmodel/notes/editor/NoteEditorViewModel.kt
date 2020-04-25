@@ -37,7 +37,7 @@ class NoteEditorViewModel(
     val text = MutableLiveData<String>(note?.text)
     val maxTextLength = meta.maxNoteTextLength?: 1500
     val textRemaining = Transformations.map(text){ t: String? ->
-        maxTextLength - (t?.length?: 0)
+        maxTextLength - (t?.codePointCount(0, t.length)?: 0)
     }
 
     val editorFiles = MediatorLiveData<List<FileNoteEditorData>>().apply{
