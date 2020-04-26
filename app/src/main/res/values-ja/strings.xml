@@ -222,6 +222,6 @@
     <string name="transparent">透明</string>
     <string name="opaque">不透明</string>
     <string name="background_image">背景画像</string>
-    <string name="classic_ui">クラシックUI</string>
+    <string name="hide_bottom_navigation">下メニューを隠す</string>
 
 </resources>

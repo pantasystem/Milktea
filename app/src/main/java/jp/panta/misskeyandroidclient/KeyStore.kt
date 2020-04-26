@@ -29,6 +29,6 @@ object KeyStore {
 
         HIDE_REMOVED_NOTE(true),
 
-        CLASSIC_UI(false)
+        HIDE_BOTTOM_NAVIGATION(false)
     }
 }

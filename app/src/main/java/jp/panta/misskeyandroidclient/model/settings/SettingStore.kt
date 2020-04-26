@@ -47,11 +47,11 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
 
     var isClassicUI: Boolean
         get(){
-            return sharedPreferences.getBoolean(KeyStore.BooleanKey.CLASSIC_UI.name, false)
+            return sharedPreferences.getBoolean(KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.name, false)
         }
         set(value) {
             val edit = sharedPreferences.edit()
-            edit.putBoolean(KeyStore.BooleanKey.CLASSIC_UI.name, value)
+            edit.putBoolean(KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.name, value)
             edit.apply()
         }
 

@@ -18,7 +18,6 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
-import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
 import kotlinx.android.synthetic.main.activity_setting_appearance.*
 
@@ -77,11 +76,11 @@ class SettingAppearanceActivity : AppCompatActivity() {
             listOf(
                 themeSelection,
                 BooleanSharedItem(
-                    key = KeyStore.BooleanKey.CLASSIC_UI.name,
-                    default = KeyStore.BooleanKey.CLASSIC_UI.default,
+                    key = KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.name,
+                    default = KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.default,
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,
                     context = this,
-                    titleStringRes = R.string.classic_ui
+                    titleStringRes = R.string.hide_bottom_navigation
                 )
             )
         )
