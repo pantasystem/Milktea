@@ -26,6 +26,9 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:onClick="@{()-> accountViewModel.setSwitchTargetConnectionInstance(accountViewData.accountRelation)}"
+                app:user="@{accountViewData.user}"
+                app:mainNameView="@{mainName}"
+                app:subNameView="@{subName}"
                 >
 
             <ImageView
@@ -42,7 +45,6 @@
                     android:layout_height="wrap_content"
                     tools:text="userName"
                     android:textSize="18sp"
-                    android:text="@{SafeUnbox.unbox(accountViewData.user.displayUserName)}"
                     android:layout_toEndOf="@id/history_icon"
                     android:textStyle="bold"
                     android:layout_toStartOf="@id/logoutButton"
@@ -53,9 +55,6 @@
                     android:layout_toEndOf="@id/history_icon"
                     android:textSize="18sp"
                     tools:text="name"
-                    app:emojis="@{accountViewData.user.emojis}"
-                    app:text="@{accountViewData.user.name}"
-                    app:clickableLink="@{false}"
                     android:layout_below="@id/mainName"
                     android:layout_toStartOf="@id/logoutButton"
                     android:layout_marginBottom="8dp"

@@ -28,6 +28,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="?attr/actionBarSize"
+                        app:user="@{userViewModel.user}"
+                        app:mainNameView="@{mainName}"
+                        app:subNameView="@{subName}"
                         >
                     <ImageView
                             android:id="@+id/headerView"
@@ -71,29 +74,27 @@
                                 android:onClick="@{()-> userViewModel.changeFollow()}"
                                 />
                     </LinearLayout>
-                    <TextView
-                            android:id="@+id/subName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            tools:text="Panta"
-                            android:layout_below="@id/avatarIcon"
-                            android:layout_alignStart="@id/avatarIcon"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            app:text="@{userViewModel.user.name}"
-                            app:emojis="@{userViewModel.user.emojis}"
-                            app:clickableLink="@{false}"
 
-                            />
                     <TextView
                             android:id="@+id/mainName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/subName"
                             android:layout_alignStart="@id/avatarIcon"
+                            android:layout_below="@id/avatarIcon"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            tools:text="Panta"
+
+                            />
+                    <TextView
+                            android:id="@+id/subName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignStart="@id/avatarIcon"
+                            android:layout_below="@id/mainName"
                             tools:text="userName"
                             android:textSize="20sp"
-                            android:text="@{userViewModel.userName}"
+
                             />
 
                     <TextView
@@ -103,7 +104,7 @@
                             android:layout_alignStart="@id/avatarIcon"
                             app:sourceText="@{userViewModel.user.description}"
                             app:emojis="@{userViewModel.user.emojis}"
-                            android:layout_below="@id/mainName"
+                            android:layout_below="@id/subName"
                             tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="8dp"

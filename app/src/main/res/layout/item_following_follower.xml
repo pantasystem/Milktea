@@ -25,6 +25,9 @@
         <RelativeLayout
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:padding="16dp"
+                app:mainNameView="@{mainName}"
+                app:subNameView="@{subName}"
+                app:user="@{followFollowerUser.user}"
                 >
             <TextView
                     android:id="@+id/followeeState"
@@ -51,7 +54,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/avatarIcon"
-                    android:text="@{SafeUnbox.unbox(followFollowerUser.user.displayUserName)}"
                     tools:text='"@"Panta@misskey.jp'
                     android:layout_toStartOf="@+id/followButton"
                     android:layout_below="@id/followeeState"
@@ -63,9 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/avatarIcon"
                     tools:text="name"
-                    app:emojis="@{followFollowerUser.user.emojis}"
-                    app:clickableLink="@{false}"
-                    app:text="@{SafeUnbox.unbox(followFollowerUser.user.name)}"
+
                     android:layout_toStartOf="@+id/followButton"
                     android:layout_below="@id/mainName"
                     android:layout_marginBottom="8dp"

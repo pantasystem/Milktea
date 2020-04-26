@@ -26,6 +26,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
+                app:user="@{listUserViewData.user}"
+                app:mainNameView="@{mainName}"
+                app:subNameView="@{subName}"
                 >
 
             <ImageView
