@@ -22,7 +22,10 @@
             >
         <RelativeLayout
                 android:layout_width="match_parent" android:layout_height="match_parent"
-                android:padding="16dp">
+                android:padding="16dp"
+                app:user="@{selectableUser.user.user}"
+                app:mainNameView="@{nameMain}"
+                app:subNameView="@{nameSub}">
             <ImageView
                     android:id="@+id/avatarIcon"
                     android:layout_width="65dp"
@@ -42,7 +45,7 @@
                     android:textSize="18sp"
                     android:layout_toStartOf="@id/userSelectCheckBox"
                     android:layout_marginBottom="8dp"
-                    android:text="@{SafeUnbox.unbox(selectableUser.user.user.displayUserName)}"/>
+                    />
             <TextView
                     android:id="@+id/nameSub"
                     android:layout_width="match_parent"
@@ -51,9 +54,7 @@
                     android:layout_below="@id/nameMain"
                     android:layout_toStartOf="@id/userSelectCheckBox"
                     tools:text="name"
-                    app:text="@{selectableUser.user.user.displayName}"
-                    app:emojis="@{selectableUser.user.user.emojis}"
-                    app:clickableLink="@{false}"
+
                     />
 
             <CheckBox
