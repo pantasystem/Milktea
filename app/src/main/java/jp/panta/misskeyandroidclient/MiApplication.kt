@@ -19,6 +19,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -47,7 +48,7 @@ class MiApplication : Application(), MiCore {
 
     lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
-
+    lateinit var settingStore: SettingStore
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -85,6 +86,7 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         colorSettingStore = ColorSettingStore(sharedPreferences)
+        settingStore = SettingStore(sharedPreferences)
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database")
             .addMigrations(MIGRATION_33_34)

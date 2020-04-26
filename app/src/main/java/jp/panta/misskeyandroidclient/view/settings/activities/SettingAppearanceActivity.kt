@@ -81,6 +81,13 @@ class SettingAppearanceActivity : AppCompatActivity() {
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,
                     context = this,
                     titleStringRes = R.string.hide_bottom_navigation
+                ),
+                BooleanSharedItem(
+                    key = KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.name,
+                    default = KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.default,
+                    choiceType = BooleanSharedItem.ChoiceType.SWITCH,
+                    context = this,
+                    titleStringRes = R.string.user_name_as_default_display_name
                 )
             )
         )

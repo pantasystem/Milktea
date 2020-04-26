@@ -25,6 +25,9 @@
 
             app:transitionDestinationNote="@{note.toShowNote}"
             app:clickedView="@{elapsedTime}"
+            app:mainNameView="@{mainName}"
+            app:subNameView="@{subName}"
+            app:user="@{note.toShowNote.user}"
             >
 
         <ImageView
@@ -41,32 +44,27 @@
         <TextView
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/avatarIcon"
-                android:text='@{note.userName, default="@Panta"}'
-                android:id="@+id/userName"
+                android:id="@+id/mainName"
                 android:textStyle="bold"
                 android:textSize="15sp"
 
                 android:layout_marginEnd="8dp"
                 />
         <TextView
-                android:id="@+id/name"
+                android:id="@+id/subName"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/userName"
-                android:text='@{note.name, default="name name"}'
+                android:layout_toEndOf="@id/mainName"
                 android:textStyle="italic"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textSize="15sp"
-                app:text='@{note.name}'
-                app:emojis='@{note.toShowNote.user.emojis}'
-                app:clickableLink="@{false}"
 
                 />
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:layout_toEndOf="@id/name"
+                android:layout_toEndOf="@id/subName"
                 android:layout_marginStart="8dp"
                 android:singleLine="true"
                 android:ellipsize="end"
@@ -83,7 +81,7 @@
                 tools:text="cwcwcwwcwcw"
                 app:textNode="@{note.cwNode}"
                 android:layout_toEndOf="@+id/avatarIcon"
-                android:layout_below="@+id/userName"
+                android:layout_below="@+id/mainName"
                 android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                 />
 
@@ -160,6 +158,9 @@
                     android:background="@drawable/shape_rounded_square_line"
                     app:transitionDestinationNote="@{note.subNote}"
                     app:clickedView="@{subNote}"
+                    app:subNameView="@{subNoteSubName}"
+                    app:mainNameView="@{subNoteMainName}"
+                    app:user="@{note.subNote.user}"
                     >
                 <ImageView
                         android:id="@+id/subAvatarIcon"
@@ -173,19 +174,17 @@
                 <TextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_toEndOf="@+id/subAvatarIcon"
-                        android:text='@{SafeUnbox.unbox(note.subNoteUserName), default="@subUserId"}'
-                        android:id="@+id/subNoteUserName"
+                        android:id="@+id/subNoteMainName"
                         android:textStyle="bold"
                         android:textSize="15sp"
 
                         android:layout_marginEnd="8dp"
                         />
                 <TextView
-                        android:layout_toEndOf="@id/subNoteUserName"
+                        android:layout_toEndOf="@id/subNoteMainName"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text='@{SafeUnbox.unbox(note.subNoteName), default="SubName SubName"}'
                         android:textStyle="italic"
-                        android:id="@+id/subNoteName"
+                        android:id="@+id/subNoteSubName"
                         android:textSize="15sp"
                         android:singleLine="true"
 
@@ -197,7 +196,7 @@
                         android:layout_height="wrap_content"
                         tools:text="cwcwcwwcwcw"
                         app:textNode="@{note.subCwNode}"
-                        android:layout_below="@+id/subNoteUserName"
+                        android:layout_below="@+id/subNoteMainName"
                         android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                         />
 

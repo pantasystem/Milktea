@@ -62,7 +62,7 @@
                     app:circleIcon="@{user.avatarUrl}"
                     tools:ignore="ContentDescription" />
             <TextView
-                    android:id="@+id/name"
+                    android:id="@+id/subName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/avatarIcon"
@@ -71,10 +71,10 @@
                     android:text="@{user.name}"
                     />
             <TextView
-                    android:id="@+id/userName"
+                    android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/name"
+                    android:layout_below="@id/subName"
                     tools:text="userName"
                     android:text="@{user.userName}"
 
@@ -84,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{user.description}"
-                    android:layout_below="@id/userName"
+                    android:layout_below="@id/mainName"
                     tools:text="awoiefhwaioejfawoefjawoiefawhfoaweifaw"
                     android:layout_marginTop="8dp"
                     />

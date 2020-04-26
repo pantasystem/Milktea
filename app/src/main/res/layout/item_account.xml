@@ -37,7 +37,7 @@
                     tools:ignore="ContentDescription"
                     app:transitionDestinationUser="@{accountViewData.user}"/>
             <TextView
-                    android:id="@+id/userName"
+                    android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="userName"
@@ -48,7 +48,7 @@
                     android:layout_toStartOf="@id/logoutButton"
                     />
             <TextView
-                    android:id="@+id/name"
+                    android:id="@+id/subName"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/history_icon"
                     android:textSize="18sp"
@@ -56,7 +56,7 @@
                     app:emojis="@{accountViewData.user.emojis}"
                     app:text="@{accountViewData.user.name}"
                     app:clickableLink="@{false}"
-                    android:layout_below="@id/userName"
+                    android:layout_below="@id/mainName"
                     android:layout_toStartOf="@id/logoutButton"
                     android:layout_marginBottom="8dp"
                     />
@@ -75,7 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="misskey.io"
-                    android:layout_below="@id/name"
+                    android:layout_below="@id/subName"
                     android:layout_toStartOf="@id/logoutButton"
                     android:layout_toEndOf="@id/history_icon"
                     android:textSize="18sp"

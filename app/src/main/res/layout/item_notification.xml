@@ -35,6 +35,9 @@
                     app:notificationType="@{notification.statusType}"
                     app:notificationReaction="@{notification.reaction}"
                     android:orientation="horizontal"
+                    app:user="@{notification.user}"
+                    app:subNameView="@{null}"
+                    app:mainNameView="@{mainName}"
 
                     >
 
@@ -82,7 +85,7 @@
 
 
                 <TextView
-                        android:id="@+id/userName"
+                        android:id="@+id/mainName"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"

@@ -223,5 +223,6 @@
     <string name="opaque">Opaque</string>
     <string name="background_image">Background image</string>
     <string name="hide_bottom_navigation">Hide Bottom menu</string>
+    <string name="user_name_as_default_display_name">Make user name as default display name</string>
 
 </resources>

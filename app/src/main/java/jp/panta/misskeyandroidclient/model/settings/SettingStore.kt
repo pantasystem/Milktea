@@ -55,6 +55,16 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             edit.apply()
         }
 
+    var isUserNameDefault: Boolean
+        get(){
+            return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.name, true)
+        }
+        set(value){
+            val edit = sharedPreferences.edit()
+            edit.putBoolean(KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.name, value)
+            edit.apply()
+        }
+
     private fun fromBooleanEnum(key: KeyStore.BooleanKey): Boolean{
         return sharedPreferences.getBoolean(key.name, key.default)
     }

@@ -27,76 +27,79 @@
             app:cardBackgroundColor="?attr/colorSurface"
 
             >
+
         <RelativeLayout
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingStart="8dp"
-                android:paddingEnd="8dp"
                 android:paddingTop="5dp"
+                android:paddingEnd="8dp"
                 android:paddingBottom="5dp"
-                >
+                app:mainNameView="@{mainName}"
+                app:subNameView="@{subName}"
+                app:user="@{note.toShowNote.user}">
+
             <TextView
+                    android:id="@+id/statusView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/statusView"
+                    android:layout_marginBottom="8dp"
                     android:text="@{SafeUnbox.unboxString(note.statusMessage)}"
                     android:visibility="@{note.statusMessage == null ? View.GONE : View.VISIBLE}"
-                    tools:text="パン太さんができました"
-                    android:layout_marginBottom="8dp"/>
+                    tools:text="パン太さんができました" />
+
             <ImageView
                     android:id="@+id/avatarIcon"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:layout_marginEnd="8dp"
-                    app:circleIcon='@{note.avatarUrl}'
-                    tools:srcCompat="@android:drawable/sym_def_app_icon"
-                    android:contentDescription="@string/avataricon"
                     android:layout_below="@id/statusView"
-                    app:transitionDestinationUser="@{note.toShowNote.user}"/>
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/avataricon"
+                    app:circleIcon='@{note.avatarUrl}'
+                    app:transitionDestinationUser="@{note.toShowNote.user}"
+                    tools:srcCompat="@android:drawable/sym_def_app_icon" />
 
             <TextView
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/avatarIcon"
-                    android:text='@{note.userName, default="@Panta"}'
-                    android:id="@+id/userName"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
+                    android:id="@+id/mainName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_below="@id/statusView"
                     android:layout_marginEnd="8dp"
-                    />
+                    android:layout_toEndOf="@id/avatarIcon"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/userName"
-                    tools:text="36秒前"
                     android:layout_below="@id/statusView"
-                    android:textSize="15sp"
                     android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@id/mainName"
                     android:gravity="end"
-                    />
-            <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_below="@id/userName"
-                    android:layout_toEndOf="@id/avatarIcon"
-                    android:text='@{note.name, default="name name"}'
-                    android:textStyle="italic"
-                    android:singleLine="true"
-                    android:ellipsize="end"
                     android:textSize="15sp"
-                    app:text='@{note.name}'
-                    app:emojis='@{note.toShowNote.user.emojis}'
-                    app:clickableLink="@{false}"
+                    tools:text="36秒前" />
+
+            <TextView
+                    android:id="@+id/subName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/mainName"
+                    android:layout_toEndOf="@id/avatarIcon"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textSize="15sp"
+                    android:textStyle="italic"
 
                     />
+
             <TextView
                     android:id="@+id/cw"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="cwcwcwwcwcw"
-                    app:textNode="@{note.cwNode}"
                     android:layout_below="@id/avatarIcon"
                     android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
-                    />
+                    app:textNode="@{note.cwNode}"
+                    tools:text="cwcwcwwcwcw" />
 
 
             <TextView
@@ -107,37 +110,38 @@
 
                     android:layout_marginStart="5dp"
                     android:layout_marginBottom="5dp"
-                    tools:text="展開する"
-                    android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
-                    android:textColor="?attr/colorAccent"
-                    android:text="@{note.contentFoldingStatusMessage}"
                     android:onClick="@{()-> note.changeContentFolding() }"
-                    />
+                    android:text="@{note.contentFoldingStatusMessage}"
+                    android:textColor="?attr/colorAccent"
+                    android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
+                    tools:text="展開する" />
+
             <RelativeLayout
                     android:id="@+id/contentMain"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/contentFoldingButton"
-                    android:visibility="@{SafeUnbox.unboxBool(note.contentFolding) ? View.GONE : View.VISIBLE }"
-                    >
+                    android:visibility="@{SafeUnbox.unboxBool(note.contentFolding) ? View.GONE : View.VISIBLE }">
+
                 <TextView
                         android:id="@id/text"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                         app:textNode="@{note.textNode}"
-                        />
+                        tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw" />
+
                 <include
                         android:id="@+id/mediaPreview"
+                        layout="@layout/media_preview"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
                         android:layout_below="@id/text"
                         android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
-                        tools:visibility="gone"
-                        layout="@layout/media_preview"
                         app:media="@{note.media}"
                         app:notesViewModel="@{notesViewModel}"
+                        tools:visibility="gone"
 
                         />
 
@@ -145,10 +149,10 @@
                         android:id="@+id/poll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:listitem="@layout/item_choice"
-                        tools:itemCount="2"
                         android:layout_below="@id/mediaPreview"
                         android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                        tools:itemCount="2"
+                        tools:listitem="@layout/item_choice"
 
 
                         />
@@ -161,9 +165,13 @@
                         android:layout_below="@+id/poll"
                         android:layout_marginTop="3dp"
                         android:background="@drawable/shape_rounded_square_line"
-                        android:padding="8dp"
                         android:onClick="@{()-> notesViewModel.setShowNote(note.subNote)}"
-                        android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'>
+                        android:padding="8dp"
+                        android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
+                        app:mainNameView="@{subNoteMainName}"
+                        app:subNameView="@{subNoteSubName}"
+                        app:user="@{note.subNote.user}">
+
                     <ImageView
                             android:id="@+id/subAvatarIcon"
                             android:layout_width="20dp"
@@ -171,26 +179,24 @@
                             android:layout_marginEnd="5dp"
                             android:contentDescription="@string/avataricon"
                             app:circleIcon='@{note.subNoteAvatarUrl}'
-                            app:transitionDestinationUser="@{note.subNote.user}"/>
+                            app:transitionDestinationUser="@{note.subNote.user}" />
 
                     <TextView
-                            android:id="@+id/subNoteUserName"
+                            android:id="@+id/subNoteMainName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_toEndOf="@+id/subAvatarIcon"
-                            android:text='@{note.subNoteUserName, default="@subUserId"}'
                             android:textSize="15sp"
 
                             android:textStyle="bold" />
 
                     <TextView
-                            android:id="@+id/subNoteName"
+                            android:id="@+id/subNoteSubName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toEndOf="@id/subNoteUserName"
+                            android:layout_toEndOf="@id/subNoteMainName"
                             android:singleLine="true"
-                            android:text='@{note.subNoteName, default="SubName SubName"}'
                             android:textSize="15sp"
                             android:textStyle="italic"
 
@@ -200,7 +206,7 @@
                             android:id="@+id/subCw"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/subNoteUserName"
+                            android:layout_below="@+id/subNoteMainName"
                             android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                             app:textNode="@{note.subCwNode}"
                             tools:text="cwcwcwwcwcw" />
@@ -230,17 +236,17 @@
                             android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
                             app:textNode="@{note.subNoteTextNode}"
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
+
                     <include
-                            layout="@layout/media_preview"
-                            app:media="@{note.subNoteMedia}"
-                            app:notesViewModel="@{notesViewModel}"
                             android:id="@+id/subNoteMediaPreview"
+                            layout="@layout/media_preview"
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
                             android:layout_below="@id/subNoteText"
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
-                            tools:layout_height="50dp"/>
-
+                            app:media="@{note.subNoteMedia}"
+                            app:notesViewModel="@{notesViewModel}"
+                            tools:layout_height="50dp" />
 
 
                 </RelativeLayout>
@@ -253,92 +259,101 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/contentMain"
                     android:layout_marginTop="8dp"
-                    tools:visibility="visible"
                     tools:layout_height="50dp"
+                    tools:visibility="visible"
 
                     />
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/reaction_view"
                     android:layout_marginTop="8dp"
-                    >
+                    android:orientation="horizontal">
 
                 <ImageButton
-                        android:layout_width="32dp"
-                        android:layout_height="32dp" app:srcCompat="@drawable/ic_reply_black_24dp"
                         android:id="@+id/imageButton"
                         style="?android:attr/borderlessButtonStyle"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        android:padding="4dp"
-                        android:scaleType="centerCrop"
-                        android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
-                        android:contentDescription="@string/reply_title"
-                        />
-                <TextView
-                        android:text='@{note.replyCount}'
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content" android:id="@+id/textView3" android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
-                        android:singleLine="true"
-                        android:visibility='@{note.replyCount == null ? View.INVISIBLE : View.VISIBLE}'
-                        />
-                <ImageButton
-                        android:layout_width="32dp"
-                        android:layout_height="32dp" app:srcCompat="@drawable/ic_re_note"
-                        android:id="@+id/imageButton2"
-                        style="?android:attr/borderlessButtonStyle"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        android:padding="4dp"
-                        android:scaleType="centerCrop"
-                        android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
-                        android:contentDescription="@string/renote"
-                        />
-                <TextView
-                        android:text='@{String.valueOf(SafeUnbox.unboxString(note.reNoteCount))}'
-                        android:visibility='@{note.reNoteCount == null ? View.INVISIBLE : View.VISIBLE}'
-
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content" android:id="@+id/textView4" android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
-                        android:singleLine="true"
-
-                        />
-                <ImageButton
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        app:isReacted="@{note.myReaction != null}"
-                        tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
-                        android:id="@+id/imageButton3"
-                        style="?android:attr/borderlessButtonStyle"
-                        android:tint="?attr/colorNoteActionButtonTint"
+                        android:contentDescription="@string/reply_title"
+                        android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                         android:padding="4dp"
                         android:scaleType="centerCrop"
-                        android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
-                        android:contentDescription="@string/reaction"
-                        />
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        app:srcCompat="@drawable/ic_reply_black_24dp" />
+
                 <TextView
-                        android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
-
-                        android:visibility="@{SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE}"
-
+                        android:id="@+id/textView3"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
+                        android:singleLine="true"
+                        android:text='@{note.replyCount}'
+                        android:visibility='@{note.replyCount == null ? View.INVISIBLE : View.VISIBLE}' />
 
-                        />
                 <ImageButton
-                        android:layout_width="32dp"
-                        android:layout_height="32dp" app:srcCompat="@drawable/ic_more_horiz_black_24dp"
-                        android:id="@+id/imageButton4"
+                        android:id="@+id/imageButton2"
                         style="?android:attr/borderlessButtonStyle"
-                        android:tint="?attr/colorNoteActionButtonTint"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@string/renote"
+                        android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
                         android:padding="4dp"
                         android:scaleType="centerCrop"
-                        android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
-                        android:contentDescription="@string/more"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        app:srcCompat="@drawable/ic_re_note" />
+
+                <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="50dp"
+
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:text='@{String.valueOf(SafeUnbox.unboxString(note.reNoteCount))}'
+                        android:visibility='@{note.reNoteCount == null ? View.INVISIBLE : View.VISIBLE}'
+
                         />
+
+                <ImageButton
+                        android:id="@+id/imageButton3"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@string/reaction"
+                        android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
+                        android:padding="4dp"
+                        android:scaleType="centerCrop"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        app:isReacted="@{note.myReaction != null}"
+                        tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp" />
+
+                <TextView
+                        android:layout_width="50dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
+                        android:visibility="@{SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE}"
+
+                        />
+
+                <ImageButton
+                        android:id="@+id/imageButton4"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@string/more"
+                        android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
+                        android:padding="4dp"
+                        android:scaleType="centerCrop"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        app:srcCompat="@drawable/ic_more_horiz_black_24dp" />
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

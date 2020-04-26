@@ -40,7 +40,7 @@
                     />
 
             <TextView
-                    android:id="@+id/userName"
+                    android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayUserName())}"
@@ -51,10 +51,10 @@
                      />
 
             <TextView
-                    android:id="@+id/name"
+                    android:id="@+id/subName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/userName"
+                    android:layout_below="@id/mainName"
                     android:layout_toEndOf="@id/avatarIcon"
                     tools:text="name"
                     android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayName())}"

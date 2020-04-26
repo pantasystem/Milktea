@@ -47,16 +47,16 @@
                 android:text="@{accountViewModel.user.name}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:layout_below="@id/imageView"
-                android:id="@+id/name"
+                android:id="@+id/subName"
                 tools:text="name"
                 />
 
         <TextView
-                android:id="@+id/userName"
+                android:id="@+id/mainName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{accountViewModel.user.userName}"
-                android:layout_below="@id/name"
+                android:layout_below="@id/subName"
                 tools:text="accountViewModel.userName"
                 />
 
@@ -64,7 +64,7 @@
                 android:id="@+id/following_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/userName"
+                android:layout_below="@id/mainName"
                 tools:text="114"
                 android:text="@{ Integer.toString(accountViewModel.user.followingCount) }"
                 android:layout_marginEnd="3dp"
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/following_count"
                 android:text="@string/following"
-                android:layout_below="@id/userName"
+                android:layout_below="@id/mainName"
                 android:layout_marginEnd="12dp"
                 android:onClick="@{()-> accountViewModel.showFollowings() }"
                 />
@@ -85,7 +85,7 @@
                 android:id="@+id/follower_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/userName"
+                android:layout_below="@id/mainName"
                 android:layout_toEndOf="@id/following"
                 tools:text="514"
                 android:layout_marginEnd="3dp"
@@ -96,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/follower_count"
-                android:layout_below="@id/userName"
+                android:layout_below="@id/mainName"
                 android:text="@string/follower"
                 android:onClick="@{()-> accountViewModel.showFollowers() }"
                 />

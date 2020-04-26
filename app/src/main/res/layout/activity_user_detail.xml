@@ -72,7 +72,7 @@
                                 />
                     </LinearLayout>
                     <TextView
-                            android:id="@+id/name"
+                            android:id="@+id/subName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:text="Panta"
@@ -86,10 +86,10 @@
 
                             />
                     <TextView
-                            android:id="@+id/userName"
+                            android:id="@+id/mainName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/name"
+                            android:layout_below="@id/subName"
                             android:layout_alignStart="@id/avatarIcon"
                             tools:text="userName"
                             android:textSize="20sp"
@@ -103,7 +103,7 @@
                             android:layout_alignStart="@id/avatarIcon"
                             app:sourceText="@{userViewModel.user.description}"
                             app:emojis="@{userViewModel.user.emojis}"
-                            android:layout_below="@id/userName"
+                            android:layout_below="@id/mainName"
                             tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="8dp"
