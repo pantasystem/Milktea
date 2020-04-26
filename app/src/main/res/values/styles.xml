@@ -82,6 +82,7 @@
         <item name="android:textColorPrimary">@color/colorTextColorPrimaryColorDarkDark</item>
         <item name="android:textColorSecondary">@color/colorTextColorSecondary</item>
 
+        <item name="android:navigationBarColor">@color/navigationDarkColor</item>
     </style>
 
     <style name="AppThemeBlack" parent="AppThemeDark">

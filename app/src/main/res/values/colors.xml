@@ -29,7 +29,7 @@
 
     <!--Dark Theme-->
     <color name="colorDarkPrimary">#262626</color>
-    <color name="colorDarkPrimaryDark">#262626</color>
+    <color name="colorDarkPrimaryDark">#1B1A1A</color>
     <color name="colorDarkWindowBackground">#0E0E0E</color>
     <color name="colorDarkAccent">#00ACC1</color>
     <color name="colorDarkSurface">#191919</color>
