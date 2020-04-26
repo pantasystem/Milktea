@@ -38,7 +38,6 @@
                 android:id="@+id/selectionList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{SafeUnbox.unboxBool(selection.isSelecting) ? View.VISIBLE : View.GONE }"
 
                 />
 

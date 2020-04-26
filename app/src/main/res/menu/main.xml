@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+            android:id="@+id/action_notification"
+            android:title="@string/notification"
+            android:icon="@drawable/ic_notifications_none_black_24dp"
+            app:showAsAction="ifRoom"
+        />
     <item android:id="@+id/action_settings"
           android:title="@string/setting"
           android:orderInCategory="100"
@@ -11,5 +17,10 @@
             android:title="@string/nav_setting_tab"
             app:showAsAction="never"
 
+        />
+    <item
+            android:id="@+id/action_messaging"
+            android:title="@string/message"
+            app:showAsAction="never"
         />
 </menu>

@@ -14,8 +14,8 @@
     <string name="share">共有</string>
     <string name="menu_send">Send</string>
     <string name="search">検索</string>
-    <string name="notification">Notification</string>
-    <string name="message">Message</string>
+    <string name="notification">通知</string>
+    <string name="message">メッセージ</string>
     <string name="start_auth">認証する</string>
     <string name="selecting_instance">選択中のインスタンス</string>
     <string name="welcome">ようこそ</string>
@@ -222,5 +222,6 @@
     <string name="transparent">透明</string>
     <string name="opaque">不透明</string>
     <string name="background_image">背景画像</string>
+    <string name="classic_ui">クラシックUI</string>
 
 </resources>

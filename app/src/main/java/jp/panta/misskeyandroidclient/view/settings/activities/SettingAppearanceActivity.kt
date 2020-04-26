@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
+import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
 import kotlinx.android.synthetic.main.activity_setting_appearance.*
@@ -72,7 +73,18 @@ class SettingAppearanceActivity : AppCompatActivity() {
         val adapter = SettingAdapter(this)
         setting_list.layoutManager = LinearLayoutManager(this)
         setting_list.adapter = adapter
-        adapter.submitList(listOf(themeSelection))
+        adapter.submitList(
+            listOf(
+                themeSelection,
+                BooleanSharedItem(
+                    key = KeyStore.BooleanKey.CLASSIC_UI.name,
+                    default = KeyStore.BooleanKey.CLASSIC_UI.default,
+                    choiceType = BooleanSharedItem.ChoiceType.SWITCH,
+                    context = this,
+                    titleStringRes = R.string.classic_ui
+                )
+            )
+        )
 
         val miApplication = applicationContext as MiApplication
 

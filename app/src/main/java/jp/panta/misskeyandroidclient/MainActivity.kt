@@ -11,6 +11,7 @@ import android.util.Log
 
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -60,6 +61,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var mNotificationService: NotificationService? = null
 
+    private var mSettingStore: SettingStore? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setTheme(R.style.AppThemeDark)
@@ -85,7 +88,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fab.setOnClickListener{
             startActivity(Intent(this, NoteEditorActivity::class.java))
         }
-
 
         val miApplication = application as MiApplication
 
@@ -277,8 +279,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
 
+        val isClassicUI = getSettingStore().isClassicUI
+        val targetItems = listOf(
+            menu.findItem(R.id.action_messaging),
+            menu.findItem(R.id.action_notification)
+        )
+
+        targetItems.forEach{
+            it.isVisible = isClassicUI
+        }
+
         setMenuTint(menu)
         return true
+    }
+
+    private fun getSettingStore(): SettingStore{
+        val store: SettingStore = mSettingStore ?: SettingStore(PreferenceManager.getDefaultSharedPreferences(this))
+        mSettingStore = store
+        return store
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -293,6 +311,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.action_tab_setting-> {
                 startActivity(Intent(this,
                     TabSettingActivity::class.java))
+                true
+            }
+            R.id.action_notification ->{
+                true
+            }
+            R.id.action_messaging ->{
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -327,6 +351,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         bindService(Intent(this, NotificationService::class.java), notificationServiceConnection, Context.BIND_AUTO_CREATE)
         setBackgroundImage()
+        applyUI()
     }
 
     override fun onResume(){
@@ -371,6 +396,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Glide.with(this)
             .load(path)
             .into(backgroundImage)
+    }
+
+    private fun applyUI(){
+        invalidateOptionsMenu()
+        bottom_navigation.visibility = if(getSettingStore().isClassicUI){
+            View.GONE
+        }else{
+            View.VISIBLE
+        }
+        if(getSettingStore().isClassicUI){
+            mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_home)
+        }
     }
 
 }
