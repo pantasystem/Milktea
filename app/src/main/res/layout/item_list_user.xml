@@ -46,7 +46,6 @@
                     android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayUserName())}"
                     tools:text="userName"
                     android:layout_toEndOf="@id/avatarIcon"
                     android:singleLine="true"
@@ -60,7 +59,6 @@
                     android:layout_below="@id/mainName"
                     android:layout_toEndOf="@id/avatarIcon"
                     tools:text="name"
-                    android:text="@{SafeUnbox.unbox(listUserViewData.user.getDisplayName())}"
                     android:singleLine="true"
                     android:layout_toStartOf="@id/removeButton"
                     />
