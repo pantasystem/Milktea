@@ -31,12 +31,12 @@
         >
 
             <TextView
-                    android:text='@{note.statusMessage, default="xxxさんがxxxしました"}'
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:id="@+id/textView2"
                     android:padding="5dp"
                     android:visibility='@{note.statusMessage == null ? View.GONE : View.VISIBLE}'
                     android:onClick="@{()-> notesViewModel.setTargetToUser(note.note.user)}"
+                    app:statusMessageTargetViewNote="@{note}"
             />
             <include
                     android:id="@+id/simpleNote"
