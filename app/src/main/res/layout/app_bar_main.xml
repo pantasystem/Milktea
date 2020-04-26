@@ -26,14 +26,7 @@
 
     <include layout="@layout/content_main"/>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="70dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="80dp"
-            android:id="@+id/simple_notification"/>
+
 
 
 
@@ -43,15 +36,30 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:orientation="vertical">
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
+        <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:tint="#FFFFFF"
-                app:srcCompat="@drawable/ic_mode_edit_black_24dp" />
+                android:orientation="horizontal">
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:id="@+id/simple_notification"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:tint="#FFFFFF"
+                    app:srcCompat="@drawable/ic_mode_edit_black_24dp" />
+        </LinearLayout>
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottom_navigation"
                 android:layout_width="match_parent"
