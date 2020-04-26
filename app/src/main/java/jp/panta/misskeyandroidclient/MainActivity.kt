@@ -282,7 +282,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val isClassicUI = getSettingStore().isClassicUI
         val targetItems = listOf(
             menu.findItem(R.id.action_messaging),
-            menu.findItem(R.id.action_notification)
+            menu.findItem(R.id.action_notification),
+            menu.findItem(R.id.action_search)
         )
 
         targetItems.forEach{
@@ -314,9 +315,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 true
             }
             R.id.action_notification ->{
+                startActivity(Intent(this, NotificationsActivity::class.java))
                 true
             }
             R.id.action_messaging ->{
+                true
+            }
+            R.id.action_search ->{
+                startActivity(Intent(this, SearchActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
