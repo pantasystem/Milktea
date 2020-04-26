@@ -29,7 +29,7 @@
 
     <!--Dark Theme-->
     <color name="colorDarkPrimary">#262626</color>
-    <color name="colorDarkPrimaryDark">#1B1A1A</color>
+    <color name="colorDarkPrimaryDark">#1B1B1B</color>
     <color name="colorDarkWindowBackground">#0E0E0E</color>
     <color name="colorDarkAccent">#00ACC1</color>
     <color name="colorDarkSurface">#191919</color>
@@ -41,7 +41,7 @@
     <color name="colorSeparatorDark">#262626</color>
     <color name="colorMessageSelfDark">#3200B4</color>
     <color name="colorMessageRecipientDark">#262626</color>
-    <color name="navigationDarkColor">#1B1A1A</color>
+    <color name="navigationDarkColor">#1B1B1B</color>
 
     <!--Bread Theme-->
     <color name="colorBreadPrimary">#D9A042</color>
