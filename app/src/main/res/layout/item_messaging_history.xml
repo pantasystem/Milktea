@@ -37,7 +37,7 @@
                     android:textSize="18sp"
                     android:layout_marginStart="8dp"
                     tools:text="title"
-                    android:text="@{historyViewData.title}"
+                    app:titleTargetMsgHistoryViewData="@{historyViewData}"
                     />
             <TextView
                     android:id="@+id/history_message"
