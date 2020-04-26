@@ -319,6 +319,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 true
             }
             R.id.action_messaging ->{
+                startActivity(Intent(this, MessagingListActivity::class.java))
                 true
             }
             R.id.action_search ->{
