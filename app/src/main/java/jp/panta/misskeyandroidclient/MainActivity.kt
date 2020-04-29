@@ -115,8 +115,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when(status){
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
                 ConnectionStatus.ACCOUNT_ERROR ->{
-                    startActivity(Intent(this, SignInActivity::class.java))
-                    //FIXME 新しい認証方式に置き換える
+                    startActivity(Intent(this, AppAuthActivity::class.java))
 
                     finish()
                 }

@@ -224,5 +224,7 @@
     <string name="background_image">背景画像</string>
     <string name="hide_bottom_navigation">下メニューを隠す</string>
     <string name="user_name_as_default_display_name">ユーザー名をデフォルト表示名にする</string>
+    <string name="successfully_created_the_app">アプリの作成に成功した</string>
+
 
 </resources>

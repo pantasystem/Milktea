@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.auth.app
 
+import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
@@ -19,11 +20,18 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 
+@Suppress("UNCHECKED_CAST")
 class AppAuthViewModel(
     val customAuthStore: CustomAuthStore
 ) : ViewModel(){
     companion object{
         const val CALL_BACK_URL = "misskey://app_auth_callback"
+    }
+
+    class Factory(val customAuthStore: CustomAuthStore) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return AppAuthViewModel(customAuthStore) as T
+        }
     }
 
     val instanceDomain = MutableLiveData<String>()
@@ -43,7 +51,7 @@ class AppAuthViewModel(
 
     init{
         meta.addSource(instanceDomain){ base ->
-            MisskeyGetMeta.getMeta(base).enqueue(object : Callback<Meta>{
+            MisskeyGetMeta.getMeta("https://$base").enqueue(object : Callback<Meta>{
                 override fun onResponse(call: Call<Meta>, response: Response<Meta>) {
                     meta.postValue(response.body())
                 }
@@ -61,7 +69,8 @@ class AppAuthViewModel(
 
     fun startAuth(){
         generatingToken.value = true
-        val instanceBase = this.instanceDomain.value?: return
+        val url = this.instanceDomain.value?: return
+        val instanceBase = "https://$url"
         val appName = this.appName.value?: return
         val meta = this.meta.value?: return
         val misskeyAPI = MisskeyAPIServiceBuilder.build(instanceBase, meta.getVersion())
@@ -76,6 +85,7 @@ class AppAuthViewModel(
                         permission = DefaultPermission.defaultPermission
                     )
                 ).execute()?.body()
+                Log.d("AppAuthViewModel", "created app: $app")
                 this@AppAuthViewModel.app.postValue(app)
                 app?: return@launch
                 val secret = app.secret
