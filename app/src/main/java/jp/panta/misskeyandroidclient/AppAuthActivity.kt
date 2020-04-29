@@ -26,6 +26,7 @@ class AppAuthActivity : AppCompatActivity() {
         appAuthViewModel.session.observe(this, Observer {
             it?.let{
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.url)))
+                finish()
             }
         })
 

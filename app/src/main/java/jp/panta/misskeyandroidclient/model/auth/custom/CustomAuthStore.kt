@@ -31,6 +31,7 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
             putString(SESSION_URL, customAuthBridge.session.url)
             putString(INSTANCE_DOMAIN, customAuthBridge.instanceDomain)
             putLong(ENABLED_DATE_END, customAuthBridge.enabledDateEnd.time)
+            putString(VIA_NAME, customAuthBridge.viaName)
             apply()
         }
 

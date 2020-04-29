@@ -248,6 +248,14 @@ class MiApplication : Application(), MiCore {
                 return
             }
 
+            if(checkDirectSignInAccountAndDelete(tmpAccounts)){
+                return loadAndInitializeAccounts()
+            }
+
+            if(checkCIEmptyAccountAndDelete(tmpAccounts)){
+                return loadAndInitializeAccounts()
+            }
+
             val current = tmpAccounts.firstOrNull {
                 it.account.id == getCurrentUserId()
             }?: tmpAccounts.firstOrNull()
@@ -286,6 +294,44 @@ class MiApplication : Application(), MiCore {
             //isSuccessCurrentAccount.postValue(false)
             Log.e(TAG, "初期読み込みに失敗しまちた", e)
         }
+    }
+
+    private fun checkDirectSignInAccountAndDelete(accounts: List<AccountRelation>): Boolean{
+        val directSignInAccounts = accounts.filter{
+            it.connectionInformationList.any { ci ->
+                ci.isDirect
+            }
+        }
+        if(directSignInAccounts.isNotEmpty()){
+            directSignInAccounts.forEach{
+                it.connectionInformationList.forEach {  eci ->
+                    try{
+                        mConnectionInformationDao.delete(eci)
+                    }catch(e: Exception){
+                        Log.e("MiApplication", "アカウント削除中にエラー発生", e)
+                    }
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    private fun checkCIEmptyAccountAndDelete(accounts: List<AccountRelation>): Boolean{
+        val emptyAccounts = accounts.filter{
+            it.connectionInformationList.isEmpty()
+        }
+        if(emptyAccounts.isNotEmpty()){
+            try{
+                emptyAccounts.forEach{
+                    mAccountDao.delete(it.account)
+                }
+            }catch(e: Exception){
+                Log.e("MiApplication", "空アカウント削除中にエラー発生", e)
+            }
+            return true
+        }
+        return false
     }
 
     override fun getCurrentInstanceMeta(): Meta?{

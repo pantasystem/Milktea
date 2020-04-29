@@ -225,5 +225,6 @@
     <string name="hide_bottom_navigation">Hide Bottom menu</string>
     <string name="user_name_as_default_display_name">Make user name as default display name</string>
     <string name="successfully_created_the_app">Successfully created the app</string>
+    <string name="continue_auth">Continue</string>
 
 </resources>
