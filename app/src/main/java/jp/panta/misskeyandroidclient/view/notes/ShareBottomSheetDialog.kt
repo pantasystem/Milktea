@@ -28,7 +28,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
             dismiss()
             return dialog
         }
-        val viewModel = ViewModelProvider(activity!!).get(NotesViewModel::class.java)
+        val viewModel = ViewModelProvider(requireActivity()).get(NotesViewModel::class.java)
         val note = viewModel.shareTarget.event
 
         dataBinding.notesViewModel = viewModel
@@ -69,7 +69,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
                 dismiss()
                 return@setOnClickListener
             }
-            clipboardManager.primaryClip = ClipData.newPlainText("", note.toShowNote.text)
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("", note.toShowNote.text))
             dismiss()
         }
 
@@ -79,7 +79,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
                 return@setOnClickListener
             }
             val baseUrl = viewModel.accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl
-            clipboardManager.primaryClip = ClipData.newPlainText("", "$baseUrl/notes/${note.id}")
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("", "$baseUrl/notes/${note.id}"))
             dismiss()
 
         }

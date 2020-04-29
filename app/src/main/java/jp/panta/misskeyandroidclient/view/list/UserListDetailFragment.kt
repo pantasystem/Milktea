@@ -24,7 +24,7 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
 
         val miCore = view.context.applicationContext as MiCore
         miCore.currentAccount.observe(viewLifecycleOwner, Observer {
-            val viewModel = ViewModelProvider(activity!!)[UserListDetailViewModel::class.java]
+            val viewModel = ViewModelProvider(requireActivity())[UserListDetailViewModel::class.java]
             val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(it, miCore))[UserListOperateViewModel::class.java]
             listUserList.layoutManager = LinearLayoutManager(view.context)
             val adapter = ListUserListAdapter(viewModel, userListOperateViewModel, viewLifecycleOwner)

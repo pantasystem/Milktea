@@ -2,11 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.setting
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import androidx.annotation.StringRes
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 
 class SelectionSharedItem (
     override val key: String,
@@ -40,7 +40,7 @@ class SelectionSharedItem (
     val title: String = context.getString(titleStringRes)
 
     val choice = IntSharedPreferenceLiveData(
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
+        sharedPreferences = context.getSharedPreferences(context.getPreferenceName(), Context.MODE_PRIVATE),
         default = default,
         key = key
     )

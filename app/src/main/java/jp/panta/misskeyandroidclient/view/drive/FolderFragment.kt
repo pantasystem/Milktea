@@ -34,7 +34,7 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
 
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer{ ar ->
             val folderViewModelFactory = FolderViewModelFactory(ar, miApplication, null)
-            val folderViewModel = ViewModelProvider( activity!!, folderViewModelFactory).get(FolderViewModel::class.java)
+            val folderViewModel = ViewModelProvider( requireActivity(), folderViewModelFactory).get(FolderViewModel::class.java)
             mFolderViewModel = folderViewModel
 
             val activity = activity

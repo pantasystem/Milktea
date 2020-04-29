@@ -14,13 +14,13 @@ class PollTimePickerDialog : AppCompatDialogFragment(), TimePickerDialog.OnTimeS
     private var mViewModel: NoteEditorViewModel? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val viewModel = ViewModelProvider(activity!!)[NoteEditorViewModel::class.java]
+        val viewModel = ViewModelProvider(requireActivity())[NoteEditorViewModel::class.java]
         mViewModel = viewModel
 
         val date = viewModel.poll.value?.expiresAt?.value?: Date()
         val c = Calendar.getInstance()
         c.time = date
-        return TimePickerDialog(activity!!, this, c[Calendar.HOUR], c[Calendar.MINUTE], true)
+        return TimePickerDialog(requireActivity(), this, c[Calendar.HOUR], c[Calendar.MINUTE], true)
 
     }
 

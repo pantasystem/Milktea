@@ -2,8 +2,8 @@ package jp.panta.misskeyandroidclient.model.auth.custom
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import jp.panta.misskeyandroidclient.model.auth.Session
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 import java.util.*
 
 class CustomAuthStore(private val sharedPreferences: SharedPreferences){
@@ -20,7 +20,7 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
 
 
         fun newInstance(context: Context): CustomAuthStore{
-            return CustomAuthStore(PreferenceManager.getDefaultSharedPreferences(context))
+            return CustomAuthStore(context.getSharedPreferences(context.getPreferenceName(), Context.MODE_PRIVATE))
         }
     }
 

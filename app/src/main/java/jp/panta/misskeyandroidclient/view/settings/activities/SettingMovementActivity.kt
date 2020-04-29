@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -114,8 +113,8 @@ class SettingMovementActivity : AppCompatActivity() {
         adapter.submitList(listOf(timelineGroup, syncGroup))
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)

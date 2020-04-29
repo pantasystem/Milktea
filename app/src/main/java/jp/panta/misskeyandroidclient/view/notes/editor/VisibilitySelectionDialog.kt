@@ -35,7 +35,7 @@ class VisibilitySelectionDialog : BottomSheetDialogFragment(){
         Log.d("VisibilitySelection", "onViewCreated")
 
         val binding = DataBindingUtil.bind<DialogVisibilitySelectionBinding>(view)
-        val viewModel = ViewModelProvider(activity!!)[NoteEditorViewModel::class.java]
+        val viewModel = ViewModelProvider(requireActivity())[NoteEditorViewModel::class.java]
         viewModel.visibilitySelectedEvent.observe(viewLifecycleOwner, Observer {
             dismiss()
         })

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.view.notes
 
 import android.app.Dialog
+import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -12,18 +13,17 @@ import kotlinx.android.synthetic.main.dialog_renote.view.*
 
 class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
+        val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.dialog_renote, null)
         dialog.setContentView(view)
-
         val miApplication = context?.applicationContext as MiApplication
         val accountRelation = miApplication.currentAccount.value
-         //val requestSetting =
+        //val requestSetting =
 
-        val activity = activity
-        if(activity != null && accountRelation != null){
+        val activity = requireActivity()
+        if(accountRelation != null){
             val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(accountRelation, miApplication)).get(NotesViewModel::class.java)
 
             view.renote.setOnClickListener{
@@ -37,6 +37,8 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
             }
 
         }
-        //val viewModel =
+        return dialog
     }
+
+
 }

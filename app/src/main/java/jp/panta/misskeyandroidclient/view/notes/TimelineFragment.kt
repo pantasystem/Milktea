@@ -1,8 +1,9 @@
 package jp.panta.misskeyandroidclient.view.notes
 
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 
 import android.util.Log
 import android.view.View
@@ -18,6 +19,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
@@ -53,9 +55,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedPreference = PreferenceManager.getDefaultSharedPreferences(this.context)
+        sharedPreference = view.context.getSharedPreferences(view.context.getPreferenceName(), MODE_PRIVATE)
+        //sharedPreference = view.context.getSharedPreferences()
 
-        mLinearLayoutManager = LinearLayoutManager(this.context!!)
+        mLinearLayoutManager = LinearLayoutManager(this.requireContext())
         list_view.layoutManager = mLinearLayoutManager
 
         //データ受け取り
@@ -68,7 +71,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.layoutManager = mLinearLayoutManager
 
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
-            val factory = TimelineViewModelFactory(accountRelation, mSetting!!, miApplication, SettingStore(PreferenceManager.getDefaultSharedPreferences(context)))
+            val factory = TimelineViewModelFactory(accountRelation, mSetting!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
             val vm = mViewModel
             if(vm == null || vm.accountRelation.getCurrentConnectionInformation() != accountRelation.getCurrentConnectionInformation()){
                 //Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, CI非一致:${vm?.connectionInstance != ci}")
@@ -76,7 +79,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 mViewModel?.loadInit()
 
                 val notesViewModelFactory = NotesViewModelFactory(accountRelation, miApplication)
-                mNotesViewModel = ViewModelProvider(activity!!, notesViewModelFactory).get(NotesViewModel::class.java)
+                mNotesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
                 mNotesViewModel?.accountRelation = accountRelation
 
             }

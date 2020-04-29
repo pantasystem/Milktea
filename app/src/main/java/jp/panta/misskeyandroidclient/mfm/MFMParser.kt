@@ -171,7 +171,7 @@ object MFMParser{
             if(!matcher.find()){
                 return null
             }else{
-                val tagName = matcher.group(1)
+                val tagName = matcher.group(1)?: return null
 
                 val tag = MFMContract.blockTypeTagNameMap[tagName]?: return null
 
@@ -202,13 +202,14 @@ object MFMParser{
             if(parent.elementType.elementClass.weight < ElementType.STRIKE.elementClass.weight || parent.elementType == ElementType.STRIKE){
                 return null
             }
-
+            val child = matcher.group(1)
+                ?: return null
             return Node(
                 start = position,
                 end = position + matcher.end(),
                 elementType = ElementType.STRIKE,
                 insideStart = position + matcher.start(1),
-                insideEnd = position + matcher.start(1) + matcher.group(1).length,
+                insideEnd = position + matcher.start(1) + child.length,
                 parentNode = parent
             )
         }
@@ -321,8 +322,9 @@ object MFMParser{
                 return null
             }
 
+            val text = matcher.group(1)?: return null
             return Search(
-                text = matcher.group(1),
+                text = text,
                 start = matcher.start(),
                 end = matcher.end(),
                 insideStart = matcher.start(1),
@@ -343,13 +345,15 @@ object MFMParser{
                 return null
             }
 
+            val text = matcher.group(1)?: return null
+            val url = matcher.group(2)?: return null
             return Link(
-                text = matcher.group(1),
+                text = text,
                 start = position + matcher.start(),
                 end = position + matcher.end(),
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.end(1),
-                url = matcher.group(2) + matcher.group(3)
+                url = url + matcher.group(3)
             )
         }
 
@@ -359,12 +363,13 @@ object MFMParser{
             if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight){
                 return null
             }
-            val emoji: Emoji = emojiNameMap[matcher.group(1)]
+            val tagName = matcher.group(1)?: return null
+            val emoji: Emoji = emojiNameMap[tagName]
                 ?: return null
 
             return EmojiElement(
                 emoji,
-                matcher.group(1),
+                tagName,
                 start = position + matcher.start(),
                 end = position + matcher.end(),
                 insideStart = position + matcher.start(1),

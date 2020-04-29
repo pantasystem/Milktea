@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.view.notes
 
+import android.content.Context
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.util.Log
 
 import android.view.LayoutInflater
@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import kotlinx.android.synthetic.main.fragment_tab.*
@@ -36,10 +37,8 @@ class TabFragment : Fragment(), ScrollableTop{
         super.onViewCreated(view, savedInstanceState)
 
         val miApp = context?.applicationContext as MiApplication
-        //val connectionInstance = miApp.currentConnectionInstanceLiveData.value
-        //val i = connectionInstance?.getI()
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
+        val sharedPreferences = requireContext().getSharedPreferences(requireContext().getPreferenceName(), Context.MODE_PRIVATE)
         val includeMyRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_MY_RENOTES.name, true)
         val includeRenotedMyNotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name, true)
         val includeLocalRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)

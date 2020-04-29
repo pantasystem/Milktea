@@ -1,8 +1,7 @@
 package jp.panta.misskeyandroidclient.view.notes
 
+import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,11 +10,11 @@ import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.NoteDetailActivity
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.picker.ReactionPickerDialog
@@ -28,10 +27,7 @@ class ActionNoteHandler(
     val activity: AppCompatActivity,
     val mNotesViewModel: NotesViewModel
 ) {
-    val settingStore = SettingStore(PreferenceManager.getDefaultSharedPreferences(activity))
-    /*init{
-        initViewModelListener()
-    }*/
+    private val settingStore = SettingStore(activity.getSharedPreferences(activity.getPreferenceName(), Context.MODE_PRIVATE))
 
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
         //Log.d("MainActivity", "reply clicked :$it")

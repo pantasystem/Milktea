@@ -57,7 +57,7 @@ class UserListDetailActivity : AppCompatActivity() {
             ActionNoteHandler(this, notesViewModel).initViewModelListener()
 
             mAccountRelation = ar
-            val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ar, listId, miCore))[UserListDetailViewModel::class.java]
+            val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ar, listId!!, miCore))[UserListDetailViewModel::class.java]
             mUserListDetailViewModel = userListDetailViewModel
 
             mUserListOperateViewModelProvider = ViewModelProvider(this, UserListOperateViewModel.Factory(ar, miCore))[UserListOperateViewModel::class.java]
@@ -92,8 +92,8 @@ class UserListDetailActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             R.id.action_add_to_tab ->{
                 toggleAddToTab()
             }

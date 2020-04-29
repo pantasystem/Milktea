@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient
 
 import android.content.Context
-import android.preference.PreferenceManager
 import android.util.TypedValue
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
@@ -9,9 +8,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 
 fun AppCompatActivity.setTheme(){
-    val preference = PreferenceManager.getDefaultSharedPreferences(this)
+    val preference = this.getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
     val theme = KeyStore.IntKey.values()[preference.getInt(KeyStore.IntKey.THEME.name, KeyStore.IntKey.THEME.default)]
 
     if(KeyStore.isNightTheme(theme)){
@@ -41,7 +41,7 @@ fun Context.setMenuTint(menu: Menu){
 
 
 fun Fragment.getAppTheme(): Int{
-    val preference = PreferenceManager.getDefaultSharedPreferences(this.context)
+    val preference = requireContext().getSharedPreferences(requireContext().getPreferenceName(), Context.MODE_PRIVATE)
 
     return when(preference.getInt(KeyStore.IntKey.THEME.name, KeyStore.IntKey.THEME.default)){
         KeyStore.IntKey.THEME_WHITE.default -> R.style.AppTheme

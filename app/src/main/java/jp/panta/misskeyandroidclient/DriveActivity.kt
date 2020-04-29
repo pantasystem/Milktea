@@ -156,6 +156,7 @@ class DriveActivity : AppCompatActivity() {
                 }
             }
         }
+        item?: return false
         return super.onOptionsItemSelected(item)
     }
 

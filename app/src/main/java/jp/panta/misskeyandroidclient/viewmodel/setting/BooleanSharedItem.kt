@@ -2,16 +2,16 @@ package jp.panta.misskeyandroidclient.viewmodel.setting
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 
 class BooleanSharedItem(
     override val key: String,
     @StringRes override val titleStringRes: Int,
     val default: Boolean,
     val choiceType: ChoiceType,
-    private val context: Context
+    context: Context
 ) : SharedItem(){
     enum class ChoiceType{
         CHECK_BOX,
@@ -21,7 +21,7 @@ class BooleanSharedItem(
     val enabled = MutableLiveData<Boolean>(true)
     val title = context.getString(titleStringRes)
     val choice = BooleanSharedPreferenceLiveData(
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
+        sharedPreferences = context.getSharedPreferences(context.getPreferenceName(), Context.MODE_PRIVATE),
         default = default,
         key = key
     )

@@ -14,7 +14,7 @@ class DateConverter{
 
     @TypeConverter
     fun toDate(formattedDate: String): Date{
-        return smf.parse(formattedDate)
+        return smf.parse(formattedDate)!!
     }
 
     @TypeConverter

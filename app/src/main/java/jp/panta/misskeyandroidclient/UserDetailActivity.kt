@@ -182,8 +182,8 @@ class UserDetailActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             android.R.id.home -> {
                 finishAndGoToMainActivity()
             }
@@ -202,6 +202,7 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.nav_add_to_tab ->{
                 addPageToTab()
             }
+            else -> return false
 
         }
         return super.onOptionsItemSelected(item)

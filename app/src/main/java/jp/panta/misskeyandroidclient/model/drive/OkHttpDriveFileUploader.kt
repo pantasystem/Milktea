@@ -68,7 +68,7 @@ class OkHttpDriveFileUploader(
                     }?: throw IllegalArgumentException("ファイル名の取得に失敗しました")
             }
             "file" ->{
-                File(uri.path).name
+                File(uri.path!!).name
             }
             else -> throw IllegalArgumentException("scheme不明")
         }

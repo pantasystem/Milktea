@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.reaction
 
-import android.preference.PreferenceManager
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,7 @@ class ReactionPickerSettingViewModel(
     class Factory(val ar: AccountRelation, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             val settingStore = SettingStore(
-                PreferenceManager.getDefaultSharedPreferences(miApplication)
+                miApplication.getSharedPreferences(miApplication.getPreferenceName(), Context.MODE_PRIVATE)
             )
             return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, settingStore, miApplication) as T
         }

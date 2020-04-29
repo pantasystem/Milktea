@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.preference.PreferenceManager
 import android.util.Log
 
 import android.view.Menu
@@ -33,6 +32,7 @@ import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
@@ -291,7 +291,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getSettingStore(): SettingStore{
-        val store: SettingStore = mSettingStore ?: SettingStore(PreferenceManager.getDefaultSharedPreferences(this))
+        val store: SettingStore = mSettingStore ?: SettingStore(getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE))
         mSettingStore = store
         return store
     }
@@ -395,7 +395,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setBackgroundImage(){
-        val path = SettingStore(PreferenceManager.getDefaultSharedPreferences(this)).backgroundImagePath
+        val path = SettingStore(getSharedPreferences(getPreferenceName() ,Context.MODE_PRIVATE)).backgroundImagePath
         Glide.with(this)
             .load(path)
             .into(backgroundImage)

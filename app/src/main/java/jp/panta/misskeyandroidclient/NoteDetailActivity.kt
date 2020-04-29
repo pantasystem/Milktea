@@ -47,7 +47,7 @@ class NoteDetailActivity : AppCompatActivity() {
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ac, miApplication))[NotesViewModel::class.java]
             ActionNoteHandler(this, notesViewModel).initViewModelListener()
             val ft = supportFragmentManager.beginTransaction()
-            ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId))
+            ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!))
             ft.commit()
         })
 
@@ -67,8 +67,8 @@ class NoteDetailActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             android.R.id.home ->{
                 finishAndGoToMainActivity()
             }

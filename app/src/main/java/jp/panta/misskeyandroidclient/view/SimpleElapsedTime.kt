@@ -23,7 +23,7 @@ class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
         val formatted = formatter.format(nowDate)
         val nowUtcDate = GsonFactory.createSimpleDateFormat().apply{
             timeZone = TimeZone.getDefault()
-        }.parse(formatted)
+        }.parse(formatted)?: Date()
 
         return when(val elapsedMilliTime = nowUtcDate.time - date.time){
             in Long.MIN_VALUE until 5 * 1000 ->{

@@ -39,15 +39,14 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val activity = activity
-            ?:return
+
 
         val layoutManager = LinearLayoutManager(this.context)
         choices.layoutManager = layoutManager
         val miApplication = context?.applicationContext as MiApplication
 
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer {
-            val viewModel = ViewModelProvider(activity, NoteEditorViewModelFactory(it, miApplication)).get(NoteEditorViewModel::class.java)
+            val viewModel = ViewModelProvider(requireActivity(), NoteEditorViewModelFactory(it, miApplication)).get(NoteEditorViewModel::class.java)
             mNoteEditorViewModel = viewModel
             val poll = viewModel.poll.value ?: return@Observer
             mPollEditor = poll

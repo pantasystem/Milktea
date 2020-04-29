@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.view.settings.activities
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MenuItem
 import android.widget.SeekBar
@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
 import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
@@ -67,7 +68,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
             themeChoices,
             this
         )
-        mSettingStore = SettingStore(PreferenceManager.getDefaultSharedPreferences(this))
+        mSettingStore = SettingStore(getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE))
         //val group = Group(null, listOf(themeSelection), this)
         val adapter = SettingAdapter(this)
         setting_list.layoutManager = LinearLayoutManager(this)
@@ -141,8 +142,8 @@ class SettingAppearanceActivity : AppCompatActivity() {
             )
         }
     }
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)

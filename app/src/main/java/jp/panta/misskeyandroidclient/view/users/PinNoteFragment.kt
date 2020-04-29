@@ -19,8 +19,8 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userViewModel = ViewModelProvider(activity!!)[UserDetailViewModel::class.java]
-        val notesViewModel = ViewModelProvider(activity!!)[NotesViewModel::class.java]
+        val userViewModel = ViewModelProvider(requireActivity())[UserDetailViewModel::class.java]
+        val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
         val adapter = TimelineListAdapter(object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
             override fun areContentsTheSame(
                 oldItem: PlaneNoteViewData,

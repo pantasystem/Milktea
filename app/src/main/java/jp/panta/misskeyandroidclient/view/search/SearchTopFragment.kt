@@ -29,7 +29,7 @@ class SearchTopFragment : Fragment(){
         super.onViewCreated(view, savedInstanceState)
 
         val activity = activity ?: return
-        search_view_pager.adapter = SearchPagerAdapter(activity.supportFragmentManager, context!!)
+        search_view_pager.adapter = SearchPagerAdapter(activity.supportFragmentManager, requireContext())
         search_tab_layout.setupWithViewPager(search_view_pager)
     }
 

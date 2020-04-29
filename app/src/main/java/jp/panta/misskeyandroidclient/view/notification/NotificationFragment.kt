@@ -30,7 +30,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mLinearLayoutManager = LinearLayoutManager(this.context!!)
+        mLinearLayoutManager = LinearLayoutManager(requireContext())
 
         val miApplication = context?.applicationContext as MiApplication
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
@@ -38,7 +38,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
             val factory = NotificationViewModelFactory(ar, miApplication)
             mViewModel = ViewModelProvider(this, factory).get("$ar",NotificationViewModel::class.java)
 
-            val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
+            val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
 
 
             val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, viewLifecycleOwner)

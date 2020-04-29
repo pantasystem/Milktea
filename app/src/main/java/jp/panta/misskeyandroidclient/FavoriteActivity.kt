@@ -46,6 +46,7 @@ class FavoriteActivity : AppCompatActivity() {
         when(item?.itemId){
             android.R.id.home -> finish()
         }
+        item?: return false
         return super.onOptionsItemSelected(item)
     }
 }

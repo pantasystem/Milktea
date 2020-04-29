@@ -270,7 +270,9 @@ class NoteEditorActivity : AppCompatActivity() {
                 if(resultCode == RESULT_OK && data != null){
                     val added = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
                     val removed = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
-                    mViewModel?.setAddress(added, removed)
+                    if(added != null && removed != null){
+                        mViewModel?.setAddress(added, removed)
+                    }
                 }
             }
         }
