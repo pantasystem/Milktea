@@ -9,11 +9,11 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.oss.licenses.plugin'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "jp.panta.misskeyandroidclient"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "v1.0.9.1-beta1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
