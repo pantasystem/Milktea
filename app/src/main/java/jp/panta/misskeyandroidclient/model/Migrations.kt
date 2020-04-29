@@ -20,3 +20,9 @@ val MIGRATION_35_36 = object : Migration(35, 36){
         database.execSQL("create table 'reaction_user_setting'('reaction' TEXT not null, 'instance_domain' TEXT not null, 'weight' INTEGER not null, primary key('reaction', 'instance_domain'))")
     }
 }
+
+val MIGRATION_36_37 = object : Migration(36, 37){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("alter table setting add weight INTEGER")
+    }
+}

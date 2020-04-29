@@ -92,6 +92,7 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_33_34)
             .addMigrations(MIGRATION_34_35)
             .addMigrations(MIGRATION_35_36)
+            .addMigrations(MIGRATION_36_37)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()

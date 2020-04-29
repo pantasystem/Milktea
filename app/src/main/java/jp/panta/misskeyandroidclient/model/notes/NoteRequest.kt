@@ -43,7 +43,8 @@ data class NoteRequest(
         val noteId: String? = null,
         var accountId: String? = null,
         var antennaId: String? = null,
-        var listId: String? = null
+        var listId: String? = null,
+        var weight: Int? = null
     ): Serializable{
         @PrimaryKey(autoGenerate = true)
         var id: Long? = null

@@ -88,7 +88,9 @@ class TabSettingFragment : Fragment(){
             val list = if(ar.pages.isNullOrEmpty()){
                 defaultTabVisibleSettings()
             }else{
-                ar.pages.map{nrt ->
+                ar.pages.sortedBy {
+                    it.weight
+                }.map{nrt ->
                     SettingTab.FromSetting(nrt)
                 }
             }
@@ -144,14 +146,12 @@ class TabSettingFragment : Fragment(){
                 it.toSetting()
             } ?: return@launch
 
-            selectedList.forEach {
-                it.id = null
+
+            selectedList.forEachIndexed { index, setting ->
+                setting.weight = index
             }
 
-            /*for(n in selectedList.indices){
-                selectedList[n].id = n.toLong()
-            }*/
-            //dao.insertAll(selectedList)
+
             miApplication?.replaceAllPagesInCurrentAccount(selectedList)
             Log.d("TabSettingFragment", "設定完了")
         }

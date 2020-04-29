@@ -11,6 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DiffUtil
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -57,13 +61,19 @@ class TabFragment : Fragment(), ScrollableTop{
             }
 
             if(mPagerAdapter == null){
-                mPagerAdapter = TimelinePagerAdapter(activity?.supportFragmentManager, emptyList())
+                mPagerAdapter = TimelinePagerAdapter(this, emptyList())
                 viewPager.adapter = mPagerAdapter
             }
-            mPagerAdapter?.requestBaseList = settings
-            mPagerAdapter?.notifyDataSetChanged()
-            tabLayout.setupWithViewPager(viewPager)
-            //mPagerAdapter = mPagerAdapter?:
+            mPagerAdapter?.setList(settings.sortedBy {
+                it.weight
+            })
+            //mPagerAdapter?.notifyDataSetChanged()
+
+            val mediator = TabLayoutMediator(tabLayout, viewPager){ tab: TabLayout.Tab, position: Int ->
+                tab.text = mPagerAdapter?.getPageTitle(position)
+            }
+            mediator.attach()
+
 
             if(settings.size <= 1){
                 tabLayout.visibility = View.GONE
@@ -82,17 +92,16 @@ class TabFragment : Fragment(), ScrollableTop{
         }
     }
 
-    class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, var requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    class TimelinePagerAdapter(fragment: Fragment, list: List<NoteRequest.Setting>) : FragmentStateAdapter(fragment){
+        var requestBaseList: List<NoteRequest.Setting> = list
+            private set
+        private var oldRequestBaseSetting = requestBaseList
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
 
-        override fun getCount(): Int {
-            return requestBaseList.size
-        }
-
-        override fun getItem(p0: Int): Fragment {
-            Log.d("getItem", "$p0, ${requestBaseList[p0].type}")
-            val item = requestBaseList[p0]
+        override fun createFragment(position: Int): Fragment {
+            Log.d("getItem", "$position, ${requestBaseList[position].type}")
+            val item = requestBaseList[position]
             val noteId = item.noteId
             val fragment =  if(item.type == NoteType.DETAIL && noteId != null){
                 NoteDetailFragment.newInstance(noteId)
@@ -105,9 +114,44 @@ class TabFragment : Fragment(), ScrollableTop{
             return fragment
         }
 
-        override fun getPageTitle(position: Int): CharSequence? {
+        fun getPageTitle(position: Int): String{
             val requestBase = requestBaseList[position]
             return requestBase.title
+        }
+
+        override fun getItemCount(): Int = requestBaseList.size
+
+        private val diffCallback = object : DiffUtil.Callback(){
+            override fun areContentsTheSame(
+                oldItemPosition: Int,
+                newItemPosition: Int
+            ): Boolean {
+                return oldRequestBaseSetting[oldItemPosition] == requestBaseList[newItemPosition]
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldRequestBaseSetting[oldItemPosition].id == requestBaseList[newItemPosition].id
+            }
+
+            override fun getNewListSize(): Int {
+                return requestBaseList.size
+            }
+
+            override fun getOldListSize(): Int {
+                return oldRequestBaseSetting.size
+            }
+        }
+
+        fun setList(list: List<NoteRequest.Setting>){
+            oldRequestBaseSetting = requestBaseList
+            requestBaseList = list
+
+            val result = DiffUtil.calculateDiff(diffCallback)
+            result.dispatchUpdatesTo(this)
+        }
+
+        override fun getItemId(position: Int): Long {
+            return requestBaseList[position].id?: super.getItemId(position)
         }
 
     }
