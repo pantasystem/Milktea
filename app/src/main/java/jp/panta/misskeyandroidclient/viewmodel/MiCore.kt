@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
@@ -27,13 +28,13 @@ interface MiCore{
 
     fun removeConnectSetting(connectionInformation: EncryptedConnectionInformation)
 
-    fun addPageInCurrentAccount(noteRequestSetting: NoteRequest.Setting)
+    fun addPageInCurrentAccount(page: Page)
 
-    fun replaceAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>)
+    fun replaceAllPagesInCurrentAccount(pages: List<Page>)
 
-    fun removePageInCurrentAccount(noteRequestSetting: NoteRequest.Setting)
+    fun removePageInCurrentAccount(page: Page)
 
-    fun removeAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>)
+    fun removeAllPagesInCurrentAccount(pages: List<Page>)
 
     fun putConnectionInfo(account: Account, ci: EncryptedConnectionInformation)
 

@@ -42,6 +42,8 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mNoteRequestSettingDao: NoteRequestSettingDao
 
+    private lateinit var mPageDao: PageDao
+
     private lateinit var mConnectionInformationDao: ConnectionInformationDao
 
     lateinit var reactionHistoryDao: ReactionHistoryDao
@@ -88,14 +90,12 @@ class MiApplication : Application(), MiCore {
         colorSettingStore = ColorSettingStore(sharedPreferences)
         settingStore = SettingStore(sharedPreferences)
 
-        val database = Room.databaseBuilder(this, DataBase::class.java, "mi_database")
-            .addMigrations(MIGRATION_33_34)
-            .addMigrations(MIGRATION_34_35)
-            .addMigrations(MIGRATION_35_36)
-            .addMigrations(MIGRATION_36_37)
+        val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()
+
+        mPageDao = database.pageDao()
 
         mNoteRequestSettingDao = database.noteSettingDao()
 
@@ -148,11 +148,13 @@ class MiApplication : Application(), MiCore {
 
 
 
-    override fun addPageInCurrentAccount(noteRequestSetting: NoteRequest.Setting){
+
+
+    override fun addPageInCurrentAccount(page: Page) {
         GlobalScope.launch(Dispatchers.IO){
             try{
-                noteRequestSetting.accountId = currentAccount.value?.account?.id
-                mNoteRequestSettingDao.insert(noteRequestSetting)
+                page.accountId = currentAccount.value?.account?.id
+                mPageDao.insert(page)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "", e)
@@ -160,15 +162,15 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun replaceAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
+    override fun replaceAllPagesInCurrentAccount(pages: List<Page>){
         GlobalScope.launch(Dispatchers.IO){
             try{
-                noteRequestSettings.forEach{
+                pages.forEach{
                     it.accountId = currentAccount.value?.account?.id
                 }
                 currentAccount.value?.let {
-                    mNoteRequestSettingDao.clearByAccount(it.account.id)
-                    mNoteRequestSettingDao.insertAll(noteRequestSettings)
+                    mPageDao.clearByAccount(it.account.id)
+                    mPageDao.insertAll(pages)
                     loadAndInitializeAccounts()
                 }
             }catch(e: Exception){
@@ -177,11 +179,11 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun removePageInCurrentAccount(noteRequestSetting: NoteRequest.Setting){
+    override fun removePageInCurrentAccount(page: Page){
         GlobalScope.launch(Dispatchers.IO){
             try{
-                noteRequestSetting.id?.let {
-                    mNoteRequestSettingDao.delete(it)
+                page.id?.let {
+                    mPageDao.delete(it)
                     loadAndInitializeAccounts()
                 }
             }catch(e: Exception){
@@ -190,10 +192,10 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun removeAllPagesInCurrentAccount(noteRequestSettings: List<NoteRequest.Setting>){
+    override fun removeAllPagesInCurrentAccount(pages: List<Page>){
         GlobalScope.launch(Dispatchers.IO){
             try{
-                mNoteRequestSettingDao.deleteAll(noteRequestSettings)
+                mPageDao.deleteAll(pages)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "", e)
