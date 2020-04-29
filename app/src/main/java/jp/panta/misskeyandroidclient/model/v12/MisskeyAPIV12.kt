@@ -56,6 +56,8 @@ open class MisskeyAPIV12(val misskey: MisskeyAPI, private val misskeyAPIV12Diff:
 
     override fun featured(noteRequest: NoteRequest): Call<List<Note>?> = misskey.featured(noteRequest)
 
+    override fun mentions(noteRequest: NoteRequest): Call<List<Note>?> = misskey.mentions(noteRequest)
+
     override fun followUser(requestUser: RequestUser): Call<User> = misskey.followUser(requestUser)
 
     override fun followers(userRequest: RequestUser): Call<List<FollowFollowerUser>> = misskey.followers(userRequest)
@@ -118,7 +120,7 @@ open class MisskeyAPIV12(val misskey: MisskeyAPI, private val misskeyAPIV12Diff:
 
     override fun vote(vote: Vote): Call<Unit> = misskey.vote(vote)
 
-    override fun antennasNotes(noteRequest: NoteRequest): Call<List<Note>> = misskeyAPIV12Diff.antennasNotes(noteRequest)
+    override fun antennasNotes(noteRequest: NoteRequest): Call<List<Note>?> = misskeyAPIV12Diff.antennasNotes(noteRequest)
 
     override fun createAntenna(antennaToAdd: AntennaToAdd): Call<Antenna> = misskeyAPIV12Diff.createAntenna(antennaToAdd)
 

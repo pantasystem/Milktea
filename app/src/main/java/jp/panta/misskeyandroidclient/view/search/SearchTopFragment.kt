@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.setMenuTint
@@ -61,7 +62,7 @@ class SearchTopFragment : Fragment(){
         }
 
         override fun getItem(position: Int): Fragment {
-            return TimelineFragment.newInstance(NoteRequest.Setting(type = NoteType.FEATURED))
+            return TimelineFragment.newInstance(Page.Featured(null))
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

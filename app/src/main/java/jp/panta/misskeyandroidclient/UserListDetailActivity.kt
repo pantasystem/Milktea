@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -79,7 +80,7 @@ class UserListDetailActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_user_list_detail, menu)
         val addToTabItem = menu?.findItem(R.id.action_add_to_tab)
         val page = mAccountRelation?.pages?.firstOrNull {
-            it.listId == mListId && mListId != null
+            (it.pageable() as? Page.UserListTimeline)?.listId == mListId && mListId != null
         }
         if(page == null){
             addToTabItem?.setIcon(R.drawable.ic_add_to_tab_24px)
@@ -146,17 +147,17 @@ class UserListDetailActivity : AppCompatActivity() {
 
     private fun toggleAddToTab(){
         val page = mAccountRelation?.pages?.firstOrNull {
-            it.listId == mListId && mListId != null
+            val pageable = it.pageable()
+            if(pageable is Page.UserListTimeline){
+                pageable.listId == mListId && mListId != null
+            }else{
+                false
+            }
         }
         val miCore = application as MiCore
         if(page == null){
             miCore.addPageInCurrentAccount(
-                NoteRequest.Setting(
-                    type = NoteType.USER_LIST,
-                    listId = mListId
-                ).apply{
-                    title = mUserListName
-                }
+                Page(null, mUserListName, null, userListTimeline = Page.UserListTimeline(mListId!!))
             )
         }else{
             miCore.removePageInCurrentAccount(page)
@@ -198,10 +199,7 @@ class UserListDetailActivity : AppCompatActivity() {
             return when(position){
                 0 ->{
                     TimelineFragment.newInstance(
-                        NoteRequest.Setting(
-                            type = NoteType.USER_LIST,
-                            listId = listId
-                        )
+                        Page.UserListTimeline(listId = listId)
                     )
                 }
                 1 ->{

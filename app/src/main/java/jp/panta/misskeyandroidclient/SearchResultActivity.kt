@@ -51,7 +51,7 @@ class SearchResultActivity : AppCompatActivity() {
         val isTag = keyword.startsWith("#")
         mIsTag = isTag
         val request = if(isTag){
-            Page.SearchByTag(tag = keyword)
+            Page.SearchByTag(tag = keyword.replace("#", ""))
 
         }else{
             Page.Search(query = keyword)
@@ -104,19 +104,21 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun searchAddToTab(){
-        val type = getType()
         val word = mSearchWord ?: return
 
         val miCore = application as MiCore
-        val page = getSamePage()
-        if(page == null){
+        val samePage = getSamePage()
+        if(samePage == null){
+            val page = if(mIsTag == true){
+                Page(null, word, null, searchByTag = Page.SearchByTag(tag = word.replace("#", "")))
+            }else{
+                Page(null, mSearchWord?: "", null, search = Page.Search(word))
+            }
             miCore.addPageInCurrentAccount(
-                NoteRequest.Setting(type = type).apply{
-                    title = word
-                }
+                page
             )
         }else{
-            miCore.removePageInCurrentAccount(page)
+            miCore.removePageInCurrentAccount(samePage)
         }
     }
 
@@ -124,9 +126,19 @@ class SearchResultActivity : AppCompatActivity() {
         return getSamePage() != null
     }
 
-    private fun getSamePage(): NoteRequest.Setting?{
+    private fun getSamePage(): Page?{
         return mAccountRelation?.pages?.firstOrNull {
-            it.type == getType() && (it.query == mSearchWord || it.tag == mSearchWord || it.title == mSearchWord)
+            when (val pageable = it.pageable()) {
+                is Page.Search -> {
+                    pageable.query == mSearchWord
+                }
+                is Page.SearchByTag -> {
+                    pageable.tag == mSearchWord
+                }
+                else -> {
+                    false
+                }
+            }
         }
     }
 

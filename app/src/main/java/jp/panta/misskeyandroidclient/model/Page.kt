@@ -21,7 +21,8 @@ data class Page(
     @Embedded(prefix = "notification") val notification: Notification? = null,
     @Embedded(prefix = "user") val userTimeline: UserTimeline? = null,
     @Embedded(prefix = "search") val search: Search? = null,
-    @Embedded(prefix = "favorite") val favorite: Favorite? = null
+    @Embedded(prefix = "favorite") val favorite: Favorite? = null,
+    @Embedded(prefix = "antenna") val antenna: Antenna? = null
 
 ){
     @PrimaryKey(autoGenerate = true) var id: Long? = null
@@ -41,6 +42,7 @@ data class Page(
             userTimeline != null -> userTimeline
             search != null -> search
             favorite != null -> favorite
+            antenna != null -> antenna
             else -> null
         }
     }
@@ -80,10 +82,11 @@ data class Page(
     data class Mention(val following: Boolean?, val  visibility: String? = null) : Timeline()
     data class Show(val noteId: String) : Pageable
     data class SearchByTag(val tag: String, var reply: Boolean? = null, var renote: Boolean? = null, var withFiles: Boolean? = null, var poll: Boolean? = null) : Timeline()
-    data class Featured(val offset: Int) : Pageable
+    data class Featured(val offset: Int?) : Timeline()
     data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null) : Pageable
     data class UserTimeline(val userId: String, var includeReplies: Boolean = true, var includeMyRenotes: Boolean? = true, var withFiles: Boolean? = null) : Timeline()
     data class Search(var query: String, var host: String? = null, var userId: String? = null) : Timeline()
+    data class Antenna(val antennaId: String) : Timeline()
 
     class Favorite : Timeline()
 }

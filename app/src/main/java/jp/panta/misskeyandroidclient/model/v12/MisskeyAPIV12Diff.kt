@@ -21,7 +21,7 @@ interface MisskeyAPIV12Diff {
     fun deleteAntenna(@Body query: AntennaQuery): Call<Unit>
 
     @POST("api/antennas/notes")
-    fun antennasNotes(@Body noteRequest: NoteRequest): Call<List<Note>>
+    fun antennasNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
     @POST("api/antennas/show")
     fun showAntenna(@Body antennaQuery: AntennaQuery): Call<Antenna>

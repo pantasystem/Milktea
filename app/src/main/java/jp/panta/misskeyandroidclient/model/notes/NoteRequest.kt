@@ -131,7 +131,8 @@ data class NoteRequest(
                         untilDate = conditions?.untilDate,
                         includeMyRenotes = pageableTimeline.includeMyRenotes?: include?.includeMyRenotes,
                         withFiles = pageableTimeline.withFiles,
-                        includeReplies = pageableTimeline.includeReplies
+                        includeReplies = pageableTimeline.includeReplies,
+                        userId = pageableTimeline.userId
                     )
                 }
                 is Page.Search ->{
@@ -152,6 +153,26 @@ data class NoteRequest(
                         untilId = conditions?.untilId,
                         sinceDate = conditions?.sinceDate,
                         untilDate = conditions?.untilDate
+                    )
+                }
+                is Page.Featured ->{
+                    NoteRequest(
+                        i = i,
+                        sinceId = conditions?.sinceId,
+                        untilId = conditions?.untilId,
+                        sinceDate = conditions?.sinceDate,
+                        untilDate = conditions?.untilDate
+                    )
+                }
+
+                is Page.Antenna ->{
+                    NoteRequest(
+                        i = i,
+                        sinceId = conditions?.sinceId,
+                        untilId = conditions?.untilId,
+                        sinceDate = conditions?.sinceDate,
+                        untilDate = conditions?.untilDate,
+                        antennaId = pageableTimeline.antennaId
                     )
                 }
                 else -> throw IllegalArgumentException("type: ${pageableTimeline.javaClass}")

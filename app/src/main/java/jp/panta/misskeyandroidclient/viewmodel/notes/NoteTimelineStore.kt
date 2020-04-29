@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
@@ -40,7 +41,16 @@ class NoteTimelineStore(
                 is Page.UserTimeline -> miCore.getMisskeyAPI(accountRelation)!!::userNotes
                 is Page.UserListTimeline -> miCore.getMisskeyAPI(accountRelation)!!::userListTimeline
                 is Page.SearchByTag -> miCore.getMisskeyAPI(accountRelation)!!::searchByTag
+                is Page.Featured -> miCore.getMisskeyAPI(accountRelation)!!::featured
                 is Page.Mention -> miCore.getMisskeyAPI(accountRelation)!!::mentions
+                is Page.Antenna -> {
+                    val api = miCore.getMisskeyAPI(accountRelation)
+                    if(api is MisskeyAPIV12){
+                        (api as MisskeyAPIV12)::antennasNotes
+                    }else{
+                        throw IllegalArgumentException("antennaはV12以上でなければ使用できません")
+                    }
+                }
                 else -> throw IllegalArgumentException("unknown class:${pageableTimeline.javaClass}")
             }
 

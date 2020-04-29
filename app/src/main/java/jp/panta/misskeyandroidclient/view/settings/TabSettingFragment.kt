@@ -84,7 +84,7 @@ class TabSettingFragment : Fragment(){
 
 
 
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer { ar ->
+        /*miApplication.currentAccount.observe(viewLifecycleOwner, Observer { ar ->
             val list = if(ar.pages.isNullOrEmpty()){
                 defaultTabVisibleSettings()
             }else{
@@ -98,7 +98,7 @@ class TabSettingFragment : Fragment(){
             val selectableList = notSelectedSettings(list)
             mSelectedListLiveData.postValue(list)
             mSelectableListLiveData.postValue(selectableList)
-        })
+        })*/
 
 
 
@@ -152,7 +152,7 @@ class TabSettingFragment : Fragment(){
             }
 
 
-            miApplication?.replaceAllPagesInCurrentAccount(selectedList)
+            //miApplication?.replaceAllPagesInCurrentAccount(selectedList)
             Log.d("TabSettingFragment", "設定完了")
         }
     }
