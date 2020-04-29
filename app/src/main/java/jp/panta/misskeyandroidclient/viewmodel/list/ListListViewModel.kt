@@ -9,6 +9,7 @@ import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.UpdateList
@@ -45,7 +46,12 @@ class ListListViewModel(
     val pagedUserList = Transformations.map(userListList){ ulList ->
         ulList.filter{ ul ->
             accountRelation.pages.any {
-                it.listId == ul.id
+                val pageable = it.pageable()
+                if(pageable is Page.UserListTimeline){
+                    pageable.listId == ul.id
+                }else{
+                    false
+                }
             }
         }
     }
@@ -121,15 +127,16 @@ class ListListViewModel(
     fun toggleTab(userList: UserList?){
         userList?.let{ ul ->
             val exPage = accountRelation.pages.firstOrNull {
-                it.listId == ul.id
+                val pageable = it.pageable()
+                if(pageable is Page.UserListTimeline){
+                    pageable.listId == ul.id
+                }else{
+                    false
+                }
             }
             if(exPage == null){
-                val setting = NoteRequest.Setting(
-                    NoteType.USER_LIST,
-                    listId = ul.id
-                )
-                setting.title = ul.name
-                miCore.addPageInCurrentAccount(setting)
+                val page = Page(null, ul.name, userListTimeline = Page.UserListTimeline(ul.id), pageNumber = null)
+                miCore.addPageInCurrentAccount(page)
             }else{
                 miCore.removePageInCurrentAccount(exPage)
             }

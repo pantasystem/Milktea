@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
@@ -28,9 +29,7 @@ class FavoriteActivity : AppCompatActivity() {
         miApplication.currentAccount.observe(this, Observer {ac ->
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ac, miApplication))[NotesViewModel::class.java]
             val fragment = TimelineFragment.newInstance(
-                NoteRequest.Setting(
-                    type = NoteType.FAVORITE
-                )
+                Page.Favorite()
             )
 
             val manager = supportFragmentManager.beginTransaction()

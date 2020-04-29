@@ -40,6 +40,8 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI) : MisskeyAPI{
 
     override fun createReaction(reaction: CreateReaction) = misskey.createReaction(reaction)
 
+    override fun mentions(noteRequest: NoteRequest): Call<List<Note>?> = misskey.mentions(noteRequest)
+
     override fun delete(deleteNote: DeleteNote) = misskey.delete(deleteNote)
 
     override fun deleteFavorite(noteRequest: NoteRequest): Call<Unit> = misskey.deleteFavorite(noteRequest)

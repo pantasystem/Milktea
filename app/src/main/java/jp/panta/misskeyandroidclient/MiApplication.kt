@@ -153,7 +153,11 @@ class MiApplication : Application(), MiCore {
     override fun addPageInCurrentAccount(page: Page) {
         GlobalScope.launch(Dispatchers.IO){
             try{
+                val aboutPageNumber = currentAccount.value?.pages?.size?: 0 + 1
                 page.accountId = currentAccount.value?.account?.id
+                if(page.pageNumber == null){
+                    page.pageNumber = aboutPageNumber
+                }
                 mPageDao.insert(page)
                 loadAndInitializeAccounts()
             }catch(e: Exception){

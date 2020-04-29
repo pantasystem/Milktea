@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -120,15 +121,9 @@ class UserDetailActivity : AppCompatActivity() {
     ) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
         private val titles = listOf(getString(R.string.post), getString(R.string.pin), getString(R.string.media))
-        private val requestMedia = NoteRequest.Setting(
-            NoteType.USER,
-            withFiles = true,
-            userId = userId
-        )
-        private val requestTimeline = NoteRequest.Setting(
-            NoteType.USER,
-            userId = userId
-        )
+        private val requestMedia = Page.UserTimeline(userId, withFiles = true)
+
+        private val requestTimeline = Page.UserTimeline(userId)
         override fun getCount(): Int {
             return titles.size
         }
@@ -167,7 +162,12 @@ class UserDetailActivity : AppCompatActivity() {
 
         val tab = menu?.findItem(R.id.nav_add_to_tab)
         val page = mAccountRelation?.pages?.firstOrNull {
-            it.userId == mUserId
+            val pageable = it.pageable()
+            if(pageable is Page.UserTimeline){
+                pageable.userId == mUserId
+            }else{
+                false
+            }
         }
         if(page == null){
             tab?.setIcon(R.drawable.ic_add_to_tab_24px)
@@ -226,15 +226,26 @@ class UserDetailActivity : AppCompatActivity() {
         user?: return
 
         val page = mAccountRelation?.pages?.firstOrNull {
-            it.userId == mUserId && mUserId != null
+            val pageable = it.pageable()
+            if(pageable is Page.UserTimeline){
+                pageable.userId == mUserId && mUserId != null
+            }else{
+                false
+            }
         }
         val isAdded = page != null
         if(isAdded){
             (application as MiCore).removePageInCurrentAccount(page!!)
         }else{
-            (application as MiApplication).addPageInCurrentAccount(NoteRequest.Setting(type = NoteType.USER, userId = user.id).apply{
-                title = user.getDisplayUserName()
-            })
+            (application as MiApplication).addPageInCurrentAccount(
+                Page(null,
+                    title = user.getDisplayUserName(),
+                    pageNumber = null,
+                    userTimeline = Page.UserTimeline(userId = user.id)
+                )
+            )
+
+
         }
 
     }

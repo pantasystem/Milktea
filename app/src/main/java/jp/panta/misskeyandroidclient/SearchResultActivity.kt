@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteType
@@ -50,15 +51,11 @@ class SearchResultActivity : AppCompatActivity() {
         val isTag = keyword.startsWith("#")
         mIsTag = isTag
         val request = if(isTag){
-            NoteRequest.Setting(
-                type = NoteType.SEARCH_HASH,
-                tag = keyword
-            )
+            Page.SearchByTag(tag = keyword)
+
         }else{
-            NoteRequest.Setting(
-                type = NoteType.SEARCH,
-                query = keyword
-            )
+            Page.Search(query = keyword)
+
         }
 
 
