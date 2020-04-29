@@ -43,8 +43,10 @@ data class Page(
         }
     }
 
-    data class GlobalTimeline(var withFiles: Boolean): Pageable
-    data class LocalTimeline(var withFiles: Boolean? = null, var excludeNsfw: Boolean? = null) : Pageable
+    abstract class Timeline
+
+    data class GlobalTimeline(var withFiles: Boolean): Pageable, Timeline()
+    data class LocalTimeline(var withFiles: Boolean? = null, var excludeNsfw: Boolean? = null) : Pageable, Timeline()
 
     /**
      * @param includeLocalRenotes 全体設定に従う場合はnullそうでない場合はパラメーターが指定される
@@ -56,14 +58,14 @@ data class Page(
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null
-    ) : Pageable
+    ) : Pageable, Timeline()
 
     data class HomeTimeline(
         var withFiles: Boolean? = null,
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null
-    ) : Pageable
+    ) : Pageable, Timeline()
 
     data class UserListTimeline(
         val listId: String,
@@ -71,14 +73,14 @@ data class Page(
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null
-    ) : Pageable
+    ) : Pageable, Timeline()
 
-    data class Mention(val following: Boolean, val  visibility: String? = null) : Pageable
+    data class Mention(val following: Boolean?, val  visibility: String? = null) : Pageable, Timeline()
     data class Show(val noteId: String) : Pageable
-    data class SearchByTag(val tag: String, var reply: Boolean? = null, var renote: Boolean? = null, var withFiles: Boolean? = null, var poll: Boolean? = null) : Pageable
+    data class SearchByTag(val tag: String, var reply: Boolean? = null, var renote: Boolean? = null, var withFiles: Boolean? = null, var poll: Boolean? = null) : Pageable, Timeline()
     data class Featured(val offset: Int) : Pageable
     data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null) : Pageable
-    data class UserTimeline(val userId: String, var includeReplies: Boolean = true, var includeMyRenotes: Boolean? = true, var withFiles: Boolean? = null) : Pageable
-    data class Search(var query: String, var host: String? = null, var userId: String? = null) : Pageable
+    data class UserTimeline(val userId: String, var includeReplies: Boolean = true, var includeMyRenotes: Boolean? = true, var withFiles: Boolean? = null) : Pageable, Timeline()
+    data class Search(var query: String, var host: String? = null, var userId: String? = null) : Pageable, Timeline()
 }
 
