@@ -1,9 +1,8 @@
-package jp.panta.misskeyandroidclient
+package jp.panta.misskeyandroidclient.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import jp.panta.misskeyandroidclient.model.Pageable
 
 @Entity
 data class Page(
