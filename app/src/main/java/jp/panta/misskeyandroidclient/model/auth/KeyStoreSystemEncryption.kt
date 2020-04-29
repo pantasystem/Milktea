@@ -34,7 +34,7 @@ class KeyStoreSystemEncryption(private val context: Context) : Encryption{
             keyPairGenerator.generateKeyPair()
         }
         val publicKey = keyStore.getCertificate(alias).publicKey
-        val privateKey = keyStore.getKey(alias, null)
+        keyStore.getKey(alias, null)
 
         // 公開鍵で暗号化
         val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION)

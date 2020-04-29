@@ -79,14 +79,7 @@ class SignInActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             android.R.id.home -> finish()
-            R.id.menu_auth ->{
-                startActivity(Intent(this, AuthActivity::class.java))
-                finish()
-            }
-            R.id.menu_custom_app ->{
-                startActivity(Intent(this, CustomAppActivity::class.java))
-                finish()
-            }
+
         }
         return super.onOptionsItemSelected(item)
     }

@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import jp.panta.misskeyandroidclient.AuthActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.I
@@ -48,7 +47,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         }
 
         view.add_account.setOnClickListener {
-            startActivity(Intent(activity, AuthActivity::class.java))
+            //FIXME 新しい認証アクティビティを実装する
             dismiss()
         }
 

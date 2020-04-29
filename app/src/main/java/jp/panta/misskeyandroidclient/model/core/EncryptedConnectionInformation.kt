@@ -7,7 +7,6 @@ import androidx.room.ForeignKey.NO_ACTION
 import androidx.room.Ignore
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
-import jp.panta.misskeyandroidclient.model.auth.Instance
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
 import jp.panta.misskeyandroidclient.model.users.User
@@ -42,18 +41,7 @@ data class EncryptedConnectionInformation(
     }
 
     class Creator(val encryption: Encryption){
-        fun create(
-            accessToken: AccessToken,
-            instance: Instance
-        ): EncryptedConnectionInformation{
-            val i = sha256(accessToken.accessToken + instance.appSecret)
-            return EncryptedConnectionInformation(
-                accountId = accessToken.user.id,
-                instanceBaseUrl = instance.domain,
-                encryptedI = encryption.encrypt(accessToken.user.id, i),
-                viaName = instance.appName
-            )
-        }
+
 
         fun create(
             accessToken: AccessToken,

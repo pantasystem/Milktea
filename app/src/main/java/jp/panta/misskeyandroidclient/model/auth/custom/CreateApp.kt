@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.auth.custom
 
 data class CreateApp(
-    val i: String,
+    val i: String?,
     val name: String,
     val description: String,
     val callbackUrl: String,

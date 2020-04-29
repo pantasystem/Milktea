@@ -76,7 +76,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             notesViewModel.postReaction(reaction)
             dismiss()
         }
-        view.reactionField.setOnEditorActionListener { textView, i, keyEvent ->
+        view.reactionField.setOnEditorActionListener { textView, _, keyEvent ->
             if(keyEvent != null && keyEvent.keyCode == KeyEvent.KEYCODE_ENTER){
                 if(keyEvent.action == KeyEvent.ACTION_UP){
                     notesViewModel.postReaction(textView.text.toString())

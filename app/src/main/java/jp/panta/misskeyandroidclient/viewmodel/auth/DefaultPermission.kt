@@ -1,6 +1,6 @@
-package jp.panta.misskeyandroidclient.viewmodel.auth.custom
+package jp.panta.misskeyandroidclient.viewmodel.auth
 
-object CustomAppDefaultPermission{
+object DefaultPermission{
     val defaultPermission = listOf(
         "write:user-groups",
         "read:user-groups",
