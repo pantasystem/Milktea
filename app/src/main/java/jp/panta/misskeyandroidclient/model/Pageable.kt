@@ -1,3 +1,3 @@
 package jp.panta.misskeyandroidclient.model
 
-interface IPage
+interface Pageable
