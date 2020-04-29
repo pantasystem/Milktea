@@ -1,3 +1,5 @@
 package jp.panta.misskeyandroidclient.model
 
-interface Pageable
+import java.io.Serializable
+
+interface Pageable : Serializable
