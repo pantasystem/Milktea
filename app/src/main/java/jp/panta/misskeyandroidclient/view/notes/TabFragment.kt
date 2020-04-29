@@ -26,7 +26,7 @@ class TabFragment : Fragment(), ScrollableTop{
 
     private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
 
-    private lateinit var mPagerAdapter: TimelinePagerAdapter
+    private var mPagerAdapter: TimelinePagerAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //return super.onCreateView(inflater, container, savedInstanceState)
@@ -56,9 +56,14 @@ class TabFragment : Fragment(), ScrollableTop{
                 setting.includeRenotedMyNotes = includeRenotedMyNotes
             }
 
-            mPagerAdapter = TimelinePagerAdapter(activity?.supportFragmentManager, settings)
-            viewPager.adapter = mPagerAdapter
+            if(mPagerAdapter == null){
+                mPagerAdapter = TimelinePagerAdapter(activity?.supportFragmentManager, emptyList())
+                viewPager.adapter = mPagerAdapter
+            }
+            mPagerAdapter?.requestBaseList = settings
+            mPagerAdapter?.notifyDataSetChanged()
             tabLayout.setupWithViewPager(viewPager)
+            //mPagerAdapter = mPagerAdapter?:
 
             if(settings.size <= 1){
                 tabLayout.visibility = View.GONE
@@ -77,7 +82,7 @@ class TabFragment : Fragment(), ScrollableTop{
         }
     }
 
-    class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, val requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    class TimelinePagerAdapter(supportFragmentManager: FragmentManager?, var requestBaseList: List<NoteRequest.Setting>) : FragmentPagerAdapter(supportFragmentManager!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
 
@@ -113,7 +118,7 @@ class TabFragment : Fragment(), ScrollableTop{
 
     private fun showTopCurrentFragment(){
         try{
-            mPagerAdapter.scrollableTopFragments.forEach{
+            mPagerAdapter?.scrollableTopFragments?.forEach{
                 it.showTop()
             }
         }catch(e: UninitializedPropertyAccessException){
