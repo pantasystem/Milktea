@@ -240,7 +240,13 @@ class MiApplication : Application(), MiCore {
 
     private fun loadAndInitializeAccounts(){
         try{
-            val tmpAccounts = mAccountDao.findAllSetting()
+            val tmpAccounts = try{
+                mAccountDao.findAllSetting()
+
+            }catch(e: Exception){
+                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
+                return
+            }
 
             val current = tmpAccounts.firstOrNull {
                 it.account.id == getCurrentUserId()

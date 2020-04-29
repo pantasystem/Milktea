@@ -16,7 +16,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".MessagingListActivity"/>
+        <activity android:name=".AppAuthActivity"></activity>
+        <activity android:name=".MessagingListActivity" />
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".view.settings.activities.ReactionSettingActivity" />
         <activity
