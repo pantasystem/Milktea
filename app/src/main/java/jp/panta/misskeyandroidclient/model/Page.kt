@@ -47,7 +47,7 @@ data class Page(
 
     abstract class Timeline : Pageable
 
-    data class GlobalTimeline(var withFiles: Boolean): Pageable, Timeline()
+    data class GlobalTimeline(var withFiles: Boolean? = null): Pageable, Timeline()
     data class LocalTimeline(var withFiles: Boolean? = null, var excludeNsfw: Boolean? = null) : Timeline()
 
     /**

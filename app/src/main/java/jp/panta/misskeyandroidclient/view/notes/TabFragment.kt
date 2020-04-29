@@ -8,8 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -18,11 +16,12 @@ import com.google.android.material.tabs.TabLayoutMediator
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
+import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import kotlinx.android.synthetic.main.fragment_tab.*
 
 class TabFragment : Fragment(), ScrollableTop{
@@ -49,23 +48,19 @@ class TabFragment : Fragment(), ScrollableTop{
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
         miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
-            var settings = accountRelation.pages
-            settings = if(settings.isNullOrEmpty()){
-                makeDefaultNoteSetting(defaultTabType)
-            }else settings
+            var pages = accountRelation.pages
+            pages = if(pages.isNullOrEmpty()){
+                makeDefaultNoteSetting()
+            }else pages
 
-            settings.forEach{setting ->
-                setting.includeLocalRenotes = includeLocalRenotes
-                setting.includeMyRenotes = includeMyRenotes
-                setting.includeRenotedMyNotes = includeRenotedMyNotes
-            }
+
 
             if(mPagerAdapter == null){
                 mPagerAdapter = TimelinePagerAdapter(this, emptyList())
                 viewPager.adapter = mPagerAdapter
             }
-            mPagerAdapter?.setList(settings.sortedBy {
-                it.weight
+            mPagerAdapter?.setList(pages.sortedBy {
+                it.pageNumber
             })
             //mPagerAdapter?.notifyDataSetChanged()
 
@@ -75,7 +70,7 @@ class TabFragment : Fragment(), ScrollableTop{
             mediator.attach()
 
 
-            if(settings.size <= 1){
+            if(pages.size <= 1){
                 tabLayout.visibility = View.GONE
                 elevationView.visibility = View.VISIBLE
             }else{
@@ -86,28 +81,44 @@ class TabFragment : Fragment(), ScrollableTop{
 
     }
 
-    private fun makeDefaultNoteSetting(list: List<NoteType>): List<NoteRequest.Setting>{
-        return list.map{
+    private fun makeDefaultNoteSetting(): List<Page>{
+        return listOf(
+            Page(null, getString(R.string.home), 1, homeTimeline = Page.HomeTimeline()),
+            Page(null, getString(R.string.hybrid), 2, hybridTimeline = Page.HybridTimeline()),
+            Page(null, getString(R.string.global), 3, globalTimeline = Page.GlobalTimeline())
+        )
+        /*return list.map{
             NoteRequest.Setting(type = it)
-        }
+        }*/
     }
 
-    class TimelinePagerAdapter(fragment: Fragment, list: List<NoteRequest.Setting>) : FragmentStateAdapter(fragment){
-        var requestBaseList: List<NoteRequest.Setting> = list
+
+    class TimelinePagerAdapter(fragment: Fragment, list: List<Page>) : FragmentStateAdapter(fragment){
+        var requestBaseList: List<Page> = list
             private set
         private var oldRequestBaseSetting = requestBaseList
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
 
         override fun createFragment(position: Int): Fragment {
-            Log.d("getItem", "$position, ${requestBaseList[position].type}")
+            Log.d("getItem", "$position, ${requestBaseList[position].pageable()?.javaClass}")
             val item = requestBaseList[position]
-            val noteId = item.noteId
-            val fragment =  if(item.type == NoteType.DETAIL && noteId != null){
-                NoteDetailFragment.newInstance(noteId)
-            }else{
-                TimelineFragment.newInstance(item)
+            val fragment = when(val pageable = item.pageable()){
+                is Page.Timeline ->{
+                    TimelineFragment.newInstance(pageable)
+                }
+                is Page.Show ->{
+                    NoteDetailFragment.newInstance(pageable.noteId)
+                }
+                is Page.Notification ->{
+                    NotificationFragment()
+                }
+                is Page.Featured ->{
+                    TODO("Featured用のFragmentを用意する")
+                }
+                else -> throw IllegalArgumentException("unknown type:${pageable?.javaClass}")
             }
+
             if(fragment is ScrollableTop){
                 scrollableTopFragments.add(fragment)
             }
@@ -115,8 +126,8 @@ class TabFragment : Fragment(), ScrollableTop{
         }
 
         fun getPageTitle(position: Int): String{
-            val requestBase = requestBaseList[position]
-            return requestBase.title
+            val page = requestBaseList[position]
+            return page.title
         }
 
         override fun getItemCount(): Int = requestBaseList.size
@@ -142,7 +153,7 @@ class TabFragment : Fragment(), ScrollableTop{
             }
         }
 
-        fun setList(list: List<NoteRequest.Setting>){
+        fun setList(list: List<Page>){
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list
 

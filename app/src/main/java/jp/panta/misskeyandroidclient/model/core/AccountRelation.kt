@@ -5,6 +5,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Relation
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 
 @Entity
@@ -15,8 +16,11 @@ class AccountRelation{
     @Relation(parentColumn = "id", entityColumn = "accountId", entity = EncryptedConnectionInformation::class)
     lateinit var connectionInformationList: List<EncryptedConnectionInformation>
 
-    @Relation(parentColumn = "id", entityColumn = "accountId", entity = NoteRequest.Setting::class)
-    lateinit var pages: List<NoteRequest.Setting>
+    /*@Relation(parentColumn = "id", entityColumn = "accountId", entity = NoteRequest.Setting::class)
+    lateinit var pages: List<NoteRequest.Setting>*/
+
+    @Relation(parentColumn = "id", entityColumn = "accountId", entity = Page::class)
+    lateinit var pages: List<Page>
 
     @Ignore
     fun getCurrentConnectionInformation(): EncryptedConnectionInformation?{

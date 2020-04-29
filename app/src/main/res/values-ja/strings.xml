@@ -227,5 +227,10 @@
     <string name="successfully_created_the_app">アプリの作成に成功した</string>
     <string name="continue_auth">Continue</string>
 
+    <string name="home">ホーム</string>
+    <string name="global">グローバル</string>
+    <string name="local">ローカル</string>
+    <string name="hybrid">ソーシャル</string>
+
 
 </resources>
