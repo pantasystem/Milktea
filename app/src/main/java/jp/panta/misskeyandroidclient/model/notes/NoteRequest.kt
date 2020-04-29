@@ -147,6 +147,15 @@ data class NoteRequest(
                         host = pageableTimeline.host
                     )
                 }
+                is Page.Favorite ->{
+                    NoteRequest(
+                        i = i,
+                        sinceId = conditions.sinceId,
+                        untilId = conditions.untilId,
+                        sinceDate = conditions.sinceDate,
+                        untilDate = conditions.untilDate
+                    )
+                }
                 else -> throw IllegalArgumentException("type: ${pageableTimeline.javaClass}")
 
             }
