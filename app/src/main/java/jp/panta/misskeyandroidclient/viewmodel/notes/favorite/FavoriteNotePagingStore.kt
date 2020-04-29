@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.favorite
 
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
@@ -13,7 +14,7 @@ import retrofit2.Response
 
 class FavoriteNotePagingStore(
     override val accountRelation: AccountRelation,
-    override val timelineRequestBase: NoteRequest.Setting,
+    override val pageableTimeline: Page.Timeline,
     miCore: MiCore,
     private val encryption: Encryption
 ) : NotePagedStore{
@@ -22,9 +23,12 @@ class FavoriteNotePagingStore(
 
     private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 
+    private val builder = NoteRequest.Builder(pageableTimeline)
+
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         return if(request == null){
-            val res =favorites(timelineRequestBase.buildRequest(connectionInformation, NoteRequest.Conditions(), encryption)).execute()
+            val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
+            val res =favorites(builder.build(i, NoteRequest.Conditions())).execute()
             makeResponse(res, false)
         }else{
             makeResponse(favorites(request).execute(), false)
@@ -32,12 +36,14 @@ class FavoriteNotePagingStore(
     }
 
     override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val res = favorites(timelineRequestBase.buildRequest(connectionInformation, NoteRequest.Conditions(sinceId = sinceId), encryption)).execute()
+        val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
+        val res = favorites(builder.build(i, NoteRequest.Conditions(sinceId = sinceId))).execute()
         return makeResponse(res, true)
     }
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val res = favorites(timelineRequestBase.buildRequest(connectionInformation, NoteRequest.Conditions(untilId), encryption)).execute()
+        val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
+        val res = favorites(builder.build(i, NoteRequest.Conditions(untilId))).execute()
         return makeResponse(res, false)
     }
 

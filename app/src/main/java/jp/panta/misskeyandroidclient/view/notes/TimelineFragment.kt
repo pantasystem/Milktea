@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.view.notes
 
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
-
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -14,24 +12,27 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.getPreferenceName
+import jp.panta.misskeyandroidclient.view.PageableView
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 
-class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop{
+class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
 
     companion object{
-        private const val EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.setting"
-        fun newInstance(setting: NoteRequest.Setting): TimelineFragment{
+        private const val EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.pageable_timeline"
+
+
+
+        fun newInstance(pageableTimeline: Page.Timeline): TimelineFragment{
             return TimelineFragment().apply{
                 arguments = Bundle().apply{
-                    this.putSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING, setting)
+                    this.putSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE, pageableTimeline)
                 }
             }
         }
@@ -45,7 +46,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     //private var isLoadInited: Boolean = false
     private var isLoadInit: Boolean = false
 
-    private var mSetting: NoteRequest.Setting? = null
+    private var mPageableTimeline: Page.Timeline? = null
     private var isShowing: Boolean = false
 
     private var mFirstVisibleItemPosition: Int? = null
@@ -63,7 +64,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         //データ受け取り
 
-        mSetting = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_NOTE_REQUEST_SETTING) as NoteRequest.Setting
+        mPageableTimeline = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE) as Page.Timeline?
 
         val miApplication = context?.applicationContext as MiApplication
 
@@ -71,7 +72,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.layoutManager = mLinearLayoutManager
 
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
-            val factory = TimelineViewModelFactory(accountRelation, mSetting!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
+            val factory = TimelineViewModelFactory(accountRelation, mPageableTimeline!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
             val vm = mViewModel
             if(vm == null || vm.accountRelation.getCurrentConnectionInformation() != accountRelation.getCurrentConnectionInformation()){
                 //Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, CI非一致:${vm?.connectionInstance != ci}")

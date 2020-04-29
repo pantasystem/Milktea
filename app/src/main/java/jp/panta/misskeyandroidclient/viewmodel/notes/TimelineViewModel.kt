@@ -4,6 +4,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -22,7 +23,9 @@ import java.util.*
 
 class TimelineViewModel(
     val accountRelation: AccountRelation,
-    val requestBaseSetting: NoteRequest.Setting,
+    //val requestBaseSetting: NoteRequest.Setting,
+    private val pageableTimeline: Page.Timeline,
+    private val include: NoteRequest.Include,
     miCore: MiCore,
     private val settingStore: SettingStore,
     encryption: Encryption
@@ -47,11 +50,12 @@ class TimelineViewModel(
 
     val position = MutableLiveData<Int>()
 
-    private val notePagingStore = when(requestBaseSetting.type){
-        NoteType.FAVORITE -> FavoriteNotePagingStore(accountRelation, requestBaseSetting, miCore, encryption)
+    private val notePagingStore = when(pageableTimeline){
+        is Page.Favorite -> FavoriteNotePagingStore(accountRelation, pageableTimeline, miCore, encryption)
         else -> NoteTimelineStore(
             accountRelation,
-            requestBaseSetting,
+            pageableTimeline,
+            include,
             miCore,
             encryption
         )
@@ -135,7 +139,7 @@ class TimelineViewModel(
                 startTimelineCapture()
             }*/
                         }else{
-                            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && list.size < requestBaseSetting.limit?: 20){
+                            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && list.size < 20){
                                 startTimelineCapture()
                             }
                             val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
@@ -270,7 +274,7 @@ class TimelineViewModel(
         val exTimeline = streamingAdapter.observerMap[timelineCaptureId]
         if(exTimeline == null && timelineCapture != null && !isTimelineCaptureStarted){
             //observer?.updateId()
-            val observer = TimelineCapture.TimelineObserver.create(requestBaseSetting.type, this.timelineObserver)
+            val observer = TimelineCapture.TimelineObserver.create(pageableTimeline, this.timelineObserver)
             mObserver = observer
             streamingAdapter.addObserver(timelineCaptureId, timelineCapture)
             if(observer != null){

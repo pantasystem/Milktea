@@ -151,6 +151,9 @@ interface MisskeyAPI {
     @POST("api/users/notes")
     fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
 
+    @POST("api/notes/mentions")
+    fun mentions(@Body noteRequest: NoteRequest): Call<List<Note>?>
+
     @POST("api/users/followers")
     fun followers(@Body userRequest: RequestUser) : Call<List<FollowFollowerUser>>
 
