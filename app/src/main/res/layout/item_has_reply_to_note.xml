@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0.5dp"
-            app:cardUseCompatPadding="true"
+            app:cardUseCompatPadding="false"
             app:cardCornerRadius="0dp"
             android:elevation="0dp"
             app:setCardViewSurfaceColor="@{null}"

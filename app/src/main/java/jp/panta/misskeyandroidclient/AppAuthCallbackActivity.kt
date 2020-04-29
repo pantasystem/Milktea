@@ -25,6 +25,7 @@ class AppAuthCallbackActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         val binding = DataBindingUtil.setContentView<ActivityAppAuthCallbackBinding>(this, R.layout.activity_app_auth_callback)
         binding.lifecycleOwner = this
         val store = CustomAuthStore.newInstance(this)

@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel
 class AppAuthActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme()
         super.onCreate(savedInstanceState)
         val binding = DataBindingUtil.setContentView<ActivityAppAuthBinding>(this, R.layout.activity_app_auth)
         setSupportActionBar(binding.appAuthToolbar)
