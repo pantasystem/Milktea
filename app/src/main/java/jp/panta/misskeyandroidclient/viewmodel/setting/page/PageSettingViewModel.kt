@@ -47,7 +47,7 @@ class PageSettingViewModel(
         }
         selectedPages.addSource(defaultPages){
             val ex = selectedPages.value?: emptyList()
-            if(ex.isEmpty()){
+            if(it.isEmpty()){
                 selectedPages.value = ex
             }
         }
@@ -75,7 +75,7 @@ class PageSettingViewModel(
         setList(list)
     }
 
-    fun syncAddUser(userId: String){
+    fun asyncAddUser(userId: String){
         miCore.getMisskeyAPI(accountRelation)?.showUser(
             RequestUser(
                 i = accountRelation?.getCurrentConnectionInformation()?.getI(encryption)!!,
