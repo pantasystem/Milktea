@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.v12.antenna
 
 class Antenna(
+    val id: String,
     val name: String,
     val src: String,
     val userListId: String?,

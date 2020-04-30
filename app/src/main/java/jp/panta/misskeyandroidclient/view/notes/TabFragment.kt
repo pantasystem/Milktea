@@ -83,9 +83,9 @@ class TabFragment : Fragment(), ScrollableTop{
 
     private fun makeDefaultNoteSetting(): List<Page>{
         return listOf(
-            Page(null, getString(R.string.home), 1, homeTimeline = Page.HomeTimeline()),
-            Page(null, getString(R.string.hybrid), 2, hybridTimeline = Page.HybridTimeline()),
-            Page(null, getString(R.string.global), 3, globalTimeline = Page.GlobalTimeline())
+            Page(null, getString(R.string.home_timeline), 1, homeTimeline = Page.HomeTimeline()),
+            Page(null, getString(R.string.hybrid_timeline), 2, hybridTimeline = Page.HybridTimeline()),
+            Page(null, getString(R.string.global_timeline), 3, globalTimeline = Page.GlobalTimeline())
         )
         /*return list.map{
             NoteRequest.Setting(type = it)

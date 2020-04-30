@@ -28,8 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/selected_tab_list"
-                tools:layout_height="wrap_content"
                 tools:layout_weight="0"
+                tools:layout_height="50dp"
                 />
 
         <TextView
@@ -45,11 +45,57 @@
                 android:elevation="4dp"
                 android:text="@string/tab_selectable" />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/selectable_tab_list"
+        <Button
+                android:id="@+id/addGlobalTimeline"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/global_timeline"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_marginBottom="8dp"/>
 
+        <Button
+                android:id="@+id/addHybridTimeline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hybrid_timeline"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_marginBottom="8dp"/>
+        <Button
+                android:id="@+id/addLocalTimeline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/local_timeline"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_marginBottom="8dp"/>
+        <Button
+                android:id="@+id/addHomeTimeline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_timeline"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_marginBottom="8dp"/>
+
+        <Button
+                android:id="@+id/addMention"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/mention"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_marginBottom="8dp"/>
+        <Button
+                android:id="@+id/addNotification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/notification"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_marginBottom="8dp"/>
+        <Button
+                android:id="@+id/addFavorite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/favorite"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_marginBottom="8dp"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
