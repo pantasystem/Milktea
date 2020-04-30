@@ -22,6 +22,7 @@ import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.android.synthetic.main.fragment_tab.*
 
 class TabFragment : Fragment(), ScrollableTop{
@@ -83,9 +84,9 @@ class TabFragment : Fragment(), ScrollableTop{
 
     private fun makeDefaultNoteSetting(): List<Page>{
         return listOf(
-            Page(null, getString(R.string.home_timeline), 1, homeTimeline = Page.HomeTimeline()),
-            Page(null, getString(R.string.hybrid_timeline), 2, hybridTimeline = Page.HybridTimeline()),
-            Page(null, getString(R.string.global_timeline), 3, globalTimeline = Page.GlobalTimeline())
+            PageableTemplate.homeTimeline(getString(R.string.home_timeline)),
+            PageableTemplate.globalTimeline(getString(R.string.global_timeline)),
+            PageableTemplate.hybridTimeline(getString(R.string.hybrid_timeline))
         )
         /*return list.map{
             NoteRequest.Setting(type = it)

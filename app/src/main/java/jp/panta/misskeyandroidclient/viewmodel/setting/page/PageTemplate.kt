@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.page
 
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.Pageable
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
@@ -16,7 +15,7 @@ object PageableTemplate {
     fun localTimeline(title: String) =
         Page(null, title, null, localTimeline = Page.LocalTimeline())
 
-    val homeTimeline = Page.HomeTimeline()
+    fun homeTimeline(title: String) = Page(null, title, null, homeTimeline = Page.HomeTimeline())
     fun userListTimeline(listId: String): Page.UserListTimeline{
         return Page.UserListTimeline(listId)
     }
@@ -56,9 +55,5 @@ object PageableTemplate {
         return Page(null, antenna.name, null, antenna = Page.Antenna(antenna.id))
     }
 
-}
-
-enum class PageType{
-    GLOBAL, HYBRID, LOCAL, HOME, USER_LIST, MENTION, SEARCH_BY_TAG, SEARCH, FEATURED, NOTIFICATION, USER, FAVORITE, ANTENNA
 }
 
