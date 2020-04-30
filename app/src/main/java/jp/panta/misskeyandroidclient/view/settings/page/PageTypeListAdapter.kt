@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSelectPageToAddBinding
 import jp.panta.misskeyandroidclient.model.PageType
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.SelectPageTypeToAdd
 
-class PageTypeListAdapter : ListAdapter<PageType, PageTypeListAdapter.VH>(ItemCallback()){
+class PageTypeListAdapter(private val selectPageTypeToAdd: SelectPageTypeToAdd) : ListAdapter<PageType, PageTypeListAdapter.VH>(ItemCallback()){
 
     class ItemCallback : DiffUtil.ItemCallback<PageType>(){
         override fun areContentsTheSame(oldItem: PageType, newItem: PageType): Boolean {
@@ -25,6 +26,7 @@ class PageTypeListAdapter : ListAdapter<PageType, PageTypeListAdapter.VH>(ItemCa
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         holder.binding.pageType = getItem(position)
+        holder.binding.selectPageTypeToAdd = selectPageTypeToAdd
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
