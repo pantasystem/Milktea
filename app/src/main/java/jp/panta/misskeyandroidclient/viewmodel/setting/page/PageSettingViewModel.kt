@@ -23,7 +23,7 @@ class PageSettingViewModel(
     val miCore: MiCore,
     val settingStore: SettingStore,
     val pageTypeNameMap: PageTypeNameMap
-) : ViewModel(), SelectPageTypeToAdd{
+) : ViewModel(), SelectPageTypeToAdd, PageSettingAction{
 
     class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
 
@@ -41,6 +41,8 @@ class PageSettingViewModel(
     var defaultPages = MutableLiveData<List<Page>>()
 
     val pageAddedEvent = EventBus<PageType>()
+
+    val pageOnActionEvent = EventBus<Page>()
 
     init{
         selectedPages.addSource(miCore.currentAccount){
@@ -140,5 +142,10 @@ class PageSettingViewModel(
 
             }
         }
+    }
+
+    override fun action(page: Page?) {
+        page?: return
+        pageOnActionEvent.event = page
     }
 }

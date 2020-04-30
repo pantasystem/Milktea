@@ -39,13 +39,7 @@ class PagesAdapter(val pageSettingViewModel: PageSettingViewModel) : ListAdapter
     override fun onBindViewHolder(holder: VH, position: Int) {
         val binding = holder.binding
         binding.page = getItem(position)
-        binding.pageSetting.setOnClickListener {
-
-        }
-
-        binding.itemPageSettingMoreButton.setOnClickListener{
-
-        }
+        binding.pageSettingAction = pageSettingViewModel
 
     }
 }

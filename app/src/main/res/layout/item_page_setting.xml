@@ -6,6 +6,9 @@
         <variable
                 name="page"
                 type="jp.panta.misskeyandroidclient.model.Page" />
+        <variable
+                name="pageSettingAction"
+                type="jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingAction" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -35,7 +38,8 @@
                     tools:ignore="ContentDescription"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     app:srcCompat="@drawable/ic_more_vert_black_24dp"
-                    android:tint="?attr/colorNoteActionButtonTint"/>
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    android:onClick="@{()-> pageSettingAction.action(page)}"/>
 
         </LinearLayout>
 

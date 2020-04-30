@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityPageSettingBinding
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.setTheme
+import jp.panta.misskeyandroidclient.view.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.view.settings.page.PagesAdapter
 import jp.panta.misskeyandroidclient.view.settings.page.SelectPageToAddDialog
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
@@ -48,6 +49,10 @@ class PageSettingActivity : AppCompatActivity() {
         binding.addPageButton.setOnClickListener {
             SelectPageToAddDialog().show(supportFragmentManager, "Activity")
         }
+
+        mPageSettingViewModel.pageOnActionEvent.observe(this, Observer {
+            PageSettingActionDialog().show(supportFragmentManager, "PSA")
+        })
 
     }
 
