@@ -25,6 +25,9 @@ class ListListActivity : AppCompatActivity() {
         const val ACTION_USER_LIST_CREATED = "jp.panta.misskeyandroidclient.ACTION_USER_LIST_CREATED"
         const val ACTION_USER_LIST_UPDATED = "jp.panta.misskeyandroidclient.ACTION_USER_LIST_UPDATED"
 
+        const val ACTION_VIEW = "jp.panta.misskeyandroidclient.ACTION_VIEW"
+        const val ACTION_SELECT = "jp.panta.misskeyandroidclient.ACTION_SELECT"
+
         private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
     }
 

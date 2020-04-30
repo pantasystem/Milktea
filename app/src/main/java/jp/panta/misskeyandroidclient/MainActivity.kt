@@ -40,7 +40,7 @@ import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
-import jp.panta.misskeyandroidclient.view.settings.activities.TabSettingActivity
+import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
@@ -307,7 +307,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.action_tab_setting-> {
                 startActivity(Intent(this,
-                    TabSettingActivity::class.java))
+                    PageSettingActivity::class.java))
                 true
             }
             R.id.action_notification ->{

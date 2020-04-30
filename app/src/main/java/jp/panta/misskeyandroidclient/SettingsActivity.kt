@@ -7,11 +7,8 @@ import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import jp.panta.misskeyandroidclient.view.settings.activities.ReactionSettingActivity
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
-import jp.panta.misskeyandroidclient.view.settings.activities.SettingAppearanceActivity
-import jp.panta.misskeyandroidclient.view.settings.activities.SettingMovementActivity
-import jp.panta.misskeyandroidclient.view.settings.activities.TabSettingActivity
+import jp.panta.misskeyandroidclient.view.settings.activities.*
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.MoveSettingActivityPanel
 import kotlinx.android.synthetic.main.activity_settings.*
@@ -37,7 +34,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val tabSetting = MoveSettingActivityPanel(
             titleStringRes = R.string.nav_setting_tab,
-            activity = TabSettingActivity::class.java,
+            activity = PageSettingActivity::class.java,
             context = this
         )
         tabSetting.startActivityEventBus.observe(this, Observer {

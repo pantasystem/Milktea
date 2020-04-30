@@ -232,5 +232,6 @@
     <string name="local_timeline">Local timeline</string>
     <string name="hybrid_timeline">Social timeline</string>
     <string name="mention">Mention</string>
+    <string name="add_tab">Add tab</string>
 
 </resources>

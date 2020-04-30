@@ -16,6 +16,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity android:name=".view.settings.activities.PageSettingActivity"></activity>
         <activity android:name=".AppAuthCallbackActivity">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
@@ -41,7 +42,6 @@
         <activity android:name=".SearchAndSelectUserActivity" />
         <activity android:name=".UserListDetailActivity" />
         <activity android:name=".ListListActivity" />
-
         <activity android:name=".SignInActivity" />
         <activity android:name=".FavoriteActivity" />
         <activity android:name=".FollowFollowerActivity" />
@@ -88,11 +88,9 @@
 
         <activity android:name=".MessageActivity" />
         <activity android:name=".DriveActivity" />
-        <activity android:name=".view.settings.activities.TabSettingActivity" />
         <activity
                 android:name=".NoteEditorActivity"
                 android:windowSoftInputMode="adjustResize" />
-
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"

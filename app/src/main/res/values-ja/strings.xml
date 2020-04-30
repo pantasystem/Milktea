@@ -232,6 +232,7 @@
     <string name="local_timeline">ローカルタイムライン</string>
     <string name="hybrid_timeline">ソーシャルタイムライン</string>
     <string name="mention">メンション</string>
+    <string name="add_tab">タブを追加する</string>
 
 
 </resources>
