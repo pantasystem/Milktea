@@ -42,7 +42,9 @@ class PageSettingViewModel(
             selectedPages.value = if(it.pages.isEmpty()){
                 defaultPages.value
             }else{
-                it.pages
+                it.pages.sortedBy { p ->
+                    p.pageNumber
+                }
             }
         }
         selectedPages.addSource(defaultPages){
