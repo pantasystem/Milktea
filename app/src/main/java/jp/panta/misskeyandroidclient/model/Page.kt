@@ -52,14 +52,14 @@ data class Page(
 
     data class GlobalTimeline(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
-        val type: PageType = PageType.GLOBAL
+        override val type: PageType = PageType.GLOBAL
     ): Pageable, Timeline(){
 
     }
     data class LocalTimeline(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
         @ColumnInfo(name = "exclude_nsfw") var excludeNsfw: Boolean? = null,
-        val type: PageType = PageType.LOCAL
+        override val type: PageType = PageType.LOCAL
     ) : Timeline()
 
     /**
@@ -72,7 +72,7 @@ data class Page(
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
-        val type: PageType = PageType.SOCIAL
+        override val type: PageType = PageType.SOCIAL
     ) : Timeline()
 
     data class HomeTimeline(
@@ -80,7 +80,7 @@ data class Page(
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
-        val type: PageType = PageType.HOME
+        override val type: PageType = PageType.HOME
     ) : Timeline()
 
     data class UserListTimeline(
@@ -89,40 +89,40 @@ data class Page(
         var includeLocalRenotes: Boolean? = null,
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
-        val type: PageType = PageType.USER_LIST
+        override val type: PageType = PageType.USER_LIST
     ) : Timeline()
 
     data class Mention(
         val following: Boolean?, val
         visibility: String? = null,
-        val type: PageType = PageType.MENTION
+        override val type: PageType = PageType.MENTION
     ) : Timeline()
     data class Show(
         val noteId: String,
-        val type: PageType = PageType.DETAIL
+        override val type: PageType = PageType.DETAIL
     ) : Pageable
     data class SearchByTag(
         val tag: String, var reply: Boolean? = null, var renote: Boolean? = null, var withFiles: Boolean? = null, var poll: Boolean? = null,
-        val type: PageType = PageType.SEARCH_HASH
+        override val type: PageType = PageType.SEARCH_HASH
     ) : Timeline()
     data class Featured(
         val offset: Int?,
-        val type: PageType = PageType.FEATURED
+        override val type: PageType = PageType.FEATURED
     ) : Timeline()
-    data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null, val type: PageType = PageType.NOTIFICATION) : Pageable
+    data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null, override val type: PageType = PageType.NOTIFICATION) : Pageable
     data class UserTimeline(
         val userId: String, var includeReplies: Boolean = true, var includeMyRenotes: Boolean? = true, var withFiles: Boolean? = null,
-        val type: PageType = PageType.USER
+        override val type: PageType = PageType.USER
     ) : Timeline()
     data class Search(
         var query: String, var host: String? = null, var userId: String? = null,
-        val type: PageType = PageType.SEARCH
+        override val type: PageType = PageType.SEARCH
     ) : Timeline()
     data class Antenna(
         val antennaId: String,
-        val type: PageType = PageType.ANTENNA
+        override val type: PageType = PageType.ANTENNA
     ) : Timeline()
 
-    class Favorite(val type: PageType = PageType.FAVORITE) : Timeline()
+    class Favorite(override val type: PageType = PageType.FAVORITE) : Timeline()
 }
 
