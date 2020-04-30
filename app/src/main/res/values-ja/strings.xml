@@ -237,6 +237,9 @@
     <string name="tag">ハッシュタグ</string>
     <string name="featured">ハイライト</string>
     <string name="antenna">アンテナ</string>
+    <string name="rename">名前の変更</string>
+    <string name="edit">編集</string>
+    <string name="delete">削除</string>
 
 
 </resources>

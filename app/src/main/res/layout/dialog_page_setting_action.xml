@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</LinearLayout>
+    <LinearLayout
+            android:orientation="vertical" android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
+            android:padding="8dp">
+
+
+        <TextView
+                android:id="@+id/editPage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/edit"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:gravity="start|center_vertical"
+                android:layout_marginBottom="8dp"
+                android:drawableStart="@drawable/ic_edit_black_24dp"
+                android:drawablePadding="8dp"
+                app:drawableTintCompat="@{null}"
+                />
+
+        <TextView
+                android:id="@+id/deletePage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/delete"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:gravity="start|center_vertical"
+                android:layout_marginBottom="8dp"
+                android:drawableStart="@drawable/ic_delete_black_24dp"
+                app:drawableTintCompat="@{null}"
+
+
+                />
+    </LinearLayout>
+</layout>

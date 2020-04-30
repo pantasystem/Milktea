@@ -237,5 +237,8 @@
     <string name="tag">Hashtag</string>
     <string name="featured">Featured</string>
     <string name="antenna">Antenna</string>
+    <string name="rename">Rename</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 
 </resources>
