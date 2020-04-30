@@ -7,10 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.PageType
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,14 +21,15 @@ import retrofit2.Response
 
 class PageSettingViewModel(
     val miCore: MiCore,
-    val settingStore: SettingStore
-) : ViewModel(){
+    val settingStore: SettingStore,
+    val pageTypeNameMap: PageTypeNameMap
+) : ViewModel(), SelectPageTypeToAdd{
 
     class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return PageSettingViewModel(miApplication, miApplication.settingStore) as T
+            return PageSettingViewModel(miApplication, miApplication.settingStore, PageTypeNameMap(miApplication)) as T
         }
     }
     val encryption = miCore.getEncryption()
@@ -35,6 +39,8 @@ class PageSettingViewModel(
     var accountRelation = miCore.currentAccount.value
 
     var defaultPages = MutableLiveData<List<Page>>()
+
+    val pageAddedEvent = EventBus<PageType>()
 
     init{
         selectedPages.addSource(miCore.currentAccount){
@@ -95,4 +101,38 @@ class PageSettingViewModel(
         })
     }
 
+
+    override fun add(type: PageType) {
+        pageAddedEvent.event = type
+        val name = pageTypeNameMap.get(type)
+        when(type){
+            PageType.GLOBAL->{
+                addPage(PageableTemplate.globalTimeline(name))
+            }
+            PageType.SOCIAL->{
+                addPage(PageableTemplate.hybridTimeline(name))
+            }
+            PageType.LOCAL -> {
+                addPage(PageableTemplate.localTimeline(name))
+            }
+            PageType.HOME ->{
+                addPage(PageableTemplate.homeTimeline(name))
+            }
+            PageType.NOTIFICATION ->{
+                addPage(PageableTemplate.notification(name))
+            }
+            PageType.FAVORITE ->{
+                addPage(PageableTemplate.favorite(name))
+            }
+            PageType.FEATURED ->{
+                addPage(PageableTemplate.featured(name))
+            }
+            PageType.MENTION ->{
+                addPage(PageableTemplate.mention(name))
+            }
+            else -> {
+
+            }
+        }
+    }
 }

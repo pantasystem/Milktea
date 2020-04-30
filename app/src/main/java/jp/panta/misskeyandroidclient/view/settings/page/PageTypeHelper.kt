@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.view.settings.page
 
+import android.content.Context
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
@@ -13,7 +14,15 @@ object PageTypeHelper{
     @BindingAdapter("pageType")
     fun TextView.setTextFromPageType(type: PageType?){
         type?: return
-        this.text = when(type){
+        this.text = nameByPageType(context, type)
+
+
+
+    }
+
+    fun nameByPageType(context: Context, pageType: PageType): String{
+
+        return when(pageType){
             GLOBAL -> context.getString(R.string.global_timeline)
             SOCIAL -> context.getString(R.string.hybrid_timeline)
             LOCAL -> context.getString(R.string.local_timeline)
@@ -26,11 +35,8 @@ object PageTypeHelper{
             DETAIL -> context.getString(R.string.conversation)
             USER_LIST -> context.getString(R.string.list)
             MENTION -> context.getString(R.string.mention)
-            NOTIFICATION -> context.getString(R.string.mention)
+            NOTIFICATION -> context.getString(R.string.notification)
             ANTENNA -> context.getString(R.string.antenna)
         }
-
-
-
     }
 }
