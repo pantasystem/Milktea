@@ -1,8 +1,11 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.page
 
+import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -17,22 +20,44 @@ class PageSettingViewModel(
     val miCore: MiCore,
     val settingStore: SettingStore
 ) : ViewModel(){
+
+    class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return PageSettingViewModel(miApplication, miApplication.settingStore) as T
+        }
+    }
     val encryption = miCore.getEncryption()
 
     val selectedPages = MediatorLiveData<List<Page>>()
 
     var accountRelation = miCore.currentAccount.value
 
+    var defaultPages = MutableLiveData<List<Page>>()
+
     init{
         selectedPages.addSource(miCore.currentAccount){
             accountRelation = it
-            selectedPages.value = it.pages
+            selectedPages.value = if(it.pages.isEmpty()){
+                defaultPages.value
+            }else{
+                it.pages
+            }
+        }
+        selectedPages.addSource(defaultPages){
+            val ex = selectedPages.value?: emptyList()
+            if(ex.isEmpty()){
+                selectedPages.value = ex
+            }
         }
     }
 
     fun setList(pages: List<Page>){
-        selectedPages.value = pages.sortedBy{
-            it.pageNumber
+        selectedPages.value = pages.mapIndexed { index, page ->
+            page.apply{
+                pageNumber = index + 1
+            }
         }
     }
     fun save(){
@@ -40,6 +65,7 @@ class PageSettingViewModel(
         list.forEachIndexed { index, page ->
             page.pageNumber = index + 1
         }
+        Log.d("PageSettingVM", "pages:$list")
         miCore.replaceAllPagesInCurrentAccount(list)
     }
 

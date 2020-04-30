@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

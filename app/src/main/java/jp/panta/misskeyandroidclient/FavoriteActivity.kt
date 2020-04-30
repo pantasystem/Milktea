@@ -7,7 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
+import jp.panta.misskeyandroidclient.model.PageType
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel

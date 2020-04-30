@@ -227,10 +227,10 @@
     <string name="successfully_created_the_app">アプリの作成に成功した</string>
     <string name="continue_auth">Continue</string>
 
-    <string name="home_timeline">ホームタイムライン</string>
-    <string name="global_timeline">グローバルタイムライン</string>
-    <string name="local_timeline">ローカルタイムライン</string>
-    <string name="hybrid_timeline">ソーシャルタイムライン</string>
+    <string name="home_timeline">ホーム</string>
+    <string name="global_timeline">グローバル</string>
+    <string name="local_timeline">ローカル</string>
+    <string name="hybrid_timeline">ソーシャル</string>
     <string name="mention">メンション</string>
     <string name="add_tab">タブを追加する</string>
 

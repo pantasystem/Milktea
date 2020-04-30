@@ -14,7 +14,6 @@ import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment

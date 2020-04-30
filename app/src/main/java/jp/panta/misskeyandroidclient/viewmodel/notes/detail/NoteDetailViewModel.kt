@@ -5,12 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -22,15 +22,20 @@ import kotlin.collections.ArrayList
 
 class NoteDetailViewModel(
     val accountRelation: AccountRelation,
+    val show: Page.Show,
     val miCore: MiCore,
-    val noteId: String,
-    val requestBase: NoteRequest.Setting = NoteRequest.Setting(type = NoteType.DETAIL, noteId = noteId),
     val encryption: Encryption = miCore.getEncryption()
 ) : ViewModel(){
+
+    private val request = NoteRequest(
+        i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+        noteId = show.noteId
+    )
 
     private val connectionInformation: EncryptedConnectionInformation = accountRelation.getCurrentConnectionInformation()!!
     private val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(connectionInformation)
     private val streamingAdapter = StreamingAdapter(connectionInformation, encryption)
+
 
     private val noteCapture = NoteCapture(accountRelation.account.id)
 
@@ -75,7 +80,7 @@ class NoteDetailViewModel(
 
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val rawDetail = misskeyAPI.showNote(requestBase.buildRequest(connectionInformation, NoteRequest.Conditions(), encryption)).execute().body()
+                val rawDetail = misskeyAPI.showNote(request).execute().body()
                     ?:return@launch
                 val detail = NoteDetailViewData(rawDetail, accountRelation.account)
                 var list: List<PlaneNoteViewData> = listOf(detail)
@@ -141,14 +146,14 @@ class NoteDetailViewModel(
 
 
     private fun loadConversation(): List<PlaneNoteViewData>?{
-        return misskeyAPI.conversation(requestBase.buildRequest(connectionInformation, NoteRequest.Conditions(), encryption)).execute().body()?.map{
+        return misskeyAPI.conversation(request).execute().body()?.map{
             PlaneNoteViewData(it, accountRelation.account)
         }
     }
 
     private fun loadChildren(): List<NoteConversationViewData>?{
-        return loadChildren(id = noteId)?.filter{
-            it.reNote?.id != noteId
+        return loadChildren(id = show.noteId)?.filter{
+            it.reNote?.id != show.noteId
         }?.map{
             val planeNoteViewData = PlaneNoteViewData(it, accountRelation.account)
             val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->

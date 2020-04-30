@@ -17,7 +17,6 @@ import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
@@ -28,7 +27,6 @@ import kotlinx.android.synthetic.main.fragment_tab.*
 class TabFragment : Fragment(), ScrollableTop{
 
 
-    private val defaultTabType = listOf(NoteType.HOME, NoteType.SOCIAL, NoteType.GLOBAL)
 
     private var mPagerAdapter: TimelinePagerAdapter? = null
 
@@ -55,6 +53,7 @@ class TabFragment : Fragment(), ScrollableTop{
             }else pages
 
 
+            Log.d("TabFragment", "pages:$pages")
 
             if(mPagerAdapter == null){
                 mPagerAdapter = TimelinePagerAdapter(this, emptyList())
@@ -117,7 +116,7 @@ class TabFragment : Fragment(), ScrollableTop{
                 is Page.Featured ->{
                     TODO("Featured用のFragmentを用意する")
                 }
-                else -> throw IllegalArgumentException("unknown type:${pageable?.javaClass}")
+                else -> throw IllegalArgumentException("unknown type:${pageable?.javaClass}, page:$item")
             }
 
             if(fragment is ScrollableTop){

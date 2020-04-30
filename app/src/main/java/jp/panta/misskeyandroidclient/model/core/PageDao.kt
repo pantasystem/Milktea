@@ -8,10 +8,10 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 @Dao
 interface PageDao {
     @Query("select * from page")
-    fun findAll(): LiveData<List<Page>?>
+    fun findAll(): List<Page>?
 
     @Query("select * from page where id = :id limit 1")
-    fun findById(id: Long): LiveData<Page?>
+    fun findById(id: Long): Page?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(page: Page)

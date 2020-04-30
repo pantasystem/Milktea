@@ -14,7 +14,6 @@ import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.*
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
@@ -40,7 +39,6 @@ class MiApplication : Application(), MiCore {
         private set*/
     private lateinit var mAccountDao: AccountDao
 
-    private lateinit var mNoteRequestSettingDao: NoteRequestSettingDao
 
     private lateinit var mPageDao: PageDao
 
@@ -91,13 +89,13 @@ class MiApplication : Application(), MiCore {
         settingStore = SettingStore(sharedPreferences)
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
+            .fallbackToDestructiveMigration()
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()
 
         mPageDao = database.pageDao()
 
-        mNoteRequestSettingDao = database.noteSettingDao()
 
         mConnectionInformationDao = database.connectionInformationDao()
 

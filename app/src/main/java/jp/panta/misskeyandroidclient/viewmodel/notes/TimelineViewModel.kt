@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
@@ -25,7 +24,7 @@ class TimelineViewModel(
     val accountRelation: AccountRelation,
     //val requestBaseSetting: NoteRequest.Setting,
     private val pageableTimeline: Page.Timeline,
-    private val include: NoteRequest.Include,
+    include: NoteRequest.Include,
     miCore: MiCore,
     private val settingStore: SettingStore,
     encryption: Encryption

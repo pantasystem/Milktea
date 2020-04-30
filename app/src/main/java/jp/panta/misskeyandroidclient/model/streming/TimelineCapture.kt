@@ -7,7 +7,6 @@ import com.google.gson.annotations.Expose
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.util.*

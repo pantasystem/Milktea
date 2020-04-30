@@ -5,11 +5,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
-import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.core.AccountDao
-import jp.panta.misskeyandroidclient.model.core.ConnectionInformationDao
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.notes.NoteRequestSettingDao
+import jp.panta.misskeyandroidclient.model.core.*
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Before
@@ -23,7 +20,7 @@ class DataBaseTest{
     lateinit var db: DataBase
     lateinit var accountDao: AccountDao
     lateinit var connectionInformationDao: ConnectionInformationDao
-    lateinit var noteSettingDao: NoteRequestSettingDao
+    lateinit var pageDao: PageDao
 
     lateinit var encryption: Encryption
 
@@ -33,8 +30,8 @@ class DataBaseTest{
         db = Room.inMemoryDatabaseBuilder(context, DataBase::class.java).build()
         accountDao = db.accountDao()
         connectionInformationDao = db.connectionInformationDao()
-        noteSettingDao = db.noteSettingDao()
         encryption = KeyStoreSystemEncryption(context)
+        pageDao = db.pageDao()
     }
 
     @Test
@@ -57,6 +54,21 @@ class DataBaseTest{
         val read = accountDao.findAllSetting()
         assert(read[0].connectionInformationList.isNotEmpty())
         Assert.assertThat(read[0].connectionInformationList, not(`is`(empty<EncryptedConnectionInformation>())))
+        pageDao.insert(
+            Page("114514", "Global", 1, globalTimeline = Page.GlobalTimeline()).apply{
+
+            }
+        )
+        val pages = pageDao.findAll()
+        Assert.assertNotEquals(pages?.firstOrNull(), null)
+        Assert.assertEquals(pages?.firstOrNull()?.accountId, "114514")
+
+        Assert.assertNotEquals(pages?.firstOrNull()?.globalTimeline ,null)
+
+        val newAccount = accountDao.findSettingByAccountId("114514")
+
+        Assert.assertNotEquals(newAccount?.pages?.first()?.globalTimeline, null)
+
     }
 
 

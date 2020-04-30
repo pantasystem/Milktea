@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel
@@ -37,7 +38,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
         val miApplication = context?.applicationContext as MiApplication
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
             val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
-            val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ar, miApplication, noteId))[NoteDetailViewModel::class.java]
+            val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ar, miApplication, Page.Show(noteId)))[NoteDetailViewModel::class.java]
 
             noteDetailViewModel.loadDetail()
             val adapter = NoteDetailAdapter(

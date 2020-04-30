@@ -15,7 +15,6 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call

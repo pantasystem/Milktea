@@ -227,10 +227,10 @@
     <string name="successfully_created_the_app">Successfully created the app</string>
     <string name="continue_auth">Continue</string>
 
-    <string name="home_timeline">Home timeline</string>
-    <string name="global_timeline">Global timeline</string>
-    <string name="local_timeline">Local timeline</string>
-    <string name="hybrid_timeline">Social timeline</string>
+    <string name="home_timeline">Home</string>
+    <string name="global_timeline">Global</string>
+    <string name="local_timeline">Local</string>
+    <string name="hybrid_timeline">Social</string>
     <string name="mention">Mention</string>
     <string name="add_tab">Add tab</string>
 

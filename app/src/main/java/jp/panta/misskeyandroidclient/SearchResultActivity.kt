@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.NoteType
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
@@ -142,11 +141,5 @@ class SearchResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun getType(): NoteType{
-        return if(SafeUnbox.unbox(mIsTag)){
-            NoteType.SEARCH_HASH
-        }else{
-            NoteType.SEARCH
-        }
-    }
+
 }
