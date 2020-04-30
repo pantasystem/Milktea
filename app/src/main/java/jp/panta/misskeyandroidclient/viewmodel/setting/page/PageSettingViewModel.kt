@@ -83,6 +83,12 @@ class PageSettingViewModel(
         setList(list)
     }
 
+    fun removePage(page: Page){
+        val list = ArrayList<Page>(selectedPages.value?: emptyList())
+        list.remove(page)
+        setList(list)
+    }
+
     fun asyncAddUser(userId: String){
         miCore.getMisskeyAPI(accountRelation)?.showUser(
             RequestUser(

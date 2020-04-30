@@ -31,7 +31,7 @@ object PageableTemplate {
         return Page(null, title, null, show = Page.Show(noteId))
     }
     fun tag(tag: String): Page{
-        return Page(null, tag, null, searchByTag = Page.SearchByTag(tag))
+        return Page(null, tag, null, searchByTag = Page.SearchByTag(tag.replace("#", "")))
     }
     fun search(query: String): Page{
         return Page(null, query, null, search = Page.Search(query))
