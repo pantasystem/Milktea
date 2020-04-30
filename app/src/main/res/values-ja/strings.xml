@@ -233,6 +233,10 @@
     <string name="hybrid_timeline">ソーシャル</string>
     <string name="mention">メンション</string>
     <string name="add_tab">タブを追加する</string>
+    <string name="list">リスト</string>
+    <string name="tag">ハッシュタグ</string>
+    <string name="featured">ハイライト</string>
+    <string name="antenna">アンテナ</string>
 
 
 </resources>

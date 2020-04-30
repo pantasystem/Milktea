@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="pageType"
+                type="jp.panta.misskeyandroidclient.model.PageType" />
+    </data>
+    <TextView
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Global"
+            android:gravity="start|center_vertical"
+            android:backgroundTint="?attr/colorSurface"
+            android:textColor="?android:attr/textColor"
+            app:pageType="@{pageType}"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+</layout>

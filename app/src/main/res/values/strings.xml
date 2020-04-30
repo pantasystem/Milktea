@@ -233,5 +233,9 @@
     <string name="hybrid_timeline">Social</string>
     <string name="mention">Mention</string>
     <string name="add_tab">Add tab</string>
+    <string name="list">List</string>
+    <string name="tag">Hashtag</string>
+    <string name="featured">Featured</string>
+    <string name="antenna">Antenna</string>
 
 </resources>
