@@ -17,8 +17,8 @@
             tools:text="Global"
             android:gravity="start|center_vertical"
             android:backgroundTint="?attr/colorSurface"
-            android:textColor="?android:attr/textColor"
             app:pageType="@{pageType}"
             android:onClick="@{()-> selectPageTypeToAdd.add(pageType)}"
-            style="@style/Widget.AppCompat.Button.Borderless"/>
+            style="@style/Widget.AppCompat.Button.Borderless"
+            />
 </layout>

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.view.settings.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
@@ -8,11 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivityPageSettingBinding
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.setTheme
+import jp.panta.misskeyandroidclient.model.PageType
 import jp.panta.misskeyandroidclient.view.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.view.settings.page.PagesAdapter
 import jp.panta.misskeyandroidclient.view.settings.page.SelectPageToAddDialog
@@ -20,6 +20,10 @@ import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 
 class PageSettingActivity : AppCompatActivity() {
+
+    companion object{
+        const val SEARCH_AND_SELECT_USER_RESULT_CODE = 30
+    }
 
     private lateinit var mPageSettingViewModel: PageSettingViewModel
 
@@ -52,6 +56,22 @@ class PageSettingActivity : AppCompatActivity() {
 
         mPageSettingViewModel.pageOnActionEvent.observe(this, Observer {
             PageSettingActionDialog().show(supportFragmentManager, "PSA")
+        })
+
+        mPageSettingViewModel.pageAddedEvent.observe(this, Observer{ pt ->
+            when(pt){
+                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(Intent(this, SearchActivity::class.java))
+                PageType.USER -> {
+                    val intent = Intent(this, SearchAndSelectUserActivity::class.java)
+                    intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTABLE_MAXIMUM_SIZE, 1)
+                    startActivityForResult(intent, SEARCH_AND_SELECT_USER_RESULT_CODE)
+                }
+                PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
+                PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
+                else ->{
+                    // auto add
+                }
+            }
         })
 
     }
