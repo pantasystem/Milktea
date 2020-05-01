@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import java.lang.IllegalArgumentException
 
@@ -20,10 +21,19 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
     companion object{
         private const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclinet.view.notes.detail.EXTRA_NOTE_ID"
+        private const val EXTRA_SHOW = "jp.panta.misskeyandroidclinet.view.notes.detail.EXTRA_SHOW"
         fun newInstance(noteId: String): NoteDetailFragment{
             return NoteDetailFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_NOTE_ID, noteId)
+                }
+            }
+        }
+
+        fun newInstance(show: Page.Show): NoteDetailFragment{
+            return NoteDetailFragment().apply{
+                arguments = Bundle().apply{
+                    putSerializable(EXTRA_SHOW, show)
                 }
             }
         }
@@ -32,13 +42,13 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val noteId = arguments?.getString(EXTRA_NOTE_ID)
-        noteId?: throw IllegalArgumentException("noteId must not null")
+        val show = arguments?.getSerializable(EXTRA_SHOW) as? Page.Show
+            ?: Page.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
 
         val miApplication = context?.applicationContext as MiApplication
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
             val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
-            val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ar, miApplication, Page.Show(noteId)))[NoteDetailViewModel::class.java]
+            val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ar, miApplication, show))[NoteDetailViewModel::class.java]
 
             noteDetailViewModel.loadDetail()
             val adapter = NoteDetailAdapter(

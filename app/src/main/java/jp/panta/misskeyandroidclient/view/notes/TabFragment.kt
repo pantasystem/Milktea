@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.util.getPreferenceName
+import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
@@ -103,21 +104,7 @@ class TabFragment : Fragment(), ScrollableTop{
         override fun createFragment(position: Int): Fragment {
             Log.d("getItem", "$position, ${requestBaseList[position].pageable()?.javaClass}")
             val item = requestBaseList[position]
-            val fragment = when(val pageable = item.pageable()){
-                is Page.Timeline ->{
-                    TimelineFragment.newInstance(pageable)
-                }
-                is Page.Show ->{
-                    NoteDetailFragment.newInstance(pageable.noteId)
-                }
-                is Page.Notification ->{
-                    NotificationFragment()
-                }
-                is Page.Featured ->{
-                    TODO("Featured用のFragmentを用意する")
-                }
-                else -> throw IllegalArgumentException("unknown type:${pageable?.javaClass}, page:$item")
-            }
+            val fragment = PageableFragmentFactory.create(item.pageable())
 
             if(fragment is ScrollableTop){
                 scrollableTopFragments.add(fragment)
