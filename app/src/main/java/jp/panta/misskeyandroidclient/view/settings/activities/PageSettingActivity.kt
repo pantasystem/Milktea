@@ -108,4 +108,16 @@ class PageSettingActivity : AppCompatActivity() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
     }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE){
+            if(resultCode == RESULT_OK && data != null){
+                val userId = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS)
+                    ?.firstOrNull()?: return
+                mPageSettingViewModel.addUserPageById(userId)
+            }
+        }
+    }
 }

@@ -85,6 +85,31 @@ class PageSettingViewModel(
         setList(list)
     }
 
+    fun addUserPageById(userId: String){
+        miCore.getMisskeyAPI(accountRelation)?.showUser(
+            RequestUser(userId = userId, i = accountRelation?.getCurrentConnectionInformation()?.getI(encryption))
+        )?.enqueue(object : Callback<User>{
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                val user = response.body()
+                if(user != null){
+                    addUserPage(user)
+                }
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                Log.e("PageSettingVM", "ユーザーの取得に失敗した", t)
+            }
+        })
+    }
+    fun addUserPage(user: User){
+        val page = if(settingStore.isUserNameDefault){
+            PageableTemplate.user(user.id, title = user.getShortDisplayName())
+        }else{
+            PageableTemplate.user(user.id, title = user.getDisplayName())
+        }
+        addPage(page)
+    }
+
     fun removePage(page: Page){
         val list = ArrayList<Page>(selectedPages.value?: emptyList())
         list.remove(page)
