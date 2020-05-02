@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +15,7 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivityPageSettingBinding
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.PageType
+import jp.panta.misskeyandroidclient.view.settings.page.EditTabNameDialog
 import jp.panta.misskeyandroidclient.view.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.view.settings.page.PagesAdapter
 import jp.panta.misskeyandroidclient.view.settings.page.SelectPageToAddDialog
@@ -56,6 +59,10 @@ class PageSettingActivity : AppCompatActivity() {
 
         mPageSettingViewModel.pageOnActionEvent.observe(this, Observer {
             PageSettingActionDialog().show(supportFragmentManager, "PSA")
+        })
+
+        mPageSettingViewModel.pageOnUpdateEvent.observe(this, Observer {
+            EditTabNameDialog().show(supportFragmentManager, "ETD")
         })
 
         mPageSettingViewModel.pageAddedEvent.observe(this, Observer{ pt ->
@@ -120,4 +127,5 @@ class PageSettingActivity : AppCompatActivity() {
             }
         }
     }
+
 }

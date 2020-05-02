@@ -44,11 +44,15 @@ class PageSettingViewModel(
 
     val pageOnActionEvent = EventBus<Page>()
 
+    val pageOnUpdateEvent = EventBus<Page>()
+
     init{
         selectedPages.addSource(miCore.currentAccount){
             accountRelation = it
             selectedPages.value = if(it.pages.isEmpty()){
-                defaultPages.value
+                defaultPages.value?.apply {
+                    forEachIndexed(::writeTheNumberOfPages)
+                }
             }else{
                 it.pages.sortedBy { p ->
                     p.pageNumber
@@ -79,8 +83,29 @@ class PageSettingViewModel(
         miCore.replaceAllPagesInCurrentAccount(list)
     }
 
+    fun updatePage(page: Page){
+        val pages = selectedPages.value?.let{
+            ArrayList(it)
+        } ?: return
+
+        var pageIndex = pages.indexOfFirst {
+            it.id == page.id && it.id != null
+        }
+        if(pageIndex < 0){
+            pageIndex = pages.indexOfFirst{
+                it.pageNumber == page.pageNumber && page.pageNumber != null
+            }
+        }
+        if(pageIndex >= 0 && pageIndex < pages.size){
+            pages[pageIndex] = page
+        }
+
+        setList(pages)
+
+    }
     fun addPage(page: Page){
         val list = ArrayList<Page>(selectedPages.value?: emptyList())
+        page.pageNumber = list.size
         list.add(page)
         setList(list)
     }
@@ -172,5 +197,9 @@ class PageSettingViewModel(
     override fun action(page: Page?) {
         page?: return
         pageOnActionEvent.event = page
+    }
+
+    private fun writeTheNumberOfPages(index: Int, page: Page){
+        page.pageNumber = index + 1
     }
 }

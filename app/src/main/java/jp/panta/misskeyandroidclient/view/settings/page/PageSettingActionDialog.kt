@@ -27,6 +27,10 @@ class PageSettingActionDialog : BottomSheetDialogFragment(){
             }
             dismiss()
         }
+        binding?.editPage?.setOnClickListener {
+            viewModel.pageOnUpdateEvent.event = targetPage
+            dismiss()
+        }
         return dialog
     }
 }

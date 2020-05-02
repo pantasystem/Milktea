@@ -241,4 +241,5 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
 
+    <string name="edit_tab_name">Edit tab name</string>
 </resources>
