@@ -24,7 +24,10 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
             dismiss()
         })
 
-        val pageTypeList = PageType.values().toList()
+        val pageTypeList = ArrayList(PageType.values().toList())
+
+        // ANTENNAは現在未対応機能なので削除している
+        pageTypeList.remove(PageType.ANTENNA)
         val adapter = PageTypeListAdapter(viewModel)
         view.pageTypeListView.adapter = adapter
         view.pageTypeListView.layoutManager = LinearLayoutManager(view.context)
