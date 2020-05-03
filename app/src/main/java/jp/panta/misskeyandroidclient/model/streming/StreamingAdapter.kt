@@ -40,6 +40,27 @@ class StreamingAdapter(
         observerMap[id] = observer
     }
 
+    fun putObserver(observer: Observer){
+        observer.streamingAdapter = this
+        val exObserver = observerMap[observer.id]
+        if(exObserver != null){
+            Log.d("StreamingAdapter", "追加済みのObserverを再追加しようとしたためキャンセルしました。Hint:IDの重複")
+            return
+        }
+
+        observerMap[observer.id] = observer
+    }
+
+    fun removeObserver(observer: Observer){
+        observer.onDisconnect()
+        val ex = observerMap[observer.id]
+        if(ex == null){
+            Log.d("StreamingAdapter", "追加されていないObserverを削除しようとしました")
+        }else{
+            observerMap.remove(ex.id)
+        }
+    }
+
 
     fun send(json: String){
         mWebSocket?.send(json)
