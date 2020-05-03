@@ -56,6 +56,7 @@ class TabFragment : Fragment(), ScrollableTop{
 
             Log.d("TabFragment", "pages:$pages")
 
+            mPagerAdapter = viewPager.adapter as? TimelinePagerAdapter
             if(mPagerAdapter == null){
                 mPagerAdapter = TimelinePagerAdapter(this, emptyList())
                 viewPager.adapter = mPagerAdapter

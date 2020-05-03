@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.view.notes.reaction.picker
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
@@ -32,14 +34,14 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         val miApplication = view.context.applicationContext as MiApplication
         val ar = miApplication.currentAccount.value
 
-        val notesViewModel = ViewModelProvider(activity!!, NotesViewModelFactory(ar!!, miApplication))[NotesViewModel::class.java]
+        val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(ar!!, miApplication))[NotesViewModel::class.java]
         val adapter =
             ReactionChoicesAdapter(
                 notesViewModel
             )
         view.reactionsView.adapter = adapter
 
-        notesViewModel.submittedNotesOnReaction.observe(activity!!, Observer{
+        notesViewModel.submittedNotesOnReaction.observe(requireActivity(), Observer{
             dismiss()
         })
         
@@ -57,7 +59,11 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             if(reactionSettings.isEmpty()){
                 reactionSettings = ReactionResourceMap.defaultReaction
             }
-            adapter.submitList(reactionSettings)
+
+            Handler(Looper.getMainLooper()).post{
+                adapter.submitList(reactionSettings)
+
+            }
 
         }
         
