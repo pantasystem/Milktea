@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import okhttp3.*
 import okio.ByteString
+import java.util.*
 
 /**
  * StreamingAdapter、１につきアカウント１にしたい
@@ -21,7 +22,7 @@ class StreamingAdapter(
     private val TAG = "StreamingAdapter"
 
     //val observers = ArrayList<Observer>()
-    val observerMap = HashMap<String, Observer>()
+    val observerMap = WeakHashMap<String, Observer>()
 
     var isConnect: Boolean = false
         private set
