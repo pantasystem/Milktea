@@ -26,16 +26,12 @@ import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.android.synthetic.main.fragment_tab.*
 
-class TabFragment : Fragment(), ScrollableTop{
+class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
 
 
     private var mPagerAdapter: TimelinePagerAdapter? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //return super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.fragment_tab, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -79,6 +75,7 @@ class TabFragment : Fragment(), ScrollableTop{
             }else{
                 tabLayout.visibility = View.VISIBLE
                 elevationView.visibility = View.GONE
+                tabLayout.elevation
             }
         })
 

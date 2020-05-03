@@ -128,5 +128,6 @@
 
     <style name="TabStyle" parent="Widget.MaterialComponents.TabLayout.Colored">
         <item name="tabIndicatorColor">?attr/colorAccent</item>
+        <item name="background">?attr/colorPrimary</item>
     </style>
 </resources>

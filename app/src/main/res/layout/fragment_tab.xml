@@ -5,21 +5,18 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
     <com.google.android.material.tabs.TabLayout
-            android:layout_width="match_parent"
+            android:id="@+id/tabLayout"
             android:layout_height="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:background="?attr/colorPrimary"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:background="?attr/colorPrimary"
             app:tabMaxWidth="0dp"
             app:tabMode="fixed"
             app:tabGravity="fill"
-            android:elevation="4dp"
-            android:id="@+id/tabLayout"
-            >
-
-
-    </com.google.android.material.tabs.TabLayout>
+            />
     <View
             android:id="@+id/elevationView"
             android:layout_width="match_parent"
@@ -27,7 +24,7 @@
 
             android:background="?attr/colorPrimary"
             android:elevation="4dp"
-            android:visibility="gone"
+            android:visibility="visible"
             />
     <androidx.viewpager2.widget.ViewPager2
             android:layout_width="match_parent"
