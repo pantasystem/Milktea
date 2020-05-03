@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.streming
 
 import android.util.Log
-import com.bumptech.glide.RequestBuilder
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import okhttp3.*
@@ -36,7 +35,7 @@ class StreamingAdapter(
         if(exObserver != null){
             Log.d(TAG, "既存のObserverを検出したので切断しました")
         }
-        exObserver?.onDissconnect()
+        exObserver?.onDisconnect()
 
         observerMap[id] = observer
     }
@@ -106,7 +105,7 @@ class StreamingAdapter(
             Log.d(TAG, "onFailure: ERROR通信が途絶えてしまった", t)
             isConnect = false
             observerMap.forEach {
-                it.value.onDissconnect()
+                it.value.onDisconnect()
             }
             Thread.sleep(2000)
             this@StreamingAdapter.connect()

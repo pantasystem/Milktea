@@ -13,7 +13,7 @@ interface Observer {
     //fun onConnect(): StreamingAction
     //fun onDisconnect(): StreamingAction
     fun onConnect()
-    fun onDissconnect()
+    fun onDisconnect()
 
     fun onReceived(msg: String)
 }

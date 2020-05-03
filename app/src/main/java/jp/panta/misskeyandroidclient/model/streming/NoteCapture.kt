@@ -56,7 +56,7 @@ class NoteCapture(
         }
     }
 
-    override fun onDissconnect() {
+    override fun onDisconnect() {
 
     }
 

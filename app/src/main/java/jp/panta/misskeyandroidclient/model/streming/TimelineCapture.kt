@@ -91,7 +91,7 @@ class TimelineCapture(
         }
     }
 
-    override fun onDissconnect() {
+    override fun onDisconnect() {
     }
 
     override fun onReceived(msg: String) {

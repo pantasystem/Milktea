@@ -110,7 +110,7 @@ class MainCapture(
         streamingAdapter?.send(gson.toJson(request))
     }
 
-    override fun onDissconnect() {
+    override fun onDisconnect() {
 
     }
 
