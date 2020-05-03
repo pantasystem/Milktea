@@ -91,7 +91,19 @@ class TimelineCapture(
         }
     }
 
+    override fun onClosing() {
+        synchronized(observerMap){
+            observerMap.values
+        }.forEach {
+            streamingAdapter?.send(gson.toJson(TimelineObserver.createDisconnect(it.body.id)))
+        }
+
+    }
+
     override fun onDisconnect() {
+        synchronized(observerMap){
+            observerMap.clear()
+        }
     }
 
     override fun onReceived(msg: String) {

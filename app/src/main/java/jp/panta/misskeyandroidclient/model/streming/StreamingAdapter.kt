@@ -48,11 +48,12 @@ class StreamingAdapter(
             observer.streamingAdapter = this
             val exObserver = observerMap[observer.id]
             if(exObserver != null){
-                Log.d("StreamingAdapter", "追加済みのObserverを再追加しようとしたためキャンセルしました。Hint:IDの重複")
-                return
+                Log.d("StreamingAdapter", "追加済みのObserverを再追加しようとしたため古い接続は閉じられました。Hint:IDの重複")
+                exObserver.onDisconnect()
             }
 
             observerMap[observer.id] = observer
+            observer.onConnect()
         }
 
     }
@@ -64,7 +65,8 @@ class StreamingAdapter(
             if(ex == null){
                 Log.d("StreamingAdapter", "追加されていないObserverを削除しようとしました")
             }else{
-                observerMap.remove(ex.id)
+                val removed = observerMap.remove(ex.id)
+                removed?.onClosing()
             }
             if(observerMap.isEmpty()){
                 this.disconnect()

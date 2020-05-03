@@ -105,13 +105,19 @@ class MainCapture(
     private var mId: String = UUID.randomUUID().toString()
 
     override fun onConnect() {
+        // 接続する毎にIDを再生成する
         mId = UUID.randomUUID().toString()
         val request = Request(body = Request.Body(id = mId))
         streamingAdapter?.send(gson.toJson(request))
     }
 
-    override fun onDisconnect() {
+    override fun onClosing() {
+        val closeRequest = Request("disconnect", Request.Body(id = mId))
+        streamingAdapter?.send(gson.toJson(closeRequest))
+    }
 
+    override fun onDisconnect() {
+        clearListener()
     }
 
     override fun onReceived(msg: String) {

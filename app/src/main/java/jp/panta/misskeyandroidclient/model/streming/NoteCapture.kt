@@ -56,8 +56,20 @@ class NoteCapture(
         }
     }
 
+    override fun onClosing() {
+        val notes = ArrayList<PlaneNoteViewData>()
+        synchronized(observeNoteMap){
+            observeNoteMap.forEach {
+                val event = it.value
+                notes.addAll(event.notes)
+            }
+        }
+        removeAll(notes)
+    }
     override fun onDisconnect() {
-
+        synchronized(observeNoteMap){
+            observeNoteMap.clear()
+        }
     }
 
     override fun onReceived(msg: String) {
