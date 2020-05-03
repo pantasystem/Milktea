@@ -7,6 +7,9 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import okhttp3.*
 import okio.ByteString
 
+/**
+ * StreamingAdapter、１につきアカウント１にしたい
+ */
 class StreamingAdapter(
     private val connectionInformation: EncryptedConnectionInformation?,
     private val encryption: Encryption

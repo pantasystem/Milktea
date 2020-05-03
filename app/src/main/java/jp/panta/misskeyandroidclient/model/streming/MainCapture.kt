@@ -11,6 +11,9 @@ import jp.panta.misskeyandroidclient.model.users.User
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * アカウント一つにつきMainCaptureを一つにしたい
+ */
 class MainCapture(
     val gson: Gson
 ) : Observer{
@@ -90,7 +93,7 @@ class MainCapture(
 
     override var streamingAdapter: StreamingAdapter? = null
 
-    private val listeners = HashMap<String, Listener>()
+    private val mListeners = WeakHashMap<String, Listener>()
 
     private val notificationType = TypeToken.getParameterized(Channel::class.java, Notification::class.java).type
     private val messageType = TypeToken.getParameterized(Channel::class.java, Message::class.java).type
@@ -123,8 +126,8 @@ class MainCapture(
             if(id != mId){
                 return
             }
-            synchronized(listeners){
-                listeners.forEach{
+            synchronized(mListeners){
+                mListeners.forEach{
                     val listener = it.value
                     when(type){
                         "notification" ->{
@@ -225,20 +228,20 @@ class MainCapture(
     }
 
     fun putListener(listener: Listener){
-        synchronized(listeners){
-            listeners[listener.id] = listener
+        synchronized(mListeners){
+            mListeners[listener.id] = listener
         }
     }
 
     fun removeListener(listener: Listener){
-        synchronized(listeners){
-            listeners.remove(listener.id)
+        synchronized(mListeners){
+            mListeners.remove(listener.id)
         }
     }
 
     fun clearListener(){
-        synchronized(listeners){
-            listeners.clear()
+        synchronized(mListeners){
+            mListeners.clear()
         }
     }
 }
