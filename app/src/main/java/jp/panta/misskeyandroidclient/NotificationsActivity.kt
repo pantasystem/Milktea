@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
+import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
@@ -32,7 +33,7 @@ class NotificationsActivity : AppCompatActivity() {
 
     private fun showNotificationFragment(){
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.notificationBase, NotificationFragment())
+        ft.replace(R.id.notificationBase, NotificationMentionFragment())
         ft.commit()
     }
 

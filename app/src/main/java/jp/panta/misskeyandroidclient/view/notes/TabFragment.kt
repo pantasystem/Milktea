@@ -139,9 +139,7 @@ class TabFragment : Fragment(), ScrollableTop{
             result.dispatchUpdatesTo(this)
         }
 
-        override fun getItemId(position: Int): Long {
-            return requestBaseList[position].id?: super.getItemId(position)
-        }
+
 
     }
 

@@ -39,6 +39,7 @@ import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
+import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
@@ -153,7 +154,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return when(menuItem.itemId){
                 R.id.navigation_home -> TabFragment()
                 R.id.navigation_search -> SearchTopFragment()
-                R.id.navigation_notification -> NotificationFragment()
+                R.id.navigation_notification -> NotificationMentionFragment()
                 R.id.navigation_message_list -> MessagingHistoryFragment()
                 else -> null
             }
