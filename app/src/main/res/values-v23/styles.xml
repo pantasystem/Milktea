@@ -8,12 +8,13 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">?android:textColorPrimary</item>
         <item name="colorPrimaryDark">@color/navigationColor</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorSurface">@color/colorLightSurface</item>
+        <item name="colorOnSurface">?android:attr/textColorPrimary</item>
 
         <item name="actionBarSize">53dp</item>
 
@@ -21,7 +22,7 @@
         <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
         <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
-
+x
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
@@ -36,11 +37,14 @@
         <item name="android:navigationBarColor">@color/navigationColor</item>
 
 
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.Colored</item>
 
     </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorDarkPrimary</item>
+        <item name="colorOnPrimary">?android:textColorPrimary</item>
+
         <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
         <item name="colorAccent">@color/colorDarkAccent</item>
 
@@ -64,6 +68,8 @@
 
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/navigationDarkColor</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.Colored</item>
+
 
     </style>
 </resources>

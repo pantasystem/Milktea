@@ -24,9 +24,10 @@
 
     </declare-styleable>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">?android:textColorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSurface">@color/colorLightSurface</item>
@@ -43,6 +44,7 @@
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
         <item name="colorSeparator">@color/colorSeparator</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.Colored</item>
 
 
 
@@ -61,7 +63,9 @@
 
     <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorDarkPrimary</item>
+        <item name="colorOnPrimary">?android:textColorPrimary</item>
         <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.Colored</item>
         <item name="colorAccent">@color/colorDarkAccent</item>
 
         <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
