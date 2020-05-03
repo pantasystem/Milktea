@@ -1,9 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.page
 
+import android.content.Context
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.PageType
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 
 object PageableTemplate {
     fun globalTimeline(title: String): Page{
@@ -53,6 +56,18 @@ object PageableTemplate {
     }
     fun antenna(antenna: Antenna): Page{
         return Page(null, antenna.name, null, antenna = Page.Antenna(antenna.id))
+    }
+
+    fun makeDefaultPages(pageTypeNameMap: PageTypeNameMap): List<Page>{
+        return listOf(
+            homeTimeline(pageTypeNameMap.get(PageType.HOME)),
+            hybridTimeline(pageTypeNameMap.get(PageType.SOCIAL)),
+            globalTimeline(pageTypeNameMap.get(PageType.GLOBAL))
+        ).apply{
+            forEachIndexed { index, page ->
+                page.pageNumber = index + 1
+            }
+        }
     }
 
 }

@@ -38,7 +38,6 @@ class PageSettingViewModel(
 
     var accountRelation = miCore.currentAccount.value
 
-    var defaultPages = MutableLiveData<List<Page>>()
 
     val pageAddedEvent = EventBus<PageType>()
 
@@ -50,21 +49,14 @@ class PageSettingViewModel(
         selectedPages.addSource(miCore.currentAccount){
             accountRelation = it
             selectedPages.value = if(it.pages.isEmpty()){
-                defaultPages.value?.apply {
-                    forEachIndexed(::writeTheNumberOfPages)
-                }
+                PageableTemplate.makeDefaultPages(pageTypeNameMap)
             }else{
                 it.pages.sortedBy { p ->
                     p.pageNumber
                 }
             }
         }
-        selectedPages.addSource(defaultPages){
-            val ex = selectedPages.value?: emptyList()
-            if(it.isEmpty()){
-                selectedPages.value = ex
-            }
-        }
+
     }
 
     fun setList(pages: List<Page>){

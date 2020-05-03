@@ -22,6 +22,7 @@ import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
+import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.android.synthetic.main.fragment_tab.*
 
@@ -50,7 +51,7 @@ class TabFragment : Fragment(), ScrollableTop{
         miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
             var pages = accountRelation.pages
             pages = if(pages.isNullOrEmpty()){
-                makeDefaultNoteSetting()
+                PageableTemplate.makeDefaultPages(PageTypeNameMap(requireContext()))
             }else pages
 
 
@@ -81,17 +82,6 @@ class TabFragment : Fragment(), ScrollableTop{
             }
         })
 
-    }
-
-    private fun makeDefaultNoteSetting(): List<Page>{
-        return listOf(
-            PageableTemplate.homeTimeline(getString(R.string.home_timeline)),
-            PageableTemplate.globalTimeline(getString(R.string.global_timeline)),
-            PageableTemplate.hybridTimeline(getString(R.string.hybrid_timeline))
-        )
-        /*return list.map{
-            NoteRequest.Setting(type = it)
-        }*/
     }
 
 

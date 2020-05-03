@@ -39,7 +39,6 @@ class PageSettingActivity : AppCompatActivity() {
 
         val miApplication = applicationContext as MiApplication
         mPageSettingViewModel = ViewModelProvider(this, PageSettingViewModel.Factory(miApplication))[PageSettingViewModel::class.java]
-        mPageSettingViewModel.defaultPages.value = createDefaultPage()
 
         val touchHelper = ItemTouchHelper(ItemTouchCallback())
         touchHelper.attachToRecyclerView(binding.pagesView)
@@ -81,14 +80,6 @@ class PageSettingActivity : AppCompatActivity() {
             }
         })
 
-    }
-
-    private fun createDefaultPage(): List<Page>{
-        return listOf(
-            PageableTemplate.homeTimeline(getString(R.string.home_timeline)),
-            PageableTemplate.hybridTimeline(getString(R.string.hybrid_timeline)),
-            PageableTemplate.globalTimeline(getString(R.string.global_timeline))
-        )
     }
 
     override fun onStop() {
