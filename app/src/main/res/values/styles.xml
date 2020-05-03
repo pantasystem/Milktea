@@ -29,7 +29,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">?android:textColorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorDarkAccent</item>
         <item name="colorSurface">@color/colorLightSurface</item>
 
         <item name="actionBarSize">53dp</item>
@@ -73,7 +73,7 @@
         <item name="android:textColor">@color/colorDarkTextColor</item>
 
         <item name="colorBottomNavigationSelected">@color/colorDarkBottomNavSelected</item>
-        <item name="colorBottomNavigationNotSelect">@color/colorDarkTextColor</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorDarkBottomNavNormal</item>
         <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
         <item name="actionBarSize">53dp</item>
 
@@ -93,7 +93,7 @@
     <style name="AppThemeBlack" parent="AppThemeDark">
         <item name="colorPrimary">@color/colorBlackPrimary</item>
         <item name="colorPrimaryDark">@color/colorBlackPrimary</item>
-        <item name="colorAccent">@color/colorBlackAccent</item>
+        <item name="colorAccent">@color/colorDarkAccent</item>
         <item name="android:windowBackground">@color/colorBlackPrimary</item>
         <item name="colorSurface">@color/colorBlackPrimary</item>
         <item name="android:textColor">@color/colorBlackTextColor</item>

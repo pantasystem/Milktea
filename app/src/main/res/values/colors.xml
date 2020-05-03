@@ -35,6 +35,7 @@
     <color name="colorDarkSurface">#191919</color>
     <color name="colorDarkTextColor">#C5C5C5</color>
     <color name="colorDarkBottomNavSelected">#FFFFFF</color>
+    <color name="colorDarkBottomNavNormal">#80FFFFFF</color>
     <color name="colorTextColorPrimaryColorDarkDark">#FFFFFF</color>
     <color name="colorIconTintDark">#C5C5C5</color>
     <color name="colorTextColorSecondary">#C5C5C5</color>

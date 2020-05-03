@@ -13,7 +13,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">?android:textColorPrimary</item>
         <item name="colorPrimaryDark">@color/navigationColor</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorDarkAccent</item>
         <item name="colorOnSurface">?android:attr/textColorPrimary</item>
 
         <item name="actionBarSize">53dp</item>
@@ -55,7 +55,7 @@ x
         <item name="android:textColor">@color/colorDarkTextColor</item>
 
         <item name="colorBottomNavigationSelected">@color/colorDarkBottomNavSelected</item>
-        <item name="colorBottomNavigationNotSelect">@color/colorDarkTextColor</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorDarkBottomNavNormal</item>
         <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
         <item name="actionBarSize">53dp</item>
 
