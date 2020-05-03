@@ -14,7 +14,7 @@ import kotlin.collections.HashMap
 
 class TimelineCapture(
     val account: Account
-) : Observer{
+) : AbsObserver(){
 
     interface Observer{
         fun onReceived(note: PlaneNoteViewData)

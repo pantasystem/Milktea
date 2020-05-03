@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
  */
 class MainCapture(
     val gson: Gson
-) : Observer{
+) : AbsObserver(){
     interface Listener{
         val id: String
         fun notification(notification: Notification)

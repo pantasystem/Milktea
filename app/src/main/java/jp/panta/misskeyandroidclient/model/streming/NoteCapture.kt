@@ -17,7 +17,7 @@ import kotlin.collections.HashMap
 
 class NoteCapture(
     var myUserId: String?
-) : Observer{
+) : AbsObserver(){
 
 
     interface NoteRemoveListener{

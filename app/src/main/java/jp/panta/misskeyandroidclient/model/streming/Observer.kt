@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.model.streming
 
+import java.util.*
+
 interface Observer {
 
 
@@ -12,8 +14,13 @@ interface Observer {
     var streamingAdapter : StreamingAdapter?
     //fun onConnect(): StreamingAction
     //fun onDisconnect(): StreamingAction
+    val id: String
     fun onConnect()
     fun onDisconnect()
 
     fun onReceived(msg: String)
+}
+
+abstract class AbsObserver : Observer{
+    override val id: String = UUID.randomUUID().toString()
 }
