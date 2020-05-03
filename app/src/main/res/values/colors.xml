@@ -19,7 +19,7 @@
     <color name="colorTextColorSecondaryLight">#2B2B2B</color>
 
     <!--Black Theme-->
-    <color name="colorBlackPrimary">#000000</color>
+    <color name="colorBlackPrimary">#FC000000</color>
     <color name="colorBlackPrimaryDark">#000000</color>
     <color name="colorBlackWindowBackground">#121212</color>
     <color name="colorBlackAccent">#03DAC5</color>

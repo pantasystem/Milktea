@@ -16,6 +16,7 @@
             app:tabMaxWidth="0dp"
             app:tabMode="fixed"
             app:tabGravity="fill"
+            android:elevation="4dp"
             />
     <View
             android:id="@+id/elevationView"
