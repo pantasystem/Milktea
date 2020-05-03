@@ -89,7 +89,7 @@ class PageSettingViewModel(
             }
         }
         if(pageIndex >= 0 && pageIndex < pages.size){
-            pages[pageIndex] = page
+            pages[pageIndex] = page.copy()
         }
 
         setList(pages)

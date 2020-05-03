@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
@@ -49,6 +50,7 @@ class PageSettingActivity : AppCompatActivity() {
         binding.pagesView.layoutManager = LinearLayoutManager(this)
 
         mPageSettingViewModel.selectedPages.observe(this, Observer {
+            Log.d("PageSettingActivity", "選択済みページが更新された")
             pagesAdapter.submitList(it)
         })
 

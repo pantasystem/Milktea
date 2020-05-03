@@ -15,7 +15,9 @@ class PagesAdapter(val pageSettingViewModel: PageSettingViewModel) : ListAdapter
 
     class ItemDiffUtil : DiffUtil.ItemCallback<Page>(){
         override fun areContentsTheSame(oldItem: Page, newItem: Page): Boolean {
-            return oldItem == newItem
+            return oldItem.title == newItem.title
+                    && oldItem.accountId == newItem.accountId
+                    && oldItem.id == newItem.id
         }
 
         override fun areItemsTheSame(oldItem: Page, newItem: Page): Boolean {
