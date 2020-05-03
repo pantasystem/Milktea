@@ -116,9 +116,7 @@ class MainCapture(
         streamingAdapter?.send(gson.toJson(closeRequest))
     }
 
-    override fun onDisconnect() {
-        clearListener()
-    }
+    override fun onDisconnect() = Unit
 
     override fun onReceived(msg: String) {
         try{

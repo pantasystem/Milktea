@@ -86,25 +86,24 @@ class TimelineCapture(
     private val gson = Gson()
 
     override fun onConnect() {
-        observerMap.forEach{
-            streamingAdapter?.send(gson.toJson(it.value))
+        val observers = synchronized(observerMap){
+            observerMap.values
         }
+        observers.forEach {
+            streamingAdapter?.send(gson.toJson(it))
+        }
+
     }
 
     override fun onClosing() {
         synchronized(observerMap){
             observerMap.values
-        }.forEach {
-            streamingAdapter?.send(gson.toJson(TimelineObserver.createDisconnect(it.body.id)))
-        }
+        }.forEach(::removeChannelObserver)
 
     }
 
-    override fun onDisconnect() {
-        synchronized(observerMap){
-            observerMap.clear()
-        }
-    }
+    // リソース解放は接続によって管理されるのではなく、オブジェクトが再利用される以上利用するクラスによって管理されるべきではないか？
+    override fun onDisconnect() = Unit
 
     override fun onReceived(msg: String) {
         try{
@@ -118,7 +117,10 @@ class TimelineCapture(
                 }else{
                     HasReplyToNoteViewData(note, account)
                 }
-                observerMap[id]?.observer?.onReceived(viewData)
+                val observer = synchronized(observerMap){
+                    observerMap[id]
+                }
+                observer?.observer?.onReceived(viewData)
             }
         }catch(e: JsonSyntaxException){
             Log.d("TimelineCapture", "遺物排除")
@@ -129,13 +131,17 @@ class TimelineCapture(
     }
 
     fun addChannelObserver(observer: TimelineObserver){
-        observerMap[observer.body.id] = observer
+        synchronized(observerMap){
+            observerMap[observer.body.id] = observer
+        }
         //Log.d("TimelineCapture", "登録しました: ${gson.toJson(observer)}")
         streamingAdapter?.send(gson.toJson(observer))
     }
 
     fun removeChannelObserver(observer: TimelineObserver){
-        val removed = observerMap.remove(observer.body.id)
+        val removed = synchronized(observerMap){
+            observerMap.remove(observer.body.id)
+        }
         if(removed != null){
             streamingAdapter?.send(gson.toJson(TimelineObserver.createDisconnect(removed.body.id)))
         }

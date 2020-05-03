@@ -66,11 +66,7 @@ class NoteCapture(
         }
         removeAll(notes)
     }
-    override fun onDisconnect() {
-        synchronized(observeNoteMap){
-            observeNoteMap.clear()
-        }
-    }
+    override fun onDisconnect() = Unit
 
     override fun onReceived(msg: String) {
 
