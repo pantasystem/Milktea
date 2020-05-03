@@ -41,24 +41,37 @@ class StreamingAdapter(
     }
 
     fun putObserver(observer: Observer){
-        observer.streamingAdapter = this
-        val exObserver = observerMap[observer.id]
-        if(exObserver != null){
-            Log.d("StreamingAdapter", "追加済みのObserverを再追加しようとしたためキャンセルしました。Hint:IDの重複")
-            return
+        synchronized(observerMap){
+            if(observerMap.isEmpty()){
+                connect()
+            }
+            observer.streamingAdapter = this
+            val exObserver = observerMap[observer.id]
+            if(exObserver != null){
+                Log.d("StreamingAdapter", "追加済みのObserverを再追加しようとしたためキャンセルしました。Hint:IDの重複")
+                return
+            }
+
+            observerMap[observer.id] = observer
         }
 
-        observerMap[observer.id] = observer
     }
 
     fun removeObserver(observer: Observer){
-        observer.onDisconnect()
-        val ex = observerMap[observer.id]
-        if(ex == null){
-            Log.d("StreamingAdapter", "追加されていないObserverを削除しようとしました")
-        }else{
-            observerMap.remove(ex.id)
+        synchronized(observerMap){
+            observer.onDisconnect()
+            val ex = observerMap[observer.id]
+            if(ex == null){
+                Log.d("StreamingAdapter", "追加されていないObserverを削除しようとしました")
+            }else{
+                observerMap.remove(ex.id)
+            }
+            if(observerMap.isEmpty()){
+                this.disconnect()
+                Log.d("StreamingAdapter", "Observerが0件になったためWebSocketを切断しました")
+            }
         }
+
     }
 
 
@@ -82,9 +95,12 @@ class StreamingAdapter(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d(TAG, "onOpenコネクション開始")
             isConnect = true
-            observerMap.forEach {
-                it.value.onConnect()
+            synchronized(observerMap){
+                observerMap.forEach {
+                    it.value.onConnect()
+                }
             }
+
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
@@ -92,13 +108,16 @@ class StreamingAdapter(
             //Log.d(TAG, "onMessage: $text")
 
             if (text.isNotBlank()) {
-                observerMap.forEach{
-                    try{
-                        it.value.onReceived(text)
-                    }catch(e: Exception){
-                        Log.d(TAG, "error", e)
+                synchronized(observerMap){
+                    observerMap.forEach{
+                        try{
+                            it.value.onReceived(text)
+                        }catch(e: Exception){
+                            Log.d(TAG, "error", e)
+                        }
                     }
                 }
+
             }
         }
 
@@ -125,9 +144,12 @@ class StreamingAdapter(
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             Log.d(TAG, "onFailure: ERROR通信が途絶えてしまった", t)
             isConnect = false
-            observerMap.forEach {
-                it.value.onDisconnect()
+            synchronized(observerMap){
+                observerMap.forEach {
+                    it.value.onDisconnect()
+                }
             }
+
             Thread.sleep(2000)
             this@StreamingAdapter.connect()
 
