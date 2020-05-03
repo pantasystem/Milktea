@@ -44,7 +44,7 @@
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
         <item name="colorSeparator">@color/colorSeparator</item>
-        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.Colored</item>
+        <item name="tabStyle">@style/TabStyle</item>
 
 
 
@@ -61,7 +61,7 @@
 
 
 
-    <style name="AppThemeDark" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorDarkPrimary</item>
         <item name="colorOnPrimary">?android:textColorPrimary</item>
         <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
@@ -87,6 +87,7 @@
         <item name="android:textColorSecondary">@color/colorTextColorSecondary</item>
 
         <item name="android:navigationBarColor">@color/navigationDarkColor</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
     </style>
 
     <style name="AppThemeBlack" parent="AppThemeDark">
@@ -105,7 +106,8 @@
         <item name="colorMessageSelf">@color/colorMessageSelf</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
         <item name="colorSeparator">@color/colorSeparator</item>
-        <item name="android:navigationBarColor">@color/navigationDarkColor</item>
+        <item name="android:navigationBarColor">@color/colorBlackPrimary</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
 
 
     </style>
@@ -123,4 +125,8 @@
         <item name="android:textColor">?android:attr/textColor</item>
     </style>
     <style name="LicensePageTheme" parent="Theme.AppCompat.Light.DarkActionBar"/>
+
+    <style name="TabStyle" parent="Widget.MaterialComponents.TabLayout.Colored">
+        <item name="tabIndicatorColor">?attr/colorAccent</item>
+    </style>
 </resources>
