@@ -13,13 +13,14 @@ import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.*
 import jp.panta.misskeyandroidclient.model.meta.Meta
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
+import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -77,6 +78,7 @@ class MiApplication : Application(), MiCore {
 
     private val mStreamingAccountMap = HashMap<Account, StreamingAdapter>()
     private val mMainCaptureAccountMap = HashMap<Account, MainCapture>()
+    private val mNoteCaptureAccountMap = HashMap<Account, NoteCapture>()
 
     lateinit var colorSettingStore: ColorSettingStore
         private set
@@ -434,32 +436,52 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMainCapture(account: AccountRelation): MainCapture{
-        val ci = account.getCurrentConnectionInformation()
-
-        var streaming = synchronized(mStreamingAccountMap){
-            mStreamingAccountMap[account.account]
+        var mainCapture = synchronized(mMainCaptureAccountMap){
+            mMainCaptureAccountMap[account.account]
         }
 
-        val mainCapture = synchronized(mMainCaptureAccountMap){
-            mMainCaptureAccountMap[account.account]
-        }?: MainCapture(GsonFactory.create())
-
-        if(streaming == null){
-            streaming = StreamingAdapter(ci, getEncryption())
-            streaming.addObserver(UUID.randomUUID().toString(), mainCapture)
-            streaming.connect()
-
-            synchronized(mStreamingAccountMap){
-                mStreamingAccountMap[account.account] = streaming
-            }
-            synchronized(mMainCaptureAccountMap){
-                mMainCaptureAccountMap[account.account] = mainCapture
-            }
+        if(mainCapture == null){
+            mainCapture = MainCapture(GsonFactory.create())
+            setupObserver(account, mainCapture)
         }
 
         return mainCapture
     }
 
+    override fun setupObserver(account: AccountRelation, observer: Observer) {
+        val ci = account.getCurrentConnectionInformation()
+        var streaming = synchronized(mStreamingAccountMap){
+            mStreamingAccountMap[account.account]
+        }
+        if(streaming == null){
+            streaming = StreamingAdapter(ci, getEncryption())
+            streaming.connect()
+
+            synchronized(mStreamingAccountMap){
+                mStreamingAccountMap[account.account] = streaming
+            }
+        }
+        synchronized(streaming.observerMap){
+            if(streaming.observerMap[observer.id] == null){
+                streaming.putObserver(observer)
+            }
+        }
+
+    }
+
+    override fun getNoteCapture(account: AccountRelation): NoteCapture {
+        var noteCapture = synchronized(mNoteCaptureAccountMap){
+            mNoteCaptureAccountMap[account.account]
+        }
+
+        if(noteCapture == null){
+            noteCapture = NoteCapture(account.account)
+            setupObserver(account, noteCapture)
+        }
+        return noteCapture
+
+
+    }
 
 
 }

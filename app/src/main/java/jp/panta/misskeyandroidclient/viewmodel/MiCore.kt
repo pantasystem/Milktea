@@ -12,6 +12,9 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
+import jp.panta.misskeyandroidclient.model.streming.Observer
+import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -48,6 +51,13 @@ interface MiCore{
 
     fun getMainCapture(account: AccountRelation): MainCapture
 
+    fun setupObserver(account: AccountRelation, observer: Observer)
+
+    fun getNoteCapture(account: AccountRelation): NoteCapture
+
     fun getCurrentInstanceMeta(): Meta?
+
+
+
 
 }
