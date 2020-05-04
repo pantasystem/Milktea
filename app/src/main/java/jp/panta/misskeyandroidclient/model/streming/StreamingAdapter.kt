@@ -27,6 +27,7 @@ class StreamingAdapter(
         private set
 
 
+    @Deprecated("use putObserver")
     fun addObserver(id: String, observer: Observer){
         //observer.onConnect()
         observer.streamingAdapter = this

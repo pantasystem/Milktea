@@ -11,7 +11,6 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.lang.Exception
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class NoteCapture(val account: Account) : AbsObserver(){
@@ -23,7 +22,7 @@ class NoteCapture(val account: Account) : AbsObserver(){
 
     private val mGson = GsonFactory.create()
 
-    private val mNoteDeletedListenerMap= HashMap<String, DeletedListener>()
+    private val mNoteDeletedListenerMap= WeakHashMap<String, DeletedListener>()
     /**
      * ノートのキャプチャーを開始します。
      * @param registerId 担当するローカルデータ管理する対象のNoteRegister-Id
