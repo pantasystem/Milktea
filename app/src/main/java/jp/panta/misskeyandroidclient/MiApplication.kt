@@ -483,5 +483,21 @@ class MiApplication : Application(), MiCore {
 
     }
 
+    override fun getStreamingAdapter(account: AccountRelation): StreamingAdapter {
+        val ci = account.getCurrentConnectionInformation()
+        var streaming = synchronized(mStreamingAccountMap){
+            mStreamingAccountMap[account.account]
+        }
+        if(streaming == null){
+            streaming = StreamingAdapter(ci, getEncryption())
+            streaming.connect()
+
+            synchronized(mStreamingAccountMap){
+                mStreamingAccountMap[account.account] = streaming
+            }
+        }
+        return streaming
+    }
+
 
 }

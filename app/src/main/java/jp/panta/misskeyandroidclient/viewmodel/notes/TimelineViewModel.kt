@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
+import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 import kotlinx.coroutines.Dispatchers
@@ -35,8 +36,9 @@ class TimelineViewModel(
     val tag = "TimelineViewModel"
     val errorState = MediatorLiveData<String>()
 
-    private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
-    private val noteCapture = NoteCapture(accountRelation.account.id)
+    private val noteCaptureRegister = NoteRegister()
+    private val streamingAdapter = miCore.getStreamingAdapter(accountRelation)
+    private val noteCapture = miCore.getNoteCapture(accountRelation)
     private val timelineCapture = if(settingStore.isAutoLoadTimeline){
         TimelineCapture(accountRelation.account)
     }else{
@@ -123,7 +125,8 @@ class TimelineViewModel(
                         isLoading.postValue(false)
                         return@launch
                     }else{
-                        noteCapture.addAll(list)
+                        noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
+
 
                         val state = timelineLiveData.value
                         val newState = if(state == null){
@@ -180,7 +183,7 @@ class TimelineViewModel(
                     isLoadingFlag = false
                     return@launch
                 }else{
-                    noteCapture.addAll(list)
+                    noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
                     val state = timelineLiveData.value
 
                     val newState = if(state == null){
@@ -231,7 +234,7 @@ class TimelineViewModel(
                             TimelineState.State.INIT
                         )
                         timelineLiveData.postValue(state)
-                        noteCapture.addAll(list)
+                        noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
                         isLoadingFlag = false
 
                     }
@@ -256,9 +259,6 @@ class TimelineViewModel(
         startNoteCapture()
         if(settingStore.isAutoLoadTimeline){
             startTimelineCapture()
-        }
-        if(!streamingAdapter.isConnect){
-            streamingAdapter.connect()
         }
     }
 
@@ -297,26 +297,12 @@ class TimelineViewModel(
     private fun startNoteCapture(){
         Log.d(tag, "ノートのキャプチャーを開始しようとしている")
 
-        val exCapture = streamingAdapter.observerMap[noteCaptureId]
-        if(exCapture == null && !isNoteCaptureStarted){
-            Log.d("TimelineViewModel", "ノートのキャプチャーを開始した")
+        noteCapture.attach(noteCaptureRegister)
 
-            isNoteCaptureStarted = true
-            streamingAdapter.addObserver(noteCaptureId, noteCapture)
-            val notes = timelineLiveData.value?.notes?: return
-            noteCapture.addAll(notes)
-
-        }
     }
 
     private fun stopNoteCapture(){
-        val exCapture = streamingAdapter.observerMap[noteCaptureId]
-        val notes = timelineLiveData.value?.notes
-        if(exCapture != null && notes != null && isNoteCaptureStarted){
-            noteCapture.removeAll(notes)
-            streamingAdapter.observerMap.remove(noteCaptureId)
-            isNoteCaptureStarted = false
-        }
+        noteCapture.detach(noteCaptureRegister)
     }
 
 
@@ -326,7 +312,7 @@ class TimelineViewModel(
             if(isLoadingFlag){
                 return
             }
-            noteCapture.add(note)
+            noteCapture.subscribe(noteCaptureRegister.registerId, note)
             val notes = timelineLiveData.value?.notes
             val list = if(notes == null){
                 arrayListOf(note)
@@ -344,15 +330,15 @@ class TimelineViewModel(
         }
     }
 
-    private val noteRemovedListener = object : NoteCapture.NoteRemoveListener{
-        override fun onRemoved(id: String) {
+    private val noteRemovedListener = object : jp.panta.misskeyandroidclient.model.streming.note.NoteCapture.DeletedListener(){
+        override fun onDeleted(noteId: String) {
             val list = timelineLiveData.value?.notes
             if(list == null){
                 return
             }else{
                 val timeline = ArrayList<PlaneNoteViewData>(list)
                 timeline.filter{
-                    it.toShowNote.id == id
+                    it.toShowNote.id == noteId
                 }.forEach{
                     timeline.remove(it)
                 }
@@ -367,7 +353,7 @@ class TimelineViewModel(
         }
     }.apply{
         if(settingStore.isHideRemovedNote){
-            noteCapture.addNoteRemoveListener(this)
+            noteCapture.addNoteDeletedListener(this)
         }
     }
 

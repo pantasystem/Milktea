@@ -11,13 +11,19 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.HashMap
 
 
 class NoteCapture(val account: Account) : AbsObserver(){
+    abstract class DeletedListener{
+        val listenerId = UUID.randomUUID().toString()
+        abstract fun onDeleted(noteId: String)
+    }
     private val mNoteRegisters = WeakHashMap<String, NoteRegister>()
 
     private val mGson = GsonFactory.create()
 
+    private val mNoteDeletedListenerMap= HashMap<String, DeletedListener>()
     /**
      * ノートのキャプチャーを開始します。
      * @param registerId 担当するローカルデータ管理する対象のNoteRegister-Id
@@ -127,6 +133,12 @@ class NoteCapture(val account: Account) : AbsObserver(){
         }
     }
 
+    fun addNoteDeletedListener(listener: DeletedListener){
+        synchronized(mNoteDeletedListenerMap){
+            mNoteDeletedListenerMap[listener.listenerId] = listener
+        }
+    }
+
     private fun capture(noteId: String){
         streamingAdapter?.send(mGson.toJson(createCaptureRequest(noteId)))
     }
@@ -188,6 +200,7 @@ class NoteCapture(val account: Account) : AbsObserver(){
                 "reacted" -> addReaction(id, reaction!!, receivedObject.body.body.emoji, userId)
                 "unreacted" -> removeReaction(id, reaction!!, userId)
                 "pollVoted" -> updatePoll(id, receivedObject.body.body?.choice!!, userId)
+                "deleted" -> deleted(id)
                 //else -> Log.d("NoteCapture", "不明なイベント")
             }
 
@@ -217,7 +230,13 @@ class NoteCapture(val account: Account) : AbsObserver(){
         }
     }
 
-    fun getNotes(noteId: String): List<PlaneNoteViewData>{
+    private fun deleted(noteId: String){
+        mNoteDeletedListenerMap.values.forEach{
+            it.onDeleted(noteId)
+        }
+    }
+
+    private fun getNotes(noteId: String): List<PlaneNoteViewData>{
         val updateTargets = ArrayList<PlaneNoteViewData>()
         synchronized(mNoteRegisters){
             val identityGroups = ArrayList<NoteIdentityGroup>()

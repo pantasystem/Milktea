@@ -57,7 +57,7 @@ interface MiCore{
 
     fun getCurrentInstanceMeta(): Meta?
 
-
+    fun getStreamingAdapter(account: AccountRelation): StreamingAdapter
 
 
 }

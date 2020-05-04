@@ -64,12 +64,9 @@ class NotificationService : Service() {
                 Log.d(TAG, "observerを登録しています")
 
                 ar.getCurrentConnectionInformation()?.let{ ci ->
-                    val adapter = StreamingAdapter(ci, (application as MiApplication).getEncryption())
-                    adapter.connect()
-                    val mainCapture = MainCapture(mGson)
+
+                    val mainCapture = (application as MiApplication).getMainCapture(ar)
                     mainCapture.putListener(MainChannelObserver(ar.account))
-                    val id = UUID.randomUUID().toString()
-                    adapter.addObserver(id, mainCapture)
                 }
 
             }
