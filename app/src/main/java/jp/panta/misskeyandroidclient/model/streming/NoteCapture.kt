@@ -33,11 +33,11 @@ class NoteCapture(
         }
     }
 
-    private data class CaptureRequest(override val type: String = "sn", val body: CaptureRequestBody): StreamingAction
-    private data class CaptureRequestBody(private val id: String)
+    data class CaptureRequest(override val type: String = "sn", val body: CaptureRequestBody): StreamingAction
+    data class CaptureRequestBody(private val id: String)
 
-    private data class NoteUpdated(override val type: String, val body: Body<NoteUpdatedBody>): StreamingAction
-    private data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?, val emoji: Emoji?)
+    data class NoteUpdated(override val type: String, val body: Body<NoteUpdatedBody>): StreamingAction
+    data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?, val emoji: Emoji?)
 
     //noteId : NoteEvent
     private val observeNoteMap = HashMap<String, NoteEvent>()

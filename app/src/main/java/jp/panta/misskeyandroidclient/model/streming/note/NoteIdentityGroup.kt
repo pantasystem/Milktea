@@ -61,4 +61,14 @@ class NoteIdentityGroup(
         }
 
     }
+
+    fun isEmpty(): Boolean{
+        synchronized(mIdentityNotes){
+            return mIdentityNotes.isEmpty()
+        }
+    }
+
+    fun getNotes(): List<PlaneNoteViewData>{
+        return mIdentityNotes
+    }
 }
