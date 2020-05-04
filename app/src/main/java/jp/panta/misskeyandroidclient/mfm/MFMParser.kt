@@ -9,7 +9,7 @@ object MFMParser{
 
     fun parse(text: String?, emojis: List<Emoji>? = emptyList()): Root?{
         text?: return null
-        println("textSize:${text.length}")
+        //println("textSize:${text.length}")
         val root = Root(text)
         NodeParser(text, root,
             emojis?.map{

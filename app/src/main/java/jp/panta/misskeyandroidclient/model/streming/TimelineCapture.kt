@@ -123,9 +123,9 @@ class TimelineCapture(
                 observer?.observer?.onReceived(viewData)
             }
         }catch(e: JsonSyntaxException){
-            Log.d("TimelineCapture", "遺物排除")
+            //Log.d("TimelineCapture", "遺物排除")
         }catch(e: NullPointerException){
-            Log.d("TimelineCapture", "遺物排除")
+            //Log.d("TimelineCapture", "遺物排除")
         }
 
     }
