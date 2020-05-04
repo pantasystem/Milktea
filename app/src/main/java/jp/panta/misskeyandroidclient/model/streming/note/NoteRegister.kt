@@ -20,6 +20,7 @@ class NoteRegister {
             if(!exNote.isReferenced(note)){
                 exNote.add(note)
             }
+            mNotes[exNote.noteId] = exNote
         }
     }
 
