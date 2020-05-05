@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +62,8 @@ interface MiCore{
     fun getCurrentInstanceMeta(): Meta?
 
     fun getStreamingAdapter(account: AccountRelation): StreamingAdapter
+
+    fun getTimelineCapture(account: AccountRelation): TimelineCapture
 
 
 }

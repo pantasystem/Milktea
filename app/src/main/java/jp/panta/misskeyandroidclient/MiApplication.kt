@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -80,6 +81,7 @@ class MiApplication : Application(), MiCore {
     private val mStreamingAccountMap = HashMap<Account, StreamingAdapter>()
     private val mMainCaptureAccountMap = HashMap<Account, MainCapture>()
     private val mNoteCaptureAccountMap = HashMap<Account, NoteCapture>()
+    private val mTimelineCaptureAccountMap = HashMap<Account, TimelineCapture>()
 
     lateinit var colorSettingStore: ColorSettingStore
         private set
@@ -505,6 +507,19 @@ class MiApplication : Application(), MiCore {
             mStreamingAccountMap[account.account] = streaming
             return streaming
         }
+    }
+
+    override fun getTimelineCapture(account: AccountRelation): TimelineCapture {
+         var timelineCapture = synchronized(mTimelineCaptureAccountMap){
+             mTimelineCaptureAccountMap[account.account]
+         }
+
+        if(timelineCapture == null){
+            timelineCapture = TimelineCapture(account.account)
+            setupObserver(account, timelineCapture)
+            mTimelineCaptureAccountMap[account.account] = timelineCapture
+        }
+        return timelineCapture
     }
 
 
