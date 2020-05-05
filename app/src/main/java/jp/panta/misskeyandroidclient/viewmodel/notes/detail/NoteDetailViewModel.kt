@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +35,11 @@ class NoteDetailViewModel(
 
     private val connectionInformation: EncryptedConnectionInformation = accountRelation.getCurrentConnectionInformation()!!
     private val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(connectionInformation)
-    private val streamingAdapter = StreamingAdapter(connectionInformation, encryption)
+    //private val streamingAdapter = StreamingAdapter(connectionInformation, encryption)
 
 
-    private val noteCapture = NoteCapture(accountRelation.account.id)
+    private val noteCapture = miCore.getNoteCapture(accountRelation)
+    private var noteRegister = NoteRegister()
 
     val notes = object : MutableLiveData<List<PlaneNoteViewData>>(){
         override fun onActive() {
@@ -56,23 +58,14 @@ class NoteDetailViewModel(
     private val mNoteDetailId = UUID.randomUUID().toString()
 
     private fun startStreaming(){
-        if(!streamingAdapter.isConnect){
-            streamingAdapter.connect()
-        }
-        streamingAdapter.addObserver(mNoteDetailId, noteCapture)
-        notes.value?.let{
-            noteCapture.addAll(it)
-        }
+
+        noteCapture.attach(noteRegister)
+
     }
 
     private fun stopStreaming(){
-        notes.value?.let{
-            noteCapture.removeAll(it)
-        }
-        streamingAdapter.observerMap.remove(mNoteDetailId)
-        if(streamingAdapter.isConnect){
-            streamingAdapter.disconnect()
-        }
+        noteCapture.detach(noteRegister)
+
     }
 
 
@@ -100,7 +93,7 @@ class NoteDetailViewModel(
                     }
                     notes.postValue(list)
                 }
-                noteCapture.addAll(list)
+                noteCapture.subscribeAll(noteRegister.registerId, list)
 
             }catch (e: Exception){
 
