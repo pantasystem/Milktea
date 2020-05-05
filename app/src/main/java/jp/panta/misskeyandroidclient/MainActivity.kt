@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             mNotificationSubscribeViewModel?.getNotifications(it)?.observe(this, Observer { notifications: List<Notification>? ->
                 Log.d("MainActivity", "通知が更新されました: $notifications")
 
-                bottom_navigation.getBadge(R.id.navigation_notification)?.apply{
+                bottom_navigation.getOrCreateBadge(R.id.navigation_notification).apply{
                     isVisible = !notifications.isNullOrEmpty()
                     notifications?.size?.let{ size ->
                         number = size
