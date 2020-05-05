@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,7 +21,8 @@ class MessageViewModel(
     private val accountRelation: AccountRelation,
     private val misskeyAPI: MisskeyAPI,
     messageHistory: Message,
-    private val encryption: Encryption
+    private val miCore: MiCore,
+    private val encryption: Encryption = miCore.getEncryption()
 
 ) : ViewModel(){
 
@@ -34,30 +36,19 @@ class MessageViewModel(
     }
     val connectionInformation = accountRelation.getCurrentConnectionInformation()
 
-    val messagesLiveData = object :MutableLiveData<State>(){
-        override fun onActive() {
-            super.onActive()
-
-        }
-        override fun onInactive() {
-            super.onInactive()
-        }
-    }
+    val messagesLiveData = MutableLiveData<State>()
     private val builder = RequestMessage.Builder(accountRelation, messageHistory).apply{
         this.limit = 20
     }
 
-    private val observerId = UUID.randomUUID().toString()
-    val streamingAdapter =  StreamingAdapter(connectionInformation, encryption).apply{
-        val main = MainCapture(GsonFactory.create())
-        addObserver(observerId, main)
-        main.putListener(MessageObserver())
-        connect()
-    }
-
-
     private var isLoading = false
 
+    private val messageObserver = MessageObserver()
+
+    private val mainCapture = miCore.getMainCapture(accountRelation)
+    init{
+        mainCapture.putListener(messageObserver)
+    }
 
     fun loadInit(){
         if(isLoading){
