@@ -68,6 +68,7 @@ class StreamingAdapter(
             }else{
                 val removed = observerMap.remove(ex.id)
                 removed?.onClosing()
+                removed?.streamingAdapter = null
             }
             if(observerMap.isEmpty()){
                 this.disconnect()

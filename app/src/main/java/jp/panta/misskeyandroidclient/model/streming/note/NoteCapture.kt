@@ -175,7 +175,11 @@ class NoteCapture(val account: Account) : AbsObserver(){
 
     override var streamingAdapter: StreamingAdapter? = null
     override fun onClosing() {
-
+        synchronized(mNoteRegisters){
+            mNoteRegisters.values.forEach{ nr ->
+                detach(nr)
+            }
+        }
     }
 
     override fun onConnect() {
