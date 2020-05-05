@@ -23,6 +23,7 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import kotlinx.coroutines.*
 import java.lang.Exception
 import java.util.*
@@ -83,6 +84,8 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
+    lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
+
     override fun onCreate() {
         super.onCreate()
 
@@ -107,6 +110,7 @@ class MiApplication : Application(), MiCore {
 
         mEncryption = KeyStoreSystemEncryption(this)
 
+        notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
 
         GlobalScope.launch(Dispatchers.IO){
             try{

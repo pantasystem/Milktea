@@ -96,6 +96,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initAccountViewModelListener()
         setHeaderProfile(mainBinding)
 
+        mNotificationSubscribeViewModel = miApplication.notificationSubscribeViewModel
+
+
         var init = false
         miApplication.currentAccount.observe(this, Observer {
             if(!init){
@@ -106,10 +109,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 init = true
                 Log.d("MainActivity", "初期化処理")
             }
-            val factory = NotificationSubscribeViewModel.Factory(it, miApplication)
-            mNotificationSubscribeViewModel = ViewModelProvider(this, factory).get("${it.account}", NotificationSubscribeViewModel::class.java)
-            mNotificationSubscribeViewModel?.currentNotification?.observe(this, notificationObserver)
+            mNotificationSubscribeViewModel?.getNotifications(it)?.observe(this, Observer { notifications: List<Notification>? ->
+                Log.d("MainActivity", "通知が更新されました: $notifications")
+
+                bottom_navigation.getBadge(R.id.navigation_notification)?.apply{
+                    isVisible = !notifications.isNullOrEmpty()
+                    notifications?.size?.let{ size ->
+                        number = size
+
+                    }
+                }
+                notifications?.lastOrNull()?.let{ notify ->
+                    Log.d("MainActivity", "通知が来ました:$notify")
+                    showNotification(notify)
+
+                }
+            })
+
+            //mNotificationSubscribeViewModel?.currentNotification?.observe(this, notificationObserver)
+
         })
+
 
 
         miApplication.connectionStatus.observe(this, Observer{ status ->
@@ -169,10 +189,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private val notificationObserver = Observer<Notification?>{ notify: Notification? ->
-        notify?: return@Observer
-
-        val account = (application as MiApplication).currentAccount.value?: return@Observer
+    private fun showNotification(notify: Notification){
+        val account = (application as MiApplication).currentAccount.value?: return
         val viewData = NotificationViewData(notify, account.account)
         //Log.d("MainActivity")
         val name = notify.user.name?: notify.user.userName
@@ -192,7 +210,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_notification)
         }*/
         snackBar.show()
-
     }
 
     private val switchAccountButtonObserver = Observer<Int>{
