@@ -109,7 +109,15 @@ class MainCapture(
         Log.d("MainCapture", "接続を開始します")
         mId = UUID.randomUUID().toString()
         val request = Request(body = Request.Body(id = mId))
-        streamingAdapter?.send(gson.toJson(request))
+        if(streamingAdapter == null){
+            Log.d("MainCapture", "streamingAdapter is nullなので送信できない")
+        }else{
+            if(streamingAdapter?.isConnect == true){
+                streamingAdapter?.send(gson.toJson(request))
+            }else{
+                Log.d("MainCapture", "streamingAdapter未接続のため送信できない")
+            }
+        }
     }
 
     override fun onClosing() {

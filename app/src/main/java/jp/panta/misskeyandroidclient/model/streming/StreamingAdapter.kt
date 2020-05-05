@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.streming
 
+import android.os.Handler
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
@@ -50,20 +51,29 @@ class StreamingAdapter(
         observerMap[id] = observer
     }
 
+    private val waitingConnectObservers = HashMap<String, Observer>()
+
     fun putObserver(observer: Observer){
         synchronized(observerMap){
             if(observerMap.isEmpty()){
                 connect()
             }
-            observer.streamingAdapter = this
-            val exObserver = observerMap[observer.id]
-            if(exObserver != null){
-                Log.d("StreamingAdapter", "追加済みのObserverを再追加しようとしたため古い接続は閉じられました。Hint:IDの重複")
-                exObserver.onDisconnect()
-            }
 
-            observerMap[observer.id] = observer
-            observer.onConnect()
+            if(isConnect){
+                observer.streamingAdapter = this
+                val exObserver = observerMap[observer.id]
+                if(exObserver != null){
+                    Log.d("StreamingAdapter", "追加済みのObserverを再追加しようとしたため古い接続は閉じられました。Hint:IDの重複")
+                    exObserver.onDisconnect()
+                }
+
+                observerMap[observer.id] = observer
+                observer.onConnect()
+            }else{
+                Handler().postDelayed({
+                    putObserver(observer)
+                }, 100)
+            }
         }
 
     }
