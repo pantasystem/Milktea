@@ -242,4 +242,6 @@
     <string name="delete">削除</string>
 
     <string name="edit_tab_name">タブ名を編集</string>
+    <string name="update_timeline_in_background">タイムラインをバックグラウンドで更新する(消費電力大)</string>
+
 </resources>

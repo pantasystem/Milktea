@@ -32,15 +32,14 @@ class TimelineViewModel(
     val errorState = MediatorLiveData<String>()
 
     private val noteCaptureRegister = NoteRegister()
-    private val streamingAdapter = miCore.getStreamingAdapter(accountRelation)
+    //private val streamingAdapter = miCore.getStreamingAdapter(accountRelation)
     private val noteCapture = miCore.getNoteCapture(accountRelation)
     private val timelineCapture = if(settingStore.isAutoLoadTimeline){
-        TimelineCapture(accountRelation.account)
+        miCore.getTimelineCapture(accountRelation)
     }else{
         null
     }
 
-    private var isTimelineCaptureStarted = false
 
 
     val position = MutableLiveData<Int>()
@@ -61,7 +60,7 @@ class TimelineViewModel(
         override fun onActive() {
             super.onActive()
 
-            if(!settingStore.isCaptureNoteWhenStopped){
+            if(!settingStore.isUpdateTimelineInBackground){
                 startNoteCapture()
             }
         }
@@ -69,13 +68,10 @@ class TimelineViewModel(
         override fun onInactive() {
             super.onInactive()
 
-            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
+            if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
                 stopTimelineCapture()
-            }
-            if(!settingStore.isCaptureNoteWhenStopped){
                 stopNoteCapture()
             }
-
         }
     }
 
@@ -121,7 +117,7 @@ class TimelineViewModel(
 
                         val state = timelineLiveData.value
                         val newState = if(state == null){
-                            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
+                            if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
                                 startTimelineCapture()
                             }
                             TimelineState(
@@ -130,7 +126,7 @@ class TimelineViewModel(
                             )
 
                         }else{
-                            if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && list.size < 20){
+                            if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground && list.size < 20){
                                 startTimelineCapture()
                             }
                             val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
@@ -258,26 +254,24 @@ class TimelineViewModel(
 
 
     private fun startTimelineCapture(){
-        Log.d(tag, "タイムラインキャプチャーを開始しようとしている")
-        val exTimeline = streamingAdapter.observerMap[timelineCaptureId]
-        if(exTimeline == null && timelineCapture != null && !isTimelineCaptureStarted){
+        if(timelineCapture != null){
             //observer?.updateId()
             val observer = TimelineCapture.TimelineObserver.create(pageableTimeline, this.timelineObserver)
-            mObserver = observer
-            streamingAdapter.putObserver(timelineCapture)
-            if(observer != null){
+            if(observer != null && mObserver == null){
+                Log.d(tag, "タイムラインキャプチャーを開始しようとしている")
                 timelineCapture.addChannelObserver(observer)
+                mObserver = observer
             }
         }
     }
 
     private fun stopTimelineCapture(){
-        val exTimeline = streamingAdapter.observerMap[timelineCaptureId]
-        if(exTimeline != null && timelineCapture != null){
-            streamingAdapter.observerMap.remove(timelineCaptureId)
+        if(timelineCapture != null){
             val observer = mObserver
             if(observer != null){
+                Log.d("TimelineViewModel" , "タイムラインキャプチャー停止中")
                 timelineCapture.removeChannelObserver(observer)
+                mObserver = null
             }
 
         }

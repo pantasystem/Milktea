@@ -24,8 +24,7 @@ object KeyStore {
         INCLUDE_LOCAL_RENOTES(true),
         AUTO_LOAD_TIMELINE(true),
 
-        CAPTURE_NOTE_WHEN_STOPPED(false),
-        AUTO_LOAD_TIMELINE_WHEN_STOPPED(false),
+        UPDATE_TIMELINE_IN_BACKGROUND(false),
 
         HIDE_REMOVED_NOTE(true),
 

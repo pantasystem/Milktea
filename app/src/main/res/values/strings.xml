@@ -241,5 +241,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
 
+    <string name="update_timeline_in_background">Update timeline in background</string>
+
     <string name="edit_tab_name">Edit tab name</string>
 </resources>

@@ -134,7 +134,7 @@ class TimelineCapture(
         synchronized(observerMap){
             observerMap[observer.body.id] = observer
         }
-        //Log.d("TimelineCapture", "登録しました: ${gson.toJson(observer)}")
+        Log.d("TimelineCapture", "登録しました: ${gson.toJson(observer)}, streamingAdapter is active:${streamingAdapter != null}")
         streamingAdapter?.send(gson.toJson(observer))
     }
 

@@ -74,35 +74,21 @@ class SettingMovementActivity : AppCompatActivity() {
             )
         )
 
-        val captureNoteWhenStopped = BooleanSharedItem(
-            key = KeyStore.BooleanKey.CAPTURE_NOTE_WHEN_STOPPED.name,
-            default = KeyStore.BooleanKey.CAPTURE_NOTE_WHEN_STOPPED.default,
+        val updateTimelineInBackground = BooleanSharedItem(
+            key = KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND.name,
+            default = KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND.default,
             choiceType = BooleanSharedItem.ChoiceType.SWITCH,
             context = this,
-            titleStringRes = R.string.capture_note_when_stopped
+            titleStringRes = R.string.update_timeline_in_background
         )
 
-        val autoLoadTimelineWhenStopped = BooleanSharedItem(
-            key = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE_WHEN_STOPPED.name,
-            default = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE_WHEN_STOPPED.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.auto_load_when_stopped
-        )
-        autoLoadTimeline.choice.observe(this, Observer{
-            if(!it){
-                autoLoadTimelineWhenStopped.choice.value = false
-            }
 
-            autoLoadTimelineWhenStopped.enabled.value = it
-
-        })
 
 
 
         val syncGroup = Group(
             titleStringRes = R.string.sync,
-            items = listOf(captureNoteWhenStopped, autoLoadTimelineWhenStopped),
+            items = listOf(updateTimelineInBackground),
             context = this
         )
 

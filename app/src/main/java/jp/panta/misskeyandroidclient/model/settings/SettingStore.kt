@@ -5,9 +5,9 @@ import jp.panta.misskeyandroidclient.KeyStore
 
 class SettingStore(private val sharedPreferences: SharedPreferences) {
 
-    val isCaptureNoteWhenStopped: Boolean
-        get() {
-            return fromBooleanEnum(KeyStore.BooleanKey.CAPTURE_NOTE_WHEN_STOPPED)
+    val isUpdateTimelineInBackground: Boolean
+        get(){
+            return fromBooleanEnum(KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND)
         }
 
     val isAutoLoadTimeline: Boolean
@@ -15,10 +15,6 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         return fromBooleanEnum(KeyStore.BooleanKey.AUTO_LOAD_TIMELINE)
     }
 
-    val isAutoLoadTimelineWhenStopped: Boolean
-        get(){
-            return fromBooleanEnum(KeyStore.BooleanKey.AUTO_LOAD_TIMELINE_WHEN_STOPPED)
-        }
 
     val isHideRemovedNote: Boolean
         get(){
