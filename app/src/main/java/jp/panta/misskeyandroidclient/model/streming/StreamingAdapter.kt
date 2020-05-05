@@ -37,21 +37,7 @@ class StreamingAdapter(
         private set
 
 
-    @Deprecated("use putObserver")
-    fun addObserver(id: String, observer: Observer){
-        //observer.onConnect()
-        observer.streamingAdapter = this
-        //observers.add(observer)
-        val exObserver = observerMap[id]
-        if(exObserver != null){
-            Log.d(TAG, "既存のObserverを検出したので切断しました")
-        }
-        exObserver?.onDisconnect()
 
-        observerMap[id] = observer
-    }
-
-    private val waitingConnectObservers = HashMap<String, Observer>()
 
     fun putObserver(observer: Observer){
         synchronized(observerMap){

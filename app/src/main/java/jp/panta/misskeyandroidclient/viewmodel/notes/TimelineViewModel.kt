@@ -5,12 +5,9 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.streming.NoteCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -18,12 +15,10 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.lang.IndexOutOfBoundsException
 import java.util.*
 
 class TimelineViewModel(
     val accountRelation: AccountRelation,
-    //val requestBaseSetting: NoteRequest.Setting,
     private val pageableTimeline: Page.Timeline,
     include: NoteRequest.Include,
     miCore: MiCore,
@@ -45,7 +40,6 @@ class TimelineViewModel(
         null
     }
 
-    private var isNoteCaptureStarted = false
     private var isTimelineCaptureStarted = false
 
 
@@ -67,9 +61,6 @@ class TimelineViewModel(
         override fun onActive() {
             super.onActive()
 
-            /*if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
-                startTimelineCapture()
-            }*/
             if(!settingStore.isCaptureNoteWhenStopped){
                 startNoteCapture()
             }
@@ -137,9 +128,7 @@ class TimelineViewModel(
                                 list,
                                 TimelineState.State.LOAD_NEW
                             )
-                            /*if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped){
-                startTimelineCapture()
-            }*/
+
                         }else{
                             if(settingStore.isAutoLoadTimeline && !settingStore.isAutoLoadTimelineWhenStopped && list.size < 20){
                                 startTimelineCapture()
@@ -275,7 +264,7 @@ class TimelineViewModel(
             //observer?.updateId()
             val observer = TimelineCapture.TimelineObserver.create(pageableTimeline, this.timelineObserver)
             mObserver = observer
-            streamingAdapter.addObserver(timelineCaptureId, timelineCapture)
+            streamingAdapter.putObserver(timelineCapture)
             if(observer != null){
                 timelineCapture.addChannelObserver(observer)
             }
