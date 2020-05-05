@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private val notificationObserver = Observer<Notification>{ notify: Notification? ->
+    private val notificationObserver = Observer<Notification?>{ notify: Notification? ->
         notify?: return@Observer
 
         val account = (application as MiApplication).currentAccount.value?: return@Observer

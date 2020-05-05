@@ -33,7 +33,11 @@ class NotificationSubscribeViewModel(val accountRelation: AccountRelation, miCor
 
     val observeNotification = BehaviorSubject.create<Notification>()
 
-    val currentNotification = MutableLiveData<Notification>()
+    val currentNotification = MutableLiveData<Notification?>()
+
+    fun readAlready(){
+        currentNotification.value = null
+    }
 
 
     inner class Listener : MainCapture.AbsListener(){
