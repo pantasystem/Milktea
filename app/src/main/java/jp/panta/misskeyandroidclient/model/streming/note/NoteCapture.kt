@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.HashSet
 
 
 class NoteCapture(val account: Account) : AbsObserver(){
@@ -98,18 +99,22 @@ class NoteCapture(val account: Account) : AbsObserver(){
      * @param noteRegister 対象のRegisterのノートを一斉にremoteに登録します。すでに登録されている場合はremoteには登録されません。
      */
     fun attach(noteRegister: NoteRegister){
-        val noteIds = noteRegister.registeredNoteIds()
-
-        noteIds.forEach{ noteId ->
-            val isRemoteCaptured = isRemoteCaptured(noteId)
-            if(!isRemoteCaptured){
-                capture(noteId)
-            }
-        }
-
+        Log.d("NoteCapture", "attach")
         synchronized(mNoteRegisters){
+            val noteIds = noteRegister.registeredNoteIds()
+
+            noteIds.forEach{ noteId ->
+                val isRemoteCaptured = isRemoteCaptured(noteId)
+                if(!isRemoteCaptured){
+                    capture(noteId)
+                }
+            }
+
             mNoteRegisters[noteRegister.registerId] = noteRegister
+
+
         }
+
     }
 
     /**
@@ -183,6 +188,15 @@ class NoteCapture(val account: Account) : AbsObserver(){
     }
 
     override fun onConnect() {
+        val noteIds = HashSet<String>()
+        synchronized(mNoteRegisters){
+            mNoteRegisters.values.forEach {
+                noteIds.addAll(it.registeredNoteIds())
+            }
+        }
+        noteIds.forEach{
+            capture(it)
+        }
     }
 
     override fun onDisconnect() = Unit

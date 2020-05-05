@@ -106,6 +106,7 @@ class MainCapture(
 
     override fun onConnect() {
         // 接続する毎にIDを再生成する
+        Log.d("MainCapture", "接続を開始します")
         mId = UUID.randomUUID().toString()
         val request = Request(body = Request.Body(id = mId))
         streamingAdapter?.send(gson.toJson(request))
@@ -130,6 +131,7 @@ class MainCapture(
             if(id != mId){
                 return
             }
+            Log.d("MainCapture", msg)
             synchronized(mListeners){
                 mListeners.forEach{
                     val listener = it.value

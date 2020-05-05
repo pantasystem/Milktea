@@ -95,12 +95,6 @@ class MessageFragment : Fragment(R.layout.fragment_message){
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        Log.d(tag, "終了処理中")
-        mMessageViewModel?.streamingAdapter?.disconnect()
-    }
 
     private val diffUtilItemCallback = object : DiffUtil.ItemCallback<MessageViewData>(){
         override fun areContentsTheSame(

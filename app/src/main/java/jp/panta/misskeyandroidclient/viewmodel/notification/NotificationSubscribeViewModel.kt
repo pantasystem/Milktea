@@ -26,8 +26,9 @@ class NotificationSubscribeViewModel(val accountRelation: AccountRelation, miCor
 
     private val mUnreadNotificationMap = HashMap<String, Notification>()
 
+    private val notificationListener = Listener()
     init{
-        miCore.getMainCapture(accountRelation).putListener(Listener())
+        miCore.getMainCapture(accountRelation).putListener(notificationListener)
     }
 
     val observeNotification = BehaviorSubject.create<Notification>()

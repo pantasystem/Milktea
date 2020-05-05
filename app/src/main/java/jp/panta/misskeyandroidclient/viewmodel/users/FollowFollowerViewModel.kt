@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
@@ -28,7 +29,8 @@ class FollowFollowerViewModel(
     val misskeyAPI: MisskeyAPI,
     val user: User?,
     val type: Type,
-    private val encryption: Encryption
+    val miCore: MiCore,
+    private val encryption: Encryption = miCore.getEncryption()
 ) : ViewModel(){
     @Suppress("UNCHECKED_CAST")
     class Factory(
@@ -46,7 +48,7 @@ class FollowFollowerViewModel(
                     misskeyAPI,
                     user,
                     type,
-                    encryption
+                    miApplication
                 ) as T
             }
             throw IllegalArgumentException("use FollowFollowerViewModel::class.java")
@@ -67,23 +69,19 @@ class FollowFollowerViewModel(
     }else{
         misskeyAPI::following
     }
-    val streamingAdapter: StreamingAdapter by lazy {
-        StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption).apply{
-            val mainCapture = MainCapture(GsonFactory.create())
-            mainCapture.putListener(Listener())
-            addObserver(UUID.randomUUID().toString(), mainCapture)
-        }
 
-    }
+    private val followFollowerUpdateListener = Listener()
+    private val mainCapture = miCore.getMainCapture(accountRelation)
+
     val isInitializing = MutableLiveData<Boolean>(false)
 
     val followFollowerViewDataList = object : MutableLiveData<List<FollowFollowerViewData>>(){
         override fun onActive() {
-            streamingAdapter.connect()
+            mainCapture.putListener(followFollowerUpdateListener)
         }
 
         override fun onInactive() {
-            streamingAdapter.disconnect()
+            mainCapture.removeListener(followFollowerUpdateListener)
         }
     }
     private var mIsLoading: Boolean = false

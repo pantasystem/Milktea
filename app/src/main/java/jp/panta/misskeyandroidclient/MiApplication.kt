@@ -436,12 +436,19 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMainCapture(account: AccountRelation): MainCapture{
-        var mainCapture = synchronized(mMainCaptureAccountMap){
-            mMainCaptureAccountMap[account.account]
+        Log.d(TAG, "getMainCapture")
+
+        val isMainCaptureCreated: Boolean
+
+        val mainCapture = synchronized(mMainCaptureAccountMap){
+            val tmp = mMainCaptureAccountMap[account.account]
+            isMainCaptureCreated = tmp == null
+            (tmp?: MainCapture(GsonFactory.create())).apply{
+                mMainCaptureAccountMap[account.account] = this
+            }
         }
 
-        if(mainCapture == null){
-            mainCapture = MainCapture(GsonFactory.create())
+        if(isMainCaptureCreated){
             setupObserver(account, mainCapture)
         }
 
@@ -450,22 +457,22 @@ class MiApplication : Application(), MiCore {
 
     override fun setupObserver(account: AccountRelation, observer: Observer) {
         val ci = account.getCurrentConnectionInformation()
-        var streaming = synchronized(mStreamingAccountMap){
-            mStreamingAccountMap[account.account]
-        }
-        if(streaming == null){
-            streaming = StreamingAdapter(ci, getEncryption())
-            streaming.connect()
-
-            synchronized(mStreamingAccountMap){
+        synchronized(mStreamingAccountMap){
+            var streaming = mStreamingAccountMap[account.account]
+            if(streaming == null){
+                streaming = StreamingAdapter(ci, getEncryption())
+                streaming.connect()
                 mStreamingAccountMap[account.account] = streaming
+
+            }
+
+            synchronized(streaming.observerMap){
+                if(streaming.observerMap[observer.id] == null){
+                    streaming.putObserver(observer)
+                }
             }
         }
-        synchronized(streaming.observerMap){
-            if(streaming.observerMap[observer.id] == null){
-                streaming.putObserver(observer)
-            }
-        }
+
 
     }
 
@@ -477,6 +484,7 @@ class MiApplication : Application(), MiCore {
         if(noteCapture == null){
             noteCapture = NoteCapture(account.account)
             setupObserver(account, noteCapture)
+            mNoteCaptureAccountMap[account.account] = noteCapture
         }
         return noteCapture
 
@@ -485,18 +493,16 @@ class MiApplication : Application(), MiCore {
 
     override fun getStreamingAdapter(account: AccountRelation): StreamingAdapter {
         val ci = account.getCurrentConnectionInformation()
-        var streaming = synchronized(mStreamingAccountMap){
-            mStreamingAccountMap[account.account]
-        }
-        if(streaming == null){
-            streaming = StreamingAdapter(ci, getEncryption())
-            streaming.connect()
 
-            synchronized(mStreamingAccountMap){
-                mStreamingAccountMap[account.account] = streaming
+        synchronized(mStreamingAccountMap){
+            var streaming = mStreamingAccountMap[account.account]
+            if(streaming == null){
+                streaming = StreamingAdapter(ci, getEncryption())
+                streaming.connect()
             }
+            mStreamingAccountMap[account.account] = streaming
+            return streaming
         }
-        return streaming
     }
 
 

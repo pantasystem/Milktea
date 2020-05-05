@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import okhttp3.*
 import okio.ByteString
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * StreamingAdapter、１につきアカウント１にしたい
@@ -15,6 +16,14 @@ class StreamingAdapter(
     private val encryption: Encryption
 ){
 
+    companion object{
+        val instanceCount = AtomicInteger()
+    }
+    init{
+        val count = instanceCount.incrementAndGet()
+        Log.d("StreamingAdapter", "生成数:$count")
+
+    }
 
     private var mWebSocket: WebSocket? = null
 
@@ -84,11 +93,14 @@ class StreamingAdapter(
     }
 
     fun connect(){
-        val wssUrl = connectionInformation?.instanceBaseUrl?.replace("https://", "wss://") + "/streaming?i=${connectionInformation?.getI(encryption)}"
-        val request = Request.Builder()
-            .url(wssUrl)
-            .build()
-        mWebSocket = OkHttpClient().newWebSocket(request, webSocketListener)
+        if(mWebSocket == null){
+            val wssUrl = connectionInformation?.instanceBaseUrl?.replace("https://", "wss://") + "/streaming?i=${connectionInformation?.getI(encryption)}"
+            val request = Request.Builder()
+                .url(wssUrl)
+                .build()
+            mWebSocket = OkHttpClient().newWebSocket(request, webSocketListener)
+        }
+
     }
 
     fun disconnect(){
@@ -141,6 +153,7 @@ class StreamingAdapter(
             Log.d(TAG, "onClose: 通信が途絶えてしまった code: $code")
             //mWebSocket = null
             isConnect = false
+            mWebSocket = null
 
         }
 
@@ -160,6 +173,7 @@ class StreamingAdapter(
             }
 
             Thread.sleep(2000)
+            mWebSocket = null
             this@StreamingAdapter.connect()
 
         }
