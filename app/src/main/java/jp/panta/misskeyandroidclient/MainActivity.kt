@@ -100,19 +100,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         var init = false
-        miApplication.currentAccount.observe(this, Observer {
+        miApplication.currentAccount.observe(this, Observer { ar ->
             if(!init){
-                mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(it, miApplication)).get(NotesViewModel::class.java)
+                mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
 
                 Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.accountRelation}")
                 ActionNoteHandler(this, mNotesViewModel).initViewModelListener()
                 init = true
                 Log.d("MainActivity", "初期化処理")
             }
-            mNotificationSubscribeViewModel?.getNotifications(it)?.observe(this, Observer { notifications: List<Notification>? ->
+            mNotificationSubscribeViewModel?.getNotifications(ar)?.observe(this, Observer { notifications: List<Notification>? ->
                 Log.d("MainActivity", "通知が更新されました: $notifications")
 
+                if(notifications.isNullOrEmpty()){
+                    bottom_navigation.getBadge(R.id.navigation_notification)?.clearNumber()
+                }
                 bottom_navigation.getOrCreateBadge(R.id.navigation_notification).apply{
+                    //isVisible = !notifications.isNullOrEmpty()
                     isVisible = !notifications.isNullOrEmpty()
                     notifications?.size?.let{ size ->
                         number = size

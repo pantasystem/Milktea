@@ -84,7 +84,7 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-    lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
+    override lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
     override fun onCreate() {
         super.onCreate()

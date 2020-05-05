@@ -139,7 +139,7 @@ class MainCapture(
             if(id != mId){
                 return
             }
-            Log.d("MainCapture", msg)
+            //Log.d("MainCapture", msg)
             synchronized(mListeners){
                 mListeners.forEach{
                     val listener = it.value

@@ -84,6 +84,7 @@ class NotificationViewModel(
 
                 isLoadingFlag = false
                 isLoading.postValue(false)
+                miCore.notificationSubscribeViewModel.readAllNotifications(accountRelation)
             }
             override fun onFailure(call: Call<List<Notification>?>, t: Throwable) {
                 isLoadingFlag = false

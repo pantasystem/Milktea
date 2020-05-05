@@ -28,7 +28,7 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
     private val notificationListenerAccountMap = HashMap<Account, Listener>()
 
 
-    init{
+    /*init{
         accounts.observeForever { arList->
             arList.forEach{ ar ->
                 val mainCapture = miCore.getMainCapture(ar)
@@ -40,19 +40,33 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
                 }
             }
         }
-    }
+    }*/
 
     val observeNotification = BehaviorSubject.create<Notification>()
 
-    fun getNotifications(account: AccountRelation): LiveData<List<Notification>>?{
+    fun getNotifications(account: AccountRelation): LiveData<List<Notification>?>?{
         var listener = notificationListenerAccountMap[account.account]
         if(listener == null){
             listener = Listener(account)
             miCore.getMainCapture(account)
                 .putListener(listener)
+            notificationListenerAccountMap[account.account] = listener
         }
 
         return listener.notificationsLiveData
+    }
+
+    fun readAllNotifications(account: AccountRelation? = miCore.currentAccount.value){
+        Log.d("NotificationSubscribeVM", "既読を開始した")
+        account?: return
+        Log.d("NotificationSubscribeVM", "既読試み中")
+
+        val listener = notificationListenerAccountMap[account.account]
+            ?: return
+
+        listener.readAllNotification()
+        Log.d("NotificationSubscribeVM", "既読完了")
+
     }
 
 
@@ -62,7 +76,7 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
         private val mUnReadNotifications = TreeSet<Notification>(kotlin.Comparator { o1, o2 ->
             o2.createdAt.compareTo(o1.createdAt)
         })
-        val notificationsLiveData = MutableLiveData<List<Notification>>()
+        val notificationsLiveData = MutableLiveData<List<Notification>?>()
 
 
 
@@ -78,21 +92,25 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
 
         }
 
-        override fun readAllNotifications() {
-            super.readAllNotifications()
 
+        fun readAllNotification(){
             mUnReadNotifications.clear()
             updateLiveData()
-
         }
-
-
 
         private fun updateLiveData(){
-            notificationsLiveData.postValue(
-                ArrayList(mUnReadNotifications.toList())
-            )
+            if(mUnReadNotifications.isEmpty()){
+                notificationsLiveData.postValue(null)
+            }else{
+                notificationsLiveData.postValue(
+                    ArrayList(mUnReadNotifications.toList())
+                )
+            }
+
+            Log.d("NotificationSubscribeVM", "未読数:${mUnReadNotifications.size}")
+
         }
+
 
     }
 
