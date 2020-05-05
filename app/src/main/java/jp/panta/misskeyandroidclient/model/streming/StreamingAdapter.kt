@@ -102,7 +102,7 @@ class StreamingAdapter(
         mWebSocket?.send(json)
     }
 
-    fun connect(){
+    private fun connect(){
         if(mWebSocket == null){
             val wssUrl = connectionInformation?.instanceBaseUrl?.replace("https://", "wss://") + "/streaming?i=${connectionInformation?.getI(encryption)}"
             val request = Request.Builder()

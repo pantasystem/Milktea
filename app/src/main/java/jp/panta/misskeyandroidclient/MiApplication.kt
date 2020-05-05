@@ -461,7 +461,6 @@ class MiApplication : Application(), MiCore {
             var streaming = mStreamingAccountMap[account.account]
             if(streaming == null){
                 streaming = StreamingAdapter(ci, getEncryption())
-                streaming.connect()
                 mStreamingAccountMap[account.account] = streaming
 
             }
@@ -498,7 +497,6 @@ class MiApplication : Application(), MiCore {
             var streaming = mStreamingAccountMap[account.account]
             if(streaming == null){
                 streaming = StreamingAdapter(ci, getEncryption())
-                streaming.connect()
             }
             mStreamingAccountMap[account.account] = streaming
             return streaming
