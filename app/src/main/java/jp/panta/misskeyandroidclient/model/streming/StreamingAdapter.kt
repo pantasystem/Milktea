@@ -92,6 +92,11 @@ class StreamingAdapter(
     }
 
     fun disconnect(){
+        synchronized(observerMap){
+            observerMap.values.forEach{ observer ->
+                observer.onClosing()
+            }
+        }
         mWebSocket?.close(1001, "close")
     }
 
