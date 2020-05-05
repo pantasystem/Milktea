@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,10 +22,11 @@ import kotlin.collections.ArrayList
 class NotificationViewModel(
     private val accountRelation: AccountRelation,
     private val misskeyAPI: MisskeyAPI,
-    private val encryption: Encryption
+    private val miCore: MiCore,
+    private val encryption: Encryption = miCore.getEncryption()
     //private val noteCapture: NoteCapture
 ) : ViewModel(){
-    val connectionInstance = accountRelation.getCurrentConnectionInformation()
+    private val connectionInstance = accountRelation.getCurrentConnectionInformation()
 
 
 
@@ -33,32 +35,23 @@ class NotificationViewModel(
     //loadNewはない
 
 
-    private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
-    private val noteCapture = NoteCapture(accountRelation.account.id)
+   // private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
+    private val noteCapture = miCore.getNoteCapture(accountRelation)
+
+    private var noteRegister = NoteRegister()
 
     val noteCaptureId = UUID.randomUUID().toString()
 
     val notificationsLiveData = object : MutableLiveData<List<NotificationViewData>>(){
         override fun onActive() {
             super.onActive()
-            streamingAdapter.addObserver(noteCaptureId, noteCapture)
-            val list = value
-            if(list != null){
-                addNoteObserver(list)
-            }
-            streamingAdapter.connect()
+            //streamingAdapter.addObserver(noteCaptureId, noteCapture)
+            noteCapture.attach(noteRegister)
 
         }
         override fun onInactive() {
             super.onInactive()
-            val list = value
-            if(list != null){
-                removeNoteObserver(list)
-            }
-            //streamingAdapter.observers.clear()
-            streamingAdapter.observerMap.clear()
-
-            streamingAdapter.disconnect()
+            noteCapture.detach(noteRegister)
         }
 
     }
@@ -81,7 +74,12 @@ class NotificationViewModel(
                     list
                 )
                 if(list != null){
-                    addNoteObserver(list)
+                    noteCapture.detach(noteRegister)
+                    noteRegister = NoteRegister()
+                    noteCapture.attach(noteRegister)
+                    noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull{
+                        it.noteViewData
+                    })
                 }
 
                 isLoadingFlag = false
@@ -128,7 +126,9 @@ class NotificationViewModel(
                     )
                 }
 
-                addNoteObserver(list)
+                noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull {
+                    it.noteViewData
+                })
 
                 notificationsLiveData.postValue(notificationViewDataList)
                 isLoadingFlag = false
@@ -138,31 +138,6 @@ class NotificationViewModel(
                 isLoadingFlag = false
             }
         })
-    }
-
-    private fun removeNoteObserver(notificationViewDataList: List<NotificationViewData>){
-        val notes = notificationViewDataList.asSequence().filter{
-            it.noteViewData != null
-        }.map{
-            it.noteViewData!!
-        }.toList()
-        noteCapture.removeAll(notes)
-    }
-
-    fun addNoteObserver(notificationViewDataList: List<NotificationViewData>){
-
-        notificationViewDataList.asSequence().filter{
-            //ノートが含まれない投稿を排除する
-            it.noteViewData != null
-        }.map{
-            it.noteViewData!!
-        }.toList().let{
-            //同様のノートの場合キャプチャーを一度解除する
-            noteCapture.removeAll(it)
-
-            noteCapture.addAll(it)
-        }
-
     }
 
 
