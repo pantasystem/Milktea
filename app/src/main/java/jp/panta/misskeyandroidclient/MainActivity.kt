@@ -207,6 +207,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             NotificationViewData.Type.REACTION -> name + getString(R.string.reacted_by)
             NotificationViewData.Type.POLL_VOTE -> name + getString(R.string.voted_by)
             NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + getString(R.string.followed_by)
+            NotificationViewData.Type.FOLLOW_REQUEST_ACCEPTED -> name + " ${getString(R.string.follow_request_accepted)}"
             else -> "もうわかんねぇなこれ"
         }
         val snackBar = Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG)

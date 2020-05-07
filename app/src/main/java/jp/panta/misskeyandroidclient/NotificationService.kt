@@ -105,42 +105,42 @@ class NotificationService : Service() {
 
     private fun showNotification(notification: NotificationViewData){
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            builder.setSmallIcon(R.mipmap.ic_launcher)
+            builder.setSmallIcon(R.mipmap.ic_launcher_foreground)
 
             when(notification.type){
                 FOLLOW ->{
                     //builder.setSmallIcon(R.drawable.ic_follow)
-                    builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.followed_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName() + " " +applicationContext.getString(R.string.followed_by))
 
                 }
                 MENTION ->{
                     //builder.setSmallIcon(R.drawable.ic_mention)
-                    builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.mention_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.mention_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
 
                 }
                 REPLY ->{
                     //builder.setSmallIcon(R.drawable.ic_reply_black_24dp)
-                    builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.replied_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.replied_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
                 }
                 QUOTE ->{
                     //builder.setSmallIcon(R.drawable.ic_format_quote_black_24dp)
-                    builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.quoted_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.quoted_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
                 }
                 POLL_VOTE->{
                     //builder.setSmallIcon(R.drawable.ic_poll_black_24dp)
-                    builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.voted_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.voted_by))
                 }
                 REACTION ->{
                     //builder.setSmallIcon(R.drawable.ic_reaction_like)
-                    builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.reacted_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.reacted_by))
                     builder.setContentText(SafeUnbox.unbox(notification.reaction))
                 }
                 RENOTE ->{
                     // builder.setSmallIcon(R.drawable.ic_re_note)
-                    builder.setContentTitle(notification.user.getDisplayUserName() + applicationContext.getString(R.string.renoted_by))
+                    builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.renoted_by))
                     builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
                 }
                 RECEIVE_FOLLOW_REQUEST ->{
@@ -173,6 +173,9 @@ E/MQSEventManagerDelegate: failed to get MQSService.
                     // builder.setContentIntent()
                     return
 
+                }
+                FOLLOW_REQUEST_ACCEPTED ->{
+                    builder.setContentTitle(notification.user.getDisplayUserName() + " " + getString(R.string.follow_request_accepted))
                 }
                 else ->{
                     Log.d("NotificationService", "unknown notification: $notification")
