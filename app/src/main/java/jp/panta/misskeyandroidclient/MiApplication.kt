@@ -24,6 +24,7 @@ import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageSubscribeViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -87,6 +88,7 @@ class MiApplication : Application(), MiCore {
         private set
 
     override lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
+    override lateinit var messageSubscribeViewModel: MessageSubscribeViewModel
 
     override fun onCreate() {
         super.onCreate()
@@ -113,6 +115,7 @@ class MiApplication : Application(), MiCore {
         mEncryption = KeyStoreSystemEncryption(this)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
+        messageSubscribeViewModel = MessageSubscribeViewModel(this)
 
         GlobalScope.launch(Dispatchers.IO){
             try{

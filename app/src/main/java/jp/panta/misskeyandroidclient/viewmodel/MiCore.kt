@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
+import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageSubscribeViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -28,6 +29,8 @@ interface MiCore{
     val currentAccount: MutableLiveData<AccountRelation>
 
     var notificationSubscribeViewModel: NotificationSubscribeViewModel
+
+    var messageSubscribeViewModel: MessageSubscribeViewModel
 
     fun switchAccount(account: Account)
 
