@@ -14,8 +14,7 @@ class MessageHistoryViewModelFactory(
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == MessageHistoryViewModel::class.java){
-            val misskeyAPI = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
-            return MessageHistoryViewModel(accountRelation, misskeyAPI, miApplication.getEncryption()) as T
+            return MessageHistoryViewModel(accountRelation, miApplication) as T
         }
         throw IllegalArgumentException("error")
     }

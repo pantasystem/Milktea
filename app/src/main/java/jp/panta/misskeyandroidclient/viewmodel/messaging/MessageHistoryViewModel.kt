@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -21,9 +22,10 @@ import java.lang.Exception
 
 class MessageHistoryViewModel(
     private val accountRelation: AccountRelation,
-    private val misskeyAPI: MisskeyAPI,
-    private val encryption: Encryption
-) : ViewModel(){
+    private val miCore: MiCore,
+    private val encryption: Encryption = miCore.getEncryption()
+
+    ) : ViewModel(){
     val connectionInformation = accountRelation.getCurrentConnectionInformation()
     val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
     val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
@@ -40,8 +42,8 @@ class MessageHistoryViewModel(
                 val groupRequest = RequestMessageHistory(i = connectionInformation?.getI(encryption)!!, group = true, limit = 100)
                 val userRequest = RequestMessageHistory(i = connectionInformation.getI(encryption)!!, group = false, limit = 100)
 
-                val groupHistory = misskeyAPI.getMessageHistory(groupRequest).execute().body()
-                val userHistory = misskeyAPI.getMessageHistory(userRequest).execute().body()
+                val groupHistory = getMisskeyAPI()?.getMessageHistory(groupRequest)?.execute()?.body()
+                val userHistory = getMisskeyAPI()?.getMessageHistory(userRequest)?.execute()?.body()
 
                 val history = if(groupHistory == null){
                     ArrayList()
@@ -72,7 +74,7 @@ class MessageHistoryViewModel(
     fun loadGroup(){
         isRefreshing.postValue(true)
         val request = RequestMessageHistory(i = connectionInformation?.getI(encryption)!!, group = true, limit = 100)
-        misskeyAPI.getMessageHistory(request).enqueue(object : Callback<List<Message>>{
+        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<Message>>{
             override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
                 val list = response.body()
                 if(list != null){
@@ -93,7 +95,7 @@ class MessageHistoryViewModel(
     fun loadUser(){
         isRefreshing.postValue(true)
         val request = RequestMessageHistory(i = connectionInformation?.getI(encryption)!!, group = false, limit = 100)
-        misskeyAPI.getMessageHistory(request).enqueue(object : Callback<List<Message>>{
+        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<Message>>{
             override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
                 val list = response.body()
                 if(list!= null){
@@ -116,4 +118,7 @@ class MessageHistoryViewModel(
         messageHistorySelected.event = messageHistory
     }
 
+    private fun getMisskeyAPI(): MisskeyAPI?{
+        return miCore.getMisskeyAPI(accountRelation)
+    }
 }
