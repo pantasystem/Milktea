@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.viewmodel.messaging.MessagingId
 import java.io.Serializable
 import java.util.*
 
@@ -34,5 +35,9 @@ data class Message(
         }else{
             recipient
         }
+    }
+
+    fun messagingId(account: Account): MessagingId{
+        return MessagingId(this, account)
     }
 }

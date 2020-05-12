@@ -34,6 +34,8 @@ class MessageViewModel(
             LOAD_INIT, LOAD_OLD, LOAD_NEW, RECEIVED
         }
     }
+
+    private val mMessageId = messageHistory.messagingId(accountRelation.account)
     val connectionInformation = accountRelation.getCurrentConnectionInformation()
 
     val messagesLiveData = MutableLiveData<State>()
@@ -65,9 +67,9 @@ class MessageViewModel(
                 val viewDataList = rawMessages.map{
                     if(it.user?.id == accountRelation.account.id){
                         //me
-                        SelfMessageViewData(it)
+                        SelfMessageViewData(it, accountRelation.account)
                     }else{
-                        RecipientMessageViewData(it)
+                        RecipientMessageViewData(it, accountRelation.account)
                     }
                 }
                 messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
@@ -102,9 +104,9 @@ class MessageViewModel(
                 }
                 val viewData = reversedMessages.map{
                     if(it.userId == accountRelation.account.id){
-                        SelfMessageViewData(it)
+                        SelfMessageViewData(it, accountRelation.account)
                     }else{
-                        RecipientMessageViewData(it)
+                        RecipientMessageViewData(it, accountRelation.account)
                     }
                 }
 
@@ -144,9 +146,9 @@ class MessageViewModel(
                 val viewData = rawList.map{
                     if(it.userId == accountRelation.account.id){
                         //me
-                        SelfMessageViewData(it)
+                        SelfMessageViewData(it, accountRelation.account)
                     }else{
-                        RecipientMessageViewData(it)
+                        RecipientMessageViewData(it, accountRelation.account)
                     }
                 }
 
@@ -166,15 +168,21 @@ class MessageViewModel(
         override fun messagingMessage(message: Message) {
             val messages = messagesLiveData.value?.messages.toArrayList()
 
-            val msg = if(message.userId == accountRelation.account.id){
-                //me
-                SelfMessageViewData(message)
-            }else{
-                RecipientMessageViewData(message)
-            }
-            messages.add(msg)
 
-            messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
+            if(message.messagingId(accountRelation.account) == mMessageId){
+                val msg = if(message.userId == accountRelation.account.id){
+                    //me
+                    SelfMessageViewData(message, accountRelation.account)
+                }else{
+                    RecipientMessageViewData(message, accountRelation.account)
+                }
+                messages.add(msg)
+
+                messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
+
+            }
+
+
         }
     }
 
