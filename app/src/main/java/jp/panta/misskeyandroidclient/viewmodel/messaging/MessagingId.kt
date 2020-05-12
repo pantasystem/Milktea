@@ -20,13 +20,17 @@ class MessagingId(val message: Message, val account: Account){
 
         if (isGroup != other.isGroup) return false
         if (msgId != other.msgId) return false
+        if(account != other.account) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = isGroup.hashCode()
+        var result = account.hashCode()
+        result = 31 * result + isGroup.hashCode()
         result = 31 * result + (msgId?.hashCode() ?: 0)
         return result
     }
+
+
 }
