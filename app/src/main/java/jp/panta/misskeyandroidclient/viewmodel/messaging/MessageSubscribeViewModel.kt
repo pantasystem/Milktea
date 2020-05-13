@@ -36,6 +36,12 @@ class MessageSubscribeViewModel(val miCore: MiCore) : ViewModel(){
         }
     }
 
+    fun getAllMergedAccountMessages(): Observable<Message>{
+        val observables = (miCore.accounts.value?: emptyList()).map{
+            getAccountMessageObservable(it)
+        }
+        return Observable.merge(observables)
+    }
 
     fun getObservable(messagingId: MessagingId, ar: AccountRelation): Observable<Message>{
         var observer = accountMessagingObserverMap[ar.account]
