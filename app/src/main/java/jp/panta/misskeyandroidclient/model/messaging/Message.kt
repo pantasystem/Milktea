@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.mfm.Root
@@ -9,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessagingId
 import java.io.Serializable
 import java.util.*
 
@@ -40,8 +38,11 @@ data class Message(
         }
     }
 
-    fun messagingId(account: Account): MessagingId{
-        return MessagingId(this, account)
+    fun messagingId(account: Account): MessagingId {
+        return MessagingId(
+            this,
+            account
+        )
     }
 
     val textNode: Root?

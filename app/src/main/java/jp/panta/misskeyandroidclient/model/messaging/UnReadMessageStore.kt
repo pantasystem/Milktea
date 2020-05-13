@@ -1,7 +1,5 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessagingId
-
 class UnReadMessageStore(val messagingId: MessagingId) {
 
     private val unreadMessages = HashSet<Message>()

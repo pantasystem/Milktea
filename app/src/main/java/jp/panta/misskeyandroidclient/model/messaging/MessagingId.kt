@@ -1,7 +1,6 @@
-package jp.panta.misskeyandroidclient.viewmodel.messaging
+package jp.panta.misskeyandroidclient.model.messaging
 
 import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.messaging.Message
 import java.io.Serializable
 
 class MessagingId(val message: Message, val account: Account) : Serializable{

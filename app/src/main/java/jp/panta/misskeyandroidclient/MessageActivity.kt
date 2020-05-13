@@ -16,7 +16,7 @@ import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageFragment
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessagingId
+import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import kotlinx.android.synthetic.main.activity_message.*
 
 class MessageActivity : AppCompatActivity() {
