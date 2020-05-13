@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
@@ -26,40 +24,66 @@ class MessageHistoryViewModel(
     private val encryption: Encryption = miCore.getEncryption()
 
     ) : ViewModel(){
+
+    private val mDisposable = CompositeDisposable()
+
     val connectionInformation = accountRelation.getCurrentConnectionInformation()
     val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
-    val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
-    val historyGroupAndUserLiveData = MutableLiveData<List<HistoryViewData>>()
+    val historyGroupLiveData = object : MutableLiveData<List<HistoryViewData>>(){
+        override fun onActive() {
+            super.onActive()
+            val disposable = miCore.messageSubscriber.getAccountMessageObservable(accountRelation)
+                .subscribe { msg ->
+                    val list = ArrayList((this.value?: emptyList()))
+                    val any = list.firstOrNull{ hvd ->
+                        hvd.messagingId == msg.messagingId(accountRelation.account)
+                    }
+                    if(any == null){
+                        list.add(HistoryViewData(accountRelation.account, msg))
+                    }else{
+                        any.message.postValue(msg)
+                    }
+                    this.postValue(list)
+                }
+            mDisposable.add(disposable)
+        }
+
+        override fun onInactive() {
+            super.onInactive()
+            mDisposable.clear()
+        }
+    }
+
+    val historyGroupAndUserLiveData = MediatorLiveData<List<HistoryViewData>>().apply{
+        addSource(historyUserLiveData){
+            val groups = historyGroupLiveData.value?: emptyList()
+            val list = ArrayList<HistoryViewData>()
+            list.addAll(groups)
+            list.addAll(it)
+            this.postValue(list)
+        }
+
+        addSource(historyGroupLiveData){
+            val users = historyUserLiveData.value?: emptyList()
+            val list = ArrayList<HistoryViewData>().apply {
+                addAll(it)
+                addAll(users)
+            }
+            this.postValue(list)
+        }
+    }
 
     val isRefreshing = MutableLiveData<Boolean>(false)
 
     val messageHistorySelected = EventBus<HistoryViewData>()
 
+
     fun loadGroupAndUser(){
         isRefreshing.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val groupRequest = RequestMessageHistory(i = connectionInformation?.getI(encryption)!!, group = true, limit = 100)
-                val userRequest = RequestMessageHistory(i = connectionInformation.getI(encryption)!!, group = false, limit = 100)
-
-                val groupHistory = getMisskeyAPI()?.getMessageHistory(groupRequest)?.execute()?.body()
-                val userHistory = getMisskeyAPI()?.getMessageHistory(userRequest)?.execute()?.body()
-
-                val history = if(groupHistory == null){
-                    ArrayList()
-                }
-                else{
-                    ArrayList(groupHistory.map{
-                        HistoryViewData(accountRelation.account, it)
-                    })
-                }
-
-                if(userHistory != null){
-                    history.addAll(userHistory.map{
-                        HistoryViewData(accountRelation.account, it)
-                    })
-                }
-                historyGroupAndUserLiveData.postValue(history)
+                loadGroup()
+                loadUser()
 
                 isRefreshing.postValue(false)
 

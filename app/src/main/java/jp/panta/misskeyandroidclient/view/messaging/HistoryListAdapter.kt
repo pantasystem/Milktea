@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.view.messaging
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,8 @@ import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel
 
 class HistoryListAdapter(
     itemCallback: DiffUtil.ItemCallback<HistoryViewData>,
-    private val historyViewModel: MessageHistoryViewModel
+    private val historyViewModel: MessageHistoryViewModel,
+    private val lifecycleOwner: LifecycleOwner
     ) : ListAdapter<HistoryViewData, HistoryListAdapter.HistoryViewHolder>(itemCallback){
     class HistoryViewHolder(val binding: ItemMessagingHistoryBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -25,6 +27,7 @@ class HistoryListAdapter(
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         holder.binding.historyViewData = getItem(position)
         holder.binding.historyViewModel = historyViewModel
+        holder.binding.lifecycleOwner = lifecycleOwner
         holder.binding.executePendingBindings()
     }
 }

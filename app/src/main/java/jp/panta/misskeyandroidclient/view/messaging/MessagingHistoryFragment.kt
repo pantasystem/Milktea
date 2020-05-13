@@ -36,7 +36,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
 
             val historyViewModel = ViewModelProvider(this, MessageHistoryViewModelFactory(ar, miApplication))["$ar", MessageHistoryViewModel::class.java]
 
-            val adapter = HistoryListAdapter(diffUtilItemCallback, historyViewModel)
+            val adapter = HistoryListAdapter(diffUtilItemCallback, historyViewModel, viewLifecycleOwner)
             history_list_view.adapter = adapter
 
 
