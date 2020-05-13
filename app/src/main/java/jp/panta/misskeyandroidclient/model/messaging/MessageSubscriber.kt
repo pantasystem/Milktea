@@ -42,21 +42,39 @@ class MessageSubscriber(val miCore: MiCore){
     }
 
     fun getObservable(messagingId: MessagingId, ar: AccountRelation): Observable<Message>{
-        var observer = accountMessagingObserverMap[ar.account]
-        if(observer == null){
-            miCore.getMainCapture(ar)
-            observer = UserMessagingObserver(ar.account)
+        synchronized(accountMessagingObserverMap){
+            var observer = accountMessagingObserverMap[ar.account]
+            if(observer == null){
+                miCore.getMainCapture(ar)
+                observer = UserMessagingObserver(ar.account)
+            }
+            return observer.getObservable(messagingId)
         }
-        return observer.getObservable(messagingId)
+
     }
 
     fun getAccountMessageObservable(ar: AccountRelation): Observable<Message>{
-        var observer = accountMessagingObserverMap[ar.account]
-        if(observer == null){
-            miCore.getMainCapture(ar)
-            observer = UserMessagingObserver(ar.account)
+        synchronized(accountMessagingObserverMap){
+            var observer = accountMessagingObserverMap[ar.account]
+            if(observer == null){
+                miCore.getMainCapture(ar)
+                observer = UserMessagingObserver(ar.account)
+            }
+            return observer.getObservable()
         }
-        return observer.getObservable()
+
+    }
+
+    fun getUnreadMessageStore(ar: AccountRelation): UnReadMessageStore{
+        synchronized(accountMessagingObserverMap){
+            var observer = accountMessagingObserverMap[ar.account]
+            if(observer == null){
+                miCore.getMainCapture(ar)
+                observer = UserMessagingObserver(ar.account)
+            }
+            return observer.unreadMessageStore
+        }
+
     }
 
     // アカウント１に対して１になる
@@ -64,10 +82,18 @@ class MessageSubscriber(val miCore: MiCore){
 
         private val messageSubject = PublishSubject.create<Message>()
 
+        val unreadMessageStore = UnReadMessageStore(account)
+
         override fun messagingMessage(message: Message) {
             super.messagingMessage(message)
 
             messageSubject.onNext(message)
+        }
+
+        override fun unreadMessagingMessage(message: Message) {
+            super.unreadMessagingMessage(message)
+
+            unreadMessageStore.addUnReadMessage(message)
         }
 
         fun getObservable(messagingId: MessagingId): Observable<Message>{
@@ -79,6 +105,8 @@ class MessageSubscriber(val miCore: MiCore){
         fun getObservable(): Observable<Message>{
             return messageSubject.share()
         }
+
+
     }
 
 
