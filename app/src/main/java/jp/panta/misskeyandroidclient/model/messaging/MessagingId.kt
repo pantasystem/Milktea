@@ -20,7 +20,7 @@ class MessagingId(val message: Message, val account: Account) : Serializable{
 
         if (isGroup != other.isGroup) return false
         if (msgId != other.msgId) return false
-        if(account != other.account) return false
+        if(account.id != other.account.id) return false
 
         return true
     }

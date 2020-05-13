@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.messaging
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -47,9 +48,28 @@ class MessageViewModel(
 
     private val messageObserver = MessageObserver()
 
-    private val mainCapture = miCore.getMainCapture(accountRelation)
+    //private val mainCapture = miCore.getMainCapture(accountRelation)
+    private val mCompositeDisposable = CompositeDisposable()
     init{
-        mainCapture.putListener(messageObserver)
+        //mainCapture.putListener(messageObserver)
+        val dis = miCore.messageSubscriber.getObservable(messageHistory.messagingId(accountRelation.account), accountRelation).subscribe { message ->
+            val messages = messagesLiveData.value?.messages.toArrayList()
+
+
+            if(message.messagingId(accountRelation.account) == mMessageId){
+                val msg = if(message.userId == accountRelation.account.id){
+                    //me
+                    SelfMessageViewData(message, accountRelation.account)
+                }else{
+                    RecipientMessageViewData(message, accountRelation.account)
+                }
+                messages.add(msg)
+
+                messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
+
+            }
+        }
+        mCompositeDisposable.add(dis)
     }
 
     fun loadInit(){
