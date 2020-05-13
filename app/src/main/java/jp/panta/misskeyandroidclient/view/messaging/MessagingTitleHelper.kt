@@ -15,7 +15,7 @@ object MessagingTitleHelper {
 
         val title = when {
             titleTargetMsgHistoryViewData.isGroup -> {
-                titleTargetMsgHistoryViewData.message.group?.name
+                titleTargetMsgHistoryViewData.group?.name
             }
             isUserNameDefault -> {
                 titleTargetMsgHistoryViewData.partner?.getDisplayUserName()

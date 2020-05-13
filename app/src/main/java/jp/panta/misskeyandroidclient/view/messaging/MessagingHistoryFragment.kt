@@ -52,10 +52,10 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
                 historyViewModel.loadGroupAndUser()
             }
 
-            historyViewModel.messageHistorySelected.observe(viewLifecycleOwner, Observer {
+            historyViewModel.messageHistorySelected.observe(viewLifecycleOwner, Observer { hvd ->
                 Handler(Looper.getMainLooper()).post{
                     val intent = Intent(activity, MessageActivity::class.java)
-                    intent.putExtra(MessageActivity.EXTRA_MESSAGE_HISTORY, it.message)
+                    intent.putExtra(MessageActivity.EXTRA_MESSAGING_ID, hvd.messagingId)
                     startActivity(intent)
                 }
             })

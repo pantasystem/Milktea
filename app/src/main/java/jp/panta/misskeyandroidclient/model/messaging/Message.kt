@@ -1,6 +1,9 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.mfm.MFMParser
+import jp.panta.misskeyandroidclient.mfm.Root
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
@@ -40,4 +43,9 @@ data class Message(
     fun messagingId(account: Account): MessagingId{
         return MessagingId(this, account)
     }
+
+    val textNode: Root?
+        get() {
+            return MFMParser.parse(text, emojis)
+        }
 }

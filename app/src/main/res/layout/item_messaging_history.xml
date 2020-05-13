@@ -24,12 +24,15 @@
                 android:onClick="@{ ()-> historyViewModel.openMessage(historyViewData) }"
                 >
 
+
             <ImageView
                     android:id="@+id/history_icon"
                     android:layout_width="65dp" android:layout_height="65dp"
                     tools:srcCompat="@drawable/ic_follow"
                     app:circleIcon="@{historyViewData.historyIcon}"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    />
+
             <TextView
                     android:id="@+id/history_title"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -41,29 +44,44 @@
                     />
             <TextView
                     android:id="@+id/history_message"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_below="@+id/history_title"
                     android:layout_toEndOf="@+id/history_icon"
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
                     tools:text="message"
-                    app:textNode="@{historyViewData.textNode}"
+                    app:textNode="@{historyViewData.message.textNode}"
+                    android:layout_toStartOf="@id/unread_message_badge"
                     />
             <ImageView
                     android:id="@+id/message_image"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_below="@+id/history_message"
                     android:layout_toEndOf="@+id/history_icon"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    />
+
+
+            <TextView
+                    android:id="@+id/unread_message_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:padding="2dp"
+                    android:layout_marginStart="8dp"
+                    />
+
             <TextView
                     android:id="@+id/updated_at"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:layout_below="@+id/message_image"
-                    android:layout_alignParentEnd="true"
                     android:layout_marginTop="4dp"
-
+                    app:elapsedTime="@{historyViewData.message.createdAt}"
+                    tools:text="13m"
+                    android:layout_below="@id/history_message"
+                    android:layout_toEndOf="@id/message_image"
+                    android:layout_marginStart="8dp"
                     />
-
 
 
         </RelativeLayout>

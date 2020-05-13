@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.core
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 /**
  * @param id 対となるUserのuserId
@@ -10,4 +11,4 @@ import androidx.room.PrimaryKey
 data class Account(
     @PrimaryKey(autoGenerate = false)
     val id: String
-)
+): Serializable

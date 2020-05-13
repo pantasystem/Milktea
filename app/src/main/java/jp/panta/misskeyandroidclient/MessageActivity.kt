@@ -16,12 +16,13 @@ import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageFragment
+import jp.panta.misskeyandroidclient.viewmodel.messaging.MessagingId
 import kotlinx.android.synthetic.main.activity_message.*
 
 class MessageActivity : AppCompatActivity() {
 
     companion object{
-        const val EXTRA_MESSAGE_HISTORY = "jp.panta.misskeyandroidclient.MessageActivity.extra_message_history"
+        const val EXTRA_MESSAGING_ID = "jp.panta.misskeyandroidclient.MessageActivity.EXTRA_MESSAGING_ID"
 
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
 
@@ -38,11 +39,11 @@ class MessageActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val messageHistory = intent?.getSerializableExtra(EXTRA_MESSAGE_HISTORY) as Message?
+        val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as MessagingId?
         val accountRelation = (applicationContext as MiApplication).currentAccount.value
 
 
-        if(messageHistory == null){
+        if(messagingId == null){
             Log.e("MessageActivity", "EXTRA_MESSAGE_HISTORY must not null")
             finish()
             return
@@ -56,13 +57,13 @@ class MessageActivity : AppCompatActivity() {
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()
-            val fragment = MessageFragment.newInstance(messageHistory)
+            val fragment = MessageFragment.newInstance(messagingId.message)
             ft.add(R.id.content_main, fragment)
             ft.commit()
         }
-        setTitle(messageHistory)
+        setTitle(messagingId.message)
 
-        val factory = MessageActionViewModel.Factory(accountRelation, application as MiApplication, messageHistory)
+        val factory = MessageActionViewModel.Factory(accountRelation, application as MiApplication, messagingId.message)
         val messageActionViewModel = ViewModelProvider(this, factory)[MessageActionViewModel::class.java]
         mViewModel = messageActionViewModel
         binding.actionViewModel = messageActionViewModel

@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.mfm
 
-interface Element{
+import java.io.Serializable
+
+interface Element : Serializable{
     val start: Int
     val end: Int
     val insideStart: Int

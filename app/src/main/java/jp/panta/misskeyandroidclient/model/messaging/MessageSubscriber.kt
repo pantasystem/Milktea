@@ -1,16 +1,16 @@
-package jp.panta.misskeyandroidclient.viewmodel.messaging
+package jp.panta.misskeyandroidclient.model.messaging
 
 import androidx.lifecycle.ViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.messaging.MessagingId
 
 
-class MessageSubscribeViewModel(val miCore: MiCore) : ViewModel(){
+class MessageSubscriber(val miCore: MiCore){
 
     private var beforeAccounts: List<Account>? = null
     private val accountMessagingObserverMap = HashMap<Account, UserMessagingObserver>()

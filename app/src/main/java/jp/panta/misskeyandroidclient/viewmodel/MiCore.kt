@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -10,18 +8,13 @@ import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.meta.Meta
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageSubscribeViewModel
+import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.lang.Exception
 
 interface MiCore{
     val accounts: MutableLiveData<List<AccountRelation>>
@@ -30,7 +23,7 @@ interface MiCore{
 
     var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
-    var messageSubscribeViewModel: MessageSubscribeViewModel
+    var messageSubscriber: MessageSubscriber
 
     fun switchAccount(account: Account)
 
