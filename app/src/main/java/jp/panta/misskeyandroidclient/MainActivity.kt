@@ -209,14 +209,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //Log.d("MainActivity")
         val name = notify.user.name?: notify.user.userName
         val msg = when(viewData.type){
-            NotificationViewData.Type.FOLLOW ->  name + getString(R.string.followed_by)
-            NotificationViewData.Type.MENTION -> name + getString(R.string.mention_by)
-            NotificationViewData.Type.REPLY -> name + getString(R.string.replied_by)
-            NotificationViewData.Type.RENOTE -> name + getString(R.string.renoted_by)
-            NotificationViewData.Type.QUOTE -> name + getString(R.string.quoted_by)
-            NotificationViewData.Type.REACTION -> name + getString(R.string.reacted_by)
-            NotificationViewData.Type.POLL_VOTE -> name + getString(R.string.voted_by)
-            NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + getString(R.string.followed_by)
+            NotificationViewData.Type.FOLLOW ->  name + " ${getString(R.string.followed_by)}"
+            NotificationViewData.Type.MENTION -> name + " ${getString(R.string.mention_by)}"
+            NotificationViewData.Type.REPLY -> name + " ${getString(R.string.replied_by)}"
+            NotificationViewData.Type.RENOTE -> name + " ${getString(R.string.renoted_by)}"
+            NotificationViewData.Type.QUOTE -> name + " ${getString(R.string.quoted_by)}"
+            NotificationViewData.Type.REACTION -> name + " ${getString(R.string.reacted_by)}"
+            NotificationViewData.Type.POLL_VOTE -> name + " ${getString(R.string.voted_by)}"
+            NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + " ${getString(R.string.followed_by)}"
+            NotificationViewData.Type.FOLLOW_REQUEST_ACCEPTED -> name + " ${getString(R.string.follow_request_accepted)}"
             else -> "もうわかんねぇなこれ"
         }
         val snackBar = Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG)

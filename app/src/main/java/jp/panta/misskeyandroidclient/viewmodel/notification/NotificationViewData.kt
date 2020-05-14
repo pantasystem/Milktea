@@ -15,7 +15,9 @@ class NotificationViewData(val notification: Notification, account: Account) {
         QUOTE("quote"),
         REACTION("reaction"),
         POLL_VOTE("pollVote"),
-        RECEIVE_FOLLOW_REQUEST("receiveFollowRequest")
+        RECEIVE_FOLLOW_REQUEST("receiveFollowRequest"),
+        FOLLOW_REQUEST_ACCEPTED("followRequestAccepted")
+
     }
     val id = notification.id
     val noteViewData: PlaneNoteViewData? = if(notification.note == null) null else PlaneNoteViewData(notification.note, account)

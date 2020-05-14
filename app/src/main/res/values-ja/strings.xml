@@ -244,4 +244,6 @@
     <string name="edit_tab_name">タブ名を編集</string>
     <string name="update_timeline_in_background">タイムラインをバックグラウンドで更新する(消費電力大)</string>
 
+    <string name="follow_request_accepted">フォローが承認されました</string>
+
 </resources>
