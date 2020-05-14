@@ -7,6 +7,7 @@ import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.gson.GsonBuilder
+import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notification.Notification
@@ -44,6 +45,8 @@ class NotificationService : Service() {
         return mBinder
     }
 
+    private val mDisposable = CompositeDisposable()
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startObserve()
         Log.d(TAG, "serviceを開始した")
@@ -71,6 +74,9 @@ class NotificationService : Service() {
 
             }
         }
+        mDisposable.add((applicationContext as MiApplication).messageSubscriber.getAllMergedAccountMessages().subscribe {
+            showMessageNotification(it)
+        })
     }
 
     private inner class MainChannelObserver(
@@ -93,14 +99,6 @@ class NotificationService : Service() {
             }
         }
 
-        override fun messagingMessage(message: Message) {
-            Handler(Looper.getMainLooper()).post{
-                Log.d(TAG, "message: $message")
-                if(account.id != message.userId){
-                    showMessageNotification(message)
-                }
-            }
-        }
     }
 
     private fun showNotification(notification: NotificationViewData){

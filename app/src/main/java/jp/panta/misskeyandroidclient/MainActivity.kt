@@ -130,6 +130,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             })
 
+            miApplication.messageSubscriber.getAccountMessageObservable(ar).subscribe{
+
+            }
+            miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
+                bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
+                    it.isVisible = count > 0
+                    it.number = count
+                }
+            })
+
             //mNotificationSubscribeViewModel?.currentNotification?.observe(this, notificationObserver)
 
         })

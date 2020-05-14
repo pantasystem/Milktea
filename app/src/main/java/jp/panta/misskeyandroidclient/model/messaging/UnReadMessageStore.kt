@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.messaging
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.core.Account
 
@@ -14,6 +15,9 @@ class UnReadMessageStore(val account: Account) {
     private val mUnreadMessagesLiveDataMap = HashMap<MessagingId, MutableLiveData<List<Message>>>()
 
     private val mMessageIdMessagingIdMap = HashMap<String, MessagingId>()
+
+
+    private val mUnreadMessagesCount = MutableLiveData<Int>()
 
     fun addUnReadMessage(message: Message){
         val messagingId = message.messagingId(account)
@@ -41,7 +45,12 @@ class UnReadMessageStore(val account: Account) {
             }
 
             val list = getUnreadMessages(messagingId)
-            liveData.postValue(list)
+            updateUnreadMessageCount()
+            val before = liveData.value
+            if(list != before){
+                liveData.postValue(list)
+            }
+
             Log.d("UnReadMessageStore", "liveDataを更新しました 総未読数:${list.size} 更新データ:$list")
             return liveData
         }
@@ -62,15 +71,18 @@ class UnReadMessageStore(val account: Account) {
         }
     }
 
+    private fun updateUnreadMessageCount(){
+        synchronized(mUnreadMessagesMap){
+            val sum = mUnreadMessagesMap.values.sumBy {
+                it.size
+            }
+            mUnreadMessagesCount.postValue(sum)
+        }
+    }
+
 
     fun getUnreadMessagesLiveData(messagingId: MessagingId): LiveData<List<Message>>{
-        synchronized(mUnreadMessagesLiveDataMap){
-            var liveData = mUnreadMessagesLiveDataMap[messagingId]
-            if(liveData == null){
-                liveData = updateLiveData(messagingId)
-            }
-            return liveData
-        }
+        return updateLiveData(messagingId)
     }
     fun allUnReadMessagesCount(): Int{
         synchronized(mUnreadMessagesMap){
@@ -132,6 +144,10 @@ class UnReadMessageStore(val account: Account) {
             mMessageIdMessagingIdMap[messageId]
         }?: return
         readAll(messagingId)
+    }
+
+    fun getUnreadMessageCountLiveData(): LiveData<Int>{
+        return mUnreadMessagesCount
     }
 
 }
