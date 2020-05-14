@@ -1,11 +1,14 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.messaging.UnReadMessageStore
 
-class HistoryViewData (account: Account, message: Message){
+class HistoryViewData (account: Account, message: Message, unReadMessageStore: UnReadMessageStore){
     val messagingId = message.messagingId(account)
     val message = MutableLiveData<Message>(message)
     val id = message.id
@@ -29,6 +32,11 @@ class HistoryViewData (account: Account, message: Message){
     }else{
         val host = partner?.host
         "@${partner?.userName}" + if(host != null) "@$host" else ""
+    }
+
+    val unreadMessages = unReadMessageStore.getUnreadMessagesLiveData(messagingId)
+    val unreadMessageCount = Transformations.map(unreadMessages){
+        it.size
     }
 
     override fun equals(other: Any?): Boolean {

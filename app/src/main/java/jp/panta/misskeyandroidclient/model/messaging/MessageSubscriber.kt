@@ -47,6 +47,7 @@ class MessageSubscriber(val miCore: MiCore){
             if(observer == null){
                 val mainCapture = miCore.getMainCapture(ar)
                 observer = UserMessagingObserver(ar.account)
+                accountMessagingObserverMap[ar.account] = observer
                 mainCapture.putListener(observer)
             }
             return observer.getObservable(messagingId)
@@ -60,6 +61,7 @@ class MessageSubscriber(val miCore: MiCore){
             if(observer == null){
                 val mainCapture = miCore.getMainCapture(ar)
                 observer = UserMessagingObserver(ar.account)
+                accountMessagingObserverMap[ar.account] = observer
                 mainCapture.putListener(observer)
             }
             return observer.getObservable()
@@ -72,6 +74,7 @@ class MessageSubscriber(val miCore: MiCore){
             var observer = accountMessagingObserverMap[ar.account]
             if(observer == null){
                 observer = UserMessagingObserver(ar.account)
+                accountMessagingObserverMap[ar.account] = observer
                 miCore.getMainCapture(ar).putListener(observer)
             }
             return observer.unreadMessageStore

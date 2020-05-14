@@ -48,6 +48,7 @@ class MessageViewModel(
 
     private val messageObserver = MessageObserver()
 
+    private val unreadMessageStore = miCore.messageSubscriber.getUnreadMessageStore(accountRelation)
     //private val mainCapture = miCore.getMainCapture(accountRelation)
     private val mCompositeDisposable = CompositeDisposable()
     init{
@@ -66,6 +67,7 @@ class MessageViewModel(
                 messages.add(msg)
 
                 messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
+                unreadMessageStore.readMessage(message)
 
             }
         }
@@ -84,6 +86,7 @@ class MessageViewModel(
                     isLoading = false
                     return
                 }
+                unreadMessageStore.readAll(mMessageId)
                 val viewDataList = rawMessages.map{
                     if(it.user?.id == accountRelation.account.id){
                         //me

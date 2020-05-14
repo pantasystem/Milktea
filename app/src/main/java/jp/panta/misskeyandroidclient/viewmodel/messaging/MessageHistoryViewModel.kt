@@ -30,6 +30,10 @@ class MessageHistoryViewModel(
     val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
     val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
 
+
+    val messageSubscriber = miCore.messageSubscriber
+    val unreadMessageStore = messageSubscriber.getUnreadMessageStore(accountRelation)
+
     val historyGroupAndUserLiveData = object : MediatorLiveData<List<HistoryViewData>>(){
         override fun onActive() {
             super.onActive()
@@ -42,7 +46,8 @@ class MessageHistoryViewModel(
                             hvd.messagingId == messagingId
                         }
                         if( anyMsg == null ){
-                            list.add(HistoryViewData(accountRelation.account, message))
+
+                            list.add(HistoryViewData(accountRelation.account, message, unreadMessageStore))
                         }else{
                             anyMsg.message.postValue(message)
                         }
@@ -111,7 +116,7 @@ class MessageHistoryViewModel(
                 val list = response.body()
                 if(list != null){
                     historyGroupLiveData.postValue(list.map{
-                        HistoryViewData(accountRelation.account, it)
+                        HistoryViewData(accountRelation.account, it, unreadMessageStore)
                     })
                 }
                 isRefreshing.postValue(false)
@@ -132,7 +137,7 @@ class MessageHistoryViewModel(
                 val list = response.body()
                 if(list!= null){
                     historyUserLiveData.postValue(list.map{
-                        HistoryViewData(accountRelation.account, it)
+                        HistoryViewData(accountRelation.account, it, unreadMessageStore)
                     })
                 }
                 isRefreshing.postValue(false)
