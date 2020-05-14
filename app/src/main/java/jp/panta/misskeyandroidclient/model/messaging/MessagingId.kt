@@ -32,5 +32,9 @@ class MessagingId(val message: Message, val account: Account) : Serializable{
         return result
     }
 
+    override fun toString(): String {
+        return "MessagingId(msgId=$msgId, account=${account.id})"
+    }
+
 
 }

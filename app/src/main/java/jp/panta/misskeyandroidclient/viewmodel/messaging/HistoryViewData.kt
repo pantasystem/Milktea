@@ -61,5 +61,9 @@ class HistoryViewData (account: Account, message: Message){
         return result
     }
 
+    override fun toString(): String {
+        return "HistoryViewData(messagingId=$messagingId, message=$message, id='$id', isGroup=$isGroup, group=$group, partner=$partner, historyIcon=$historyIcon, title='$title')"
+    }
+
 
 }

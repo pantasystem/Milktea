@@ -7,7 +7,6 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -29,21 +28,32 @@ class MessageHistoryViewModel(
 
     val connectionInformation = accountRelation.getCurrentConnectionInformation()
     val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
-    val historyGroupLiveData = object : MutableLiveData<List<HistoryViewData>>(){
+    val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
+
+    val historyGroupAndUserLiveData = object : MediatorLiveData<List<HistoryViewData>>(){
         override fun onActive() {
             super.onActive()
             val disposable = miCore.messageSubscriber.getAccountMessageObservable(accountRelation)
                 .subscribe { msg ->
-                    val list = ArrayList((this.value?: emptyList()))
-                    val any = list.firstOrNull{ hvd ->
-                        hvd.messagingId == msg.messagingId(accountRelation.account)
+                    val messagingId = msg.messagingId(accountRelation.account)
+                    fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: Message){
+                        val list = ArrayList<HistoryViewData>(liveData.value?: emptyList())
+                        val anyMsg = list.firstOrNull { hvd ->
+                            hvd.messagingId == messagingId
+                        }
+                        if( anyMsg == null ){
+                            list.add(HistoryViewData(accountRelation.account, message))
+                        }else{
+                            anyMsg.message.postValue(message)
+                        }
+                        liveData.postValue(list)
                     }
-                    if(any == null){
-                        list.add(HistoryViewData(accountRelation.account, msg))
+                    if(messagingId.isGroup){
+                        updateLiveData(historyGroupLiveData, msg)
                     }else{
-                        any.message.postValue(msg)
+                        updateLiveData(historyUserLiveData, msg)
                     }
-                    this.postValue(list)
+
                 }
             mDisposable.add(disposable)
         }
@@ -52,9 +62,7 @@ class MessageHistoryViewModel(
             super.onInactive()
             mDisposable.clear()
         }
-    }
-
-    val historyGroupAndUserLiveData = MediatorLiveData<List<HistoryViewData>>().apply{
+    }.apply{
         addSource(historyUserLiveData){
             val groups = historyGroupLiveData.value?: emptyList()
             val list = ArrayList<HistoryViewData>()
