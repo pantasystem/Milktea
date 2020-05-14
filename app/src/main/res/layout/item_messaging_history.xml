@@ -9,6 +9,7 @@
         <variable
                 name="historyViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel" />
+        <import type="android.view.View" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -50,7 +51,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
                     tools:text="message"
-                    app:textNode="@{historyViewData.message.textNode}"
+                    android:text='@{historyViewData.message.text ?? ""}'
                     android:layout_toStartOf="@id/unread_message_badge"
                     />
             <ImageView
@@ -68,9 +69,11 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_alignParentEnd="true"
-                    android:padding="2dp"
+                    android:padding="4dp"
                     android:layout_marginStart="8dp"
                     android:text="@{String.valueOf(historyViewData.unreadMessageCount?? 0)}"
+                    android:visibility="@{ historyViewData.unreadMessageCount == null || historyViewData.unreadMessageCount == 0 ? View.INVISIBLE : View.VISIBLE }"
+                    android:background="@drawable/shape_messages_badge"
                     />
 
             <TextView
