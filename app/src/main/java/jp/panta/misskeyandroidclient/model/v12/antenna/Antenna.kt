@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.model.v12.antenna
 
+import java.io.Serializable
+
 class Antenna(
     val id: String,
     val name: String,
@@ -14,4 +16,4 @@ class Antenna(
     val withReplies: Boolean,
     val notify: Boolean,
     val hasUnreadNote: Boolean
-)
+) : Serializable

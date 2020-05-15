@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.viewmodel.antenna
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
@@ -15,6 +17,14 @@ import retrofit2.Response
 class AntennaListViewModel (
     val miCore: MiCore
 ){
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return AntennaListViewModel(miCore) as T
+        }
+    }
+
     companion object{
         const val TAG = "AntennaViewModel"
     }
