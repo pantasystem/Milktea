@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.v12.antenna
 
 /**
  * @param i ユーザーのの認証
+ * @param antennaId updateのときはUpdate対象のアンテナのIdを指定します
  * @param withReplies 返信を含むのか
  * @param name アンテナの名称
  * @param src 受信するソース "home" "all" "users" "list" "group"
@@ -16,6 +17,7 @@ package jp.panta.misskeyandroidclient.model.v12.antenna
  */
 data class AntennaToAdd(
     val i: String,
+    val antennaId: String?,
     val name: String,
     val src: String,
     val userListId: String?,
