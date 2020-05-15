@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.viewmodel.antenna
 
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
@@ -10,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,6 +31,11 @@ class AntennaListViewModel (
 
     val antennas = MediatorLiveData<List<Antenna>>()
 
+    val editAntennaEvent = EventBus<Antenna>()
+
+    val confirmDeletionAntennaEvent = EventBus<Antenna>()
+
+    val openAntennasTimelineEvent = EventBus<Antenna>()
 
     init{
         antennas.addSource(miCore.currentAccount){
@@ -59,6 +64,24 @@ class AntennaListViewModel (
         })
     }
 
+    fun toggleTab(antenna: Antenna?){
+        antenna?: return
+        miCore.addPageInCurrentAccount(PageableTemplate.antenna(antenna))
+    }
+
+    fun confirmDeletionAntenna(antenna: Antenna?){
+        antenna?: return
+        confirmDeletionAntennaEvent.event = antenna
+    }
+
+    fun editAntenna(antenna: Antenna?){
+        antenna?: return
+        editAntennaEvent.event = antenna
+    }
+
+    fun openAntennasTimeline(antenna: Antenna?){
+        openAntennasTimelineEvent.event = antenna
+    }
 
     private fun getMisskeyAPI(): MisskeyAPIV12?{
         return miCore.getMisskeyAPI(miCore.currentAccount.value) as? MisskeyAPIV12
