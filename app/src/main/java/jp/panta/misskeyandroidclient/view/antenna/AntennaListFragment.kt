@@ -20,7 +20,7 @@ class AntennaListFragment : Fragment(R.layout.fragment_antenna_list){
 
         val layoutManager = LinearLayoutManager(view.context)
 
-        val antennaViewModel = ViewModelProvider(this, AntennaListViewModel.Factory(miApplication))[AntennaListViewModel::class.java]
+        val antennaViewModel = ViewModelProvider(requireActivity() , AntennaListViewModel.Factory(miApplication))[AntennaListViewModel::class.java]
 
         val adapter = AntennaListAdapter(antennaViewModel, viewLifecycleOwner)
         antennaListView.adapter = adapter

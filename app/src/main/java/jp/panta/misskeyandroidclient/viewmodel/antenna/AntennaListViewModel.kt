@@ -1,10 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel.antenna
 
 import android.util.Log
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
@@ -40,9 +39,25 @@ class AntennaListViewModel (
 
     val isLoading = MutableLiveData<Boolean>(false)
 
+    val pagedAntennaIds = Transformations.map(miCore.currentAccount){
+        it.pages.mapNotNull { page ->
+            val pageable = page.pageable()
+            if (pageable is Page.Antenna) {
+                pageable.antennaId
+            } else {
+                null
+            }
+        }.toSet()
+    }
+
+    var account: AccountRelation? = null
+
     init{
         antennas.addSource(miCore.currentAccount){
-            loadInit()
+            if(account?.account != it?.account){
+                loadInit()
+                account = it
+            }
         }
     }
 
@@ -72,7 +87,14 @@ class AntennaListViewModel (
 
     fun toggleTab(antenna: Antenna?){
         antenna?: return
-        miCore.addPageInCurrentAccount(PageableTemplate.antenna(antenna))
+        val paged = account?.pages?.firstOrNull {
+            it.antenna?.antennaId == antenna.id
+        }
+        if(paged == null){
+            miCore.addPageInCurrentAccount(PageableTemplate.antenna(antenna))
+        }else{
+            miCore.removePageInCurrentAccount(paged)
+        }
     }
 
     fun confirmDeletionAntenna(antenna: Antenna?){

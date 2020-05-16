@@ -44,6 +44,8 @@
                     android:contentDescription="@string/add_to_tab"
                     android:layout_below="@id/antennaName"
                     android:onClick="@{ ()-> antennaListViewModel.toggleTab(antenna) }"
+                    app:pagedAntennaIds="@{antennaListViewModel.pagedAntennaIds}"
+                    app:targetAntenna="@{antenna}"
                     />
 
             <ImageButton
