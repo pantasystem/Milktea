@@ -245,5 +245,7 @@
     <string name="update_timeline_in_background">タイムラインをバックグラウンドで更新する(消費電力大)</string>
 
     <string name="follow_request_accepted">フォローが承認されました</string>
+    <string name="confirm_deletion">削除の確認</string>
+
 
 </resources>

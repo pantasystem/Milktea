@@ -61,6 +61,7 @@ class AntennaListViewModel (
         }
     }
 
+    val deleteResultEvent = EventBus<Boolean>()
 
     fun loadInit(){
         isLoading.value = true
@@ -109,6 +110,27 @@ class AntennaListViewModel (
 
     fun openAntennasTimeline(antenna: Antenna?){
         openAntennasTimelineEvent.event = antenna
+    }
+
+    fun deleteAntenna(antenna: Antenna){
+        account?.getCurrentConnectionInformation()?.getI(miCore.getEncryption())?.let{ i ->
+            getMisskeyAPI()?.deleteAntenna(AntennaQuery(
+                i = i,
+                antennaId = antenna.id,
+                limit = null
+            ))?.enqueue(object : Callback<Unit>{
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    deleteResultEvent.event = response.code() in 200 until 300
+                    if(response.code() in 200 until 300){
+                        loadInit()
+                    }
+                }
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    deleteResultEvent.event = false
+                }
+            })
+        }
+
     }
 
     private fun getMisskeyAPI(): MisskeyAPIV12?{
