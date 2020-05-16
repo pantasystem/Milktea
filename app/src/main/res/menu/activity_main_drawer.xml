@@ -19,6 +19,11 @@
             android:icon="@drawable/ic_cloud_black_24dp"
             android:title="@string/nav_cloud"/>
         <item
+            android:id="@+id/nav_antenna"
+            android:icon="@drawable/ic_call_received_black_24dp"
+            android:title="@string/antenna"
+            />
+        <item
                 android:id="@+id/nav_setting"
                 android:title="@string/setting"
                 android:icon='@drawable/ic_settings_black_24dp'

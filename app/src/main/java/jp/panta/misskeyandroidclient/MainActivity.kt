@@ -26,11 +26,13 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
+import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -130,9 +132,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             })
 
-            miApplication.messageSubscriber.getAccountMessageObservable(ar).subscribe{
-
-            }
             miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
                 bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
                     it.isVisible = count > 0
@@ -141,6 +140,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             })
 
             //mNotificationSubscribeViewModel?.currentNotification?.observe(this, notificationObserver)
+            val isV12 = miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Companion.Major.V_12)?: false
+            Log.d("MainActivity", if(isV12) "v12のようです" else "v12以外のようです")
+            navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
 
         })
 
@@ -376,6 +378,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(
                     Intent(this, ListListActivity::class.java)
                 )
+            }
+            R.id.nav_antenna ->{
+                startActivity(Intent(this, AntennaListActivity::class.java))
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
