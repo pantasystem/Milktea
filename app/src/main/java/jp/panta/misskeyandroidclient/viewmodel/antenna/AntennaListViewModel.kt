@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.antenna
 
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
@@ -16,7 +17,7 @@ import retrofit2.Response
 
 class AntennaListViewModel (
     val miCore: MiCore
-){
+) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
@@ -37,14 +38,17 @@ class AntennaListViewModel (
 
     val openAntennasTimelineEvent = EventBus<Antenna>()
 
+    val isLoading = MutableLiveData<Boolean>(false)
+
     init{
         antennas.addSource(miCore.currentAccount){
-            initLoad()
+            loadInit()
         }
     }
 
 
-    fun initLoad(){
+    fun loadInit(){
+        isLoading.value = true
         val i = miCore.currentAccount.value?.getCurrentConnectionInformation()?.getI(miCore.getEncryption())
             ?: return
         getMisskeyAPI()?.getAntennas(
@@ -56,10 +60,12 @@ class AntennaListViewModel (
         )?.enqueue(object : Callback<List<Antenna>>{
             override fun onResponse(call: Call<List<Antenna>>, response: Response<List<Antenna>>) {
                 antennas.postValue(response.body())
+                isLoading.postValue(false)
             }
 
             override fun onFailure(call: Call<List<Antenna>>, t: Throwable) {
                 Log.e(TAG, "アンテナ一覧の取得に失敗しました。", t)
+                isLoading.postValue(false)
             }
         })
     }
