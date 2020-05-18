@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
@@ -27,7 +28,9 @@ class AntennaListActivity : AppCompatActivity() {
         )[AntennaListViewModel::class.java]
 
         mAntennaListViewModel.editAntennaEvent.observe(this , Observer {
-
+            val intent = Intent(this, AntennaEditorActivity::class.java)
+            intent.putExtra(AntennaEditorActivity.EXTRA_ANTENNA, it)
+            startActivity(intent)
         })
 
         mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, Observer {

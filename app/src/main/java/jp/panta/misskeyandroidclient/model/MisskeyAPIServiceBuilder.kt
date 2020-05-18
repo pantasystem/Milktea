@@ -4,6 +4,7 @@ import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.MisskeyAuthAPI
 import jp.panta.misskeyandroidclient.model.api.Version
+import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12Diff
 import okhttp3.OkHttpClient
@@ -30,11 +31,8 @@ object MisskeyAPIServiceBuilder {
     fun build(baseUrl: String, version: Version): MisskeyAPI{
         return when{
             version.isInRange(Version.Companion.Major.V_10) ->{
-                Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
-                    .build()
-                    .create(jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10::class.java)
+
+                return MisskeyAPIV10(build(baseUrl))
             }
             version.isInRange(Version.Companion.Major.V_11) ->{
                 build(baseUrl)

@@ -96,7 +96,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        //super.onBackPressed()
 
         setResultFinish()
     }
