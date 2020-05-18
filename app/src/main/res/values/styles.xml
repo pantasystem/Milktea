@@ -45,7 +45,7 @@
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
         <item name="colorSeparator">@color/colorSeparator</item>
         <item name="tabStyle">@style/TabStyle</item>
-
+        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
 
 
     </style>
@@ -88,6 +88,8 @@
 
         <item name="android:navigationBarColor">@color/navigationDarkColor</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+
     </style>
 
     <style name="AppThemeBlack" parent="AppThemeDark">
@@ -131,7 +133,7 @@
         <item name="background">?attr/colorPrimary</item>
     </style>
 
-    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="hintTextColor">?attr/colorAccent</item>
     </style>
 </resources>
