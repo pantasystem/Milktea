@@ -4,6 +4,8 @@
 
     <data>
 
+        <import type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel.Source"/>
+        <import type="android.view.View" />
         <variable
                 name="antennaEditorViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel" />
@@ -36,7 +38,8 @@
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/receiving_source"/>
+                    android:text="@string/receiving_source"
+                    />
             <Spinner
                     android:id="@+id/receivingSourceSpinner"
                     android:layout_width="match_parent"
@@ -47,12 +50,17 @@
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/list"/>
+                    android:text="@string/list"
+                    android:visibility="@{ antennaEditorViewModel.source == Source.LIST ? View.VISIBLE : View.GONE}"
+                    />
             <Spinner
                     android:id="@+id/userListListSpinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_marginBottom="8dp"
+                    android:visibility="@{ antennaEditorViewModel.source == Source.LIST ? View.VISIBLE : View.GONE}"
+                    />
+
         </LinearLayout>
     </ScrollView>
 </layout>
