@@ -130,4 +130,8 @@
         <item name="tabIndicatorColor">?attr/colorAccent</item>
         <item name="background">?attr/colorPrimary</item>
     </style>
+
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="hintTextColor">?attr/colorAccent</item>
+    </style>
 </resources>
