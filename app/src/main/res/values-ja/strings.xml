@@ -246,6 +246,14 @@
 
     <string name="follow_request_accepted">フォローが承認されました</string>
     <string name="confirm_deletion">削除の確認</string>
+    <string name="name">名前</string>
+    <string name="receiving_source">受信ソース</string>
+
+    <string name="all_notes">全てのノート</string>
+    <string name="notes_from_following_users">フォローしているユーザーのノート</string>
+    <string name="notes_from_specific_users">指定した一人または複数のユーザーのノート</string>
+    <string name="notes_from_specific_list">指定したリストのノート</string>
+    <string name="notes_from_users_in_the_specified_group">指定したグループのノート</string>
 
 
 </resources>

@@ -4,6 +4,9 @@
 
     <data>
 
+        <variable
+                name="antennaEditorViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel" />
     </data>
     <ScrollView
             android:layout_width="match_parent"
@@ -13,7 +16,33 @@
                 android:id="@+id/antennaEditorLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:padding="16dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/antennaNameInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/antennaNameEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/name"
+                        android:text="@{antennaEditorViewModel.name}"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/receiving_source"/>
+            <Spinner
+                    android:id="@+id/receivingSourceSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/receiving_source_type"/>
+
         </LinearLayout>
     </ScrollView>
 </layout>

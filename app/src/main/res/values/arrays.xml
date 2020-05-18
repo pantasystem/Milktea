@@ -27,4 +27,12 @@
         <item>@string/list_picker</item>
         <item>@string/simple_picker</item>
     </string-array>
+
+    <string-array name="receiving_source_type">
+        <item>@string/all_notes</item>
+        <item>@string/notes_from_following_users</item>
+        <item>@string/notes_from_specific_users</item>
+        <item>@string/notes_from_specific_list</item>
+        <item>@string/notes_from_users_in_the_specified_group</item>
+    </string-array>
 </resources>

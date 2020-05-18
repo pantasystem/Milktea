@@ -247,5 +247,13 @@
 
     <string name="follow_request_accepted">Follow request accepted</string>
     <string name="confirm_deletion">Confirm deletion</string>
+    <string name="name">name</string>
+    <string name="receiving_source">Receiving source</string>
+
+    <string name="all_notes">All notes</string>
+    <string name="notes_from_following_users">Notes from following users</string>
+    <string name="notes_from_specific_users">Notes from specific users</string>
+    <string name="notes_from_specific_list">Notes from specific list</string>
+    <string name="notes_from_users_in_the_specified_group">Notes from users in the specified group</string>
 
 </resources>
