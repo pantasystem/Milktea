@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-       >
+        xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -59,6 +59,30 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:visibility="@{ antennaEditorViewModel.source == Source.LIST ? View.VISIBLE : View.GONE}"
+                    />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/user"
+                    android:visibility="@{ antennaEditorViewModel.source == Source.USERS ? View.VISIBLE : View.GONE }"
+                    />
+           <androidx.recyclerview.widget.RecyclerView
+                   android:id="@+id/specifiedUserListView"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   tools:listitem="@layout/item_user_chip"
+                   tools:itemCount="1"
+                   android:visibility="@{ antennaEditorViewModel.source == Source.USERS ? View.VISIBLE : View.GONE }"
+
+                   />
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="@string/add_user"
+                    android:visibility="@{ antennaEditorViewModel.source == Source.USERS ? View.VISIBLE : View.GONE }"
+                    android:layout_marginBottom="8dp"
                     />
 
         </LinearLayout>
