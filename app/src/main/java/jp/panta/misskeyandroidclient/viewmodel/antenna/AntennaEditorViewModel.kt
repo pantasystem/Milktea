@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UserList
@@ -68,23 +69,43 @@ class AntennaEditorViewModel (
         }
     }
 
-    val userList = MediatorLiveData<UserList?>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            val ci = accountRelation.getCurrentConnectionInformation()
-                ?: return@addSource
-            val i = ci.getI(miCore.getEncryption())
-                ?: return@addSource
-            it?.userListId?.let{ userListId ->
-                miCore.getMisskeyAPI(ci).showList(ListId(i, userListId)).enqueue(object : Callback<UserList>{
-                    override fun onResponse(call: Call<UserList>, response: Response<UserList>) {
-                        this@apply.postValue(response.body())
-                    }
 
-                    override fun onFailure(call: Call<UserList>, t: Throwable) {
-                        Log.e("AntennaEditorViewModel", "userListの読み込みに失敗しました", t)
-                    }
-                })
+
+    val userListList = MediatorLiveData<List<UserList>>().apply{
+        fun loadUserListList(){
+            val ci = accountRelation.getCurrentConnectionInformation()
+                ?: return
+            val i = ci.getI(miCore.getEncryption())
+                ?: return
+            miCore.getMisskeyAPI(ci).userList(I(i)).enqueue(object : Callback<List<UserList>>{
+                override fun onResponse(
+                    call: Call<List<UserList>>,
+                    response: Response<List<UserList>>
+                ) {
+                    this@apply.postValue(response.body())
+                }
+
+                override fun onFailure(call: Call<List<UserList>>, t: Throwable) {
+                    this@apply.postValue(emptyList())
+                    Log.e("AntennaEditorVM", "ユーザーリスト一覧の取得に失敗しました", t)
+                }
+            })
+        }
+        addSource(this@AntennaEditorViewModel.antenna){
+            loadUserListList()
+        }
+        addSource(this@AntennaEditorViewModel.source){
+            if(it == Source.LIST && this.value.isNullOrEmpty()){
+                loadUserListList()
             }
+        }
+    }
+
+    val userList = MediatorLiveData<UserList?>().apply{
+        addSource(userListList){ list ->
+            this.value = list.firstOrNull {
+                it.id == this@AntennaEditorViewModel.antenna.value?.userListId
+            }?: list.firstOrNull()
         }
     }
 
