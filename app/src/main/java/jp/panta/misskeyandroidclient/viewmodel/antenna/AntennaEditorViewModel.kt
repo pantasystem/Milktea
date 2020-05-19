@@ -244,7 +244,12 @@ class AntennaEditorViewModel (
 
     private fun toListKeywords(keywords: String): List<List<String>>{
         return keywords.split('\n').map{
-            it.split(Pattern.compile("""[ 　]"""))
+            it.split(Pattern.compile("""[ 　]""")).filter{ str ->
+                str.isNotEmpty()
+
+            }
+        }.filter{ list ->
+            list.isNotEmpty()
         }
     }
 
