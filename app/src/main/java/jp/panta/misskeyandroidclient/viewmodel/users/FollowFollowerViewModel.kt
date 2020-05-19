@@ -89,16 +89,16 @@ class FollowFollowerViewModel(
     }
     private var mIsLoading: Boolean = false
 
-    private class Result(val nextId: String, val users: List<User>)
+    private data class Result(val nextId: String?, val users: List<User>)
     private abstract inner class Loader{
-        private var cursorId: String? = null
+        private var result: Result? = null
         abstract fun onLoadInit(): Result?
         abstract fun onLoadNext(nextId: String?): Result?
         fun loadInit(){
             if(mIsLoading){
                 return
             }
-            cursorId = null
+            result = null
             users.value = emptyList()
             loadNext()
         }
@@ -107,18 +107,29 @@ class FollowFollowerViewModel(
             if(mIsLoading){
                 return
             }
+            if(result != null && result?.nextId == null){
+                return
+            }
             mIsLoading = true
             viewModelScope.launch(Dispatchers.IO){
-                val tmpCursorId = cursorId
+
+                val tmpCursorId = result?.nextId
+                val beforeResult = result
+
 
                 try{
+                    if(beforeResult != null && beforeResult.nextId == null){
+                        return@launch
+                    }
+
                     val result = if(tmpCursorId == null){
                         onLoadInit()
                     }else{
                         onLoadNext(tmpCursorId)
                     }
+
                     result?: return@launch
-                    cursorId = result.nextId
+                    this@Loader.result = result
                     val viewDataList = result.users.map{
                         UserViewData(it)
                     }
@@ -150,14 +161,18 @@ class FollowFollowerViewModel(
         }
 
         override fun onLoadNext(nextId: String?): Result? {
-            val body = store.invoke(
+            val res = store.invoke(
                 RequestFollowFollower(
                     i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
                     userId = userId,
                     cursor = nextId
                 )
-            ).execute().body()
-                ?: return null
+            ).execute()
+            val body = res.body()?: return null
+            Log.d(tag, "受信したデータ:$body")
+            if(body.users.isNullOrEmpty()){
+                Log.e(tag, "受信に失敗した: ${res.code()}, ${res.errorBody()}")
+            }
             return Result(body.next, body.users)
         }
 
@@ -175,19 +190,23 @@ class FollowFollowerViewModel(
         }
 
         override fun onLoadNext(nextId: String?): Result? {
-            val body = store.invoke(
+            val res = store.invoke(
                 RequestUser(
                     i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
                     userId = userId,
                     untilId = nextId
                 )
-            ).execute().body()
-                ?: return null
-            val next = body.lastOrNull()?.id
-                ?: return null
+            ).execute()
+            val body = res.body()
+            if(body == null){
+                Log.d(tag, "取得に失敗しました:code:${res.code()} ,${res.errorBody()?.string()}")
+                return null
+            }
+            val next = body.lastOrNull()?.id!!
             val users = body.mapNotNull {
                 it.followee ?: it.follower
             }
+
             return Result(next, users)
         }
     }
@@ -199,7 +218,10 @@ class FollowFollowerViewModel(
         is MisskeyAPIV10 ->{
             V10Loader(misskeyAPI)
         }
-        else -> null
+        else -> {
+            Log.e(tag, "想定外のバージョンで実行されたかAPIの初期化に失敗している")
+            null
+        }
     }
     fun loadInit(){
         loader?.loadInit()
@@ -215,13 +237,17 @@ class FollowFollowerViewModel(
         override fun follow(user: User) {
 
             users.value?.forEach { uvd ->
-                uvd.user.value = user
+                if(uvd.userId == user.id){
+                    uvd.user.postValue(user)
+                }
             }
         }
 
         override fun unFollowed(user: User) {
             users.value?.forEach { uvd ->
-                uvd.user.value = user
+                if(uvd.userId == user.id){
+                    uvd.user.postValue(user)
+                }
             }
         }
     }

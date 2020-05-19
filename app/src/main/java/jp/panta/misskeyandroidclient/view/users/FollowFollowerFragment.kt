@@ -60,7 +60,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
             follow_follower_list.adapter = adapter
 
             followFollowerViewModel.users.observe(viewLifecycleOwner, Observer {
-
+                adapter.submitList(it)
             })
 
             followFollowerViewModel.loadInit()

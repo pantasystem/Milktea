@@ -7,7 +7,7 @@ data class RequestFollowFollower(
     val username: String? = null,
     val host: String? = null,
     val limit: Int = 20,
-    val iknow: Boolean = true,
-    val diff: Boolean = true
+    val iknow: Boolean? = null,
+    val diff: Boolean? = null
 
 )
