@@ -75,7 +75,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
 
             viewModel.userListList.observe( viewLifecycleOwner, Observer { list ->
-                val userListListAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_item, list.map{
+                val userListListAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, list.map{
                     it.name
                 })
                 binding.userListListSpinner.adapter = userListListAdapter
@@ -109,7 +109,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
             viewModel.groupList.observe( viewLifecycleOwner, Observer {
                 it?.let{ groups ->
-                    val groupsAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_item, groups.map{ group ->
+                    val groupsAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, groups.map{ group ->
                         group.name
                     })
                     binding.groupListSpinner.adapter = groupsAdapter
