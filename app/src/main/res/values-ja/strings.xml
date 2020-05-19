@@ -262,6 +262,7 @@
     <string name="notify_notes">新しいノートを通知する</string>
     <string name="with_files">ファイルが添付されたノートのみ</string>
     <string name="group">グループ</string>
+    <string name="save">保存</string>
 
 
 </resources>

@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
@@ -45,6 +46,10 @@ class AntennaEditorActivity : AppCompatActivity() {
             })
             viewModel.name.observe(this, Observer {
                 supportActionBar?.title = it
+            })
+            viewModel.antennaRemovedEvent.observe(this, Observer {
+                Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
+                finish()
             })
         })
     }

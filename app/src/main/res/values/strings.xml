@@ -263,5 +263,6 @@
     <string name="notify_notes">Notify of new notes</string>
     <string name="with_files">Filter only notes with file attached</string>
     <string name="group">Group</string>
+    <string name="save">Save</string>
 
 </resources>

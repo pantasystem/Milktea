@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaToAdd
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -223,6 +224,28 @@ class AntennaEditorViewModel (
         })
     }
 
+    val antennaRemovedEvent = EventBus<Unit>()
+
+    fun removeRemote(){
+        val api = miCore.getMisskeyAPI(accountRelation) as? MisskeyAPIV12
+        api?.deleteAntenna(
+            AntennaQuery(
+                i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption())!!,
+                antennaId = antenna.value?.id,
+                limit = null
+            )
+        )?.enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if(response.code() in 200 until 300){
+                    antennaRemovedEvent.event = Unit
+                }
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e("AntennaEditorViewModel", "delete error", t)
+            }
+        })
+    }
     val selectUserEvent = EventBus<List<String>>()
     fun selectUser(){
         selectUserEvent.event = users.value?.map{
