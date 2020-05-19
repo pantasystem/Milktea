@@ -27,11 +27,6 @@ class AntennaListActivity : AppCompatActivity() {
             AntennaListViewModel.Factory(this.applicationContext as MiApplication)
         )[AntennaListViewModel::class.java]
 
-        mAntennaListViewModel.editAntennaEvent.observe(this , Observer {
-            val intent = Intent(this, AntennaEditorActivity::class.java)
-            intent.putExtra(AntennaEditorActivity.EXTRA_ANTENNA, it)
-            startActivity(intent)
-        })
 
         mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, Observer {
             confirmDeleteAntenna(it)

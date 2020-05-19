@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.view.antenna
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -82,11 +83,8 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                     it.name
                 })
                 binding.userListListSpinner.adapter = userListListAdapter
-                binding.userListListSpinner.setSelection(
-                    list.indexOfFirst {
-                        it.id == viewModel.userList.value?.id || viewModel.userList.value == null
-                    }
-                )
+
+
                 binding.userListListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                     override fun onItemSelected(
                         parent: AdapterView<*>?,
@@ -98,6 +96,16 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+                }
+
+            })
+            viewModel.userList.observe(viewLifecycleOwner, Observer {
+                it?.let{ ul ->
+                    val index = viewModel.userListList.value?.indexOfFirst { list ->
+                        ul.id == list.id
+                    }?: 0
+                    Log.d("AntennaEditorFragment", "選択したIndex:$index, userList:${viewModel.userList.value}")
+                    binding.userListListSpinner.setSelection(index)
                 }
 
             })
