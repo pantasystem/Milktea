@@ -25,14 +25,25 @@
                 android:theme="?attr/actionBarTheme"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:contentInsetStart="0dp">
 
             <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="100dp"
                     >
 
+                <ImageButton
+                        android:id="@+id/actionUpButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_alignParentStart="true"
+                        app:srcCompat="@drawable/ic_arrow_back_black_24dp"
+                        android:layout_centerVertical="true"
+                        tools:ignore="ContentDescription"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        />
                 <Button
                         android:id="@+id/postButton"
                         android:layout_width="wrap_content"
@@ -52,8 +63,9 @@
                         android:layout_marginEnd="8dp"
                         android:layout_toStartOf="@+id/postButton"
                         android:textSize="18sp"
-                        android:text="@{viewModel.textRemaining.toString()}"
-                        tools:text="200" />
+                        android:text="@{String.valueOf(viewModel.textRemaining)}"
+                        tools:text="200"
+                        tools:ignore="RelativeOverlap" />
 
 
             </RelativeLayout>

@@ -58,6 +58,10 @@ class NoteEditorActivity : AppCompatActivity() {
 
         binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
+        binding.actionUpButton.setOnClickListener {
+            finish()
+        }
+
         val userChipAdapter = UserChipListAdapter(this)
         binding.addressUsersView.adapter = userChipAdapter
         val flexBoxLayoutManager = FlexboxLayoutManager(this)
