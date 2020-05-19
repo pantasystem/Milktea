@@ -4,12 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
+import kotlinx.android.synthetic.main.activity_antenna_editor.*
 
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
@@ -21,7 +23,10 @@ class AntennaEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_antenna_editor)
+        setSupportActionBar(antennaEditorToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val antenna = intent.getSerializableExtra(EXTRA_ANTENNA) as? Antenna?
 
@@ -38,6 +43,9 @@ class AntennaEditorActivity : AppCompatActivity() {
             viewModel.selectUserEvent.observe(this, Observer {
                 showSearchAndSelectUserActivity(it)
             })
+            viewModel.name.observe(this, Observer {
+                supportActionBar?.title = it
+            })
         })
     }
 
@@ -45,6 +53,13 @@ class AntennaEditorActivity : AppCompatActivity() {
         val intent = Intent(this, SearchAndSelectUserActivity::class.java)
         intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, userIds.toTypedArray())
         startActivityForResult(intent, REQUEST_SEARCH_AND_SELECT_USER)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
