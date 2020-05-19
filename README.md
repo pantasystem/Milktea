@@ -7,8 +7,8 @@ MisskeyにMilkteaはいかが？<br>
 これはMisskeyのAndroidのクライアント
 
 ## インストール方法
-Playストアにはまだ出していないので以下からapkをダウンロード＆インストールする<br>
-[releases](https://github.com/Kinoshita0623/MisskeyAndroidClient/releases)<br>
+GooglePlayストアでダウンロードインストール
+[Milktea](https://play.google.com/store/apps/details?id=jp.panta.misskeyandroidclient)
 
 利用するMisskeyインスタンスのアカウントを持っていない場合はアカウントを作成してください。<br>
 [はじめに](https://join.misskey.page/ja/wiki/first)
