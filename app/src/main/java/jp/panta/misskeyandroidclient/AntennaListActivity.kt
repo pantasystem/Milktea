@@ -31,6 +31,9 @@ class AntennaListActivity : AppCompatActivity() {
         mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, Observer {
             confirmDeleteAntenna(it)
         })
+        addAntennaFab.setOnClickListener {
+            startActivity(Intent(this, AntennaEditorActivity::class.java))
+        }
 
     }
 

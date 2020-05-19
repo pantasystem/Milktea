@@ -26,4 +26,15 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addAntennaFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_add_black_24dp"
+            android:focusable="true"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
