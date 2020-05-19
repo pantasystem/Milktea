@@ -11,32 +11,28 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 
 class FollowFollowerListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val followFollowerViewModel: FollowFollowerViewModel
-) : ListAdapter<FollowFollowerViewData, FollowFollowerListAdapter.ViewHolder>(
+) : ListAdapter<UserViewData, FollowFollowerListAdapter.ViewHolder>(
     DiffUtilItemCallback()
 ){
-    class DiffUtilItemCallback : DiffUtil.ItemCallback<FollowFollowerViewData>(){
-        override fun areContentsTheSame(
-            oldItem: FollowFollowerViewData,
-            newItem: FollowFollowerViewData
-        ): Boolean {
-            return oldItem.user == newItem.user
+    class DiffUtilItemCallback : DiffUtil.ItemCallback<UserViewData>(){
+        override fun areContentsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
+            return oldItem.user.value == newItem.user.value
         }
 
-        override fun areItemsTheSame(
-            oldItem: FollowFollowerViewData,
-            newItem: FollowFollowerViewData
-        ): Boolean {
-            return oldItem.id == newItem.id
+        override fun areItemsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
+            return oldItem.userId == newItem.userId
         }
     }
     class ViewHolder(val binding: ItemFollowingFollowerBinding) : RecyclerView.ViewHolder(binding.root)
 
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.followFollowerUser = getItem(position)
+        holder.binding.userViewData = getItem(position)
         holder.binding.lifecycleOwner = viewLifecycleOwner
         holder.binding.followFollowerViewModel = followFollowerViewModel
         holder.binding.executePendingBindings()

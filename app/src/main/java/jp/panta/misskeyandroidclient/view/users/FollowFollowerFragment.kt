@@ -58,8 +58,9 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
             val adapter = FollowFollowerListAdapter(viewLifecycleOwner, followFollowerViewModel)
 
             follow_follower_list.adapter = adapter
-            followFollowerViewModel.followFollowerViewDataList.observe(viewLifecycleOwner, Observer {
-                adapter.submitList(it)
+
+            followFollowerViewModel.users.observe(viewLifecycleOwner, Observer {
+
             })
 
             followFollowerViewModel.loadInit()

@@ -15,14 +15,20 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10
+import jp.panta.misskeyandroidclient.model.v10.RequestFollowFollower
+import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.reflect.KFunction1
 
 class FollowFollowerViewModel(
     val accountRelation: AccountRelation,
@@ -64,18 +70,15 @@ class FollowFollowerViewModel(
 
     val userId = user?.id?: accountRelation.account.id
 
-    val store = if(type == Type.FOLLOWER){
-        misskeyAPI::followers
-    }else{
-        misskeyAPI::following
-    }
+
 
     private val followFollowerUpdateListener = Listener()
     private val mainCapture = miCore.getMainCapture(accountRelation)
 
     val isInitializing = MutableLiveData<Boolean>(false)
 
-    val followFollowerViewDataList = object : MutableLiveData<List<FollowFollowerViewData>>(){
+
+    val users = object : MutableLiveData<List<UserViewData>>(){
         override fun onActive() {
             mainCapture.putListener(followFollowerUpdateListener)
         }
@@ -86,100 +89,158 @@ class FollowFollowerViewModel(
     }
     private var mIsLoading: Boolean = false
 
-    fun loadInit(){
-        viewModelScope.launch(Dispatchers.IO){
+    private class Result(val nextId: String, val users: List<User>)
+    private abstract inner class Loader{
+        private var cursorId: String? = null
+        abstract fun onLoadInit(): Result?
+        abstract fun onLoadNext(nextId: String?): Result?
+        fun loadInit(){
             if(mIsLoading){
-                return@launch
+                return
+            }
+            cursorId = null
+            users.value = emptyList()
+            loadNext()
+        }
+
+        fun loadNext(){
+            if(mIsLoading){
+                return
             }
             mIsLoading = true
-            isInitializing.postValue(true)
-            val request = RequestUser(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                userId = userId,
-                limit = 30
-            )
-            val response = store(request).execute()
-            val viewDataList = response.body()?.toViewDataList()
-            if(response.code() != 200 || viewDataList == null){
-                mIsLoading = false
-                isInitializing.postValue(false)
-                Log.d(tag, "FollowFollowerViewModel, error, status:${response.code()}, errMsg:${response.errorBody()?.string()}")
-                return@launch
+            viewModelScope.launch(Dispatchers.IO){
+                val tmpCursorId = cursorId
+
+                try{
+                    val result = if(tmpCursorId == null){
+                        onLoadInit()
+                    }else{
+                        onLoadNext(tmpCursorId)
+                    }
+                    result?: return@launch
+                    cursorId = result.nextId
+                    val viewDataList = result.users.map{
+                        UserViewData(it)
+                    }
+                    val arrayList = ArrayList(users.value?: emptyList())
+                    arrayList.addAll(viewDataList)
+                    users.postValue(arrayList)
+
+                }catch(e: Exception){
+                    Log.e(tag, "読み込み中にエラー発生", e)
+                }finally {
+                    mIsLoading = false
+                    if(tmpCursorId == null){
+                        isInitializing.postValue(false)
+                    }
+                }
             }
 
-            followFollowerViewDataList.postValue(viewDataList)
-            isInitializing.postValue(false)
-            mIsLoading = false
         }
+    }
+
+    private inner class V10Loader(misskeyAPIV10: MisskeyAPIV10) : Loader(){
+        val store = if(type == Type.FOLLOWING){
+            misskeyAPIV10::following
+        }else{
+            misskeyAPIV10::followers
+        }
+        override fun onLoadInit(): Result? {
+            return onLoadNext(null)
+        }
+
+        override fun onLoadNext(nextId: String?): Result? {
+            val body = store.invoke(
+                RequestFollowFollower(
+                    i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
+                    userId = userId,
+                    cursor = nextId
+                )
+            ).execute().body()
+                ?: return null
+            return Result(body.next, body.users)
+        }
+
+    }
+
+    private inner class V11Loader(misskeyAPIV11: MisskeyAPIV11) : Loader(){
+
+        val store = if(type == Type.FOLLOWING){
+            misskeyAPIV11::following
+        }else{
+            misskeyAPIV11::followers
+        }
+        override fun onLoadInit(): Result? {
+            return onLoadNext(null)
+        }
+
+        override fun onLoadNext(nextId: String?): Result? {
+            val body = store.invoke(
+                RequestUser(
+                    i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
+                    userId = userId,
+                    untilId = nextId
+                )
+            ).execute().body()
+                ?: return null
+            val next = body.lastOrNull()?.id
+                ?: return null
+            val users = body.mapNotNull {
+                it.followee ?: it.follower
+            }
+            return Result(next, users)
+        }
+    }
+
+    private val loader = when(misskeyAPI){
+        is MisskeyAPIV11 ->{
+            V11Loader(misskeyAPI)
+        }
+        is MisskeyAPIV10 ->{
+            V10Loader(misskeyAPI)
+        }
+        else -> null
+    }
+    fun loadInit(){
+        loader?.loadInit()
     }
 
 
 
     fun loadOld(){
-        viewModelScope.launch(Dispatchers.IO){
-            if(mIsLoading){
-                return@launch
-            }
-            mIsLoading = true
-            val untilId = followFollowerViewDataList.value?.lastOrNull()?.id
-            if(untilId == null){
-                mIsLoading = false
-                return@launch loadInit()
-            }
-            val request = RequestUser(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                untilId = untilId,
-                userId = userId,
-                limit = 30
-            )
-
-            val response = store(request).execute()
-            val tmpViewDataList = response.body()?.toViewDataList()
-            if(response.code() != 200 || tmpViewDataList == null){
-                mIsLoading = false
-                Log.d(tag, "FollowFollowerViewModel, error, status:${response.code()}, errMsg:${response.errorBody()?.string()}")
-                return@launch
-            }
-
-            followFollowerViewDataList.postValue(followFollowerViewDataList.value.toArrayList().apply{
-                addAll(tmpViewDataList)
-            })
-            mIsLoading = false
-        }
+        loader?.loadNext()
     }
 
     private inner class Listener : MainCapture.AbsListener(){
         override fun follow(user: User) {
-            followFollowerViewDataList.value?.forEach{
-                if(it.user.id == user.id){
-                    it.isFollowing.postValue(true)
-                }
+
+            users.value?.forEach { uvd ->
+                uvd.user.value = user
             }
         }
 
         override fun unFollowed(user: User) {
-            followFollowerViewDataList.value?.forEach {
-                if(it.user.id == user.id){
-                    it.isFollowing.postValue(false)
-                }
+            users.value?.forEach { uvd ->
+                uvd.user.value = user
             }
         }
     }
 
-    fun followOrUnfollow(followFollowerViewData: FollowFollowerViewData){
+    fun followOrUnfollow(user: User?){
 
-        if(SafeUnbox.unbox(followFollowerViewData.isFollowing.value)){
+        user?: return
+        if(SafeUnbox.unbox(user.isFollowing)){
             viewModelScope.launch(Dispatchers.IO){
                 misskeyAPI.unFollowUser(RequestUser(
                     i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                    userId = followFollowerViewData.user.id
+                    userId = user.id
                 )).execute()
             }
         }else{
             viewModelScope.launch(Dispatchers.IO){
                 misskeyAPI.followUser(RequestUser(
                     i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                    userId = followFollowerViewData.user.id
+                    userId = user.id
                 )).execute()
             }
 
@@ -188,21 +249,9 @@ class FollowFollowerViewModel(
     }
 
     val showUserEventBus = EventBus<User>()
-    fun showUser(followFollowerViewData: FollowFollowerViewData){
-        showUserEventBus.event = followFollowerViewData.user
+    fun showUser(user: User?){
+        showUserEventBus.event = user
     }
 
-    private fun List<FollowFollowerViewData>?.toArrayList() : ArrayList<FollowFollowerViewData>{
-        return if(this == null){
-            ArrayList()
-        }else{
-            ArrayList(this)
-        }
-    }
 
-    private fun List<FollowFollowerUser>.toViewDataList() : List<FollowFollowerViewData>{
-        return this.map{
-            FollowFollowerViewData(it)
-        }
-    }
 }
