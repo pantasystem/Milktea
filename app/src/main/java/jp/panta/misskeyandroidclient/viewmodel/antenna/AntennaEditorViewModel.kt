@@ -51,7 +51,8 @@ class AntennaEditorViewModel (
     }
     val source = MediatorLiveData<Source>().apply{
         addSource(this@AntennaEditorViewModel.antenna){ a ->
-            Source.values().firstOrNull {
+            Log.d("AntennaEditorVM", "antenna:$a")
+            this.value = Source.values().firstOrNull {
                 a?.src ==  it.remote
             }?: Source.ALL
         }

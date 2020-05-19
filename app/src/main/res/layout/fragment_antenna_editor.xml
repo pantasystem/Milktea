@@ -46,7 +46,9 @@
                     android:id="@+id/receivingSourceSpinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_marginBottom="8dp"
+                    android:entries="@array/receiving_source_type"
+                    />
 
             <TextView
                     android:layout_width="match_parent"

@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.model.v12.antenna
 
 import java.io.Serializable
 
-class Antenna(
+data class Antenna(
     val id: String,
     val name: String,
     val src: String,

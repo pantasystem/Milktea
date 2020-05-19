@@ -46,11 +46,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
             val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(ar, miCore, antenna))[AntennaEditorViewModel::class.java]
             binding.antennaEditorViewModel = viewModel
 
-            val items = AntennaEditorViewModel.Source.values().map{ src ->
-                sourceToResourceString(src)
-            }
-            val adapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_item, items)
-            binding.receivingSourceSpinner.adapter = adapter
+
             binding.receivingSourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
@@ -58,13 +54,9 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                     position: Int,
                     id: Long
                 ) {
-                    when(receivedSourceStringArray[position]){
-                        getString(R.string.all_notes) -> viewModel.source.value = AntennaEditorViewModel.Source.ALL
-                        getString(R.string.notes_from_following_users) -> viewModel.source.value = AntennaEditorViewModel.Source.HOME
-                        getString(R.string.notes_from_specific_list) -> viewModel.source.value = AntennaEditorViewModel.Source.LIST
-                        getString(R.string.notes_from_specific_users) -> viewModel.source.value = AntennaEditorViewModel.Source.USERS
-                        getString(R.string.notes_from_users_in_the_specified_group) -> viewModel.source.value = AntennaEditorViewModel.Source.GROUP
-                    }
+                   resourceStringToSource(receivedSourceStringArray[position])?.let{
+                       viewModel.source.value = it
+                   }
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
@@ -72,7 +64,9 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
             viewModel.source.observe(viewLifecycleOwner, Observer {
 
-                binding.receivingSourceSpinner.setSelection(receivedSourceStringArray.indexOf(sourceToResourceString(it)))
+                val srcIndex = receivedSourceStringArray.indexOf(sourceToResourceString(it))
+                Log.d("AntennaEditorViewModel", "srcIndex:$srcIndex, type:$it")
+                binding.receivingSourceSpinner.setSelection(srcIndex)
 
 
             })
