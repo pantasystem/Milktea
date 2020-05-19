@@ -3,10 +3,10 @@ package jp.panta.misskeyandroidclient.viewmodel.antenna
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
@@ -35,20 +35,28 @@ class AntennaEditorViewModel (
         HOME("home"), ALL("all"), USERS("users"), LIST("list"), GROUP("group")
     }
 
-    val name = Transformations.map(this.antenna){
-        it?.name?: ""
+    val name = MediatorLiveData<String>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){
+            this.value = it?.name?: ""
+        }
     }
-    val source = Transformations.map(this.antenna){ a ->
-        Source.values().firstOrNull {
-            a?.src ==  it.remote
-        }?: Source.ALL
+    val source = MediatorLiveData<Source>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){ a ->
+            Source.values().firstOrNull {
+                a?.src ==  it.remote
+            }?: Source.ALL
+        }
     }
-    val keywords = Transformations.map(this.antenna){
-        setupKeywords(it?.keywords)
+    val keywords = MediatorLiveData<String>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){
+            this.value = setupKeywords(it?.keywords)
+        }
     }
 
-    val excludeKeywords = Transformations.map(this.antenna){
-        setupKeywords(it?.excludeKeywords)
+    val excludeKeywords = MediatorLiveData<String>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){
+            this.value = setupKeywords(it?.excludeKeywords)
+        }
     }
 
     val users = MediatorLiveData<List<UserViewData>>().apply{
@@ -109,32 +117,56 @@ class AntennaEditorViewModel (
         }
     }
 
+    val groupList = MediatorLiveData<List<Group>?>().apply{
+        addSource(this@AntennaEditorViewModel.source){
+            /*if(it == Source.GROUP && this.value.isNullOrEmpty()){
+                miCore.getMisskeyAPI(accountRelation)
+            }*/
+        }
+    }
+
+    val group = MediatorLiveData<Group>().apply{
+        addSource(groupList){
+            this.value = it?.firstOrNull { g ->
+                g.id == this@AntennaEditorViewModel.antenna.value?.userGroupId
+            }?: it?.firstOrNull()
+        }
+    }
+
     /**
      * 新しいノートを通知します
      */
-    val notify = Transformations.map(this.antenna){
-        it?.notify?: false
+    val notify = MediatorLiveData<Boolean?>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){
+            this.value = it?.notify?: false
+        }
     }
 
     /**
      * ファイルが添付されたノートのみ
      */
-    val withFile = Transformations.map(this.antenna){
-        it?.withFile?: false
+    val withFile =  MediatorLiveData<Boolean?>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){
+            this.value = it?.withFile?: false
+        }
     }
 
     /**
      * 大文字と小文字を区別します
      */
-    val caseSensitive = Transformations.map(this.antenna){
-        it?.caseSensitive?: false
+    val caseSensitive =  MediatorLiveData<Boolean?>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){
+            this.value = it?.caseSensitive?: false
+        }
     }
 
     /**
      * 返信を含める
      */
-    val withReplies = Transformations.map(this.antenna){
-        it?.withReplies?: false
+    val withReplies = MediatorLiveData<Boolean>().apply{
+        addSource(this@AntennaEditorViewModel.antenna){
+            this.value = it?.withReplies?: false
+        }
     }
     
     fun addRemote(){

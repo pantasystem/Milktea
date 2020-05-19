@@ -254,6 +254,9 @@
     <string name="notes_from_specific_users">指定した一人または複数のユーザーのノート</string>
     <string name="notes_from_specific_list">指定したリストのノート</string>
     <string name="notes_from_users_in_the_specified_group">指定したグループのノート</string>
+    <string name="include_replies">返信を含める</string>
+    <string name="keywords_to_receive">受信キーワード</string>
+    <string name="keyword_input_method">AND条件の場合はスペースで区切ります。 ORの場合は改行で区切ります。</string>
 
 
 </resources>

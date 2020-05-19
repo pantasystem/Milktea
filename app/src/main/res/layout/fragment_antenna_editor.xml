@@ -6,9 +6,11 @@
 
         <import type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel.Source"/>
         <import type="android.view.View" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
         <variable
                 name="antennaEditorViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel" />
+
     </data>
     <ScrollView
             android:layout_width="match_parent"
@@ -84,6 +86,32 @@
                     android:visibility="@{ antennaEditorViewModel.source == Source.USERS ? View.VISIBLE : View.GONE }"
                     android:layout_marginBottom="8dp"
                     />
+
+            <Switch
+                    android:id="@+id/includeRepliesSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/include_replies"
+                    android:layout_marginBottom="8dp"
+                    android:checked="@={ SafeUnbox.unbox(antennaEditorViewModel.withReplies) }"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/keywordsToReceiveEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/keywords_to_receive"
+                        android:inputType="textMultiLine"
+                        />
+            </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/keyword_input_method"
+                    android:layout_marginBottom="8dp"/>
+
 
         </LinearLayout>
     </ScrollView>

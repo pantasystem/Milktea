@@ -255,5 +255,8 @@
     <string name="notes_from_specific_users">Notes from specific users</string>
     <string name="notes_from_specific_list">Notes from specific list</string>
     <string name="notes_from_users_in_the_specified_group">Notes from users in the specified group</string>
+    <string name="include_replies">Include replies</string>
+    <string name="keywords_to_receive">Keywords to receive</string>
+    <string name="keyword_input_method">Separate with spaces for AND condition. Separate with line breaks for OR.</string>
 
 </resources>
