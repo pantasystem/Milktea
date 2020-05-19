@@ -103,17 +103,39 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                 }
 
             })
+
+
             viewModel.groupList.observe( viewLifecycleOwner, Observer {
                 it?.let{ groups ->
                     val groupsAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_item, groups.map{ group ->
                         group.name
                     })
                     binding.groupListSpinner.adapter = groupsAdapter
-                    binding.groupListSpinner.setSelection( groups.indexOfFirst {  group ->
-                        group.id == viewModel.group.value?.id || viewModel.group.value == null
-                    })
+                    binding.groupListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+                            viewModel.group.value = groups[position]
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+
+                    }
 
                 }
+            })
+
+            viewModel.group.observe( viewLifecycleOwner, Observer { g ->
+                g?.let{
+                    val index = viewModel.groupList.value?.indexOfFirst { inG ->
+                        g.id == inG.id
+                    }?: 0
+                    binding.groupListSpinner.setSelection(index)
+                }
+
             })
 
             viewModel.users.observe( viewLifecycleOwner, Observer {
