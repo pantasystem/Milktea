@@ -258,5 +258,10 @@
     <string name="include_replies">Include replies</string>
     <string name="keywords_to_receive">Keywords to receive</string>
     <string name="keyword_input_method">Separate with spaces for AND condition. Separate with line breaks for OR.</string>
+    <string name="keywords_to_exclude">Keywords to exclude</string>
+    <string name="case_sensitive">Case sensitive</string>
+    <string name="notify_notes">Notify of new notes</string>
+    <string name="with_files">Filter only notes with file attached</string>
+    <string name="group">Group</string>
 
 </resources>

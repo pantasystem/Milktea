@@ -66,6 +66,20 @@
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="@string/group"
+                    android:visibility="@{ antennaEditorViewModel.source == Source.GROUP ? View.VISIBLE : View.GONE }"
+                    />
+            <Spinner
+                    android:id="@+id/groupListSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="@{ antennaEditorViewModel.source == Source.GROUP ? View.VISIBLE : View.GONE }"
+                    />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:text="@string/user"
                     android:visibility="@{ antennaEditorViewModel.source == Source.USERS ? View.VISIBLE : View.GONE }"
                     />
@@ -104,6 +118,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/keywords_to_receive"
                         android:inputType="textMultiLine"
+                        android:text="@={ antennaEditorViewModel.keywords }"
                         />
             </com.google.android.material.textfield.TextInputLayout>
             <TextView
@@ -111,6 +126,39 @@
                     android:layout_height="wrap_content"
                     android:text="@string/keyword_input_method"
                     android:layout_marginBottom="8dp"/>
+            <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/keywords_to_exclude"
+                        android:text="@={ antennaEditorViewModel.excludeKeywords }"
+                        android:inputType="textMultiLine"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/keyword_input_method"
+                    android:layout_marginBottom="8dp"/>
+            <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/case_sensitive"
+                    android:checked="@={ SafeUnbox.unbox(antennaEditorViewModel.caseSensitive) }"/>
+
+            <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/with_files"
+                    android:checked="@={ SafeUnbox.unbox(antennaEditorViewModel.withFile) }"/>
+
+            <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notify_notes"
+                    android:checked="@={ SafeUnbox.unbox(antennaEditorViewModel.notify) }"
+                />
 
 
         </LinearLayout>
