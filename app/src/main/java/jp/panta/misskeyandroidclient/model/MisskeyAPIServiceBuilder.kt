@@ -5,6 +5,9 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.MisskeyAuthAPI
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10
+import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10Diff
+import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11
+import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11Diff
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12Diff
 import okhttp3.OkHttpClient
@@ -29,22 +32,25 @@ object MisskeyAPIServiceBuilder {
             .create(MisskeyAuthAPI::class.java)
 
     fun build(baseUrl: String, version: Version): MisskeyAPI{
+        val retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
+            .build()
         return when{
             version.isInRange(Version.Companion.Major.V_10) ->{
-
-                return MisskeyAPIV10(build(baseUrl))
+                val diff = retrofit.create(MisskeyAPIV10Diff::class.java)
+                return MisskeyAPIV10(build(baseUrl), diff)
             }
-            version.isInRange(Version.Companion.Major.V_11) ->{
-                build(baseUrl)
-            }
-            version.isInRange(Version.Companion.Major.V_12) ->{
-                val misskeyAPIV12 = build(baseUrl)
-                val misskeyAPI12DiffImpl = Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
-                    .build()
-                    .create(MisskeyAPIV12Diff::class.java)
-                return MisskeyAPIV12(misskeyAPIV12, misskeyAPI12DiffImpl)
+            version.isInRange(Version.Companion.Major.V_11)
+                    || version.isInRange(Version.Companion.Major.V_12) ->{
+                val baseAPI = build(baseUrl)
+                val misskeyAPIV11Diff = retrofit.create(MisskeyAPIV11Diff::class.java)
+                if(version.isInRange(Version.Companion.Major.V_12)){
+                    val misskeyAPI12DiffImpl = retrofit.create(MisskeyAPIV12Diff::class.java)
+                     MisskeyAPIV12(baseAPI, misskeyAPI12DiffImpl, misskeyAPIV11Diff)
+                }else{
+                    MisskeyAPIV11(baseAPI, misskeyAPIV11Diff)
+                }
             }
             else ->{
                 build(baseUrl)

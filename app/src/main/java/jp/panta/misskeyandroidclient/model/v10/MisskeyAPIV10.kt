@@ -24,7 +24,7 @@ import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import retrofit2.Call
 
-open class MisskeyAPIV10(val misskey: MisskeyAPI) : MisskeyAPI{
+open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI{
     override fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
 
     override fun children(noteRequest: NoteRequest) = misskey.children(noteRequest)
@@ -56,9 +56,9 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI) : MisskeyAPI{
 
     override fun followUser(requestUser: RequestUser): Call<User> = misskey.followUser(requestUser)
 
-    override fun followers(userRequest: RequestUser): Call<List<FollowFollowerUser>> = misskey.followers(userRequest)
+    open fun following(followFollower: RequestFollowFollower): Call<FollowFollowerUsers> = diff.following(followFollower)
 
-    override fun following(userRequest: RequestUser): Call<List<FollowFollowerUser>> = misskey.following(userRequest)
+    open fun followers(followFollower: RequestFollowFollower): Call<FollowFollowerUsers> = diff.followers(followFollower)
 
     override fun getFiles(fileRequest: RequestFile): Call<List<FileProperty>> = misskey.getFiles(fileRequest)
 
