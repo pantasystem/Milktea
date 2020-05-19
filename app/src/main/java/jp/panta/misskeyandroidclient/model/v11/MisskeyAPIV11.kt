@@ -80,6 +80,6 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override fun userListTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskeyAPI.userListTimeline(noteRequest)
     override fun userNotes(noteRequest: NoteRequest): Call<List<Note>?> = misskeyAPI.userNotes(noteRequest)
     override fun vote(vote: Vote): Call<Unit> = misskeyAPI.vote(vote)
-
+    override fun unrenote(deleteNote: DeleteNote): Call<Unit> = misskeyAPI.unrenote(deleteNote)
 
 }

@@ -34,6 +34,8 @@ open class PlaneNoteViewData (
 
     val isMyNote = account.id == toShowNote.user.id
 
+    val isRenotedByMe = (note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()) && note.user.id == account.id
+
     val statusMessage: String?
         get(){
             if(note.reply != null){

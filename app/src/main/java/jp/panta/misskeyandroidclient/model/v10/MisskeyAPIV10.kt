@@ -131,4 +131,6 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
     override fun pullUserFromList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pullUserFromList(listUserOperation)
 
     override fun pushUserToList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pushUserToList(listUserOperation)
+
+    override fun unrenote(deleteNote: DeleteNote): Call<Unit> = misskey.unrenote(deleteNote)
 }

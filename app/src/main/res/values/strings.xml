@@ -264,5 +264,6 @@
     <string name="with_files">Filter only notes with file attached</string>
     <string name="group">Group</string>
     <string name="save">Save</string>
+    <string name="unrenote">Unrenote</string>
 
 </resources>

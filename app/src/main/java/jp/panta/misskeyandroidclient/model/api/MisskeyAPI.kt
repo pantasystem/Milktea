@@ -107,6 +107,9 @@ interface MisskeyAPI {
     @POST("api/notes/reactions/delete")
     fun deleteReaction(@Body deleteNote: DeleteNote): Call<Unit>
 
+    @POST("api/notes/unrenote")
+    fun unrenote(@Body deleteNote: DeleteNote): Call<Unit>
+
     @POST("api/notes/search")
     fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
 

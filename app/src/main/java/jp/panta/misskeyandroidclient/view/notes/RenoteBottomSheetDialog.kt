@@ -26,6 +26,20 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         if(accountRelation != null){
             val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(accountRelation, miApplication)).get(NotesViewModel::class.java)
 
+            val target = notesViewModel.reNoteTarget.event
+            if(target?.isRenotedByMe == true){
+                view.unRenoteBase.visibility = View.VISIBLE
+            }else{
+                view.unRenoteBase.visibility = View.GONE
+            }
+
+            view.unRenote.setOnClickListener {
+                target?.let{
+                    notesViewModel.unRenote(target)
+                    dismiss()
+                }
+            }
+
             view.renote.setOnClickListener{
                 notesViewModel.postRenote()
                 dismiss()

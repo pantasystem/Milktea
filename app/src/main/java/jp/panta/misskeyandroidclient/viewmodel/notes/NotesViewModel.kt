@@ -297,6 +297,25 @@ class NotesViewModel(
         })
     }
 
+    fun unRenote(planeNoteViewData: PlaneNoteViewData){
+        if(planeNoteViewData.isRenotedByMe){
+            miCore.getMisskeyAPI(accountRelation)?.delete(
+                DeleteNote(i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption())!!, noteId = planeNoteViewData.note.id)
+            )?.enqueue(object : Callback<Unit>{
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if(response.code() in 200 until 300){
+                        statusMessage.event = "削除に成功しました"
+                    }
+                }
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    Log.d(TAG, "unrenote失敗")
+                }
+            })
+        }
+
+    }
+
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
         miCore.getMisskeyAPI(accountRelation)?.noteState(NoteRequest(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.id))
             ?.enqueue(object : Callback<State>{

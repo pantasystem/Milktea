@@ -263,6 +263,7 @@
     <string name="with_files">ファイルが添付されたノートのみ</string>
     <string name="group">グループ</string>
     <string name="save">保存</string>
+    <string name="unrenote">Renote解除</string>
 
 
 </resources>
