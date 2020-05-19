@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.group.Group
@@ -12,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaToAdd
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import retrofit2.Call
@@ -28,6 +30,13 @@ class AntennaEditorViewModel (
     val miCore: MiCore,
     antenna: Antenna?
 ) : ViewModel(){
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(val ar: AccountRelation, val miCore: MiCore, val antenna: Antenna?) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return AntennaEditorViewModel(ar,miCore, antenna) as T
+        }
+    }
 
     val antenna = MutableLiveData<Antenna?>(antenna)
 
@@ -210,6 +219,14 @@ class AntennaEditorViewModel (
             }
         })
     }
+
+    val selectUserEvent = EventBus<List<String>>()
+    fun selectUser(){
+        selectUserEvent.event = users.value?.map{
+            it.userId
+        }?: emptyList()
+    }
+
     
     private fun setupKeywords(keywords: List<List<String>>?): String{
         val builder = StringBuilder()
