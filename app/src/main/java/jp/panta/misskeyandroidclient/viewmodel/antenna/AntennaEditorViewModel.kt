@@ -71,7 +71,9 @@ class AntennaEditorViewModel (
 
     val users = MediatorLiveData<List<UserViewData>>().apply{
         addSource(this@AntennaEditorViewModel.antenna){
-            this.value = it?.users?.map{ userId ->
+            this.value = it?.users?.filter{ str ->
+                str.isNotBlank()
+            }?.map{ userId ->
                 UserViewData(userId)
             }?: emptyList()
         }
@@ -243,6 +245,12 @@ class AntennaEditorViewModel (
     private fun toListKeywords(keywords: String): List<List<String>>{
         return keywords.split('\n').map{
             it.split(Pattern.compile("""[ 　]"""))
+        }
+    }
+
+    fun setUserIds(userIds: List<String>){
+        users.value = userIds.map{
+            UserViewData(it)
         }
     }
 

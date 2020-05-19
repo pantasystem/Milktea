@@ -9,10 +9,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
 
@@ -138,8 +140,18 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
             })
 
-            viewModel.users.observe( viewLifecycleOwner, Observer {
 
+            val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
+            binding.specifiedUserListView.adapter = userChipAdapter
+            val flexBoxLayoutManager = FlexboxLayoutManager(view.context)
+            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
+            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
+            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
+            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+            binding.specifiedUserListView.layoutManager = flexBoxLayoutManager
+
+            viewModel.users.observe( viewLifecycleOwner, Observer {
+                userChipAdapter.submitList(it)
             })
         })
 
