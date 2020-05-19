@@ -49,6 +49,7 @@ class AntennaEditorActivity : AppCompatActivity() {
             })
             viewModel.antennaRemovedEvent.observe(this, Observer {
                 Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
+                setResult(RESULT_OK)
                 finish()
             })
         })
@@ -62,7 +63,10 @@ class AntennaEditorActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            android.R.id.home -> finish()
+            android.R.id.home ->{
+                setResult(RESULT_OK)
+                finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

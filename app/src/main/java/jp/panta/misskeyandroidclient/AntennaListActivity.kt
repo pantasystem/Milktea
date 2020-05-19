@@ -13,6 +13,9 @@ import kotlinx.android.synthetic.main.activity_antenna_list.*
 
 class AntennaListActivity : AppCompatActivity() {
 
+    companion object{
+        const val REQUEST_ANTENNA_EDITOR_CODE = 239
+    }
     private lateinit var mAntennaListViewModel: AntennaListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,8 +34,14 @@ class AntennaListActivity : AppCompatActivity() {
         mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, Observer {
             confirmDeleteAntenna(it)
         })
+        mAntennaListViewModel.editAntennaEvent.observe( this, Observer {
+            val intent = Intent(this, AntennaEditorActivity::class.java)
+            intent.putExtra(AntennaEditorActivity.EXTRA_ANTENNA, it)
+            startActivityForResult(intent, REQUEST_ANTENNA_EDITOR_CODE)
+        })
+
         addAntennaFab.setOnClickListener {
-            startActivity(Intent(this, AntennaEditorActivity::class.java))
+            startActivityForResult(Intent(this, AntennaEditorActivity::class.java), REQUEST_ANTENNA_EDITOR_CODE)
         }
 
     }
@@ -54,6 +63,18 @@ class AntennaListActivity : AppCompatActivity() {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode){
+            REQUEST_ANTENNA_EDITOR_CODE ->{
+                if(resultCode == RESULT_OK){
+                    mAntennaListViewModel.loadInit()
+                }
+            }
+        }
     }
 
 

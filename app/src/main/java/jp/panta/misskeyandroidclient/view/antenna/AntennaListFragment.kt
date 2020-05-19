@@ -40,10 +40,6 @@ class AntennaListFragment : Fragment(R.layout.fragment_antenna_list){
             antennaListSwipeRefresh.isRefreshing = it
         })
 
-        antennaViewModel.editAntennaEvent.observe(viewLifecycleOwner, Observer {
-            val intent = Intent(requireActivity(), AntennaEditorActivity::class.java)
-            intent.putExtra(AntennaEditorActivity.EXTRA_ANTENNA, it)
-            startActivity(intent)
-        })
+
     }
 }
