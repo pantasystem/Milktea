@@ -109,7 +109,7 @@ class TimelineListAdapter(
         adapter.submitList(reactionList)
 
         val observer = Observer<LinkedHashMap<String, Int>> {
-            adapter.submitList(it.toList())
+            adapter.submitList(it?.toList())
         }
         holder.reactionCountsObserver = observer
         note.reactionCounts.observe(lifecycleOwner, observer)
