@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
@@ -151,7 +152,7 @@ class ReactionSettingActivity : AppCompatActivity() {
     }
 
     private fun showConfirmDeleteReactionDialog(reaction: String){
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.confirm_delete_reaction))
             .setMessage(getString(R.string.delete_reaction) + " $reaction")
             .setNegativeButton(android.R.string.cancel) { _, _->
