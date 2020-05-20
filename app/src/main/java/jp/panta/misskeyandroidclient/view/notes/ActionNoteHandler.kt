@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
+import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -138,6 +139,9 @@ class ActionNoteHandler(
     }
 
     private val confirmedEventObserver = Observer<ConfirmEvent> {
+        if(it.resultType == ResultType.NEGATIVE){
+            return@Observer
+        }
         when(it.eventType){
             "delete_note" ->{
                 if(it.args is Note){
