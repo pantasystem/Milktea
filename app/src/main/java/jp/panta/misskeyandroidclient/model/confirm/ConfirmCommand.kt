@@ -12,7 +12,7 @@ import java.util.*
  * @param confirmId クライアントが識別するためのIdコールバックとなるConfirmEventのconfirmIdと対になる
  */
 data class ConfirmCommand(
-    val title: String,
+    val title: String?,
     val message: String?,
     val eventType: String,
     val args: Serializable?,

@@ -20,7 +20,9 @@ class ConfirmDialog : AppCompatDialogFragment(){
         val event = confirmViewModel.confirmEvent.event
         if(event != null){
             val builder = MaterialAlertDialogBuilder(requireContext())
-                .setTitle(event.title)
+            if(event.title != null){
+                builder.setTitle(event.title)
+            }
             if(event.message != null){
                 builder.setMessage(event.message)
             }

@@ -124,6 +124,15 @@ class ActionNoteHandler(
         )
     }
 
+    private val confirmDeleteAndEditEventObserver = Observer<PlaneNoteViewData> {
+        confirmViewModel.confirmEvent.event = ConfirmCommand(
+            null,
+            activity.getString(R.string.confirm_delete_and_edit_note_description),
+            eventType = "delete_and_edit_note",
+            args = it.toShowNote
+        )
+    }
+
     private val confirmCommandEventObserver = Observer<ConfirmCommand>{
         ConfirmDialog().show(activity.supportFragmentManager, "")
     }
@@ -133,6 +142,11 @@ class ActionNoteHandler(
             "delete_note" ->{
                 if(it.args is Note){
                     mNotesViewModel.removeNote(it.args)
+                }
+            }
+            "delete_and_edit_note" ->{
+                if(it.args is Note){
+                    mNotesViewModel.removeAndEditNote(it.args)
                 }
             }
         }
@@ -179,6 +193,9 @@ class ActionNoteHandler(
 
         mNotesViewModel.confirmDeletionEvent.removeObserver(confirmDeletionEventObserver)
         mNotesViewModel.confirmDeletionEvent.observe(activity, confirmDeletionEventObserver)
+
+        mNotesViewModel.confirmDeleteAndEditEvent.removeObserver(confirmDeleteAndEditEventObserver)
+        mNotesViewModel.confirmDeleteAndEditEvent.observe(activity, confirmDeleteAndEditEventObserver)
 
         confirmViewModel.confirmEvent.removeObserver(confirmCommandEventObserver)
         confirmViewModel.confirmEvent.observe(activity, confirmCommandEventObserver)

@@ -54,6 +54,8 @@ class NotesViewModel(
 
     val confirmDeletionEvent = EventBus<PlaneNoteViewData>()
 
+    val confirmDeleteAndEditEvent = EventBus<PlaneNoteViewData>()
+
     val shareNoteState = MutableLiveData<State>()
 
     val targetUser = EventBus<User>()
@@ -273,16 +275,16 @@ class NotesViewModel(
         })
     }
 
-    fun removeAndEditNote(planeNoteViewData: PlaneNoteViewData){
+    fun removeAndEditNote(note: Note){
         miCore.getMisskeyAPI(accountRelation)?.delete(
             DeleteNote(
                 i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                noteId = planeNoteViewData.toShowNote.id
+                noteId = note.id
             )
         )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){
-                    openNoteEditor.event = planeNoteViewData.toShowNote
+                    openNoteEditor.event = note
                 }
             }
 
