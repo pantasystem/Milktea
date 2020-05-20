@@ -120,7 +120,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
                     ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.DEFAULT)
                 }
                 else ->{
-                    val categoryName = categoryList[position - 2]
+                    val categoryName = categoryList[position - 3]
                     ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.CATEGORY, categoryName)
                 }
             }
