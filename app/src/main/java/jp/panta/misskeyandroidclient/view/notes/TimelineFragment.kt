@@ -104,8 +104,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             if(nvm != null){
 
                 mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
-                val adapter = list_view.adapter as TimelineListAdapter?
-                    ?: TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, nvm)
+                val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, nvm)
                 list_view.adapter = adapter
 
                 var  timelineState: TimelineState.State? = null
