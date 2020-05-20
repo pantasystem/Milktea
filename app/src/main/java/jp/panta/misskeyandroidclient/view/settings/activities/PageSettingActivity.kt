@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
@@ -37,6 +38,7 @@ class PageSettingActivity : AppCompatActivity() {
         val binding = DataBindingUtil.setContentView<ActivityPageSettingBinding>(this, R.layout.activity_page_setting)
         binding.lifecycleOwner = this
         setSupportActionBar(binding.pageSettingToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val miApplication = applicationContext as MiApplication
         mPageSettingViewModel = ViewModelProvider(this, PageSettingViewModel.Factory(miApplication))[PageSettingViewModel::class.java]
@@ -76,6 +78,7 @@ class PageSettingActivity : AppCompatActivity() {
                 }
                 PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
                 PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
+                PageType.ANTENNA -> startActivity(Intent(this, AntennaListActivity::class.java))
                 else ->{
                     // auto add
                 }
@@ -89,6 +92,13 @@ class PageSettingActivity : AppCompatActivity() {
 
         mPageSettingViewModel.save()
         //save
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     inner class ItemTouchCallback : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.ACTION_STATE_IDLE){
