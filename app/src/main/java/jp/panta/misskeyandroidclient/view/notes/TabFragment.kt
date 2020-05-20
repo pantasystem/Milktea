@@ -132,6 +132,11 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             }
         }
 
+        override fun getItemId(position: Int): Long {
+            val item = requestBaseList[position]
+            return requestBaseList[position].id?: item.hashCode().toLong() + (item.accountId?.hashCode()?: 0)
+        }
+
         fun setList(list: List<Page>){
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list
