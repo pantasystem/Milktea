@@ -6,18 +6,19 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import jp.panta.misskeyandroidclient.MediaActivity
-import jp.panta.misskeyandroidclient.NoteDetailActivity
-import jp.panta.misskeyandroidclient.NoteEditorActivity
-import jp.panta.misskeyandroidclient.UserDetailActivity
+import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
+import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.getPreferenceName
+import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.picker.ReactionPickerDialog
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
@@ -25,7 +26,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 
 class ActionNoteHandler(
     val activity: AppCompatActivity,
-    val mNotesViewModel: NotesViewModel
+    val mNotesViewModel: NotesViewModel,
+    val confirmViewModel: ConfirmViewModel
 ) {
     private val settingStore = SettingStore(activity.getSharedPreferences(activity.getPreferenceName(), Context.MODE_PRIVATE))
 
@@ -113,6 +115,31 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
+    private val confirmDeletionEventObserver = Observer<PlaneNoteViewData>{
+        confirmViewModel.confirmEvent.event = ConfirmCommand(
+            activity.getString(R.string.confirm_deletion),
+            null,
+            eventType = "delete_note",
+            args = it.toShowNote
+        )
+    }
+
+    private val confirmCommandEventObserver = Observer<ConfirmCommand>{
+        ConfirmDialog().show(activity.supportFragmentManager, "")
+    }
+
+    private val confirmedEventObserver = Observer<ConfirmEvent> {
+        when(it.eventType){
+            "delete_note" ->{
+                if(it.args is Note){
+                    mNotesViewModel.removeNote(it.args)
+                }
+            }
+        }
+    }
+
+
+
     fun initViewModelListener(){
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
         mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
@@ -149,5 +176,14 @@ class ActionNoteHandler(
 
         mNotesViewModel.showNoteEvent.removeObserver(showNoteEventObserver)
         mNotesViewModel.showNoteEvent.observe(activity, showNoteEventObserver)
+
+        mNotesViewModel.confirmDeletionEvent.removeObserver(confirmDeletionEventObserver)
+        mNotesViewModel.confirmDeletionEvent.observe(activity, confirmDeletionEventObserver)
+
+        confirmViewModel.confirmEvent.removeObserver(confirmCommandEventObserver)
+        confirmViewModel.confirmEvent.observe(activity, confirmCommandEventObserver)
+
+        confirmViewModel.confirmedEvent.removeObserver(confirmedEventObserver)
+        confirmViewModel.confirmedEvent.observe(activity, confirmedEventObserver)
     }
 }

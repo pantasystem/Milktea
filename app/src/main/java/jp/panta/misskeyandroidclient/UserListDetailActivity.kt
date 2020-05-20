@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
@@ -54,7 +55,7 @@ class UserListDetailActivity : AppCompatActivity() {
         val miCore = application as MiCore
         miCore.currentAccount.observe(this, Observer{ ar ->
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel).initViewModelListener()
+            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
             mAccountRelation = ar
             val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ar, listId!!, miCore))[UserListDetailViewModel::class.java]

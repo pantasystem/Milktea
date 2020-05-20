@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
@@ -25,7 +26,7 @@ class NotificationsActivity : AppCompatActivity() {
         val miApplication = applicationContext as MiApplication
         miApplication.currentAccount.observe(this, Observer{ ar ->
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel).initViewModelListener()
+            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
             showNotificationFragment()
         })

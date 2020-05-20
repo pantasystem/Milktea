@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.activity_note_detail.*
@@ -45,7 +46,7 @@ class NoteDetailActivity : AppCompatActivity() {
         val miApplication = applicationContext as MiApplication
         miApplication.currentAccount.observe(this, Observer {ac ->
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ac, miApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel).initViewModelListener()
+            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
             val ft = supportFragmentManager.beginTransaction()
             ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!))
             ft.commit()

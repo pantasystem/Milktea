@@ -46,6 +46,8 @@
         <item name="colorSeparator">@color/colorSeparator</item>
         <item name="tabStyle">@style/TabStyle</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
+
 
 
     </style>
@@ -89,6 +91,8 @@
         <item name="android:navigationBarColor">@color/navigationDarkColor</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
+
 
     </style>
 
@@ -135,5 +139,16 @@
 
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="hintTextColor">?attr/colorAccent</item>
+    </style>
+    
+    <style name="DialogStyle" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+    </style>
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?android:textColor</item>
+    </style>
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?attr/colorAccent</item>
     </style>
 </resources>

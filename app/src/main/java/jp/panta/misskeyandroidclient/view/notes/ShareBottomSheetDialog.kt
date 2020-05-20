@@ -85,7 +85,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
         }
 
         dataBinding.removeMyNote.setOnClickListener {
-            viewModel.removeNoteFromShareTarget()
+            viewModel.confirmDeletionEvent.event = viewModel.shareTarget.event
             dismiss()
         }
 

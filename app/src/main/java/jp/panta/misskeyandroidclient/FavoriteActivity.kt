@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.PageType
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineViewModel
@@ -36,7 +37,7 @@ class FavoriteActivity : AppCompatActivity() {
             manager.replace(R.id.favorite_fragment_base, fragment)
             manager.commit()
 
-            ActionNoteHandler(this, notesViewModel).initViewModelListener()
+            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         })
 
     }

@@ -12,5 +12,5 @@ data class ConfirmEvent(
     val resultType: ResultType,
     val eventType: String,
     val confirmId: String,
-    val args: Any?
+    val args: Serializable?
 ): Serializable

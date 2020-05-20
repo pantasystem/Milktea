@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.activity_search_result.*
@@ -65,7 +66,7 @@ class SearchResultActivity : AppCompatActivity() {
 
         (application as MiCore).currentAccount.observe(this, Observer { ar ->
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel).initViewModelListener()
+            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
             mAccountRelation = ar
             invalidateOptionsMenu()
         })

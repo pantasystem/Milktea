@@ -40,6 +40,8 @@ x
         <item name="tabStyle">@style/TabStyle</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
+
 
 
     </style>
@@ -76,6 +78,8 @@ x
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
 
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
+
 
     </style>
 </resources>

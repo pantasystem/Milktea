@@ -45,6 +45,7 @@ import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragme
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
 
                 Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.accountRelation}")
-                ActionNoteHandler(this, mNotesViewModel).initViewModelListener()
+                ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
                 init = true
                 Log.d("MainActivity", "初期化処理")
             }
