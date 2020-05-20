@@ -47,7 +47,11 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
         miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
             var pages = accountRelation.pages
             pages = if(pages.isNullOrEmpty()){
-                PageableTemplate.makeDefaultPages(PageTypeNameMap(requireContext()))
+                PageableTemplate.makeDefaultPages(PageTypeNameMap(requireContext())).apply{
+                    forEach {
+                        it.accountId = accountRelation.account.id
+                    }
+                }
             }else pages
 
 

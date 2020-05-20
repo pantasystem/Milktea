@@ -107,9 +107,7 @@ class TimelineViewModel(
                 try{
                     val res = notePagingStore.loadNew(sinceId)
                     val list = res.second
-                    if(list == null || list.isEmpty()){
-                        isLoadingFlag = false
-                        isLoading.postValue(false)
+                    if(list.isNullOrEmpty()){
                         return@launch
                     }else{
                         noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
@@ -139,14 +137,13 @@ class TimelineViewModel(
                         }
 
                         timelineLiveData.postValue(newState)
-                        isLoadingFlag = false
-                        isLoading.postValue(false)
                     }
                 }catch(e: IOException){
-                    isLoadingFlag = false
-                    isLoading.postValue(false)
                 }catch (e: Exception){
                     Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
+                }finally {
+                    isLoading.postValue(false)
+                    isLoadingFlag = false
                 }
 
             }
@@ -164,8 +161,7 @@ class TimelineViewModel(
             try {
                 val res = notePagingStore.loadOld(untilId)
                 val list = res.second
-                if(list == null || list.isEmpty()){
-                    isLoadingFlag = false
+                if(list.isNullOrEmpty()){
                     return@launch
                 }else{
                     noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
@@ -186,14 +182,15 @@ class TimelineViewModel(
                         )
                     }
 
-
                     timelineLiveData.postValue(newState)
-                    isLoadingFlag = false
                 }
             }catch (e: IOException){
-                isLoadingFlag = false
+
             }catch(e: Exception){
                 Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
+            }finally {
+                isLoadingFlag = false
+
             }
         }
     }
@@ -208,31 +205,25 @@ class TimelineViewModel(
             viewModelScope.launch(Dispatchers.IO){
                 try{
                     val response = notePagingStore.loadInit()
-                    val list = response.second
-                    if(list == null || list.isEmpty()){
-                        isLoadingFlag = false
-                        isLoading.postValue(false)
-                        return@launch
-                    }else{
-                        val state = TimelineState(
-                            list,
-                            TimelineState.State.INIT
-                        )
-                        timelineLiveData.postValue(state)
-                        noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
-                        isLoadingFlag = false
-
-                    }
+                    val list = response.second?: emptyList()
+                    val state = TimelineState(
+                        list,
+                        TimelineState.State.INIT
+                    )
+                    timelineLiveData.postValue(state)
+                    noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
 
                     if(settingStore.isAutoLoadTimeline){
                         startTimelineCapture()
                     }
 
                 }catch(e: IOException){
-                    isLoadingFlag = false
-                    isLoading.postValue(false)
+                    Log.d("TimelineLiveData", "タイムライン取得中にIOエラー発生", e)
                 }catch (e: Exception){
                     Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
+                }finally{
+                    isLoading.postValue(false)
+                    isLoadingFlag = false
                 }
 
             }
