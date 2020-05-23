@@ -10,10 +10,12 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
+import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
+import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.util.*
 
@@ -21,11 +23,10 @@ class TimelineViewModel(
     val accountRelation: AccountRelation,
     private val pageableTimeline: Page.Timeline,
     include: NoteRequest.Include,
-    miCore: MiCore,
+    private val miCore: MiCore,
     private val settingStore: SettingStore,
     encryption: Encryption
 ) : ViewModel(){
-
 
 
     val tag = "TimelineViewModel"
@@ -111,7 +112,7 @@ class TimelineViewModel(
                         return@launch
                     }else{
                         noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
-
+                        loadUrlPreviews(list)
 
                         val state = timelineLiveData.value
                         val newState = if(state == null){
@@ -165,6 +166,7 @@ class TimelineViewModel(
                     return@launch
                 }else{
                     noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
+                    loadUrlPreviews(list)
                     val state = timelineLiveData.value
 
                     val newState = if(state == null){
@@ -210,8 +212,10 @@ class TimelineViewModel(
                         list,
                         TimelineState.State.INIT
                     )
-                    timelineLiveData.postValue(state)
                     noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
+                    loadUrlPreviews(list)
+
+                    timelineLiveData.postValue(state)
 
                     if(settingStore.isAutoLoadTimeline){
                         startTimelineCapture()
@@ -330,5 +334,28 @@ class TimelineViewModel(
             noteCapture.addNoteDeletedListener(this)
         }
     }
+
+    private fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
+        val store = miCore.urlPreviewStore?: return
+        list.forEach{ note ->
+            note.textNode?.getUrls()?.let{ urls ->
+                UrlPreviewLoadTask(
+                    store,
+                    urls,
+                    viewModelScope
+                ).load(object : UrlPreviewLoadTask.Callback{
+                    override fun accept(list: List<UrlPreview>) {
+                        note.setUrlPreviews(list)
+                    }
+                })
+            }
+
+        }
+
+    }
+
+
+
+
 
 }

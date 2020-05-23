@@ -9,15 +9,15 @@ class Root(
     override val insideStart: Int = 0
     override val insideEnd: Int = sourceText.length
 
-    fun getUrls(urls: HashSet<String> = HashSet()): Set<String>{
+    fun getUrls(urls: LinkedHashSet<String> = LinkedHashSet(), node: Node = this): List<String>{
 
-        childElements.forEach { el ->
+        node.childElements.forEach { el ->
             if(el is Node){
-                getUrls(urls)
+                getUrls(urls, el)
             }else if(el is Link){
                 urls.add(el.url)
             }
         }
-        return urls
+        return urls.toList()
     }
 }

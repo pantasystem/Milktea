@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
+import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 
 interface MiCore{
@@ -24,6 +25,8 @@ interface MiCore{
     var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
     var messageSubscriber: MessageSubscriber
+
+    val urlPreviewStore: UrlPreviewStore?
 
     fun switchAccount(account: Account)
 

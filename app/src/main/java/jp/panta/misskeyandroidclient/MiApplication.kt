@@ -25,8 +25,11 @@ import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
+import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
+import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import kotlinx.coroutines.*
+import org.jsoup.Jsoup
 import java.lang.Exception
 import kotlin.collections.HashMap
 
@@ -58,6 +61,14 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var sharedPreferences: SharedPreferences
 
+    override var urlPreviewStore: UrlPreviewStore? = null
+        get() {
+            if(field == null){
+                field = JSoupUrlPreviewStore()
+            }
+            return field
+        }
+        private set
     /*var misskeyAPIService: MisskeyAPI? = null
         private set*/
 

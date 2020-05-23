@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 
@@ -93,6 +94,8 @@ open class PlaneNoteViewData (
 
     val files = toShowNote.files?: emptyList()
     val media = MediaViewData(files)
+
+    val urlPreviews = MutableLiveData<List<UrlPreview>>()
 
     var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
 
@@ -188,5 +191,8 @@ open class PlaneNoteViewData (
         subContentFolding.value = !isFolding
     }
 
+    fun setUrlPreviews(list: List<UrlPreview>){
+        urlPreviews.postValue(list)
+    }
 
 }
