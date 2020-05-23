@@ -65,6 +65,7 @@ class JSoupUrlPreviewStore : UrlPreviewStore{
             }
             //val iconUrl =
             return UrlPreview(
+                url,
                 title = title!!,
                 description = description!!,
                 siteName = siteName?: urlMatcher.group(3)!!,
