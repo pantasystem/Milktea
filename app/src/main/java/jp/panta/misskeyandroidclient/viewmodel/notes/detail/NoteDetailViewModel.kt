@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
@@ -76,6 +77,7 @@ class NoteDetailViewModel(
                 val rawDetail = misskeyAPI.showNote(request).execute().body()
                     ?:return@launch
                 val detail = NoteDetailViewData(rawDetail, accountRelation.account)
+                loadUrlPreview(detail)
                 var list: List<PlaneNoteViewData> = listOf(detail)
                 notes.postValue(list)
 
@@ -130,7 +132,9 @@ class NoteDetailViewModel(
         }else{
             conversation.add(next)
             val children = misskeyAPI.children(NoteRequest(connectionInformation.getI(encryption), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
-                PlaneNoteViewData(it,accountRelation.account)
+                PlaneNoteViewData(it,accountRelation.account).apply{
+                    loadUrlPreview(this)
+                }
             }
             noteConversationViewData.nextChildren = children
             getChildrenToIterate(noteConversationViewData, conversation)
@@ -140,7 +144,9 @@ class NoteDetailViewModel(
 
     private fun loadConversation(): List<PlaneNoteViewData>?{
         return misskeyAPI.conversation(request).execute().body()?.map{
-            PlaneNoteViewData(it, accountRelation.account)
+            PlaneNoteViewData(it, accountRelation.account).apply{
+                loadUrlPreview(this)
+            }
         }
     }
 
@@ -150,7 +156,9 @@ class NoteDetailViewModel(
         }?.map{
             val planeNoteViewData = PlaneNoteViewData(it, accountRelation.account)
             val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->
-                PlaneNoteViewData(n, accountRelation.account)
+                PlaneNoteViewData(n, accountRelation.account).apply{
+                    loadUrlPreview(this)
+                }
             }
             NoteConversationViewData(it, childInChild, accountRelation.account).apply{
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
@@ -161,6 +169,14 @@ class NoteDetailViewModel(
 
     private fun loadChildren(id: String): List<Note>?{
         return misskeyAPI.children(NoteRequest(i = connectionInformation.getI(encryption)!!, limit = 100, noteId = id)).execute().body()
+    }
+
+    private fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData){
+        UrlPreviewLoadTask(
+            miCore.urlPreviewStore,
+            planeNoteViewData.urls,
+            viewModelScope
+        ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
 

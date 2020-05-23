@@ -8,8 +8,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.*
 
 class UrlPreviewLoadTask(
-    private val urlPreviewStore: UrlPreviewStore,
-    private val urlList: List<String>,
+    private val urlPreviewStore: UrlPreviewStore?,
+    private val urlList: List<String>?,
     private val coroutineScope: CoroutineScope
 ) {
 
@@ -30,6 +30,8 @@ class UrlPreviewLoadTask(
 
     private fun loadUrlPreviews(callback: Callback)= coroutineScope.launch(Dispatchers.IO){
         try{
+            urlPreviewStore?: return@launch
+            urlList?: return@launch
             val list = urlList.mapIndexed { i, url ->
                 coroutineScope.async(Dispatchers.IO) {
                     try{

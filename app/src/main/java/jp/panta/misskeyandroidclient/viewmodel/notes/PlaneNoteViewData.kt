@@ -86,7 +86,7 @@ open class PlaneNoteViewData (
 
     val text = toShowNote.text
     val textNode = MFMParser.parse(toShowNote.text, toShowNote.emojis)
-    private val urls = textNode?.getUrls()
+    val urls = textNode?.getUrls()
 
     val emojis = toShowNote.emojis
 

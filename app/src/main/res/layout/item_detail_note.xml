@@ -157,12 +157,22 @@
 
                         />
 
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/url_preview_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/poll"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_url_preview"
+                        app:urlPreviewList="@{note.urlPreviewList}"
+                        />
+
 
                 <RelativeLayout
                         android:id="@+id/subNote"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/poll"
+                        android:layout_below="@+id/url_preview_list"
                         android:layout_marginTop="3dp"
                         android:background="@drawable/shape_rounded_square_line"
                         android:onClick="@{()-> notesViewModel.setShowNote(note.subNote)}"
