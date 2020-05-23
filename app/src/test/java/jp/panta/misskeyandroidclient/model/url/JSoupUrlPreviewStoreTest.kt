@@ -39,4 +39,20 @@ class JSoupUrlPreviewStoreTest {
         println(data)
         assertNotEquals(data, null)
     }
+
+    @Test
+    fun getTest5(){
+        val store = JSoupUrlPreviewStore()
+        val data = store.get("https://www.reddit.com/r/cloudygamer/")
+        println(data)
+        assertNotEquals(data, null)
+    }
+
+    @Test
+    fun getTest6(){
+        val store = JSoupUrlPreviewStore()
+        val data = store.get("https://twitter.com/sirakawakuu/status/1264168306308558848")
+        println(data)
+        assertNotEquals(data, null)
+    }
 }
