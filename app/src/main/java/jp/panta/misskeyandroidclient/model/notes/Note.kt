@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
@@ -41,5 +42,7 @@ data class Note(
     val poll: Poll?,
     @SerializedName("renote") val reNote: Note?,
     val reply: Note?,
-    @SerializedName("myReaction") val myReaction: String?
+    @SerializedName("myReaction") val myReaction: String?,
+
+    val app: App
 ): Serializable

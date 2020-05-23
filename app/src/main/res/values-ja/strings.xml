@@ -266,5 +266,6 @@
     <string name="unrenote">Renote解除</string>
 
     <string name="confirm_delete_and_edit_note_description">このノートへのリアクション、Renote、返信も全て削除されます。削除してもう一度編集しますか？</string>
+    <string name="via">via</string>
 
 </resources>

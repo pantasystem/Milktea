@@ -121,7 +121,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/contentFoldingButton"
-                    android:visibility="@{SafeUnbox.unboxBool(note.contentFolding) ? View.GONE : View.VISIBLE }">
+                    android:visibility="@{SafeUnbox.unboxBool(note.contentFolding) ? View.GONE : View.VISIBLE }"
+                    android:layout_marginBottom="8dp">
 
                 <TextView
                         android:id="@id/text"
@@ -262,12 +263,45 @@
                 </RelativeLayout>
             </RelativeLayout>
 
+            <TextView
+                    android:id="@+id/elapsed_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:elapsedTime="@{note.toShowNote.createdAt}"
+                    android:layout_below="@id/contentMain"
+                    tools:text="10秒前"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/via"
+                    android:visibility="@{ note.toShowNote.app == null ? View.GONE : View.VISIBLE}"
+                    android:layout_toStartOf="@id/via_name"
+                    android:id="@+id/via"
+                    android:layout_below="@id/contentMain"
+                    android:layout_marginEnd="4dp"
+
+                    />
+            <TextView
+                    android:id="@+id/via_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{ note.toShowNote.app.name }"
+                    android:visibility="@{ note.toShowNote.app == null ? View.GONE : View.VISIBLE}"
+                    android:layout_below="@id/contentMain"
+                    tools:text="Milktea"
+                    android:textStyle="bold"
+                    android:layout_alignParentEnd="true"
+                    />
 
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/reaction_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/contentMain"
+                    android:layout_below="@id/elapsed_time"
                     android:layout_marginTop="8dp"
                     tools:layout_height="50dp"
                     tools:visibility="visible"
