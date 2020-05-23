@@ -114,4 +114,6 @@ dependencies {
 
     // Swipe refresh
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01"
+
+    implementation 'org.jsoup:jsoup:1.7.3'
 }

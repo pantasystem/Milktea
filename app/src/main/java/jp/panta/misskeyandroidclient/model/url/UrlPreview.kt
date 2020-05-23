@@ -7,8 +7,8 @@ data class UrlPreview(
     val icon: String,
     val description: String,
     val thumbnail: String,
-    @SerializedName("sitename")val siteName: String,
-    val sensitive: Boolean
+    @SerializedName("sitename")val siteName: String
+    //val sensitive: Boolean
     //val player,
 )
 

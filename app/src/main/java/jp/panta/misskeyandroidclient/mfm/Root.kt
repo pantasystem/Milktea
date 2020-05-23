@@ -8,4 +8,16 @@ class Root(
     override val end: Int = sourceText.length
     override val insideStart: Int = 0
     override val insideEnd: Int = sourceText.length
+
+    fun getUrls(urls: HashSet<String> = HashSet()): Set<String>{
+
+        childElements.forEach { el ->
+            if(el is Node){
+                getUrls(urls)
+            }else if(el is Link){
+                urls.add(el.url)
+            }
+        }
+        return urls
+    }
 }
