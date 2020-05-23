@@ -291,6 +291,7 @@ class TimelineViewModel(
                 return
             }
             noteCapture.subscribe(noteCaptureRegister.registerId, note)
+            loadUrlPreviews(listOf(note))
             val notes = timelineLiveData.value?.notes
             val list = if(notes == null){
                 arrayListOf(note)
@@ -343,11 +344,7 @@ class TimelineViewModel(
                     store,
                     urls,
                     viewModelScope
-                ).load(object : UrlPreviewLoadTask.Callback{
-                    override fun accept(list: List<UrlPreview>) {
-                        note.setUrlPreviews(list)
-                    }
-                })
+                ).load(note.urlPreviewLoadTaskCallback)
             }
 
         }

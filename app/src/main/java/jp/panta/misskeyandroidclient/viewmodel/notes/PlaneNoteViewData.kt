@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
+import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 
 open class PlaneNoteViewData (
     val note: Note,
@@ -85,6 +86,7 @@ open class PlaneNoteViewData (
 
     val text = toShowNote.text
     val textNode = MFMParser.parse(toShowNote.text, toShowNote.emojis)
+    private val urls = textNode?.getUrls()
 
     val emojis = toShowNote.emojis
 
@@ -95,7 +97,7 @@ open class PlaneNoteViewData (
     val files = toShowNote.files?: emptyList()
     val media = MediaViewData(files)
 
-    val urlPreviews = MutableLiveData<List<UrlPreview>>()
+    val urlPreviewList = MutableLiveData<List<UrlPreview>>()
 
     var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
 
@@ -192,7 +194,13 @@ open class PlaneNoteViewData (
     }
 
     fun setUrlPreviews(list: List<UrlPreview>){
-        urlPreviews.postValue(list)
+        urlPreviewList.postValue(list)
+    }
+
+    val urlPreviewLoadTaskCallback = object : UrlPreviewLoadTask.Callback{
+        override fun accept(list: List<UrlPreview>) {
+            urlPreviewList.postValue(list)
+        }
     }
 
 }
