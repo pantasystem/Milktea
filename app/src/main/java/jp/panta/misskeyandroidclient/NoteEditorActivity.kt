@@ -106,60 +106,57 @@ class NoteEditorActivity : AppCompatActivity() {
             binding.cw.setTokenizer(CustomEmojiTokenizer())
         }
 
-        miApplication.currentAccount.observe(this, Observer {
-            val factory = NoteEditorViewModelFactory(it, miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, note = note)
-            val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
-            mViewModel = viewModel
-            binding.viewModel = viewModel
+        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, note = note)
+        val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
+        mViewModel = viewModel
+        binding.viewModel = viewModel
+        val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(viewModel)
+        binding.imageListPreview.adapter = simpleImagePreviewAdapter
 
-            val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(viewModel)
-            binding.imageListPreview.adapter = simpleImagePreviewAdapter
+        viewModel.editorFiles.observe(this, Observer{list ->
+            simpleImagePreviewAdapter.submitList(list)
+        })
+        viewModel.poll.observe(this, Observer { poll ->
+            if(poll == null){
+                removePollFragment()
+            }else{
+                setPollFragment()
+            }
+        })
 
-            viewModel.editorFiles.observe(this, Observer{list ->
-                simpleImagePreviewAdapter.submitList(list)
-            })
+        viewModel.noteTask.observe(this, Observer{postNote->
+            Log.d("NoteEditorActivity", "$postNote")
+            val intent = Intent(this, PostNoteService::class.java)
+            intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
+            startService(intent)
+            finish()
+        })
 
-            viewModel.poll.observe(this, Observer { poll ->
-                if(poll == null){
-                    removePollFragment()
-                }else{
-                    setPollFragment()
-                }
-            })
+        viewModel.showVisibilitySelectionEvent.observe(this, Observer {
+            Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
+            val dialog = VisibilitySelectionDialog()
+            dialog.show(supportFragmentManager, "NoteEditor")
+        })
 
-            viewModel.noteTask.observe(this, Observer{postNote->
-                Log.d("NoteEditorActivity", "$postNote")
-                val intent = Intent(this, PostNoteService::class.java)
-                intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
-                startService(intent)
-                finish()
-            })
+        viewModel.address.observe(this, Observer{
+            userChipAdapter.submitList(it)
+        })
 
-            viewModel.showVisibilitySelectionEvent.observe(this, Observer {
-                Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
-                val dialog = VisibilitySelectionDialog()
-                dialog.show(supportFragmentManager, "NoteEditor")
-            })
+        viewModel.showPollTimePicker.observe(this, Observer{
+            PollTimePickerDialog().show(supportFragmentManager, "TimePicker")
+        })
 
-            viewModel.address.observe(this, Observer{
-                userChipAdapter.submitList(it)
-            })
+        viewModel.showPollDatePicker.observe(this, Observer {
+            PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
+        })
 
-            viewModel.showPollTimePicker.observe(this, Observer{
-                PollTimePickerDialog().show(supportFragmentManager, "TimePicker")
-            })
-
-            viewModel.showPollDatePicker.observe(this, Observer {
-                PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
-            })
-            viewModel.showPreviewFileEvent.observe(this, Observer{ file ->
-                file.fileProperty?.let{ fp ->
-                    startActivity(MediaActivity.newIntent(this, fp))
-                }
-                file.uploadFile?.getUri()?.let{ uri ->
-                    startActivity(MediaActivity.newIntent(this, uri))
-                }
-            })
+        viewModel.showPreviewFileEvent.observe(this, Observer{ file ->
+            file.fileProperty?.let{ fp ->
+                startActivity(MediaActivity.newIntent(this, fp))
+            }
+            file.uploadFile?.getUri()?.let{ uri ->
+                startActivity(MediaActivity.newIntent(this, uri))
+            }
         })
 
         selectFileFromDrive.setOnClickListener {

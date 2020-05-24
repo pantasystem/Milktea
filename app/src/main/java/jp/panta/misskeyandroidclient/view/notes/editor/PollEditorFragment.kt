@@ -44,20 +44,17 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
         val layoutManager = LinearLayoutManager(this.context)
         choices.layoutManager = layoutManager
         val miApplication = context?.applicationContext as MiApplication
+        val viewModel = ViewModelProvider(requireActivity(), NoteEditorViewModelFactory(miApplication)).get(NoteEditorViewModel::class.java)
+        mNoteEditorViewModel = viewModel
+        val poll = viewModel.poll.value ?: return
+        mPollEditor = poll
+        mBinding.pollEditor = poll
+        mBinding.noteEditorViewModel = viewModel
 
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {
-            val viewModel = ViewModelProvider(requireActivity(), NoteEditorViewModelFactory(it, miApplication)).get(NoteEditorViewModel::class.java)
-            mNoteEditorViewModel = viewModel
-            val poll = viewModel.poll.value ?: return@Observer
-            mPollEditor = poll
-            mBinding.pollEditor = poll
-            mBinding.noteEditorViewModel = viewModel
-
-            val adapter = PollChoicesAdapter(poll, viewLifecycleOwner)
-            choices.adapter = adapter
-            poll.choices.observe(viewLifecycleOwner, Observer{list ->
-                adapter.submitList(list)
-            })
+        val adapter = PollChoicesAdapter(poll, viewLifecycleOwner)
+        choices.adapter = adapter
+        poll.choices.observe(viewLifecycleOwner, Observer{list ->
+            adapter.submitList(list)
         })
 
         val deadLineType = view.context.resources.getStringArray(R.array.deadline_choices)

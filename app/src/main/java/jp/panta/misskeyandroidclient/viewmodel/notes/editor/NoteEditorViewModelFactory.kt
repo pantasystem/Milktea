@@ -9,7 +9,6 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class NoteEditorViewModelFactory(
-    private val accountRelation: AccountRelation,
     private val miApplication: MiApplication,
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
@@ -17,8 +16,7 @@ class NoteEditorViewModelFactory(
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NoteEditorViewModel::class.java){
-            val meta = miApplication.getCurrentInstanceMeta()!!
-            return NoteEditorViewModel(miApplication,meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.getEncryption(), note = note) as T
+            return NoteEditorViewModel(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.getEncryption(), note = note) as T
         }
         throw IllegalArgumentException("use NoteEditorViewModel::class.java")
     }

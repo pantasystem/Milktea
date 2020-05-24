@@ -26,7 +26,7 @@ class NoteEditorViewModel(
     //private val accountRelation: AccountRelation,
     //private val misskeyAPI: MisskeyAPI,
     private val miCore: MiCore,
-    meta: Meta,
+    //meta: Meta,
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
@@ -49,9 +49,21 @@ class NoteEditorViewModel(
     val hasCw = MutableLiveData<Boolean>(note?.cw != null)
     val cw = MutableLiveData<String>(note?.cw)
     val text = MutableLiveData<String>(note?.text)
-    val maxTextLength = meta.maxNoteTextLength?: 1500
-    val textRemaining = Transformations.map(text){ t: String? ->
-        maxTextLength - (t?.codePointCount(0, t.length)?: 0)
+    var maxTextLength = Transformations.map(currentAccount){
+        miCore.getCurrentInstanceMeta()?.maxNoteTextLength?: 1500
+    }
+    /*val textRemaining = Transformations.map(text){ t: String? ->
+        (maxTextLength.value?: 1500) - (t?.codePointCount(0, t.length)?: 0)
+    }*/
+    val textRemaining = MediatorLiveData<Int>().apply{
+        addSource(maxTextLength){ maxSize ->
+            val t = text.value
+            value = (maxSize?: 1500) - (t?.codePointCount(0, t.length)?: 0)
+        }
+        addSource(text){ t ->
+            val max = maxTextLength.value?: 1500
+            value = max - (t?.codePointCount(0, t.length)?: 0)
+        }
     }
 
     val editorFiles = MediatorLiveData<List<FileNoteEditorData>>().apply{
@@ -72,13 +84,13 @@ class NoteEditorViewModel(
     val isPostAvailable = MediatorLiveData<Boolean>().apply{
         this.addSource(textRemaining){
             val totalImageTmp = totalImageCount.value
-            this.value =  it in 0 until maxTextLength
+            this.value =  it in 0 until (maxTextLength.value?: 1500)
                     || (totalImageTmp != null && totalImageTmp > 0 && totalImageTmp <= 4)
                     || quoteToNoteId != null
         }
         this.addSource(totalImageCount){
             val tmpTextSize = textRemaining.value
-            this.value = tmpTextSize in 0 until maxTextLength
+            this.value = tmpTextSize in 0 until (maxTextLength.value?: 1500)
                     || (it != null && it > 0 && it <= 4)
                     || quoteToNoteId != null
         }
@@ -116,6 +128,12 @@ class NoteEditorViewModel(
     val showPollTimePicker = EventBus<Unit>()
 
     val showPreviewFileEvent = EventBus<FileNoteEditorData>()
+
+    init{
+        currentAccount.observeForever {
+            miCore.getCurrentInstanceMeta()
+        }
+    }
 
     fun post(){
         val noteTask = PostNoteTask(getCurrentInformation()!!, encryption)
