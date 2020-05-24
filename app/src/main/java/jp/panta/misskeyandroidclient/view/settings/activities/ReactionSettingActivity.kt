@@ -133,8 +133,8 @@ class ReactionSettingActivity : AppCompatActivity() {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            val from = viewHolder.adapterPosition
-            val to = target.adapterPosition
+            val from = viewHolder.absoluteAdapterPosition
+            val to = target.absoluteAdapterPosition
             val exList = mReactionPickerSettingViewModel?.reactionSettingsList?.value?: emptyList()
             val list = ArrayList(exList)
             val d = list.removeAt(from)

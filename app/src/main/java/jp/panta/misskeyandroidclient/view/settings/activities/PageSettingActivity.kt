@@ -107,8 +107,8 @@ class PageSettingActivity : AppCompatActivity() {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            val from = viewHolder.adapterPosition
-            val to = target.adapterPosition
+            val from = viewHolder.absoluteAdapterPosition
+            val to = target.absoluteAdapterPosition
             val exList = ArrayList(mPageSettingViewModel.selectedPages.value?: emptyList())
             val d = exList.removeAt(from)
             exList.add(to, d)

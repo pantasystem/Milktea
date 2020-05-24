@@ -18,8 +18,7 @@ class NoteEditorViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NoteEditorViewModel::class.java){
             val meta = miApplication.getCurrentInstanceMeta()!!
-            val api = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
-            return NoteEditorViewModel(accountRelation, api, miApplication,meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.getEncryption(), note = note) as T
+            return NoteEditorViewModel(miApplication,meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.getEncryption(), note = note) as T
         }
         throw IllegalArgumentException("use NoteEditorViewModel::class.java")
     }

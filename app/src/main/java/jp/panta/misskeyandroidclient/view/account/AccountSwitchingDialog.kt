@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.view.account
 
 import android.app.Dialog
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -26,12 +27,10 @@ import retrofit2.Response
 
 class AccountSwitchingDialog : BottomSheetDialogFragment(){
 
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.dialog_switch_account,null)
         dialog.setContentView(view)
-
 
         val miApplication = context?.applicationContext as MiApplication
         //miApplication.connectionInstanceDao?.findAll()
@@ -39,12 +38,12 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         if(accounts == null){
             Log.w("AccountSwitchDialog", "アカウント達の取得に失敗しました")
             Toast.makeText(this.context, "アカウントの取得に失敗しました", Toast.LENGTH_LONG).show()
-            return
+            return dialog
         }
         val activity = activity
         if(activity == null){
             dismiss()
-            return
+            return dialog
         }
 
         view.add_account.setOnClickListener {
@@ -52,7 +51,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
             dismiss()
         }
 
-        view.accounts_view.layoutManager = LinearLayoutManager(context)
+        view.accounts_view.layoutManager = LinearLayoutManager(view.context)
 
 
         val viewDataList = accounts.map{ ar ->
@@ -65,11 +64,10 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         val adapter = AccountListAdapter(diff, accountViewModel, activity)
         adapter.submitList(viewDataList)
         view.accounts_view.adapter = adapter
-        accountViewModel.switchTargetConnectionInstance.observe(activity, Observer {
+        accountViewModel.switchTargetConnectionInstanceEvent.observe(activity, Observer {
             dismiss()
         })
-
-
+        return dialog
     }
 
     private fun loadUser(miCore: MiCore, accountViewData: AccountViewData): AccountViewData{

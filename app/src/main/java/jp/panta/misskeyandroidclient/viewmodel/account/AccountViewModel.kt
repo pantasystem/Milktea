@@ -45,6 +45,8 @@ class AccountViewModel(
 
     val showProfile = EventBus<User>()
 
+    val switchTargetConnectionInstanceEvent = EventBus<Unit>()
+
     init{
         miCore.currentAccount.observeForever {
             val ci = it.getCurrentConnectionInformation()
@@ -70,7 +72,7 @@ class AccountViewModel(
     }
 
     fun setSwitchTargetConnectionInstance(account: AccountRelation){
-        //switchTargetConnectionInstance.event = account
+        switchTargetConnectionInstanceEvent.event = Unit
         miCore.switchAccount(account.account)
     }
 
