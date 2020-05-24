@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import java.util.*
@@ -23,6 +24,7 @@ import kotlin.collections.ArrayList
 class NoteEditorViewModel(
     private val accountRelation: AccountRelation,
     private val misskeyAPI: MisskeyAPI,
+    miCore: MiCore,
     meta: Meta,
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
@@ -31,6 +33,17 @@ class NoteEditorViewModel(
 ) : ViewModel(){
 
 
+    val currentAccount = miCore.currentAccount
+
+    val currentUser = Transformations.map(currentAccount){
+        UserViewData(it.account.id).apply{
+            val ci = it.getCurrentConnectionInformation()
+            val i = ci?.getI(miCore.getEncryption())
+            i?.let{
+                setApi(i, miCore.getMisskeyAPI(ci))
+            }
+        }
+    }
 
     val hasCw = MutableLiveData<Boolean>(note?.cw != null)
     val cw = MutableLiveData<String>(note?.cw)

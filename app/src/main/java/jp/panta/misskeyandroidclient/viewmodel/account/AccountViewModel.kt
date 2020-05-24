@@ -39,7 +39,6 @@ class AccountViewModel(
 
     val switchAccount = EventBus<Int>()
 
-    val switchTargetConnectionInstance = EventBus<AccountRelation>()
 
     val showFollowers = EventBus<Unit>()
     val showFollowings = EventBus<Unit>()
@@ -71,7 +70,8 @@ class AccountViewModel(
     }
 
     fun setSwitchTargetConnectionInstance(account: AccountRelation){
-        switchTargetConnectionInstance.event = account
+        //switchTargetConnectionInstance.event = account
+        miCore.switchAccount(account.account)
     }
 
     fun showSwitchDialog(){

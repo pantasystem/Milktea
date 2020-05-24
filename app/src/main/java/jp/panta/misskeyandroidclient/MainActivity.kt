@@ -238,10 +238,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private val switchAccountObserver = Observer<AccountRelation>{
-        Log.d(this.javaClass.simpleName, "アカウントを切り替えようとしている")
-        (application as MiApplication).switchAccount(it.account)
-    }
 
     private val showFollowingsObserver = Observer<Unit>{
         closeDrawerWhenOpenedDrawer()
@@ -268,9 +264,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun initAccountViewModelListener(){
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
-
-        mAccountViewModel.switchTargetConnectionInstance.removeObserver(switchAccountObserver)
-        mAccountViewModel.switchTargetConnectionInstance.observe(this, switchAccountObserver)
 
         mAccountViewModel.showFollowings.observe(this, showFollowingsObserver)
         mAccountViewModel.showFollowers.observe(this, showFollowersObserver)

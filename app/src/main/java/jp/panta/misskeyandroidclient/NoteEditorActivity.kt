@@ -17,10 +17,12 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
+import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import kotlinx.android.synthetic.main.activity_note_editor.*
@@ -72,6 +74,17 @@ class NoteEditorActivity : AppCompatActivity() {
         binding.addressUsersView.layoutManager = flexBoxLayoutManager
 
         val miApplication = applicationContext as MiApplication
+
+        val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
+        binding.accountViewModel = accountViewModel
+        accountViewModel.switchAccount.observe(this, Observer {
+            AccountSwitchingDialog().show(supportFragmentManager, "tag")
+        })
+        accountViewModel.showProfile.observe(this, Observer {
+            val intent = Intent(this, UserDetailActivity::class.java)
+            intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
+            startActivity(intent)
+        })
 
         miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"

@@ -19,7 +19,7 @@ class NoteEditorViewModelFactory(
         if(modelClass == NoteEditorViewModel::class.java){
             val meta = miApplication.getCurrentInstanceMeta()!!
             val api = miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!)
-            return NoteEditorViewModel(accountRelation, api, meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.getEncryption(), note = note) as T
+            return NoteEditorViewModel(accountRelation, api, miApplication,meta, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, encryption = miApplication.getEncryption(), note = note) as T
         }
         throw IllegalArgumentException("use NoteEditorViewModel::class.java")
     }

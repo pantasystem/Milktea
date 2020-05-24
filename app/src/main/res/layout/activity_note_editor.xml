@@ -6,6 +6,9 @@
         <variable
                 name="viewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
+        <variable
+                name="accountViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
         <import type="android.view.View"/>
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
@@ -55,6 +58,20 @@
                         android:text="@string/post" />
 
 
+                <ImageButton
+                        android:id="@+id/currentAccountAvatarIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        tools:src="@mipmap/ic_launcher"
+                        android:layout_toEndOf="@id/actionUpButton"
+                        android:layout_marginEnd="8dp"
+                        android:layout_centerInParent="true"
+                        app:circleIcon="@{viewModel.currentUser.user.avatarUrl}"
+                        android:padding="4dp"
+
+                        tools:ignore="ContentDescription"
+                        android:onClick="@{ ()-> accountViewModel.showSwitchDialog() }"/>
                 <TextView
                         android:id="@+id/textCounter"
                         android:layout_width="wrap_content"
