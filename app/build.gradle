@@ -115,5 +115,8 @@ dependencies {
     // Swipe refresh
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01"
 
+    // ViewPager2
+    implementation "androidx.viewpager2:viewpager2:1.1.0-alpha01"
+
     implementation 'org.jsoup:jsoup:1.7.3'
 }
