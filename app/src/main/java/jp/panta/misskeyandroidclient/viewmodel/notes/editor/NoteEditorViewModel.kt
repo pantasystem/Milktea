@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.meta.Meta
@@ -22,13 +23,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class NoteEditorViewModel(
-    private val accountRelation: AccountRelation,
-    private val misskeyAPI: MisskeyAPI,
-    miCore: MiCore,
+    //private val accountRelation: AccountRelation,
+    //private val misskeyAPI: MisskeyAPI,
+    private val miCore: MiCore,
     meta: Meta,
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
-    private val encryption: Encryption,
+    private val encryption: Encryption = miCore.getEncryption(),
     val note: Note? = null
 ) : ViewModel(){
 
@@ -92,7 +93,11 @@ class NoteEditorViewModel(
     val address = MutableLiveData<List<UserViewData>>(
         note?.visibleUserIds?.map{ userId ->
             UserViewData(userId).apply{
-                setApi(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, misskeyAPI)
+                val ci = getCurrentInformation()
+                val i = ci?.getI(miCore.getEncryption())
+                i?.let{
+                    setApi(i, miCore.getMisskeyAPI(ci))
+                }
             }
         }
     )
@@ -113,7 +118,7 @@ class NoteEditorViewModel(
     val showPreviewFileEvent = EventBus<FileNoteEditorData>()
 
     fun post(){
-        val noteTask = PostNoteTask(accountRelation.getCurrentConnectionInformation()!!, encryption)
+        val noteTask = PostNoteTask(getCurrentInformation()!!, encryption)
         noteTask.cw = cw.value
         noteTask.files = editorFiles.value
         noteTask.text =text.value
@@ -230,7 +235,11 @@ class NoteEditorViewModel(
         list.addAll(
             added.map{
                 UserViewData(it).apply{
-                    setApi(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, misskeyAPI)
+                    val ci = getCurrentInformation()
+                    val i = ci?.getI(miCore.getEncryption())
+                    i?.let{
+                        setApi(i, miCore.getMisskeyAPI(ci))
+                    }
                 }
             }
         )
@@ -247,5 +256,9 @@ class NoteEditorViewModel(
         showPreviewFileEvent.event = previewImage
     }
 
+
+    private fun getCurrentInformation(): EncryptedConnectionInformation?{
+        return currentAccount.value?.getCurrentConnectionInformation()
+    }
 
 }
