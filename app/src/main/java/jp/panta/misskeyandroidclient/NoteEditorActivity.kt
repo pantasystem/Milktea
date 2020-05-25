@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
+import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -170,6 +171,20 @@ class NoteEditorActivity : AppCompatActivity() {
         binding.addAddress.setOnClickListener {
             startSearchAndSelectUser()
         }
+
+        (applicationContext as? MiApplication)?.connectionStatus?.observe(this, Observer{ status ->
+            when(status){
+                ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
+                ConnectionStatus.ACCOUNT_ERROR ->{
+                    finish()
+                    startActivity(Intent(this, AppAuthActivity::class.java))
+                }
+                ConnectionStatus.NETWORK_ERROR ->{
+                    Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()
+                }
+                else -> Log.d("MainActivity", "not initialized")
+            }
+        })
     }
 
     private fun setPollFragment(){
