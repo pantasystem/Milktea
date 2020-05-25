@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
@@ -38,6 +39,7 @@ class NoteEditorActivity : AppCompatActivity() {
         const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
         const val SELECT_USER_REQUEST_CODE = 810
+        const val SELECT_MENTION_TO_USER_REQUEST_CODE = 931
     }
     private var mViewModel: NoteEditorViewModel? = null
 
@@ -172,6 +174,14 @@ class NoteEditorActivity : AppCompatActivity() {
             startSearchAndSelectUser()
         }
 
+        binding.mentionButton.setOnClickListener {
+            startMentionToSearchAndSelectUser()
+        }
+
+        binding.showEmojisButton.setOnClickListener {
+
+        }
+
         (applicationContext as? MiApplication)?.connectionStatus?.observe(this, Observer{ status ->
             when(status){
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
@@ -248,6 +258,11 @@ class NoteEditorActivity : AppCompatActivity() {
         startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
     }
 
+    private fun startMentionToSearchAndSelectUser(){
+        val intent = Intent(this, SearchAndSelectUserActivity::class.java)
+        startActivityForResult(intent, SELECT_MENTION_TO_USER_REQUEST_CODE)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -302,6 +317,14 @@ class NoteEditorActivity : AppCompatActivity() {
                     if(added != null && removed != null){
                         mViewModel?.setAddress(added, removed)
                     }
+                }
+            }
+            SELECT_MENTION_TO_USER_REQUEST_CODE ->{
+                if(resultCode == RESULT_OK && data != null){
+                    val users = (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USERS) as ArrayList<*>).mapNotNull {
+                        it as? User
+                    }
+                    mViewModel?.addMentionUsers(users)
                 }
             }
         }

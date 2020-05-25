@@ -23,6 +23,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_SELECTABLE_MAXIMUM_SIZE = "jp.panta.misskeyandroidclient.EXTRA_SELECTABLE_MAXIMUM_SIZE"
         const val EXTRA_SELECTED_USER_IDS = "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_IDS"
+        const val EXTRA_SELECTED_USERS = "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USERS"
 
         const val EXTRA_ADDED_USER_IDS = "jp.panta.misskeyandroidclient.EXTRA_ADDED_USER_IDS"
         const val EXTRA_REMOVED_USER_IDS = "jp.panta.misskeyandroidclient.EXTRA_REMOVED_USER_IDS"
@@ -103,6 +104,10 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
     private fun setResultFinish(){
         val selectedDiff = mSearchAndSelectUserViewModel?.getSelectedUserIdsChangedDiff()
+        val selectedUsers =
+            (mSearchAndSelectUserViewModel?.selectedUsers?.value ?: emptyList()).mapNotNull {
+                it.user.user.value
+            }
         if(selectedDiff == null){
             setResult(Activity.RESULT_CANCELED)
             finish()
@@ -114,6 +119,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         intent.putExtra(EXTRA_SELECTED_USER_IDS, selectedDiff.selected.toTypedArray())
         intent.putExtra(EXTRA_ADDED_USER_IDS, selectedDiff.added.toTypedArray())
         intent.putExtra(EXTRA_REMOVED_USER_IDS, selectedDiff.removed.toTypedArray())
+        intent.putExtra(EXTRA_SELECTED_USERS, ArrayList(selectedUsers))
         setResult(RESULT_OK, intent)
         finish()
 

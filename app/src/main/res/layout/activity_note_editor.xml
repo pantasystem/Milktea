@@ -175,7 +175,7 @@
         <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="?attr/actionBarSize"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -189,7 +189,10 @@
                     android:layout_weight="1"
                     app:srcCompat="@drawable/ic_menu_gallery"
                     android:tint="?attr/colorNoteActionButtonTint"
-                    tools:ignore="ContentDescription" />
+                    android:adjustViewBounds="true"
+                    tools:ignore="ContentDescription"
+                    android:layout_margin="4dp"
+                    />
 
             <ImageButton
                     android:id="@+id/selectFileFromDrive"
@@ -199,7 +202,10 @@
                     android:layout_weight="1"
                     app:srcCompat="@drawable/ic_cloud_black_24dp"
                     android:tint="?attr/colorNoteActionButtonTint"
-                    tools:ignore="ContentDescription" />
+                    android:adjustViewBounds="true"
+                    tools:ignore="ContentDescription"
+                    android:layout_margin="4dp"
+                    />
 
             <ImageButton
                     android:id="@+id/makePoll"
@@ -210,7 +216,10 @@
                     app:srcCompat="@drawable/ic_poll_black_24dp"
                     android:onClick="@{()-> viewModel.enablePoll()}"
                     android:tint="?attr/colorNoteActionButtonTint"
-                    tools:ignore="ContentDescription" />
+                    android:adjustViewBounds="true"
+                    tools:ignore="ContentDescription"
+                    android:layout_margin="4dp"
+                    />
 
             <ImageButton
                     android:id="@+id/setCw"
@@ -221,8 +230,39 @@
                     app:srcCompat="@drawable/ic_visibility_off_black_24dp"
                     android:tint="?attr/colorNoteActionButtonTint"
                     android:onClick="@{()-> viewModel.changeCwEnabled() }"
-                    tools:ignore="ContentDescription" />
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    tools:ignore="ContentDescription"
+                    android:layout_margin="4dp"
+                    />
+            <ImageButton
+                    android:id="@+id/mentionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="ContentDescription"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    app:srcCompat="@drawable/ic_mention"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:padding="12dp"
+                    android:layout_margin="4dp"
 
+                    />
+            <ImageButton
+                    android:id="@+id/showEmojisButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="ContentDescription"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    app:srcCompat="@drawable/ic_insert_emoticon_black_24dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:padding="12dp"
+                    android:layout_margin="4dp"/>
 
 
         </LinearLayout>
