@@ -95,6 +95,7 @@ class AccountViewModel(
     fun signOut(accountViewData: AccountViewData){
         viewModelScope.launch(Dispatchers.IO){
             miCore.logoutAccount(accountViewData.accountRelation.account)
+            switchTargetConnectionInstanceEvent.event = Unit
         }
     }
 

@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -54,15 +55,23 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         view.accounts_view.layoutManager = LinearLayoutManager(view.context)
 
 
-        val viewDataList = accounts.map{ ar ->
+        /*val viewDataList = accounts.map{ ar ->
             loadUser(miApplication, AccountViewData(MutableLiveData(), ar))
+        }*/
+        val usersLiveData = Transformations.map(miApplication.accounts){ list ->
+            list.map{ ar ->
+                loadUser(miApplication, AccountViewData(MutableLiveData(), ar))
+            }
         }
+
 
 
         val accountViewModel = ViewModelProvider(activity)[AccountViewModel::class.java]
 
         val adapter = AccountListAdapter(diff, accountViewModel, activity)
-        adapter.submitList(viewDataList)
+        usersLiveData.observe(this, Observer {
+            adapter.submitList(it)
+        })
         view.accounts_view.adapter = adapter
         accountViewModel.switchTargetConnectionInstanceEvent.observe(activity, Observer {
             dismiss()
