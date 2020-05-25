@@ -72,6 +72,19 @@
 
                         tools:ignore="ContentDescription"
                         android:onClick="@{ ()-> accountViewModel.showSwitchDialog() }"/>
+                <ImageButton
+                        android:id="@+id/noteVisibility"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        tools:src="@drawable/ic_language_black_24dp"
+                        tools:ignore="ContentDescription"
+                        app:noteVisibility="@{viewModel.visibility}"
+                        android:onClick="@{()-> viewModel.showVisibilitySelection()}"
+                        android:layout_marginEnd="4dp"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/textCounter"/>
                 <TextView
                         android:id="@+id/textCounter"
                         android:layout_width="wrap_content"
@@ -210,17 +223,8 @@
                     android:onClick="@{()-> viewModel.changeCwEnabled() }"
                     tools:ignore="ContentDescription" />
 
-            <ImageButton
-                    android:id="@+id/noteVisibility"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:tint="?attr/colorNoteActionButtonTint"
-                    tools:src="@drawable/ic_language_black_24dp"
-                    tools:ignore="ContentDescription"
-                    app:noteVisibility="@{viewModel.visibility}"
-                    android:onClick="@{()-> viewModel.showVisibilitySelection()}"/>
+
+
         </LinearLayout>
 
         <LinearLayout
