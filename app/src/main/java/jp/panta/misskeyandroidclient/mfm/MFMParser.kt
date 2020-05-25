@@ -276,7 +276,7 @@ object MFMParser{
             )
         }
 
-        private val titlePattern = Pattern.compile("""\A[【\[]([^\s.,!?'"#:/\[\]【】@]+)[】\]](\n|\z)""")
+        private val titlePattern = Pattern.compile("""\A[【\[]([^\n\[\]【】]+)[】\]](\n|\z)""")
 
         private val searchPattern = Pattern.compile("""^(.+?) (\[(?i)Search]|検索|\[検索]|(?i)Search)$""", Pattern.MULTILINE)
         private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
@@ -416,7 +416,7 @@ object MFMParser{
 
         }
 
-        private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+        private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
         private fun parseUrl(): Link?{
             val matcher = urlPattern.matcher(sourceText.substring(position, parent.insideEnd))
             if(!matcher.find()){

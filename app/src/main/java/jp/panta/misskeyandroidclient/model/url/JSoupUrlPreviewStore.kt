@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 class JSoupUrlPreviewStore : UrlPreviewStore{
     private val ogPattern = Pattern.compile("""og:(.*)""")
-    private val urlPattern = Pattern.compile("""(https)(://)([-_.!~*'()a-zA-Z0-9;?:@&=+${'$'},%#]+)(/[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)?""")
+    private val urlPattern = Pattern.compile("""(https)(://)([-_.!~*'()\[\]a-zA-Z0-9;?:@&=+${'$'},%#]+)(/[-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)?""")
     //private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
     override fun get(url: String): UrlPreview? {
         try{
