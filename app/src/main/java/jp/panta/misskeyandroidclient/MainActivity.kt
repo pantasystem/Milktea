@@ -391,14 +391,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume(){
         super.onResume()
-        (application as MiApplication?)?.currentAccount?.value?.let{
+        (application as? MiApplication?)?.currentAccount?.value?.let{
             mNotificationService?.stopShowPushNotification(it.account)
         }
     }
 
     override fun onPause() {
         super.onPause()
-        (application as MiApplication?)?.currentAccount?.value?.let{
+        (application as? MiApplication?)?.currentAccount?.value?.let{
             mNotificationService?.startShowPushNotification(it.account)
         }
     }

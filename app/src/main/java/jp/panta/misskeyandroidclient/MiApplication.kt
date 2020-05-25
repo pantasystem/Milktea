@@ -156,10 +156,16 @@ class MiApplication : Application(), MiCore {
     override fun logoutAccount(account: Account) {
         GlobalScope.launch(Dispatchers.IO){
             try{
+                mPageDao.clearByAccount(account.id)
                 mAccountDao.delete(account)
                 synchronized(mStreamingAccountMap){
-                    val streaming = mStreamingAccountMap[account]
-                    streaming?.disconnect()
+                    try{
+                        val streaming = mStreamingAccountMap[account]
+                        streaming?.disconnect()
+                    }catch(e: Exception){
+                        Log.e(TAG, "disconnect error", e)
+                    }
+
                 }
                 loadAndInitializeAccounts()
             }catch(e: Exception){
