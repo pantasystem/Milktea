@@ -43,6 +43,17 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
         val includeRenotedMyNotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name, true)
         val includeLocalRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
 
+        mPagerAdapter = viewPager.adapter as? TimelinePagerAdapter
+        if(mPagerAdapter == null){
+            mPagerAdapter = TimelinePagerAdapter(this, emptyList())
+            viewPager.adapter = mPagerAdapter
+        }
+
+        val mediator = TabLayoutMediator(tabLayout, viewPager){ tab: TabLayout.Tab, position: Int ->
+            tab.text = mPagerAdapter?.getPageTitle(position)
+        }
+        mediator.attach()
+
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
         miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
             var pages = accountRelation.pages
@@ -57,20 +68,13 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
             Log.d("TabFragment", "pages:$pages")
 
-            mPagerAdapter = viewPager.adapter as? TimelinePagerAdapter
-            if(mPagerAdapter == null){
-                mPagerAdapter = TimelinePagerAdapter(this, emptyList())
-                viewPager.adapter = mPagerAdapter
-            }
+
             mPagerAdapter?.setList(pages.sortedBy {
                 it.pageNumber
             })
             //mPagerAdapter?.notifyDataSetChanged()
 
-            val mediator = TabLayoutMediator(tabLayout, viewPager){ tab: TabLayout.Tab, position: Int ->
-                tab.text = mPagerAdapter?.getPageTitle(position)
-            }
-            mediator.attach()
+
 
 
             if(pages.size <= 1){
