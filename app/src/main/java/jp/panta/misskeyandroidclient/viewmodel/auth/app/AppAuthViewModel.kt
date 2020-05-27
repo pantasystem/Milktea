@@ -18,7 +18,9 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.IllegalArgumentException
 import java.util.*
+import java.util.regex.Pattern
 
 @Suppress("UNCHECKED_CAST")
 class AppAuthViewModel(
@@ -33,6 +35,8 @@ class AppAuthViewModel(
             return AppAuthViewModel(customAuthStore) as T
         }
     }
+
+    private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
     val instanceDomain = MutableLiveData<String>()
     val meta = MediatorLiveData<Meta?>()
@@ -51,15 +55,28 @@ class AppAuthViewModel(
 
     init{
         meta.addSource(instanceDomain){ base ->
-            MisskeyGetMeta.getMeta("https://$base").enqueue(object : Callback<Meta>{
-                override fun onResponse(call: Call<Meta>, response: Response<Meta>) {
-                    meta.postValue(response.body())
-                }
+            val url = if(base.startsWith("https://")){
+                base
+            }else{
+                "https://$base"
+            }.replace(" ", "").replace("\t", "").replace("　", "")
+            if(urlPattern.matcher(url).find()){
 
-                override fun onFailure(call: Call<Meta>, t: Throwable) {
-                    meta.postValue(null)
+                try{
+                    MisskeyGetMeta.getMeta(url).enqueue(object : Callback<Meta>{
+                        override fun onResponse(call: Call<Meta>, response: Response<Meta>) {
+                            meta.postValue(response.body())
+                        }
+
+                        override fun onFailure(call: Call<Meta>, t: Throwable) {
+                            meta.postValue(null)
+                        }
+                    })
+                }catch(e: IllegalArgumentException){
+                    Log.w("AppAuthViewModel", "不正なURLの可能性があります", e)
                 }
-            })
+            }
+
         }
         validatedInstanceDomain.addSource(meta){
             validatedInstanceDomain.value = it != null
