@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.group.Group
@@ -190,7 +191,7 @@ class AntennaEditorViewModel (
         val antenna = this.antenna.value
         val api = miCore.getMisskeyAPI(ci) as? MisskeyAPIV12
             ?: return
-        val antennaAPI = if(antenna == null){
+        val antennaAPI = if(antenna?.id == null){
             api::createAntenna
         }else{
             api::updateAntenna
@@ -215,7 +216,11 @@ class AntennaEditorViewModel (
         )
         antennaAPI.invoke(request).enqueue(object : Callback<Antenna>{
             override fun onResponse(call: Call<Antenna>, response: Response<Antenna>) {
-                this@AntennaEditorViewModel.antenna.postValue(response.body())
+                if(response.code() in 200 until 300){
+                    this@AntennaEditorViewModel.antenna.postValue(response.body())
+                }else{
+                    Log.d("AntennaViewModel", "add antenna error code:${response.code()}, errorMsg:${response.errorBody()?.string()}")
+                }
             }
 
             override fun onFailure(call: Call<Antenna>, t: Throwable) {
