@@ -48,12 +48,8 @@ class PageSettingViewModel(
     init{
         selectedPages.addSource(miCore.currentAccount){
             accountRelation = it
-            selectedPages.value = if(it.pages.isEmpty()){
-                PageableTemplate.makeDefaultPages(pageTypeNameMap)
-            }else{
-                it.pages.sortedBy { p ->
-                    p.pageNumber
-                }
+            selectedPages.value = it.pages.sortedBy { p ->
+                p.pageNumber
             }
         }
 

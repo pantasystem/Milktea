@@ -56,14 +56,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
         miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
-            var pages = accountRelation.pages
-            pages = if(pages.isNullOrEmpty()){
-                PageableTemplate.makeDefaultPages(PageTypeNameMap(requireContext())).apply{
-                    forEach {
-                        it.accountId = accountRelation.account.id
-                    }
-                }
-            }else pages
+            val pages = accountRelation.pages
 
 
             Log.d("TabFragment", "pages:$pages")

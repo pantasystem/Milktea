@@ -28,8 +28,8 @@ import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
-import org.jsoup.Jsoup
 import java.lang.Exception
 import kotlin.collections.HashMap
 
@@ -319,6 +319,11 @@ class MiApplication : Application(), MiCore {
                 connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
             }
 
+            if(current.pages.isEmpty()){
+                saveDefaultPages(current, meta)
+                return loadAndInitializeAccounts()
+            }
+
             currentAccount.postValue(current)
             accounts.postValue(tmpAccounts)
             connectionStatus.postValue(ConnectionStatus.SUCCESS)
@@ -328,6 +333,35 @@ class MiApplication : Application(), MiCore {
         }catch(e: Exception){
             //isSuccessCurrentAccount.postValue(false)
             Log.e(TAG, "初期読み込みに失敗しまちた", e)
+        }
+    }
+
+    private fun saveDefaultPages(account: AccountRelation, meta: Meta?){
+        val isGlobalEnabled = !(meta?.disableGlobalTimeline?: false)
+        val isLocalEnabled = !(meta?.disableLocalTimeline?: false)
+
+        try{
+            val defaultPages = ArrayList<Page>()
+            defaultPages.add(PageableTemplate.homeTimeline(getString(R.string.home_timeline)))
+            if(isLocalEnabled){
+                defaultPages.add(PageableTemplate.hybridTimeline(getString(R.string.hybrid_timeline)))
+            }
+            if(isGlobalEnabled){
+                defaultPages.add(PageableTemplate.globalTimeline(getString(R.string.global_timeline)))
+            }
+            defaultPages.forEachIndexed { index, page ->
+                page.accountId = account.account.id
+                page.pageNumber = index + 1
+            }
+
+            try{
+                mPageDao.insertAll(defaultPages)
+            }catch(e: Exception){
+                Log.e(TAG, "default pages insert error", e)
+            }
+
+        }catch(e: Exception){
+            Log.e(TAG, "default pages create error", e)
         }
     }
 
