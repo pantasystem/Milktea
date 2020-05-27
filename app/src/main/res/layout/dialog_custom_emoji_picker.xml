@@ -14,11 +14,10 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:singleLine="true"
-            tools:layout_editor_absoluteX="107dp"
-            tools:layout_editor_absoluteY="46dp"
             android:hint="@string/search_emojis"
             tools:ignore="Autofill"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/emojisView"
             android:layout_width="match_parent"

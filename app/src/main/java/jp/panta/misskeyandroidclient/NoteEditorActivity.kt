@@ -17,19 +17,22 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
+import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import kotlinx.android.synthetic.main.activity_note_editor.*
 
-class NoteEditorActivity : AppCompatActivity() {
+class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     companion object{
         const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
@@ -179,7 +182,7 @@ class NoteEditorActivity : AppCompatActivity() {
         }
 
         binding.showEmojisButton.setOnClickListener {
-
+            CustomEmojiPickerDialog().show(supportFragmentManager, "Editor")
         }
 
         (applicationContext as? MiApplication)?.connectionStatus?.observe(this, Observer{ status ->
@@ -195,6 +198,14 @@ class NoteEditorActivity : AppCompatActivity() {
                 else -> Log.d("MainActivity", "not initialized")
             }
         })
+    }
+
+    override fun onSelect(emoji: Emoji) {
+        mViewModel?.addEmoji(emoji)
+    }
+
+    override fun onSelect(emoji: String) {
+        mViewModel?.addEmoji(emoji)
     }
 
     private fun setPollFragment(){

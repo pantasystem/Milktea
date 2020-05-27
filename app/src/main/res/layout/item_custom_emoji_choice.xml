@@ -14,16 +14,16 @@
                 type="jp.panta.misskeyandroidclient.model.emoji.Emoji" />
 
     </data>
-    <ImageButton
+    <ImageView
             android:id="@+id/reactionImagePreview"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
 
             android:layout_gravity="center"
             tools:ignore="ContentDescription"
             android:onClick="@{ ()-> customEmojiSelection.onSelect(emoji)}"
             tools:src="@drawable/ic_insert_emoticon_black_24dp"
-            style="@style/Widget.AppCompat.Button.Borderless"
             tools:scaleType="centerCrop"
             app:customEmoji="@{emoji}"
             />

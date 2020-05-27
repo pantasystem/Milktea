@@ -4,33 +4,46 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
+import com.google.android.flexbox.*
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.emojis.Emojis
 import kotlinx.android.synthetic.main.dialog_custom_emoji_picker.view.*
 
-class CustomEmojiPickerDialog : AppCompatDialogFragment(){
+class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
 
     private var mEmojisAdapter: EmojiListAdapter? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog =  super.onCreateDialog(savedInstanceState)
 
-        val activity = requireActivity()
-        if(activity is EmojiSelection){
-            val adapter = EmojiListAdapter(activity, requireActivity())
-            mEmojisAdapter = adapter
-        }
+
 
         val emojis = (dialog.context.applicationContext as MiApplication).getCurrentInstanceMeta()?.emojis
 
         View.inflate(dialog.context, R.layout.dialog_custom_emoji_picker, null)?.let{ view ->
             dialog.setContentView(view)
 
-            view.inputEmoji.addTextChangedListener(object : TextWatcher{
+            val adapter = EmojiListAdapter(EmojiSelectionListener(), requireActivity())
+            view.emojisView.adapter = adapter
+            val flexBoxLayoutManager = FlexboxLayoutManager(dialog.context)
+            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
+            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
+            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
+            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+            view.emojisView.layoutManager = flexBoxLayoutManager
+            mEmojisAdapter = adapter
+            Log.d("PickerDialog", "アダプターをセットアップしました")
+            emojis?.let{
+                mEmojisAdapter?.submitList(Emojis.categoryBy(it))
+            }
+            /*view.inputEmoji.addTextChangedListener(object : TextWatcher{
                 override fun afterTextChanged(s: Editable?) = Unit
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
@@ -50,10 +63,29 @@ class CustomEmojiPickerDialog : AppCompatDialogFragment(){
                         }
                     }
                 }
-            })
+            })*/
 
 
         }
         return dialog
+    }
+
+    inner class EmojiSelectionListener : EmojiSelection{
+
+        val activity = requireActivity()
+
+        override fun onSelect(emoji: String) {
+            if(activity is EmojiSelection){
+                activity.onSelect(emoji)
+            }
+            dismiss()
+        }
+
+        override fun onSelect(emoji: Emoji) {
+            if(activity is EmojiSelection){
+                activity.onSelect(emoji)
+            }
+            dismiss()
+        }
     }
 }

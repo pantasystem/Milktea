@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
@@ -33,7 +34,7 @@ class NoteEditorViewModel(
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
     val note: Note? = null
-) : ViewModel(), ReactionSelection{
+) : ViewModel(){
 
 
     val currentAccount = miCore.currentAccount
@@ -286,9 +287,13 @@ class NoteEditorViewModel(
         text.value = builder.toString()
     }
 
-    override fun selectReaction(reaction: String) {
+    fun addEmoji(emoji: Emoji){
+        addEmoji(":${emoji.name}:")
+    }
+
+    fun addEmoji(emoji: String){
         val builder = StringBuilder(text.value?: "")
-        builder.append(reaction)
+        builder.append(emoji)
         text.value = builder.toString()
     }
 
