@@ -8,8 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -45,14 +48,11 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
         mPagerAdapter = viewPager.adapter as? TimelinePagerAdapter
         if(mPagerAdapter == null){
-            mPagerAdapter = TimelinePagerAdapter(this, emptyList())
+            mPagerAdapter = TimelinePagerAdapter(this.childFragmentManager, emptyList())
             viewPager.adapter = mPagerAdapter
         }
 
-        val mediator = TabLayoutMediator(tabLayout, viewPager){ tab: TabLayout.Tab, position: Int ->
-            tab.text = mPagerAdapter?.getPageTitle(position)
-        }
-        mediator.attach()
+
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
         miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
@@ -68,6 +68,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             //mPagerAdapter?.notifyDataSetChanged()
 
 
+            tabLayout.setupWithViewPager(viewPager)
 
 
             if(pages.size <= 1){
@@ -83,14 +84,19 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
     }
 
 
-    class TimelinePagerAdapter(fragment: Fragment, list: List<Page>) : FragmentStateAdapter(fragment){
+    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         var requestBaseList: List<Page> = list
             private set
         private var oldRequestBaseSetting = requestBaseList
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
+        private val mFragments = ArrayList<Fragment>()
 
-        override fun createFragment(position: Int): Fragment {
+        override fun getCount(): Int {
+            return requestBaseList.size
+        }
+
+        override fun getItem(position: Int): Fragment {
             Log.d("getItem", "$position, ${requestBaseList[position].pageable()?.javaClass}")
             val item = requestBaseList[position]
             val fragment = PageableFragmentFactory.create(item.pageable())
@@ -98,15 +104,23 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             if(fragment is ScrollableTop){
                 scrollableTopFragments.add(fragment)
             }
+            mFragments.add(fragment)
             return fragment
         }
 
-        fun getPageTitle(position: Int): String{
+
+        override fun getPageTitle(position: Int): String{
             val page = requestBaseList[position]
             return page.title
         }
 
-        override fun getItemCount(): Int = requestBaseList.size
+        override fun getItemPosition(any: Any): Int {
+            val target = any as Fragment
+            if(mFragments.contains(target)){
+                return PagerAdapter.POSITION_UNCHANGED
+            }
+            return PagerAdapter.POSITION_NONE
+        }
 
         private val diffCallback = object : DiffUtil.Callback(){
             override fun areContentsTheSame(
@@ -127,19 +141,19 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             override fun getOldListSize(): Int {
                 return oldRequestBaseSetting.size
             }
+
         }
 
-        override fun getItemId(position: Int): Long {
-            val item = requestBaseList[position]
-            return requestBaseList[position].id?: item.hashCode().toLong() + (item.accountId?.hashCode()?: 0)
-        }
+
 
         fun setList(list: List<Page>){
+            mFragments.clear()
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list
+            if(requestBaseList != oldRequestBaseSetting){
+                notifyDataSetChanged()
+            }
 
-            val result = DiffUtil.calculateDiff(diffCallback)
-            result.dispatchUpdatesTo(this)
         }
 
 
