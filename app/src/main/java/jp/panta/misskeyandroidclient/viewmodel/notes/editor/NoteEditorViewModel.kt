@@ -12,8 +12,11 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -274,6 +277,25 @@ class NoteEditorViewModel(
         showPreviewFileEvent.event = previewImage
     }
 
+    fun addMentionUsers(users: List<User>){
+        val builder = StringBuilder(text.value?: "")
+        users.forEach {
+            val userName = it.getDisplayUserName()
+            builder.append("\n")
+            builder.append(userName)
+        }
+        text.value = builder.toString()
+    }
+
+    fun addEmoji(emoji: Emoji){
+        addEmoji(":${emoji.name}:")
+    }
+
+    fun addEmoji(emoji: String){
+        val builder = StringBuilder(text.value?: "")
+        builder.append(emoji)
+        text.value = builder.toString()
+    }
 
     private fun getCurrentInformation(): EncryptedConnectionInformation?{
         return currentAccount.value?.getCurrentConnectionInformation()

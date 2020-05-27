@@ -17,18 +17,22 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
+import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import kotlinx.android.synthetic.main.activity_note_editor.*
 
-class NoteEditorActivity : AppCompatActivity() {
+class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     companion object{
         const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
@@ -38,6 +42,7 @@ class NoteEditorActivity : AppCompatActivity() {
         const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
         const val SELECT_USER_REQUEST_CODE = 810
+        const val SELECT_MENTION_TO_USER_REQUEST_CODE = 931
     }
     private var mViewModel: NoteEditorViewModel? = null
 
@@ -172,6 +177,14 @@ class NoteEditorActivity : AppCompatActivity() {
             startSearchAndSelectUser()
         }
 
+        binding.mentionButton.setOnClickListener {
+            startMentionToSearchAndSelectUser()
+        }
+
+        binding.showEmojisButton.setOnClickListener {
+            CustomEmojiPickerDialog().show(supportFragmentManager, "Editor")
+        }
+
         (applicationContext as? MiApplication)?.connectionStatus?.observe(this, Observer{ status ->
             when(status){
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
@@ -185,6 +198,14 @@ class NoteEditorActivity : AppCompatActivity() {
                 else -> Log.d("MainActivity", "not initialized")
             }
         })
+    }
+
+    override fun onSelect(emoji: Emoji) {
+        mViewModel?.addEmoji(emoji)
+    }
+
+    override fun onSelect(emoji: String) {
+        mViewModel?.addEmoji(emoji)
     }
 
     private fun setPollFragment(){
@@ -248,6 +269,11 @@ class NoteEditorActivity : AppCompatActivity() {
         startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
     }
 
+    private fun startMentionToSearchAndSelectUser(){
+        val intent = Intent(this, SearchAndSelectUserActivity::class.java)
+        startActivityForResult(intent, SELECT_MENTION_TO_USER_REQUEST_CODE)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -302,6 +328,14 @@ class NoteEditorActivity : AppCompatActivity() {
                     if(added != null && removed != null){
                         mViewModel?.setAddress(added, removed)
                     }
+                }
+            }
+            SELECT_MENTION_TO_USER_REQUEST_CODE ->{
+                if(resultCode == RESULT_OK && data != null){
+                    val users = (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USERS) as ArrayList<*>).mapNotNull {
+                        it as? User
+                    }
+                    mViewModel?.addMentionUsers(users)
                 }
             }
         }

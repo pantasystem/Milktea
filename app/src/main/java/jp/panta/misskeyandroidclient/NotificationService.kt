@@ -66,7 +66,7 @@ class NotificationService : Service() {
             accountRelations?.forEach{ar ->
                 Log.d(TAG, "observerを登録しています")
 
-                ar.getCurrentConnectionInformation()?.let{ ci ->
+                ar.getCurrentConnectionInformation()?.let{ _ ->
 
                     val mainCapture = (application as MiApplication).getMainCapture(ar)
                     mainCapture.putListener(MainChannelObserver(ar.account))

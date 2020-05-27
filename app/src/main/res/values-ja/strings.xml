@@ -267,5 +267,6 @@
 
     <string name="confirm_delete_and_edit_note_description">このノートへのリアクション、Renote、返信も全て削除されます。削除してもう一度編集しますか？</string>
     <string name="via">via</string>
+    <string name="search_emojis">絵文字を検索</string>
 
 </resources>
