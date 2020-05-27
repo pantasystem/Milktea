@@ -277,24 +277,32 @@ class NoteEditorViewModel(
         showPreviewFileEvent.event = previewImage
     }
 
-    fun addMentionUsers(users: List<User>){
-        val builder = StringBuilder(text.value?: "")
-        users.forEach {
+    fun addMentionUsers(users: List<User>, pos: Int): Int{
+        val mentionBuilder = StringBuilder()
+        users.forEachIndexed { index, it ->
             val userName = it.getDisplayUserName()
-            builder.append("\n")
-            builder.append(userName)
+            if(index < users.size - 1){
+                mentionBuilder.appendln(userName)
+            }else{
+                mentionBuilder.append(userName)
+            }
         }
-        text.value = builder.toString()
-    }
-
-    fun addEmoji(emoji: Emoji){
-        addEmoji(":${emoji.name}:")
-    }
-
-    fun addEmoji(emoji: String){
         val builder = StringBuilder(text.value?: "")
-        builder.append(emoji)
+        builder.insert(pos, mentionBuilder.toString())
         text.value = builder.toString()
+        return pos + mentionBuilder.length
+    }
+
+    fun addEmoji(emoji: Emoji, pos: Int): Int{
+        return addEmoji(":${emoji.name}:", pos)
+    }
+
+    fun addEmoji(emoji: String, pos: Int): Int{
+        val builder = StringBuilder(text.value?: "")
+        builder.insert(pos, emoji)
+        text.value = builder.toString()
+        Log.d("NoteEditorViewModel", "position:${pos + emoji.length - 1}")
+        return pos + emoji.length
     }
 
     private fun getCurrentInformation(): EncryptedConnectionInformation?{

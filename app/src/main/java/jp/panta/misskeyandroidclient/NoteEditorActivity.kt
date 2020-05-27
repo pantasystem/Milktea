@@ -46,6 +46,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     }
     private var mViewModel: NoteEditorViewModel? = null
 
+    private lateinit var mBinding: ActivityNoteEditorBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -54,6 +56,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
+        mBinding = binding
 
         //binding.viewModel
         binding.lifecycleOwner = this
@@ -203,11 +206,20 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     }
 
     override fun onSelect(emoji: Emoji) {
-        mViewModel?.addEmoji(emoji)
+        val pos = mBinding.inputMain.selectionEnd
+        mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
+            mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+            mBinding.inputMain.setSelection(newPos)
+            Log.d("NoteEditorActivity", "入力されたデータ:${mBinding.inputMain.text}")
+        }
     }
 
     override fun onSelect(emoji: String) {
-        mViewModel?.addEmoji(emoji)
+        val pos = mBinding.inputMain.selectionEnd
+        mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
+            mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+            mBinding.inputMain.setSelection(newPos)
+        }
     }
 
     private fun setPollFragment(){
@@ -337,7 +349,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                     val users = (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USERS) as ArrayList<*>).mapNotNull {
                         it as? User
                     }
-                    mViewModel?.addMentionUsers(users)
+                    val pos = mBinding.inputMain.selectionEnd
+                    mViewModel?.addMentionUsers(users, pos)?.let{ newPos ->
+                        mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+                        mBinding.inputMain.setSelection(newPos)
+                    }
                 }
             }
         }
