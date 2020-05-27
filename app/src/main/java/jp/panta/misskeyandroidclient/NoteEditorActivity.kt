@@ -198,6 +198,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                 else -> Log.d("MainActivity", "not initialized")
             }
         })
+
+        binding.inputMain.requestFocus()
     }
 
     override fun onSelect(emoji: Emoji) {
