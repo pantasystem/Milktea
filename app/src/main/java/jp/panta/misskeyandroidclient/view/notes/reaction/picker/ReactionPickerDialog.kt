@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +20,7 @@ import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import kotlinx.android.synthetic.main.dialog_reaction_input.view.*
 import kotlinx.android.synthetic.main.dialog_reaction_picker.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -82,12 +84,14 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             notesViewModel.postReaction(reaction)
             dismiss()
         }
-        view.reactionField.setOnEditorActionListener { textView, _, keyEvent ->
-            if(keyEvent != null && keyEvent.keyCode == KeyEvent.KEYCODE_ENTER){
-                if(keyEvent.action == KeyEvent.ACTION_UP){
-                    notesViewModel.postReaction(textView.text.toString())
-                    return@setOnEditorActionListener true
+        view.reactionField.setOnEditorActionListener { v, _, event ->
+            if(event != null && event.keyCode == KeyEvent.KEYCODE_ENTER){
+                if(event.action == KeyEvent.ACTION_UP){
+                    notesViewModel.postReaction(v.text.toString())
+                    (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(v.windowToken, 0)
+                    dismiss()
                 }
+                return@setOnEditorActionListener true
             }
             false
         }
