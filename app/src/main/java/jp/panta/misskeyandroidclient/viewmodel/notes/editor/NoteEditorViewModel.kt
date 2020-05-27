@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
@@ -32,7 +33,7 @@ class NoteEditorViewModel(
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
     val note: Note? = null
-) : ViewModel(){
+) : ViewModel(), ReactionSelection{
 
 
     val currentAccount = miCore.currentAccount
@@ -282,6 +283,12 @@ class NoteEditorViewModel(
             builder.append("\n")
             builder.append(userName)
         }
+        text.value = builder.toString()
+    }
+
+    override fun selectReaction(reaction: String) {
+        val builder = StringBuilder(text.value?: "")
+        builder.append(reaction)
         text.value = builder.toString()
     }
 

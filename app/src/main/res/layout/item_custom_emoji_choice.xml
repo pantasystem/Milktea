@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+                name="customEmojiSelection"
+                type="jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection" />
+
+        <variable
+                name="emoji"
+                type="jp.panta.misskeyandroidclient.model.emoji.Emoji" />
+
+    </data>
+    <ImageButton
+            android:id="@+id/reactionImagePreview"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+
+            android:layout_gravity="center"
+            tools:ignore="ContentDescription"
+            android:onClick="@{ ()-> customEmojiSelection.onSelect(emoji)}"
+            tools:src="@drawable/ic_insert_emoticon_black_24dp"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            tools:scaleType="centerCrop"
+            app:customEmoji="@{emoji}"
+            />
+</layout>

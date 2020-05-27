@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="emoji"
+                type="String" />
+        <variable
+                name="emojiSelection"
+                type="jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection" />
+    </data>
+    <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            tools:text="a"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:textSize="20sp"
+            android:onClick="@{()-> emojiSelection.onSelect(emojiSelection)}"
+            android:text="@{emoji}"/>
+
+</layout>
