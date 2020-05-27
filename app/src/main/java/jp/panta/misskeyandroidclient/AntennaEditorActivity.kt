@@ -52,6 +52,14 @@ class AntennaEditorActivity : AppCompatActivity() {
                 setResult(RESULT_OK)
                 finish()
             })
+
+            viewModel.antennaAddedStateEvent.observe(this, Observer {
+                if(it){
+                    Toast.makeText(this, getString(R.string.success), Toast.LENGTH_LONG).show()
+                }else{
+                    Toast.makeText(this, getString(R.string.failure), Toast.LENGTH_LONG).show()
+                }
+            })
         })
     }
 
@@ -69,6 +77,11 @@ class AntennaEditorActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        setResult(RESULT_OK)
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

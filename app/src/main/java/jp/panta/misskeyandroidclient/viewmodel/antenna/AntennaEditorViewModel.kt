@@ -182,6 +182,8 @@ class AntennaEditorViewModel (
             this.value = it?.withReplies?: false
         }
     }
+
+    val antennaAddedStateEvent = EventBus<Boolean>()
     
     fun addRemote(){
         val ci = accountRelation.getCurrentConnectionInformation()
@@ -218,13 +220,16 @@ class AntennaEditorViewModel (
             override fun onResponse(call: Call<Antenna>, response: Response<Antenna>) {
                 if(response.code() in 200 until 300){
                     this@AntennaEditorViewModel.antenna.postValue(response.body())
+                    antennaAddedStateEvent.event = true
                 }else{
                     Log.d("AntennaViewModel", "add antenna error code:${response.code()}, errorMsg:${response.errorBody()?.string()}")
+                    antennaAddedStateEvent.event = false
                 }
             }
 
             override fun onFailure(call: Call<Antenna>, t: Throwable) {
                 Log.e("AntennaEditorViewModel", "add antenna error", t)
+                antennaAddedStateEvent.event = false
             }
         })
     }

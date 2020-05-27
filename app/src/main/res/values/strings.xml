@@ -269,4 +269,8 @@
     <string name="via">via</string>
     <string name="search_emojis">Search emojis</string>
 
+    <string name="success">Success</string>
+    <string name="failure">Failure</string>
+
+
 </resources>

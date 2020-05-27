@@ -269,4 +269,7 @@
     <string name="via">via</string>
     <string name="search_emojis">絵文字を検索</string>
 
+    <string name="success">成功しました</string>
+    <string name="failure">失敗しました</string>
+
 </resources>
