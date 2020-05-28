@@ -8,6 +8,8 @@ import jp.panta.misskeyandroidclient.model.auth.custom.ShowApp
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
+import jp.panta.misskeyandroidclient.model.hashtag.HashTag
+import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.list.*
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
@@ -81,5 +83,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override fun userNotes(noteRequest: NoteRequest): Call<List<Note>?> = misskeyAPI.userNotes(noteRequest)
     override fun vote(vote: Vote): Call<Unit> = misskeyAPI.vote(vote)
     override fun unrenote(deleteNote: DeleteNote): Call<Unit> = misskeyAPI.unrenote(deleteNote)
+    override fun getHashTagList(requestHashTagList: RequestHashTagList): Call<List<HashTag>> = misskeyAPI.getHashTagList(requestHashTagList)
+    override fun getUsers(requestUser: RequestUser): Call<List<User>> = misskeyAPI.getUsers(requestUser)
 
 }

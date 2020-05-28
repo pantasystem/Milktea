@@ -7,6 +7,8 @@ import jp.panta.misskeyandroidclient.model.auth.custom.ShowApp
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
+import jp.panta.misskeyandroidclient.model.hashtag.HashTag
+import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.list.*
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
@@ -50,6 +52,9 @@ interface MisskeyAPI {
     fun i(@Body i: I): Call<User>
 
     //users
+    @POST("api/users")
+    fun getUsers(@Body requestUser: RequestUser): Call<List<User>>
+
     @POST("api/users/show")
     fun showUser(@Body requestUser: RequestUser): Call<User>
 
@@ -196,5 +201,8 @@ interface MisskeyAPI {
 
     @POST("api/mute/delete")
     fun unmuteUser(@Body requestUser: RequestUser): Call<Unit>
+
+    @POST("api/hashtags/list")
+    fun getHashTagList(@Body requestHashTagList: RequestHashTagList): Call<List<HashTag>>
 
 }
