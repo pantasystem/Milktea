@@ -15,4 +15,44 @@ data class RequestUser(
     val untilId: String? = null,
     val limit: Int = 21,
     val query: String? = null
-)
+){
+
+    class Sort{
+        fun follower(): OrderBy{
+            return OrderBy("follower")
+        }
+
+        fun createdAt(): OrderBy{
+            return OrderBy("createdAt")
+        }
+
+        fun updatedAt(): OrderBy{
+            return OrderBy("updatedAt")
+        }
+    }
+
+    class OrderBy(private val sortBy: String){
+        fun asc(): String{
+            return "+$sortBy"
+        }
+
+        fun desc(): String{
+            return "-$sortBy"
+        }
+
+    }
+
+
+    enum class State(val state: String){
+        ALL("all"), ADMIN("admin"), MODERATOR("moderator"), ADMIN_OR_MODERATOR("adminOrModerator"), ALIVE("alive")
+    }
+
+    enum class Origin(val origin: String){
+        LOCAL("local"),
+        COMBINED("combined"),
+        REMOTE("remote")
+
+    }
+
+
+}
