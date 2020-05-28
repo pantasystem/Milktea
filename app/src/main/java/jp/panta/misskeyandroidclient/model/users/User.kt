@@ -23,7 +23,7 @@ data class User(
     //@SerializedName("lastUsedAt") val lastUsedAt: String?,
     @SerializedName("line") val line: String?,
     @SerializedName("links") val links: String?,
-    @SerializedName("profile") val profile: Any?,
+    //@SerializedName("profile") val profile: Any?,
     //@SerializedName("settings") val settings: Any?,
     @SerializedName("pinnedNoteIds") val pinnedNoteIds: List<String>?,
     @SerializedName("pinnedNotes") val pinnedNotes: List<Note>?,
