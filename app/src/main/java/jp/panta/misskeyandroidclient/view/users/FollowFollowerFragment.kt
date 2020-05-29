@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import kotlinx.android.synthetic.main.fragment_follow_follwer.*
 
 class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
@@ -55,7 +56,9 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
             val encryption = miApplication.getEncryption()
             val followFollowerViewModel = ViewModelProvider(this, FollowFollowerViewModel.Factory(accountRelation, miApplication, user, type, encryption))[FollowFollowerViewModel::class.java]
             mViewModel = followFollowerViewModel
-            val adapter = FollowFollowerListAdapter(viewLifecycleOwner, followFollowerViewModel)
+            val adapter = FollowFollowerListAdapter(
+                viewLifecycleOwner, followFollowerViewModel, ViewModelProvider(this, ToggleFollowViewModel.Factory(miApplication))[ToggleFollowViewModel::class.java]
+            )
 
             follow_follower_list.adapter = adapter
 

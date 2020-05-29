@@ -9,13 +9,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
-import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 
 class FollowFollowerListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
-    private val followFollowerViewModel: FollowFollowerViewModel
+    private val followFollowerViewModel: FollowFollowerViewModel,
+    private val toggleFollowViewModel: ToggleFollowViewModel
 ) : ListAdapter<UserViewData, FollowFollowerListAdapter.ViewHolder>(
     DiffUtilItemCallback()
 ){

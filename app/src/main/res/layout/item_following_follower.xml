@@ -11,6 +11,9 @@
         <variable
                 name="followFollowerViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel" />
+        <variable
+                name="toggleFollowViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView
@@ -78,7 +81,7 @@
                     android:layout_marginStart='8dp'
                     android:layout_alignTop="@id/mainName"
                     app:isFollowing="@{SafeUnbox.unbox(userViewData.user.following)}"
-                    android:onClick="@{()-> followFollowerViewModel.followOrUnfollow(userViewData.user)}"
+                    android:onClick="@{()-> toggleFollowViewModel.toggleFollow(userViewData.user)}"
 
                     />
             <TextView

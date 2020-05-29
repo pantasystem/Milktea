@@ -252,27 +252,6 @@ class FollowFollowerViewModel(
         }
     }
 
-    fun followOrUnfollow(user: User?){
-
-        user?: return
-        if(SafeUnbox.unbox(user.isFollowing)){
-            viewModelScope.launch(Dispatchers.IO){
-                misskeyAPI.unFollowUser(RequestUser(
-                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                    userId = user.id
-                )).execute()
-            }
-        }else{
-            viewModelScope.launch(Dispatchers.IO){
-                misskeyAPI.followUser(RequestUser(
-                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
-                    userId = user.id
-                )).execute()
-            }
-
-        }
-
-    }
 
     val showUserEventBus = EventBus<User>()
     fun showUser(user: User?){
