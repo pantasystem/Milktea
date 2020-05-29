@@ -9,8 +9,8 @@
                 name="userViewData"
                 type="jp.panta.misskeyandroidclient.viewmodel.users.UserViewData" />
         <variable
-                name="followFollowerViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel" />
+                name="showUserDetails"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails" />
         <variable
                 name="toggleFollowViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel" />
@@ -49,7 +49,7 @@
                     app:circleIcon="@{SafeUnbox.unbox(userViewData.user.avatarUrl)}"
                     android:layout_marginEnd="8dp"
                     android:layout_below="@id/followeeState"
-                    android:onClick="@{()-> followFollowerViewModel.showUser(userViewData.user) }"
+                    android:onClick="@{()-> showUserDetails.show(userViewData.user) }"
                     tools:ignore="ContentDescription" />
 
             <TextView

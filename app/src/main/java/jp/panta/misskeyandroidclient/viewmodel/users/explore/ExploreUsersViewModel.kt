@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users.explore
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
@@ -13,10 +14,17 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.Serializable
 
-class ExploreUserViewModel(
+@Suppress("UNCHECKED_CAST")
+class ExploreUsersViewModel(
     val miCore: MiCore,
     val type: Type
 ) : ViewModel(){
+
+    class Factory(val miCore: MiCore, val type: Type) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return ExploreUsersViewModel(miCore, type) as T
+        }
+    }
 
     data class UserRequestConditions(
         val origin: RequestUser.Origin?,
@@ -106,10 +114,19 @@ class ExploreUserViewModel(
         }
     }
 
+    val isRefreshing = MutableLiveData<Boolean>()
+
     fun loadUsers(){
+
         val ci = miCore.currentAccount.value?.getCurrentConnectionInformation()
         val i = ci?.getI(miCore.getEncryption())
-            ?: return
+
+        if(i == null){
+            isRefreshing.value = false
+            return
+        }else{
+            isRefreshing.value = true
+        }
         miCore.getMisskeyAPI(ci).getUsers(type.conditions.toRequestUser(i)).enqueue(object : Callback<List<User>>{
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if(response.code() in 200 until 300){
@@ -117,10 +134,11 @@ class ExploreUserViewModel(
                         UserViewData(it)
                     })
                 }
+                isRefreshing.postValue(false)
             }
 
             override fun onFailure(call: Call<List<User>>, t: Throwable) {
-
+                isRefreshing.postValue(false)
             }
         })
 

@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
-import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 
-class FollowFollowerListAdapter(
+class FollowableUserListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
-    private val followFollowerViewModel: FollowFollowerViewModel,
+    private val showUserDetails: ShowUserDetails,
     private val toggleFollowViewModel: ToggleFollowViewModel
-) : ListAdapter<UserViewData, FollowFollowerListAdapter.ViewHolder>(
+) : ListAdapter<UserViewData, FollowableUserListAdapter.ViewHolder>(
     DiffUtilItemCallback()
 ){
     class DiffUtilItemCallback : DiffUtil.ItemCallback<UserViewData>(){
@@ -35,7 +35,7 @@ class FollowFollowerListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.userViewData = getItem(position)
         holder.binding.lifecycleOwner = viewLifecycleOwner
-        holder.binding.followFollowerViewModel = followFollowerViewModel
+        holder.binding.showUserDetails = showUserDetails
         holder.binding.toggleFollowViewModel = toggleFollowViewModel
         holder.binding.executePendingBindings()
     }

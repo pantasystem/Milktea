@@ -37,7 +37,7 @@ class FollowFollowerViewModel(
     val type: Type,
     val miCore: MiCore,
     private val encryption: Encryption = miCore.getEncryption()
-) : ViewModel(){
+) : ViewModel(), ShowUserDetails{
     @Suppress("UNCHECKED_CAST")
     class Factory(
         val accountRelation: AccountRelation,
@@ -254,7 +254,8 @@ class FollowFollowerViewModel(
 
 
     val showUserEventBus = EventBus<User>()
-    fun showUser(user: User?){
+
+    override fun show(user: User?) {
         showUserEventBus.event = user
     }
 
