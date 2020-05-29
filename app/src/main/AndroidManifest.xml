@@ -16,7 +16,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".AntennaEditorActivity"/>
+        <activity android:name=".SortedUsesActivity"/>
+        <activity android:name=".AntennaEditorActivity" />
         <activity android:name=".AntennaListActivity" />
         <activity android:name=".view.settings.activities.PageSettingActivity" />
         <activity android:name=".AppAuthCallbackActivity">

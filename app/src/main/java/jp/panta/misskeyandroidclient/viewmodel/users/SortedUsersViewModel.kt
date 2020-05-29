@@ -1,28 +1,34 @@
-package jp.panta.misskeyandroidclient.viewmodel.users.explore
+package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")
-class ExploreUsersViewModel(
+class SortedUsersViewModel(
     val miCore: MiCore,
-    val type: Type
+    type: Type?,
+    orderBy: UserRequestConditions?
 ) : ViewModel(){
+    val orderBy: UserRequestConditions = type?.conditions?: orderBy!!
 
-    class Factory(val miCore: MiCore, val type: Type) : ViewModelProvider.Factory{
+    class Factory(val miCore: MiCore, val type: Type?, private val orderBy: UserRequestConditions?) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return ExploreUsersViewModel(miCore, type) as T
+            return SortedUsersViewModel(
+                miCore,
+                type,
+                orderBy
+            ) as T
         }
     }
 
@@ -127,7 +133,7 @@ class ExploreUsersViewModel(
         }else{
             isRefreshing.value = true
         }
-        miCore.getMisskeyAPI(ci).getUsers(type.conditions.toRequestUser(i)).enqueue(object : Callback<List<User>>{
+        miCore.getMisskeyAPI(ci).getUsers(orderBy.toRequestUser(i)).enqueue(object : Callback<List<User>>{
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if(response.code() in 200 until 300){
                     users.postValue(response.body()?.map{

@@ -9,22 +9,41 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
+import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.users.FollowableUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.explore.ExploreUsersViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.android.synthetic.main.fragment_explore_users.*
 
-class ExploreUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails{
+class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails{
 
     companion object{
-        const val EXTRA_EXPLORE_USERS_TYPE = "jp.panta.misskeyandroidclient.viewmodel.users.explore.ExploreUsersViewModel.Type"
-        fun newInstance(type: ExploreUsersViewModel.Type): ExploreUsersFragment{
-            return ExploreUsersFragment().apply{
+        const val EXTRA_EXPLORE_USERS_TYPE = "jp.panta.misskeyandroidclient.viewmodel.users.ExploreUsersViewModel.Type"
+
+        const val EXTRA_ORIGIN = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_ORIGIN"
+        const val EXTRA_SORT = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_SORT"
+        const val EXTRA_STATE = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_STATE"
+        fun newInstance(type: SortedUsersViewModel.Type): SortedUsersFragment{
+            return SortedUsersFragment().apply{
                 arguments = Bundle().apply{
                     putSerializable(EXTRA_EXPLORE_USERS_TYPE, type)
+                }
+            }
+        }
+
+        fun newInstance(
+            origin: RequestUser.Origin?,
+            sort: String?,
+            state: RequestUser.State?
+        ): SortedUsersFragment{
+            return SortedUsersFragment().apply{
+                arguments = Bundle().apply{
+                    putSerializable(EXTRA_ORIGIN, origin)
+                    putSerializable(EXTRA_STATE, state)
+                    putString(EXTRA_SORT, sort)
                 }
             }
         }
@@ -33,9 +52,15 @@ class ExploreUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUser
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val type = arguments?.getSerializable(EXTRA_EXPLORE_USERS_TYPE) as ExploreUsersViewModel.Type
+        val type = arguments?.getSerializable(EXTRA_EXPLORE_USERS_TYPE) as? SortedUsersViewModel.Type
+        val condition = SortedUsersViewModel.UserRequestConditions(
+            sort = arguments?.getString(EXTRA_SORT),
+            state = arguments?.getSerializable(EXTRA_STATE) as? RequestUser.State?,
+            origin = arguments?.getSerializable(EXTRA_ORIGIN) as? RequestUser.Origin?
+        )
+
         val miCore = view.context.applicationContext as MiCore
-        val exploreUsersViewModel = ViewModelProvider(this, ExploreUsersViewModel.Factory(miCore, type))[ExploreUsersViewModel::class.java]
+        val exploreUsersViewModel = ViewModelProvider(this, SortedUsersViewModel.Factory(miCore, type, condition))[SortedUsersViewModel::class.java]
         val toggleFollowViewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miCore))[ToggleFollowViewModel::class.java]
 
 
