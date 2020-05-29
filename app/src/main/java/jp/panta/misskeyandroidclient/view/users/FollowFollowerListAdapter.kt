@@ -36,6 +36,7 @@ class FollowFollowerListAdapter(
         holder.binding.userViewData = getItem(position)
         holder.binding.lifecycleOwner = viewLifecycleOwner
         holder.binding.followFollowerViewModel = followFollowerViewModel
+        holder.binding.toggleFollowViewModel = toggleFollowViewModel
         holder.binding.executePendingBindings()
     }
 
