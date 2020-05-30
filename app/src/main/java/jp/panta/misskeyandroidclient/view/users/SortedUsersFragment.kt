@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.view.users.explore
+package jp.panta.misskeyandroidclient.view.users
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,7 +11,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.view.users.FollowableUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
@@ -26,20 +25,25 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         const val EXTRA_ORIGIN = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_ORIGIN"
         const val EXTRA_SORT = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_SORT"
         const val EXTRA_STATE = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_STATE"
-        fun newInstance(type: SortedUsersViewModel.Type): SortedUsersFragment{
-            return SortedUsersFragment().apply{
+
+        @JvmStatic
+        fun newInstance(type: SortedUsersViewModel.Type): SortedUsersFragment {
+            return SortedUsersFragment()
+                .apply{
                 arguments = Bundle().apply{
                     putSerializable(EXTRA_EXPLORE_USERS_TYPE, type)
                 }
             }
         }
 
+        @JvmStatic
         fun newInstance(
             origin: RequestUser.Origin?,
             sort: String?,
             state: RequestUser.State?
-        ): SortedUsersFragment{
-            return SortedUsersFragment().apply{
+        ): SortedUsersFragment {
+            return SortedUsersFragment()
+                .apply{
                 arguments = Bundle().apply{
                     putSerializable(EXTRA_ORIGIN, origin)
                     putSerializable(EXTRA_STATE, state)
