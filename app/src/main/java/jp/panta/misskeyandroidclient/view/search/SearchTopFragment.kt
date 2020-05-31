@@ -13,8 +13,10 @@ import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.setMenuTint
+import jp.panta.misskeyandroidclient.view.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import kotlinx.android.synthetic.main.fragment_search_top.*
+import java.lang.IllegalArgumentException
 
 class SearchTopFragment : Fragment(){
     override fun onCreateView(
@@ -55,13 +57,17 @@ class SearchTopFragment : Fragment(){
         setHasOptionsMenu(true)
     }
     class SearchPagerAdapter(supportFragmentManager: FragmentManager, context: Context) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
-        val tabList = listOf(context.getString(R.string.title_featured))
+        val tabList = listOf(context.getString(R.string.title_featured), context.getString(R.string.explore))
         override fun getCount(): Int {
             return tabList.size
         }
 
         override fun getItem(position: Int): Fragment {
-            return TimelineFragment.newInstance(Page.Featured(null))
+            return when(position){
+                0 -> TimelineFragment.newInstance(Page.Featured(null))
+                1 -> ExploreFragment()
+                else -> throw IllegalArgumentException("range 0..1, list:$tabList")
+            }
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

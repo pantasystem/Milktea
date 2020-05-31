@@ -2,12 +2,13 @@ package jp.panta.misskeyandroidclient
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.view.users.SortedUsersFragment
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.android.synthetic.main.activity_sorted_uses.*
 
-class SortedUsesActivity : AppCompatActivity() {
+class SortedUsersActivity : AppCompatActivity() {
 
     companion object{
         const val EXTRA_SORT = "jp.panta.misskeyandroidclient.EXTRA_SORT"
@@ -49,5 +50,12 @@ class SortedUsesActivity : AppCompatActivity() {
 
         }
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
