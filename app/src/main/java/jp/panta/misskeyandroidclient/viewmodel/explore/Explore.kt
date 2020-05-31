@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.explore
 
 import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import java.io.Serializable
 
@@ -8,10 +9,7 @@ sealed class Explore(open val name: String): Serializable{
 
     data class Tag(
         override val name: String,
-        val sort: String,
-        val attachedToUserOnly: Boolean? = null,
-        val attachedToLocalUserOnly: Boolean? = null,
-        val attachedToRemoteUserOnly: Boolean? = null
+        val conditions: SortedHashTagListViewModel.Conditions
     ): Explore(name)
 
     data class User(

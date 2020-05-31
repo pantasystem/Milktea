@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.SortedHashTagsActivity
 import jp.panta.misskeyandroidclient.SortedUsersActivity
 import jp.panta.misskeyandroidclient.databinding.ItemExploreBinding
 import jp.panta.misskeyandroidclient.viewmodel.explore.Explore
@@ -38,7 +39,10 @@ class ExploresAdapter : ListAdapter<Explore, ExploresAdapter.VH>(ItemCB){
                     it.context.startActivity(intent)
                 }
                 is Explore.Tag ->{
-
+                    val intent = Intent(it.context, SortedHashTagsActivity::class.java)
+                    intent.putExtra(SortedHashTagsActivity.EXTRA_HASH_TAG_CONDITION, explore.conditions)
+                    intent.putExtra(SortedHashTagsActivity.EXTRA_TITLE, explore.name)
+                    it.context.startActivity(intent)
                 }
                 is Explore.UserType ->{
                     val intent = Intent(it.context, SortedUsersActivity::class.java)

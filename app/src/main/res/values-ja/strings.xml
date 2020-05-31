@@ -278,4 +278,5 @@
 
     <string name="newly_joined_users">新規ユーザー</string>
     <string name="newly_discovered_users">新たに発見されたユーザー</string>
+    <string name="trending_tag">人気のタグ</string>
 </resources>
