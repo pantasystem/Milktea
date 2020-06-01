@@ -22,5 +22,7 @@ data class DraftFile(
     @ColumnInfo(name = "file_path") val filePath: String?,
     @ColumnInfo(name = "draft_note_id") val draftNoteId: Long
 ){
-    @PrimaryKey(autoGenerate = true) val fileId: Int? = null
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "file_id")
+    val fileId: Int? = null
 }

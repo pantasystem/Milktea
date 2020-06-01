@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes.draft
 
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import jp.panta.misskeyandroidclient.model.notes.draft.db.PollChoiceDTO
@@ -38,16 +39,16 @@ abstract class DraftNoteDao {
         return id
     }
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(draftNote: DraftNote): Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertDraftFiles(list: List<DraftFile>): List<Long>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertPollChoices(pollChoices: List<PollChoiceDTO>)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertUserIds(userIds: List<UserIdDTO>)
 
     @Transaction
