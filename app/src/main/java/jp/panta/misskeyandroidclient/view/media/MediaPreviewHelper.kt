@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.MediaPreviewBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.view.media.MediaPreviewHelper.setPreview
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import java.lang.IllegalArgumentException
@@ -140,9 +141,13 @@ object MediaPreviewHelper{
         try{
             val file = mediaViewData!!.files[fileIndex]
             this.visibility = View.VISIBLE
+            val miCore = this.context.applicationContext as? MiCore
+            val instanceBaseUrl = miCore?.currentAccount?.value?.getCurrentConnectionInformation()?.instanceBaseUrl
+
+
 
             Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
-            MediaPreviewHelper.setPreview(thumbnailView, playButton, file)
+            setPreview(thumbnailView, playButton, file, instanceBaseUrl?: "")
 
             val listener = View.OnClickListener {
                 val context = it.context
@@ -173,20 +178,23 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView", "playButton", "fileViewData")
     @JvmStatic
     fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?){
+        val miCore = this.context.applicationContext as? MiCore
+        val instanceBaseUrl = miCore?.currentAccount?.value?.getCurrentConnectionInformation()?.instanceBaseUrl
+
         try{
             this.visibility = View.VISIBLE
-            MediaPreviewHelper.setPreview(thumbnailView, playButton, fileViewData!!)
+            setPreview(thumbnailView, playButton, fileViewData!!, instanceBaseUrl?: "")
 
         }catch(e: Exception){
             this.visibility = View.GONE
         }
     }
 
-    fun setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData){
+    fun setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData, instanceBaseUrl: String){
         when(fileViewData.type){
             FileViewData.Type.IMAGE, FileViewData.Type.VIDEO -> {
                 Glide.with(thumbnailView)
-                    .load(fileViewData.thumbnailUrl)
+                    .load(fileViewData.fileProperty.getThumbnailUrl(instanceBaseUrl))
                     .centerCrop()
                     .into(thumbnailView)
 
@@ -220,7 +228,11 @@ object MediaPreviewHelper{
 
     @BindingAdapter("leftMediaBase", "rightMediaBase", "mediaViewData")
     @JvmStatic
-    fun LinearLayout.visibilityControl(leftMediaBase: LinearLayout, rightMediaBase: LinearLayout, mediaViewData: MediaViewData?){
+    fun ViewGroup.visibilityControl(
+        leftMediaBase: LinearLayout,
+        rightMediaBase: LinearLayout,
+        mediaViewData: MediaViewData?
+    ){
         when {
             mediaViewData == null -> {
                 leftMediaBase.visibility = View.VISIBLE
