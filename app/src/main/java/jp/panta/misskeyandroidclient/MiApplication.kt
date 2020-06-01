@@ -108,7 +108,7 @@ class MiApplication : Application(), MiCore {
         settingStore = SettingStore(sharedPreferences)
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
-            .fallbackToDestructiveMigration()
+            .addMigrations(MIGRATION_1_2)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()

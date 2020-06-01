@@ -10,7 +10,7 @@ import androidx.room.Entity
             parentColumns = ["draft_note_id"],
             entity = jp.panta.misskeyandroidclient.model.notes.draft.DraftNote::class,
             onDelete = androidx.room.ForeignKey.CASCADE,
-            onUpdate = androidx.room.ForeignKey.NO_ACTION
+            onUpdate = androidx.room.ForeignKey.CASCADE
         )]
 )
 data class UserIdDTO(
