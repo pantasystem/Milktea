@@ -4,15 +4,19 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftFileDTO
+import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftNoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.db.PollChoiceDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.db.UserIdDTO
 
 abstract class DraftNoteDao {
 
-    @Transaction
     fun fullInsert(draftNote: DraftNote): Long?{
-        val id = insert(draftNote)
-        val files = draftNote.draftFiles
+        val draftNoteDTO = DraftNoteDTO.make(draftNote)
+        val id = insert(draftNoteDTO)
+        val files = draftNote.draftFiles?.map{
+            DraftFileDTO.make(it)
+        }
         val pollChoices = draftNote.draftPoll?.choices?.let{
             it.mapIndexed { index, s ->
                 PollChoiceDTO(
@@ -40,10 +44,10 @@ abstract class DraftNoteDao {
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(draftNote: DraftNote): Long
+    abstract fun insert(draftNote: DraftNoteDTO): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertDraftFiles(list: List<DraftFile>): List<Long>
+    abstract fun insertDraftFiles(list: List<DraftFileDTO>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertPollChoices(pollChoices: List<PollChoiceDTO>)
@@ -51,14 +55,12 @@ abstract class DraftNoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertUserIds(userIds: List<UserIdDTO>)
 
-    @Transaction
     fun findDraftNote(draftNoteId: Long): DraftNote{
         return findDraftNote(draftNoteId).apply{
             loadDraftNotesData(this)
         }
     }
 
-    @Transaction
     fun findDraftNotesByAccountId(accountId: String): List<DraftNote>{
         return findDraftNotesByAccountId(accountId).map {
             it.apply{
