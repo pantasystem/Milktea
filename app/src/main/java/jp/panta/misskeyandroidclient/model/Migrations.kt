@@ -26,3 +26,9 @@ val MIGRATION_36_37 = object : Migration(36, 37){
         database.execSQL("alter table setting add weight INTEGER")
     }
 }
+
+val MIGRATION_1_2 = object : Migration(1, 2){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        //TODO migrationを書く
+    }
+}
