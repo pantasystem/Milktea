@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
         ForeignKey(
             childColumns = ["draft_note_id"],
             parentColumns = ["draft_note_id"],
-            entity = DraftNote::class,
+            entity = DraftNoteDTO::class,
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
         )

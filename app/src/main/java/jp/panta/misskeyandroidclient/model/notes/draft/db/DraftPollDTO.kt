@@ -1,21 +1,30 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
+import androidx.room.Entity
+import androidx.room.Ignore
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 
+@Entity
 class DraftPollDTO(
     val multiple: Boolean,
     val expiresAt: Long? = null
 ){
 
     companion object{
-       fun make(draftPoll: DraftPoll?): DraftPollDTO?{
-           return draftPoll?.let{
+
+        @JvmStatic
+        fun make(draftPoll: DraftPoll?): DraftPollDTO?{
+            return draftPoll?.let{
                DraftPollDTO(draftPoll.multiple, draftPoll.expiresAt)
            }
-       }
+        }
     }
 
-    fun toDraftPoll(choices: List<PollChoiceDTO>): DraftPoll{
+    @Ignore
+    fun toDraftPoll(choices: List<PollChoiceDTO>?): DraftPoll?{
+        if(choices.isNullOrEmpty()){
+            return null
+        }
         return DraftPoll(
             choices.map{
                 it.choice

@@ -1,14 +1,20 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftFile
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 
-@Entity(tableName = "draft_note")
+@Entity(tableName = "draft_note", foreignKeys = [
+    ForeignKey(
+        parentColumns = ["id"],
+        childColumns = ["accountId"],
+        entity = Account::class,
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE
+    )
+])
 data class DraftNoteDTO(
     val accountId: String,
     val visibility: String = "public",
@@ -44,24 +50,27 @@ data class DraftNoteDTO(
                 draftNote.replyId,
                 draftNote.renoteId,
                 DraftPollDTO.make(draftNote.draftPoll)
-            )
+            ).apply {
+                draftNoteId = draftNote.draftNoteId
+            }
         }
     }
 
+    @Ignore
     fun toDraftNote(
-        visibilityUserIds: List<UserIdDTO>,
-        draftFiles: List<DraftFileDTO>,
-        pollChoicesDTO: List<PollChoiceDTO>
+        visibilityUserIds: List<UserIdDTO>?,
+        draftFiles: List<DraftFileDTO>?,
+        pollChoicesDTO: List<PollChoiceDTO>?
     ): DraftNote{
         return DraftNote(
             accountId,
             visibility,
-            visibilityUserIds.map{
+            visibilityUserIds?.map{
                 it.userId
             },
             text,
             cw,
-            draftFiles.map{
+            draftFiles?.map{
                 it.toDraftFile()
             },
             viaMobile,
@@ -74,7 +83,9 @@ data class DraftNoteDTO(
             poll?.toDraftPoll(pollChoicesDTO)
 
 
-        )
+        ).apply{
+            draftNoteId = this@DraftNoteDTO.draftNoteId
+        }
     }
 
 }

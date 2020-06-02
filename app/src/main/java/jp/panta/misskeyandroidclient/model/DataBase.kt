@@ -8,6 +8,8 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftFile
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
+import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftFileDTO
+import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftNoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.db.PollChoiceDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.db.UserIdDTO
 import jp.panta.misskeyandroidclient.model.notes.reaction.*
@@ -21,8 +23,8 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.*
         Page::class,
         PollChoiceDTO::class,
         UserIdDTO::class,
-        DraftFile::class,
-        DraftNote::class
+        DraftFileDTO::class,
+        DraftNoteDTO::class
     ],
     version = 2
 )

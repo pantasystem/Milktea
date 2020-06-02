@@ -1,9 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftFile
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
@@ -13,7 +10,7 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
         ForeignKey(
             childColumns = ["draft_note_id"],
             parentColumns = ["draft_note_id"],
-            entity = DraftNote::class,
+            entity = DraftNoteDTO::class,
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
         )
@@ -39,6 +36,7 @@ data class DraftFileDTO(
         }
     }
 
+    @Ignore
     fun toDraftFile(): DraftFile{
         return DraftFile(
             remoteFileId,
