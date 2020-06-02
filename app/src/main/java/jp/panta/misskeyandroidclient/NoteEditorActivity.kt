@@ -15,18 +15,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
+import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
+import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
+import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
@@ -43,10 +48,14 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
         const val SELECT_USER_REQUEST_CODE = 810
         const val SELECT_MENTION_TO_USER_REQUEST_CODE = 931
+
+        private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
     }
     private var mViewModel: NoteEditorViewModel? = null
 
     private lateinit var mBinding: ActivityNoteEditorBinding
+
+    private lateinit var mConfirmViewModel: ConfirmViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +79,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         binding.actionUpButton.setOnClickListener {
-            finish()
+            finishOrConfirmSaveAsDraftOrDelete()
         }
+
+        mConfirmViewModel = ViewModelProvider(this)[ConfirmViewModel::class.java]
 
         val userChipAdapter = UserChipListAdapter(this)
         binding.addressUsersView.adapter = userChipAdapter
@@ -202,6 +213,28 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             }
         })
 
+        mConfirmViewModel.confirmedEvent.observe(this, Observer {
+            when(it.eventType){
+                CONFIRM_SAVE_AS_DRAFT_OR_DELETE ->{
+                    if(it.resultType == ResultType.POSITIVE){
+                        mViewModel?.saveDraft()
+                    }else{
+                        finish()
+                    }
+                }
+            }
+        })
+
+        mViewModel?.isSaveNoteAsDraft?.observe(this, Observer {
+            runOnUiThread {
+                if(it == null){
+                    Toast.makeText(this, "下書きに失敗しました", Toast.LENGTH_LONG).show()
+                }else{
+                    finish()
+                }
+            }
+
+        })
         binding.inputMain.requestFocus()
     }
 
@@ -286,6 +319,29 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     private fun startMentionToSearchAndSelectUser(){
         val intent = Intent(this, SearchAndSelectUserActivity::class.java)
         startActivityForResult(intent, SELECT_MENTION_TO_USER_REQUEST_CODE)
+    }
+
+    private fun finishOrConfirmSaveAsDraftOrDelete(){
+        if(mViewModel?.canSaveDraft() == true){
+            mConfirmViewModel.confirmEvent.event = ConfirmCommand(
+                getString(R.string.save_draft),
+                getString(R.string.save_the_note_as_a_draft),
+                eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE ,
+                args = "",
+                positiveButtonText = getString(R.string.save),
+                negativeButtonText = getString(R.string.delete)
+
+            )
+            ConfirmDialog().show(supportFragmentManager, "confirm")
+        }else{
+            finish()
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        finishOrConfirmSaveAsDraftOrDelete()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

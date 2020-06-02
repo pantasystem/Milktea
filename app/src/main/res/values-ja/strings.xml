@@ -279,4 +279,7 @@
     <string name="newly_joined_users">新規ユーザー</string>
     <string name="newly_discovered_users">新たに発見されたユーザー</string>
     <string name="trending_tag">人気のタグ</string>
+
+    <string name="save_draft">下書き保存</string>
+    <string name="save_the_note_as_a_draft">ノートを下書き保存しますか</string>
 </resources>

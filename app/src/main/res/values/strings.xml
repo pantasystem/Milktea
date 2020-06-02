@@ -278,5 +278,7 @@
     <string name="newly_joined_users">Newly joined users</string>
     <string name="newly_discovered_users">Newly discovered users</string>
     <string name="trending_tag">Trending Tags</string>
+    <string name="save_draft">Save draft</string>
+    <string name="save_the_note_as_a_draft">Save the note as a draft</string>
 
 </resources>

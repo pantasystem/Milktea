@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll
 
 import androidx.lifecycle.MutableLiveData
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import java.util.*
@@ -62,6 +63,17 @@ class PollEditor(val poll: Poll? = null) {
             )
         }
         return null
+    }
+
+    fun toDraftPoll(): DraftPoll?{
+        val choices = this.choices.value
+            ?: return null
+        return DraftPoll(choices = choices.mapNotNull{
+                it.choice?.text
+            },
+            multiple = isMutable.value == true,
+            expiresAt = expiresAt.value?.time
+        )
     }
 
 }

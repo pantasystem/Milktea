@@ -26,7 +26,7 @@ class ConfirmDialog : AppCompatDialogFragment(){
             if(event.message != null){
                 builder.setMessage(event.message)
             }
-            builder.setPositiveButton(android.R.string.ok) { _, _ ->
+            builder.setPositiveButton(event.positiveButtonText?: getString(android.R.string.ok)) { _, _ ->
                 confirmViewModel.confirmedEvent.event = ConfirmEvent(
                     confirmId = event.confirmId,
                     resultType = ResultType.POSITIVE,
@@ -36,7 +36,7 @@ class ConfirmDialog : AppCompatDialogFragment(){
                 dismiss()
             }
 
-            builder.setNegativeButton(android.R.string.cancel) { _, _ ->
+            builder.setNegativeButton(event.negativeButtonText?: getString(android.R.string.cancel)) { _, _ ->
                 confirmViewModel.confirmedEvent.event = ConfirmEvent(
                     confirmId = event.confirmId,
                     resultType = ResultType.NEGATIVE,

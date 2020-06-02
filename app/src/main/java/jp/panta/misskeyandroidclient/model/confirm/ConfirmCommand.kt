@@ -16,5 +16,7 @@ data class ConfirmCommand(
     val message: String?,
     val eventType: String,
     val args: Serializable?,
-    val confirmId: String = UUID.randomUUID().toString()
+    val confirmId: String = UUID.randomUUID().toString(),
+    val negativeButtonText: String? = null,
+    val positiveButtonText: String? = null
 ): Serializable
