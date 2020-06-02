@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.notes.draft.db
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
 @Entity(tableName = "user_id", primaryKeys = ["userId", "draft_note_id"],
@@ -13,7 +14,8 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
             entity = DraftNoteDTO::class,
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
-        )]
+        )],
+    indices = [Index("draft_note_id")]
 )
 data class UserIdDTO(
     val userId: String,

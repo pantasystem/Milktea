@@ -1,14 +1,11 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
 @Entity(
     tableName = "poll_choice",
-    primaryKeys = ["choice", "draft_note_id", "weight"],
+    primaryKeys = ["choice", "weight", "draft_note_id"],
     foreignKeys = [
         ForeignKey(
             childColumns = ["draft_note_id"],
@@ -17,7 +14,8 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("draft_note_id", "choice")]
 )
 data class PollChoiceDTO(
     val choice: String,

@@ -52,10 +52,11 @@ abstract class DraftNoteDao {
 
     fun findDraftNotesByAccount(accountId: String): List<DraftNote>{
         return findDraftNotesRelation(accountId).map{
-            it.draftNoteDTO.toDraftNote(it.visibilityUserIds, it.draftFiles, it.pollChoices)
+            it.toDraftNote()
         }
     }
 
+    @Transaction
     @Query("select * from draft_note where accountId = :accountId")
     abstract fun findDraftNotesRelation(accountId: String): List<DraftNoteRelation>
 

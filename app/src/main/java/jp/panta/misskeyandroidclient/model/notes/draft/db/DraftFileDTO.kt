@@ -14,7 +14,9 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
         )
-    ])
+    ],
+    indices = [Index("draft_note_id")]
+)
 data class DraftFileDTO(
     @ColumnInfo(name = "remote_file_id") val remoteFileId: String?,
     @ColumnInfo(name = "file_path") val filePath: String?,

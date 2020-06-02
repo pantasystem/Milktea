@@ -14,7 +14,8 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.CASCADE
     )
-])
+],
+indices = [Index("accountId", "text")])
 data class DraftNoteDTO(
     val accountId: String,
     val visibility: String = "public",
