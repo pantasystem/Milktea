@@ -56,13 +56,27 @@ abstract class DraftNoteDao {
         }
     }
 
+    fun searchDraftNotes(accountId: String, word: String): List<DraftNote>{
+        return searchByWordDraftNotesRelation(accountId, word).map{
+            it.toDraftNote()
+        }
+    }
+
+    fun getDraftNote(accountId: String, draftNoteId: Long): DraftNote{
+        return getDraftNoteRelation(accountId, draftNoteId).toDraftNote()
+    }
+
     @Transaction
     @Query("select * from draft_note where accountId = :accountId")
     abstract fun findDraftNotesRelation(accountId: String): List<DraftNoteRelation>
 
+    @Transaction
+    @Query("select * from draft_note where accountId = :accountId and text like '%'||:word||'%'")
+    abstract fun searchByWordDraftNotesRelation(accountId: String, word: String): List<DraftNoteRelation>
 
-
-
+    @Transaction
+    @Query("select * from draft_note where accountId = :accountId and draft_note_id = :draftNoteId")
+    abstract fun getDraftNoteRelation(accountId: String, draftNoteId: Long): DraftNoteRelation
 
 
 

@@ -25,6 +25,7 @@ import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
@@ -55,6 +56,8 @@ class MiApplication : Application(), MiCore {
     lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
     lateinit var settingStore: SettingStore
+
+    lateinit var draftNoteDao: DraftNoteDao
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -121,6 +124,8 @@ class MiApplication : Application(), MiCore {
         reactionHistoryDao = database.reactionHistoryDao()
 
         reactionUserSettingDao = database.reactionUserSettingDao()
+
+        draftNoteDao = database.draftNoteDao()
 
         mEncryption = KeyStoreSystemEncryption(this)
 
