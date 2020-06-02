@@ -66,8 +66,17 @@ class DraftNoteDaoTest{
         assertEquals(searchedNote.text, draftNoteTestText)
 
 
-        val draftNote = draftNoteDao.getDraftNote(testAccountId, id!!)
+        val draftNote = draftNoteDao.getDraftNote(testAccountId, id!!)!!
         assertEquals(draftNote.text, draftNoteTestText)
+
+        draftNoteDao.deleteDraftNote(draftNote)
+
+        val afterDeletedDraftNote = draftNoteDao.getDraftNote(testAccountId, id)
+
+        assertEquals(afterDeletedDraftNote, null)
+
+        val afterDeletedDraftNotes = draftNoteDao.findDraftNotesByAccount(testAccountId)
+        assertEquals(afterDeletedDraftNotes.isEmpty(), true)
 
 
     }

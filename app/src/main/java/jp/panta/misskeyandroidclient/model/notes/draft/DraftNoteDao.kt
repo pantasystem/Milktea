@@ -62,8 +62,14 @@ abstract class DraftNoteDao {
         }
     }
 
-    fun getDraftNote(accountId: String, draftNoteId: Long): DraftNote{
-        return getDraftNoteRelation(accountId, draftNoteId).toDraftNote()
+    fun getDraftNote(accountId: String, draftNoteId: Long): DraftNote?{
+        return getDraftNoteRelation(accountId, draftNoteId)?.toDraftNote()
+    }
+
+    fun deleteDraftNote(draftNote: DraftNote){
+        draftNote.draftNoteId?.let{
+            deleteDraftNote(draftNote.accountId, it)
+        }
     }
 
     @Transaction
@@ -76,7 +82,11 @@ abstract class DraftNoteDao {
 
     @Transaction
     @Query("select * from draft_note where accountId = :accountId and draft_note_id = :draftNoteId")
-    abstract fun getDraftNoteRelation(accountId: String, draftNoteId: Long): DraftNoteRelation
+    abstract fun getDraftNoteRelation(accountId: String, draftNoteId: Long): DraftNoteRelation?
+
+    @Transaction
+    @Query("delete from 'draft_note' where accountId = :accountId and draft_note_id = :draftNoteId")
+    abstract fun deleteDraftNote(accountId: String, draftNoteId: Long)
 
 
 
