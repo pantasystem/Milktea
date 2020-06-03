@@ -122,7 +122,6 @@
 
                     layout="@layout/media_preview"
                     app:media="@{note.media}"
-                    app:notesViewModel="@{notesViewModel}"
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
                     android:layout_below="@id/text"
@@ -235,7 +234,6 @@
                         android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
                         />
                 <include layout="@layout/media_preview"
-                        app:notesViewModel="@{notesViewModel}"
                         app:media="@{note.subNoteMedia}"
                         android:id="@+id/subNoteMediaPreview"
                         android:layout_width="match_parent"

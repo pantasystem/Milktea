@@ -93,19 +93,17 @@ class PostNoteTask(
 
     private fun executeFileUpload(fileUploader: FileUploader): Boolean{
         val tmpFiles = files
-        val exUploadAndUploaded = tmpFiles?.mapNotNull {
+        filesIds = tmpFiles?.mapNotNull {
             if (it.isLocal && it.uploadFile != null) {
-                fileUploader.upload(it.uploadFile)
+                fileUploader.upload(it.uploadFile)?.id
             } else {
                 //skip
-                it.fileProperty
+                it.remoteFileId
             }
         }
-        filesIds = exUploadAndUploaded?.map{
-            it.id
-        }
+
         //サイズが合わなければエラー
-        return tmpFiles != null && tmpFiles.size == exUploadAndUploaded?.size
+        return tmpFiles != null && tmpFiles.size == filesIds?.size
     }
 
 }

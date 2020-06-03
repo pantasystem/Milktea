@@ -11,18 +11,22 @@ class FileNoteEditorData: Serializable{
     val url: String
     val uploadFile: UploadFile?
     val fileProperty: FileProperty?
+    val remoteFileId: String?
     val isLocal: Boolean
+
     constructor(uploadFile: UploadFile){
         this.url = uploadFile.getUri().toString()
         this.uploadFile = uploadFile
         this.fileProperty = null
         this.isLocal = true
+        this.remoteFileId = null
     }
     constructor(fileProperty: FileProperty){
         this.url = fileProperty.thumbnailUrl?: fileProperty.url
         this.uploadFile = null
         this.fileProperty = fileProperty
         this.isLocal = false
+        this.remoteFileId = fileProperty.id
     }
 
     constructor(draftFile: DraftFile){
@@ -30,6 +34,7 @@ class FileNoteEditorData: Serializable{
         this.uploadFile = UploadFile(Uri.parse(this.url), true)
         this.fileProperty = null
         this.isLocal = draftFile.remoteFileId == null
+        this.remoteFileId = draftFile.remoteFileId
     }
 
     override fun equals(other: Any?): Boolean {

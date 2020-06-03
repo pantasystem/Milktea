@@ -141,7 +141,6 @@
                         android:layout_below="@id/text"
                         android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                         app:media="@{note.media}"
-                        app:notesViewModel="@{notesViewModel}"
                         tools:visibility="gone"
 
                         />
@@ -256,7 +255,6 @@
                             android:layout_below="@id/subNoteText"
                             android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
                             app:media="@{note.subNoteMedia}"
-                            app:notesViewModel="@{notesViewModel}"
                             tools:layout_height="50dp" />
 
 

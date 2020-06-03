@@ -10,9 +10,7 @@
                 name="media"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData" />
 
-        <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+
     </data>
     <LinearLayout
             android:orientation="horizontal" android:layout_width="match_parent"

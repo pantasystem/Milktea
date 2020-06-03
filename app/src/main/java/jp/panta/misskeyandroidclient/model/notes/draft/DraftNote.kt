@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.draft
 
+import java.io.Serializable
 
 
 data class DraftNote(
@@ -19,7 +20,7 @@ data class DraftNote(
     val draftPoll: DraftPoll? = null
 
 
-){
+): Serializable{
 
     var draftNoteId: Long? = null
 
