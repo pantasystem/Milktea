@@ -40,3 +40,15 @@ val MIGRATION_1_2 = object : Migration(1, 2){
         database.execSQL("create index 'index_draft_file' on 'draft_file'('draft_note_id')")
     }
 }
+
+val MIGRATION_2_3 = object : Migration(2, 3){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // change draftFileDTO
+
+
+        database.execSQL("alter table 'draft_file' add column 'is_sensitive' INTEGER not null default 0")
+        database.execSQL("alter table 'draft_file' add column 'type' TEXT")
+        database.execSQL("alter table 'draft_file' add column 'thumbnailUrl' TEXT")
+        database.execSQL("alter table 'draft_file' add column 'name' TEXT not null default 'name none'")
+    }
+}

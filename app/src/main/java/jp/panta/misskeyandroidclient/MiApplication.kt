@@ -112,6 +112,7 @@ class MiApplication : Application(), MiCore {
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
             .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()

@@ -5,7 +5,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import jp.panta.misskeyandroidclient.model.core.*
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftFile
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftFileDTO
@@ -26,7 +25,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.*
         DraftFileDTO::class,
         DraftNoteDTO::class
     ],
-    version = 2
+    version = 3
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class)
 abstract class DataBase : RoomDatabase(){

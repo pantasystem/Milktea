@@ -1,12 +1,13 @@
 package jp.panta.misskeyandroidclient.model.drive
 
 import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.file.File
 import java.io.Serializable
 
 data class FileProperty(
     @SerializedName("id") val id: String,
     //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date?,
-    @SerializedName("name") val name: String?,
+    @SerializedName("name") val name: String,
     @SerializedName("type") val type: String? = null,
     @SerializedName("md5") val md5: String? = null,
     @SerializedName("size") val size: Int? = null,
@@ -48,6 +49,21 @@ data class FileProperty(
                 "$hostUrl/$url"
             }
         }
+    }
+
+    fun toFile(instanceBaseUrl: String): File{
+        val path = getUrl(instanceBaseUrl)
+        val thumbnailUrl = getThumbnailUrl(instanceBaseUrl)
+
+        return File(
+            name,
+            path,
+            type,
+            id,
+            null,
+            thumbnailUrl,
+            isSensitive
+        )
     }
 
 }

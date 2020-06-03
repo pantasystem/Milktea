@@ -1,8 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
 import androidx.room.*
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftFile
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.file.File
 
 @Entity(
     tableName = "draft_file",
@@ -18,34 +17,47 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
     indices = [Index("draft_note_id")]
 )
 data class DraftFileDTO(
+    @ColumnInfo(defaultValue = "name none") val name: String,
     @ColumnInfo(name = "remote_file_id") val remoteFileId: String?,
     @ColumnInfo(name = "file_path") val filePath: String?,
+    @ColumnInfo(name = "is_sensitive") val isSensitive: Boolean?,
+    @ColumnInfo(name = "type") val type: String?,
+    @ColumnInfo(name ="thumbnailUrl") val thumbnailUrl: String?,
     @ColumnInfo(name = "draft_note_id") val draftNoteId: Long
 ){
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "file_id")
-    var fileId: Int? = null
+    var fileId: Long? = null
 
     companion object{
-        fun make(draftFile: DraftFile): DraftFileDTO{
+        fun make(file: File, draftNoteId: Long): DraftFileDTO{
             return DraftFileDTO(
-                draftFile.remoteFileId,
-                draftFile.filePath,
-                draftFile.draftNoteId
+                file.name,
+                file.remoteFileId,
+                file.path,
+                file.isSensitive,
+                file.type,
+                file.thumbnailUrl,
+                draftNoteId
             ).apply{
-                this.fileId = draftFile.fileId
+                this.fileId = file.localFileId
             }
         }
     }
 
+
+
     @Ignore
-    fun toDraftFile(): DraftFile{
-        return DraftFile(
+    fun toFile(): File{
+        return File(
+            name,
+            filePath?: "",
+            type,
             remoteFileId,
-            filePath,
-            draftNoteId
-        ).apply{
-            this.fileId = this@DraftFileDTO.fileId
-        }
+            fileId,
+            thumbnailUrl,
+            isSensitive
+
+        )
     }
 }

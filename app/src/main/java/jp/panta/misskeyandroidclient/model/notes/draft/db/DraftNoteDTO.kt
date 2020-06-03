@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.model.notes.draft.db
 
 import androidx.room.*
 import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftFile
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 
@@ -72,7 +71,7 @@ data class DraftNoteDTO(
             text,
             cw,
             draftFiles?.map{
-                it.toDraftFile()
+                it.toFile()
             },
             viaMobile,
             localOnly,

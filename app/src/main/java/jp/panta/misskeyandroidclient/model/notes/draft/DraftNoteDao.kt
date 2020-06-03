@@ -9,8 +9,8 @@ abstract class DraftNoteDao {
     fun fullInsert(draftNote: DraftNote): Long?{
         val draftNoteDTO = DraftNoteDTO.make(draftNote)
         val id = insert(draftNoteDTO)
-        val files = draftNote.draftFiles?.map{
-            DraftFileDTO.make(it)
+        val files = draftNote.files?.map{
+            DraftFileDTO.make(it, id)
         }
         val pollChoices = draftNote.draftPoll?.choices?.let{
             it.mapIndexed { index, s ->

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.draft
 
+import jp.panta.misskeyandroidclient.model.file.File
 import java.io.Serializable
 
 
@@ -9,7 +10,7 @@ data class DraftNote(
     var visibleUserIds: List<String>? = null,
     val text: String?,
     val cw: String? = null,
-    var draftFiles: List<DraftFile>? = null,
+    var files: List<File>? = null,
     val viaMobile: Boolean? = null,
     val localOnly: Boolean? = null,
     val noExtractMentions: Boolean? = null,
