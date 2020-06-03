@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.view.media.ImageFragment
 import jp.panta.misskeyandroidclient.view.media.PlayerFragment
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.android.synthetic.main.activity_media.*
 import java.io.File
 import java.io.Serializable
@@ -121,11 +122,13 @@ class MediaActivity : AppCompatActivity() {
     }
 
     private fun createFragment(fileProperty: FileProperty?, uri: Uri?): Fragment{
+        val miCore = applicationContext as? MiCore
+        val baseUrl = miCore?.currentAccount?.value?.getCurrentConnectionInformation()?.instanceBaseUrl?: ""
         if(fileProperty != null){
             return if(fileProperty.type?.contains("image") == true){
-                ImageFragment.newInstance(fileProperty.url)
+                ImageFragment.newInstance(fileProperty.getUrl(baseUrl))
             }else{
-                PlayerFragment.newInstance(fileProperty.url)
+                PlayerFragment.newInstance(fileProperty.getUrl(baseUrl))
             }
         }
         if(uri != null){

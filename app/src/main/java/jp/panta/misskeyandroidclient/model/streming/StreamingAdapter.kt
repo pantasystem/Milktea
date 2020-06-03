@@ -84,8 +84,8 @@ class StreamingAdapter(
     }
 
 
-    fun send(json: String){
-        mWebSocket?.send(json)
+    fun send(json: String): Boolean{
+        return mWebSocket?.send(json)?: false
     }
 
     private fun connect(){

@@ -19,4 +19,35 @@ data class FileProperty(
     //@SerializedName("webpublicUrl") val webPublicUrl: String? = null,
     @SerializedName("thumbnailUrl") val thumbnailUrl: String? = null,
     @SerializedName("attachedNoteIds") val attachedNoteIds: List<String?>? = null
-): Serializable
+): Serializable{
+
+
+    fun getThumbnailUrl(instanceBaseUrl: String): String{
+        return getUrl(instanceBaseUrl, thumbnailUrl?: url)
+    }
+
+    fun getUrl(instanceBaseUrl: String): String{
+        return getUrl(instanceBaseUrl, url)
+    }
+
+    private fun getUrl(instanceBaseUrl: String, url: String): String{
+        val hostUrl = if(instanceBaseUrl.endsWith("/")){
+            instanceBaseUrl.substring(0, instanceBaseUrl.length - 1)
+        }else{
+            instanceBaseUrl
+        }
+
+        return when {
+            url.startsWith("https://") -> {
+                url
+            }
+            url.startsWith("/") -> {
+                hostUrl + url
+            }
+            else -> {
+                "$hostUrl/$url"
+            }
+        }
+    }
+
+}
