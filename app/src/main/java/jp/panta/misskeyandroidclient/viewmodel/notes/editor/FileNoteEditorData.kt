@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import java.io.Serializable
 
-class FileNoteEditorData: Serializable{
+/*class FileNoteEditorData: Serializable{
     val url: String
     val uploadFile: UploadFile?
     val fileProperty: FileProperty?
@@ -55,4 +55,4 @@ class FileNoteEditorData: Serializable{
     }
 
 
-}
+}*/

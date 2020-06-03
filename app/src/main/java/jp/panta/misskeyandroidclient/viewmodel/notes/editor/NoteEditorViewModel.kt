@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
@@ -69,21 +70,18 @@ class NoteEditorViewModel(
         }
     }
 
-    val editorFiles = MediatorLiveData<List<FileNoteEditorData>>().apply{
-        this.postValue(note?.files?.map{
-            FileNoteEditorData(
-                it
-            )
-        }?: draftNote?.files?.map{
-            FileNoteEditorData(
-                UploadFile.create(it)
-            )
-        }?: emptyList())
+
+    val files = MediatorLiveData<List<File>>().apply{
+        this.postValue(
+            note?.files?.map{
+                it.toFile(getInstanceBaseUrl()?: "")
+            }?:draftNote?.files?: emptyList<File>()
+        )
     }
 
     val totalImageCount = MediatorLiveData<Int>().apply{
 
-        this.addSource(editorFiles){
+        this.addSource(files){
             Log.d("NoteEditorViewModel", "list$it, sizeは: ${it.size}")
             this.value = it.size
         }
@@ -142,7 +140,7 @@ class NoteEditorViewModel(
     val showPollDatePicker = EventBus<Unit>()
     val showPollTimePicker = EventBus<Unit>()
 
-    val showPreviewFileEvent = EventBus<FileNoteEditorData>()
+    val showPreviewFileEvent = EventBus<File>()
 
     val isSaveNoteAsDraft = EventBus<Long?>()
     init{
@@ -154,7 +152,7 @@ class NoteEditorViewModel(
     fun post(){
         val noteTask = PostNoteTask(getCurrentInformation()!!, encryption)
         noteTask.cw = cw.value
-        noteTask.files = editorFiles.value
+        noteTask.files = files.value
         noteTask.text =text.value
         noteTask.poll = poll.value?.buildCreatePoll()
         noteTask.renoteId = quoteToNoteId
@@ -165,74 +163,54 @@ class NoteEditorViewModel(
         this.noteTask.postValue(noteTask)
     }
 
-    fun add(file: Uri){
-        val files = editorFiles.value.toArrayList()
+    fun add(file: File){
+        val files = files.value.toArrayList()
         files.add(
-            FileNoteEditorData(
-                UploadFile(file, true)
-            )
+            file
         )
-        editorFiles.value = files
+        this.files.value = files
     }
 
     fun add(fp: FileProperty){
-        val files = editorFiles.value.toArrayList()
-        files.add(
-            FileNoteEditorData(
-                fp
-            )
-        )
-        editorFiles.value = files
+        add(fp.toFile(getInstanceBaseUrl()?: ""))
     }
 
-    fun addAllFile(file: List<Uri>){
-        val files = editorFiles.value.toArrayList()
-        files.addAll(file.map{
-            FileNoteEditorData(
-                UploadFile(it, true)
-            )
-        })
-        editorFiles.value = files
-    }
+
 
     fun addAllFileProperty(fpList: List<FileProperty>){
-        val files = editorFiles.value.toArrayList()
+        val files = files.value.toArrayList()
         files.addAll(fpList.map{
-            FileNoteEditorData(
-                it
-            )
+            it.toFile(getInstanceBaseUrl()?: "")
         })
-        editorFiles.value = files
+        this.files.value = files
     }
 
-    fun removeFileNoteEditorData(data: FileNoteEditorData){
-        val files = editorFiles.value.toArrayList()
-        files.remove(data)
-        editorFiles.value = files
+    fun removeFileNoteEditorData(file: File){
+        val files = files.value.toArrayList()
+        files.remove(file)
+        this.files.value = files
     }
 
     fun localFileTotal(): Int{
-        return editorFiles.value?.filter{
-            it.isLocal
+        return files.value?.filter{
+            it.remoteFileId == null
         }?.size?: 0
     }
 
     fun driveFileTotal(): Int{
-        return editorFiles.value?.filter{
-            !it.isLocal
+        return files.value?.filter{
+            it.remoteFileId != null
         }?.size?: 0
     }
 
     fun fileTotal(): Int{
-        return editorFiles.value?.size?: 0
+        return files.value?.size?: 0
     }
 
-    fun driveFiles(): List<FileProperty>{
-        return editorFiles.value?.filter {
-            !it.isLocal && it.fileProperty != null
-        }?.mapNotNull {
-            it.fileProperty
-        } ?: emptyList()
+    fun remoteFiles(): List<File>{
+        return files.value?.filter{
+            it.remoteFileId != null
+        }?: emptyList()
     }
 
 
@@ -265,11 +243,11 @@ class NoteEditorViewModel(
     }
 
 
-    private fun List<FileNoteEditorData>?.toArrayList(): ArrayList<FileNoteEditorData>{
+    private fun List<File>?.toArrayList(): ArrayList<File>{
         return if(this == null){
-            ArrayList<FileNoteEditorData>()
+            ArrayList<File>()
         }else{
-            ArrayList<FileNoteEditorData>(this)
+            ArrayList<File>(this)
         }
     }
 
@@ -298,8 +276,8 @@ class NoteEditorViewModel(
         address.postValue(list)
     }
 
-    fun showPreviewFile(previewImage: FileNoteEditorData){
-        showPreviewFileEvent.event = previewImage
+    fun showPreviewFile(file: File){
+        showPreviewFileEvent.event = file
     }
 
     fun addMentionUsers(users: List<User>, pos: Int): Int{
@@ -377,7 +355,7 @@ class NoteEditorViewModel(
     fun canSaveDraft(): Boolean{
         return !cw.value.isNullOrBlank()
                 || !text.value.isNullOrBlank()
-                || !editorFiles.value.isNullOrEmpty()
+                || !files.value.isNullOrEmpty()
                 || !poll.value?.choices?.value.isNullOrEmpty()
                 || !address.value.isNullOrEmpty()
     }
@@ -385,6 +363,10 @@ class NoteEditorViewModel(
     private fun <T, S>MediatorLiveData<T>.addSourceChain(liveData: LiveData<S>, observer: (out: S)-> Unit): MediatorLiveData<T>{
         this.addSource(liveData, observer)
         return this
+    }
+
+    private fun getInstanceBaseUrl(): String?{
+        return currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl
     }
 
 }

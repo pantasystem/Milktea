@@ -4,11 +4,11 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-                name="noteEditorViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
+                name="fileListener"
+                type="jp.panta.misskeyandroidclient.viewmodel.file.FileListener" />
         <variable
-                name="fileNoteEditorData"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.FileNoteEditorData" />
+                name="file"
+                type="jp.panta.misskeyandroidclient.model.file.File" />
     </data>
     <FrameLayout
             android:layout_width="wrap_content"
@@ -21,9 +21,9 @@
                 android:layout_height="100dp"
                 android:padding="8dp"
 
-                app:setSimpleImageUri="@{fileNoteEditorData.url}"
+                app:setSimpleImageUri="@{file.path}"
                 tools:srcCompat="@mipmap/ic_launcher_round"
-                android:onClick="@{ ()-> noteEditorViewModel.showPreviewFile(fileNoteEditorData)}"
+                android:onClick="@{ ()-> fileListener.onSelect(file) }"
                 tools:ignore="ContentDescription" />
         <CheckBox
                 android:id="@+id/checkBox"
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:checked="true"
-                android:onClick="@{()-> noteEditorViewModel.removeFileNoteEditorData(fileNoteEditorData)}"
+                android:onClick="@{()-> fileListener.onDetach(file) }"
                 />
     </FrameLayout>
 
