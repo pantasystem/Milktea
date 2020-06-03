@@ -8,9 +8,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteEditorFilePreviewBinding
+import jp.panta.misskeyandroidclient.viewmodel.notes.editor.FileNoteEditorData
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 
-class SimpleImagePreviewAdapter(private val viewModel: NoteEditorViewModel) : ListAdapter<FileNoteEditorData ,SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(ItemCallback()){
+class SimpleImagePreviewAdapter(private val viewModel: NoteEditorViewModel) : ListAdapter<FileNoteEditorData,SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(ItemCallback()){
     private class ItemCallback: DiffUtil.ItemCallback<FileNoteEditorData>(){
         override fun areContentsTheSame(
             oldItem: FileNoteEditorData,

@@ -3,23 +3,16 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
-import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
@@ -78,9 +71,13 @@ class NoteEditorViewModel(
 
     val editorFiles = MediatorLiveData<List<FileNoteEditorData>>().apply{
         this.postValue(note?.files?.map{
-            FileNoteEditorData(it)
-        }?: draftNote?.draftFiles?.map{
-            FileNoteEditorData(it)
+            FileNoteEditorData(
+                it
+            )
+        }?: draftNote?.files?.map{
+            FileNoteEditorData(
+                UploadFile.create(it)
+            )
         }?: emptyList())
     }
 
@@ -170,20 +167,30 @@ class NoteEditorViewModel(
 
     fun add(file: Uri){
         val files = editorFiles.value.toArrayList()
-        files.add(FileNoteEditorData(UploadFile(file, true)))
+        files.add(
+            FileNoteEditorData(
+                UploadFile(file, true)
+            )
+        )
         editorFiles.value = files
     }
 
     fun add(fp: FileProperty){
         val files = editorFiles.value.toArrayList()
-        files.add(FileNoteEditorData(fp))
+        files.add(
+            FileNoteEditorData(
+                fp
+            )
+        )
         editorFiles.value = files
     }
 
     fun addAllFile(file: List<Uri>){
         val files = editorFiles.value.toArrayList()
         files.addAll(file.map{
-            FileNoteEditorData(UploadFile(it, true))
+            FileNoteEditorData(
+                UploadFile(it, true)
+            )
         })
         editorFiles.value = files
     }
@@ -191,7 +198,9 @@ class NoteEditorViewModel(
     fun addAllFileProperty(fpList: List<FileProperty>){
         val files = editorFiles.value.toArrayList()
         files.addAll(fpList.map{
-            FileNoteEditorData(it)
+            FileNoteEditorData(
+                it
+            )
         })
         editorFiles.value = files
     }

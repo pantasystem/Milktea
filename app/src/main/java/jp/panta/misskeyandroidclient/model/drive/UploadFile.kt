@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.drive
 
 import android.net.Uri
-import java.io.File
+import jp.panta.misskeyandroidclient.model.file.File
 import java.io.Serializable
 
 class UploadFile(
@@ -17,4 +17,14 @@ class UploadFile(
         return Uri.parse(path)
     }
 
+    companion object{
+
+        @JvmStatic
+        fun create(file: File): UploadFile{
+            return UploadFile(
+                Uri.parse(file.path),
+                true
+            )
+        }
+    }
 }

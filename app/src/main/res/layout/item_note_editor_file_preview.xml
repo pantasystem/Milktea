@@ -8,7 +8,7 @@
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
         <variable
                 name="fileNoteEditorData"
-                type="jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData" />
+                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.FileNoteEditorData" />
     </data>
     <FrameLayout
             android:layout_width="wrap_content"

@@ -1,10 +1,7 @@
-package jp.panta.misskeyandroidclient.view.notes.editor
+package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
-import android.net.Uri
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftFile
-import java.io.File
 import java.io.Serializable
 
 class FileNoteEditorData: Serializable{
@@ -29,13 +26,7 @@ class FileNoteEditorData: Serializable{
         this.remoteFileId = fileProperty.id
     }
 
-    constructor(draftFile: DraftFile){
-        this.url = draftFile.filePath?: ""
-        this.uploadFile = UploadFile(Uri.parse(this.url), true)
-        this.fileProperty = null
-        this.isLocal = draftFile.remoteFileId == null
-        this.remoteFileId = draftFile.remoteFileId
-    }
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

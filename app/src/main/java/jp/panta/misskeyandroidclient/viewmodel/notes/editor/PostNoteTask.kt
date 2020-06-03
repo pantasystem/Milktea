@@ -5,7 +5,6 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
-import jp.panta.misskeyandroidclient.view.notes.editor.FileNoteEditorData
 import java.io.Serializable
 import java.util.*
 
