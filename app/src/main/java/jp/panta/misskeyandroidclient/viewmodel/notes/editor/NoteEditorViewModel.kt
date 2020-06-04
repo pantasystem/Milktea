@@ -326,7 +326,8 @@ class NoteEditorViewModel(
                     visibility = visibility.value?.visibility?: "public",
                     localOnly = visibility.value?.isLocalOnly,
                     renoteId = quoteToNoteId,
-                    replyId = replyToNoteId
+                    replyId = replyToNoteId,
+                    files = files.value
                 ).apply{
                     this.draftNoteId = draftNote?.draftNoteId
                 }

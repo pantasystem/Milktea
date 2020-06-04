@@ -36,6 +36,9 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
         draftNotesSwipeRefresh.setOnRefreshListener {
             viewModel.loadDraftNotes()
         }
+        viewModel.isLoading.observe( viewLifecycleOwner, Observer {
+            draftNotesSwipeRefresh.isRefreshing = it
+        })
     }
 
     override fun onSelect(draftNote: DraftNote?) {
