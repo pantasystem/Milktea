@@ -284,4 +284,6 @@
     <string name="save_the_note_as_a_draft">ノートを下書き保存しますか</string>
     <string name="draft_notes">下書きノート</string>
     <string name="toggle_content_visibility">コンテンツを表示/非表示</string>
+    <string name="delete_draft_note">下書きノートを削除する</string>
+
 </resources>

@@ -91,6 +91,7 @@ class DraftNotesViewModel(
         viewModelScope.launch(Dispatchers.IO){
             try{
                 draftNoteDao.deleteDraftNote(draftNote)
+                loadDraftNotes()
             }catch(e: Exception){
                 Log.e("DraftNotesViewModel", "下書きノート削除に失敗しました", e)
             }

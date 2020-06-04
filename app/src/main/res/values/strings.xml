@@ -282,5 +282,6 @@
     <string name="save_the_note_as_a_draft">Save the note as a draft</string>
     <string name="draft_notes">Draft notes</string>
     <string name="toggle_content_visibility">Toggle content visibility</string>
+    <string name="delete_draft_note">Delete draft note</string>
 
 </resources>

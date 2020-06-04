@@ -98,6 +98,32 @@
 
 
             </RelativeLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/contentMain"
+                    android:gravity="end">
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:src="@drawable/ic_edit_black_24dp"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        android:layout_marginEnd="8dp"
+                        tools:ignore="ContentDescription"
+                        android:onClick="@{ ()-> draftNoteAction.onSelect(note.note) }"
+                        />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:src="@drawable/ic_delete_black_24dp"
+                        android:tint="?attr/colorNoteActionButtonTint"
+                        tools:ignore="ContentDescription"
+                        android:onClick="@{ ()-> draftNoteAction.onDelete(note.note) }"
+                        />
+            </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
