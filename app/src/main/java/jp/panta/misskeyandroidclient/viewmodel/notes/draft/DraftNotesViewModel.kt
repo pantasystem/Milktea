@@ -19,7 +19,7 @@ class DraftNotesViewModel(
     val miCore: MiCore
 ) : ViewModel(){
 
-    val draftNotes = object : MediatorLiveData<List<DraftNote>>(){
+    val draftNotes = object : MediatorLiveData<List<DraftNoteViewData>>(){
         override fun onActive() {
             super.onActive()
             if(value.isNullOrEmpty()){
@@ -38,7 +38,9 @@ class DraftNotesViewModel(
         viewModelScope.launch(Dispatchers.IO){
             try{
                 val notes = draftNoteDao.findDraftNotesByAccount(ar.account.id)
-                draftNotes.postValue(notes)
+                draftNotes.postValue(notes.map{
+                    DraftNoteViewData(it)
+                })
             }catch(e: Exception){
 
             }finally {
@@ -56,11 +58,12 @@ class DraftNotesViewModel(
     fun detachFile(file: File?) {
         file?.localFileId?.let{
             val notes = ArrayList(draftNotes.value?: emptyList())
-            val targetNote = notes.firstOrNull {
-                it.files?.any{ f ->
+            val targetNote = (notes.firstOrNull {
+                it.note.value?.files?.any{ f ->
                     f == file
                 }?: false
-            }?: return
+            }?: return).note.value ?: return
+
             val updatedFiles = ArrayList(targetNote.files?: emptyList())
             updatedFiles.remove(file)
 

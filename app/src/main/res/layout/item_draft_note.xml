@@ -7,6 +7,9 @@
         <variable
                 name="note"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.draft.DraftNoteViewData" />
+        <variable
+                name="draftNoteAction"
+                type="jp.panta.misskeyandroidclient.view.notes.draft.DraftNoteActionCallback" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -62,6 +65,23 @@
                         android:visibility='@{note.note.text == null ? View.GONE : View.VISIBLE}'
 
                         />
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/pollChoicesView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:itemCount="1"
+                        android:layout_below="@id/text"
+                        tools:listitem="@layout/item_draft_note_poll_choice"
+                        android:layout_marginBottom="8dp"
+                    />
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/imagesView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/pollChoicesView"
+                        tools:listitem="@layout/item_note_editor_file_preview"
+                        tools:itemCount="1"/>
 
 
             </RelativeLayout>
