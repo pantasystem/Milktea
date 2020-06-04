@@ -32,8 +32,8 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:onClick="@{ ()-> draftNoteAction.onSelect(note.note) }"
                 >
             <TextView
@@ -43,6 +43,7 @@
                     tools:text="cwcwcwwcwcw"
                     android:text="@{note.note.cw}"
                     android:visibility='@{note.note.cw == null ? View.GONE : View.VISIBLE}'
+                    android:textSize="16sp"
 
                     />
 
@@ -70,7 +71,7 @@
                 <TextView
                         android:id="@id/text"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:text="@{note.note.text}"
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
 

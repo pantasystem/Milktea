@@ -76,14 +76,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        when(requestCode){
-            300 ->{
-                if(resultCode == RESULT_OK){
-                    mDraftNotesViewModel?.loadDraftNotes()
-                }
-            }
-        }
+        mDraftNotesViewModel?.loadDraftNotes()
 
     }
 
