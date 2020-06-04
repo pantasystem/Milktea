@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.draft
 
 import android.util.Log
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
@@ -18,6 +16,16 @@ class DraftNotesViewModel(
     val draftNoteDao: DraftNoteDao,
     val miCore: MiCore
 ) : ViewModel(){
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(
+        val miApplication: MiApplication
+    ) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return DraftNotesViewModel(miApplication.draftNoteDao, miApplication) as T
+
+        }
+    }
 
     val draftNotes = object : MediatorLiveData<List<DraftNoteViewData>>(){
         override fun onActive() {

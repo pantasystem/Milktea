@@ -4,5 +4,5 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
 interface DraftNoteActionCallback {
 
-    fun onSelect(draftNote: DraftNote)
+    fun onSelect(draftNote: DraftNote?)
 }

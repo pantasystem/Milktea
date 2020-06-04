@@ -46,6 +46,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
         const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
         const val EXTRA_NOTE = "jp.panta.misskeyandroidclient.EXTRA_NOTE"
+        const val EXTRA_DRAFT_NOTE = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
         const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
