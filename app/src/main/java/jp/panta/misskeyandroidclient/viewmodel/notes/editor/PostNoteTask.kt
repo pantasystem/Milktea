@@ -1,10 +1,13 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.CreateNote
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import java.io.Serializable
 import java.util.*
@@ -12,7 +15,9 @@ import java.util.*
 class PostNoteTask(
     //connectionInstance: ConnectionInstance,
     connectionInformation: EncryptedConnectionInformation,
-    encryption: Encryption
+    encryption: Encryption,
+    val draftNote: DraftNote?,
+    val account: Account
     //private val fileUploader: FileUploader
 ): Serializable{
 
@@ -100,6 +105,26 @@ class PostNoteTask(
 
         //サイズが合わなければエラー
         return tmpFiles != null && tmpFiles.size == filesIds?.size
+    }
+
+    fun toDraftNote(): DraftNote{
+        val draftPoll = poll?.let{
+            DraftPoll(it.choices, it.multiple, it.expiresAt)
+        }
+
+        return DraftNote(
+            accountId = account.id,
+            text = text,
+            cw = cw,
+            visibleUserIds = visibleUserIds,
+            draftPoll = draftPoll,
+            visibility = visibility?.name?: "public",
+            localOnly = isLocal,
+            renoteId = renoteId,
+            replyId = replyId
+        ).apply{
+            this.draftNoteId = draftNote?.draftNoteId
+        }
     }
 
 }

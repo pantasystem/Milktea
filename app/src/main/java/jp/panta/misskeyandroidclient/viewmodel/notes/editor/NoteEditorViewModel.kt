@@ -150,7 +150,7 @@ class NoteEditorViewModel(
     }
 
     fun post(){
-        val noteTask = PostNoteTask(getCurrentInformation()!!, encryption)
+        val noteTask = PostNoteTask(getCurrentInformation()!!, encryption, draftNote, currentAccount.value?.account!!)
         noteTask.cw = cw.value
         noteTask.files = files.value
         noteTask.text =text.value
