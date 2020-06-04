@@ -48,11 +48,11 @@ class DraftNotesViewModel(
                 val notes = draftNoteDao.findDraftNotesByAccount(ar.account.id)
                 draftNotes.postValue(notes.map{
                     DraftNoteViewData(it)
-                })
+                }.asReversed())
             }catch(e: Exception){
 
             }finally {
-                isLoading.value = false
+                isLoading.postValue(false)
             }
         }
     }

@@ -280,5 +280,6 @@
     <string name="trending_tag">Trending Tags</string>
     <string name="save_draft">Save draft</string>
     <string name="save_the_note_as_a_draft">Save the note as a draft</string>
+    <string name="draft_notes">Draft notes</string>
 
 </resources>

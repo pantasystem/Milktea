@@ -376,6 +376,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_antenna ->{
                 startActivity(Intent(this, AntennaListActivity::class.java))
             }
+            R.id.nav_draft ->{
+                startActivity(
+                    Intent(this, DraftNotesActivity::class.java)
+                )
+            }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)

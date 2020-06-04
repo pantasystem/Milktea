@@ -5,7 +5,11 @@ import android.content.Intent
 import android.util.Log
 import com.google.gson.GsonBuilder
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class PostNoteService : IntentService("PostNoteService") {
 
@@ -31,6 +35,7 @@ class PostNoteService : IntentService("PostNoteService") {
         val createNote = noteTask.execute(uploader)
         if(createNote == null){
             Log.d(tag, "ファイルのアップロードに失敗しました")
+            saveDraftNote(noteTask.toDraftNote())
             return
         }
 
@@ -39,9 +44,38 @@ class PostNoteService : IntentService("PostNoteService") {
 
         if(result?.code() in 200 until 300){
             Log.d(tag, "ノートの投稿に成功しました")
+            removeExDraftNote(noteTask.draftNote)
+
         }else{
             Log.d(tag, "ノートの投稿に失敗しました")
+            saveDraftNote(noteTask.toDraftNote())
+
         }
     }
+
+    private fun removeExDraftNote(draftNote: DraftNote?){
+        GlobalScope.launch(Dispatchers.IO){
+            try{
+                val app = applicationContext.applicationContext as MiApplication
+                draftNote?.let{
+                    app.draftNoteDao.deleteDraftNote(draftNote)
+                }
+            }catch(e: Exception){
+                Log.e("PostNoteTask", "delete ex draft note error", e)
+            }
+        }
+    }
+
+    private fun saveDraftNote(draftNote: DraftNote){
+        GlobalScope.launch(Dispatchers.IO) {
+            try{
+                val app = applicationContext as MiApplication
+                app.draftNoteDao.fullInsert(draftNote)
+            }catch(e: Exception){
+                Log.e("PostNoteTask", "save draft note error", e)
+            }
+        }
+    }
+
 
 }
