@@ -89,5 +89,7 @@ abstract class DraftNoteDao {
     abstract fun deleteDraftNote(accountId: String, draftNoteId: Long)
 
 
+    @Query("delete from 'draft_file' where draft_note_id = :draftNoteId and file_id = :fileId")
+    abstract fun deleteFile(draftNoteId: Long, fileId: Long)
 
 }

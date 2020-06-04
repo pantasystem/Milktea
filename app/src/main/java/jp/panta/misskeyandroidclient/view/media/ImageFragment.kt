@@ -7,6 +7,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.file.File
 import kotlinx.android.synthetic.main.fragment_image.*
 
 class ImageFragment : Fragment(R.layout.fragment_image){
@@ -30,6 +31,10 @@ class ImageFragment : Fragment(R.layout.fragment_image){
                     putString(EXTRA_IMAGE_URI, uri.toString())
                 }
             }
+        }
+
+        fun newInstance(file: File): ImageFragment{
+            return newInstance(file.path)
         }
     }
 

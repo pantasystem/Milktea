@@ -10,13 +10,20 @@
         <variable
                 name="draftNoteAction"
                 type="jp.panta.misskeyandroidclient.view.notes.draft.DraftNoteActionCallback" />
+        <variable
+                name="fileListener"
+                type="jp.panta.misskeyandroidclient.viewmodel.file.FileListener" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardUseCompatPadding="false"
-            app:cardCornerRadius="0dp"
-            android:layout_marginTop="0.5dp"
+            app:cardCornerRadius="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:elevation="0dp"
             app:setCardViewSurfaceColor="@{null}"
             >
@@ -34,8 +41,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="cwcwcwwcwcw"
-                    android:visibility='@{note.note.cw == null ? View.GONE : View.VISIBLE}'
                     android:text="@{note.note.cw}"
+                    android:visibility='@{note.note.cw == null ? View.GONE : View.VISIBLE}'
+
                     />
 
 
@@ -46,8 +54,8 @@
                     android:layout_below="@+id/cw"
                     android:layout_marginBottom="5dp"
                     android:layout_marginStart="5dp"
-                    tools:text="展開する"
-                    android:visibility='@{note.isFoldingContent == true ? View.GONE : View.VISIBLE }'
+                    android:text="@string/toggle_content_visibility"
+                    android:visibility='@{note.note.cw == null ? View.GONE : View.VISIBLE }'
                     android:textColor="?attr/colorAccent"
                     android:onClick="@{ ()-> note.toggleFoldingContent() }"
                     />
@@ -56,6 +64,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/contentFoldingButton"
+                    android:visibility='@{ SafeUnbox.unbox(note.isFoldingContent) ? View.GONE : View.VISIBLE }'
+
                     >
                 <TextView
                         android:id="@id/text"
@@ -63,7 +73,6 @@
                         android:textSize="15sp"
                         android:text="@{note.note.text}"
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
-                        android:visibility='@{note.note.text == null ? View.GONE : View.VISIBLE}'
 
                         />
                 <androidx.recyclerview.widget.RecyclerView
@@ -82,7 +91,9 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/pollChoicesView"
                         tools:listitem="@layout/item_note_editor_file_preview"
-                        tools:itemCount="1"/>
+                        tools:itemCount="1"
+                        app:previewFiles="@{note.note.files}"
+                        app:imagePreviewsFileListener="@{fileListener}"/>
 
 
             </RelativeLayout>

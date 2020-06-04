@@ -66,19 +66,18 @@ class DraftNotesViewModel(
     fun detachFile(file: File?) {
         file?.localFileId?.let{
             val notes = ArrayList(draftNotes.value?: emptyList())
-            val targetNote = (notes.firstOrNull {
-                it.note.value?.files?.any{ f ->
-                    f == file
+            val targetNote = (notes.firstOrNull { dNote ->
+                dNote.note.value?.files?.any {
+                    it.localFileId == file.localFileId
                 }?: false
             }?: return).note.value ?: return
 
             val updatedFiles = ArrayList(targetNote.files?: emptyList())
             updatedFiles.remove(file)
 
-            val updatedDraftNote = targetNote.copy(files = updatedFiles)
             viewModelScope.launch(Dispatchers.IO){
                 try{
-                    draftNoteDao.fullInsert(updatedDraftNote)
+                    draftNoteDao.deleteFile(targetNote.draftNoteId!!, file.localFileId)
 
                     loadDraftNotes()
                 }catch(e: Exception){

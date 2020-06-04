@@ -21,6 +21,7 @@ class MediaActivity : AppCompatActivity() {
     private sealed class Media : Serializable{
         data class UriMedia(val uri: Uri): Media()
         data class FilePropertyMedia(val fileProperty: FileProperty) : Media()
+        data class FileMedia(val file: File): Media()
     }
 
 
@@ -77,10 +78,7 @@ class MediaActivity : AppCompatActivity() {
         val file = intent.getSerializableExtra(EXTRA_FILE) as? File
 
         val extraUri: String? = intent.getStringExtra(EXTRA_URI)
-        var uri = if(extraUri.isNullOrBlank()) null else Uri.parse(extraUri)
-        if(uri == null && file != null){
-            uri = Uri.parse(file.path)
-        }
+        val uri = if(extraUri.isNullOrBlank()) null else Uri.parse(extraUri)
 
         val list = when{
             fileProperty != null ->{
@@ -93,6 +91,9 @@ class MediaActivity : AppCompatActivity() {
             }
             uri != null ->{
                 listOf<Media>(Media.UriMedia(uri))
+            }
+            file != null ->{
+                listOf<Media>(Media.FileMedia(file))
             }
             else ->{
                 Log.e(TAG, "params must not null")
@@ -123,13 +124,14 @@ class MediaActivity : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             return when (val item = list[position]) {
-                is Media.FilePropertyMedia -> createFragment(item.fileProperty, null)
-                is Media.UriMedia -> createFragment(null, item.uri)
+                is Media.FilePropertyMedia -> createFragment(item.fileProperty, null, null)
+                is Media.UriMedia -> createFragment(null, item.uri, null)
+                is Media.FileMedia -> createFragment(null, null, item.file)
             }
         }
     }
 
-    private fun createFragment(fileProperty: FileProperty?, uri: Uri?): Fragment{
+    private fun createFragment(fileProperty: FileProperty?, uri: Uri?, file: File?): Fragment{
         val miCore = applicationContext as? MiCore
         val baseUrl = miCore?.currentAccount?.value?.getCurrentConnectionInformation()?.instanceBaseUrl?: ""
         if(fileProperty != null){
@@ -144,6 +146,13 @@ class MediaActivity : AppCompatActivity() {
                 ImageFragment.newInstance(uri)
             }else{
                 PlayerFragment.newInstance(uri)
+            }
+        }
+        if(file != null){
+            return if(file.type?.contains("image") == true){
+                ImageFragment.newInstance(file)
+            }else{
+                PlayerFragment.newInstance(file.path)
             }
         }
         throw NullPointerException("fileProperty xor uri must not null")

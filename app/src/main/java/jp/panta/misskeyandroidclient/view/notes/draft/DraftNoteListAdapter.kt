@@ -9,10 +9,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemDraftNoteBinding
+import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.draft.DraftNoteViewData
 
 class DraftNoteListAdapter(
     val draftNoteActionCallback: DraftNoteActionCallback,
+    val fileListener: FileListener,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<DraftNoteViewData, DraftNoteListAdapter.VH>(DFUtilItemCallback()){
 
@@ -32,8 +34,7 @@ class DraftNoteListAdapter(
         holder.binding.note = getItem(position)
         holder.binding.lifecycleOwner = lifecycleOwner
         holder.binding.draftNoteAction = draftNoteActionCallback
-
-        // TODO 投票・Fileを表示できるようにする
+        holder.binding.fileListener = fileListener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {

@@ -8,14 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.draft.DraftNotesViewModel
 import kotlinx.android.synthetic.main.fragment_draft_notes.*
 
-class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteActionCallback{
+class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteActionCallback, FileListener{
 
     private var mDraftNotesViewModel: DraftNotesViewModel? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,7 +28,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
         val viewModel = ViewModelProvider(this, DraftNotesViewModel.Factory(miApplication))[DraftNotesViewModel::class.java]
         mDraftNotesViewModel = viewModel
 
-        val adapter = DraftNoteListAdapter(this, viewLifecycleOwner)
+        val adapter = DraftNoteListAdapter(this, this, viewLifecycleOwner)
         draftNotesView.adapter = adapter
         draftNotesView.layoutManager = LinearLayoutManager(view.context)
 
@@ -56,6 +59,19 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
                     mDraftNotesViewModel?.loadDraftNotes()
                 }
             }
+        }
+
+    }
+
+    override fun onDetach(file: File?) {
+        mDraftNotesViewModel?.detachFile(file)
+    }
+
+    override fun onSelect(file: File?) {
+        file?.let{
+            val intent = Intent(requireContext(), MediaActivity::class.java)
+            intent.putExtra(MediaActivity.EXTRA_FILE, file)
+            startActivity(intent)
         }
 
     }
