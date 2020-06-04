@@ -12,5 +12,11 @@
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            tools:text="choice 1"/>
+            tools:text="choice 1"
+            android:background="@drawable/shape_normal_reaction_backgruond"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@{choice}"/>
 </layout>

@@ -12,9 +12,11 @@ import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
+import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollChoice
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.Dispatchers
@@ -131,9 +133,13 @@ class NoteEditorViewModel(
         it == PostNoteTask.Visibility.SPECIFIED
     }
 
-    val poll = MutableLiveData<PollEditor?>(note?.poll?.let{
-        PollEditor(it)
-    })
+    val poll = MutableLiveData<PollEditor?>(
+        note?.poll?.let{
+            PollEditor(it)
+        }?: draftNote?.draftPoll?.let{
+            PollEditor(it)
+        }
+    )
 
     val noteTask = MutableLiveData<PostNoteTask>()
 

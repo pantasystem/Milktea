@@ -3,10 +3,20 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import java.util.*
+import kotlin.contracts.contract
 
-class PollChoice(val choice: Poll.Choice? = null) {
+class PollChoice() {
+
+
     val id = UUID.randomUUID().toString()
-    var text = MutableLiveData<String>(choice?.text)
+    var text = MutableLiveData<String>()
+
+    constructor(text: String?) : this(){
+        this.text.value = text
+    }
+
+    constructor(choice: Poll.Choice?) : this(choice?.text)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

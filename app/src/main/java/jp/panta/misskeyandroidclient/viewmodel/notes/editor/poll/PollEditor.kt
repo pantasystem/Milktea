@@ -7,23 +7,46 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PollEditor(val poll: Poll? = null) {
-    private val exChoices = poll?.choices?.map {
-        PollChoice(it)
-    } ?: listOf(
-            PollChoice(),
-            PollChoice()
-        )
+class PollEditor() {
+
+
     enum class DeadLineType{
         INDEFINITE_PERIOD,
         DATE_AND_TIME
     }
-    val choices = MutableLiveData<List<PollChoice>>(exChoices)
+    val choices = MutableLiveData<List<PollChoice>>()
     val isMutable = MutableLiveData<Boolean>()
 
     val expiresAt = MutableLiveData<Date>()
 
     val deadLineType = MutableLiveData<DeadLineType>(DeadLineType.INDEFINITE_PERIOD)
+
+    constructor(choices: List<String>?, multiple: Boolean?, expiresAt: Date?) : this(){
+        this.choices.postValue(
+            choices?.map{
+                PollChoice(it)
+            }
+        )
+        this.isMutable.postValue(multiple)
+        this.expiresAt.postValue(expiresAt)
+    }
+
+    constructor(poll: Poll?) : this(
+        poll?.choices?.map{
+            it.text
+        },
+        poll?.multiple,
+        poll?.expiresAt
+    )
+
+    constructor(draftPoll: DraftPoll?) : this(
+        draftPoll?.choices,
+        draftPoll?.multiple,
+        draftPoll?.expiresAt?.let{
+            Date(it)
+        }
+
+    )
 
     fun makeAndAddChoice(){
         val choices = this.choices.value
@@ -69,7 +92,7 @@ class PollEditor(val poll: Poll? = null) {
         val choices = this.choices.value
             ?: return null
         return DraftPoll(choices = choices.mapNotNull{
-                it.choice?.text
+                it.text.value
             },
             multiple = isMutable.value == true,
             expiresAt = expiresAt.value?.time

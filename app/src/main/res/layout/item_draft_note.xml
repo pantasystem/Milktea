@@ -83,6 +83,7 @@
                         android:layout_below="@id/text"
                         tools:listitem="@layout/item_draft_note_poll_choice"
                         android:layout_marginBottom="8dp"
+                        app:draftPollChoices="@{note.note.draftPoll.choices}"
                     />
 
                 <androidx.recyclerview.widget.RecyclerView
