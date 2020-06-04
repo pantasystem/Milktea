@@ -21,8 +21,10 @@ import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
@@ -33,11 +35,12 @@ import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
+import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import kotlinx.android.synthetic.main.activity_note_editor.*
 
-class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
+class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
     companion object{
         const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
@@ -130,10 +133,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
         binding.viewModel = viewModel
-        val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(viewModel)
+        val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
 
-        viewModel.editorFiles.observe(this, Observer{list ->
+        viewModel.files.observe(this, Observer{list ->
             simpleImagePreviewAdapter.submitList(list)
         })
         viewModel.poll.observe(this, Observer { poll ->
@@ -170,14 +173,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
         })
 
-        viewModel.showPreviewFileEvent.observe(this, Observer{ file ->
-            file.fileProperty?.let{ fp ->
-                startActivity(MediaActivity.newIntent(this, fp))
-            }
-            file.uploadFile?.getUri()?.let{ uri ->
-                startActivity(MediaActivity.newIntent(this, uri))
-            }
-        })
+
 
         selectFileFromDrive.setOnClickListener {
             showDriveFileSelector()
@@ -355,10 +351,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                     }
                     //mViewModel?.driveFiles?.postValue(files)
                     if(files != null){
-                        val exFiles = mViewModel?.driveFiles()
+                        val exFiles = mViewModel?.files?.value
                         val addFiles = files.filter{out ->
                             exFiles?.firstOrNull {
-                                it == out
+                                it.remoteFileId == out.id
                             } == null
                         }
                         mViewModel?.addAllFileProperty(addFiles)
@@ -374,7 +370,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                         val size = mViewModel?.fileTotal()
 
                         if(size != null && size < 4){
-                            mViewModel?.add(uri)
+                            mViewModel?.add(uri.toFile(this))
                             Log.d("NoteEditorActivity", "成功しました")
                         }else{
                             Log.d("NoteEditorActivity", "失敗しました")
@@ -412,6 +408,19 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                     }
                 }
             }
+        }
+    }
+
+    override fun onSelect(file: File?) {
+        file?.let{
+            startActivity(MediaActivity.newIntent(this, file))
+        }
+
+    }
+
+    override fun onDetach(file: File?) {
+        file?.let{
+            mViewModel?.removeFileNoteEditorData(file)
         }
     }
 

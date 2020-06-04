@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.UploadFile
+import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
@@ -207,7 +208,7 @@ class DriveActivity : AppCompatActivity() {
         val miCore = application as MiCore
         miCore.currentAccount.value?.getCurrentConnectionInformation()?.let{ ci ->
             val uploader = OkHttpDriveFileUploader(this, ci, GsonFactory.create(), miCore.getEncryption())
-            mFileViewModel?.uploadFile(UploadFile(uri, true), uploader)
+            mFileViewModel?.uploadFile(uri.toFile(this), uploader)
         }
 
     }

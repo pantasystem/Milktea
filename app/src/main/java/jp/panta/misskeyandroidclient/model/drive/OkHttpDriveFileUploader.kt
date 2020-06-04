@@ -6,15 +6,17 @@ import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
+import jp.panta.misskeyandroidclient.model.file.File
 import okhttp3.*
+import okhttp3.logging.HttpLoggingInterceptor
 import okio.BufferedSink
 import okio.Okio
-import java.io.File
-import java.lang.IllegalArgumentException
+import java.net.CookieManager
+import java.net.CookiePolicy
 import java.net.URL
+
 
 class OkHttpDriveFileUploader(
     val context: Context,
@@ -22,20 +24,23 @@ class OkHttpDriveFileUploader(
     val gson: Gson,
     val encryption: Encryption
 ) : FileUploader{
-    override fun upload(uploadFile: UploadFile): FileProperty? {
+    override fun upload(file: File, isForce: Boolean): FileProperty? {
+        Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
+
             val client = OkHttpClient()
+
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("i", connectionInformation.getI(encryption)!!)
-                .addFormDataPart("force", uploadFile.force.toString())
+                .addFormDataPart("force", isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
-                .addFormDataPart("file", getFileName(uploadFile.getUri()), createRequestBody(uploadFile.getUri()))
+                .addFormDataPart("file", file.name, createRequestBody(Uri.parse(file.path)))
 
-            val isSensitive = uploadFile.isSensitive
+            val isSensitive = file.isSensitive
             if( isSensitive != null ) requestBodyBuilder.addFormDataPart("isSensitive", isSensitive.toString())
 
-            val folderId = uploadFile.folderId
+            val folderId = file.folderId
             if( folderId != null ) requestBodyBuilder.addFormDataPart("folderId", folderId)
 
             val requestBody = requestBodyBuilder.build()
@@ -43,10 +48,10 @@ class OkHttpDriveFileUploader(
             val request = Request.Builder().url(URL("${connectionInformation.instanceBaseUrl}/api/drive/files/create")).post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code()
-            if(code < 300){
+            if(code in 200 until 300){
                 gson.fromJson(response.body()?.string(), FileProperty::class.java)
             }else{
-                Log.d("OkHttpConnection", "error${response.body()?.string()}")
+                Log.d("OkHttpConnection", "code: $code, error${response.body()?.string()}")
                 null
             }
         }catch(e: Exception){
@@ -68,7 +73,7 @@ class OkHttpDriveFileUploader(
                     }?: throw IllegalArgumentException("ファイル名の取得に失敗しました")
             }
             "file" ->{
-                File(uri.path!!).name
+                java.io.File(uri.path!!).name
             }
             else -> throw IllegalArgumentException("scheme不明")
         }

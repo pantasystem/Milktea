@@ -140,7 +140,7 @@ class NoteEditorViewModel(
     val showPollDatePicker = EventBus<Unit>()
     val showPollTimePicker = EventBus<Unit>()
 
-    val showPreviewFileEvent = EventBus<File>()
+
 
     val isSaveNoteAsDraft = EventBus<Long?>()
     init{
@@ -276,9 +276,6 @@ class NoteEditorViewModel(
         address.postValue(list)
     }
 
-    fun showPreviewFile(file: File){
-        showPreviewFileEvent.event = file
-    }
 
     fun addMentionUsers(users: List<User>, pos: Int): Int{
         val mentionBuilder = StringBuilder()

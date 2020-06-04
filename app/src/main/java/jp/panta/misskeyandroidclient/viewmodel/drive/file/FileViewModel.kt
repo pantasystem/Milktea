@@ -195,11 +195,12 @@ class FileViewModel(
         }
     }
 
-    fun uploadFile(uploadFile: UploadFile, fileUploader: FileUploader){
-        uploadFile.folderId = currentFolder.value
+    fun uploadFile(file: jp.panta.misskeyandroidclient.model.file.File, fileUploader: FileUploader){
+        val uploadFile = file.copy(folderId = currentFolder.value)
+
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                fileUploader.upload(uploadFile)
+                fileUploader.upload(uploadFile, true)
             }catch(e: Exception){
                 Log.d("DriveViewModel", "ファイルアップロードに失敗した")
             }

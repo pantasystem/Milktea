@@ -2,23 +2,19 @@ package jp.panta.misskeyandroidclient
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.webkit.MimeTypeMap
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.view.media.ImageFragment
 import jp.panta.misskeyandroidclient.view.media.PlayerFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.android.synthetic.main.activity_media.*
-import java.io.File
 import java.io.Serializable
-import java.lang.IllegalArgumentException
-import java.lang.NullPointerException
 
 class MediaActivity : AppCompatActivity() {
 
@@ -34,6 +30,7 @@ class MediaActivity : AppCompatActivity() {
         const val EXTRA_FILE_PROPERTY_LIST = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILE_PROPERTY_LIST"
         const val EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_INT_FILE_PROPERTY_LIST_CURRENT_INDEX"
         const val EXTRA_URI = "jp.panta.misskeyadnroidclient.MediaActivity.EXTRA_URI"
+        const val EXTRA_FILE = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILE"
 
         fun newIntent(activity: AppCompatActivity, list: ArrayList<FileProperty>, currentIndex: Int) : Intent{
             return Intent(activity, MediaActivity::class.java).apply{
@@ -55,6 +52,12 @@ class MediaActivity : AppCompatActivity() {
             }
         }
 
+        fun newIntent(activity: AppCompatActivity, file: File) : Intent{
+            return Intent(activity, MediaActivity::class.java).apply{
+                putExtra(EXTRA_FILE, file)
+            }
+        }
+
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,8 +74,13 @@ class MediaActivity : AppCompatActivity() {
 
         val filePropertyListCurrentIndex = intent.getIntExtra(EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, 0)
 
+        val file = intent.getSerializableExtra(EXTRA_FILE) as? File
+
         val extraUri: String? = intent.getStringExtra(EXTRA_URI)
-        val uri = if(extraUri.isNullOrBlank()) null else Uri.parse(extraUri)
+        var uri = if(extraUri.isNullOrBlank()) null else Uri.parse(extraUri)
+        if(uri == null && file != null){
+            uri = Uri.parse(file.path)
+        }
 
         val list = when{
             fileProperty != null ->{

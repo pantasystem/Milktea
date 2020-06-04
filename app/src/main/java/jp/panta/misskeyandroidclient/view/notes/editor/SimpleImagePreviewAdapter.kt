@@ -8,21 +8,22 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteEditorFilePreviewBinding
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.FileNoteEditorData
+import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 
-class SimpleImagePreviewAdapter(private val viewModel: NoteEditorViewModel) : ListAdapter<FileNoteEditorData,SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(ItemCallback()){
-    private class ItemCallback: DiffUtil.ItemCallback<FileNoteEditorData>(){
+class SimpleImagePreviewAdapter(private val fileListener: FileListener) : ListAdapter<File,SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(ItemCallback()){
+    private class ItemCallback: DiffUtil.ItemCallback<File>(){
         override fun areContentsTheSame(
-            oldItem: FileNoteEditorData,
-            newItem: FileNoteEditorData
+            oldItem: File,
+            newItem: File
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areItemsTheSame(
-            oldItem: FileNoteEditorData,
-            newItem: FileNoteEditorData
+            oldItem: File,
+            newItem: File
         ): Boolean {
             return oldItem == newItem
         }
@@ -35,8 +36,8 @@ class SimpleImagePreviewAdapter(private val viewModel: NoteEditorViewModel) : Li
     }
 
     override fun onBindViewHolder(holder: SimpleImagePreviewHolder, position: Int) {
-        holder.binding.fileNoteEditorData = getItem(position)
-        holder.binding.noteEditorViewModel = viewModel
+        holder.binding.file = getItem(position)
+        holder.binding.fileListener = fileListener
         holder.binding.checkBox.isChecked = true
     }
 }

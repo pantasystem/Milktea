@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import java.io.Serializable
@@ -29,7 +30,7 @@ class PostNoteTask(
     private var visibleUserIds: List<String>? = null
     private var visibility: CreateNote.Visibility? = null
     private var isLocal: Boolean? = null
-    var files: List<FileNoteEditorData>? = null
+    var files: List<File>? = null
     private var filesIds: List<String>? = null
     var text: String? = null
     var cw: String? = null
@@ -93,12 +94,8 @@ class PostNoteTask(
     private fun executeFileUpload(fileUploader: FileUploader): Boolean{
         val tmpFiles = files
         filesIds = tmpFiles?.mapNotNull {
-            if (it.isLocal && it.uploadFile != null) {
-                fileUploader.upload(it.uploadFile)?.id
-            } else {
-                //skip
-                it.remoteFileId
-            }
+            //skip
+            it.remoteFileId ?: fileUploader.upload(it, true)?.id
         }
 
         //サイズが合わなければエラー

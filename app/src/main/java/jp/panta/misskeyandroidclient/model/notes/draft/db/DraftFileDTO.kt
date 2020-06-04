@@ -23,7 +23,8 @@ data class DraftFileDTO(
     @ColumnInfo(name = "is_sensitive") val isSensitive: Boolean?,
     @ColumnInfo(name = "type") val type: String?,
     @ColumnInfo(name ="thumbnailUrl") val thumbnailUrl: String?,
-    @ColumnInfo(name = "draft_note_id") val draftNoteId: Long
+    @ColumnInfo(name = "draft_note_id") val draftNoteId: Long,
+    @ColumnInfo(name = "folder_id") val folderId: String?
 ){
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "file_id")
@@ -38,7 +39,8 @@ data class DraftFileDTO(
                 file.isSensitive,
                 file.type,
                 file.thumbnailUrl,
-                draftNoteId
+                draftNoteId,
+                file.folderId
             ).apply{
                 this.fileId = file.localFileId
             }
@@ -56,7 +58,8 @@ data class DraftFileDTO(
             remoteFileId,
             fileId,
             thumbnailUrl,
-            isSensitive
+            isSensitive,
+            folderId
 
         )
     }

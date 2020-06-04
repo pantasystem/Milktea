@@ -46,9 +46,10 @@ val MIGRATION_2_3 = object : Migration(2, 3){
         // change draftFileDTO
 
 
-        database.execSQL("alter table 'draft_file' add column 'is_sensitive' INTEGER not null default 0")
+        database.execSQL("alter table 'draft_file' add column 'is_sensitive' INTEGER")
         database.execSQL("alter table 'draft_file' add column 'type' TEXT")
         database.execSQL("alter table 'draft_file' add column 'thumbnailUrl' TEXT")
         database.execSQL("alter table 'draft_file' add column 'name' TEXT not null default 'name none'")
+        database.execSQL("alter table 'draft_file' add column 'folder_id' TEXT ")
     }
 }
