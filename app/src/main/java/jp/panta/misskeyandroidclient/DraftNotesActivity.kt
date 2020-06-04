@@ -10,6 +10,7 @@ class DraftNotesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme()
         setContentView(R.layout.activity_draft_notes)
 
         setSupportActionBar(draftNotesToolbar)
