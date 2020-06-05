@@ -38,6 +38,7 @@ class NoteDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val noteId = intent.getStringExtra(EXTRA_NOTE_ID)
+            ?: intent.data?.path?.replace("/notes/", "")
         Log.d(TAG, "受け取ったnoteId: $noteId")
         mNoteId = noteId
 

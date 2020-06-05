@@ -56,6 +56,13 @@ class UserDetailActivity : AppCompatActivity() {
         mUserId = userId
         val userName = intent.data?.getQueryParameter("userName")
             ?: intent.getStringExtra(EXTRA_USER_NAME)
+            ?: intent.data?.path?.let{ path ->
+                if(path.startsWith("/")){
+                    path.substring(1, path.length)
+                }else{
+                    path
+                }
+            }
         Log.d("UserDetailActivity", "userName:$userName")
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
