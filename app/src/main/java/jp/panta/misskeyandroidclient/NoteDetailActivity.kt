@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.app.TaskStackBuilder
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -28,6 +28,8 @@ class NoteDetailActivity : AppCompatActivity() {
     private var mNoteId: String? = null
     private var mIsMainActive: Boolean = true
 
+    private var mParentActivity: Activities? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -36,6 +38,8 @@ class NoteDetailActivity : AppCompatActivity() {
         setSupportActionBar(noteDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        mParentActivity = intent.getParentActivity()
 
         val noteId = intent.getStringExtra(EXTRA_NOTE_ID)
             ?: intent.data?.path?.replace("/notes/", "")
@@ -82,6 +86,24 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     private fun finishAndGoToMainActivity(){
+        when(mParentActivity){
+            Activities.ACTIVITY_OUT_APP -> {
+                val upIntent = Intent(this, MainActivity::class.java)
+                upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                if(shouldUpRecreateTask(upIntent)){
+                    TaskStackBuilder.create(this)
+                        .addNextIntentWithParentStack(upIntent)
+                        .startActivities()
+                    finish()
+                }else{
+                    navigateUpTo(upIntent)
+                }
+            }
+            Activities.ACTIVITY_IN_APP ->{
+                finish()
+            }
+
+        }
         if(!mIsMainActive){
             startActivity(Intent(this, MainActivity::class.java))
         }

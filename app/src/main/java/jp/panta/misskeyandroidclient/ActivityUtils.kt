@@ -1,12 +1,20 @@
 package jp.panta.misskeyandroidclient
 
-import java.io.Serializable
+import android.content.Intent
 
-object ActivityUtils {
 
-    const val EXTRA_PARENT = "jp.panta.misskeyandroidclient.EXTRA_PARENT"
 
-    enum class Activities : Serializable{
-        ACTIVITY_IN_APP
-    }
+const val EXTRA_PARENT = "jp.panta.misskeyandroidclient.EXTRA_PARENT"
+
+enum class Activities{
+    ACTIVITY_OUT_APP,
+    ACTIVITY_IN_APP,
+}
+
+fun Intent.putActivity(activities: Activities){
+    this.putExtra(EXTRA_PARENT, activities.ordinal)
+}
+
+fun Intent.getParentActivity(): Activities{
+    return Activities.values()[getIntExtra(EXTRA_PARENT, Activities.ACTIVITY_OUT_APP.ordinal)]
 }

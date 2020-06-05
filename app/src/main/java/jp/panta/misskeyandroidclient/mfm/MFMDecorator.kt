@@ -12,10 +12,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import jp.panta.misskeyandroidclient.ActivityUtils
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.SearchResultActivity
-import jp.panta.misskeyandroidclient.UserDetailActivity
+import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
 import jp.panta.misskeyandroidclient.view.text.EmojiSpan
 import java.lang.ref.WeakReference
@@ -130,7 +127,8 @@ object MFMDecorator {
             return textView.get()?.let{ textView ->
                 val intent = Intent(textView.context, UserDetailActivity::class.java)
                 intent.putExtra(UserDetailActivity.EXTRA_USER_NAME, mention.text)
-                intent.putExtra(ActivityUtils.EXTRA_PARENT, ActivityUtils.Activities.ACTIVITY_IN_APP)
+                intent.putActivity(Activities.ACTIVITY_IN_APP)
+
 
                 makeClickableSpan(mention.text, intent)
             }?: closeErrorElement(mention)

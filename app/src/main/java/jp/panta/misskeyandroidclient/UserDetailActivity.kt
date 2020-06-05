@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.app.NavUtils
+import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -43,7 +44,7 @@ class UserDetailActivity : AppCompatActivity() {
     private var mUserId: String? = null
     private var mIsMainActive: Boolean = true
 
-    private var mParentActivity: ActivityUtils.Activities? = null
+    private var mParentActivity: Activities? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +54,7 @@ class UserDetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.userDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        mParentActivity = intent.getSerializableExtra(ActivityUtils.EXTRA_PARENT) as? ActivityUtils.Activities
+        mParentActivity = intent.getParentActivity()
 
         val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
         mUserId = userId
@@ -193,9 +194,12 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d("UserDetail", "mParentActivity: $mParentActivity")
+
         when(item.itemId){
             android.R.id.home -> {
                 finishAndGoToMainActivity()
+                return true
             }
             R.id.block ->{
                 mViewModel?.block()
@@ -224,10 +228,20 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
     private fun finishAndGoToMainActivity(){
-        if(mParentActivity == null){
+        if(mParentActivity == null || mParentActivity == Activities.ACTIVITY_OUT_APP) {
             val upIntent = Intent(this, MainActivity::class.java)
             upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            NavUtils.navigateUpTo(this, upIntent)
+
+            if(shouldUpRecreateTask(upIntent)){
+                TaskStackBuilder.create(this)
+                    .addNextIntentWithParentStack(upIntent)
+                    .startActivities()
+                finish()
+            }else{
+                navigateUpTo(upIntent)
+            }
+
+
             return
         }
         finish()

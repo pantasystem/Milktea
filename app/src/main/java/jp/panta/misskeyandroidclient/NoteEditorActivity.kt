@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -114,7 +115,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         accountViewModel.showProfile.observe(this, Observer {
             val intent = Intent(this, UserDetailActivity::class.java)
             intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
-            intent.putExtra(ActivityUtils.EXTRA_PARENT, ActivityUtils.Activities.ACTIVITY_IN_APP)
+            intent.putActivity(Activities.ACTIVITY_IN_APP)
+
 
             startActivity(intent)
         })
@@ -241,7 +243,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
                 if(it == null){
                     Toast.makeText(this, "下書きに失敗しました", Toast.LENGTH_LONG).show()
                 }else{
-                    finish()
+                    upTo()
                 }
             }
 
@@ -344,7 +346,24 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
             )
         }else{
+            upTo()
+        }
+    }
+
+    private fun upTo(){
+        if(intent.getStringExtra(Intent.EXTRA_TEXT).isNullOrEmpty()){
             finish()
+        }else{
+            val upIntent = Intent(this, MainActivity::class.java)
+            upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            if(shouldUpRecreateTask(upIntent)){
+                TaskStackBuilder.create(this)
+                    .addNextIntentWithParentStack(upIntent)
+                    .startActivities()
+                finish()
+            }else{
+                navigateUpTo(upIntent)
+            }
         }
     }
 
