@@ -144,7 +144,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, note = note, draftNote = draftNote)
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
-        viewModel.text.value = text?: ""
+        if(!text.isNullOrBlank()){
+            viewModel.text.value = text
+        }
         binding.viewModel = viewModel
         val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
