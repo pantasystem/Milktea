@@ -224,6 +224,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
         })
 
+        mConfirmViewModel.confirmEvent.observe( this, Observer {
+            ConfirmDialog().show(supportFragmentManager, "confirm")
+        })
+
         mViewModel?.isSaveNoteAsDraft?.observe(this, Observer {
             runOnUiThread {
                 if(it == null){
@@ -331,14 +335,12 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
                 negativeButtonText = getString(R.string.delete)
 
             )
-            ConfirmDialog().show(supportFragmentManager, "confirm")
         }else{
             finish()
         }
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
 
         finishOrConfirmSaveAsDraftOrDelete()
     }

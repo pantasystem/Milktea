@@ -357,11 +357,11 @@ class NoteEditorViewModel(
     }
 
     fun canSaveDraft(): Boolean{
-        return !cw.value.isNullOrBlank()
-                || !text.value.isNullOrBlank()
-                || !files.value.isNullOrEmpty()
-                || !poll.value?.choices?.value.isNullOrEmpty()
-                || !address.value.isNullOrEmpty()
+        return !(cw.value.isNullOrBlank()
+                && text.value.isNullOrBlank()
+                && files.value.isNullOrEmpty()
+                && poll.value?.choices?.value.isNullOrEmpty()
+                && address.value.isNullOrEmpty())
     }
 
     private fun <T, S>MediatorLiveData<T>.addSourceChain(liveData: LiveData<S>, observer: (out: S)-> Unit): MediatorLiveData<T>{
