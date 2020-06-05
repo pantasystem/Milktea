@@ -54,6 +54,7 @@ class NoteCapture(val account: Account) : AbsObserver(){
     }
 
     fun subscribeAll(registerId: String, notes: List<PlaneNoteViewData>){
+        Log.d("NoteCapture", "subscribeAll")
         notes.forEach{
             subscribe(registerId, it)
         }
@@ -99,7 +100,7 @@ class NoteCapture(val account: Account) : AbsObserver(){
      * @param noteRegister 対象のRegisterのノートを一斉にremoteに登録します。すでに登録されている場合はremoteには登録されません。
      */
     fun attach(noteRegister: NoteRegister){
-        Log.d("NoteCapture", "attach")
+        Log.d("NoteCapture", "attach, size:${noteRegister.registeredNoteIds().size}")
         synchronized(mNoteRegisters){
             val noteIds = noteRegister.registeredNoteIds()
 
@@ -124,7 +125,10 @@ class NoteCapture(val account: Account) : AbsObserver(){
      * @param noteRegister 対象のRegisterのノートを一斉にremoteから解除します。他に登録されている場合はremoteには登録されません。
      */
     fun detach(noteRegister: NoteRegister){
+        Log.d("NoteCapture", "detach")
         val noteIds = noteRegister.registeredNoteIds()
+
+        // 次の作業で他のClientがノートをキャプチャーし続けているのか判定したいため先に除外する
         synchronized(mNoteRegisters){
             mNoteRegisters.remove(noteRegister.registerId)
         }
@@ -144,7 +148,11 @@ class NoteCapture(val account: Account) : AbsObserver(){
     }
 
     private fun capture(noteId: String){
-        streamingAdapter?.send(mGson.toJson(createCaptureRequest(noteId)))
+        streamingAdapter?.send(mGson.toJson(createCaptureRequest(noteId))).let{
+            if(it == null || it == false){
+                Log.w("NoteCapture", "ノートの登録に失敗した")
+            }
+        }
     }
 
     private fun unCapture(noteId: String){
@@ -184,6 +192,7 @@ class NoteCapture(val account: Account) : AbsObserver(){
             mNoteRegisters.values.forEach{ nr ->
                 detach(nr)
             }
+            mNoteRegisters.clear()
         }
     }
 
@@ -221,7 +230,9 @@ class NoteCapture(val account: Account) : AbsObserver(){
                 //else -> Log.d("NoteCapture", "不明なイベント")
             }
 
-            //Log.d("NoteCapture", "onReceived: $receivedObject")
+            if(receivedObject.body.type == "reacted"){
+                Log.d("NoteCapture", "onReceived: $receivedObject")
+            }
         }catch(e: JsonSyntaxException){
             //他のイベントが流れてくるので回避する
         }catch(e: Exception){

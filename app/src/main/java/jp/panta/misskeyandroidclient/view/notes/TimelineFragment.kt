@@ -21,13 +21,14 @@ import jp.panta.misskeyandroidclient.view.PageableView
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
+import java.util.*
 
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
 
     companion object{
         private const val EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.pageable_timeline"
 
-
+        private const val EXTRA_FIRST_VISIBLE_NOTE_DATE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.EXTRA_FIRST_VISIBLE_NOTE_DATE"
 
         fun newInstance(pageableTimeline: Page.Timeline): TimelineFragment{
             return TimelineFragment().apply{
@@ -53,10 +54,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private lateinit var sharedPreference: SharedPreferences
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-        sharedPreference = view.context.getSharedPreferences(view.context.getPreferenceName(), MODE_PRIVATE)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        sharedPreference = requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)
         //sharedPreference = view.context.getSharedPreferences()
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
@@ -70,6 +72,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         list_view.addOnScrollListener(mScrollListener)
         list_view.layoutManager = mLinearLayoutManager
+
+        val firstVisibleNoteDate = savedInstanceState?.let{
+            it.getSerializable(EXTRA_FIRST_VISIBLE_NOTE_DATE) as? Date?
+        }
 
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
             val factory = TimelineViewModelFactory(accountRelation, mPageableTimeline!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
@@ -103,7 +109,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val nvm = mNotesViewModel
             if(nvm != null){
 
-                mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
+                //mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
                 val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, nvm)
                 list_view.adapter = adapter
 
@@ -126,7 +132,29 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
 
         })
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        mFirstVisibleItemPosition?.let{ firstVisibleItemPosition ->
+
+
+            val firstVisibleNote = if(firstVisibleItemPosition > 0 && firstVisibleItemPosition <= mViewModel?.getTimelineLiveData()?.value?.notes?.size?: 0){
+                try{
+                    mViewModel?.getTimelineLiveData()?.value?.notes?.get(firstVisibleItemPosition)
+                }catch(t: Throwable){
+                    Log.e("TimelineFragment", "先端に表示されているノートを取得しようとしたら失敗した", t)
+                    null
+                }
+            }else{
+                null
+            }
+
+            if(firstVisibleNote != null){
+                outState.putSerializable(EXTRA_FIRST_VISIBLE_NOTE_DATE, firstVisibleNote.note.createdAt)
+            }
+        }
 
     }
 
