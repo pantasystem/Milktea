@@ -16,8 +16,8 @@ import kotlinx.android.synthetic.main.fragment_pin_note.*
 
 class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
         val userViewModel = ViewModelProvider(requireActivity())[UserDetailViewModel::class.java]
         val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
