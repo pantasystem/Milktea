@@ -114,6 +114,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         accountViewModel.showProfile.observe(this, Observer {
             val intent = Intent(this, UserDetailActivity::class.java)
             intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
+            intent.putExtra(ActivityUtils.EXTRA_PARENT, ActivityUtils.Activities.ACTIVITY_IN_APP)
+
             startActivity(intent)
         })
 

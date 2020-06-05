@@ -205,6 +205,7 @@ E/MQSEventManagerDelegate: failed to get MQSService.
             FOLLOW, RECEIVE_FOLLOW_REQUEST->{
                 Intent(this, UserDetailActivity::class.java).apply{
                     putExtra(UserDetailActivity.EXTRA_USER_ID, notificationViewData.user.id)
+                    putExtra(ActivityUtils.EXTRA_PARENT, ActivityUtils.Activities.ACTIVITY_IN_APP)
                     putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.app.NavUtils
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -42,6 +43,8 @@ class UserDetailActivity : AppCompatActivity() {
     private var mUserId: String? = null
     private var mIsMainActive: Boolean = true
 
+    private var mParentActivity: ActivityUtils.Activities? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -50,7 +53,7 @@ class UserDetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.userDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        mParentActivity = intent.getSerializableExtra(ActivityUtils.EXTRA_PARENT) as? ActivityUtils.Activities
 
         val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
         mUserId = userId
@@ -221,8 +224,11 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
     private fun finishAndGoToMainActivity(){
-        if(!mIsMainActive){
-            startActivity(Intent(this, MainActivity::class.java))
+        if(mParentActivity == null){
+            val upIntent = Intent(this, MainActivity::class.java)
+            upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            NavUtils.navigateUpTo(this, upIntent)
+            return
         }
         finish()
     }

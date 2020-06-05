@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import jp.panta.misskeyandroidclient.ActivityUtils
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.users.RequestUser
@@ -88,6 +89,8 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         user?: return
 
         val intent = Intent(requireContext(), UserDetailActivity::class.java)
+        intent.putExtra(ActivityUtils.EXTRA_PARENT, ActivityUtils.Activities.ACTIVITY_IN_APP)
+
         intent.putExtra(UserDetailActivity.EXTRA_USER_ID, user.id)
         startActivity(intent)
     }

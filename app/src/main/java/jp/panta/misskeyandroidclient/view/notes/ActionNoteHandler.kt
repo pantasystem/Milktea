@@ -53,6 +53,8 @@ class ActionNoteHandler(
         Log.d("MainActivity", "user clicked :$it")
         val intent = Intent(activity, UserDetailActivity::class.java)
         intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+        intent.putExtra(ActivityUtils.EXTRA_PARENT, ActivityUtils.Activities.ACTIVITY_IN_APP)
+
         activity.startActivity(intent)
     }
 
