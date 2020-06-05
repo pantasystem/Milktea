@@ -69,6 +69,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         setSupportActionBar(note_editor_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        var text: String? = null
+        if(intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true){
+            text = intent.getStringExtra(Intent.EXTRA_TEXT)
+        }
+
         val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
         mBinding = binding
 
@@ -135,6 +140,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, note = note, draftNote = draftNote)
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
+        viewModel.text.value = text?: ""
         binding.viewModel = viewModel
         val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
