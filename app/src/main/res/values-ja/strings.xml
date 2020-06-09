@@ -285,5 +285,7 @@
     <string name="draft_notes">下書きノート</string>
     <string name="toggle_content_visibility">コンテンツを表示/非表示</string>
     <string name="delete_draft_note">下書きノートを削除する</string>
+    <string name="show_remotely">リモートで表示する</string>
+    <string name="incomplete_information_for_remote_user">リモートユーザーのため情報が不完全です。</string>
 
 </resources>

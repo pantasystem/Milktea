@@ -76,6 +76,11 @@ class UserDetailViewModel(
         }
     }
 
+    val isRemoteUser = MediatorLiveData<Boolean>().apply{
+        addSource(user){
+            value = it.url != null
+        }
+    }
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
 

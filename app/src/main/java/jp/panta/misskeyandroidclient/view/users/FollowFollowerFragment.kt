@@ -9,9 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.UserDetailActivity
+import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
@@ -74,6 +72,9 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
             mViewModel?.showUserEventBus?.observe(viewLifecycleOwner, Observer {
                 val intent = Intent(activity, UserDetailActivity::class.java)
+                intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+
                 intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
                 activity?.startActivity(intent)
             })

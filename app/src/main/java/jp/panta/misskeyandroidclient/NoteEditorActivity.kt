@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -69,6 +70,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         setSupportActionBar(note_editor_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        var text: String? = null
+        if(intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true){
+            text = intent.getStringExtra(Intent.EXTRA_TEXT)
+        }
+
         val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
         mBinding = binding
 
@@ -109,6 +115,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         accountViewModel.showProfile.observe(this, Observer {
             val intent = Intent(this, UserDetailActivity::class.java)
             intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
+            intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+
             startActivity(intent)
         })
 
@@ -135,6 +144,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, note = note, draftNote = draftNote)
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
+        if(!text.isNullOrBlank()){
+            viewModel.text.value = text
+        }
         binding.viewModel = viewModel
         val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
@@ -224,12 +236,16 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
         })
 
+        mConfirmViewModel.confirmEvent.observe( this, Observer {
+            ConfirmDialog().show(supportFragmentManager, "confirm")
+        })
+
         mViewModel?.isSaveNoteAsDraft?.observe(this, Observer {
             runOnUiThread {
                 if(it == null){
                     Toast.makeText(this, "下書きに失敗しました", Toast.LENGTH_LONG).show()
                 }else{
-                    finish()
+                    upTo()
                 }
             }
 
@@ -331,14 +347,29 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
                 negativeButtonText = getString(R.string.delete)
 
             )
-            ConfirmDialog().show(supportFragmentManager, "confirm")
         }else{
+            upTo()
+        }
+    }
+
+    private fun upTo(){
+        if(intent.getStringExtra(Intent.EXTRA_TEXT).isNullOrEmpty()){
             finish()
+        }else{
+            val upIntent = Intent(this, MainActivity::class.java)
+            upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            if(shouldUpRecreateTask(upIntent)){
+                TaskStackBuilder.create(this)
+                    .addNextIntentWithParentStack(upIntent)
+                    .startActivities()
+                finish()
+            }else{
+                navigateUpTo(upIntent)
+            }
         }
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
 
         finishOrConfirmSaveAsDraftOrDelete()
     }

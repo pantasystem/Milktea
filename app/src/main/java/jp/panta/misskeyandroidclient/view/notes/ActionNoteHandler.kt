@@ -53,6 +53,9 @@ class ActionNoteHandler(
         Log.d("MainActivity", "user clicked :$it")
         val intent = Intent(activity, UserDetailActivity::class.java)
         intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+        intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+
         activity.startActivity(intent)
     }
 
@@ -81,12 +84,14 @@ class ActionNoteHandler(
     private val noteTargetObserver = Observer<PlaneNoteViewData>{
         val intent = Intent(activity, NoteDetailActivity::class.java)
         intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.toShowNote.id)
+        intent.putActivity(Activities.ACTIVITY_IN_APP)
         activity.startActivity(intent)
     }
 
     private val showNoteEventObserver = Observer<Note>{
         val intent = Intent(activity, NoteDetailActivity::class.java)
         intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.id)
+        intent.putActivity(Activities.ACTIVITY_IN_APP)
         activity.startActivity(intent)
     }
     private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{

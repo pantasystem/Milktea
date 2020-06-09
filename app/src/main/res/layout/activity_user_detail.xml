@@ -7,6 +7,7 @@
         <variable
                 name="userViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel" />
+        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -32,12 +33,37 @@
                         app:mainNameView="@{mainName}"
                         app:subNameView="@{subName}"
                         >
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:id="@+id/remoteUserState"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"
+
+                            android:visibility="@{ SafeUnbox.unbox(userViewModel.isRemoteUser) ? View.VISIBLE : View.GONE }">
+                        <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/incomplete_information_for_remote_user"
+                                />
+                        <Button
+                                android:id="@+id/showRemoteUser"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/show_remotely"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                />
+                    </LinearLayout>
                     <ImageView
                             android:id="@+id/headerView"
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
                             app:headerImageUrl="@{userViewModel.user.bannerUrl}"
                             tools:ignore="ContentDescription"
+                            android:layout_below="@id/remoteUserState"
                             />
 
                     <ImageView

@@ -60,4 +60,8 @@ class NoteRegister {
         return mNotes.values.toList()
     }
 
+    fun clear(){
+        mNotes.clear()
+    }
+
 }

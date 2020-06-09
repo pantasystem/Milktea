@@ -259,6 +259,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         closeDrawerWhenOpenedDrawer()
         val intent = Intent(this, UserDetailActivity::class.java)
         intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+        intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }
     private fun initAccountViewModelListener(){

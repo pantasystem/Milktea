@@ -40,7 +40,8 @@ data class User(
 
 
     @SerializedName("isBlocking") val isBlocking: Boolean,
-    @SerializedName("isMuted") val isMuted: Boolean
+    @SerializedName("isMuted") val isMuted: Boolean,
+    val url: String?
 
     //JsonProperty("isVerified") val isVerified: Boolean,
     //@JsonProperty("isLocked") val isLocked: Boolean

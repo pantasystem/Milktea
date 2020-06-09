@@ -84,8 +84,29 @@
                         android:host="user"
                         android:scheme="misskey" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                        android:scheme="https"
+                        android:host="*"
+                        android:pathPrefix="/@"
+                    />
+            </intent-filter>
         </activity>
-        <activity android:name=".NoteDetailActivity" />
+        <activity android:name=".NoteDetailActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                        android:scheme="https"
+                        android:host="*"
+                        android:pathPrefix="/notes/"
+                        />
+            </intent-filter>
+        </activity>
 
         <service
                 android:name=".PostNoteService"
@@ -95,7 +116,15 @@
         <activity android:name=".DriveActivity" />
         <activity
                 android:name=".NoteEditorActivity"
-                android:windowSoftInputMode="adjustResize" />
+                android:windowSoftInputMode="adjustResize" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                        android:mimeType="text/*"
+                        />
+            </intent-filter>
+        </activity>
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"

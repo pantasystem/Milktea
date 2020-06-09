@@ -7,10 +7,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import jp.panta.misskeyandroidclient.Activities
+
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
@@ -88,6 +91,9 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         user?: return
 
         val intent = Intent(requireContext(), UserDetailActivity::class.java)
+        intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+
         intent.putExtra(UserDetailActivity.EXTRA_USER_ID, user.id)
         startActivity(intent)
     }
