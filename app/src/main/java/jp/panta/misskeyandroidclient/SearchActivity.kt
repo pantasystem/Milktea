@@ -36,7 +36,7 @@ class SearchActivity : AppCompatActivity() {
         val searchView = menu?.findItem(R.id.app_bar_search)?.actionView as SearchView
         mSearchView = searchView
 
-        searchView.setIconifiedByDefault(false)
+        searchView.isIconifiedByDefault = false
         searchView.setOnQueryTextListener(queryTextListener)
         searchView.isIconified = false
         searchView.setQuery(mSearchWord,false)
@@ -54,6 +54,7 @@ class SearchActivity : AppCompatActivity() {
             if(!query.isNullOrBlank()){
                 //search(query)
                 showSearchResult(query)
+                return true
             }
             return false
         }
