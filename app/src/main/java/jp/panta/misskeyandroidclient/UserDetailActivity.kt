@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -117,7 +118,18 @@ class UserDetailActivity : AppCompatActivity() {
 
             invalidateOptionsMenu()
 
+
+            binding.showRemoteUser.setOnClickListener {
+                viewModel.user.value?.url?.let{
+                    val uri = Uri.parse(it)
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, uri)
+                    )
+                }
+            }
+
         })
+
 
 
 
