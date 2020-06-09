@@ -13,9 +13,9 @@ object NoteVisibilityIconHelper {
     @JvmStatic
     fun ImageButton.setVisibilityIcon(noteVisibility: Visibility?){
         when(noteVisibility){
-            Visibility.PUBLIC, Visibility.PUBLIC_LOCAL_ONLY -> this.setImageResource(R.drawable.ic_language_black_24dp)
-            Visibility.HOME, Visibility.HOME_LOCAL_ONLY -> this.setImageResource(R.drawable.ic_home_black_24dp)
-            Visibility.FOLLOWERS, Visibility.FOLLOWERS_LOCAL_ONLY -> this.setImageResource(R.drawable.ic_lock_black_24dp)
+            Visibility.PUBLIC -> this.setImageResource(R.drawable.ic_language_black_24dp)
+            Visibility.HOME -> this.setImageResource(R.drawable.ic_home_black_24dp)
+            Visibility.FOLLOWERS -> this.setImageResource(R.drawable.ic_lock_black_24dp)
             Visibility.SPECIFIED -> this.setImageResource(R.drawable.ic_email_black_24dp)
             else -> return
         }

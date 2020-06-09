@@ -21,14 +21,11 @@ class PostNoteTask(
     //private val fileUploader: FileUploader
 ): Serializable{
 
-    enum class Visibility(val visibility: String, val isLocalOnly: Boolean){
-        PUBLIC("public", false),
-        HOME("home", false),
-        FOLLOWERS("followers", false),
-        SPECIFIED("specified", false),
-        PUBLIC_LOCAL_ONLY("public", true),
-        HOME_LOCAL_ONLY("home", true),
-        FOLLOWERS_LOCAL_ONLY("followers", true)
+    enum class Visibility(val visibility: String, val canLocalOnly: Boolean){
+        PUBLIC("public", true),
+        HOME("home", true),
+        FOLLOWERS("followers", true),
+        SPECIFIED("specified", false)
     }
 
     private val i: String = connectionInformation.getI(encryption)!!
@@ -51,19 +48,15 @@ class PostNoteTask(
     //  でもその迷いが発せしてしまう純心さと優しさが尊い！！
     fun setVisibility(visibility: Visibility?, visibilityUsers: List<String>? = null){
         visibility?: return
-        val isLocalVisibility = visibility == Visibility.FOLLOWERS_LOCAL_ONLY
-                || visibility == Visibility.HOME_LOCAL_ONLY
-                || visibility == Visibility.PUBLIC_LOCAL_ONLY
 
         val v = when(visibility){
-            Visibility.PUBLIC, Visibility.PUBLIC_LOCAL_ONLY -> CreateNote.Visibility.PUBLIC
-            Visibility.HOME, Visibility.HOME_LOCAL_ONLY -> CreateNote.Visibility.HOME
-            Visibility.FOLLOWERS, Visibility.FOLLOWERS_LOCAL_ONLY -> CreateNote.Visibility.FOLLOWERS
+            Visibility.PUBLIC -> CreateNote.Visibility.PUBLIC
+            Visibility.HOME -> CreateNote.Visibility.HOME
+            Visibility.FOLLOWERS -> CreateNote.Visibility.FOLLOWERS
             Visibility.SPECIFIED -> CreateNote.Visibility.SPECIFIED
         }
         //require(canLocalVisibility == isLocal) { "" }
         this.visibility = v
-        this.isLocal = isLocalVisibility
         this.visibleUserIds = visibilityUsers
     }
     

@@ -9,91 +9,16 @@
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
 
     </data>
-    <RadioGroup
+    <Switch
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:background="?attr/colorSurface"
-
-            >
-
-        <RadioButton
-                android:id="@+id/radioButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorPrimary"
-                android:text="@string/visibility_public"
-                android:layout_marginBottom="8dp"
-                android:checked="@{noteEditorViewModel.visibility == Visibility.PUBLIC}"
-                android:onClick="@{()-> noteEditorViewModel.setVisibility(Visibility.PUBLIC)}"
-                />
-
-        <RadioButton
-                android:id="@+id/radioButton2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/visibility_home"
-                android:layout_marginBottom="8dp"
-                android:checked="@{noteEditorViewModel.visibility == Visibility.HOME}"
-                android:onClick="@{()-> noteEditorViewModel.setVisibility(Visibility.HOME)}"
-                android:textColor="?android:attr/textColorPrimary"
-                />
-        <RadioButton
-                android:id="@+id/radioButton4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/visibility_follower"
-                android:layout_marginBottom="8dp"
-                android:checked="@{noteEditorViewModel.visibility == Visibility.FOLLOWERS}"
-                android:onClick="@{()-> noteEditorViewModel.setVisibility(Visibility.FOLLOWERS)}"
-                android:textColor="?android:attr/textColorPrimary"
-
-                />
-        <RadioButton
-                android:id="@+id/radioButton3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/visibility_specified"
-                android:layout_marginBottom="8dp"
-                android:checked="@{noteEditorViewModel.visibility == Visibility.SPECIFIED}"
-                android:onClick="@{()-> noteEditorViewModel.setVisibility(Visibility.SPECIFIED)}"
-                android:textColor="?android:attr/textColorPrimary"
-                />
-
-        <RadioButton
-                android:id="@+id/radioButton5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/visibility_public_local_only"
-                android:layout_marginBottom="8dp"
-                android:checked="@{noteEditorViewModel.visibility == Visibility.PUBLIC_LOCAL_ONLY}"
-                android:onClick="@{()-> noteEditorViewModel.setVisibility(Visibility.PUBLIC_LOCAL_ONLY)}"
-                android:textColor="?android:attr/textColorPrimary"
-                />
-
-        <RadioButton
-                android:id="@+id/radioButton6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/visibility_home_local_only"
-                android:layout_marginBottom="8dp"
-                android:checked="@{noteEditorViewModel.visibility == Visibility.HOME_LOCAL_ONLY}"
-                android:onClick="@{()-> noteEditorViewModel.setVisibility(Visibility.HOME_LOCAL_ONLY)}"
-                android:textColor="?android:attr/textColorPrimary"
-                />
-
-        <RadioButton
-                android:id="@+id/radioButton7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/visibility_follower_local_only"
-                android:layout_marginBottom="8dp"
-                android:checked="@{noteEditorViewModel.visibility == Visibility.FOLLOWERS_LOCAL_ONLY}"
-                android:onClick="@{()-> noteEditorViewModel.setVisibility(Visibility.FOLLOWERS_LOCAL_ONLY)}"
-                android:textColor="?android:attr/textColorPrimary"
-                />
-
-
-    </RadioGroup>
+            android:layout_height="0dp"
+            android:text="@string/local_only"
+            android:layout_marginTop="8dp"
+            android:enabled="@{ SafeUnbox.unbox(noteEditorViewModel.isLocalOnlyEnabled) }"
+            android:checked="@={ SafeUnbox.unbox(noteEditorViewModel.isLocalOnly) }"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:textColor="@android:color/white"
+            />
 
 </layout>

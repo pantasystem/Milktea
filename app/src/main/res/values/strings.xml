@@ -285,5 +285,6 @@
     <string name="delete_draft_note">Delete draft note</string>
     <string name="show_remotely">Display remotely</string>
     <string name="incomplete_information_for_remote_user">Incomplete information for remote user</string>
+    <string name="local_only">Local only</string>
 
 </resources>

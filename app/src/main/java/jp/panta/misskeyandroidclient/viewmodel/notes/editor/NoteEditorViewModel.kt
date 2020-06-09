@@ -1,22 +1,18 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollChoice
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.Dispatchers
@@ -107,10 +103,23 @@ class NoteEditorViewModel(
 
     private val mVisibilityEnums = PostNoteTask.Visibility.values()
     private val mExVisibility = mVisibilityEnums.firstOrNull {
-        it.visibility == note?.visibility?.toLowerCase(Locale.US) && it.isLocalOnly == note.localOnly?: false
-                || it.visibility == draftNote?.visibility?.toLowerCase(Locale.US) && it.isLocalOnly == draftNote.localOnly?: false
+        it.visibility == note?.visibility?.toLowerCase(Locale.US)
+                || it.visibility == draftNote?.visibility?.toLowerCase(Locale.US)
     }
     val visibility = MutableLiveData<PostNoteTask.Visibility>(mExVisibility?: PostNoteTask.Visibility.PUBLIC)
+
+    val isLocalOnly = MediatorLiveData<Boolean>().apply{
+        addSource(visibility){
+            value = it.canLocalOnly && value == true
+        }
+    }
+
+    val isLocalOnlyEnabled = MediatorLiveData<Boolean>().apply{
+        addSource(visibility){
+            value = it?.canLocalOnly == true
+        }
+    }
+
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
@@ -166,6 +175,7 @@ class NoteEditorViewModel(
         noteTask.setVisibility(visibility.value, address.value?.map{
             it.userId
         })
+        noteTask.localOnly = this.isLocalOnly.value?: false
         this.noteTask.postValue(noteTask)
     }
 
@@ -249,6 +259,7 @@ class NoteEditorViewModel(
     }
 
 
+
     private fun List<File>?.toArrayList(): ArrayList<File>{
         return if(this == null){
             ArrayList<File>()
@@ -330,7 +341,7 @@ class NoteEditorViewModel(
                     },
                     draftPoll = poll.value?.toDraftPoll(),
                     visibility = visibility.value?.visibility?: "public",
-                    localOnly = visibility.value?.isLocalOnly,
+                    localOnly = visibility.value?.canLocalOnly,
                     renoteId = quoteToNoteId,
                     replyId = replyToNoteId,
                     files = files.value
