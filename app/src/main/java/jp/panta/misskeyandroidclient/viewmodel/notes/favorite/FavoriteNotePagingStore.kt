@@ -43,14 +43,14 @@ class FavoriteNotePagingStore(
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
-        val res = favorites(builder.build(i, NoteRequest.Conditions(untilId))).execute()
+        val res = favorites(builder.build(i, NoteRequest.Conditions(untilId = untilId))).execute()
         return makeResponse(res, false)
     }
 
     private fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
-            FavoriteNoteViewData(it, accountRelation.account) as PlaneNoteViewData
+            FavoriteNoteViewData(it, accountRelation.account)
         }
         return Pair(BodyLessResponse(res), list)
     }
