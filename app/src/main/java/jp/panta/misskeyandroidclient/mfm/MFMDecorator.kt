@@ -118,7 +118,7 @@ object MFMDecorator {
 
         private fun decorateSearch(search: Search): Spanned?{
             val intent = Intent(Intent.ACTION_SEARCH)
-            intent.setClassName("com.google.android.googlequicksearchbox",  "com.google.android.googlequicksearchbox.SearchActivity")
+            //intent.setClassName("com.google.android.googlequicksearchbox",  "com.google.android.googlequicksearchbox.SearchActivity")
             intent.putExtra(SearchManager.QUERY, search.text)
             return makeClickableSpan("${search.text}  ${(textView.get()?.context?.getString(R.string.search)?: "Search")}", intent)
         }
