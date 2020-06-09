@@ -30,6 +30,7 @@ object KeyStore {
 
         HIDE_BOTTOM_NAVIGATION(false),
 
-        IS_USER_NAME_DEFAULT(true)
+        IS_USER_NAME_DEFAULT(true),
+        IS_POST_BUTTON_TO_BOTTOM(false)
     }
 }

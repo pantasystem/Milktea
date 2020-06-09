@@ -89,6 +89,13 @@ class SettingAppearanceActivity : AppCompatActivity() {
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,
                     context = this,
                     titleStringRes = R.string.user_name_as_default_display_name
+                ),
+                BooleanSharedItem(
+                    key = KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.name,
+                    default = KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.default,
+                    choiceType = BooleanSharedItem.ChoiceType.SWITCH,
+                    context = this,
+                    titleStringRes = R.string.post_button_at_the_bottom
                 )
             )
         )

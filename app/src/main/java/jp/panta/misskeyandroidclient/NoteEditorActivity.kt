@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.TaskStackBuilder
@@ -16,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
+import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
@@ -78,6 +81,24 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
         mBinding = binding
 
+        val miApplication = applicationContext as MiApplication
+
+        val toolbarBase = if(miApplication.settingStore.isPostButtonAtTheBottom){
+            binding.noteEditorToolbar.visibility = View.GONE
+            binding.bottomToolbarBase.visibility = View.VISIBLE
+            binding.bottomToolbarBase
+        }else{
+            binding.bottomToolbarBase.visibility = View.GONE
+            binding.bottomToolbarBase.visibility = View.VISIBLE
+            binding.noteEditorToolbar
+        }
+        val noteEditorToolbar = DataBindingUtil.inflate<ViewNoteEditorToolbarBinding>(
+            LayoutInflater.from(this),
+            R.layout.view_note_editor_toolbar,
+            toolbarBase,
+            true
+        )
+
         //binding.viewModel
         binding.lifecycleOwner = this
 
@@ -90,7 +111,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        binding.actionUpButton.setOnClickListener {
+        noteEditorToolbar.actionUpButton.setOnClickListener {
             finishOrConfirmSaveAsDraftOrDelete()
         }
 
@@ -105,10 +126,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         flexBoxLayoutManager.alignItems = AlignItems.STRETCH
         binding.addressUsersView.layoutManager = flexBoxLayoutManager
 
-        val miApplication = applicationContext as MiApplication
 
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
+        noteEditorToolbar.accountViewModel = accountViewModel
         accountViewModel.switchAccount.observe(this, Observer {
             AccountSwitchingDialog().show(supportFragmentManager, "tag")
         })
@@ -148,6 +169,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             viewModel.text.value = text
         }
         binding.viewModel = viewModel
+        noteEditorToolbar.viewModel = viewModel
+        noteEditorToolbar.lifecycleOwner = this
+
         val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
 

@@ -61,6 +61,15 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             edit.apply()
         }
 
+    var isPostButtonAtTheBottom: Boolean
+        get(){
+            return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.name, KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.default)
+        }
+        set(value) {
+            val edit = sharedPreferences.edit()
+            edit.putBoolean(KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.name, value)
+            edit.apply()
+        }
     private fun fromBooleanEnum(key: KeyStore.BooleanKey): Boolean{
         return sharedPreferences.getBoolean(key.name, key.default)
     }

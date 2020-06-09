@@ -288,5 +288,7 @@
     <string name="show_remotely">リモートで表示する</string>
     <string name="incomplete_information_for_remote_user">リモートユーザーのため情報が不完全です。</string>
     <string name="local_only">ローカルのみ</string>
+    <string name="post_button_at_the_bottom">投稿ボタンを下に配置する。</string>
+
 
 </resources>

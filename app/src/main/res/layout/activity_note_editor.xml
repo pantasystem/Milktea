@@ -31,74 +31,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:contentInsetStart="0dp">
 
-            <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    >
 
-                <ImageButton
-                        android:id="@+id/actionUpButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_alignParentStart="true"
-                        app:srcCompat="@drawable/ic_arrow_back_black_24dp"
-                        android:layout_centerVertical="true"
-                        tools:ignore="ContentDescription"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        />
-                <Button
-                        android:id="@+id/postButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerHorizontal="true"
-                        android:clickable="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
-                        android:onClick="@{()-> viewModel.post()}"
-                        android:text="@string/post" />
-
-
-                <ImageButton
-                        android:id="@+id/currentAccountAvatarIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        tools:src="@mipmap/ic_launcher"
-                        android:layout_toEndOf="@id/actionUpButton"
-                        android:layout_marginEnd="8dp"
-                        android:layout_centerInParent="true"
-                        app:circleIcon="@{viewModel.currentUser.user.avatarUrl}"
-                        android:padding="4dp"
-
-                        tools:ignore="ContentDescription"
-                        android:onClick="@{ ()-> accountViewModel.showSwitchDialog() }"/>
-                <ImageButton
-                        android:id="@+id/noteVisibility"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        tools:src="@drawable/ic_language_black_24dp"
-                        tools:ignore="ContentDescription"
-                        app:noteVisibility="@{viewModel.visibility}"
-                        android:onClick="@{()-> viewModel.showVisibilitySelection()}"
-                        android:layout_marginEnd="4dp"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/textCounter"/>
-                <TextView
-                        android:id="@+id/textCounter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_marginEnd="8dp"
-                        android:layout_toStartOf="@+id/postButton"
-                        android:textSize="18sp"
-                        android:text="@{String.valueOf(viewModel.textRemaining)}"
-                        tools:text="200"
-                        tools:ignore="RelativeOverlap" />
-
-
-            </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
 
         <FrameLayout
@@ -172,6 +105,13 @@
         </FrameLayout>
 
 
+        <FrameLayout
+                android:id="@+id/bottomToolbarBase"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/linearLayout2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
         <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="0dp"
@@ -277,7 +217,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_marginBottom="1dp"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+                app:layout_constraintBottom_toTopOf="@+id/bottomToolbarBase"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/frameLayout"
