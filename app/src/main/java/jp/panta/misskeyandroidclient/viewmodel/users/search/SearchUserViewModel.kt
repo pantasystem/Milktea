@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.RequestUser
@@ -24,6 +25,13 @@ class SearchUserViewModel(
     val miCore: MiCore,
     val hasDetail: Boolean?
 ) : ViewModel(){
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(val miCore: MiCore, val hasDetail: Boolean?) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return SearchUserViewModel(miCore, hasDetail) as T
+        }
+    }
 
     val userName = MutableLiveData<String>()
     val host = MutableLiveData<String>()

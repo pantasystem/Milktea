@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users.selectable
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -16,6 +17,23 @@ class SelectedUserViewModel(
     exSelectedUserIds: List<String> = emptyList(),
     exSelectedUsers: List<User> = emptyList()
 ) : ViewModel(){
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(
+        val miCore: MiCore,
+        val selectableSize: Int,
+        val selectedUserIds: List<String>?,
+        val selectedUsers: List<User>?
+    ) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return SelectedUserViewModel(
+                miCore,
+                selectableSize,
+                selectedUserIds?: emptyList(),
+                selectedUsers?: emptyList()
+            ) as T
+        }
+    }
 
     private val mSelectedUserIdUserMap = LinkedHashMap<String, UserViewData>()
 
@@ -33,6 +51,13 @@ class SelectedUserViewModel(
             }.toSet()
         }
     }
+
+    val isSelectable = MediatorLiveData<Boolean>().apply{
+        addSource(selectedUserIds){
+            value = it.size <= selectableSize
+        }
+    }
+
 
     init{
         val usersMap = HashMap<String, UserViewData>()
