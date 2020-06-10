@@ -6,6 +6,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import jp.panta.misskeyandroidclient.view.users.ClickableUserListAdapter
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import kotlinx.android.synthetic.main.activity_search.*
 
 class SearchActivity : AppCompatActivity() {
@@ -18,6 +24,8 @@ class SearchActivity : AppCompatActivity() {
 
     private var mSearchWord: String? = null
 
+    private lateinit var mSearchUserViewModel: SearchUserViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -27,6 +35,16 @@ class SearchActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayShowTitleEnabled(false)
         mSearchWord = intent.getStringExtra(EXTRA_SEARCH_WORD)
+
+        val miCore = applicationContext as MiCore
+        mSearchUserViewModel = ViewModelProvider(this, SearchUserViewModel.Factory(miCore, null))[SearchUserViewModel::class.java]
+
+        val usersAdapter = ClickableUserListAdapter(this)
+        searchedUsers.adapter = usersAdapter
+        searchedUsers.layoutManager = LinearLayoutManager(this)
+        mSearchUserViewModel.getUsers().observe(this, Observer {
+            usersAdapter.submitList(it)
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -47,7 +65,8 @@ class SearchActivity : AppCompatActivity() {
 
     private val queryTextListener = object : SearchView.OnQueryTextListener{
         override fun onQueryTextChange(newText: String?): Boolean {
-            return false
+            mSearchUserViewModel.userName.value = newText?: ""
+            return true
         }
 
         override fun onQueryTextSubmit(query: String?): Boolean {
