@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.users.SearchByUserAndHost
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -97,47 +98,5 @@ class SearchUserViewModel(
         return miCore.currentAccount.value?.getCurrentConnectionInformation()
     }
 
-    class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
 
-        private var mMainCapture: MainCapture? = null
-
-        override fun onActive() {
-            super.onActive()
-
-            mMainCapture?.putListener(listener)
-        }
-        override fun onInactive() {
-            super.onInactive()
-
-            mMainCapture?.removeListener(listener)
-        }
-        fun setMainCapture(mainCapture: MainCapture){
-            mMainCapture?.removeListener(listener)
-            mMainCapture = mainCapture
-            mainCapture.putListener(listener)
-        }
-
-        val listener = object : MainCapture.AbsListener(){
-            override fun followed(user: User) {
-                super.followed(user)
-
-                value?.forEach {
-                    if(it.userId == user.id){
-                        it.user.postValue(user)
-                    }
-                }
-            }
-
-            override fun follow(user: User) {
-                super.follow(user)
-
-                value?.forEach {
-                    if(it.userId == user.id){
-                        it.user.postValue(user)
-                    }
-                }
-            }
-        }
-
-    }
 }
