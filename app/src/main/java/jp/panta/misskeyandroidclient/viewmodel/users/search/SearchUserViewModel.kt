@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.users.search
 
 import android.util.Log
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.RequestUser
@@ -50,6 +47,10 @@ class SearchUserViewModel(
 
     private var mSearchByUserAndHost: SearchByUserAndHost? = null
     private var mNowInstanceBase: String? = null
+
+    fun getUsers(): LiveData<List<UserViewData>> {
+        return users
+    }
 
     fun search(){
 

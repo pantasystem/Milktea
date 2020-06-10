@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.users.selectable
 
+import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,13 +10,14 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
+import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 
 
 class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,
-    exSelectedUserIds: List<String> = emptyList(),
-    exSelectedUsers: List<User> = emptyList()
+    val exSelectedUserIds: List<String> = emptyList(),
+    val exSelectedUsers: List<User> = emptyList()
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
@@ -34,6 +36,13 @@ class SelectedUserViewModel(
             ) as T
         }
     }
+
+
+    data class ChangedDiffResult(
+        val selected: List<String>,
+        val added: List<String>,
+        val removed: List<String>
+    )
 
     private val mSelectedUserIdUserMap = LinkedHashMap<String, UserViewData>()
 
@@ -54,7 +63,12 @@ class SelectedUserViewModel(
 
     val isSelectable = MediatorLiveData<Boolean>().apply{
         addSource(selectedUserIds){
-            value = it.size <= selectableSize
+            /*value = if(selectableSize > 0){
+                it.size <= selectableSize
+            }else{
+                true
+            }*/
+            value = true
         }
     }
 
@@ -121,5 +135,31 @@ class SelectedUserViewModel(
         return synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.containsKey(user.id)
         }
+    }
+
+    fun getSelectedUserIdsChangedDiff(): ChangedDiffResult {
+        val selectedBeforeIds = exSelectedUserIds.toSet()
+        val selectedBeforeUsers = exSelectedUsers.map{
+            it.id
+        }.toSet()
+        val exSelected = HashSet<String>().apply{
+            addAll(selectedBeforeIds)
+            addAll(selectedBeforeUsers)
+        }
+
+        val selected = selectedUsers.value?.map{
+            it.userId
+        }?: emptyList()
+
+
+
+        val added = selected.filter{ s ->
+            !exSelected.contains(s)
+        }
+
+        val removed = exSelected.filter{ ex ->
+            !selected.contains(ex)
+        }
+        return ChangedDiffResult(selected.toList(), added, removed)
     }
 }

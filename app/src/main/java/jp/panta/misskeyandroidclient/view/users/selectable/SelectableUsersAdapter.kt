@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSelectableSimpleUserBinding
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SearchAndSelectUserViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectableUserViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 
 class SelectableUsersAdapter(
@@ -33,7 +31,7 @@ class SelectableUsersAdapter(
     override fun onBindViewHolder(holder: VH, position: Int) {
         val user = getItem(position)
         holder.binding.selectedUserViewModel = selectedUserViewModel
-        holder.binding.user = getItem(position)
+        holder.binding.user = user
         holder.binding.lifecycleOwner = lifecycleOwner
     }
 

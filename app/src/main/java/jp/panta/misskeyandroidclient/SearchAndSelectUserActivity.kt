@@ -15,7 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
 import jp.panta.misskeyandroidclient.view.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SearchAndSelectUserViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_search_and_select_user.*
 
@@ -30,8 +30,9 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         const val EXTRA_REMOVED_USER_IDS = "jp.panta.misskeyandroidclient.EXTRA_REMOVED_USER_IDS"
     }
 
-    private var mSearchAndSelectUserViewModel: SearchAndSelectUserViewModel? = null
     private var mSelectedUserIds: List<String>? = null
+
+    private var mSelectedUserViewModel: SelectedUserViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,42 +56,28 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
         val selectedUserViewModel =
             ViewModelProvider(this, SelectedUserViewModel.Factory(miCore, selectableMaximumSize, selectedUserIdList, null))[SelectedUserViewModel::class.java]
-        miCore.currentAccount.observe(this, Observer{ ar ->
-            val searchAndSelectUserViewModel = ViewModelProvider(
-                this,
-                SearchAndSelectUserViewModel.Factory(
-                    ar,
-                    miCore,
-                    selectableMaximumSize,
-                    selectedUserIdList
-                ))[SearchAndSelectUserViewModel::class.java]
+        val selectableUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
 
-            mSearchAndSelectUserViewModel = searchAndSelectUserViewModel
+        val searchUserViewModel =
+            ViewModelProvider(this, SearchUserViewModel.Factory(miCore, false))[SearchUserViewModel::class.java]
+        activitySearchAndSelectUserBinding.usersView.adapter = selectableUsersAdapter
+        activitySearchAndSelectUserBinding.searchUserViewModel = searchUserViewModel
+        activitySearchAndSelectUserBinding.selectedUserViewModel = selectedUserViewModel
+        activitySearchAndSelectUserBinding.usersView.layoutManager = linearLayoutManager
+        activitySearchAndSelectUserBinding.lifecycleOwner = this
 
-            val selectableUsersAdapter = SelectableUsersAdapter(searchAndSelectUserViewModel, this)
-            activitySearchAndSelectUserBinding.usersView.adapter = selectableUsersAdapter
-            activitySearchAndSelectUserBinding.searchSelectViewModel = searchAndSelectUserViewModel
-            activitySearchAndSelectUserBinding.usersView.layoutManager = linearLayoutManager
-            activitySearchAndSelectUserBinding.lifecycleOwner = this
+        val selectedUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
+        activitySearchAndSelectUserBinding.selectedUsersView.selectedUserViewModel = selectedUserViewModel
+        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter = selectedUsersAdapter
+        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager = LinearLayoutManager(this)
 
-            val selectedUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
-            activitySearchAndSelectUserBinding.selectedUsersView.searchAndSelectUserViewModel = searchAndSelectUserViewModel
-            activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter = selectedUsersAdapter
-            activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager = LinearLayoutManager(this)
-
-
-            searchAndSelectUserViewModel.searchResultUsers.observe(this, Observer{ list ->
-                selectableUsersAdapter.submitList(list)
-            })
-
-            searchAndSelectUserViewModel.selectedUsers.observe(this, Observer{ selectedUsers ->
-                selectedUsersAdapter.submitList(selectedUsers)
-
-            })
-
-
+        searchUserViewModel.getUsers().observe(this, Observer {
+            selectableUsersAdapter.submitList(it)
         })
 
+        selectedUserViewModel.selectedUsers.observe(this, Observer {
+            selectedUsersAdapter.submitList(it)
+        })
 
     }
 
@@ -108,10 +95,10 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     }
 
     private fun setResultFinish(){
-        val selectedDiff = mSearchAndSelectUserViewModel?.getSelectedUserIdsChangedDiff()
+        val selectedDiff = mSelectedUserViewModel?.getSelectedUserIdsChangedDiff()
         val selectedUsers =
-            (mSearchAndSelectUserViewModel?.selectedUsers?.value ?: emptyList()).mapNotNull {
-                it.user.user.value
+            (mSelectedUserViewModel?.selectedUsers?.value ?: emptyList()).mapNotNull {
+                it.user.value
             }
         if(selectedDiff == null){
             setResult(Activity.RESULT_CANCELED)

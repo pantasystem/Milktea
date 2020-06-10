@@ -5,8 +5,11 @@
 
     <data>
         <variable
-                name="searchSelectViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SearchAndSelectUserViewModel" />
+                name="selectedUserViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel" />
+        <variable
+                name="searchUserViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel" />
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -56,7 +59,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
-                            android:text="@={searchSelectViewModel.userName}"
+                            android:text="@={searchUserViewModel.userName}"
                             android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
                 <TextView
@@ -77,7 +80,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
-                            android:text="@={searchSelectViewModel.host}"
+                            android:text="@={searchUserViewModel.host}"
                             android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
