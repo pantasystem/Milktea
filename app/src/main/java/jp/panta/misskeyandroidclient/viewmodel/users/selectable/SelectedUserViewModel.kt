@@ -63,12 +63,7 @@ class SelectedUserViewModel(
 
     val isSelectable = MediatorLiveData<Boolean>().apply{
         addSource(selectedUserIds){
-            /*value = if(selectableSize > 0){
-                it.size <= selectableSize
-            }else{
-                true
-            }*/
-            value = true
+            value = it.size <= selectableSize
         }
     }
 
@@ -108,6 +103,7 @@ class SelectedUserViewModel(
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap[user.id] = UserViewData(user)
+            selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
 
@@ -115,6 +111,7 @@ class SelectedUserViewModel(
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.remove(user.id)
+            selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
 

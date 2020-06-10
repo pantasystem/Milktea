@@ -66,7 +66,9 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart='8dp'
                     android:onClick="@{() -> selectedUserViewModel.toggleSelectUser(user.user)}"
-                    android:enabled="@{SafeUnbox.unbox(selectedUserViewModel.isSelectable) || SafeUnbox.unbox(selectedUserViewModel.isSelectedUser(user.user))}"
+                    app:selectedUsers="@{selectedUserViewModel.selectedUserIds}"
+                    app:selectableUserEnabled="@{user.user}"
+                    app:selectableMaxCount="@{selectedUserViewModel.selectableSize}"
                     android:checked="@{SafeUnbox.unbox(selectedUserViewModel.isSelectedUser(user.user))}"/>
 
         </RelativeLayout>
