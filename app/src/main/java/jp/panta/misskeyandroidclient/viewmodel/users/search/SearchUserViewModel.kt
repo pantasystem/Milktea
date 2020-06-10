@@ -33,6 +33,8 @@ class SearchUserViewModel(
     val userName = MutableLiveData<String>()
     val host = MutableLiveData<String>()
 
+    val isLoading = MutableLiveData<Boolean>()
+
     private val users = UsersLiveData().apply{
         addSource(userName){
             search()
@@ -64,7 +66,7 @@ class SearchUserViewModel(
             host = host,
             detail = hasDetail
         )
-
+        isLoading.postValue(true)
         getSearchByUserAndHost()?.search(request)?.enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 users.postValue(
@@ -72,12 +74,14 @@ class SearchUserViewModel(
                         UserViewData(it)
                     }
                 )
+                isLoading.postValue(false)
 
 
             }
 
             override fun onFailure(call: Call<List<User>>, t: Throwable) {
                 Log.e("SearchUserViewModel", "search and select user error", t)
+                isLoading.postValue(false)
             }
         })
     }
