@@ -5,12 +5,13 @@
     <data>
 
         <variable
-                name="selectableUser"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectableUserViewData" />
+                name="user"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.UserViewData" />
 
         <variable
-                name="selectUserViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SearchAndSelectUserViewModel" />
+                name="selectedUserViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel" />
+
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView android:layout_width="match_parent"
@@ -23,7 +24,7 @@
         <RelativeLayout
                 android:layout_width="match_parent" android:layout_height="match_parent"
                 android:padding="16dp"
-                app:user="@{selectableUser.user.user}"
+                app:user="@{user.user}"
                 app:mainNameView="@{nameMain}"
                 app:subNameView="@{nameSub}">
             <ImageView
@@ -33,8 +34,8 @@
                     android:layout_marginEnd="8dp"
                     tools:src="@drawable/ic_person_add_black_24dp"
                     tools:ignore="ContentDescription"
-                    app:circleIcon="@{selectableUser.user.user.avatarUrl}"
-                    app:transitionDestinationUser="@{selectableUser.user.user}"/>
+                    app:circleIcon="@{user.user.avatarUrl}"
+                    app:transitionDestinationUser="@{user.user}"/>
             <TextView
                     android:id="@+id/nameMain"
                     android:layout_toEndOf="@id/avatarIcon"
@@ -64,9 +65,9 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart='8dp'
-                    android:onClick="@{() -> selectUserViewModel.toggleSelect(selectableUser)}"
-                    android:enabled="@{SafeUnbox.unbox(selectableUser.selected) || SafeUnbox.unbox(selectUserViewModel.isSelectable)}"
-                    android:checked="@{SafeUnbox.unbox(selectableUser.selected)}"/>
+                    android:onClick="@{() -> selectedUserViewModel.toggleSelectUser(user.user)}"
+                    android:enabled="@{SafeUnbox.unbox(selectedUserViewModel.isSelectable) || SafeUnbox.unbox(selectedUserViewModel.isSelectedUser(user.user))}"
+                    android:checked="@{SafeUnbox.unbox(selectedUserViewModel.isSelectedUser(user.user))}"/>
 
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

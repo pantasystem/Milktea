@@ -9,35 +9,31 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSelectableSimpleUserBinding
+import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SearchAndSelectUserViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectableUserViewData
+import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 
 class SelectableUsersAdapter(
-    val selectableUserViewModel: SearchAndSelectUserViewModel,
+    val selectedUserViewModel: SelectedUserViewModel,
     val lifecycleOwner: LifecycleOwner
-) : ListAdapter<SelectableUserViewData, SelectableUsersAdapter.VH>(ItemCallback()){
+) : ListAdapter<UserViewData, SelectableUsersAdapter.VH>(ItemCallback()){
 
     class VH(val binding: ItemSelectableSimpleUserBinding) : RecyclerView.ViewHolder(binding.root)
-    class ItemCallback : DiffUtil.ItemCallback<SelectableUserViewData>(){
-        override fun areContentsTheSame(
-            oldItem: SelectableUserViewData,
-            newItem: SelectableUserViewData
-        ): Boolean {
-            return oldItem == newItem
+    class ItemCallback : DiffUtil.ItemCallback<UserViewData>(){
+        override fun areContentsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
+            return oldItem.user.value == newItem.user.value
         }
 
-        override fun areItemsTheSame(
-            oldItem: SelectableUserViewData,
-            newItem: SelectableUserViewData
-        ): Boolean {
-            return oldItem.user.userId == newItem.user.userId
+        override fun areItemsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
+            return oldItem.userId == newItem.userId
         }
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val user = getItem(position)
-        holder.binding.selectUserViewModel = selectableUserViewModel
-        holder.binding.selectableUser = user
+        holder.binding.selectedUserViewModel = selectedUserViewModel
+        holder.binding.user = getItem(position)
         holder.binding.lifecycleOwner = lifecycleOwner
     }
 

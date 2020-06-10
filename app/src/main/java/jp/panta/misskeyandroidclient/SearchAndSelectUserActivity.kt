@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBind
 import jp.panta.misskeyandroidclient.view.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SearchAndSelectUserViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_search_and_select_user.*
 
 class SearchAndSelectUserActivity : AppCompatActivity() {
@@ -50,6 +51,10 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
 
         val miCore = applicationContext as MiCore
+
+
+        val selectedUserViewModel =
+            ViewModelProvider(this, SelectedUserViewModel.Factory(miCore, selectableMaximumSize, selectedUserIdList, null))[SelectedUserViewModel::class.java]
         miCore.currentAccount.observe(this, Observer{ ar ->
             val searchAndSelectUserViewModel = ViewModelProvider(
                 this,
@@ -68,7 +73,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
             activitySearchAndSelectUserBinding.usersView.layoutManager = linearLayoutManager
             activitySearchAndSelectUserBinding.lifecycleOwner = this
 
-            val selectedUsersAdapter = SelectableUsersAdapter(searchAndSelectUserViewModel, this)
+            val selectedUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
             activitySearchAndSelectUserBinding.selectedUsersView.searchAndSelectUserViewModel = searchAndSelectUserViewModel
             activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter = selectedUsersAdapter
             activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager = LinearLayoutManager(this)

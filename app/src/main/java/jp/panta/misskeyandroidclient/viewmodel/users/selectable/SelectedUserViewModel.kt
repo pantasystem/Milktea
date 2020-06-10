@@ -115,4 +115,11 @@ class SelectedUserViewModel(
             }
         }
     }
+
+    fun isSelectedUser(user: User?): Boolean{
+        user?: return false
+        return synchronized(mSelectedUserIdUserMap){
+            mSelectedUserIdUserMap.containsKey(user.id)
+        }
+    }
 }
