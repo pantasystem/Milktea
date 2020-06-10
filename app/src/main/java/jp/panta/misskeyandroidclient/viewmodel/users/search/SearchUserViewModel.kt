@@ -20,7 +20,8 @@ import retrofit2.Response
  * SelectedUserViewModelに分離する予定
  */
 class SearchUserViewModel(
-    val miCore: MiCore
+    val miCore: MiCore,
+    val hasDetail: Boolean?
 ) : ViewModel(){
 
     val userName = MutableLiveData<String>()
@@ -50,7 +51,8 @@ class SearchUserViewModel(
             i = getCi()?.getI(miCore.getEncryption())!!,
             userName = userName,
             userId = null,
-            host = host
+            host = host,
+            detail = hasDetail
         )
 
         getSearchByUserAndHost()?.search(request)?.enqueue(object : Callback<List<User>> {
