@@ -11,7 +11,7 @@ object SelectableUserHelper {
     @BindingAdapter("selectedUsers", "selectableUserEnabled", "selectableMaxCount")
     fun CheckBox.setSelectableUserEnabled(selectedUsers: Set<String>?, selectableUserEnabled: User?, selectableMaxCount: Int?){
         val max = selectableMaxCount?: 0
-        if(selectableUserEnabled == null){
+        if(selectableUserEnabled == null || max <= 0){
             this.visibility = View.GONE
             return
         }
