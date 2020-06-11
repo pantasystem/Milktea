@@ -25,8 +25,9 @@ class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
     }
 
     val listener = object : MainCapture.AbsListener(){
-        override fun followed(user: User) {
-            super.followed(user)
+
+        override fun follow(user: User) {
+            super.follow(user)
 
             value?.forEach {
                 if(it.userId == user.id){
@@ -35,9 +36,7 @@ class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
             }
         }
 
-        override fun follow(user: User) {
-            super.follow(user)
-
+        override fun unFollowed(user: User) {
             value?.forEach {
                 if(it.userId == user.id){
                     it.user.postValue(user)
