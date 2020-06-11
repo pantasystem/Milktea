@@ -44,20 +44,22 @@ class NoteCapture(override val account: Account) : AbsObserver(){
             val isRemoteCaptured = isRemoteCaptured(planeNoteViewData)
 
             noteRegister.add(planeNoteViewData)
-            if(!isRemoteCaptured){
+            return if(!isRemoteCaptured){
                 // capture開始する
                 capture(planeNoteViewData.toShowNote.id)
+            }else{
+                false
             }
         }
-        return true
 
     }
 
     fun subscribeAll(registerId: String, notes: List<PlaneNoteViewData>){
-        Log.d("NoteCapture", "subscribeAll")
-        notes.forEach{
-            subscribe(registerId, it)
+        val subscribed = notes.sumBy{
+            if(subscribe(registerId, it)) 1 else 0
         }
+        Log.d("NoteCapture", "subscribeAll, subscribeしようとした件数:${notes.size}, subscribeした件数:$subscribed")
+
     }
 
     /**
@@ -100,19 +102,22 @@ class NoteCapture(override val account: Account) : AbsObserver(){
      * @param noteRegister 対象のRegisterのノートを一斉にremoteに登録します。すでに登録されている場合はremoteには登録されません。
      */
     fun attach(noteRegister: NoteRegister){
-        Log.d("NoteCapture", "attach, size:${noteRegister.registeredNoteIds().size}")
+        Log.d("NoteCapture", "attach, registerId:${noteRegister.registerId}, size:${noteRegister.registeredNoteIds().size}")
         synchronized(mNoteRegisters){
             val noteIds = noteRegister.registeredNoteIds()
 
-            noteIds.forEach{ noteId ->
+            val captured = noteIds.sumBy{ noteId ->
                 val isRemoteCaptured = isRemoteCaptured(noteId)
                 if(!isRemoteCaptured){
-                    capture(noteId)
+                    if(capture(noteId)) 1 else 0
+                }else{
+                    0
                 }
             }
 
-            mNoteRegisters[noteRegister.registerId] = noteRegister
+            Log.d("NoteCapture", "attach ノート件数:${noteIds.size}, 実際に登録された件数:$captured")
 
+            mNoteRegisters[noteRegister.registerId] = noteRegister
 
         }
 
@@ -133,12 +138,16 @@ class NoteCapture(override val account: Account) : AbsObserver(){
             mNoteRegisters.remove(noteRegister.registerId)
         }
 
-        noteIds.forEach{ noteId ->
+        val unCaptured = noteIds.sumBy{ noteId ->
             val isRemoteCaptured = isRemoteCaptured(noteId)
             if(!isRemoteCaptured){
                 unCapture(noteId)
+                1
+            }else{
+                0
             }
         }
+        Log.d("NoteCapture", "detached ノート件数:${noteIds.size}, 実際に解除された件数:$unCaptured")
     }
 
     fun addNoteDeletedListener(listener: DeletedListener){
@@ -147,11 +156,13 @@ class NoteCapture(override val account: Account) : AbsObserver(){
         }
     }
 
-    private fun capture(noteId: String){
+    private fun capture(noteId: String): Boolean{
         streamingAdapter?.send(mGson.toJson(createCaptureRequest(noteId))).let{
             if(it == null || it == false){
                 Log.w("NoteCapture", "ノートの登録に失敗した")
             }
+            return it?: false
+
         }
     }
 

@@ -110,7 +110,7 @@ class StreamingAdapter(
 
     private val webSocketListener = object : WebSocketListener(){
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            Log.d(TAG, "onOpenコネクション開始")
+            Log.d(TAG, "-------------------------------onOpenコネクション開始--------------------------------")
             isConnect = true
             synchronized(observerMap){
                 observerMap.forEach {

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.streming.note
 
+import android.util.Log
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.util.*
 import kotlin.collections.HashMap
@@ -10,6 +11,9 @@ import kotlin.collections.HashMap
  */
 class NoteRegister {
     val registerId = UUID.randomUUID().toString()
+    init{
+        Log.d("NoteRegister", "インスタンスが生成されました registerId:$registerId")
+    }
 
     private val mNotes = HashMap<String, NoteIdentityGroup>()
 
