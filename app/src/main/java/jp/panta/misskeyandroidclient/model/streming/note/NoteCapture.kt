@@ -14,7 +14,7 @@ import java.util.*
 import kotlin.collections.HashSet
 
 
-class NoteCapture(val account: Account) : AbsObserver(){
+class NoteCapture(override val account: Account) : AbsObserver(){
     abstract class DeletedListener{
         val listenerId = UUID.randomUUID().toString()
         abstract fun onDeleted(noteId: String)

@@ -5,27 +5,26 @@ import java.lang.IndexOutOfBoundsException
 
 class Version : Comparable<Version>{
 
-    companion object{
-        enum class Major{
-            V_10{
-                override fun range(version: Version): Boolean {
-                    return version >= Version("10") && version < Version("11")
-                }
-            },
-            V_11{
-                override fun range(version: Version): Boolean {
-                    return version >= Version("11") && version < Version("12")
-                }
-            },
-            V_12{
-                override fun range(version: Version): Boolean {
-                    return version >= Version("12") && version < Version("13")
-                }
-            };
+    enum class Major{
+        V_10{
+            override fun range(version: Version): Boolean {
+                return version >= Version("10") && version < Version("11")
+            }
+        },
+        V_11{
+            override fun range(version: Version): Boolean {
+                return version >= Version("11") && version < Version("12")
+            }
+        },
+        V_12{
+            override fun range(version: Version): Boolean {
+                return version >= Version("12") && version < Version("13")
+            }
+        };
 
-            abstract fun range(version: Version): Boolean
-        }
+        abstract fun range(version: Version): Boolean
     }
+
     private val subVersions: List<Int>
 
     constructor(version: String){
@@ -77,12 +76,19 @@ class Version : Comparable<Version>{
     }
 
     fun isUntilRange(minVersion: Version, maxVersion: Version): Boolean{
-        0 in 0..1
-        return this >= minVersion && this < maxVersion
+        return try{
+            this >= minVersion && this < maxVersion
+        }catch( e: Exception ){
+            false
+        }
     }
 
     fun isInRange(version: Major): Boolean{
-        return version.range(this)
+        return try{
+            version.range(this)
+        }catch( e: Exception ){
+            false
+        }
     }
 
 

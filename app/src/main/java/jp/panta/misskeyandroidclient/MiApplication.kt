@@ -511,7 +511,7 @@ class MiApplication : Application(), MiCore {
         val mainCapture = synchronized(mMainCaptureAccountMap){
             val tmp = mMainCaptureAccountMap[account.account]
             isMainCaptureCreated = tmp == null
-            (tmp?: MainCapture(GsonFactory.create())).apply{
+            (tmp?: MainCapture(account.account, GsonFactory.create())).apply{
                 mMainCaptureAccountMap[account.account] = this
             }
         }
@@ -519,6 +519,8 @@ class MiApplication : Application(), MiCore {
         if(isMainCaptureCreated){
             setupObserver(account, mainCapture)
         }
+        validateObserverAccount(mainCapture, account.account)
+
 
         return mainCapture
     }
@@ -553,6 +555,8 @@ class MiApplication : Application(), MiCore {
             setupObserver(account, noteCapture)
             mNoteCaptureAccountMap[account.account] = noteCapture
         }
+        validateObserverAccount(noteCapture, account.account)
+
         return noteCapture
 
 
@@ -581,7 +585,16 @@ class MiApplication : Application(), MiCore {
             setupObserver(account, timelineCapture)
             mTimelineCaptureAccountMap[account.account] = timelineCapture
         }
+        validateObserverAccount(timelineCapture, account.account)
         return timelineCapture
+    }
+
+    private fun validateObserverAccount(observer: Observer, account: Account){
+        if(observer.account == account){
+            Log.d("MiApplication", "Observerのアカウント一致正常です！！")
+        }else{
+            Log.e("MiApplication" ,"Observerのアカウントが一致しません！！エラー")
+        }
     }
 
 

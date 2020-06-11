@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.streming
 
+import jp.panta.misskeyandroidclient.model.core.Account
 import java.util.*
 
 interface Observer {
@@ -15,6 +16,8 @@ interface Observer {
     //fun onConnect(): StreamingAction
     //fun onDisconnect(): StreamingAction
     val id: String
+
+    val account: Account
 
     /**
      * 接続が開始されたときに呼び出されます

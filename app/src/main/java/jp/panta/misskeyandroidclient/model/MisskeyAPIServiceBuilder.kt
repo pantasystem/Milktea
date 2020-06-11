@@ -37,15 +37,15 @@ object MisskeyAPIServiceBuilder {
             .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
             .build()
         return when{
-            version.isInRange(Version.Companion.Major.V_10) ->{
+            version.isInRange(Version.Major.V_10) ->{
                 val diff = retrofit.create(MisskeyAPIV10Diff::class.java)
                 return MisskeyAPIV10(build(baseUrl), diff)
             }
-            version.isInRange(Version.Companion.Major.V_11)
-                    || version.isInRange(Version.Companion.Major.V_12) ->{
+            version.isInRange(Version.Major.V_11)
+                    || version.isInRange(Version.Major.V_12) ->{
                 val baseAPI = build(baseUrl)
                 val misskeyAPIV11Diff = retrofit.create(MisskeyAPIV11Diff::class.java)
-                if(version.isInRange(Version.Companion.Major.V_12)){
+                if(version.isInRange(Version.Major.V_12)){
                     val misskeyAPI12DiffImpl = retrofit.create(MisskeyAPIV12Diff::class.java)
                      MisskeyAPIV12(baseAPI, misskeyAPI12DiffImpl, misskeyAPIV11Diff)
                 }else{

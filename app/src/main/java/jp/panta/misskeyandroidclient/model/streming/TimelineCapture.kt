@@ -13,7 +13,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class TimelineCapture(
-    val account: Account
+    override val account: Account
 ) : AbsObserver(){
 
     interface Observer{

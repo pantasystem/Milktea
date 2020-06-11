@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.streming
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -15,6 +16,7 @@ import kotlin.collections.ArrayList
  * アカウント一つにつきMainCaptureを一つにしたい
  */
 class MainCapture(
+    override val account: Account,
     val gson: Gson
 ) : AbsObserver(){
     interface Listener{

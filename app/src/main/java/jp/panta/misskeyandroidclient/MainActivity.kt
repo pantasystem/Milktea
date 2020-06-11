@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             })
 
             //mNotificationSubscribeViewModel?.currentNotification?.observe(this, notificationObserver)
-            val isV12 = miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Companion.Major.V_12)?: false
+            val isV12 = miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Major.V_12)?: false
             Log.d("MainActivity", if(isV12) "v12のようです" else "v12以外のようです")
             navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
 
