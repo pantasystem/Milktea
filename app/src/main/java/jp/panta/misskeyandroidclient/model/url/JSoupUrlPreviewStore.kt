@@ -11,11 +11,11 @@ class JSoupUrlPreviewStore : UrlPreviewStore{
         try{
             val urlMatcher = urlPattern.matcher(url)
             if(!urlMatcher.find()){
-                println("urlではないため終了:$url")
+                //println("urlではないため終了:$url")
                 return null
             }
             val baseUrl = urlMatcher.group(1)!! + urlMatcher.group(2) + urlMatcher.group(3)
-            println("baseUrl:$baseUrl")
+            //println("baseUrl:$baseUrl")
             val document = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36")
                 .timeout(5000).get()
@@ -64,7 +64,7 @@ class JSoupUrlPreviewStore : UrlPreviewStore{
             }
             title = title?: urlMatcher.group(3)
 
-            println("title:$title, \nsiteName:$siteName, \ndescription:$description, \nicon:$iconUrl, \ndescription:$description\n thumbnail:$thumbnailImage")
+            //println("title:$title, \nsiteName:$siteName, \ndescription:$description, \nicon:$iconUrl, \ndescription:$description\n thumbnail:$thumbnailImage")
 
             if(title.isNullOrEmpty() || description.isNullOrEmpty()){
                 return null
