@@ -116,9 +116,8 @@ class TimelineViewModel(
 
                         val state = timelineLiveData.value
                         val newState = if(state == null){
-                            if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
-                                startTimelineCapture()
-                            }
+                            startTimelineCapture()
+
                             TimelineState(
                                 list,
                                 TimelineState.State.LOAD_NEW
@@ -236,15 +235,18 @@ class TimelineViewModel(
     }
 
     fun start(){
-        startNoteCapture()
-        if(settingStore.isAutoLoadTimeline){
-            startTimelineCapture()
+
+        if(settingStore.isUpdateTimelineInBackground){
+            startNoteCapture()
         }
     }
 
     fun stop(){
-        stopNoteCapture()
-        stopTimelineCapture()
+
+        if(settingStore.isUpdateTimelineInBackground){
+            stopTimelineCapture()
+            stopNoteCapture()
+        }
     }
 
 

@@ -83,6 +83,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             if(vm == null || vm.accountRelation.getCurrentConnectionInformation() != accountRelation.getCurrentConnectionInformation()){
                 Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, アカウント不一致:${vm?.accountRelation?.account != accountRelation?.account}")
                 mViewModel = ViewModelProvider(this, factory).get("$accountRelation",TimelineViewModel::class.java)
+                mViewModel?.stop()
+                mViewModel?.start()
                 mViewModel?.loadInit()
 
                 val notesViewModelFactory = NotesViewModelFactory(accountRelation, miApplication)
@@ -93,8 +95,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
             //mViewModel?.streamingStop()
             //mViewModel?.streamingStart()
-            mViewModel?.stop()
-            mViewModel?.start()
 
             refresh.setOnRefreshListener {
                 mViewModel?.loadNew()
@@ -182,7 +182,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onDestroyView()
 
         //mViewModel?.streamingStop()
-        mViewModel?.stop()
+        //mViewModel?.stop()
         Log.d("TimelineFragment", "onDestroyView")
     }
 
