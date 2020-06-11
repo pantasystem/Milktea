@@ -102,6 +102,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mNotificationSubscribeViewModel = miApplication.notificationSubscribeViewModel
 
 
+        var beforeAccountRelation: AccountRelation? = null
+
         var init = false
         miApplication.currentAccount.observe(this, Observer { ar ->
             if(!init){
@@ -112,26 +114,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 init = true
                 Log.d("MainActivity", "初期化処理")
             }
-            mNotificationSubscribeViewModel?.getNotifications(ar)?.observe(this, Observer { notifications: List<Notification>? ->
-                Log.d("MainActivity", "通知が更新されました: $notifications")
-
-                if(notifications.isNullOrEmpty()){
-                    bottom_navigation.getBadge(R.id.navigation_notification)?.clearNumber()
-                }
-                bottom_navigation.getOrCreateBadge(R.id.navigation_notification).apply{
-                    //isVisible = !notifications.isNullOrEmpty()
-                    isVisible = !notifications.isNullOrEmpty()
-                    notifications?.size?.let{ size ->
-                        number = size
-
-                    }
-                }
-                notifications?.lastOrNull()?.let{ notify ->
-                    Log.d("MainActivity", "通知が来ました:$notify")
-                    showNotification(notify)
-
-                }
-            })
+            beforeAccountRelation?.let{
+                mNotificationSubscribeViewModel?.getNotifications(it)?.removeObserver(notificationObserver)
+            }
+            mNotificationSubscribeViewModel?.getNotifications(ar)?.observe(this, notificationObserver)
+            beforeAccountRelation = ar
 
             miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
                 bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
@@ -170,6 +157,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    private val notificationObserver = Observer { notifications: List<Notification>? ->
+        Log.d("MainActivity", "通知が更新されました: $notifications")
+
+        if(notifications.isNullOrEmpty()){
+            bottom_navigation.getBadge(R.id.navigation_notification)?.clearNumber()
+        }
+        bottom_navigation.getOrCreateBadge(R.id.navigation_notification).apply{
+            //isVisible = !notifications.isNullOrEmpty()
+            isVisible = !notifications.isNullOrEmpty()
+            notifications?.size?.let{ size ->
+                number = size
+
+            }
+        }
+        notifications?.lastOrNull()?.let{ notify ->
+            Log.d("MainActivity", "通知が来ました:$notify")
+            showNotification(notify)
+
+        }
+    }
 
 
     inner class MainBottomNavigationAdapter
