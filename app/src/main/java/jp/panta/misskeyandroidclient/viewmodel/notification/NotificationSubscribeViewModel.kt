@@ -27,7 +27,6 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
 
     private val notificationListenerAccountMap = HashMap<Account, Listener>()
 
-    private var mBeforeAccount: AccountRelation? = null
     val notifications = MediatorLiveData<List<Notification>?>().apply{
 
         addSource(miCore.currentAccount){
@@ -35,20 +34,6 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
         }
     }
 
-
-    /*init{
-        accounts.observeForever { arList->
-            arList.forEach{ ar ->
-                val mainCapture = miCore.getMainCapture(ar)
-                var listener = notificationListenerAccountMap[ar.account]
-                if(listener == null){
-                    listener = Listener(ar)
-                    notificationListenerAccountMap[ar.account] = listener
-                    mainCapture.putListener(listener)
-                }
-            }
-        }
-    }*/
 
     val observeNotification = BehaviorSubject.create<Notification>()
 
