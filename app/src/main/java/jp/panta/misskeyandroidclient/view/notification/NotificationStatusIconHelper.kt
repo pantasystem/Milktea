@@ -7,16 +7,21 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionViewHelper
+import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 
 object NotificationStatusIconHelper {
 
     @JvmStatic
-    @BindingAdapter("notificationStatusView", "notificationReactionImageView", "notificationReactionStringView", "notificationType", "notificationReaction")
-    fun LinearLayout.setStatusIcon(notificationStatusView: ImageView, notificationReactionImageView: ImageView, notificationReactionStringView: TextView, notificationType: String, notificationReaction: String?){
+    @BindingAdapter("notificationStatusView", "notificationReactionImageView", "notificationReactionStringView", "notificationType", "notificationReaction", "notification")
+    fun LinearLayout.setStatusIcon(notificationStatusView: ImageView, notificationReactionImageView: ImageView, notificationReactionStringView: TextView, notificationType: String, notificationReaction: String?, notification: NotificationViewData){
         when(notificationType){
             "reaction" -> {
-                if(notificationReaction != null) ReactionViewHelper.setReaction(this.context, notificationReactionImageView, notificationReactionStringView, notificationReaction)
+                //context: Context, reactionTextTypeView: TextView, reactionImageTypeView: ImageView,reaction: String, note: PlaneNoteViewData)
+                if(notificationReaction != null && notification.noteViewData != null) {
+                    ReactionViewHelper.setReactionCount(this.context, notificationReactionStringView, notificationReactionImageView,  notificationReaction, notification.noteViewData)
+                }
                 notificationStatusView.visibility = View.GONE
+
             }
             else -> {
                 notificationReactionImageView.visibility = View.GONE
