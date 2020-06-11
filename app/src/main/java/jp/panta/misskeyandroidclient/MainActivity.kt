@@ -102,7 +102,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mNotificationSubscribeViewModel = miApplication.notificationSubscribeViewModel
 
 
-        var beforeAccountRelation: AccountRelation? = null
 
         var init = false
         miApplication.currentAccount.observe(this, Observer { ar ->
@@ -114,11 +113,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 init = true
                 Log.d("MainActivity", "初期化処理")
             }
-            beforeAccountRelation?.let{
-                mNotificationSubscribeViewModel?.getNotifications(it)?.removeObserver(notificationObserver)
-            }
-            mNotificationSubscribeViewModel?.getNotifications(ar)?.observe(this, notificationObserver)
-            beforeAccountRelation = ar
+
 
             miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
                 bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
@@ -134,6 +129,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         })
 
+        mNotificationSubscribeViewModel?.notifications?.observe(this, notificationObserver)
 
 
         miApplication.connectionStatus.observe(this, Observer{ status ->

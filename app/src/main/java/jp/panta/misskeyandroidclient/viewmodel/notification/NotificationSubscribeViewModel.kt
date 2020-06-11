@@ -27,6 +27,14 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
 
     private val notificationListenerAccountMap = HashMap<Account, Listener>()
 
+    private var mBeforeAccount: AccountRelation? = null
+    val notifications = MediatorLiveData<List<Notification>?>().apply{
+
+        addSource(miCore.currentAccount){
+            value = getNotifications(it)?.value
+        }
+    }
+
 
     /*init{
         accounts.observeForever { arList->
@@ -99,12 +107,14 @@ class NotificationSubscribeViewModel(private val miCore: MiCore) : ViewModel(){
         }
 
         private fun updateLiveData(){
-            if(mUnReadNotifications.isEmpty()){
-                notificationsLiveData.postValue(null)
+            val data = if(mUnReadNotifications.isEmpty()){
+                null
             }else{
-                notificationsLiveData.postValue(
-                    ArrayList(mUnReadNotifications.toList())
-                )
+                ArrayList(mUnReadNotifications.toList())
+            }
+            notificationsLiveData.postValue(data)
+            if(miCore.currentAccount.value?.account == account.account){
+                notifications.postValue(data)
             }
 
             Log.d("NotificationSubscribeVM", "未読数:${mUnReadNotifications.size}")
