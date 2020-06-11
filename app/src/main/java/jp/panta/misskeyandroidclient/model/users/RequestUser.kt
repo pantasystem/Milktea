@@ -14,7 +14,8 @@ data class RequestUser(
     val sinceId: String? = null,
     val untilId: String? = null,
     val limit: Int = 21,
-    val query: String? = null
+    val query: String? = null,
+    val detail: Boolean? = null
 ){
 
     class Sort{

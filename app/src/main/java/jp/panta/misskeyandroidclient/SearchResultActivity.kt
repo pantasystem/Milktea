@@ -1,19 +1,25 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.view.users.SearchUserFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -23,6 +29,10 @@ import kotlinx.android.synthetic.main.activity_search_result.*
 class SearchResultActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_SEARCH_WORLD = "jp.panta.misskeyandroidclient.SearchResultActivity.EXTRA_SEARCH_WORLD"
+
+        private const val SEARCH_NOTES = 0
+        private const val SEARCH_USERS = 1
+        private const val SEARCH_NOTES_WITH_FILES = 2
     }
 
     private var mSearchWord: String? = null
@@ -50,19 +60,11 @@ class SearchResultActivity : AppCompatActivity() {
 
         val isTag = keyword.startsWith("#")
         mIsTag = isTag
-        val request = if(isTag){
-            Page.SearchByTag(tag = keyword.replace("#", ""))
 
-        }else{
-            Page.Search(query = keyword)
+        val pager = PagerAdapter(this, keyword, supportFragmentManager)
+        searchResultPager.adapter = pager
+        searchResultTab.setupWithViewPager(searchResultPager)
 
-        }
-
-
-        val timelineFragment = TimelineFragment.newInstance(request)
-        val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.search_result_base, timelineFragment)
-        ft.commit()
 
         (application as MiCore).currentAccount.observe(this, Observer { ar ->
             val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
@@ -138,6 +140,61 @@ class SearchResultActivity : AppCompatActivity() {
                 else -> {
                     false
                 }
+            }
+        }
+    }
+
+    class PagerAdapter(
+        private val context: Context,
+        val keyword: String,
+        fragmentManager: FragmentManager
+    ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+
+        val isTag = keyword.startsWith("#")
+
+        val pages = ArrayList(listOf(SEARCH_NOTES, SEARCH_USERS)).apply{
+            if(isTag){
+                add(SEARCH_NOTES_WITH_FILES)
+            }
+        }
+        override fun getCount(): Int {
+            return pages.size
+        }
+
+        override fun getItem(position: Int): Fragment {
+            val isTag = keyword.startsWith("#")
+
+            return when(pages[position]){
+                SEARCH_NOTES, SEARCH_NOTES_WITH_FILES ->{
+                    val request = if(isTag){
+                        if(pages[position] == SEARCH_NOTES){
+                            Page.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
+                        }else{
+                            Page.SearchByTag(tag = keyword.replace("#", ""))
+                        }
+
+                    }else{
+                        Page.Search(query = keyword)
+                    }
+                    TimelineFragment.newInstance(request)
+                }
+                SEARCH_USERS ->{
+                    SearchUserFragment.newInstance(keyword, true)
+                }
+                else ->{
+                    TimelineFragment.newInstance(
+                        Page.Search(query = keyword)
+                    )
+                }
+            }
+        }
+
+        override fun getPageTitle(position: Int): CharSequence? {
+            return when(pages[position]){
+                SEARCH_NOTES -> context.getString(R.string.timeline)
+                SEARCH_NOTES_WITH_FILES -> context.getString(R.string.media)
+                SEARCH_USERS -> context.getString(R.string.user)
+                else -> null
             }
         }
     }
