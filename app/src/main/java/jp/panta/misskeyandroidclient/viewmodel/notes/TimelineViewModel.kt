@@ -248,6 +248,7 @@ class TimelineViewModel(
     }
 
     fun loadInit(){
+        Log.d("TimelineViewModel", "初期読み込みを開始します")
         this.isLoading.postValue(true)
 
         if( ! isLoadingFlag ){

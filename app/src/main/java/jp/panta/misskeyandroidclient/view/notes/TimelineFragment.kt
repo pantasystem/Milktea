@@ -22,6 +22,7 @@ import jp.panta.misskeyandroidclient.view.PageableView
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
+import java.lang.Exception
 import java.util.*
 
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
@@ -126,6 +127,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 }
             }
         })
+
+        mViewModel?.position?.value?.let{
+            try{
+                mLinearLayoutManager.scrollToPosition(it)
+            }catch(e: Exception){
+
+            }
+        }
 
         //mViewModel?.loadInit()
 
