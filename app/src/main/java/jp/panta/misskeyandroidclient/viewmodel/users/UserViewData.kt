@@ -9,7 +9,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class UserViewData{
+open class UserViewData{
 
     val userId: String
     val user: MutableLiveData<User?> = object : MutableLiveData<User?>(){

@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.account
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.users.User
@@ -33,6 +30,21 @@ class AccountViewModel(
 
     companion object{
         const val TAG = "AccountViewModel"
+    }
+
+    val accounts = MediatorLiveData<List<AccountViewData>>().apply{
+        addSource(miCore.accounts){ arList ->
+            value = arList.map{ ar ->
+                val avd = AccountViewData(ar)
+                val ci = ar.getCurrentConnectionInformation()
+                ci?.getI(miCore.getEncryption())?.let{ i ->
+                    miCore.getMisskeyAPI(ci).i(
+                        I(i)
+                    ).enqueue(avd.accept)
+                }
+                avd
+            }
+        }
     }
 
     val user = MutableLiveData<User>()

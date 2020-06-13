@@ -58,18 +58,14 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         /*val viewDataList = accounts.map{ ar ->
             loadUser(miApplication, AccountViewData(MutableLiveData(), ar))
         }*/
-        val usersLiveData = Transformations.map(miApplication.accounts){ list ->
-            list.map{ ar ->
-                loadUser(miApplication, AccountViewData(MutableLiveData(), ar))
-            }
-        }
+
 
 
 
         val accountViewModel = ViewModelProvider(activity)[AccountViewModel::class.java]
 
         val adapter = AccountListAdapter(diff, accountViewModel, activity)
-        usersLiveData.observe(this, Observer {
+        accountViewModel.accounts.observe(this, Observer {
             adapter.submitList(it)
         })
         view.accounts_view.adapter = adapter
@@ -79,24 +75,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         return dialog
     }
 
-    private fun loadUser(miCore: MiCore, accountViewData: AccountViewData): AccountViewData{
 
-        miCore.getMisskeyAPI(accountViewData.accountRelation)?.i(
-            I(
-                accountViewData.accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption())!!
-            )
-        )?.enqueue(object : Callback<User>{
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                val user = response.body()
-                accountViewData.user.postValue(user)
-            }
-
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                Log.d(this.javaClass.name, "user load error", t)
-            }
-        })
-        return accountViewData
-    }
 
     private val diff = object : DiffUtil.ItemCallback<AccountViewData>(){
         override fun areContentsTheSame(
