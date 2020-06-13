@@ -72,15 +72,18 @@ class UserDetailActivity : AppCompatActivity() {
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
         val miApplication = applicationContext as MiApplication
+
+        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
+        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java])
+            .initViewModelListener()
+
         miApplication.currentAccount.observe(this, Observer {ar ->
             mAccountRelation = ar
             val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel
             binding.userViewModel = viewModel
 
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java])
-                .initViewModelListener()
+
 
             viewModel.load()
             viewModel.user.observe(this, Observer {

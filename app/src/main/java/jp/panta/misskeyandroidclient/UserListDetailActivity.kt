@@ -53,9 +53,10 @@ class UserListDetailActivity : AppCompatActivity() {
         val listId = intent.getStringExtra(EXTRA_LIST_ID)
         mListId = listId
         val miCore = application as MiCore
+        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
+        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+
         miCore.currentAccount.observe(this, Observer{ ar ->
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
             mAccountRelation = ar
             val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ar, listId!!, miCore))[UserListDetailViewModel::class.java]

@@ -102,18 +102,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mNotificationSubscribeViewModel = miApplication.notificationSubscribeViewModel
 
 
+        mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
+        ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        var init = false
         miApplication.currentAccount.observe(this, Observer { ar ->
-            if(!init){
-                mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
-
-                Log.d("MainActivity", "NotesViewModelのコネクション情報: ${mNotesViewModel.accountRelation}")
-                ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
-                init = true
-                Log.d("MainActivity", "初期化処理")
-            }
-
 
             miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
                 bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{

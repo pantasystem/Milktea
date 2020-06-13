@@ -27,18 +27,17 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.favorite)
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentAccount.observe(this, Observer {ac ->
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ac, miApplication))[NotesViewModel::class.java]
-            val fragment = TimelineFragment.newInstance(
-                Page.Favorite()
-            )
 
-            val manager = supportFragmentManager.beginTransaction()
-            manager.replace(R.id.favorite_fragment_base, fragment)
-            manager.commit()
+        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
+        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        val fragment = TimelineFragment.newInstance(
+            Page.Favorite()
+        )
 
-            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
-        })
+        val manager = supportFragmentManager.beginTransaction()
+        manager.replace(R.id.favorite_fragment_base, fragment)
+        manager.commit()
+
 
     }
 

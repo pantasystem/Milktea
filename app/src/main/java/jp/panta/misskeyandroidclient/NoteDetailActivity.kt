@@ -49,13 +49,11 @@ class NoteDetailActivity : AppCompatActivity() {
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentAccount.observe(this, Observer {ac ->
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ac, miApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
-            val ft = supportFragmentManager.beginTransaction()
-            ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!))
-            ft.commit()
-        })
+        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
+        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!))
+        ft.commit()
 
 
     }

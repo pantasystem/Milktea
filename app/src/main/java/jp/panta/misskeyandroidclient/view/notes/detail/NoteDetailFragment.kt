@@ -46,8 +46,10 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
             ?: Page.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
 
         val miApplication = context?.applicationContext as MiApplication
+
+        val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
+
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
-            val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
             val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ar, miApplication, show))[NoteDetailViewModel::class.java]
 
             noteDetailViewModel.loadDetail()

@@ -73,9 +73,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.addOnScrollListener(mScrollListener)
         list_view.layoutManager = mLinearLayoutManager
 
-        val firstVisibleNoteDate = savedInstanceState?.let{
+       /* val firstVisibleNoteDate = savedInstanceState?.let{
             it.getSerializable(EXTRA_FIRST_VISIBLE_NOTE_DATE) as? Date?
-        }
+        }*/
+        val notesViewModelFactory = NotesViewModelFactory(miApplication)
+        mNotesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
 
         miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
             val factory = TimelineViewModelFactory(accountRelation, mPageableTimeline!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
@@ -87,9 +89,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 mViewModel?.start()
                 mViewModel?.loadInit()
 
-                val notesViewModelFactory = NotesViewModelFactory(accountRelation, miApplication)
-                mNotesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
-                mNotesViewModel?.accountRelation = accountRelation
 
             }
 

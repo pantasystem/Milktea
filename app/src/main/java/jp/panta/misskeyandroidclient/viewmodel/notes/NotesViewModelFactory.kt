@@ -7,10 +7,10 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import java.lang.ClassCastException
 
 @Suppress("UNCHECKED_CAST")
-class NotesViewModelFactory(private val accountRelation: AccountRelation, private val miApplication: MiApplication) : ViewModelProvider.Factory{
+class NotesViewModelFactory(private val miApplication: MiApplication) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NotesViewModel::class.java){
-            return NotesViewModel(accountRelation, miApplication, miApplication.reactionHistoryDao) as T
+            return NotesViewModel(miApplication, miApplication.reactionHistoryDao) as T
         }
         throw ClassCastException("知らないこだなぁ～？？？")
     }

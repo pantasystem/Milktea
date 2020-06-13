@@ -41,7 +41,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
         }*/
         activity?: return
         ar?: return
-        val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(ar, miApplication)).get(NotesViewModel::class.java)
+        val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
         mNoteViewModel = notesViewModel
 
         notesViewModel.submittedNotesOnReaction.observe(activity, Observer {

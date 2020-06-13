@@ -65,12 +65,11 @@ class SearchResultActivity : AppCompatActivity() {
         searchResultPager.adapter = pager
         searchResultTab.setupWithViewPager(searchResultPager)
 
-
+        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
+        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        invalidateOptionsMenu()
         (application as MiCore).currentAccount.observe(this, Observer { ar ->
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, application as MiApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
             mAccountRelation = ar
-            invalidateOptionsMenu()
         })
 
     }

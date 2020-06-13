@@ -24,12 +24,10 @@ class NotificationsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentAccount.observe(this, Observer{ ar ->
-            val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(ar, miApplication))[NotesViewModel::class.java]
-            ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
+        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-            showNotificationFragment()
-        })
+        showNotificationFragment()
     }
 
     private fun showNotificationFragment(){
