@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableView
@@ -29,11 +30,16 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         private const val EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.pageable_timeline"
 
         private const val EXTRA_FIRST_VISIBLE_NOTE_DATE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.EXTRA_FIRST_VISIBLE_NOTE_DATE"
+        private const val EXTRA_ACCOUNT = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.ACCOUNT"
 
-        fun newInstance(pageableTimeline: Page.Timeline): TimelineFragment{
+        fun newInstance(account: Account?, pageableTimeline: Page.Timeline): TimelineFragment{
             return TimelineFragment().apply{
                 arguments = Bundle().apply{
                     this.putSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE, pageableTimeline)
+                    account?.let{
+                        this.putSerializable(EXTRA_ACCOUNT, account)
+
+                    }
                 }
             }
         }
@@ -54,6 +60,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private lateinit var sharedPreference: SharedPreferences
 
+    private var mAccount: Account? = null
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -68,6 +76,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         mPageableTimeline = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE) as Page.Timeline?
 
+        mAccount = arguments?.getSerializable(EXTRA_ACCOUNT) as? Account?
+
         val miApplication = context?.applicationContext as MiApplication
 
         list_view.addOnScrollListener(mScrollListener)
@@ -77,60 +87,48 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             it.getSerializable(EXTRA_FIRST_VISIBLE_NOTE_DATE) as? Date?
         }*/
         val notesViewModelFactory = NotesViewModelFactory(miApplication)
-        mNotesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
-
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
-            val factory = TimelineViewModelFactory(accountRelation, mPageableTimeline!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
-            val vm = mViewModel
-            if(vm == null || vm.accountRelation.getCurrentConnectionInformation() != accountRelation.getCurrentConnectionInformation()){
-                Log.d("TimelineFragment", "初期化処理をします: vm is null:${vm == null}, アカウント不一致:${vm?.accountRelation?.account != accountRelation?.account}")
-                mViewModel = ViewModelProvider(this, factory).get("$accountRelation",TimelineViewModel::class.java)
-                mViewModel?.stop()
-                mViewModel?.start()
-                mViewModel?.loadInit()
+        val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
+        mNotesViewModel = notesViewModel
+        val factory = TimelineViewModelFactory(mAccount, mPageableTimeline!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
+        mViewModel = ViewModelProvider(this, factory).get("$mAccount$mPageableTimeline",TimelineViewModel::class.java)
 
 
+        //mViewModel?.streamingStop()
+        //mViewModel?.streamingStart()
+
+        refresh.setOnRefreshListener {
+            mViewModel?.loadNew()
+        }
+
+        mViewModel?.isLoading?.observe(viewLifecycleOwner, Observer<Boolean> {
+            if(it != null && !it){
+                refresh?.isRefreshing = false
             }
-
-            //mViewModel?.streamingStop()
-            //mViewModel?.streamingStart()
-
-            refresh.setOnRefreshListener {
-                mViewModel?.loadNew()
-            }
-
-            mViewModel?.isLoading?.observe(viewLifecycleOwner, Observer<Boolean> {
-                if(it != null && !it){
-                    refresh?.isRefreshing = false
-                }
-            })
-
-            val nvm = mNotesViewModel
-            if(nvm != null){
-
-                //mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
-                val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, nvm)
-                list_view.adapter = adapter
-
-                var  timelineState: TimelineState.State? = null
-                mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
-                    adapter.submitList(it.notes)
-                    timelineState = it.state
-                })
-
-                adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
-
-                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                        super.onItemRangeInserted(positionStart, itemCount)
-
-                        if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
-                            mLinearLayoutManager.scrollToPosition(0)
-                        }
-                    }
-                })
-            }
-
         })
+
+        //mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
+        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
+        list_view.adapter = adapter
+
+        var  timelineState: TimelineState.State? = null
+        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it.notes)
+            timelineState = it.state
+        })
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+
+                if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
+                    mLinearLayoutManager.scrollToPosition(0)
+                }
+            }
+        })
+
+        //mViewModel?.loadInit()
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

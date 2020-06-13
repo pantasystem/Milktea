@@ -31,6 +31,7 @@ class FavoriteActivity : AppCompatActivity() {
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         val fragment = TimelineFragment.newInstance(
+            null,
             Page.Favorite()
         )
 

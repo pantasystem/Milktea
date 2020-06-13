@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -15,7 +16,7 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class TimelineViewModelFactory(
-    private val accountRelation: AccountRelation,
+    private val account: Account?,
     private val pageableTimeline: Page.Timeline,
     private val miApplication: MiApplication,
     private val settingStore: SettingStore
@@ -34,7 +35,7 @@ class TimelineViewModelFactory(
                 includeMyRenotes = includeMyRenotes
             )
 
-            return TimelineViewModel(accountRelation, pageableTimeline, include, miApplication, settingStore, miApplication.getEncryption()) as T
+            return TimelineViewModel(account, pageableTimeline, include, miApplication, settingStore, miApplication.getEncryption()) as T
 
         }
 

@@ -160,9 +160,9 @@ class UserDetailActivity : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             return when(position){
-                0 -> TimelineFragment.newInstance(requestTimeline)
+                0 -> TimelineFragment.newInstance(null, requestTimeline)
                 1 -> PinNoteFragment()
-                2 -> TimelineFragment.newInstance(requestMedia)
+                2 -> TimelineFragment.newInstance(null, requestMedia)
                 else -> throw IllegalArgumentException("こんなものはない！！")
             }
         }

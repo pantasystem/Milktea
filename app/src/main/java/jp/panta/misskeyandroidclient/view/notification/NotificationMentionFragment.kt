@@ -38,7 +38,7 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
     inner class PagerAdapter(val pages: List<Page>) : FragmentStateAdapter(this){
 
         override fun createFragment(position: Int): Fragment {
-            return PageableFragmentFactory.create(pages[position].pageable())
+            return PageableFragmentFactory.create(null, pages[position].pageable())
         }
 
         override fun getItemCount(): Int {

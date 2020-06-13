@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -62,7 +63,9 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             Log.d("TabFragment", "pages:$pages")
 
 
-            mPagerAdapter?.setList(pages.sortedBy {
+            mPagerAdapter?.setList(
+                accountRelation.account,
+                pages.sortedBy {
                 it.pageNumber
             })
             //mPagerAdapter?.notifyDataSetChanged()
@@ -84,10 +87,12 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
     }
 
 
-    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    class TimelinePagerAdapter( fragmentManager: FragmentManager, list: List<Page>) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         var requestBaseList: List<Page> = list
             private set
         private var oldRequestBaseSetting = requestBaseList
+
+        var account: Account? = null
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
         private val mFragments = ArrayList<Fragment>()
@@ -99,7 +104,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
         override fun getItem(position: Int): Fragment {
             Log.d("getItem", "$position, ${requestBaseList[position].pageable()?.javaClass}")
             val item = requestBaseList[position]
-            val fragment = PageableFragmentFactory.create(item.pageable())
+            val fragment = PageableFragmentFactory.create(account, item.pageable())
 
             if(fragment is ScrollableTop){
                 scrollableTopFragments.add(fragment)
@@ -146,10 +151,11 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
 
 
-        fun setList(list: List<Page>){
+        fun setList(account: Account, list: List<Page>){
             mFragments.clear()
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list
+            this.account = account
             if(requestBaseList != oldRequestBaseSetting){
                 notifyDataSetChanged()
             }

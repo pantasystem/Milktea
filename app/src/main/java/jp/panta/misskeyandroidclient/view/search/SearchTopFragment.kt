@@ -64,7 +64,7 @@ class SearchTopFragment : Fragment(){
 
         override fun getItem(position: Int): Fragment {
             return when(position){
-                0 -> TimelineFragment.newInstance(Page.Featured(null))
+                0 -> TimelineFragment.newInstance(null, Page.Featured(null))
                 1 -> ExploreFragment()
                 else -> throw IllegalArgumentException("range 0..1, list:$tabList")
             }

@@ -5,13 +5,13 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
+import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
-import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
-import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
@@ -20,7 +20,7 @@ import java.io.IOException
 import java.util.*
 
 class TimelineViewModel(
-    val accountRelation: AccountRelation,
+    val account: Account?,
     private val pageableTimeline: Page.Timeline,
     include: NoteRequest.Include,
     private val miCore: MiCore,
@@ -34,45 +34,94 @@ class TimelineViewModel(
 
     private val noteCaptureRegister = NoteRegister()
     //private val streamingAdapter = miCore.getStreamingAdapter(accountRelation)
-    private val noteCapture = miCore.getNoteCapture(accountRelation)
-    private val timelineCapture = if(settingStore.isAutoLoadTimeline){
-        miCore.getTimelineCapture(accountRelation)
-    }else{
-        null
-    }
 
+    private val mNoteDeletedListener = NoteDeletedListener()
+
+    private var noteCapture: NoteCapture? = null
+    private var timelineCapture: TimelineCapture? = null
 
 
     val position = MutableLiveData<Int>()
 
-    private val notePagingStore = when(pageableTimeline){
-        is Page.Favorite -> FavoriteNotePagingStore(accountRelation, pageableTimeline, miCore, encryption)
-        else -> NoteTimelineStore(
-            accountRelation,
-            pageableTimeline,
-            include,
-            miCore,
-            encryption
-        )
+    private var notePagingStore: NotePagedStore? = null
+
+    private var isInitialized: Boolean = false
+
+    private val accountRelation = MediatorLiveData<AccountRelation>().apply{
+        fun init(ar: AccountRelation?){
+            ar?: return
+            timelineCapture = if(settingStore.isAutoLoadTimeline){
+                miCore.getTimelineCapture(ar)
+            }else{
+                null
+            }
+            noteCapture = miCore.getNoteCapture(ar)
+            noteCapture?.addNoteDeletedListener(mNoteDeletedListener)
+            notePagingStore = when(pageableTimeline){
+                is Page.Favorite -> FavoriteNotePagingStore(ar, pageableTimeline, miCore, encryption)
+                else -> NoteTimelineStore(
+                    ar,
+                    pageableTimeline,
+                    include,
+                    miCore,
+                    encryption
+                )
+            }
+            //noteCapture?.addNoteDeletedListener(noteRemovedListener)
+            isInitialized = true
+
+        }
+        addSource(miCore.currentAccount){
+            if( account != null ) return@addSource
+            init(it)
+            value = it
+        }
+        addSource(miCore.accounts){
+            if( account == null ) return@addSource
+            if( value?.account == account ) return@addSource
+            val ar = it.firstOrNull { ar ->
+                ar.account == account
+            }
+            init(ar)
+            value = ar
+        }
+
+
     }
 
-
-    private val timelineLiveData = object : MutableLiveData<TimelineState>(){
+    private var isActive: Boolean = false
+    private var mBeforeAccountRelation: AccountRelation? = null
+    private val timelineLiveData = object : MediatorLiveData<TimelineState>(){
         override fun onActive() {
             super.onActive()
+            isActive = true
 
             if(!settingStore.isUpdateTimelineInBackground){
                 startNoteCapture()
+            }
+            if(isInitialized && value?.notes.isNullOrEmpty()){
+                loadInit()
             }
         }
 
         override fun onInactive() {
             super.onInactive()
+            isActive = false
 
             if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
                 stopTimelineCapture()
                 stopNoteCapture()
             }
+        }
+    }.apply{
+        addSource(accountRelation){ nowAr ->
+            if(isActive){
+                startNoteCapture()
+            }
+            if( nowAr != mBeforeAccountRelation || value?.notes.isNullOrEmpty()){
+                loadInit()
+            }
+            mBeforeAccountRelation = nowAr
         }
     }
 
@@ -80,8 +129,6 @@ class TimelineViewModel(
     private var mObserver: TimelineCapture.TimelineObserver? = null
 
 
-    private val noteCaptureId = UUID.randomUUID().toString()
-    private val timelineCaptureId = UUID.randomUUID().toString()
 
     val isLoading = MutableLiveData<Boolean>()
 
@@ -106,12 +153,14 @@ class TimelineViewModel(
             }
             viewModelScope.launch(Dispatchers.IO){
                 try{
-                    val res = notePagingStore.loadNew(sinceId)
+                    val res = notePagingStore?.loadNew(sinceId)
+                        ?: return@launch
                     val list = res.second
                     if(list.isNullOrEmpty()){
                         return@launch
                     }else{
-                        noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
+                        noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
+                            ?: return@launch
                         loadUrlPreviews(list)
 
                         val state = timelineLiveData.value
@@ -159,12 +208,14 @@ class TimelineViewModel(
         isLoadingFlag = true
         viewModelScope.launch(Dispatchers.IO){
             try {
-                val res = notePagingStore.loadOld(untilId)
+                val res = notePagingStore?.loadOld(untilId)
+                    ?: return@launch
                 val list = res.second
                 if(list.isNullOrEmpty()){
                     return@launch
                 }else{
-                    noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
+                    noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
+                        ?: return@launch
                     loadUrlPreviews(list)
                     val state = timelineLiveData.value
 
@@ -205,13 +256,14 @@ class TimelineViewModel(
 
             viewModelScope.launch(Dispatchers.IO){
                 try{
-                    val response = notePagingStore.loadInit()
+                    val response = notePagingStore?.loadInit()!!
                     val list = response.second?: emptyList()
                     val state = TimelineState(
                         list,
                         TimelineState.State.INIT
                     )
-                    noteCapture.subscribeAll(noteCaptureRegister.registerId, list)
+                    noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
+                        ?: return@launch
                     loadUrlPreviews(list)
 
                     timelineLiveData.postValue(state)
@@ -256,7 +308,7 @@ class TimelineViewModel(
             val observer = TimelineCapture.TimelineObserver.create(pageableTimeline, this.timelineObserver)
             if(observer != null && mObserver == null){
                 Log.d(tag, "タイムラインキャプチャーを開始しようとしている")
-                timelineCapture.addChannelObserver(observer)
+                timelineCapture?.addChannelObserver(observer)
                 mObserver = observer
             }
         }
@@ -267,7 +319,7 @@ class TimelineViewModel(
             val observer = mObserver
             if(observer != null){
                 Log.d("TimelineViewModel" , "タイムラインキャプチャー停止中")
-                timelineCapture.removeChannelObserver(observer)
+                timelineCapture?.removeChannelObserver(observer)
                 mObserver = null
             }
 
@@ -277,12 +329,12 @@ class TimelineViewModel(
     private fun startNoteCapture(){
         Log.d(tag, "ノートのキャプチャーを開始しようとしている")
 
-        noteCapture.attach(noteCaptureRegister)
+        noteCapture?.attach(noteCaptureRegister)
 
     }
 
     private fun stopNoteCapture(){
-        noteCapture.detach(noteCaptureRegister)
+        noteCapture?.detach(noteCaptureRegister)
     }
 
 
@@ -292,7 +344,7 @@ class TimelineViewModel(
             if(isLoadingFlag){
                 return
             }
-            noteCapture.subscribe(noteCaptureRegister.registerId, note)
+            noteCapture?.subscribe(noteCaptureRegister.registerId, note)
             loadUrlPreviews(listOf(note))
             val notes = timelineLiveData.value?.notes
             val list = if(notes == null){
@@ -311,7 +363,7 @@ class TimelineViewModel(
         }
     }
 
-    private val noteRemovedListener = object : jp.panta.misskeyandroidclient.model.streming.note.NoteCapture.DeletedListener(){
+    inner class NoteDeletedListener : NoteCapture.DeletedListener(){
         override fun onDeleted(noteId: String) {
             val list = timelineLiveData.value?.notes
             if(list == null){
@@ -331,10 +383,6 @@ class TimelineViewModel(
                 )
             }
 
-        }
-    }.apply{
-        if(settingStore.isHideRemovedNote){
-            noteCapture.addNoteDeletedListener(this)
         }
     }
 

@@ -68,7 +68,7 @@ class UserListDetailActivity : AppCompatActivity() {
                 supportActionBar?.title = ul.name
                 mUserListName = ul.name
 
-                userListDetailViewPager.adapter = PagerAdapter(ul.id)
+                userListDetailViewPager.adapter = PagerAdapter(ar, ul.id)
                 userListDetailTab.setupWithViewPager(userListDetailViewPager)
             })
             invalidateOptionsMenu()
@@ -190,7 +190,7 @@ class UserListDetailActivity : AppCompatActivity() {
         finish()
     }
 
-    inner class PagerAdapter(val listId: String) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class PagerAdapter(val ar: AccountRelation, val listId: String) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))
         override fun getCount(): Int {
             return titles.size
@@ -200,6 +200,7 @@ class UserListDetailActivity : AppCompatActivity() {
             return when(position){
                 0 ->{
                     TimelineFragment.newInstance(
+                        ar.account,
                         Page.UserListTimeline(listId = listId)
                     )
                 }

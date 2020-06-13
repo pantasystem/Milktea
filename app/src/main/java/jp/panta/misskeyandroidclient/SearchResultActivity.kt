@@ -175,13 +175,14 @@ class SearchResultActivity : AppCompatActivity() {
                     }else{
                         Page.Search(query = keyword)
                     }
-                    TimelineFragment.newInstance(request)
+                    TimelineFragment.newInstance(null, request)
                 }
                 SEARCH_USERS ->{
                     SearchUserFragment.newInstance(keyword, true)
                 }
                 else ->{
                     TimelineFragment.newInstance(
+                        null,
                         Page.Search(query = keyword)
                     )
                 }
