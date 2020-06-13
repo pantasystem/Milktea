@@ -289,6 +289,7 @@
     <string name="incomplete_information_for_remote_user">リモートユーザーのため情報が不完全です。</string>
     <string name="local_only">ローカルのみ</string>
     <string name="post_button_at_the_bottom">投稿ボタンを下に配置する。</string>
+    <string name="please_again_to_finish">もう一度押して終了</string>
 
 
 </resources>

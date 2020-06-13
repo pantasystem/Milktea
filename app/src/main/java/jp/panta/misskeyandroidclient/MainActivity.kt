@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.Gravity
 
 import android.view.Menu
 import android.view.MenuItem
@@ -34,6 +35,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
+import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -66,6 +68,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var mNotificationService: NotificationService? = null
 
     private var mSettingStore: SettingStore? = null
+
+    private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -281,12 +285,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        }else if(mBottomNavigationAdapter?.currentMenuItem?.itemId != R.id.navigation_home){
-            mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_home)
-        }else{
-            super.onBackPressed()
+        when {
+            drawerLayout.isDrawerOpen(GravityCompat.START) -> {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            }
+            mBottomNavigationAdapter?.currentMenuItem?.itemId != R.id.navigation_home -> {
+                mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_home)
+            }
+            else -> {
+                if(mBackPressedDelegate.back()){
+                    super.onBackPressed()
+                }else{
+                    Toast.makeText(this, getString(R.string.please_again_to_finish), Toast.LENGTH_SHORT).apply{
+                        setGravity(Gravity.CENTER, 0, 0)
+                        show()
+                    }
+                }
+            }
         }
     }
 
