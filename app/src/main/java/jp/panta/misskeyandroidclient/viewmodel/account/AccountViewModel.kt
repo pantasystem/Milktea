@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -47,7 +48,8 @@ class AccountViewModel(
         }
     }
 
-    val user = MutableLiveData<User>()
+    private var mBeforeAccountRelation: AccountRelation? = null
+    val user = MediatorLiveData<User>()
 
     val switchAccount = EventBus<Int>()
 
@@ -60,9 +62,8 @@ class AccountViewModel(
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init{
-        miCore.currentAccount.observeForever {
+        user.addSource(miCore.currentAccount){
             val ci = it.getCurrentConnectionInformation()
-
             val nullableI = ci?.getI(miCore.getEncryption())
             nullableI?.let { i ->
                 miCore.getMisskeyAPI(ci).i(I(i)).enqueue(object : Callback<User>{
@@ -78,9 +79,12 @@ class AccountViewModel(
                     }
                 })
             }
-
+            mBeforeAccountRelation?.let{ before ->
+                miCore.getMainCapture(before).removeListener(mainCaptureListener)
+            }
+            miCore.getMainCapture(it).putListener(mainCaptureListener)
+            mBeforeAccountRelation = it
         }
-
     }
 
     fun setSwitchTargetConnectionInstance(account: AccountRelation){
@@ -111,5 +115,17 @@ class AccountViewModel(
         }
     }
 
+    private val mainCaptureListener = object : MainCapture.AbsListener(){
+        override fun meUpdated(user: User) {
+            if(user.id == miCore.currentAccount.value?.account?.id){
+                this@AccountViewModel.user.postValue(user)
+            }
+            accounts.value?.forEach {
+                if(it.userId == user.id){
+                    it.user.postValue(user)
+                }
+            }
+        }
+    }
 
 }
