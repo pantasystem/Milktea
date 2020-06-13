@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.util
 
+import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.annotation.IdRes
@@ -7,17 +8,22 @@ import androidx.annotation.MenuRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import jp.panta.misskeyandroidclient.R
 
 abstract class BottomNavigationAdapter(
     private val bottomNavigationView: BottomNavigationView,
     private val fragmentManager: FragmentManager,
     @IdRes val currentMenuRes: Int,
-    @IdRes val containerViewId: Int
+    @IdRes val containerViewId: Int,
+    val savedInstanceState: Bundle?
 ) {
     companion object{
         private const val TAG = "BottomNavigationAdapter"
+        private const val EXTRA_CURRENT_FRAGMENT_TAG = "jp.panta.misskeyandroidclient.util.BottomNavigationAdapter.EXTRA_CURRENT_FRAGMENT_TAG"
+        private const val EXTRA_SELECTED_ITEM_ID = "jp.panta.misskeyandroidclient.util.BottomNavigationAdapter.EXTRA_SELECTED_ITEM_ID"
     }
-    private var currentFragmentTag = makeTag(currentMenuRes)
+    private var currentFragmentTag: String = makeTag(currentMenuRes)
+    private var selectedItemId: Int = savedInstanceState?.getInt(EXTRA_SELECTED_ITEM_ID, currentMenuRes)?: bottomNavigationView.selectedItemId
 
     abstract fun getItem(menuItem: MenuItem) : Fragment?
 
@@ -37,23 +43,54 @@ abstract class BottomNavigationAdapter(
         bottomNavigationView.setOnNavigationItemSelectedListener {
             setFragment(it)
         }
-        setCurrentFragment(currentMenuRes)
+        /*if(selectedItemId == R.id.navigation_home){
+            Log.d("BottomNavigationAdapter", "#initFragment homeを選択していることになっている")
+        }else{
+            Log.d("BottomNavigationAdapter", "#initFragment homeを選択していない")
+        }*/
+        if(currentFragmentTag == makeTag(R.id.navigation_home)){
+            Log.d(TAG, "#initFragment currentFragmentTagはHomeを選択していることになっている")
+        }
+
+        setCurrentFragment(selectedItemId)
+
     }
 
     fun setCurrentFragment(@IdRes id: Int){
         val menuItem = bottomNavigationView.menu.findItem(id)
-        menuItem.isChecked = setFragment(menuItem)
+        if(menuItem.itemId == R.id.navigation_home){
+            Log.d("BottomNavigationAdapter", "#setCurrentFragment, homeを選択していることになっている")
+        }
+        menuItem.isChecked = setFragment(menuItem).also{
+            if(it){
+                Log.d(TAG, "Fragment設置成功")
+            }else{
+                Log.d(TAG, "Fragment設置　失敗")
+            }
+        }
 
     }
 
     private fun setFragment(menuItem: MenuItem): Boolean{
+        selectedItemId = menuItem.itemId
         val targetTag = makeTag(menuItem.itemId)
 
         val currentFragment = fragmentManager.findFragmentByTag(currentFragmentTag)
+
+
         val targetFragment = fragmentManager.findFragmentByTag(targetTag)
 
+        Log.d(TAG, "currentFragment ${if(currentFragment != null) "生きてる" else "死んでる"}, targetFragment ${if(targetFragment != null) "生きてる" else "死んでる"}")
+        Log.d(
+            TAG ,
+            if(currentFragmentTag == targetTag)
+                "CurrentとTargetは同じ"
+            else
+                "CurrentとTargetは非一致"
+        )
         if(currentFragmentTag == targetTag && currentFragment != null){
             menuRetouched(menuItem, currentFragment)
+            Log.d(TAG, "#setFragment 再タッチされた")
             return true
         }
 
@@ -63,6 +100,8 @@ abstract class BottomNavigationAdapter(
             //ft.detach(currentFragment)
             ft.hide(currentFragment)
             currentFragment.setMenuVisibility(false)
+        }else{
+            Log.d(TAG, "#setFragment currentFragmentは存在しなかった")
         }
 
         if(targetFragment == null){
@@ -84,11 +123,22 @@ abstract class BottomNavigationAdapter(
         }
         currentFragmentTag = targetTag
 
+        if(currentFragmentTag == makeTag(R.id.navigation_home)){
+            Log.d(TAG, "#setFramgnet currentFragmentTagはHomeを選択していることになっている")
+        }else{
+            Log.d(TAG, "#setFramgnet currentFragmentTagはHomeは選択されていない")
+        }
+
         ft.commit()
         return true
     }
 
     private fun makeTag(@IdRes menuId: Int): String{
         return "BottomNavigationAdapter:${menuId}"
+    }
+
+    fun saveState(bundle: Bundle){
+        bundle.putString(EXTRA_CURRENT_FRAGMENT_TAG, currentFragmentTag)
+        bundle.putInt(EXTRA_SELECTED_ITEM_ID, selectedItemId)
     }
 }

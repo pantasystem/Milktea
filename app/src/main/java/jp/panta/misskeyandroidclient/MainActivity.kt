@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         startService(Intent(this, NotificationService::class.java))
-        mBottomNavigationAdapter = MainBottomNavigationAdapter()
+        mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState)
 
     }
 
@@ -167,8 +167,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    inner class MainBottomNavigationAdapter
-        : BottomNavigationAdapter(bottom_navigation, supportFragmentManager, R.id.navigation_home, R.id.content_main){
+    inner class MainBottomNavigationAdapter(savedInstanceState: Bundle?)
+        : BottomNavigationAdapter(bottom_navigation, supportFragmentManager, R.id.navigation_home, R.id.content_main, savedInstanceState){
         private val home = bottom_navigation.menu.findItem(R.id.navigation_home)
         var currentMenuItem: MenuItem? = null
 
@@ -411,6 +411,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         unbindService(notificationServiceConnection)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        Log.d("MainActivity", "#onSaveInstanceStateが呼び出された")
+
+        mBottomNavigationAdapter?.saveState(outState)
+    }
     private val notificationServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
             val binder = p1 as NotificationService.NotificationBinder?
