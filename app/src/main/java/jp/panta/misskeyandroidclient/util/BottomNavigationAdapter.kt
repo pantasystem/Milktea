@@ -19,7 +19,6 @@ abstract class BottomNavigationAdapter(
 ) {
     companion object{
         private const val TAG = "BottomNavigationAdapter"
-        private const val EXTRA_CURRENT_FRAGMENT_TAG = "jp.panta.misskeyandroidclient.util.BottomNavigationAdapter.EXTRA_CURRENT_FRAGMENT_TAG"
         private const val EXTRA_SELECTED_ITEM_ID = "jp.panta.misskeyandroidclient.util.BottomNavigationAdapter.EXTRA_SELECTED_ITEM_ID"
     }
     private var currentFragmentTag: String = makeTag(currentMenuRes)
@@ -80,16 +79,10 @@ abstract class BottomNavigationAdapter(
 
         val targetFragment = fragmentManager.findFragmentByTag(targetTag)
 
-        Log.d(TAG, "currentFragment ${if(currentFragment != null) "生きてる" else "死んでる"}, targetFragment ${if(targetFragment != null) "生きてる" else "死んでる"}")
-        Log.d(
-            TAG ,
-            if(currentFragmentTag == targetTag)
-                "CurrentとTargetは同じ"
-            else
-                "CurrentとTargetは非一致"
-        )
+
         if(currentFragmentTag == targetTag && currentFragment != null){
             menuRetouched(menuItem, currentFragment)
+            viewChanged(menuItem, currentFragment)
             Log.d(TAG, "#setFragment 再タッチされた")
             return true
         }
@@ -138,7 +131,6 @@ abstract class BottomNavigationAdapter(
     }
 
     fun saveState(bundle: Bundle){
-        bundle.putString(EXTRA_CURRENT_FRAGMENT_TAG, currentFragmentTag)
         bundle.putInt(EXTRA_SELECTED_ITEM_ID, selectedItemId)
     }
 }

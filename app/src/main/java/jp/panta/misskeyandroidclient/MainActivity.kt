@@ -266,7 +266,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mAccountViewModel.showProfile.observe(this, showProfileObserver)
     }
     fun changeTitle(title: String?){
-        toolbar.title = title
+        supportActionBar?.title = title
     }
 
     private fun setHeaderProfile(activityMainBinding: ActivityMainBinding){
