@@ -27,10 +27,15 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
+import jp.panta.misskeyandroidclient.model.url.MisskeyUrlPreviewStore
+import jp.panta.misskeyandroidclient.model.url.RetrofitMisskeyUrlPreview
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 import kotlin.collections.HashMap
 
@@ -67,7 +72,19 @@ class MiApplication : Application(), MiCore {
     override var urlPreviewStore: UrlPreviewStore? = null
         get() {
             if(field == null){
-                field = JSoupUrlPreviewStore()
+                //field = JSoupUrlPreviewStore()
+                currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ baseUrl ->
+                    field = MisskeyUrlPreviewStore(
+                        Retrofit.Builder()
+                            .baseUrl(baseUrl)
+                            .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
+                            .client(OkHttpClient.Builder().build())
+                            .build()
+                            .create(RetrofitMisskeyUrlPreview::class.java)
+                    )
+                }
+
+                //RetrofitMisskeyUrlPreview
             }
             return field
         }
