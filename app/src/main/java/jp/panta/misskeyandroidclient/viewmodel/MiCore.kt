@@ -28,6 +28,8 @@ interface MiCore{
 
     val urlPreviewStore: UrlPreviewStore?
 
+    fun getUrlPreviewStore(account: AccountRelation?): UrlPreviewStore?
+
     fun switchAccount(account: Account)
 
     fun logoutAccount(account: Account)

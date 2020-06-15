@@ -73,4 +73,6 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
     private fun fromBooleanEnum(key: KeyStore.BooleanKey): Boolean{
         return sharedPreferences.getBoolean(key.name, key.default)
     }
+
+    val urlPreviewSetting = UrlPreviewSourceSetting(sharedPreferences)
 }

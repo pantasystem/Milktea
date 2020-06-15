@@ -26,6 +26,7 @@ import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
+import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
 import jp.panta.misskeyandroidclient.model.url.MisskeyUrlPreviewStore
 import jp.panta.misskeyandroidclient.model.url.RetrofitMisskeyUrlPreview
@@ -37,6 +38,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 
 
@@ -69,26 +71,10 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    override var urlPreviewStore: UrlPreviewStore? = null
+    override val urlPreviewStore: UrlPreviewStore?
         get() {
-            if(field == null){
-                //field = JSoupUrlPreviewStore()
-                currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ baseUrl ->
-                    field = MisskeyUrlPreviewStore(
-                        Retrofit.Builder()
-                            .baseUrl(baseUrl)
-                            .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
-                            .client(OkHttpClient.Builder().build())
-                            .build()
-                            .create(RetrofitMisskeyUrlPreview::class.java)
-                    )
-                }
-
-                //RetrofitMisskeyUrlPreview
-            }
-            return field
+            return getUrlPreviewStore(currentAccount.value)
         }
-        private set
     /*var misskeyAPIService: MisskeyAPI? = null
         private set*/
 
@@ -113,6 +99,8 @@ class MiApplication : Application(), MiCore {
     private val mMainCaptureAccountMap = HashMap<Account, MainCapture>()
     private val mNoteCaptureAccountMap = HashMap<Account, NoteCapture>()
     private val mTimelineCaptureAccountMap = HashMap<Account, TimelineCapture>()
+
+    private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
     lateinit var colorSettingStore: ColorSettingStore
         private set
@@ -163,6 +151,43 @@ class MiApplication : Application(), MiCore {
             }
         }
     }
+
+    override fun getUrlPreviewStore(account: AccountRelation?): UrlPreviewStore? {
+        return account?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ accountUrl ->
+            val url = settingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
+
+            var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
+            if(store == null){
+                store = createUrlPreviewStore(url)
+            }
+            mUrlPreviewStoreInstanceBaseUrlMap[url] = store
+            store
+        }
+    }
+
+    private fun createUrlPreviewStore(url: String): UrlPreviewStore{
+        return when(settingStore.urlPreviewSetting.getSourceType()){
+            UrlPreviewSourceSetting.MISSKEY, UrlPreviewSourceSetting.SUMMALY ->{
+                try{
+                    MisskeyUrlPreviewStore(
+                        Retrofit.Builder()
+                            .baseUrl(url)
+                            .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
+                            .client(OkHttpClient.Builder().build())
+                            .build()
+                            .create(RetrofitMisskeyUrlPreview::class.java)
+                    )
+                }catch (e: Exception){
+                    JSoupUrlPreviewStore()
+                }
+
+            }
+            else ->{
+                JSoupUrlPreviewStore()
+            }
+        }
+    }
+
 
     override fun switchAccount(account: Account) {
         GlobalScope.launch(Dispatchers.IO){
