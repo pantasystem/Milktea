@@ -150,14 +150,20 @@ class MiApplication : Application(), MiCore {
                 //isSuccessCurrentAccount.postValue(false)
             }
         }
+        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
     }
 
+
     override fun getUrlPreviewStore(account: AccountRelation?): UrlPreviewStore? {
+        return getUrlPreviewStore(account, false)
+    }
+
+    private fun getUrlPreviewStore(account: AccountRelation?, isReplace: Boolean): UrlPreviewStore?{
         return account?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ accountUrl ->
             val url = settingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
 
             var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
-            if(store == null){
+            if(store == null || isReplace){
                 store = createUrlPreviewStore(url)
             }
             mUrlPreviewStoreInstanceBaseUrlMap[url] = store
@@ -638,6 +644,17 @@ class MiApplication : Application(), MiCore {
             Log.e("MiApplication" ,"Observerのアカウントが一致しません！！エラー")
         }
     }
+
+    private val sharedPreferencesChangedListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            when(key){
+                UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
+                    accounts.value?.forEach {
+                        getUrlPreviewStore(it, true)
+                    }
+                }
+            }
+        }
 
 
 }

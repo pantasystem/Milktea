@@ -289,5 +289,7 @@
     <string name="post_button_at_the_bottom">Place the post button at the bottom of the screen.</string>
     <string name="please_again_to_finish">もう一度押して終了</string>
 
+    <string name="url_preview">URL preview</string>
+
 
 </resources>

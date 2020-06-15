@@ -16,7 +16,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".DraftNotesActivity"/>
+        <activity android:name=".view.settings.activities.UrlPreviewSourceSettingActivity"/>
+        <activity android:name=".DraftNotesActivity" />
         <activity android:name=".SortedHashTagsActivity" />
         <activity android:name=".SortedUsersActivity" />
         <activity android:name=".AntennaEditorActivity" />
@@ -85,26 +86,28 @@
                         android:scheme="misskey" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
-                        android:scheme="https"
                         android:host="*"
                         android:pathPrefix="/@"
-                    />
+                        android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity android:name=".NoteDetailActivity" >
+        <activity android:name=".NoteDetailActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data
-                        android:scheme="https"
                         android:host="*"
                         android:pathPrefix="/notes/"
-                        />
+                        android:scheme="https" />
             </intent-filter>
         </activity>
 
@@ -116,13 +119,13 @@
         <activity android:name=".DriveActivity" />
         <activity
                 android:name=".NoteEditorActivity"
-                android:windowSoftInputMode="adjustResize" >
+                android:windowSoftInputMode="adjustResize">
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                <data
-                        android:mimeType="text/*"
-                        />
+
+                <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
         <activity

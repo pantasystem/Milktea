@@ -61,6 +61,17 @@ class SettingsActivity : AppCompatActivity() {
             })
         }
 
+
+        val urlPreviewSource = MoveSettingActivityPanel(
+            R.string.url_preview,
+            UrlPreviewSourceSettingActivity::class.java,
+            this
+        )
+        urlPreviewSource.startActivityEventBus.observe(this, Observer {
+            startActivity(Intent(this, it))
+        })
+
+
         val licenseActivitySetting = MoveSettingActivityPanel(
             titleStringRes = R.string.license,
             activity = OssLicensesMenuActivity::class.java,
@@ -75,7 +86,7 @@ class SettingsActivity : AppCompatActivity() {
         val group = Group(
             titleStringRes = null,
             context = this,
-            items = listOf(movementSetting, tabSetting, appearanceSetting, reactionSetting, licenseActivitySetting)
+            items = listOf(movementSetting, tabSetting, appearanceSetting, urlPreviewSource, reactionSetting, licenseActivitySetting)
         )
 
         val adapter = SettingAdapter(this)
