@@ -40,8 +40,12 @@ class PostNoteService : IntentService("PostNoteService") {
         }
 
         Log.d(tag, "createNote: $createNote")
-        val result = miApplication.getMisskeyAPI(ci).create(createNote).execute()
+        val result =try{
+             miApplication.getMisskeyAPI(ci).create(createNote).execute()
 
+        }catch(e: Exception){
+            null
+        }
         if(result?.code() in 200 until 300){
             Log.d(tag, "ノートの投稿に成功しました")
             removeExDraftNote(noteTask.draftNote)
@@ -51,6 +55,7 @@ class PostNoteService : IntentService("PostNoteService") {
             saveDraftNote(noteTask.toDraftNote())
 
         }
+
     }
 
     private fun removeExDraftNote(draftNote: DraftNote?){

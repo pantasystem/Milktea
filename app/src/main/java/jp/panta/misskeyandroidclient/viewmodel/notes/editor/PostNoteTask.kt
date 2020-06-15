@@ -92,8 +92,12 @@ class PostNoteTask(
     private fun executeFileUpload(fileUploader: FileUploader): Boolean{
         val tmpFiles = files
         filesIds = tmpFiles?.mapNotNull {
+            try{
+                it.remoteFileId ?: fileUploader.upload(it, true)?.id
+            }catch( e: Exception ){
+                null
+            }
             //skip
-            it.remoteFileId ?: fileUploader.upload(it, true)?.id
         }
 
         //サイズが合わなければエラー
