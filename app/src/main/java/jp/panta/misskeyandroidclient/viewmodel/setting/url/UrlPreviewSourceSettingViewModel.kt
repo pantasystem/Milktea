@@ -1,9 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.url
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
@@ -13,6 +11,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: SettingStore) : ViewModel(){
+
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
+
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return UrlPreviewSourceSettingViewModel(miApplication, miApplication.settingStore) as T
+        }
+    }
 
     private var mUrlPreviewStore = miCore.urlPreviewStore
 
@@ -64,9 +71,6 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
         }
     }
 
-    fun setSourceType(type: Int?){
-        type?: return
-        urlPreviewSourceType.value = type
-    }
+
 
 }
