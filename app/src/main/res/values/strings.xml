@@ -290,6 +290,13 @@
     <string name="please_again_to_finish">もう一度押して終了</string>
 
     <string name="url_preview">URL preview</string>
+    <string name="summaly_server_url">Summaly server url</string>
+    <string name="displayed_url_preview">Displayed url preview</string>
+    <string name="preview_display_test">preview display test</string>
+    <string name="test_url">Test URL</string>
+    <string name="from_misskey_api">From misskey API</string>
+    <string name="specify_summaly_server">Specify Summaly server</string>
+    <string name="use_app_implementation_deprecated">Use app implementation (Deprecated)</string>
 
 
 </resources>

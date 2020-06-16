@@ -292,6 +292,13 @@
     <string name="please_again_to_finish">もう一度押して終了</string>
 
     <string name="url_preview">URLプレビュー</string>
+    <string name="summaly_server_url">SummalyサーバーURL</string>
+    <string name="displayed_url_preview">表示されるURLプレビュー</string>
+    <string name="preview_display_test">プレビュー表示テスト</string>
+    <string name="test_url">テスト用URL</string>
+    <string name="from_misskey_api">Misskey APIから</string>
+    <string name="specify_summaly_server">Summalyサーバーを指定する</string>
+    <string name="use_app_implementation_deprecated">アプリ実装を使用する(非推奨)</string>
 
 
 </resources>
