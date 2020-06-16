@@ -15,10 +15,13 @@
             android:orientation="vertical">
         <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                >
             <androidx.appcompat.widget.Toolbar
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize" />
+                    android:layout_height="?attr/actionBarSize"
+                    app:title="@string/url_preview"
+                    />
         </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
@@ -34,24 +37,33 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
-                        android:checkedButton="@={ viewModel.urlPreviewSourceType }"
                         >
                     <RadioButton
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/from_misskey_api"
+                            android:checked="@{ viewModel.urlPreviewSourceType == UrlPreviewSourceSetting.MISSKEY }"
+                            android:onClick="@{ () -> viewModel.setSourceType(UrlPreviewSourceSetting.MISSKEY) }"
                             />
                     <RadioButton
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/specify_summaly_server"
+                            android:onClick="@{ () -> viewModel.setSourceType(UrlPreviewSourceSetting.SUMMALY) }"
+                            android:checked="@{ viewModel.urlPreviewSourceType == UrlPreviewSourceSetting.SUMMALY }"
+
+
 
                             />
                     <RadioButton
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/use_app_implementation_deprecated"
-                           />
+                            android:onClick="@{ () -> viewModel.setSourceType(UrlPreviewSourceSetting.APP) }"
+                            android:checked="@{ viewModel.urlPreviewSourceType == UrlPreviewSourceSetting.APP }"
+
+
+                            />
                 </RadioGroup>
                 <LinearLayout
                         android:layout_width="match_parent"
@@ -73,7 +85,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:hint="@string/summaly_server_url"
-                                android:text="@={ viewModel.summalyServerUrl }"/>
+                                android:text="@={ viewModel.summalyServerUrl }"
+                                android:inputType="textUri"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -114,7 +127,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:hint="@string/test_url"
-                                android:text="@={ viewModel.previewTestUrl }"/>
+                                android:text="@={ viewModel.previewTestUrl }"
+                                android:inputType="textUri"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -134,6 +148,7 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         app:urlPreview="@{viewModel.urlPreviewData}"
+                        android:visibility="@{ viewModel.urlPreviewData == null ? View.GONE : View.VISIBLE }"
                         />
             </LinearLayout>
 

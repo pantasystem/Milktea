@@ -23,7 +23,12 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
 
     private var mUrlPreviewStore = miCore.urlPreviewStore
 
-    val urlPreviewSourceType = MutableLiveData<Int>(settingStore.urlPreviewSetting.getSourceType())
+    val urlPreviewSourceType = object : MutableLiveData<Int>(settingStore.urlPreviewSetting.getSourceType()){
+        override fun onInactive() {
+            super.onInactive()
+            save()
+        }
+    }
 
     private var mSummalyServerUrl: String? = settingStore.urlPreviewSetting.getSummalyUrl()
     val summalyServerUrl = MediatorLiveData<String?>().apply{
@@ -34,9 +39,13 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
                 mSummalyServerUrl = value
                 null
             }
+            var url = this.value
+            if(url != null){
+                url = "https://$url"
+            }
             mUrlPreviewStore = UrlPreviewStoreFactory(
                 it,
-                this.value,
+                url,
                 miCore.currentAccount.value
             ).create()
         }
@@ -44,7 +53,7 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
     }
 
     val previewTestUrl = MutableLiveData<String?>(
-        miCore.currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl
+        miCore.currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl?.replace("https://", "")
     )
 
     val urlPreviewData = MediatorLiveData<UrlPreview>().apply{
@@ -61,7 +70,7 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
             try{
                 previewTestUrl.value?.let{
                     urlPreviewData.postValue(
-                        mUrlPreviewStore?.get(it)
+                        mUrlPreviewStore?.get("https://$it")
                     )
                 }
 
@@ -71,6 +80,24 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
         }
     }
 
+    fun setSourceType(type: Int){
+        if(type in 0 until 3){
+            urlPreviewSourceType.value = type
+        }
+    }
+
+    private fun save(){
+        val sourceType = urlPreviewSourceType.value?: UrlPreviewSourceSetting.APP
+
+        if( sourceType == UrlPreviewSourceSetting.SUMMALY ){
+            summalyServerUrl.value?.let{
+                settingStore.urlPreviewSetting.setSummalyUrl(it)
+                return
+            }
+        }
+
+        settingStore.urlPreviewSetting.setSourceType(sourceType)
+    }
 
 
 }

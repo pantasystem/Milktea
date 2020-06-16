@@ -42,6 +42,17 @@ class UrlPreviewSourceSetting(
         }
     }
 
+    fun setSourceType(type: Int){
+        val edit = sharedPreferences.edit()
+        val srcType = if( type in 0 until 3){
+            type
+        }else{
+            MISSKEY
+        }
+        edit.putInt(URL_PREVIEW_SOURCE_TYPE_KEY, srcType)
+        edit.apply()
+    }
+
     fun getSourceType(): Int{
         val type = sharedPreferences.getInt(URL_PREVIEW_SOURCE_TYPE_KEY, MISSKEY)
         if(type in MISSKEY..APP){
