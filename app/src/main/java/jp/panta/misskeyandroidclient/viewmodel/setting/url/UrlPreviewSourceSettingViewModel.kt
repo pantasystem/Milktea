@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.url
 
+import android.os.Handler
+import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -8,7 +10,9 @@ import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStoreFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.util.*
 
 class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: SettingStore) : ViewModel(){
 
@@ -65,15 +69,32 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
         }
     }
 
+
+    private var urlPreviewLoadCounter = 0
+
+    private val releaseUrlPreviewLoadQueue = Handler()
+
+    private val releaseUrlPreviewLoadCounter = Runnable {
+        urlPreviewLoadCounter = 0
+
+        // リミッターが解除されたタイミングでリクエストを送信する
+        loadPreview()
+    }
+
     fun loadPreview(){
+        if(urlPreviewLoadCounter ++ > 0){
+            releaseUrlPreviewLoadQueue.removeCallbacks(releaseUrlPreviewLoadCounter)
+            releaseUrlPreviewLoadQueue.postDelayed(releaseUrlPreviewLoadCounter, 1000)
+            return
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             try{
                 previewTestUrl.value?.let{
-                    urlPreviewData.postValue(
-                        mUrlPreviewStore?.get("https://$it")
-                    )
-                }
+                    val preview = mUrlPreviewStore?.get("https://$it")
+                    urlPreviewData.postValue(preview)
 
+                }
             }catch (e: Exception){
 
             }
