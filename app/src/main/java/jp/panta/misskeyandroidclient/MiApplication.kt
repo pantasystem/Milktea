@@ -27,10 +27,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
-import jp.panta.misskeyandroidclient.model.url.JSoupUrlPreviewStore
-import jp.panta.misskeyandroidclient.model.url.MisskeyUrlPreviewStore
-import jp.panta.misskeyandroidclient.model.url.RetrofitMisskeyUrlPreview
-import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
+import jp.panta.misskeyandroidclient.model.url.*
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
@@ -164,35 +161,17 @@ class MiApplication : Application(), MiCore {
 
             var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
             if(store == null || isReplace){
-                store = createUrlPreviewStore(url)
+                store = UrlPreviewStoreFactory(
+                    settingStore.urlPreviewSetting.getSourceType(),
+                    settingStore.urlPreviewSetting.getSummalyUrl(),
+                    currentAccount.value
+                ).create()
             }
             mUrlPreviewStoreInstanceBaseUrlMap[url] = store
             store
         }
     }
 
-    private fun createUrlPreviewStore(url: String): UrlPreviewStore{
-        return when(settingStore.urlPreviewSetting.getSourceType()){
-            UrlPreviewSourceSetting.MISSKEY, UrlPreviewSourceSetting.SUMMALY ->{
-                try{
-                    MisskeyUrlPreviewStore(
-                        Retrofit.Builder()
-                            .baseUrl(url)
-                            .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
-                            .client(OkHttpClient.Builder().build())
-                            .build()
-                            .create(RetrofitMisskeyUrlPreview::class.java)
-                    )
-                }catch (e: Exception){
-                    JSoupUrlPreviewStore()
-                }
-
-            }
-            else ->{
-                JSoupUrlPreviewStore()
-            }
-        }
-    }
 
 
     override fun switchAccount(account: Account) {

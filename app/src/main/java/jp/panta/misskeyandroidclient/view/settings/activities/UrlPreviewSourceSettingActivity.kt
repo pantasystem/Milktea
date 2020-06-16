@@ -19,6 +19,8 @@ class UrlPreviewSourceSettingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme()
         val binding = DataBindingUtil.setContentView<ActivityUrlPreviewSourceSettingBinding>(this, R.layout.activity_url_preview_source_setting)
+        setSupportActionBar(binding.urlPreviewSrcSettingToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val miApplication = applicationContext as MiApplication
         val viewModel = ViewModelProvider(this, UrlPreviewSourceSettingViewModel.Factory(miApplication))[UrlPreviewSourceSettingViewModel::class.java]
@@ -29,12 +31,7 @@ class UrlPreviewSourceSettingActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home ->{
-                val settings = Intent(this, SettingsActivity::class.java)
-                if(shouldUpRecreateTask(settings)){
-
-                }else{
-
-                }
+                finish()
             }
         }
         return super.onOptionsItemSelected(item)

@@ -45,7 +45,10 @@ class UrlPreviewLoadTask(
                 it.first
             }.mapNotNull {
                 it.second
+            }.filterNot {
+                it.url.isBlank()
             }
+            Log.d("UrlPreviewLoadTask", list.toString())
             callback.accept(list)
 
         }catch(e: Throwable){
