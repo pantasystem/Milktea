@@ -142,6 +142,9 @@ class StreamingAdapter(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Log.d(TAG, "-------------------------------onOpenコネクション開始--------------------------------")
             isConnect = true
+
+            // 接続に成功したので接続リクエスト回数をゼロにする
+            requestCounter = 0
             synchronized(observerMap){
                 observerMap.forEach {
                     it.value.onConnect()
