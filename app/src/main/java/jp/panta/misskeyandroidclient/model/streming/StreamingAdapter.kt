@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import okhttp3.*
 import okio.ByteString
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -29,6 +30,8 @@ class StreamingAdapter(
     private var mWebSocket: WebSocket? = null
 
     private val TAG = "StreamingAdapter"
+    private val format = SimpleDateFormat("YYYY/MM/dd HH:mm ss.SS", Locale.US)
+
 
     //val observers = ArrayList<Observer>()
     val observerMap = WeakHashMap<String, Observer>()
@@ -119,7 +122,7 @@ class StreamingAdapter(
 
 
         if(mWebSocket == null){
-            Log.d(TAG, "接続を試行する")
+            Log.d(TAG, "接続を試行する ${ format.format(Date()) }")
             val wssUrl = connectionInformation?.instanceBaseUrl?.replace("https://", "wss://") + "/streaming?i=${connectionInformation?.getI(encryption)}"
             val request = Request.Builder()
                 .url(wssUrl)
@@ -179,7 +182,7 @@ class StreamingAdapter(
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            Log.d(TAG, "onClose: 通信が途絶えてしまった code: $code")
+            Log.d(TAG, "onClose: ${ format.format(Date()) } 通信が途絶えてしまった code: $code")
             //mWebSocket = null
             isConnect = false
             mWebSocket = null
@@ -187,13 +190,14 @@ class StreamingAdapter(
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            Log.d(TAG, "onClosing: 通信を閉じている code: $code")
+            Log.d(TAG, "onClosing: ${ format.format(Date()) }, 通信を閉じている code: $code")
             isConnect = false
 
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            Log.d(TAG, "onFailure: ERROR通信が途絶えてしまった", t)
+            val date = Date()
+            Log.d(TAG, "onFailure: ERROR通信が途絶えてしまった: ${ format.format(date) }", t)
             isConnect = false
             synchronized(observerMap){
                 observerMap.forEach {
