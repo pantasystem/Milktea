@@ -88,8 +88,38 @@ class StreamingAdapter(
         return mWebSocket?.send(json)?: false
     }
 
+    private var requestCounter = 0
+    private val connectionLimiterHandler = Handler()
+    private var connectingCounter = 0
+    private val connectCallback = object : Runnable {
+        override fun run() {
+            connectingCounter = 0
+            connectionLimiterHandler.removeCallbacks(this)
+            if(mWebSocket == null){
+                connect()
+            }
+        }
+
+    }
     private fun connect(){
+
+        if( connectingCounter > 0 ){
+            return
+        }
+
+        requestCounter ++
+        connectingCounter ++
+
+        val limitTime = if(requestCounter < 600){
+            100 * requestCounter
+        }else{
+            120 * 1000 * 10
+        }
+        connectionLimiterHandler.postDelayed(connectCallback, limitTime.toLong())
+
+
         if(mWebSocket == null){
+            Log.d(TAG, "接続を試行する")
             val wssUrl = connectionInformation?.instanceBaseUrl?.replace("https://", "wss://") + "/streaming?i=${connectionInformation?.getI(encryption)}"
             val request = Request.Builder()
                 .url(wssUrl)
