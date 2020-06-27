@@ -27,6 +27,51 @@ class TimelineViewModel(
     encryption: Encryption
 ) : ViewModel(){
 
+    data class Request(
+        val sinceId: String? = null,
+        val untilId: String? = null,
+        var substitute: Request? = null
+    ){
+        companion object{
+            @JvmStatic
+            fun makeUntilIdRequest(timelineState: TimelineState, substituteSize: Int = 2): Request?{
+                val ids = timelineState.getUntilIds(substituteSize)
+                return makeUntilIdRequest(ids)
+            }
+
+            @JvmStatic
+            private fun makeUntilIdRequest(ids: List<String>, index: Int = 0): Request?{
+                if(ids.size <= index){
+                    return null
+                }
+                val now = Request(
+                    untilId = ids[index]
+                )
+                now.substitute = makeUntilIdRequest(ids,index + 1)
+                return now
+            }
+
+            @JvmStatic
+            fun makeSinceIdRequest(timelineState: TimelineState, substituteSize: Int = 2): Request?{
+                return makeSinceIdRequest(
+                    timelineState.getSinceIds(substituteSize)
+                )
+            }
+
+            @JvmStatic
+            private fun makeSinceIdRequest(ids: List<String>, index: Int = 0): Request?{
+                if(ids.size <= index){
+                    return null
+                }
+                val now = Request(
+                    sinceId = ids[index]
+                )
+                now.substitute = makeUntilIdRequest(ids,index + 1)
+                return now
+            }
+        }
+
+    }
 
     val tag = "TimelineViewModel"
     val errorState = MediatorLiveData<String>()
@@ -286,6 +331,8 @@ class TimelineViewModel(
 
         }
     }
+
+
 
     fun start(){
 

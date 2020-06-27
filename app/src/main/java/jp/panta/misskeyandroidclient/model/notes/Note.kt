@@ -44,5 +44,7 @@ data class Note(
     val reply: Note?,
     @SerializedName("myReaction") val myReaction: String?,
 
+    @SerializedName("_featuredId_") val tmpFeaturedId: String?,
+
     val app: App
 ): Serializable

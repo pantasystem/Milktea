@@ -16,7 +16,7 @@ class MisskeyGetMetaTest{
         val version = response.body()?.getVersion()
 
         // テスト段階ではV12だった
-        assert(version?.isInRange(Version.Companion.Major.V_12) == true)
+        assert(version?.isInRange(Version.Major.V_12) == true)
         assert(response?.body() != null)
     }
 }
