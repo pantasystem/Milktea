@@ -66,6 +66,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
 
         val binding = DataBindingUtil.bind<FragmentSimpleEditorBinding>(requireView())
             ?: throw IllegalArgumentException("bindできません！！")
+        binding.simpleEditor = this
         mBinding = binding
 
         val miApplication = requireContext().applicationContext as MiApplication
@@ -116,7 +117,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
         }
 
         val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = null, quoteToNoteId = null, note = null, draftNote = null)
-        val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
+        val viewModel = ViewModelProvider(requireActivity(), factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
 
         binding.noteEditorViewModel = viewModel
@@ -181,6 +182,11 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
 
         binding.showEmojisButton.setOnClickListener {
             CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
+        }
+
+
+        binding.postButton.setOnClickListener {
+            viewModel.post()
         }
 
 

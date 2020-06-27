@@ -56,6 +56,11 @@
                     android:tint="#FFFFFF"
                     app:srcCompat="@drawable/ic_mode_edit_black_24dp" />
         </LinearLayout>
+        <FrameLayout
+                android:id="@+id/simpleEditorBase"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottom_navigation"

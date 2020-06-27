@@ -53,7 +53,9 @@
                     android:src="@drawable/ic_zoom_out_map_black_24dp"
                     android:tint="?attr/colorNoteActionButtonTint"
                     tools:ignore="ContentDescription"
+                    android:onClick="@{ ()-> simpleEditor.goToNormalEditor() }"
 
+                    android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE }"
 
                     />
 
@@ -118,7 +120,7 @@
                 android:hint="@string/cw_hint"
                 android:inputType="textMultiLine"
                 android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) &amp;&amp; SafeUnbox.unboxBool(noteEditorViewModel.hasCw) ? View.VISIBLE : View.GONE}"
-
+                android:text="@={noteEditorViewModel.cw}"
 
                 />
         <LinearLayout
@@ -253,8 +255,10 @@
                     android:layout_weight="1"
                     android:hint="@string/please_speak"
                     android:inputType="textMultiLine"
+                    android:text="@={ noteEditorViewModel.text }"
                     />
             <ImageButton
+                    android:id="@+id/postButton"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="40dp"
                     android:layout_height="40dp"

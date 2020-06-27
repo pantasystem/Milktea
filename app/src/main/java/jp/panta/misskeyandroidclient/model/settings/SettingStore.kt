@@ -15,6 +15,8 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         return fromBooleanEnum(KeyStore.BooleanKey.AUTO_LOAD_TIMELINE)
     }
 
+    val isSimpleEditorEnabled = fromBooleanEnum(KeyStore.BooleanKey.IS_SIMPLE_EDITOR_ENABLED)
+
 
     val isHideRemovedNote: Boolean
         get(){

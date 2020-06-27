@@ -42,6 +42,7 @@ import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
+import jp.panta.misskeyandroidclient.view.notes.editor.SimpleEditorFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
@@ -146,6 +147,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState)
+        setSimpleEditor()
 
     }
 
@@ -203,6 +205,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
+    }
+
+    private fun setSimpleEditor(){
+        val miApplication = applicationContext as MiApplication
+        val ft = supportFragmentManager.beginTransaction()
+
+        if(miApplication.settingStore.isSimpleEditorEnabled){
+            fab.visibility = View.GONE
+            ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
+        }else{
+            fab.visibility = View.VISIBLE
+            supportFragmentManager.findFragmentByTag("simpleEditor")?.let{
+                ft.remove(it)
+            }
+
+        }
+        ft.commit()
     }
 
     private fun showNotification(notify: Notification){
