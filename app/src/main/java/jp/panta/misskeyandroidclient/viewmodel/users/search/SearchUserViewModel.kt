@@ -2,6 +2,9 @@ package jp.panta.misskeyandroidclient.viewmodel.users.search
 
 import android.util.Log
 import androidx.lifecycle.*
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.RequestUser
@@ -13,6 +16,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.TimeUnit
+import javax.security.auth.Subject
 
 /**
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
@@ -30,12 +35,27 @@ class SearchUserViewModel(
         }
     }
 
+    private val compositeDisposable = CompositeDisposable()
+
+    private val searchUserRequests = PublishSubject.create<RequestUser>()
     val userName = MutableLiveData<String>()
     val host = MutableLiveData<String>()
 
     val isLoading = MutableLiveData<Boolean>()
 
-    private val users = UsersLiveData().apply{
+    private val users = object : UsersLiveData(){
+        override fun onActive() {
+            super.onActive()
+
+            addRequestSubscriber()
+        }
+
+        override fun onInactive() {
+            super.onInactive()
+            compositeDisposable.clear()
+
+        }
+    }.apply{
         addSource(userName){
             search()
         }
@@ -50,12 +70,12 @@ class SearchUserViewModel(
     private var mSearchByUserAndHost: SearchByUserAndHost? = null
     private var mNowInstanceBase: String? = null
 
+
     fun getUsers(): LiveData<List<UserViewData>> {
         return users
     }
 
     fun search(){
-
         val userName = this.userName.value?: return
         val host = this.host.value
 
@@ -66,6 +86,11 @@ class SearchUserViewModel(
             host = host,
             detail = hasDetail
         )
+        searchUserRequests.onNext(request)
+    }
+    fun search(request: RequestUser){
+
+
         isLoading.postValue(true)
         getSearchByUserAndHost()?.search(request)?.enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
@@ -111,5 +136,13 @@ class SearchUserViewModel(
         return miCore.currentAccount.value?.getCurrentConnectionInformation()
     }
 
+    private fun addRequestSubscriber(){
+        val disposable = searchUserRequests.distinctUntilChanged()
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .subscribe {
+                search(it)
+            }
+        compositeDisposable.add(disposable)
+    }
 
 }

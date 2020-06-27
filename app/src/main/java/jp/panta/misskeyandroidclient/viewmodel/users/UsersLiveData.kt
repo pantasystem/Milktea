@@ -4,7 +4,7 @@ import androidx.lifecycle.MediatorLiveData
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.User
 
-class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
+open class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
 
     private var mMainCapture: MainCapture? = null
 

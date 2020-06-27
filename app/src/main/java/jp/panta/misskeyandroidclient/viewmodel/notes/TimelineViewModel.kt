@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
@@ -46,6 +45,7 @@ class TimelineViewModel(
     private var notePagingStore: NotePagedStore? = null
 
     private var isInitialized: Boolean = false
+
 
     private val accountRelation = MediatorLiveData<AccountRelation>().apply{
         fun init(ar: AccountRelation?){
