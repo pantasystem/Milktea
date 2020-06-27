@@ -144,7 +144,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
             val intent = Intent(requireContext(), PostNoteService::class.java)
             intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
             requireActivity().startService(intent)
-
+            viewModel.clear()
         })
 
         viewModel.showVisibilitySelectionEvent.observe(this, Observer {
@@ -306,6 +306,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
             val intent = Intent(requireContext(), NoteEditorActivity::class.java)
             intent.putExtra(NoteEditorActivity.EXTRA_DRAFT_NOTE, it)
             startActivity(intent)
+            mViewModel?.clear()
         }
 
     }

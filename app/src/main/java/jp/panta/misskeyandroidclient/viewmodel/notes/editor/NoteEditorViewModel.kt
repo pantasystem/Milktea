@@ -48,7 +48,7 @@ class NoteEditorViewModel(
         }
     }
 
-    val hasCw = MutableLiveData<Boolean>(note?.cw != null || draftNote?.cw != null)
+    val hasCw = MutableLiveData<Boolean>(!note?.cw.isNullOrBlank()|| !draftNote?.cw.isNullOrBlank())
     val cw = MutableLiveData<String>(note?.cw?: draftNote?.cw)
     val text = MutableLiveData<String>(note?.text?: draftNote?.text)
     var maxTextLength = Transformations.map(currentAccount){
@@ -233,6 +233,9 @@ class NoteEditorViewModel(
 
     fun changeCwEnabled(){
         hasCw.value = !(hasCw.value?: false)
+        if(hasCw.value == false){
+            cw.value = ""
+        }
     }
 
     fun enablePoll(){
@@ -385,6 +388,14 @@ class NoteEditorViewModel(
 
     private fun getInstanceBaseUrl(): String?{
         return currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl
+    }
+
+    fun clear(){
+        text.value = ""
+        cw.value = ""
+        files.value = emptyList()
+        address.value = emptyList()
+        poll.value = null
     }
 
 }
