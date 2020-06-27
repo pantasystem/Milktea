@@ -28,7 +28,7 @@ data class TimelineState(
     fun getSinceIds(size: Int): List<String>{
         var index = 0
         val list = ArrayList<String>()
-        while(index < notes.size && list.size <= size){
+        while(index < notes.size && list.size < size){
             if(notes[index].note.tmpFeaturedId.isNullOrBlank()){
                 list.add(notes[index].getRequestId())
             }
@@ -45,7 +45,7 @@ data class TimelineState(
     fun getUntilIds(size: Int): List<String>{
         var counter = 0
         val list = ArrayList<String>()
-        while(notes.size - 1 - counter >= 0 && list.size <= size){
+        while(notes.size - counter >= 0 && list.size < size){
             if(notes[notes.size - 1 - counter].note.tmpFeaturedId.isNullOrBlank()){
                 list.add(notes[notes.size - 1 - counter].getRequestId())
             }

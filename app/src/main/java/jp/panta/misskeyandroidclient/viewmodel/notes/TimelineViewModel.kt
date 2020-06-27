@@ -248,7 +248,7 @@ class TimelineViewModel(
 
     fun loadOld(){
         val request = Request.makeUntilIdRequest(timelineLiveData.value)
-        request?.sinceId
+        request?.untilId
             ?: return loadInit()
         if( isLoadingFlag){
             return
