@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
+import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
@@ -34,9 +35,9 @@ class TimelineViewModel(
     ){
         companion object{
             @JvmStatic
-            fun makeUntilIdRequest(timelineState: TimelineState, substituteSize: Int = 2): Request?{
-                val ids = timelineState.getUntilIds(substituteSize)
-                return makeUntilIdRequest(ids)
+            fun makeUntilIdRequest(timelineState: TimelineState?, substituteSize: Int = 2): Request?{
+                val ids = timelineState?.getUntilIds(substituteSize)
+                return makeUntilIdRequest(ids?: emptyList())
             }
 
             @JvmStatic
@@ -52,9 +53,9 @@ class TimelineViewModel(
             }
 
             @JvmStatic
-            fun makeSinceIdRequest(timelineState: TimelineState, substituteSize: Int = 2): Request?{
+            fun makeSinceIdRequest(timelineState: TimelineState?, substituteSize: Int = 2): Request?{
                 return makeSinceIdRequest(
-                    timelineState.getSinceIds(substituteSize)
+                    timelineState?.getSinceIds(substituteSize)?: emptyList()
                 )
             }
 
@@ -190,15 +191,15 @@ class TimelineViewModel(
         if( ! isLoadingFlag ){
             isLoadingFlag = true
             //val sinceId = observableTimelineList.firstOrNull()?.id
-            val sinceId = timelineLiveData.value?.getSinceId()
-            if(sinceId == null){
+            val request = Request.makeSinceIdRequest(timelineLiveData.value)
+            if(request?.sinceId == null){
                 isLoadingFlag = false
                 isLoading.postValue(false)
                 return loadInit()
             }
             viewModelScope.launch(Dispatchers.IO){
                 try{
-                    val res = notePagingStore?.loadNew(sinceId)
+                    val res = syncLoad(request)
                         ?: return@launch
                     val list = res.second
                     if(list.isNullOrEmpty()){
@@ -246,14 +247,16 @@ class TimelineViewModel(
     }
 
     fun loadOld(){
-        val untilId = timelineLiveData.value?.getUntilId() ?: return loadInit()
+        val request = Request.makeUntilIdRequest(timelineLiveData.value)
+        request?.sinceId
+            ?: return loadInit()
         if( isLoadingFlag){
             return
         }
         isLoadingFlag = true
         viewModelScope.launch(Dispatchers.IO){
             try {
-                val res = notePagingStore?.loadOld(untilId)
+                val res = syncLoad(request)
                     ?: return@launch
                 val list = res.second
                 if(list.isNullOrEmpty()){
@@ -332,7 +335,51 @@ class TimelineViewModel(
         }
     }
 
+    private fun syncLoad(request: Request?, isRetry: Boolean = false): Pair<BodyLessResponse, List<PlaneNoteViewData>?>?{
+        if(request == null && isRetry){
+            return null
+        }
 
+        val res = when {
+            request?.untilId != null -> {
+                notePagingStore?.loadOld(untilId = request.untilId)
+            }
+            request?.sinceId != null -> {
+                notePagingStore?.loadNew(sinceId = request.sinceId)
+            }
+            else -> {
+                notePagingStore?.loadInit()
+            }
+        }
+        val notes = res?.second
+        notes?.let{
+            loadUrlPreviews(it)
+        }
+
+        if(notes?.isNotEmpty() == true){
+            return res
+        }
+
+        val targetNoteId = request?.untilId?: request?.sinceId ?: return null
+
+        val targetNote = try{
+            miCore.getMisskeyAPI(accountRelation.value)?.showNote(
+                NoteRequest(
+                    i = accountRelation.value?.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
+                    noteId = targetNoteId
+                )
+            )?.execute()
+        }catch(e: Throwable){
+            null
+        }
+
+        if(targetNote != null){
+            return res
+        }
+
+        return syncLoad(request?.substitute, true)
+
+    }
 
     fun start(){
 
