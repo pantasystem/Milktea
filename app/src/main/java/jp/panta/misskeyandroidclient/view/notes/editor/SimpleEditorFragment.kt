@@ -49,11 +49,11 @@ interface SimpleEditor{
 class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSelection, FileListener, SimpleEditor {
 
     companion object{
-        const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
-        const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
-        const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
-        const val SELECT_USER_REQUEST_CODE = 810
-        const val SELECT_MENTION_TO_USER_REQUEST_CODE = 931
+        const val SELECT_DRIVE_FILE_REQUEST_CODE = 1141
+        const val SELECT_LOCAL_FILE_REQUEST_CODE = 5142
+        const val READ_STORAGE_PERMISSION_REQUEST_CODE = 191
+        const val SELECT_USER_REQUEST_CODE = 814
+        const val SELECT_MENTION_TO_USER_REQUEST_CODE = 939
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
     }
@@ -147,7 +147,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
             viewModel.clear()
         })
 
-        viewModel.showVisibilitySelectionEvent.observe(this, Observer {
+        viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner, Observer {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(childFragmentManager, "NoteEditor")

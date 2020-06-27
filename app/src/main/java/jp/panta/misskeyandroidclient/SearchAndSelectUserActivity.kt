@@ -78,6 +78,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         selectedUserViewModel.selectedUsers.observe(this, Observer {
             selectedUsersAdapter.submitList(it)
         })
+        mSelectedUserViewModel = selectedUserViewModel
 
     }
 
