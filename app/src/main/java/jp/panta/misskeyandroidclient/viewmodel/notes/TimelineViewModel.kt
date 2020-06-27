@@ -352,9 +352,6 @@ class TimelineViewModel(
             }
         }
         val notes = res?.second
-        notes?.let{
-            loadUrlPreviews(it)
-        }
 
         if(notes?.isNotEmpty() == true){
             return res
