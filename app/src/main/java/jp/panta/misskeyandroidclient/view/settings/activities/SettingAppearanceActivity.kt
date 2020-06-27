@@ -84,6 +84,13 @@ class SettingAppearanceActivity : AppCompatActivity() {
                     titleStringRes = R.string.hide_bottom_navigation
                 ),
                 BooleanSharedItem(
+                    key = KeyStore.BooleanKey.IS_SIMPLE_EDITOR_ENABLED.name,
+                    default = KeyStore.BooleanKey.IS_SIMPLE_EDITOR_ENABLED.default,
+                    choiceType = BooleanSharedItem.ChoiceType.SWITCH,
+                    context = this,
+                    titleStringRes = R.string.use_simple_editor
+                ),
+                BooleanSharedItem(
                     key = KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.name,
                     default = KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.default,
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,

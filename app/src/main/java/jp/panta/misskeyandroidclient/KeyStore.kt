@@ -31,6 +31,7 @@ object KeyStore {
         HIDE_BOTTOM_NAVIGATION(false),
 
         IS_USER_NAME_DEFAULT(true),
-        IS_POST_BUTTON_TO_BOTTOM(false)
+        IS_POST_BUTTON_TO_BOTTOM(false),
+        IS_SIMPLE_EDITOR_ENABLED(false)
     }
 }

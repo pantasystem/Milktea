@@ -108,25 +108,19 @@
 
 
 
-        <com.google.android.material.textfield.TextInputLayout
+
+        <MultiAutoCompleteTextView
+                android:id="@+id/inputCw"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE}"
+                android:layout_marginBottom="8dp"
 
-                >
-
-            <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-
-                    android:hint="@string/cw_hint"
-                    android:inputType="textMultiLine"
-                    android:visibility="@{SafeUnbox.unboxBool(noteEditorViewModel.hasCw) ? View.VISIBLE : View.GONE}"
+                android:hint="@string/cw_hint"
+                android:inputType="textMultiLine"
+                android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) &amp;&amp; SafeUnbox.unboxBool(noteEditorViewModel.hasCw) ? View.VISIBLE : View.GONE}"
 
 
-                    />
-        </com.google.android.material.textfield.TextInputLayout>
+                />
         <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
@@ -173,19 +167,7 @@
                     tools:ignore="ContentDescription"
                     />
 
-            <ImageButton
-                    android:id="@+id/makePoll"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:adjustViewBounds="true"
-                    android:onClick="@{()-> noteEditorViewModel.enablePoll()}"
-                    android:tint="?attr/colorNoteActionButtonTint"
-                    app:srcCompat="@drawable/ic_poll_black_24dp"
-                    tools:ignore="ContentDescription"
-                    />
+
 
             <ImageButton
                     android:id="@+id/setCw"
@@ -264,19 +246,14 @@
                     android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.GONE : View.VISIBLE }"
                     tools:ignore="ContentDescription"
                     tools:visibility="gone"/>
-            <com.google.android.material.textfield.TextInputLayout
+            <MultiAutoCompleteTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:id="@+id/inputMainText"
                     android:layout_weight="1"
-                    >
-
-                <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/please_speak"
-                        android:inputType="textMultiLine"
-                        />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:hint="@string/please_speak"
+                    android:inputType="textMultiLine"
+                    />
             <ImageButton
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="40dp"

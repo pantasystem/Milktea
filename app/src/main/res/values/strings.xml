@@ -298,5 +298,6 @@
     <string name="specify_summaly_server">Specify Summaly server</string>
     <string name="use_app_implementation_deprecated">Use app implementation (Deprecated)</string>
 
+    <string name="use_simple_editor">Use simple editor.</string>
 
 </resources>

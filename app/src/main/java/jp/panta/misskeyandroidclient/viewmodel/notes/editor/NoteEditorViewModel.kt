@@ -326,28 +326,31 @@ class NoteEditorViewModel(
         return currentAccount.value?.getCurrentConnectionInformation()
     }
 
+    fun toDraftNote(): DraftNote{
+        return DraftNote(
+            accountId = currentAccount.value?.account?.id!!,
+            text = text.value,
+            cw = cw.value,
+            visibleUserIds = address.value?.map{
+                it.userId
+            },
+            draftPoll = poll.value?.toDraftPoll(),
+            visibility = visibility.value?.visibility?: "public",
+            localOnly = visibility.value?.canLocalOnly,
+            renoteId = quoteToNoteId,
+            replyId = replyToNoteId,
+            files = files.value
+        ).apply{
+            this.draftNoteId = draftNote?.draftNoteId
+        }
+    }
     fun saveDraft(){
         if(!canSaveDraft()){
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                val dfNote = DraftNote(
-                    accountId = currentAccount.value?.account?.id!!,
-                    text = text.value,
-                    cw = cw.value,
-                    visibleUserIds = address.value?.map{
-                        it.userId
-                    },
-                    draftPoll = poll.value?.toDraftPoll(),
-                    visibility = visibility.value?.visibility?: "public",
-                    localOnly = visibility.value?.canLocalOnly,
-                    renoteId = quoteToNoteId,
-                    replyId = replyToNoteId,
-                    files = files.value
-                ).apply{
-                    this.draftNoteId = draftNote?.draftNoteId
-                }
+                val dfNote = toDraftNote()
 
                 try{
                     isSaveNoteAsDraft.event = draftNoteDao.fullInsert(dfNote)
