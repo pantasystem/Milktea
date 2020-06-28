@@ -110,14 +110,14 @@
     <string name="play_media">メディアを再生する</string>
     <string name="avataricon">avatarIcon</string>
     <string name="reaction">リアクション</string>
-    <string name="followed_by">さんがフォローしました</string>
-    <string name="replied_by">さんが返信しました</string>
-    <string name="quoted_by">さんが引用しました</string>
-    <string name="voted_by">さんが投票しました</string>
+    <string name="followed_by">さんにフォローされました</string>
+    <string name="replied_by">さんに返信されました</string>
+    <string name="quoted_by">さんに引用されました</string>
+    <string name="voted_by">さんに投票されました</string>
     <string name="request_follow">さんがフォローリクエストしてます</string>
-    <string name="mention_by">さんがメンションしました</string>
-    <string name="reacted_by">さんがリアクションをしました</string>
-    <string name="renoted_by">さんがリノートしました</string>
+    <string name="mention_by">さんにメンションされました</string>
+    <string name="reacted_by">さんにリアクションされました</string>
+    <string name="renoted_by">さんにリノートされました</string>
 
     <string name="input_message">相手に思いを伝えてください</string>
 
