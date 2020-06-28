@@ -32,6 +32,7 @@ import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
+import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
@@ -46,7 +47,7 @@ interface SimpleEditor{
     fun openMenu()
 }
 
-class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSelection, FileListener, SimpleEditor {
+class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileListener, SimpleEditor {
 
     companion object{
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 1141
@@ -192,11 +193,13 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
             viewModel.post()
         }
 
-
+        val emojiSelectionViewModel = ViewModelProvider(requireActivity())[EmojiSelectionViewModel::class.java]
+        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, Observer(::onSelect))
+        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, Observer(::onSelect))
 
     }
 
-    override fun onSelect(emoji: Emoji) {
+    private fun onSelect(emoji: Emoji) {
         val pos = mBinding.inputMainText.selectionEnd
         mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
             mBinding.inputMainText.setText(mViewModel?.text?.value?: "")
@@ -205,7 +208,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), EmojiSel
         }
     }
 
-    override fun onSelect(emoji: String) {
+    private fun onSelect(emoji: String) {
         val pos = mBinding.inputMainText.selectionEnd
         mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
             mBinding.inputMainText.setText(mViewModel?.text?.value?: "")

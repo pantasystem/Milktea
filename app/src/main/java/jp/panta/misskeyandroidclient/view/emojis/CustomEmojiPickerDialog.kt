@@ -7,18 +7,21 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
+import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.Emojis
 import kotlinx.android.synthetic.main.dialog_custom_emoji_picker.view.*
 
 class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
 
     private var mEmojisAdapter: EmojiListAdapter? = null
+    private var mSelectionViewModel: EmojiSelectionViewModel? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog =  super.onCreateDialog(savedInstanceState)
@@ -29,6 +32,10 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
 
         View.inflate(dialog.context, R.layout.dialog_custom_emoji_picker, null)?.let{ view ->
             dialog.setContentView(view)
+
+            if(requireActivity() !is EmojiSelection){
+                mSelectionViewModel = ViewModelProvider(requireActivity())[EmojiSelectionViewModel::class.java]
+            }
 
             val adapter = EmojiListAdapter(EmojiSelectionListener(), requireActivity())
             view.emojisView.adapter = adapter
@@ -77,6 +84,8 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
         override fun onSelect(emoji: String) {
             if(activity is EmojiSelection){
                 activity.onSelect(emoji)
+            }else{
+                mSelectionViewModel?.onSelect(emoji)
             }
             dismiss()
         }
@@ -84,6 +93,8 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
         override fun onSelect(emoji: Emoji) {
             if(activity is EmojiSelection){
                 activity.onSelect(emoji)
+            }else{
+                mSelectionViewModel?.onSelect(emoji)
             }
             dismiss()
         }
