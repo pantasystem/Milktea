@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFilePreviewBinding
 import jp.panta.misskeyandroidclient.databinding.ItemUrlPreviewBinding
@@ -50,11 +51,19 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
             binding.fileProperty = preview.file
             val context = this.binding.filePropertyView.context
             binding.filePropertyView.setOnClickListener {
-                context?.startActivity(
-                    Intent(Intent.ACTION_VIEW).apply{
-                        data = Uri.parse(preview.file.url)
-                    }
-                )
+                if(preview.file.type?.startsWith("audio") == true){
+                    val intent = Intent(binding.root.context, MediaActivity::class.java)
+                    intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY, preview.file)
+                    context?.startActivity(intent)
+                }else{
+                    context?.startActivity(
+                        Intent(Intent.ACTION_VIEW).apply{
+                            data = Uri.parse(preview.file.url)
+                            type = preview.file.type
+                        }
+                    )
+                }
+
             }
 
         }
