@@ -3,10 +3,12 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
@@ -95,9 +97,30 @@ open class PlaneNoteViewData (
     }?.toMap()?: mapOf())
 
     val files = toShowNote.files?: emptyList()
-    val media = MediaViewData(files)
+    val previewableFiles = toShowNote.files?.filter{
+        it.type?.startsWith("image") == true || it.type?.startsWith("video") == true
+    }?: emptyList()
+    val media = MediaViewData(previewableFiles)
+
 
     val urlPreviewList = MutableLiveData<List<UrlPreview>>()
+
+    val previews = MediatorLiveData<List<Preview>>().apply{
+        addSource(urlPreviewList){
+            val otherFiles: List<Preview> = toShowNote.files?.filterNot{ fp ->
+                fp.type?.startsWith("image") == true || fp.type?.startsWith("video") == true
+            }?.map{ fp ->
+                Preview.FileWrapper(fp)
+            }?: emptyList()
+            val list = ArrayList(otherFiles)
+            val urlPreviews = it?.map{ url ->
+                Preview.UrlWrapper(url)
+            }?: emptyList()
+            list.addAll(urlPreviews)
+            postValue(list)
+
+        }
+    }
 
     var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
 
