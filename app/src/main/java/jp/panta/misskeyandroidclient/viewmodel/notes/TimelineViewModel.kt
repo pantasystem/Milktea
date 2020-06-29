@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePaging
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import java.io.IOException
+import java.net.SocketTimeoutException
 import java.util.*
 
 class TimelineViewModel(
@@ -74,8 +75,17 @@ class TimelineViewModel(
 
     }
 
+    enum class Errors{
+        AUTHENTICATION,
+        I_AM_AI,
+        SERVER_ERROR,
+        PARAMETER_ERROR,
+        NETWORK,
+        TIMEOUT
+    }
+
     val tag = "TimelineViewModel"
-    val errorState = MediatorLiveData<String>()
+    val errorState = MutableLiveData<Errors>()
 
     private val noteCaptureRegister = NoteRegister()
     //private val streamingAdapter = miCore.getStreamingAdapter(accountRelation)
@@ -177,6 +187,7 @@ class TimelineViewModel(
 
 
     val isLoading = MutableLiveData<Boolean>()
+    val isInitLoading = MutableLiveData<Boolean>()
 
     private var isLoadingFlag = false
 
@@ -233,9 +244,13 @@ class TimelineViewModel(
 
                         timelineLiveData.postValue(newState)
                     }
-                }catch(e: IOException){
-                }catch (e: Exception){
+                } catch(e: IOException){
+                    errorState.postValue(Errors.NETWORK)
+                } catch(e: SocketTimeoutException){
+                    errorState.postValue(Errors.TIMEOUT)
+                } catch (e: Exception){
                     Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
+                    errorState.postValue(Errors.NETWORK)
                 }finally {
                     isLoading.postValue(false)
                     isLoadingFlag = false
@@ -285,8 +300,11 @@ class TimelineViewModel(
                     timelineLiveData.postValue(newState)
                 }
             }catch (e: IOException){
-
+                errorState.postValue(Errors.NETWORK)
+            }catch(e: SocketTimeoutException){
+                errorState.postValue(Errors.TIMEOUT)
             }catch(e: Exception){
+                errorState.postValue(Errors.NETWORK)
                 Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
             }finally {
                 isLoadingFlag = false
@@ -298,6 +316,7 @@ class TimelineViewModel(
     fun loadInit(){
         Log.d("TimelineViewModel", "初期読み込みを開始します")
         this.isLoading.postValue(true)
+        this.isInitLoading.postValue(true)
 
         if( ! isLoadingFlag ){
 
@@ -312,7 +331,7 @@ class TimelineViewModel(
                         TimelineState.State.INIT
                     )
                     noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
-                        ?: return@launch
+
                     loadUrlPreviews(list)
 
                     timelineLiveData.postValue(state)
@@ -321,13 +340,22 @@ class TimelineViewModel(
                         startTimelineCapture()
                     }
 
-                }catch(e: IOException){
+                } catch(e: IOException){
                     Log.d("TimelineLiveData", "タイムライン取得中にIOエラー発生", e)
-                }catch (e: Exception){
+                    errorState.postValue(Errors.NETWORK)
+                    timelineLiveData.postValue(null)
+                } catch(e: SocketTimeoutException){
+                    errorState.postValue(Errors.TIMEOUT)
+                    timelineLiveData.postValue(null)
+                } catch (e: Exception){
                     Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
-                }finally{
+                    errorState.postValue(Errors.NETWORK)
+                    timelineLiveData.postValue(null)
+
+                } finally{
                     isLoading.postValue(false)
                     isLoadingFlag = false
+                    isInitLoading.postValue(false)
                 }
 
             }

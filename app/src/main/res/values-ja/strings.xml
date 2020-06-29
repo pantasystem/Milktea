@@ -301,5 +301,7 @@
     <string name="use_app_implementation_deprecated">アプリ実装を使用する(非推奨)</string>
 
     <string name="use_simple_editor">簡易エディターを使う</string>
+    <string name="retry">リトライ</string>
+    <string name="failed_to_get_the_note">ノートの取得に失敗しました</string>
 
 </resources>

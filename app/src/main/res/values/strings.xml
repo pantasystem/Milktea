@@ -299,5 +299,7 @@
     <string name="use_app_implementation_deprecated">Use app implementation (Deprecated)</string>
 
     <string name="use_simple_editor">Use simple editor.</string>
+    <string name="retry">Retry</string>
+    <string name="failed_to_get_the_note">Failed to get the note</string>
 
 </resources>

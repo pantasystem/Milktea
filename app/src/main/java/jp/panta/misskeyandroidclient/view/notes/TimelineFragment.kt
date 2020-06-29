@@ -84,9 +84,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.addOnScrollListener(mScrollListener)
         list_view.layoutManager = mLinearLayoutManager
 
-       /* val firstVisibleNoteDate = savedInstanceState?.let{
-            it.getSerializable(EXTRA_FIRST_VISIBLE_NOTE_DATE) as? Date?
-        }*/
         val notesViewModelFactory = NotesViewModelFactory(miApplication)
         val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
         mNotesViewModel = notesViewModel
@@ -94,8 +91,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         mViewModel = ViewModelProvider(this, factory).get("$mAccount$mPageableTimeline",TimelineViewModel::class.java)
 
 
-        //mViewModel?.streamingStop()
-        //mViewModel?.streamingStart()
 
         refresh.setOnRefreshListener {
             mViewModel?.loadNew()
@@ -112,9 +107,54 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.adapter = adapter
 
         var  timelineState: TimelineState.State? = null
-        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer {
-            adapter.submitList(it.notes)
-            timelineState = it.state
+        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer { tm ->
+            if( tm != null){
+
+                adapter.submitList(tm.notes)
+                timelineState = tm.state
+            }
+            if(tm?.notes.isNullOrEmpty()){
+                timelineEmptyView.visibility = View.VISIBLE
+                refresh.visibility = View.GONE
+            }else{
+                timelineEmptyView.visibility = View.GONE
+                refresh.visibility = View.VISIBLE
+            }
+            timelineProgressBar.visibility = View.GONE
+
+
+        })
+
+        mViewModel?.isInitLoading?.observe( viewLifecycleOwner, Observer {
+            if(it){
+
+                timelineProgressBar.visibility = View.VISIBLE
+                refresh.visibility = View.GONE
+                timelineEmptyView.visibility = View.GONE
+            } else {
+                timelineProgressBar.visibility = View.GONE
+
+            }
+        })
+
+        mViewModel?.errorState?.observe( viewLifecycleOwner, Observer { error ->
+            when(error){
+                TimelineViewModel.Errors.AUTHENTICATION ->{
+
+                }
+                TimelineViewModel.Errors.I_AM_AI ->{
+
+                }
+                TimelineViewModel.Errors.PARAMETER_ERROR ->{
+
+                }
+                TimelineViewModel.Errors.SERVER_ERROR ->{
+
+                }
+                else ->{
+                    Log.d("TimelineViewModel", "不明なエラー")
+                }
+            }
         })
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
@@ -134,6 +174,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }catch(e: Exception){
 
             }
+        }
+
+        retryLoadButton.setOnClickListener {
+            Log.d("TimelineFragment", "リトライボタンを押しました")
+            mViewModel?.loadInit()
         }
 
         //mViewModel?.loadInit()
