@@ -11,9 +11,8 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.MediaPreviewBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.view.media.MediaPreviewHelper.setPreview
+import jp.panta.misskeyandroidclient.util.CircleOutlineProvider
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
@@ -251,6 +250,13 @@ object MediaPreviewHelper{
                 rightMediaBase.visibility = View.VISIBLE
             }
         }
+    }
+
+    @JvmStatic
+    @BindingAdapter("rect")
+    fun ViewGroup.setCircleOutline(rect: Float?){
+
+        outlineProvider = CircleOutlineProvider.getInstance(rect?: 20F)
     }
 
 
