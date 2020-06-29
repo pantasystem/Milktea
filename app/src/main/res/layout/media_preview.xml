@@ -30,7 +30,6 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:id="@+id/leftMediaBase"
-                android:layout_marginEnd="2dp"
                 >
 
             <FrameLayout
@@ -45,7 +44,6 @@
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{0}"
                     android:onClick="@{()-> media.fileOne.show()}"
-                    android:layout_marginBottom="2dp"
                     >
 
                 <ImageView
@@ -92,7 +90,7 @@
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{2}"
                     android:onClick="@{()-> media.fileThree.show()}"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomLeft"
@@ -131,7 +129,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="4dp"
                 android:orientation="vertical">
 
             <FrameLayout
@@ -146,7 +144,6 @@
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{1}"
                     android:onClick="@{()-> media.fileTwo.show() }"
-                    android:layout_marginBottom="2dp"
 
                     >
                 <ImageView
@@ -190,8 +187,7 @@
                     app:mediaViewData="@{media}"
                     app:fileIndex="@{3}"
                     android:onClick="@{()-> media.fileFour.show() }"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomRight"
