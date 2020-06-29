@@ -7,22 +7,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
+import jp.panta.misskeyandroidclient.viewmodel.notes.Preview
 
 object UrlPreviewHelper {
 
     @JvmStatic
-    @BindingAdapter("urlPreviewList")
-    fun RecyclerView.setUrlPreviewList(urlPreviewList: List<UrlPreview>?){
-        urlPreviewList?.let{
+    @BindingAdapter("previewList")
+    fun RecyclerView.setUrlPreviewList(previewList: List<Preview>?){
 
-        }
-        if(urlPreviewList == null){
+        if(previewList.isNullOrEmpty()){
             this.visibility = View.GONE
 
         }else{
             this.visibility = View.VISIBLE
-            val adapter = UrlPreviewListAdapter()
-            adapter.submitList(urlPreviewList)
+            val adapter = PreviewListAdapter()
+            adapter.submitList(previewList)
             this.layoutManager = LinearLayoutManager(this.context)
             this.adapter = adapter
         }

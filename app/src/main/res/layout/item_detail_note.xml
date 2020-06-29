@@ -164,7 +164,8 @@
                         android:layout_below="@id/poll"
                         tools:itemCount="1"
                         tools:listitem="@layout/item_url_preview"
-                        app:urlPreviewList="@{note.urlPreviewList}"
+                        app:previewList="@{note.previews}"
+
                         />
 
 
