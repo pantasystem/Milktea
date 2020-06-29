@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -138,18 +139,25 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         })
 
         mViewModel?.errorState?.observe( viewLifecycleOwner, Observer { error ->
+            Log.d("TimelineFragment", "error:$error")
             when(error){
                 TimelineViewModel.Errors.AUTHENTICATION ->{
-
+                    Toast.makeText(requireContext(), R.string.auth_error, Toast.LENGTH_LONG).show()
                 }
                 TimelineViewModel.Errors.I_AM_AI ->{
-
+                    Toast.makeText(requireContext(), R.string.bot_error, Toast.LENGTH_LONG).show()
                 }
                 TimelineViewModel.Errors.PARAMETER_ERROR ->{
-
+                    Toast.makeText(requireContext(), R.string.parameter_error, Toast.LENGTH_LONG).show()
                 }
                 TimelineViewModel.Errors.SERVER_ERROR ->{
-
+                    Toast.makeText(requireContext(), R.string.auth_error, Toast.LENGTH_LONG).show()
+                }
+                TimelineViewModel.Errors.NETWORK ->{
+                    Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_LONG).show()
+                }
+                TimelineViewModel.Errors.TIMEOUT ->{
+                    Toast.makeText(requireContext(), R.string.timeout_error, Toast.LENGTH_LONG).show()
                 }
                 else ->{
                     Log.d("TimelineViewModel", "不明なエラー")

@@ -304,4 +304,10 @@
     <string name="retry">リトライ</string>
     <string name="failed_to_get_the_note">ノートの取得に失敗しました</string>
 
+    <string name="timeout_error">タイムアウト</string>
+    <string name="server_error">サーバーエラー</string>
+    <string name="bot_error">ボットですか？</string>
+    <string name="auth_error">認証エラー</string>
+    <string name="parameter_error">パラメーターエラー</string>
+
 </resources>
