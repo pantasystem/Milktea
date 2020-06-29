@@ -70,6 +70,7 @@ object MediaPreviewHelper{
         }
 
 
+        context
         for(n in 0.until(4)){
             val thumbnail = thumbnailViews[n]
             val actionButton = actionButtons[n]
@@ -233,11 +234,9 @@ object MediaPreviewHelper{
         mediaViewData: MediaViewData?
     ){
         when {
-            mediaViewData == null -> {
-                leftMediaBase.visibility = View.VISIBLE
-                rightMediaBase.visibility = View.VISIBLE
-            }
-            mediaViewData.files.isEmpty() -> {
+
+            mediaViewData == null || mediaViewData.files.isEmpty() -> {
+                this.visibility = View.GONE
                 leftMediaBase.visibility = View.GONE
                 rightMediaBase.visibility = View.GONE
             }
@@ -252,12 +251,7 @@ object MediaPreviewHelper{
         }
     }
 
-    @JvmStatic
-    @BindingAdapter("rect")
-    fun ViewGroup.setCircleOutline(rect: Float?){
 
-        outlineProvider = CircleOutlineProvider.getInstance(rect?: 20F)
-    }
 
 
 

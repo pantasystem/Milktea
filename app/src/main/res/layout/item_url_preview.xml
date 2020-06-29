@@ -13,12 +13,13 @@
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:background="@drawable/shape_rounded_square_line"
             android:layout_marginTop="4dp"
+            app:reactByDp="@{7}"
             >
 
         <ImageView
                 android:id="@+id/siteThumbnailView"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="62dp"
+                android:layout_height="62dp"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -28,7 +29,7 @@
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_selectable_file"
                 app:urlPreviewThumbnailUrl="@{urlPreview.thumbnail}"
-                android:layout_marginStart="3dp"
+                android:layout_marginStart="1dp"
                 />
 
         <TextView

@@ -97,7 +97,7 @@ open class PlaneNoteViewData (
     }?.toMap()?: mapOf())
 
     val files = toShowNote.files?: emptyList()
-    val previewableFiles = toShowNote.files?.filter{
+    private val previewableFiles = toShowNote.files?.filter{
         it.type?.startsWith("image") == true || it.type?.startsWith("video") == true
     }?: emptyList()
     val media = MediaViewData(previewableFiles)
