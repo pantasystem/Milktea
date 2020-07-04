@@ -147,7 +147,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState)
-        setSimpleEditor()
 
     }
 
@@ -211,12 +210,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val miApplication = applicationContext as MiApplication
         val ft = supportFragmentManager.beginTransaction()
 
+        val editor = supportFragmentManager.findFragmentByTag("simpleEditor")
+
         if(miApplication.settingStore.isSimpleEditorEnabled){
             fab.visibility = View.GONE
-            ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
+            if(editor == null){
+                ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
+            }
         }else{
             fab.visibility = View.VISIBLE
-            supportFragmentManager.findFragmentByTag("simpleEditor")?.let{
+
+            editor?.let{
                 ft.remove(it)
             }
 
@@ -477,6 +481,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun applyUI(){
         invalidateOptionsMenu()
+        setSimpleEditor()
+
         bottom_navigation.visibility = if(getSettingStore().isClassicUI){
             View.GONE
         }else{

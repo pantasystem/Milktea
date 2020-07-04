@@ -232,6 +232,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             isLoadInit = true
 
         }
+        mViewModel?.loadNew()
 
         //(activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
     }
