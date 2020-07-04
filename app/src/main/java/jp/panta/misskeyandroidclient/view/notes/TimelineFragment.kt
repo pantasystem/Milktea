@@ -4,6 +4,9 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -18,6 +21,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableView
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -67,6 +71,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        setHasOptionsMenu(true)
 
         sharedPreference = requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)
         //sharedPreference = view.context.getSharedPreferences()
@@ -245,6 +251,21 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         Log.d("TimelineFragment", "onDestroyView")
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_timeline, menu)
+        requireContext().setMenuTint(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.refresh_timeline ->{
+                mViewModel?.loadInit()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
         override fun areContentsTheSame(

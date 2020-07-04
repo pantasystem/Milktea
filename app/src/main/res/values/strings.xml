@@ -307,5 +307,6 @@
     <string name="bot_error">Are you human?</string>
     <string name="auth_error">Authentication error</string>
     <string name="parameter_error">Parameter error</string>
+    <string name="refresh">Refresh</string>
 
 </resources>

@@ -309,5 +309,6 @@
     <string name="bot_error">ボットですか？</string>
     <string name="auth_error">認証エラー</string>
     <string name="parameter_error">パラメーターエラー</string>
+    <string name="refresh">リフレッシュ</string>
 
 </resources>
