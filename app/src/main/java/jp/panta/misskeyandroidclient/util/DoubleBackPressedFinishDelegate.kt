@@ -15,7 +15,7 @@ class DoubleBackPressedFinishDelegate {
             true
         }else{
             mHandler.removeCallbacks(mCounterTimeReset)
-            mHandler.postDelayed(mCounterTimeReset, 500)
+            mHandler.postDelayed(mCounterTimeReset, 2000)
             false
         }
     }
