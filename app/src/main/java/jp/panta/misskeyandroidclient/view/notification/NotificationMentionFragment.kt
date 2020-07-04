@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -14,7 +15,9 @@ import jp.panta.misskeyandroidclient.model.PageType
 import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
+import kotlinx.android.synthetic.main.fragment_notification_mention.*
 import kotlinx.android.synthetic.main.fragment_notification_mention.view.*
+import kotlinx.android.synthetic.main.fragment_notification_mention.view.notificationTab
 
 class NotificationMentionFragment : Fragment(R.layout.fragment_notification_mention){
 
@@ -29,21 +32,34 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
 
         val notificationPagerAdapter =  PagerAdapter(pagerItems)
         view.notificationPager.adapter = notificationPagerAdapter
-        val mediator = TabLayoutMediator(view.notificationTab, view.notificationPager){ tab: TabLayout.Tab, position: Int ->
-            tab.text = notificationPagerAdapter.pages[position].title
-        }
-        mediator.attach()
+        notificationTab.setupWithViewPager(notificationPager)
+
+        val miCore = requireContext().applicationContext as MiApplication
+        miCore.currentAccount.observe( viewLifecycleOwner, Observer {
+            notificationPagerAdapter.notifyDataSetChanged()
+        })
+
     }
 
-    inner class PagerAdapter(val pages: List<Page>) : FragmentStateAdapter(this){
+    inner class PagerAdapter(val pages: List<Page>) : FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
-        override fun createFragment(position: Int): Fragment {
+        private fun createFragment(position: Int): Fragment {
             return PageableFragmentFactory.create(null, pages[position].pageable())
         }
 
-        override fun getItemCount(): Int {
+        override fun getPageTitle(position: Int): CharSequence? {
+            return pages[position].title
+        }
+
+        override fun getItem(position: Int): Fragment {
+            return createFragment(position)
+        }
+
+        override fun getCount(): Int {
             return pages.size
         }
+
+
 
     }
 }
