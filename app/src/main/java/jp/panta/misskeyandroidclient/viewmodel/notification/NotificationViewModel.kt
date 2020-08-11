@@ -35,7 +35,7 @@ class NotificationViewModel(
     //loadNewはない
 
 
-   // private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
+    // private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
     private val noteCapture = miCore.getNoteCapture(accountRelation)
 
     private var noteRegister = NoteRegister()
@@ -67,8 +67,19 @@ class NotificationViewModel(
                 call: Call<List<Notification>?>,
                 response: Response<List<Notification>?>
             ) {
-                val list = response.body()?.map{
-                    NotificationViewData((it), accountRelation.account)
+                val list = try{
+                    response.body()?.mapNotNull{
+                        try{
+                            NotificationViewData((it), accountRelation.account)
+
+                        }catch(e: Exception){
+                            Log.e("NotificationViewModel", "error:${it}", e)
+                            null
+                        }
+                    }
+                }catch(e: Exception){
+                    Log.e("NotificationViewModel", "error:${response.body()}", e)
+                    null
                 }
                 notificationsLiveData.postValue(
                     list
