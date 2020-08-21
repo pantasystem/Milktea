@@ -25,7 +25,8 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.*
         DraftFileDTO::class,
         DraftNoteDTO::class
     ],
-    version = 3
+    version = 3,
+    exportSchema = true
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class)
 abstract class DataBase : RoomDatabase(){
