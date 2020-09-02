@@ -84,7 +84,10 @@ class EmojiSpan(view: View) : ReplacementSpan(){
                 imageDrawable?.callback = Animated()
                 if(resource is GifDrawable){
                     resource.start()
+                }else{
+                    view.invalidate()
                 }
+
             }
         }
         override fun onLoadCleared(placeholder: Drawable?) {
