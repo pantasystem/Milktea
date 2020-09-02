@@ -14,6 +14,9 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
+import jp.panta.misskeyandroidclient.view.text.BitmapEmojiSpan
+import jp.panta.misskeyandroidclient.view.text.DrawableEmojiSpan
+import jp.panta.misskeyandroidclient.view.text.EmojiAdapter
 import jp.panta.misskeyandroidclient.view.text.EmojiSpan
 import java.lang.ref.WeakReference
 
@@ -22,7 +25,9 @@ object MFMDecorator {
 
 
     fun decorate(textView: TextView, node: Root): Spanned{
-        return Visitor(WeakReference(textView), node, node).decorate()
+        val emojiAdapter = EmojiAdapter(textView)
+        emojiAdapter.subscribe()
+        return Visitor(WeakReference(textView), node, node, emojiAdapter).decorate()
             ?: SpannedString(node.sourceText)
     }
 
@@ -32,7 +37,8 @@ object MFMDecorator {
     class Visitor(
         val textView: WeakReference<TextView>,
         val root: Root,
-        val parent: Element
+        val parent: Element,
+        val emojiAdapter: EmojiAdapter
     ){
         private var position = 0
         private val start = position
@@ -46,7 +52,7 @@ object MFMDecorator {
         fun decorate(): Spanned?{
             if(parent is Node){
                 parent.childElements.forEach{ ele ->
-                    val spanned = Visitor(textView, root, ele).decorate()
+                    val spanned = Visitor(textView, root, ele, emojiAdapter).decorate()
                         ?: closeErrorElement(ele)
                     spannableStringBuilder.append(spanned)
                     position += spanned.length - 1
@@ -94,19 +100,23 @@ object MFMDecorator {
         private fun decorateEmoji(emojiElement: EmojiElement): Spanned?{
             val spanned = SpannableString(emojiElement.text)
             textView.get()?.let{ textView ->
-                val emojiSpan = EmojiSpan(textView)
-                spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
+                //val emojiSpan = EmojiSpan(textView)
+                val emojiSpan: EmojiSpan<*>
                 if(emojiElement.emoji.isSvg()){
+                    emojiSpan = BitmapEmojiSpan(emojiAdapter)
                     GlideApp.with(textView.context)
                         .`as`(Bitmap::class.java)
                         .load(emojiElement.emoji.url?: emojiElement.emoji.url)
-                        .into(emojiSpan.bitmapTarget)
+                        .into(emojiSpan.target)
                 }else{
+                    emojiSpan = DrawableEmojiSpan(emojiAdapter)
                     Glide.with(textView)
                         .asDrawable()
                         .load(emojiElement.emoji.url)
                         .into(emojiSpan.target)
                 }
+                spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
+
             }
 
             return spanned
