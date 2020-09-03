@@ -17,7 +17,7 @@ object ContentFoldingHelper {
 
         val isFoldContent = isFolding?: false
 
-        val isNeedFold = foldingNote.cw?.isNotBlank() == true || foldingNote.text?.length?: 0 >= foldingNote.autoFoldSTextLength
+        val isNeedFold = foldingNote.cw?.isNotBlank() == true || foldingNote.determineTextLength.isLong()
         if(foldingNote.cw.isNullOrBlank()){
             if(isNeedFold){
                 cw?.visibility = View.VISIBLE
