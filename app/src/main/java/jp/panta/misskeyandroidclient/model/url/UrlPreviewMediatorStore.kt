@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.model.url
 
+import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 
 class UrlPreviewMediatorStore(
@@ -12,7 +14,12 @@ class UrlPreviewMediatorStore(
         var preview = urlPreviewDAO.findByUrl(url)
         if(preview == null){
             preview = remoteStore.get(url)?.apply{
-                urlPreviewDAO.insert(this)
+                try{
+
+                    urlPreviewDAO.insert(this)
+                }catch(e: SQLiteConstraintException){
+                    Log.w("UrlPreviewMediatorStore", "不正なデータ", e)
+                }
             }
         }
         return preview
