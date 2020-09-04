@@ -45,4 +45,11 @@ object DateFormatHelper {
         }
         this.text = simpleElapsedTime.format(date)
     }
+
+    @BindingAdapter("createdAt")
+    @JvmStatic
+    fun TextView.setCreatedAt(createdAt: Date?){
+        val date = createdAt?: Date()
+        this.text = SimpleDateFormat.getDateTimeInstance().format(date)
+    }
 }
