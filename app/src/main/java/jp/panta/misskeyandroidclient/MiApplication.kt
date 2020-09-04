@@ -28,6 +28,7 @@ import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.url.*
+import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
@@ -62,6 +63,8 @@ class MiApplication : Application(), MiCore {
     lateinit var settingStore: SettingStore
 
     lateinit var draftNoteDao: DraftNoteDao
+
+    lateinit var urlPreviewDAO: UrlPreviewDAO
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -115,6 +118,7 @@ class MiApplication : Application(), MiCore {
         val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_3_4)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountDao = database.accountDao()
@@ -131,6 +135,8 @@ class MiApplication : Application(), MiCore {
         draftNoteDao = database.draftNoteDao()
 
         mEncryption = KeyStoreSystemEncryption(this)
+
+        urlPreviewDAO = database.urlPreviewDAO()
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
         messageSubscriber =
@@ -162,7 +168,8 @@ class MiApplication : Application(), MiCore {
             var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
             if(store == null || isReplace){
                 store = UrlPreviewStoreFactory(
-                    settingStore.urlPreviewSetting.getSourceType(),
+                    urlPreviewDAO
+                    ,settingStore.urlPreviewSetting.getSourceType(),
                     settingStore.urlPreviewSetting.getSummalyUrl(),
                     currentAccount.value
                 ).create()

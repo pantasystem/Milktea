@@ -4,12 +4,14 @@ import android.util.Log
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
+import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 
 class UrlPreviewStoreFactory (
+    val urlPreviewDAO: UrlPreviewDAO,
     sourceType: Int? = null,
     var summalyUrl: String? = null,
     var accountRelation: AccountRelation? = null
@@ -29,7 +31,7 @@ class UrlPreviewStoreFactory (
             }
             else -> null
         }
-        return createUrlPreviewStore(url)
+        return UrlPreviewMediatorStore(urlPreviewDAO, createUrlPreviewStore(url))
     }
 
     private fun createUrlPreviewStore(url: String?): UrlPreviewStore{

@@ -48,6 +48,7 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
                 url = "https://$url"
             }
             mUrlPreviewStore = UrlPreviewStoreFactory(
+                (miCore as MiApplication).urlPreviewDAO,
                 it,
                 url,
                 miCore.currentAccount.value

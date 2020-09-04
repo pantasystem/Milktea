@@ -1,9 +1,12 @@
 package jp.panta.misskeyandroidclient.model.url
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "url_preview")
 data class UrlPreview(
-    val url: String,
+    @PrimaryKey(autoGenerate = false) val url: String,
     val title: String,
     val icon: String,
     val description: String,

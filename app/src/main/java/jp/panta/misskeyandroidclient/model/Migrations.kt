@@ -53,3 +53,10 @@ val MIGRATION_2_3 = object : Migration(2, 3){
         database.execSQL("alter table 'draft_file' add column 'folder_id' TEXT ")
     }
 }
+
+val MIGRATION_3_4 = object : Migration(3, 4){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'url_preview' ('url' TEXT NOT NULL, 'title' TEXT NOT NULL, 'icon' TEXT NOT NULL, 'description' TEXT NOT NULL, 'thumbnail' TEXT NOT NULL, 'siteName' TEXT NOT NULL, PRIMARY KEY('url'))")
+    }
+}
