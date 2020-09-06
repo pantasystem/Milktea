@@ -20,7 +20,7 @@ const val AUTO_FOLD_TEXT_LENGTH = 400
 open class PlaneNoteViewData (
     val note: Note,
     val account: Account,
-    val determineTextLength: DetermineTextLength = DetermineTextLengthImpl(AUTO_FOLD_TEXT_LENGTH, 10)
+    var determineTextLength: DetermineTextLength = DetermineTextLengthImpl(AUTO_FOLD_TEXT_LENGTH, 10)
 ) : NoteViewData{
 
 
