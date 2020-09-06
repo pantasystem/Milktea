@@ -12,6 +12,8 @@ import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftNoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.db.PollChoiceDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.db.UserIdDTO
 import jp.panta.misskeyandroidclient.model.notes.reaction.*
+import jp.panta.misskeyandroidclient.model.url.UrlPreview
+import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 
 @Database(
     entities = [
@@ -23,9 +25,12 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.*
         PollChoiceDTO::class,
         UserIdDTO::class,
         DraftFileDTO::class,
-        DraftNoteDTO::class
+        DraftNoteDTO::class,
+
+        UrlPreview::class
     ],
-    version = 3
+    version = 4,
+    exportSchema = true
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class)
 abstract class DataBase : RoomDatabase(){
@@ -36,5 +41,7 @@ abstract class DataBase : RoomDatabase(){
     abstract fun reactionUserSettingDao(): ReactionUserSettingDao
     abstract fun pageDao(): PageDao
     abstract fun draftNoteDao(): DraftNoteDao
+
+    abstract fun urlPreviewDAO(): UrlPreviewDAO
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
 }

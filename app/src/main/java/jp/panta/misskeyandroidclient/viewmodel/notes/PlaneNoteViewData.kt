@@ -16,10 +16,13 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 
+const val AUTO_FOLD_TEXT_LENGTH = 400
 open class PlaneNoteViewData (
     val note: Note,
-    val account: Account
+    val account: Account,
+    val determineTextLength: DetermineTextLength = DetermineTextLengthImpl(AUTO_FOLD_TEXT_LENGTH, 10)
 ) : NoteViewData{
+
 
     val id = note.id
 
@@ -80,13 +83,16 @@ open class PlaneNoteViewData (
     val cwNode = MFMParser.parse(toShowNote.cw, toShowNote.emojis)
 
     //true　折り畳み
-    val contentFolding = MutableLiveData<Boolean>(cw != null)
+    val text = toShowNote.text.apply{
+        determineTextLength.setText(this)
+    }
+
+    val contentFolding = MutableLiveData<Boolean>(cw != null || determineTextLength.isLong())
     val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding){
         if(it) "もっと見る: ${text?.length}文字" else "隠す"
     }
 
 
-    val text = toShowNote.text
     val textNode = MFMParser.parse(toShowNote.text, toShowNote.emojis)
     val urls = textNode?.getUrls()
 

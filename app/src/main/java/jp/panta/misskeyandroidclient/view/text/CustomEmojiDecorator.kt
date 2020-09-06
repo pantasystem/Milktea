@@ -21,13 +21,13 @@ class CustomEmojiDecorator{
         if(emojis.isNullOrEmpty()){
             return SpannableStringBuilder(text)
         }
+        val emojiAdapter = EmojiAdapter(view)
         val builder = SpannableStringBuilder(text)
         for(emoji in emojis){
             val pattern = ":${emoji.name}:"
             val matcher = Pattern.compile(pattern).matcher(text)
             while(matcher.find()){
-                val span = EmojiSpan(view)
-                builder.setSpan(span, matcher.start(), matcher.end(), 0)
+                val span: EmojiSpan<*>
 
                 /*
                 GlideApp.with(this.context)
@@ -39,23 +39,29 @@ class CustomEmojiDecorator{
                         .into(reactionImageView)
                  */
                 if(emoji.isSvg()){
+                    span = BitmapEmojiSpan(emojiAdapter)
                     GlideApp.with(view.context)
                         .`as`(Bitmap::class.java)
                         //.listener(SvgSoftwareLayerSetter())
                         //.transition(withCrossFade())
                         .load(emoji.url?: emoji.url)
-                        .into(span.bitmapTarget)
+                        .into(span.target)
 
 
                 }else{
+                    span = DrawableEmojiSpan(emojiAdapter)
                     Glide.with(view)
                         .asDrawable()
                         .load(emoji.url)
                         .into(span.target)
                 }
 
+                builder.setSpan(span, matcher.start(), matcher.end(), 0)
+
+
             }
         }
+        emojiAdapter.subscribe()
         return builder
     }
 }

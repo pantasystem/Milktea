@@ -28,6 +28,12 @@
             app:mainNameView="@{mainName}"
             app:subNameView="@{subName}"
             app:user="@{note.toShowNote.user}"
+
+            app:foldingNote="@{note}"
+            app:foldingButton="@{contentFoldingButton}"
+            app:cw="@{cw}"
+            app:foldingContent="@{contentMain}"
+            app:isFolding="@{note.contentFolding}"
             >
 
         <ImageView
@@ -82,7 +88,6 @@
                 app:textNode="@{note.cwNode}"
                 android:layout_toEndOf="@+id/avatarIcon"
                 android:layout_below="@+id/mainName"
-                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                 />
 
 
@@ -95,9 +100,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginStart="5dp"
                 tools:text="展開する"
-                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
                 android:textColor="?attr/colorAccent"
-                android:text="@{SafeUnbox.unboxString(note.contentFoldingStatusMessage)}"
                 android:onClick="@{()-> note.changeContentFolding() }"
             />
         <RelativeLayout
@@ -106,7 +109,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/contentFoldingButton"
                 android:layout_toEndOf="@id/avatarIcon"
-                android:visibility="@{SafeUnbox.unbox(note.contentFolding) ? View.GONE : View.VISIBLE }"
                 >
             <TextView
                     android:id="@id/text"
