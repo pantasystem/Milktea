@@ -12,7 +12,7 @@ object StatusMessageHelper {
     @JvmStatic
     @BindingAdapter("statusMessageTargetViewNote")
     fun TextView.setStatusMessage(statusMessageTargetViewNote: PlaneNoteViewData){
-        val settingStore = (context.applicationContext as MiApplication).settingStore
+        val settingStore = (context.applicationContext as MiApplication).getSettingStore()
         val isUserNameDefault = settingStore.isUserNameDefault
         val note = statusMessageTargetViewNote.note
         val name = if(isUserNameDefault){

@@ -11,7 +11,7 @@ object MessagingTitleHelper {
     @JvmStatic
     @BindingAdapter("titleTargetMsgHistoryViewData")
     fun TextView.setMessageTitle(titleTargetMsgHistoryViewData: HistoryViewData){
-        val isUserNameDefault = (this.context.applicationContext as MiApplication).settingStore.isUserNameDefault
+        val isUserNameDefault = (this.context.applicationContext as MiApplication).getSettingStore().isUserNameDefault
 
         val title = when {
             titleTargetMsgHistoryViewData.isGroup -> {

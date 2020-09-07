@@ -83,7 +83,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         val miApplication = applicationContext as MiApplication
 
-        val toolbarBase = if(miApplication.settingStore.isPostButtonAtTheBottom){
+        val toolbarBase = if(miApplication.getSettingStore().isPostButtonAtTheBottom){
             binding.noteEditorToolbar.visibility = View.GONE
             binding.bottomToolbarBase.visibility = View.VISIBLE
             binding.bottomToolbarBase

@@ -20,7 +20,7 @@ object ContentFoldingHelper {
     fun ViewGroup.setFoldingState(foldingNote: PlaneNoteViewData?, cw: TextView?, foldingButton: TextView?, foldingContent: ViewGroup?, isFolding: Boolean?){
         foldingNote?:return
 
-        val settingStore = (context.applicationContext as? MiApplication)?.settingStore
+        val settingStore = (context.applicationContext as? MiApplication)?.getSettingStore()
         val maxLength = settingStore?.foldingTextLengthLimit?: 300
         val maxReturns = settingStore?.foldingTextReturnsLimit?: 10
         foldingNote.determineTextLength = DetermineTextLengthImpl(maxLength, maxReturns)

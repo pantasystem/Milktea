@@ -15,7 +15,7 @@ class UserDetailViewModelFactory(
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == UserDetailViewModel::class.java){
-            return UserDetailViewModel(accountRelation, miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!), userId, fqcnUserName, miApplication.getEncryption()) as T
+            return UserDetailViewModel(accountRelation, miApplication.getMisskeyAPI(accountRelation.getCurrentConnectionInformation()!!), userId, fqcnUserName, miApplication.getEncryption(), miApplication) as T
         }
         throw IllegalArgumentException("対応していません")
     }

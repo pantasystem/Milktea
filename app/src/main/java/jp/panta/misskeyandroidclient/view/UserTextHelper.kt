@@ -13,7 +13,7 @@ object UserTextHelper{
     @BindingAdapter("mainNameView", "subNameView", "user")
     fun View.setUserInfo(mainNameView: TextView?, subNameView: TextView?, user: User?){
         user?: return
-        val isUserNameDefault = (this.context.applicationContext as MiApplication).settingStore.isUserNameDefault
+        val isUserNameDefault = (this.context.applicationContext as MiApplication).getSettingStore().isUserNameDefault
         val userName: TextView?
         val name: TextView?
         if(isUserNameDefault){

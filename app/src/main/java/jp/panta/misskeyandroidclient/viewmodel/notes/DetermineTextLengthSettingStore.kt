@@ -1,13 +1,19 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import java.util.regex.Pattern
 
-class DetermineTextLengthImpl(val length: Int, val lineBreaks: Int) : DetermineTextLength{
-
-     private var mText: String? = null
+class DetermineTextLengthSettingStore(
+    private val settingStore: SettingStore
+)  : DetermineTextLength{
+    private var mText: String? = null
 
     override fun isLong(): Boolean {
+
         val text = mText?: return false
+
+        val length = settingStore.foldingTextLengthLimit
+        val lineBreaks = settingStore.foldingTextReturnsLimit
 
         if(text.codePointCount(0, text.length) >= length){
             return true
@@ -29,7 +35,7 @@ class DetermineTextLengthImpl(val length: Int, val lineBreaks: Int) : DetermineT
         mText = text
     }
 
-    override fun clone(): DetermineTextLengthImpl {
-        return DetermineTextLengthImpl(length, lineBreaks)
+    override fun clone(): DetermineTextLength {
+        return DetermineTextLengthSettingStore(settingStore)
     }
 }
