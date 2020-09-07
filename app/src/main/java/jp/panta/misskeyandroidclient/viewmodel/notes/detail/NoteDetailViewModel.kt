@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +77,7 @@ class NoteDetailViewModel(
             try{
                 val rawDetail = misskeyAPI.showNote(request).execute().body()
                     ?:return@launch
-                val detail = NoteDetailViewData(rawDetail, accountRelation.account)
+                val detail = NoteDetailViewData(rawDetail, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
                 loadUrlPreview(detail)
                 var list: List<PlaneNoteViewData> = listOf(detail)
                 notes.postValue(list)
@@ -132,7 +133,7 @@ class NoteDetailViewModel(
         }else{
             conversation.add(next)
             val children = misskeyAPI.children(NoteRequest(connectionInformation.getI(encryption), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
-                PlaneNoteViewData(it,accountRelation.account).apply{
+                PlaneNoteViewData(it,accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
                     loadUrlPreview(this)
                 }
             }
@@ -144,7 +145,7 @@ class NoteDetailViewModel(
 
     private fun loadConversation(): List<PlaneNoteViewData>?{
         return misskeyAPI.conversation(request).execute().body()?.map{
-            PlaneNoteViewData(it, accountRelation.account).apply{
+            PlaneNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
                 loadUrlPreview(this)
             }
         }
@@ -154,13 +155,13 @@ class NoteDetailViewModel(
         return loadChildren(id = show.noteId)?.filter{
             it.reNote?.id != show.noteId
         }?.map{
-            val planeNoteViewData = PlaneNoteViewData(it, accountRelation.account)
+            val planeNoteViewData = PlaneNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
             val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->
-                PlaneNoteViewData(n, accountRelation.account).apply{
+                PlaneNoteViewData(n, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
                     loadUrlPreview(this)
                 }
             }
-            NoteConversationViewData(it, childInChild, accountRelation.account).apply{
+            NoteConversationViewData(it, childInChild, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }
         }

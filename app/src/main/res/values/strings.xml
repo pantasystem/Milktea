@@ -311,4 +311,7 @@
 
     <string name="long_text">Collapsed automatically because it is too long(size:%d)</string>
     <string name="show_more">Show more(size:%d)</string>
+    <string name="text_length_limit">Text length limit</string>
+    <string name="returns_limit">Returns limit</string>
+    <string name="auto_note_folding">Automatic note folding</string>
 </resources>

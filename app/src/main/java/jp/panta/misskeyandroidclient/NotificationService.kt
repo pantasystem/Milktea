@@ -14,6 +14,8 @@ import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.view.SafeUnbox
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import java.lang.ref.WeakReference
 import java.util.*
@@ -89,7 +91,7 @@ class NotificationService : Service() {
 
                     if(mStopNotificationAccountMap[account.id] == null){
                         Log.d(TAG, "notification,:$notification")
-                        showNotification(NotificationViewData(notification, account))
+                        showNotification(NotificationViewData(notification, account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore())))
                     }else{
                         Log.d(TAG, "通知を表示しなかった")
                     }

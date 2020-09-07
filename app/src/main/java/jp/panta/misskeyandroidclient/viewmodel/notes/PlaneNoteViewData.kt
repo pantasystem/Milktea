@@ -16,11 +16,10 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 
-const val AUTO_FOLD_TEXT_LENGTH = 400
 open class PlaneNoteViewData (
     val note: Note,
     val account: Account,
-    val determineTextLength: DetermineTextLength = DetermineTextLengthImpl(AUTO_FOLD_TEXT_LENGTH, 10)
+    var determineTextLength: DetermineTextLength
 ) : NoteViewData{
 
 

@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotePagedStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Response
@@ -15,7 +16,7 @@ import retrofit2.Response
 class FavoriteNotePagingStore(
     override val accountRelation: AccountRelation,
     override val pageableTimeline: Page.Timeline,
-    miCore: MiCore,
+    private val miCore: MiCore,
     private val encryption: Encryption
 ) : NotePagedStore{
 
@@ -50,7 +51,7 @@ class FavoriteNotePagingStore(
     private fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
-            FavoriteNoteViewData(it, accountRelation.account)
+            FavoriteNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
         }
         return Pair(BodyLessResponse(res), list)
     }

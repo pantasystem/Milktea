@@ -5,6 +5,8 @@ import jp.panta.misskeyandroidclient.KeyStore
 
 class SettingStore(private val sharedPreferences: SharedPreferences) {
 
+
+
     val isUpdateTimelineInBackground: Boolean
         get(){
             return fromBooleanEnum(KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND)
@@ -80,4 +82,14 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
     }
 
     val urlPreviewSetting = UrlPreviewSourceSetting(sharedPreferences)
+
+    val foldingTextLengthLimit: Int
+        get(){
+            return sharedPreferences.getInt(KeyStore.AutoTextFoldingCount.LENGTH.name,  KeyStore.AutoTextFoldingCount.LENGTH.default)
+        }
+
+    val foldingTextReturnsLimit: Int
+        get(){
+            return sharedPreferences.getInt(KeyStore.AutoTextFoldingCount.RETURNS.name, KeyStore.AutoTextFoldingCount.RETURNS.default)
+        }
 }

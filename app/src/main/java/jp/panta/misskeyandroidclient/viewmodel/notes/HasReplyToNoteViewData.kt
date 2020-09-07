@@ -6,7 +6,7 @@ import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import java.lang.IllegalArgumentException
 
-class HasReplyToNoteViewData(note: Note, account: Account)  : PlaneNoteViewData(note, account){
+class HasReplyToNoteViewData(note: Note, account: Account, determineTextLength: DetermineTextLength)  : PlaneNoteViewData(note, account, determineTextLength){
     val reply = note.reply
 
     /*val replyToAvatarUrl = reply?.user?.avatarUrl
@@ -26,7 +26,7 @@ class HasReplyToNoteViewData(note: Note, account: Account)  : PlaneNoteViewData(
     val replyTo = if(reply == null){
         throw IllegalArgumentException("replyがnullですPlaneNoteViewDataを利用してください")
     }else{
-        PlaneNoteViewData(reply, account)
+        PlaneNoteViewData(reply, account, determineTextLength.clone())
     }
 
 

@@ -29,7 +29,7 @@ class PageSettingViewModel(
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return PageSettingViewModel(miApplication, miApplication.settingStore, PageTypeNameMap(miApplication)) as T
+            return PageSettingViewModel(miApplication, miApplication.getSettingStore(), PageTypeNameMap(miApplication)) as T
         }
     }
     val encryption = miCore.getEncryption()

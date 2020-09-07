@@ -10,6 +10,11 @@ object KeyStore {
         THEME(THEME_WHITE.default)
     }
 
+    enum class AutoTextFoldingCount(val default: Int){
+        RETURNS(10),
+        LENGTH(300)
+    }
+
     fun isNightTheme(key: IntKey): Boolean{
         return IntKey.THEME_BLACK == key
                 || IntKey.THEME_DARK == key

@@ -93,9 +93,9 @@ class NoteTimelineStore(
         return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
             try{
                 if(it.reply == null){
-                    PlaneNoteViewData(it, accountRelation.account)
+                    PlaneNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
                 }else{
-                    HasReplyToNoteViewData(it, accountRelation.account)
+                    HasReplyToNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
                 }
             }catch(e: Exception){
                 Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)

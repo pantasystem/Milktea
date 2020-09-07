@@ -60,7 +60,7 @@ class MiApplication : Application(), MiCore {
 
     lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
-    lateinit var settingStore: SettingStore
+    lateinit var mSettingStore: SettingStore
 
     lateinit var draftNoteDao: DraftNoteDao
 
@@ -113,7 +113,7 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
-        settingStore = SettingStore(sharedPreferences)
+        mSettingStore = SettingStore(sharedPreferences)
 
         val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
             .addMigrations(MIGRATION_1_2)
@@ -163,14 +163,14 @@ class MiApplication : Application(), MiCore {
 
     private fun getUrlPreviewStore(account: AccountRelation?, isReplace: Boolean): UrlPreviewStore?{
         return account?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ accountUrl ->
-            val url = settingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
+            val url = mSettingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
 
             var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
             if(store == null || isReplace){
                 store = UrlPreviewStoreFactory(
                     urlPreviewDAO
-                    ,settingStore.urlPreviewSetting.getSourceType(),
-                    settingStore.urlPreviewSetting.getSummalyUrl(),
+                    ,mSettingStore.urlPreviewSetting.getSourceType(),
+                    mSettingStore.urlPreviewSetting.getSummalyUrl(),
                     currentAccount.value
                 ).create()
             }
@@ -311,6 +311,10 @@ class MiApplication : Application(), MiCore {
                 Log.e(TAG, "", e)
             }
         }
+    }
+
+    override fun getSettingStore(): SettingStore {
+        return this.mSettingStore
     }
 
     private fun loadAndInitializeAccounts(){
@@ -615,7 +619,7 @@ class MiApplication : Application(), MiCore {
          }
 
         if(timelineCapture == null){
-            timelineCapture = TimelineCapture(account.account)
+            timelineCapture = TimelineCapture(account.account, getSettingStore())
             setupObserver(account, timelineCapture)
             mTimelineCaptureAccountMap[account.account] = timelineCapture
         }

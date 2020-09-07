@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -70,7 +71,7 @@ class NotificationViewModel(
                 val list = try{
                     response.body()?.mapNotNull{
                         try{
-                            NotificationViewData((it), accountRelation.account)
+                            NotificationViewData((it), accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
 
                         }catch(e: Exception){
                             Log.e("NotificationViewModel", "error:${it}", e)
@@ -129,7 +130,7 @@ class NotificationViewModel(
                 }
 
                 val list = rawList.map{
-                    NotificationViewData(it, accountRelation.account)
+                    NotificationViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
                 }
 
                 val notificationViewDataList = ArrayList<NotificationViewData>(exNotificationList).apply{

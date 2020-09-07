@@ -3,10 +3,11 @@ package jp.panta.misskeyandroidclient.viewmodel.notification
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLength
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.lang.IllegalArgumentException
 
-class NotificationViewData(val notification: Notification, account: Account) {
+class NotificationViewData(val notification: Notification, account: Account, determineTextLength: DetermineTextLength) {
     enum class Type(val default: String){
         FOLLOW("follow"),
         MENTION("mention"),
@@ -20,7 +21,7 @@ class NotificationViewData(val notification: Notification, account: Account) {
 
     }
     val id = notification.id
-    val noteViewData: PlaneNoteViewData? = if(notification.note == null) null else PlaneNoteViewData(notification.note, account)
+    val noteViewData: PlaneNoteViewData? = if(notification.note == null) null else PlaneNoteViewData(notification.note, account,determineTextLength)
 
     val statusType: String = notification.type
     val type: Type? = Type.values().firstOrNull {

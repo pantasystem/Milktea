@@ -21,7 +21,7 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
     class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return UrlPreviewSourceSettingViewModel(miApplication, miApplication.settingStore) as T
+            return UrlPreviewSourceSettingViewModel(miApplication, miApplication.getSettingStore()) as T
         }
     }
 

@@ -7,10 +7,12 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
+import jp.panta.misskeyandroidclient.viewmodel.setting.TextSharedItem
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingMovementActivity : AppCompatActivity() {
@@ -74,6 +76,27 @@ class SettingMovementActivity : AppCompatActivity() {
             )
         )
 
+        val noteTextLimitGroup = Group(
+            titleStringRes = R.string.auto_note_folding,
+            context = this,
+            items = listOf(
+                TextSharedItem(
+                    KeyStore.AutoTextFoldingCount.LENGTH.name,
+                    R.string.text_length_limit,
+                    type = TextSharedItem.InputType.NUMBER,
+                    context = this,
+                    default = KeyStore.AutoTextFoldingCount.LENGTH.default.toString()
+                ),
+                TextSharedItem(
+                    KeyStore.AutoTextFoldingCount.RETURNS.name,
+                    R.string.returns_limit,
+                    type = TextSharedItem.InputType.NUMBER,
+                    context = this,
+                    default = KeyStore.AutoTextFoldingCount.RETURNS.default.toString()
+                )
+            )
+        )
+
         val updateTimelineInBackground = BooleanSharedItem(
             key = KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND.name,
             default = KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND.default,
@@ -96,7 +119,7 @@ class SettingMovementActivity : AppCompatActivity() {
         setting_list.adapter = adapter
         setting_list.layoutManager = LinearLayoutManager(this)
 
-        adapter.submitList(listOf(timelineGroup, syncGroup))
+        adapter.submitList(listOf(timelineGroup, syncGroup, noteTextLimitGroup))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

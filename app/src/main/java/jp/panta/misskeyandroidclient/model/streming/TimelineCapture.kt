@@ -7,13 +7,16 @@ import com.google.gson.annotations.Expose
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import java.util.*
 import kotlin.collections.HashMap
 
 class TimelineCapture(
-    override val account: Account
+    override val account: Account,
+    val settingStore: SettingStore
 ) : AbsObserver(){
 
     interface Observer{
@@ -113,9 +116,9 @@ class TimelineCapture(
             val id = res.body.id
             if(note != null){
                 val viewData = if(note.reply == null){
-                    PlaneNoteViewData(note, account)
+                    PlaneNoteViewData(note, account, DetermineTextLengthSettingStore(settingStore))
                 }else{
-                    HasReplyToNoteViewData(note, account)
+                    HasReplyToNoteViewData(note, account, DetermineTextLengthSettingStore(settingStore))
                 }
                 val observer = synchronized(observerMap){
                     observerMap[id]

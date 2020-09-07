@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,7 +23,8 @@ class UserDetailViewModel(
     val misskeyAPI: MisskeyAPI,
     val userId: String?,
     val fqcnUserName: String?,
-    val encryption: Encryption
+    val encryption: Encryption,
+    val miCore: MiCore
 ) : ViewModel(){
     val tag=  "userDetailViewModel"
 
@@ -31,7 +34,7 @@ class UserDetailViewModel(
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply{
         addSource(user){
             this.value = it.pinnedNotes?.map{note ->
-                PlaneNoteViewData(note, accountRelation.account)
+                PlaneNoteViewData(note, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
             }
         }
     }

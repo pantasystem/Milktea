@@ -47,8 +47,10 @@ import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
@@ -212,7 +214,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val editor = supportFragmentManager.findFragmentByTag("simpleEditor")
 
-        if(miApplication.settingStore.isSimpleEditorEnabled){
+        if(miApplication.getSettingStore().isSimpleEditorEnabled){
             fab.visibility = View.GONE
             if(editor == null){
                 ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
@@ -230,7 +232,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun showNotification(notify: Notification){
         val account = (application as MiApplication).currentAccount.value?: return
-        val viewData = NotificationViewData(notify, account.account)
+        val viewData = NotificationViewData(notify, account.account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore()))
         //Log.d("MainActivity")
         val name = notify.user.name?: notify.user.userName
         val msg = when(viewData.type){
