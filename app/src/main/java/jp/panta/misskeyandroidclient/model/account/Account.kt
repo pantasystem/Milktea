@@ -48,7 +48,7 @@ data class Account (
     constructor(remoteId: String,
                 instanceDomain: String,
                 userName: String,
-                name: String?,
+                /*name: String?,
                 description: String?,
                 followersCount: Int,
                 followingCount: Int,
@@ -56,7 +56,7 @@ data class Account (
                 isBot: Boolean,
                 isCat: Boolean,
                 avatarUrl: String?,
-                bannerUrl: String?,
+                bannerUrl: String?,*/
                 encryptedToken: String) :
             this(
                 remoteId,
@@ -145,7 +145,7 @@ fun AccountRelation.newAccount(user: User?): Account?{
             remoteId = ci.accountId,
             instanceDomain = ci.instanceBaseUrl,
             userName = "",
-            name = "",
+            /*name = "",
             description = "",
             followersCount = 0,
             followingCount = 0,
@@ -153,7 +153,7 @@ fun AccountRelation.newAccount(user: User?): Account?{
             isBot = false,
             isCat = false,
             avatarUrl = null,
-            bannerUrl = null,
+            bannerUrl = null,*/
             encryptedToken = ci.encryptedI
         )
 }
