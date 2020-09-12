@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.model.streming.note
 import android.util.Log
 import com.google.gson.JsonSyntaxException
 import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.streming.AbsObserver
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
@@ -253,19 +253,19 @@ class NoteCapture(override val account: Account) : AbsObserver(){
 
     private fun addReaction(noteId: String, reaction: String, emoji: Emoji?, actionUserId: String?){
        getNotes(noteId).forEach{
-           it.addReaction(reaction, emoji, it.account.id == actionUserId)
+           it.addReaction(reaction, emoji, it.account.remoteId == actionUserId)
        }
     }
 
     private fun removeReaction(noteId: String, reaction: String, actionUserId: String?){
         getNotes(noteId).forEach {
-            it.takeReaction(reaction, it.account.id == actionUserId)
+            it.takeReaction(reaction, it.account.remoteId == actionUserId)
         }
     }
 
     private fun updatePoll(noteId: String, choice: Int, actionUserId: String?){
         getNotes(noteId).forEach{
-            it.poll?.update(choice, account.id == actionUserId)
+            it.poll?.update(choice, account.remoteId == actionUserId)
         }
     }
 

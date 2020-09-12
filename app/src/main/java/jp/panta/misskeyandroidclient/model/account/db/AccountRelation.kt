@@ -11,13 +11,8 @@ class AccountRelation{
     @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = Page::class)
     lateinit var pages: List<Page>
 
-    @Relation(parentColumn = "accountId", entityColumn = "accountId")
-    lateinit var emojis: List<AccountEmoji>
-
     @Ignore
     fun toAccount(): Account{
-        return account.copy(emojis = emojis.map{ ae ->
-            ae.toEmoji()
-        }, pages = pages)
+        return account.copy(pages = pages)
     }
 }

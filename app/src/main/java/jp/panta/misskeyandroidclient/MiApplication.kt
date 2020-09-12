@@ -4,12 +4,12 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -40,7 +40,7 @@ import kotlinx.coroutines.*
 import java.lang.Exception
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
-
+import jp.panta.misskeyandroidclient.model.account.page.Page
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -72,10 +72,7 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    override val urlPreviewStore: UrlPreviewStore?
-        get() {
-            return getUrlPreviewStore(mCurrentAccount.value)
-        }
+
     /*var misskeyAPIService: MisskeyAPI? = null
         private set*/
 
@@ -216,19 +213,14 @@ class MiApplication : Application(), MiCore {
             }catch(e: Exception){
 
             }
-
-            synchronized(mStreamingAccountMap){
-                try{
-                    val streaming = mStreamingAccountMap[account]
-                    streaming?.disconnect()
-                }catch(e: Exception){
-                    Log.e(TAG, "disconnect error", e)
-                }
-
+            try{
+                closeAccountResource(account)
+            }catch(e: Exception){
+                Log.e(TAG, "disconnect error", e)
             }
 
             try{
-                // TODO 更新処理をする
+                loadAndInitializeAccounts()
             }catch(e: Exception){
 
             }
@@ -236,11 +228,31 @@ class MiApplication : Application(), MiCore {
         }
     }
 
+
+    private fun closeAccountResource(account: Account){
+        synchronized(mStreamingAccountMap){
+            mStreamingAccountMap.remove(account.accountId)?.disconnect()
+        }
+
+        synchronized(mMainCaptureAccountMap){
+            mStreamingAccountMap.remove(account.accountId)
+        }
+
+        synchronized(mTimelineCaptureAccountMap){
+            mStreamingAccountMap.remove(account.accountId)
+        }
+
+        synchronized(mNoteCaptureAccountMap){
+            mNoteCaptureAccountMap.remove(account.accountId)
+        }
+    }
 
     override fun addAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
                 accountRepository.add(account, true)
+
+                loadAndInitializeAccounts()
             }catch(e: Exception){
 
             }
@@ -248,141 +260,125 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun addPageInCurrentAccount(page: jp.panta.misskeyandroidclient.model.account.page.Page) {
-        TODO("Not yet implemented")
+    override fun addPageInCurrentAccount(page: Page) {
+        applicationScope.launch(Dispatchers.IO){
+            val account = getCurrentAccountErrorSafe()
+                ?: return@launch
+            val pages = account.pages.toArrayList()
+            pages.add(page)
+            try{
+                val updated= accountRepository.add(account.copy(pages = pages), true)
+                mCurrentAccount.postValue(updated)
+            }catch(e: Exception){
+                Log.e(TAG, "アカウント更新処理中にエラー発生", e)
+            }
+            loadAndInitializeAccounts()
+        }
+    }
+
+    override fun removeAllPagesInCurrentAccount(pages: List<Page>) {
+        applicationScope.launch {
+
+            val account = getCurrentAccountErrorSafe()?: return@launch
+            val removed = account.pages.filterNot{ i ->
+                i.pageId == pages.firstOrNull { j ->
+                    i.pageId == i.pageId
+                }?.pageId
+            }
+            try{
+                accountRepository.add(account.copy(pages = removed), true)
+                loadAndInitializeAccounts()
+            }catch(e: AccountNotFoundException){
+
+            }
+        }
+    }
+
+
+
+    override fun removePageInCurrentAccount(page: Page) {
+        applicationScope.launch{
+            try{
+                val current = accountRepository.getCurrentAccount()
+                val removed = current.copy(pages = current.pages.filterNot{
+                    it == page || it.pageId == page.pageId
+                })
+                accountRepository.add(removed, true)
+                loadAndInitializeAccounts()
+            }catch(e: AccountNotFoundException){
+                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
+            }
+        }
+    }
+
+    override fun replaceAllPagesInCurrentAccount(pages: List<Page>) {
+        applicationScope.launch{
+            try{
+                val updated = accountRepository.getCurrentAccount().copy(pages = pages)
+                accountRepository.add(updated, true)
+                loadAndInitializeAccounts()
+            }catch(e: AccountNotFoundException){
+                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
+            }
+        }
+    }
+
+    private suspend fun getCurrentAccountErrorSafe(): Account?{
+        return try{
+            accountRepository.getCurrentAccount()
+        }catch(e: AccountNotFoundException){
+            Log.e(TAG, "アカウントローディング中に失敗しました", e)
+            connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
+            return null
+        }
     }
 
 
 
 
-    override fun replaceAllPagesInCurrentAccount(pages: List<Page>){
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                pages.forEach{
-                    it.accountId = mCurrentAccount.value?.account?.id
+
+    override fun setupObserver(account: Account, observer: Observer) {
+        synchronized(mStreamingAccountMap) {
+            var streaming = mStreamingAccountMap[account.accountId]
+            if (streaming == null) {
+                streaming = StreamingAdapter(account, getEncryption())
+                mStreamingAccountMap[account.accountId] = streaming
+
+            }
+
+            synchronized(streaming.observerMap) {
+                if (streaming.observerMap[observer.id] == null) {
+                    streaming.putObserver(observer)
                 }
-                mCurrentAccount.value?.let {
-                    mPageDao.clearByAccount(it.account.id)
-                    mPageDao.insertAll(pages)
-                    loadAndInitializeAccounts()
-                }
-            }catch(e: Exception){
-                Log.e(TAG, "", e)
             }
         }
     }
 
-    override fun removePageInCurrentAccount(page: Page){
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                page.id?.let {
-                    mPageDao.delete(it)
-                    loadAndInitializeAccounts()
-                }
-            }catch(e: Exception){
-                Log.e(TAG, "", e)
-            }
-        }
-    }
 
-    override fun removeAllPagesInCurrentAccount(pages: List<Page>){
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                mPageDao.deleteAll(pages)
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
-                Log.e(TAG, "", e)
-            }
-        }
-    }
 
-    override fun putConnectionInfo(account: Account, ci: EncryptedConnectionInformation){
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                Log.d(TAG, "putConnectionInfo")
-                val result = mAccountDao.insert(account)
-                Log.d(this.javaClass.simpleName, "add account result:$result")
-                //ci.accountId = account.id
-                mConnectionInformationDao.add(ci)
-                setCurrentUserId(account.id)
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
-                Log.e(TAG, "", e)
-            }
-        }
-    }
-
-    override fun removeConnectSetting(connectionInformation: EncryptedConnectionInformation) {
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                mConnectionInformationDao.delete(connectionInformation)
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
-                Log.e(TAG, "", e)
-            }
-        }
-    }
-
-    override fun removeConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation){
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                mConnectionInformationDao.insert(ci)
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
-                Log.e(TAG, "", e)
-            }
-        }
-    }
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
     }
 
 
-    private suspend fun updateAccountSyncWithRemote(account: Account){
-
-    }
-    private fun loadAndInitializeAccounts(){
+    private suspend fun loadAndInitializeAccounts(){
         try{
+            val current: Account
             val tmpAccounts = try{
-                mAccountDao.findAllSetting()
+                current = accountRepository.getCurrentAccount()
 
-            }catch(e: Exception){
+                accountRepository.findAll()
+            }catch(e: AccountNotFoundException){
                 connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
                 return
             }
 
-            if(checkDirectSignInAccountAndDelete(tmpAccounts)){
-                return loadAndInitializeAccounts()
-            }
 
-            if(checkCIEmptyAccountAndDelete(tmpAccounts)){
-                return loadAndInitializeAccounts()
-            }
+            Log.d(this.javaClass.simpleName, "load account result : $current")
 
-            val current = tmpAccounts.firstOrNull {
-                it.account.id == getCurrentUserId()
-            }?: tmpAccounts.firstOrNull()
 
-            current
-                ?: Log.e(this.javaClass.simpleName, "load account error")
-            Log.d(this.javaClass.simpleName, "load account relation result : $current")
-            ConnectionStatus.ACCOUNT_ERROR
-
-            //isSuccessCurrentAccount.postValue(current?.getCurrentConnectionInformation() != null)
-
-            if(current == null){
-                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
-                return
-            }
-
-            val i = current.getCurrentConnectionInformation()?.getI(getEncryption())
-            if(i == null){
-                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
-                return
-            }
-
-            val meta = loadInstanceMetaAndSetupAPI(current.getCurrentConnectionInformation()!!)
+            val meta = loadInstanceMetaAndSetupAPI(current.instanceDomain)
 
             if(meta == null){
                 connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
@@ -405,72 +401,34 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    private fun saveDefaultPages(account: AccountRelation, meta: Meta?){
-        val isGlobalEnabled = !(meta?.disableGlobalTimeline?: false)
-        val isLocalEnabled = !(meta?.disableLocalTimeline?: false)
-
+    private suspend fun saveDefaultPages(account: Account, meta: Meta?){
         try{
-            val defaultPages = ArrayList<Page>()
-            defaultPages.add(PageableTemplate.homeTimeline(getString(R.string.home_timeline)))
-            if(isLocalEnabled){
-                defaultPages.add(PageableTemplate.hybridTimeline(getString(R.string.hybrid_timeline)))
-            }
-            if(isGlobalEnabled){
-                defaultPages.add(PageableTemplate.globalTimeline(getString(R.string.global_timeline)))
-            }
-            defaultPages.forEachIndexed { index, page ->
-                page.accountId = account.account.id
-                page.pageNumber = index + 1
-            }
-
-            try{
-                mPageDao.insertAll(defaultPages)
-            }catch(e: Exception){
-                Log.e(TAG, "default pages insert error", e)
-            }
-
+            val pages = makeDefaultPages(account, meta)
+            accountRepository.add(account.copy(pages = pages))
         }catch(e: Exception){
             Log.e(TAG, "default pages create error", e)
         }
     }
 
-    /*private fun checkDirectSignInAccountAndDelete(accounts: List<AccountRelation>): Boolean{
-        val directSignInAccounts = accounts.filter{
-            it.connectionInformationList.any { ci ->
-                ci.isDirect
+    private fun makeDefaultPages(account: Account, meta: Meta?): List<Page>{
+        val isGlobalEnabled = !(meta?.disableGlobalTimeline?: false)
+        val isLocalEnabled = !(meta?.disableLocalTimeline?: false)
+
+        val defaultPages = ArrayList<Page>()
+        defaultPages.add(PageableTemplate(account).homeTimeline(getString(R.string.home_timeline)))
+        if(isLocalEnabled){
+            defaultPages.add(PageableTemplate(account).hybridTimeline(getString(R.string.hybrid_timeline)))
+        }
+        if(isGlobalEnabled){
+            defaultPages.add(PageableTemplate(account).globalTimeline(getString(R.string.global_timeline)))
+        }
+        return defaultPages.mapIndexed { index, page ->
+            page.also {
+                page.weight = index
             }
         }
-        if(directSignInAccounts.isNotEmpty()){
-            directSignInAccounts.forEach{
-                it.connectionInformationList.forEach {  eci ->
-                    try{
-                        mConnectionInformationDao.delete(eci)
-                    }catch(e: Exception){
-                        Log.e("MiApplication", "アカウント削除中にエラー発生", e)
-                    }
-                }
-            }
-            return true
-        }
-        return false
     }
 
-    private fun checkCIEmptyAccountAndDelete(accounts: List<AccountRelation>): Boolean{
-        val emptyAccounts = accounts.filter{
-            it.connectionInformationList.isEmpty()
-        }
-        if(emptyAccounts.isNotEmpty()){
-            try{
-                emptyAccounts.forEach{
-                    mAccountDao.delete(it.account)
-                }
-            }catch(e: Exception){
-                Log.e("MiApplication", "空アカウント削除中にエラー発生", e)
-            }
-            return true
-        }
-        return false
-    }*/
 
     override fun getCurrentInstanceMeta(): Meta?{
         return synchronized(mMetaInstanceUrlMap){
@@ -480,12 +438,10 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    private fun setUpMetaMap(accounts: List<AccountRelation>){
+    private fun setUpMetaMap(accounts: List<Account>){
         try{
-            accounts.forEach{ ac ->
-                ac.getCurrentConnectionInformation()?.let{ ci ->
-                    loadInstanceMetaAndSetupAPI(ci)
-                }
+            accounts.forEach { ac ->
+                loadInstanceMetaAndSetupAPI(ac.instanceDomain)
             }
         }catch(e: Exception){
             Log.e(TAG, "meta取得中にエラー発生", e)
@@ -493,17 +449,17 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    private fun loadInstanceMetaAndSetupAPI(connectionInformation: EncryptedConnectionInformation): Meta?{
+    private fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
             val meta = synchronized(mMisskeyAPIUrlMap){
                 try{
-                    mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl]
+                    mMetaInstanceUrlMap[instanceDomain]
                 }catch(e: Exception){
                     Log.d(TAG, "metaマップからの取得に失敗したでち")
                     null
                 }
             } ?: try{
-                MisskeyGetMeta.getMeta(connectionInformation.instanceBaseUrl).execute().body()
+                MisskeyGetMeta.getMeta(instanceDomain).execute().body()
             }catch(e: Exception){
                 Log.d(TAG, "metaをオンラインから取得するのに失敗したでち")
                 connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
@@ -517,13 +473,13 @@ class MiApplication : Application(), MiCore {
             meta?: return null
 
             synchronized(mMetaInstanceUrlMap){
-                mMetaInstanceUrlMap[connectionInformation.instanceBaseUrl] = meta
+                mMetaInstanceUrlMap[instanceDomain] = meta
             }
             synchronized(mMisskeyAPIUrlMap){
-                val versionAndApi = mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl]
+                val versionAndApi = mMisskeyAPIUrlMap[instanceDomain]
                 if(versionAndApi?.first != meta.getVersion()){
-                    val newApi = MisskeyAPIServiceBuilder.build(connectionInformation.instanceBaseUrl, meta.getVersion())
-                    mMisskeyAPIUrlMap[connectionInformation.instanceBaseUrl] = Pair(meta.getVersion(), newApi)
+                    val newApi = MisskeyAPIServiceBuilder.build(instanceDomain, meta.getVersion())
+                    mMisskeyAPIUrlMap[instanceDomain] = Pair(meta.getVersion(), newApi)
                 }
             }
             return meta
@@ -567,68 +523,50 @@ class MiApplication : Application(), MiCore {
         val isMainCaptureCreated: Boolean
 
         val mainCapture = synchronized(mMainCaptureAccountMap){
-            val tmp = mMainCaptureAccountMap[account]
+            val tmp = mMainCaptureAccountMap[account.accountId]
             isMainCaptureCreated = tmp == null
             (tmp?: MainCapture(account, GsonFactory.create())).apply{
-                mMainCaptureAccountMap[account.account] = this
+                mMainCaptureAccountMap[account.accountId] = this
             }
         }
 
         if(isMainCaptureCreated){
             setupObserver(account, mainCapture)
         }
-        validateObserverAccount(mainCapture, account.account)
+        validateObserverAccount(mainCapture, account)
 
 
         return mainCapture
     }
 
-    override fun setupObserver(account: AccountRelation, observer: Observer) {
-        val ci = account.getCurrentConnectionInformation()
-        synchronized(mStreamingAccountMap){
-            var streaming = mStreamingAccountMap[account.account]
-            if(streaming == null){
-                streaming = StreamingAdapter(ci, getEncryption())
-                mStreamingAccountMap[account.account] = streaming
-
-            }
-
-            synchronized(streaming.observerMap){
-                if(streaming.observerMap[observer.id] == null){
-                    streaming.putObserver(observer)
-                }
-            }
-        }
 
 
-    }
-
-    override fun getNoteCapture(account: AccountRelation): NoteCapture {
+    override fun getNoteCapture(account: Account): NoteCapture {
         var noteCapture = synchronized(mNoteCaptureAccountMap){
-            mNoteCaptureAccountMap[account.account]
+            mNoteCaptureAccountMap[account.accountId]
         }
 
         if(noteCapture == null){
-            noteCapture = NoteCapture(account.account)
+            noteCapture = NoteCapture(account)
             setupObserver(account, noteCapture)
-            mNoteCaptureAccountMap[account.account] = noteCapture
+            mNoteCaptureAccountMap[account.accountId] = noteCapture
         }
-        validateObserverAccount(noteCapture, account.account)
+        validateObserverAccount(noteCapture, account)
 
         return noteCapture
 
 
     }
 
-    override fun getStreamingAdapter(account: AccountRelation): StreamingAdapter {
-        val ci = account.getCurrentConnectionInformation()
+
+    private fun getStreamingAdapter(account: Account): StreamingAdapter {
 
         synchronized(mStreamingAccountMap){
-            var streaming = mStreamingAccountMap[account.account]
+            var streaming = mStreamingAccountMap[account.accountId]
             if(streaming == null){
-                streaming = StreamingAdapter(ci, getEncryption())
+                streaming = StreamingAdapter(account, getEncryption())
             }
-            mStreamingAccountMap[account.account] = streaming
+            mStreamingAccountMap[account.accountId] = streaming
             return streaming
         }
     }
@@ -639,11 +577,11 @@ class MiApplication : Application(), MiCore {
          }
 
         if(timelineCapture == null){
-            timelineCapture = TimelineCapture(account.account, getSettingStore())
+            timelineCapture = TimelineCapture(account, getSettingStore())
             setupObserver(account, timelineCapture)
-            mTimelineCaptureAccountMap[account.account] = timelineCapture
+            mTimelineCaptureAccountMap[account.accountId] = timelineCapture
         }
-        validateObserverAccount(timelineCapture, account.account)
+        validateObserverAccount(timelineCapture, account)
         return timelineCapture
     }
 
@@ -666,5 +604,8 @@ class MiApplication : Application(), MiCore {
             }
         }
 
+    private fun<T> List<T>.toArrayList(): ArrayList<T>{
+        return ArrayList(this)
+    }
 
 }

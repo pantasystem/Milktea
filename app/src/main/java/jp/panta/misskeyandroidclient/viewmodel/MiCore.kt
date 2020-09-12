@@ -25,7 +25,6 @@ interface MiCore{
 
     var messageSubscriber: MessageSubscriber
 
-    val urlPreviewStore: UrlPreviewStore?
 
     fun getAccounts(): LiveData<List<Account>>
 

@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.Expose
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore

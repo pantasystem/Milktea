@@ -7,7 +7,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -38,9 +38,9 @@ open class PlaneNoteViewData (
             }
         }
 
-    val isMyNote = account.id == toShowNote.user.id
+    val isMyNote = account.remoteId == toShowNote.user.id
 
-    val isRenotedByMe = (note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()) && note.user.id == account.id
+    val isRenotedByMe = (note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()) && note.user.id == account.remoteId
 
     val statusMessage: String?
         get(){

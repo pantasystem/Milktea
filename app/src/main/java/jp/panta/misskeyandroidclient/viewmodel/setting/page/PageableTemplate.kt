@@ -1,74 +1,65 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.page
 
 import android.content.Context
-import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.PageType
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 
-object PageableTemplate {
+class PageableTemplate(val account: Account) {
     fun globalTimeline(title: String): Page{
-        return Page(null, title, null, globalTimeline = Page.GlobalTimeline())
+        return Page(account.accountId, title, 0, Pageable.GlobalTimeline())
     }
     fun hybridTimeline(title: String) =
-        Page(null, title, null, hybridTimeline = Page.HybridTimeline())
+        Page(account.accountId, title, 0, Pageable.HybridTimeline())
 
     fun localTimeline(title: String) =
-        Page(null, title, null, localTimeline = Page.LocalTimeline())
+        Page(account.accountId, title, 0, Pageable.LocalTimeline())
 
-    fun homeTimeline(title: String) = Page(null, title, null, homeTimeline = Page.HomeTimeline())
-    fun userListTimeline(listId: String): Page.UserListTimeline{
-        return Page.UserListTimeline(listId)
-    }
+    fun homeTimeline(title: String) = Page(account.accountId, title, 0, Pageable.HomeTimeline())
+
+    fun userListTimeline(listId: String) = Pageable.UserListTimeline(listId = listId)
 
     fun userListTimeline(userList: UserList): Page{
-        return Page(null, userList.name, null, userListTimeline = Page.UserListTimeline(userList.id))
+        return Page(account.accountId, userList.name, 0,  Pageable.UserListTimeline(userList.id))
     }
     fun mention(title: String): Page{
-        return Page(null, title, null, mention = Page.Mention(null))
+        return Page(account.accountId, title, 0, Pageable.Mention(null))
     }
 
     fun show(noteId: String, title: String): Page{
-        return Page(null, title, null, show = Page.Show(noteId))
+        return Page(account.accountId, title, 0, Pageable.Show(noteId))
     }
     fun tag(tag: String): Page{
-        return Page(null, tag, null, searchByTag = Page.SearchByTag(tag.replace("#", "")))
+        return Page(account.accountId, tag, 0, Pageable.SearchByTag(tag.replace("#", "")))
     }
     fun search(query: String): Page{
-        return Page(null, query, null, search = Page.Search(query))
+        return Page(account.accountId, query, 0, Pageable.Search(query))
     }
-    fun featured(title: String) = Page(null, title, null, featured = Page.Featured(null))
-    fun notification(title: String) = Page(null, title, null, notification = Page.Notification())
+    fun featured(title: String) = Page(account.accountId, title, 0, Pageable.Featured(null))
+    fun notification(title: String) = Page(account.accountId, title, 0, Pageable.Notification())
     fun user(userId: String, title: String): Page{
-        return Page(null, title, null, userTimeline = Page.UserTimeline(userId))
+        return Page(account.accountId, title, 0, Pageable.UserTimeline(userId))
     }
     fun user(user: User, isUserNameDefault: Boolean): Page{
         val title = if(isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
-        return Page(null, title, null, userTimeline = Page.UserTimeline(userId = user.id))
+        return Page(account.accountId, title, 0, Pageable.UserTimeline(userId = user.id))
     }
     fun favorite(title: String): Page{
-        return Page(null, title, null, favorite = Page.Favorite())
+        return Page(account.accountId, title, 0, Pageable.Favorite)
     }
     fun antenna(antennaId: String, title: String): Page{
-        return Page(null, title, null, antenna = Page.Antenna(antennaId))
+        return Page(account.accountId, title, 0, Pageable.Antenna(antennaId))
     }
     fun antenna(antenna: Antenna): Page{
-        return Page(null, antenna.name, null, antenna = Page.Antenna(antenna.id))
+        return Page(account.accountId, antenna.name, 0, Pageable.Antenna(antenna.id))
     }
 
-    fun makeDefaultPages(pageTypeNameMap: PageTypeNameMap): List<Page>{
-        return listOf(
-            homeTimeline(pageTypeNameMap.get(PageType.HOME)),
-            hybridTimeline(pageTypeNameMap.get(PageType.SOCIAL)),
-            globalTimeline(pageTypeNameMap.get(PageType.GLOBAL))
-        ).apply{
-            forEachIndexed { index, page ->
-                page.pageNumber = index + 1
-            }
-        }
-    }
+
 
 }
 

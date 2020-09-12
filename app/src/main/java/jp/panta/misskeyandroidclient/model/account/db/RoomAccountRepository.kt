@@ -29,12 +29,7 @@ class RoomAccountRepository(
             isNeedDeepUpdate = true
         }
         
-        if(exAccount.emojis != account.emojis){
-            accountDao.insertAll(account.emojis.map{ emoji ->
-                emoji.toAccountEmoji(exAccount.accountId)
-            })
-        }
-        
+
         if(isNeedDeepUpdate){
             pageDAO.clearByAccountId(exAccount.accountId)
             pageDAO.insertAll(account.pages.mapIndexed{ i, page ->
