@@ -35,7 +35,8 @@ data class NoteRequest(
     val poll: Boolean? = null,
     val offset: Int? = null,
     val includeReplies: Boolean? = null,
-    val host: String? = null
+    val host: String? = null,
+    val markAsRead: Boolean? = null
 ): Serializable{
 
     class Builder(

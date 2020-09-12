@@ -108,6 +108,9 @@ class MiApplication : Application(), MiCore {
     override lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
     override lateinit var messageSubscriber: MessageSubscriber
 
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+
     override fun onCreate() {
         super.onCreate()
 
@@ -144,7 +147,7 @@ class MiApplication : Application(), MiCore {
                 this
             )
 
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 //val connectionInstances = connectionInstanceDao!!.findAll()
                 loadAndInitializeAccounts()
@@ -182,7 +185,7 @@ class MiApplication : Application(), MiCore {
 
 
     override fun switchAccount(account: Account) {
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
 
                 setCurrentUserId(account.id)
@@ -194,7 +197,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun logoutAccount(account: Account) {
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 mPageDao.clearByAccount(account.id)
                 mAccountDao.delete(account)
@@ -219,7 +222,7 @@ class MiApplication : Application(), MiCore {
 
 
     override fun addPageInCurrentAccount(page: Page) {
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 val aboutPageNumber = currentAccount.value?.pages?.size?: 0 + 1
                 page.accountId = currentAccount.value?.account?.id
@@ -235,7 +238,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun replaceAllPagesInCurrentAccount(pages: List<Page>){
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 pages.forEach{
                     it.accountId = currentAccount.value?.account?.id
@@ -252,7 +255,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun removePageInCurrentAccount(page: Page){
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 page.id?.let {
                     mPageDao.delete(it)
@@ -265,7 +268,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun removeAllPagesInCurrentAccount(pages: List<Page>){
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 mPageDao.deleteAll(pages)
                 loadAndInitializeAccounts()
@@ -276,7 +279,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun putConnectionInfo(account: Account, ci: EncryptedConnectionInformation){
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 Log.d(TAG, "putConnectionInfo")
                 val result = mAccountDao.insert(account)
@@ -292,7 +295,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun removeConnectSetting(connectionInformation: EncryptedConnectionInformation) {
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 mConnectionInformationDao.delete(connectionInformation)
                 loadAndInitializeAccounts()
@@ -303,7 +306,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun removeConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation){
-        GlobalScope.launch(Dispatchers.IO){
+        applicationScope.launch(Dispatchers.IO){
             try{
                 mConnectionInformationDao.insert(ci)
                 loadAndInitializeAccounts()
