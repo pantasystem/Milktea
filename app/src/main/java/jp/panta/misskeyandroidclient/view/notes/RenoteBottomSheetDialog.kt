@@ -19,13 +19,13 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         val view = View.inflate(context, R.layout.dialog_renote, null)
         dialog.setContentView(view)
         val miApplication = context?.applicationContext as MiApplication
-        val accountRelation = miApplication.mCurrentAccount.value
+        val account = miApplication.getCurrentAccount().value
         //val requestSetting =
 
         val activity = requireActivity()
         val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
 
-        if(accountRelation != null){
+        if(account != null){
 
             val target = notesViewModel.reNoteTarget.event
             if(target?.isRenotedByMe == true){
