@@ -9,7 +9,7 @@ import androidx.room.*
 data class Page(
     val accountId: Long,
     val title: String,
-    val weight: Int,
+    var weight: Int,
     @Embedded val pageParams: PageParams
 ){
 

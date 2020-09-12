@@ -89,7 +89,7 @@ class AccountViewModel(
 
     fun setSwitchTargetConnectionInstance(account: AccountRelation){
         switchTargetConnectionInstanceEvent.event = Unit
-        miCore.switchAccount(account.account)
+        miCore.switchCurrentAccount(account.account)
     }
 
     fun showSwitchDialog(){

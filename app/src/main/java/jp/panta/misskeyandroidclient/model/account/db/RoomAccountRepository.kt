@@ -37,7 +37,11 @@ class RoomAccountRepository(
         
         if(isNeedDeepUpdate){
             pageDAO.clearByAccountId(exAccount.accountId)
-            pageDAO.insertAll(account.pages)
+            pageDAO.insertAll(account.pages.mapIndexed{ i, page ->
+                page.also{
+                    it.weight = i
+                }
+            })
         }
 
         return exAccount
