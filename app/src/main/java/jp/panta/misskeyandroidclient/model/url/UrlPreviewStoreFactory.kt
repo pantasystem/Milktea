@@ -1,8 +1,7 @@
 package jp.panta.misskeyandroidclient.model.url
 
-import android.util.Log
 import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import okhttp3.OkHttpClient
@@ -14,7 +13,7 @@ class UrlPreviewStoreFactory (
     val urlPreviewDAO: UrlPreviewDAO,
     sourceType: Int? = null,
     var summalyUrl: String? = null,
-    var accountRelation: AccountRelation? = null
+    var account: Account? = null
 ){
 
     private var sourceType = sourceType?: UrlPreviewSourceSetting.MISSKEY
@@ -22,12 +21,12 @@ class UrlPreviewStoreFactory (
     fun create(): UrlPreviewStore{
         val url = when(sourceType){
             UrlPreviewSourceSetting.MISSKEY ->{
-                accountRelation?.getCurrentConnectionInformation()?.instanceBaseUrl
+                account?.instanceDomain
                     ?: summalyUrl
             }
             UrlPreviewSourceSetting.SUMMALY ->{
                 summalyUrl
-                    ?: accountRelation?.getCurrentConnectionInformation()?.instanceBaseUrl
+                    ?: account?.instanceDomain
             }
             else -> null
         }

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.core.app.NavUtils
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -19,7 +18,6 @@ import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.users.PinNoteFragment
@@ -77,7 +75,7 @@ class UserDetailActivity : AppCompatActivity() {
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java])
             .initViewModelListener()
 
-        miApplication.currentAccount.observe(this, Observer {ar ->
+        miApplication.mCurrentAccount.observe(this, Observer { ar ->
             mAccountRelation = ar
             val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel

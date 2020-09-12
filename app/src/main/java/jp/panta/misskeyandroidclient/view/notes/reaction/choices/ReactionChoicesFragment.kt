@@ -109,7 +109,7 @@ class ReactionChoicesFragment : Fragment(){
 
     private fun showFrequency(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
-        val ar = miApplication.currentAccount.value?: return
+        val ar = miApplication.mCurrentAccount.value?: return
         val emojis = miApplication.getCurrentInstanceMeta()?.emojis
         if(emojis == null){
             Log.d(TAG, "emojiの取得に失敗しました")
@@ -140,7 +140,7 @@ class ReactionChoicesFragment : Fragment(){
         val miApplication = context?.applicationContext as MiApplication
         GlobalScope.launch(Dispatchers.IO){
             try{
-                val instance = miApplication.currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl!!
+                val instance = miApplication.mCurrentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl!!
                 var reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance)?.map{
                     it.reaction
                 }?: ReactionResourceMap.defaultReaction

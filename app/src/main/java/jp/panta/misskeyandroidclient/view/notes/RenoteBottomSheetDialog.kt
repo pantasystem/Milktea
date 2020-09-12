@@ -19,7 +19,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         val view = View.inflate(context, R.layout.dialog_renote, null)
         dialog.setContentView(view)
         val miApplication = context?.applicationContext as MiApplication
-        val accountRelation = miApplication.currentAccount.value
+        val accountRelation = miApplication.mCurrentAccount.value
         //val requestSetting =
 
         val activity = requireActivity()

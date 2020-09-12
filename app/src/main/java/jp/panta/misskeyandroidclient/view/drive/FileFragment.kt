@@ -18,7 +18,6 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import kotlinx.android.synthetic.main.fragment_file.*
-import java.lang.IllegalArgumentException
 
 class FileFragment : Fragment(R.layout.fragment_file){
 
@@ -61,7 +60,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
         files_view.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {
+        miApplication.mCurrentAccount.observe(viewLifecycleOwner, Observer {
             val activity = activity?: return@Observer
 
             val driveViewModelFactory = DriveViewModelFactory(maxSize)

@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.url
 
 import android.os.Handler
-import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -10,9 +9,7 @@ import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStoreFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.*
 
 class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: SettingStore) : ViewModel(){
 
@@ -51,7 +48,7 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
                 (miCore as MiApplication).urlPreviewDAO,
                 it,
                 url,
-                miCore.currentAccount.value
+                miCore.mCurrentAccount.value
             ).create()
         }
 

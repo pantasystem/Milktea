@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -16,9 +17,9 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
 
 interface MiCore{
-    val accounts: MutableLiveData<List<Account>>
+    //val accounts: MutableLiveData<List<Account>>
 
-    val currentAccount: MutableLiveData<Account>
+    //val currentAccount: MutableLiveData<Account>
 
     var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
@@ -26,9 +27,13 @@ interface MiCore{
 
     val urlPreviewStore: UrlPreviewStore?
 
+    fun getAccounts(): LiveData<List<Account>>
+
+    fun getCurrentAccount(): LiveData<Account>
+
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?
 
-    fun switchCurrentAccount(account: Account)
+    fun setCurrentAccount(account: Account)
 
     fun logoutAccount(account: Account)
 

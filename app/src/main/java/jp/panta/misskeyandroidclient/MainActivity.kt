@@ -28,12 +28,10 @@ import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.api.Version
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.util.getPreferenceName
@@ -43,7 +41,6 @@ import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleEditorFragment
-import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
@@ -112,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        miApplication.currentAccount.observe(this, Observer { ar ->
+        miApplication.mCurrentAccount.observe(this, Observer { ar ->
 
             miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
                 bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
@@ -231,7 +228,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun showNotification(notify: Notification){
-        val account = (application as MiApplication).currentAccount.value?: return
+        val account = (application as MiApplication).mCurrentAccount.value?: return
         val viewData = NotificationViewData(notify, account.account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore()))
         //Log.d("MainActivity")
         val name = notify.user.name?: notify.user.userName
@@ -432,14 +429,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume(){
         super.onResume()
-        (application as? MiApplication?)?.currentAccount?.value?.let{
+        (application as? MiApplication?)?.mCurrentAccount?.value?.let{
             mNotificationService?.stopShowPushNotification(it.account)
         }
     }
 
     override fun onPause() {
         super.onPause()
-        (application as? MiApplication?)?.currentAccount?.value?.let{
+        (application as? MiApplication?)?.mCurrentAccount?.value?.let{
             mNotificationService?.startShowPushNotification(it.account)
         }
     }
@@ -462,7 +459,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
             val binder = p1 as NotificationService.NotificationBinder?
             mNotificationService = binder?.getService()
-            (application as MiApplication?)?.currentAccount?.value?.let{
+            (application as MiApplication?)?.mCurrentAccount?.value?.let{
                 mNotificationService?.stopShowPushNotification(it.account)
             }
         }

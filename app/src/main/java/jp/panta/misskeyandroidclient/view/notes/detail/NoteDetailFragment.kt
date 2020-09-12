@@ -13,9 +13,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.android.synthetic.main.fragment_note_detail.*
-import java.lang.IllegalArgumentException
 
 class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
@@ -49,7 +47,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
 
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
+        miApplication.mCurrentAccount.observe(viewLifecycleOwner, Observer { ar ->
             val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ar, miApplication, show))[NoteDetailViewModel::class.java]
 
             noteDetailViewModel.loadDetail()

@@ -12,12 +12,10 @@ import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
-import java.lang.ref.WeakReference
 import java.util.*
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData.Type.*
 
@@ -64,7 +62,7 @@ class NotificationService : Service() {
 
     private fun startObserve(){
 
-        (applicationContext as MiApplication).accounts.observeForever {accountRelations ->
+        (applicationContext as MiApplication).mAccounts.observeForever { accountRelations ->
             accountRelations?.forEach{ar ->
                 Log.d(TAG, "observerを登録しています")
 

@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.model.streming
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notes.Note

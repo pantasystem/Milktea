@@ -2,9 +2,7 @@ package jp.panta.misskeyandroidclient.view.notification
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -37,7 +35,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
 
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
+        miApplication.mCurrentAccount.observe(viewLifecycleOwner, Observer { ar ->
             val factory = NotificationViewModelFactory(ar, miApplication)
             mViewModel = ViewModelProvider(this, factory).get("$ar",NotificationViewModel::class.java)
 

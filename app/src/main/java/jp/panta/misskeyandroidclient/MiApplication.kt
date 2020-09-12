@@ -4,14 +4,19 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import android.util.SparseArray
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.*
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
-import jp.panta.misskeyandroidclient.model.core.*
+import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
@@ -32,9 +37,6 @@ import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
@@ -49,12 +51,9 @@ class MiApplication : Application(), MiCore {
 
     /*var connectionInstanceDao: ConnectionInstanceDao? = null
         private set*/
-    private lateinit var mAccountDao: AccountDao
 
 
-    private lateinit var mPageDao: PageDao
 
-    private lateinit var mConnectionInformationDao: ConnectionInformationDao
 
     lateinit var reactionHistoryDao: ReactionHistoryDao
 
@@ -66,6 +65,8 @@ class MiApplication : Application(), MiCore {
 
     lateinit var urlPreviewDAO: UrlPreviewDAO
 
+    lateinit var accountRepository: AccountRepository
+
 
     //private var nowInstanceMeta: Meta? = null
 
@@ -73,7 +74,7 @@ class MiApplication : Application(), MiCore {
 
     override val urlPreviewStore: UrlPreviewStore?
         get() {
-            return getUrlPreviewStore(currentAccount.value)
+            return getUrlPreviewStore(mCurrentAccount.value)
         }
     /*var misskeyAPIService: MisskeyAPI? = null
         private set*/
@@ -82,9 +83,8 @@ class MiApplication : Application(), MiCore {
 
     // private var mConnectionInstance: ConnectionInstance? = null
 
-    override val accounts = MutableLiveData<List<AccountRelation>>()
-
-    override val currentAccount = MutableLiveData<AccountRelation>()
+    private val mAccounts = MutableLiveData<List<Account>>()
+    private val mCurrentAccount = MutableLiveData<Account>()
 
 
     //var isSuccessCurrentAccount = MutableLiveData<Boolean>()
@@ -95,10 +95,10 @@ class MiApplication : Application(), MiCore {
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIUrlMap = HashMap<String, Pair<Version?, MisskeyAPI>>()
 
-    private val mStreamingAccountMap = HashMap<Account, StreamingAdapter>()
-    private val mMainCaptureAccountMap = HashMap<Account, MainCapture>()
-    private val mNoteCaptureAccountMap = HashMap<Account, NoteCapture>()
-    private val mTimelineCaptureAccountMap = HashMap<Account, TimelineCapture>()
+    private val mStreamingAccountMap = HashMap<Long, StreamingAdapter>()
+    private val mMainCaptureAccountMap = HashMap<Long, MainCapture>()
+    private val mNoteCaptureAccountMap = HashMap<Long, NoteCapture>()
+    private val mTimelineCaptureAccountMap = HashMap<Long, TimelineCapture>()
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
@@ -124,12 +124,9 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_3_4)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
-        mAccountDao = database.accountDao()
-
-        mPageDao = database.pageDao()
+        accountRepository = RoomAccountRepository(database.accountDAO(), database.pageDAO(), sharedPreferences)
 
 
-        mConnectionInformationDao = database.connectionInformationDao()
 
         reactionHistoryDao = database.reactionHistoryDao()
 
@@ -159,13 +156,21 @@ class MiApplication : Application(), MiCore {
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
     }
 
+    override fun getAccounts(): LiveData<List<Account>> {
+        return mAccounts
+    }
 
-    override fun getUrlPreviewStore(account: AccountRelation?): UrlPreviewStore? {
+    override fun getCurrentAccount(): LiveData<Account> {
+        return mCurrentAccount
+    }
+
+    override fun getUrlPreviewStore(account: Account): UrlPreviewStore? {
         return getUrlPreviewStore(account, false)
     }
 
-    private fun getUrlPreviewStore(account: AccountRelation?, isReplace: Boolean): UrlPreviewStore?{
-        return account?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ accountUrl ->
+
+    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore?{
+        return account.instanceDomain.let{ accountUrl ->
             val url = mSettingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
 
             var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
@@ -174,7 +179,7 @@ class MiApplication : Application(), MiCore {
                     urlPreviewDAO
                     ,mSettingStore.urlPreviewSetting.getSourceType(),
                     mSettingStore.urlPreviewSetting.getSummalyUrl(),
-                    currentAccount.value
+                    mCurrentAccount.value
                 ).create()
             }
             mUrlPreviewStoreInstanceBaseUrlMap[url] = store
@@ -182,9 +187,17 @@ class MiApplication : Application(), MiCore {
         }
     }
 
+    override fun setCurrentAccount(account: Account) {
+        applicationScope.launch(Dispatchers.IO){
+            try{
+                mCurrentAccount.postValue(accountRepository.setCurrentAccount(account))
+            }catch(e: Exception){
+                Log.e(TAG, "switchAccount error", e)
+            }
+        }
+    }
 
-
-    override fun switchAccount(account: Account) {
+    /*override fun switchAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
 
@@ -194,56 +207,61 @@ class MiApplication : Application(), MiCore {
                 Log.d(TAG, "add or change account error", e)
             }
         }
-    }
+    }*/
 
     override fun logoutAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                mPageDao.clearByAccount(account.id)
-                mAccountDao.delete(account)
-                synchronized(mStreamingAccountMap){
-                    try{
-                        val streaming = mStreamingAccountMap[account]
-                        streaming?.disconnect()
-                    }catch(e: Exception){
-                        Log.e(TAG, "disconnect error", e)
-                    }
-
-                }
-                loadAndInitializeAccounts()
+                accountRepository.delete(account)
             }catch(e: Exception){
-                Log.e(TAG, "logout error", e)
+
             }
+
+            synchronized(mStreamingAccountMap){
+                try{
+                    val streaming = mStreamingAccountMap[account]
+                    streaming?.disconnect()
+                }catch(e: Exception){
+                    Log.e(TAG, "disconnect error", e)
+                }
+
+            }
+
+            try{
+                // TODO 更新処理をする
+            }catch(e: Exception){
+
+            }
+
         }
     }
 
 
-
-
-
-    override fun addPageInCurrentAccount(page: Page) {
+    override fun addAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                val aboutPageNumber = currentAccount.value?.pages?.size?: 0 + 1
-                page.accountId = currentAccount.value?.account?.id
-                if(page.pageNumber == null){
-                    page.pageNumber = aboutPageNumber
-                }
-                mPageDao.insert(page)
-                loadAndInitializeAccounts()
+                accountRepository.add(account, true)
             }catch(e: Exception){
-                Log.e(TAG, "", e)
+
             }
         }
     }
+
+
+    override fun addPageInCurrentAccount(page: jp.panta.misskeyandroidclient.model.account.page.Page) {
+        TODO("Not yet implemented")
+    }
+
+
+
 
     override fun replaceAllPagesInCurrentAccount(pages: List<Page>){
         applicationScope.launch(Dispatchers.IO){
             try{
                 pages.forEach{
-                    it.accountId = currentAccount.value?.account?.id
+                    it.accountId = mCurrentAccount.value?.account?.id
                 }
-                currentAccount.value?.let {
+                mCurrentAccount.value?.let {
                     mPageDao.clearByAccount(it.account.id)
                     mPageDao.insertAll(pages)
                     loadAndInitializeAccounts()
@@ -320,6 +338,10 @@ class MiApplication : Application(), MiCore {
         return this.mSettingStore
     }
 
+
+    private suspend fun updateAccountSyncWithRemote(account: Account){
+
+    }
     private fun loadAndInitializeAccounts(){
         try{
             val tmpAccounts = try{
@@ -371,8 +393,8 @@ class MiApplication : Application(), MiCore {
                 return loadAndInitializeAccounts()
             }
 
-            currentAccount.postValue(current)
-            accounts.postValue(tmpAccounts)
+            mCurrentAccount.postValue(current)
+            mAccounts.postValue(tmpAccounts)
             connectionStatus.postValue(ConnectionStatus.SUCCESS)
 
             setUpMetaMap(tmpAccounts)
@@ -412,7 +434,7 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    private fun checkDirectSignInAccountAndDelete(accounts: List<AccountRelation>): Boolean{
+    /*private fun checkDirectSignInAccountAndDelete(accounts: List<AccountRelation>): Boolean{
         val directSignInAccounts = accounts.filter{
             it.connectionInformationList.any { ci ->
                 ci.isDirect
@@ -448,11 +470,11 @@ class MiApplication : Application(), MiCore {
             return true
         }
         return false
-    }
+    }*/
 
     override fun getCurrentInstanceMeta(): Meta?{
         return synchronized(mMetaInstanceUrlMap){
-            currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl?.let{ url ->
+            mCurrentAccount.value?.instanceDomain?.let{ url ->
                 mMetaInstanceUrlMap[url]
             }
         }
@@ -515,18 +537,13 @@ class MiApplication : Application(), MiCore {
 
     }
 
-    override fun getMisskeyAPI(ci: EncryptedConnectionInformation): MisskeyAPI{
+    override fun getMisskeyAPI(account: Account): MisskeyAPI{
         synchronized(mMisskeyAPIUrlMap){
-            val api = mMisskeyAPIUrlMap[ci.instanceBaseUrl]
-                ?: Pair(null, MisskeyAPIServiceBuilder.build(ci.instanceBaseUrl))
-            mMisskeyAPIUrlMap[ci.instanceBaseUrl] = api
+            val api = mMisskeyAPIUrlMap[account.instanceDomain]
+                ?: Pair(null, MisskeyAPIServiceBuilder.build(account.instanceDomain))
+            mMisskeyAPIUrlMap[account.instanceDomain] = api
             return api.second
         }
-    }
-
-    override fun getMisskeyAPI(accountRelation: AccountRelation?): MisskeyAPI?{
-        val ci = accountRelation?.getCurrentConnectionInformation()?: return null
-        return getMisskeyAPI(ci)
     }
 
     override fun getEncryption(): Encryption {
@@ -544,15 +561,15 @@ class MiApplication : Application(), MiCore {
         return sharedPreferences.getString(CURRENT_USER_ID, null)
     }
 
-    override fun getMainCapture(account: AccountRelation): MainCapture{
+    override fun getMainCapture(account: Account): MainCapture{
         Log.d(TAG, "getMainCapture")
 
         val isMainCaptureCreated: Boolean
 
         val mainCapture = synchronized(mMainCaptureAccountMap){
-            val tmp = mMainCaptureAccountMap[account.account]
+            val tmp = mMainCaptureAccountMap[account]
             isMainCaptureCreated = tmp == null
-            (tmp?: MainCapture(account.account, GsonFactory.create())).apply{
+            (tmp?: MainCapture(account, GsonFactory.create())).apply{
                 mMainCaptureAccountMap[account.account] = this
             }
         }
@@ -616,9 +633,9 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun getTimelineCapture(account: AccountRelation): TimelineCapture {
+    override fun getTimelineCapture(account: Account): TimelineCapture {
          var timelineCapture = synchronized(mTimelineCaptureAccountMap){
-             mTimelineCaptureAccountMap[account.account]
+             mTimelineCaptureAccountMap[account.accountId]
          }
 
         if(timelineCapture == null){
@@ -642,7 +659,7 @@ class MiApplication : Application(), MiCore {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when(key){
                 UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
-                    accounts.value?.forEach {
+                    mAccounts.value?.forEach {
                         getUrlPreviewStore(it, true)
                     }
                 }

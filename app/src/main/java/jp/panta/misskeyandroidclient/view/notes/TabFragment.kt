@@ -4,18 +4,13 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager.widget.PagerAdapter
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -24,10 +19,6 @@ import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.ScrollableTop
-import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
-import jp.panta.misskeyandroidclient.view.notification.NotificationFragment
-import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.android.synthetic.main.fragment_tab.*
 
 class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
@@ -56,7 +47,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
-        miApp.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
+        miApp.mCurrentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
             val pages = accountRelation.pages
 
 

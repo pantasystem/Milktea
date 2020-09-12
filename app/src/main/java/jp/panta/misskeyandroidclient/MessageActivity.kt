@@ -40,7 +40,7 @@ class MessageActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as MessagingId?
-        val accountRelation = (applicationContext as MiApplication).currentAccount.value
+        val accountRelation = (applicationContext as MiApplication).mCurrentAccount.value
 
 
         if(messagingId == null){
@@ -87,7 +87,7 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun setTitle(message: Message){
-        val ac = (applicationContext as MiApplication).currentAccount.value ?: return
+        val ac = (applicationContext as MiApplication).mCurrentAccount.value ?: return
         supportActionBar?.title = if(message.isGroup()){
             message.group?.name
         }else{

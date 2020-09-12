@@ -25,7 +25,7 @@ class PostNoteService : IntentService("PostNoteService") {
             return
         }
         val miApplication = applicationContext as MiApplication
-        val ci = miApplication.currentAccount.value?.getCurrentConnectionInformation()
+        val ci = miApplication.mCurrentAccount.value?.getCurrentConnectionInformation()
         if(ci == null){
             Log.e(tag, "ConnectionInstanceの取得に失敗しました")
             return
