@@ -1,11 +1,9 @@
 package jp.panta.misskeyandroidclient.model.account.page.db
 
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
 
+@Dao
 interface PageDAO{
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

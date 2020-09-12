@@ -11,7 +11,7 @@ class AccountRelation{
     @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = Page::class)
     lateinit var pages: List<Page>
 
-    @Relation(parentColumn = "accountId", entityColumn = "emojiId")
+    @Relation(parentColumn = "accountId", entityColumn = "accountId")
     lateinit var emojis: List<AccountEmoji>
 
     @Ignore

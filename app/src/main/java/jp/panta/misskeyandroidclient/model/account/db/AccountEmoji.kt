@@ -22,3 +22,12 @@ data class AccountEmoji(
         )
     }
 }
+
+
+fun Emoji.toAccountEmoji(accountId: Long): AccountEmoji{
+    return AccountEmoji(
+        name = this.name,
+        url = this.url?: this.uri!!,
+        accountId = accountId
+    )
+}

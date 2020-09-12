@@ -20,7 +20,7 @@ enum class PageType(val defaultName: String){
     //USER_PINは別
 }
 
-class PageTypeConverter{
+class TimelinePageTypeConverter{
 
     @TypeConverter
     fun convert(type: PageType): String{

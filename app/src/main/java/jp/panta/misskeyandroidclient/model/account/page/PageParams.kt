@@ -5,7 +5,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.account.page.PageType.*
 
 data class PageParams (
-    val type: PageType,
+    val type: PageType = HOME,
     val withFiles: Boolean? = null,
     //var withFiles: Boolean? = null,
     var excludeNsfw: Boolean? = null,
