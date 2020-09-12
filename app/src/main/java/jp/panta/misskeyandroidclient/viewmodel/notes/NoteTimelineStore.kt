@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
@@ -18,7 +19,7 @@ import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 
 class NoteTimelineStore(
-    override val accountRelation: AccountRelation,
+    override val account: Account,
     //override val timelineRequestBase: NoteRequest.Setting,
     override val pageableTimeline: Page.Timeline,
     val include: NoteRequest.Include,
@@ -31,19 +32,19 @@ class NoteTimelineStore(
     private fun getStore(): ((NoteRequest)-> Call<List<Note>?>)? {
         return try{
             when(pageableTimeline){
-                is Page.GlobalTimeline -> miCore.getMisskeyAPI(accountRelation)!!::globalTimeline
-                is Page.LocalTimeline -> miCore.getMisskeyAPI(accountRelation)!!::localTimeline
-                is Page.HybridTimeline -> miCore.getMisskeyAPI(accountRelation)!!::hybridTimeline
-                is Page.HomeTimeline -> miCore.getMisskeyAPI(accountRelation)!!::homeTimeline
-                is Page.Search -> miCore.getMisskeyAPI(accountRelation)!!::searchNote
+                is Page.GlobalTimeline -> miCore.getMisskeyAPI(account)::globalTimeline
+                is Page.LocalTimeline -> miCore.getMisskeyAPI(account)::localTimeline
+                is Page.HybridTimeline -> miCore.getMisskeyAPI(account)::hybridTimeline
+                is Page.HomeTimeline -> miCore.getMisskeyAPI(account)::homeTimeline
+                is Page.Search -> miCore.getMisskeyAPI(account)::searchNote
                 is Page.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
-                is Page.UserTimeline -> miCore.getMisskeyAPI(accountRelation)!!::userNotes
-                is Page.UserListTimeline -> miCore.getMisskeyAPI(accountRelation)!!::userListTimeline
-                is Page.SearchByTag -> miCore.getMisskeyAPI(accountRelation)!!::searchByTag
-                is Page.Featured -> miCore.getMisskeyAPI(accountRelation)!!::featured
-                is Page.Mention -> miCore.getMisskeyAPI(accountRelation)!!::mentions
+                is Page.UserTimeline -> miCore.getMisskeyAPI(account)::userNotes
+                is Page.UserListTimeline -> miCore.getMisskeyAPI(account)::userListTimeline
+                is Page.SearchByTag -> miCore.getMisskeyAPI(account)::searchByTag
+                is Page.Featured -> miCore.getMisskeyAPI(account)::featured
+                is Page.Mention -> miCore.getMisskeyAPI(account)::mentions
                 is Page.Antenna -> {
-                    val api = miCore.getMisskeyAPI(accountRelation)
+                    val api = miCore.getMisskeyAPI(account)
                     if(api is MisskeyAPIV12){
                         (api as MisskeyAPIV12)::antennasNotes
                     }else{
@@ -61,7 +62,7 @@ class NoteTimelineStore(
 
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){
-            val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
+            val i = account.getI(encryption)!!
             val req = requestBuilder.build(i, null)
             getStore()?.invoke(req)?.execute()
         }else{
@@ -71,7 +72,7 @@ class NoteTimelineStore(
     }
 
     override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
+        val i = account.getI(encryption)!!
 
         val req = requestBuilder.build(i, NoteRequest.Conditions(sinceId = sinceId))
         val res = getStore()?.invoke(req)?.execute()
@@ -80,7 +81,7 @@ class NoteTimelineStore(
     }
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
+        val i = account.getI(encryption)!!
         val req = requestBuilder.build(i, NoteRequest.Conditions(untilId = untilId))
         val res = getStore()?.invoke(req)?.execute()
         return makeResponse(res?.body(), res)
@@ -93,9 +94,9 @@ class NoteTimelineStore(
         return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
             try{
                 if(it.reply == null){
-                    PlaneNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                    PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
                 }else{
-                    HasReplyToNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                    HasReplyToNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
                 }
             }catch(e: Exception){
                 Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)
