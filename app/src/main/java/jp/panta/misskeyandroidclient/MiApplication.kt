@@ -161,6 +161,10 @@ class MiApplication : Application(), MiCore {
         return mCurrentAccount
     }
 
+    override suspend fun getAccount(accountId: Long): Account {
+        return accountRepository.get(accountId)
+    }
+
     override fun getUrlPreviewStore(account: Account): UrlPreviewStore? {
         return getUrlPreviewStore(account, false)
     }
@@ -494,10 +498,14 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMisskeyAPI(account: Account): MisskeyAPI{
+        return getMisskeyAPI(account.instanceDomain)
+    }
+
+    override fun getMisskeyAPI(instanceDomain: String): MisskeyAPI {
         synchronized(mMisskeyAPIUrlMap){
-            val api = mMisskeyAPIUrlMap[account.instanceDomain]
-                ?: Pair(null, MisskeyAPIServiceBuilder.build(account.instanceDomain))
-            mMisskeyAPIUrlMap[account.instanceDomain] = api
+            val api = mMisskeyAPIUrlMap[instanceDomain]
+                ?: Pair(null, MisskeyAPIServiceBuilder.build(instanceDomain))
+            mMisskeyAPIUrlMap[instanceDomain] = api
             return api.second
         }
     }

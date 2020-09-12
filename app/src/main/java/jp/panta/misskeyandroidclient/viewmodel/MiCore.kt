@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
 
 interface MiCore{
@@ -29,6 +30,9 @@ interface MiCore{
     fun getAccounts(): LiveData<List<Account>>
 
     fun getCurrentAccount(): LiveData<Account>
+
+    @Throws(AccountNotFoundException::class)
+    suspend fun getAccount(accountId: Long) : Account
 
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?
 
@@ -47,6 +51,7 @@ interface MiCore{
     fun removeAllPagesInCurrentAccount(pages: List<Page>)
 
 
+    fun getMisskeyAPI(instanceDomain: String): MisskeyAPI
 
 
     fun getMisskeyAPI(account: Account): MisskeyAPI

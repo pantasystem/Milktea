@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
@@ -17,33 +16,35 @@ import retrofit2.Response
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 
 class NoteTimelineStore(
     override val account: Account,
     //override val timelineRequestBase: NoteRequest.Setting,
-    override val pageableTimeline: Page.Timeline,
+    override val pageableTimeline: Page,
     val include: NoteRequest.Include,
     private val miCore: MiCore,
     private val encryption: Encryption
 ) : NotePagedStore{
 
-    private val requestBuilder = NoteRequest.Builder(pageableTimeline, include)
+    private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(encryption), include)
 
     private fun getStore(): ((NoteRequest)-> Call<List<Note>?>)? {
         return try{
-            when(pageableTimeline){
-                is Page.GlobalTimeline -> miCore.getMisskeyAPI(account)::globalTimeline
-                is Page.LocalTimeline -> miCore.getMisskeyAPI(account)::localTimeline
-                is Page.HybridTimeline -> miCore.getMisskeyAPI(account)::hybridTimeline
-                is Page.HomeTimeline -> miCore.getMisskeyAPI(account)::homeTimeline
-                is Page.Search -> miCore.getMisskeyAPI(account)::searchNote
-                is Page.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
-                is Page.UserTimeline -> miCore.getMisskeyAPI(account)::userNotes
-                is Page.UserListTimeline -> miCore.getMisskeyAPI(account)::userListTimeline
-                is Page.SearchByTag -> miCore.getMisskeyAPI(account)::searchByTag
-                is Page.Featured -> miCore.getMisskeyAPI(account)::featured
-                is Page.Mention -> miCore.getMisskeyAPI(account)::mentions
-                is Page.Antenna -> {
+            when(pageableTimeline.pageable()){
+                is Pageable.GlobalTimeline -> miCore.getMisskeyAPI(account)::globalTimeline
+                is Pageable.LocalTimeline -> miCore.getMisskeyAPI(account)::localTimeline
+                is Pageable.HybridTimeline -> miCore.getMisskeyAPI(account)::hybridTimeline
+                is Pageable.HomeTimeline -> miCore.getMisskeyAPI(account)::homeTimeline
+                is Pageable.Search -> miCore.getMisskeyAPI(account)::searchNote
+                is Pageable.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
+                is Pageable.UserTimeline -> miCore.getMisskeyAPI(account)::userNotes
+                is Pageable.UserListTimeline -> miCore.getMisskeyAPI(account)::userListTimeline
+                is Pageable.SearchByTag -> miCore.getMisskeyAPI(account)::searchByTag
+                is Pageable.Featured -> miCore.getMisskeyAPI(account)::featured
+                is Pageable.Mention -> miCore.getMisskeyAPI(account)::mentions
+                is Pageable.Antenna -> {
                     val api = miCore.getMisskeyAPI(account)
                     if(api is MisskeyAPIV12){
                         (api as MisskeyAPIV12)::antennasNotes
@@ -63,7 +64,7 @@ class NoteTimelineStore(
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){
             val i = account.getI(encryption)!!
-            val req = requestBuilder.build(i, null)
+            val req = requestBuilder.build( null)
             getStore()?.invoke(req)?.execute()
         }else{
             getStore()?.invoke(request)?.execute()
@@ -74,7 +75,7 @@ class NoteTimelineStore(
     override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val i = account.getI(encryption)!!
 
-        val req = requestBuilder.build(i, NoteRequest.Conditions(sinceId = sinceId))
+        val req = requestBuilder.build(NoteRequest.Conditions(sinceId = sinceId))
         val res = getStore()?.invoke(req)?.execute()
         val reversedList = res?.body()?.asReversed()
         return makeResponse(reversedList, res)
@@ -82,7 +83,7 @@ class NoteTimelineStore(
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val i = account.getI(encryption)!!
-        val req = requestBuilder.build(i, NoteRequest.Conditions(untilId = untilId))
+        val req = requestBuilder.build(NoteRequest.Conditions(untilId = untilId))
         val res = getStore()?.invoke(req)?.execute()
         return makeResponse(res?.body(), res)
     }

@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.favorite
 
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
@@ -16,7 +14,7 @@ import retrofit2.Response
 
 class FavoriteNotePagingStore(
     override val account: Account,
-    override val pageableTimeline: Page.Timeline,
+    override val pageableTimeline: Page,
     private val miCore: MiCore,
     private val encryption: Encryption
 ) : NotePagedStore{
@@ -25,12 +23,11 @@ class FavoriteNotePagingStore(
 
     //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 
-    private val builder = NoteRequest.Builder(pageableTimeline)
+    private val builder = NoteRequest.Builder(pageableTimeline, account.getI(encryption))
 
     override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         return if(request == null){
-            val i = account.getI(encryption)!!
-            val res =favorites(builder.build(i, NoteRequest.Conditions())).execute()
+            val res =favorites(builder.build(NoteRequest.Conditions())).execute()
             makeResponse(res, false)
         }else{
             makeResponse(favorites(request).execute(), false)
@@ -38,14 +35,12 @@ class FavoriteNotePagingStore(
     }
 
     override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = account.getI(encryption)!!
-        val res = favorites(builder.build(i, NoteRequest.Conditions(sinceId = sinceId))).execute()
+        val res = favorites(builder.build(NoteRequest.Conditions(sinceId = sinceId))).execute()
         return makeResponse(res, true)
     }
 
     override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = account.getI(encryption)!!
-        val res = favorites(builder.build(i, NoteRequest.Conditions(untilId = untilId))).execute()
+        val res = favorites(builder.build(NoteRequest.Conditions(untilId = untilId))).execute()
         return makeResponse(res, false)
     }
 

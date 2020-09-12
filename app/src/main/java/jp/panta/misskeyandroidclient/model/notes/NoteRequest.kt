@@ -4,7 +4,7 @@ import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import java.io.Serializable
@@ -39,7 +39,48 @@ data class NoteRequest(
     val markAsRead: Boolean? = null
 ): Serializable{
 
+
     class Builder(
+        val page: Page,
+        var i: String?,
+        var includes: Include? = null,
+        var limit: Int = 20
+    ){
+
+        fun build(conditions: NoteRequest.Conditions?): NoteRequest{
+            val params = page.pageParams
+            return NoteRequest(
+                i = i,
+                userId = params.userId,
+                withFiles = params.withFiles,
+                excludeNsfw = params.excludeNsfw,
+                limit = limit,
+                sinceId = conditions?.sinceId,
+                untilId = conditions?.untilId,
+                untilDate = conditions?.untilDate,
+                sinceDate = conditions?.sinceDate,
+                query = params.query,
+                tag = params.tag,
+                includeRenotedMyNotes = params.includeRenotedMyRenotes,
+                includeMyRenotes = params.includeMyRenotes,
+                includeReplies = params.includeReplies,
+                includeLocalRenotes = params.includeLocalRenotes,
+                following = params.following,
+                poll = params.poll,
+                offset = params.offset,
+                visibility = params.visibility,
+                host = params.host,
+                antennaId = params.antennaId,
+                markAsRead = params.markAsRead,
+                renote = params.renote,
+                reply = params.reply,
+                listId = params.listId,
+                noteId = params.noteId
+            )
+        }
+
+    }
+    /*class Builder(
         val pageableTimeline: Page.Timeline,
         var include: Include? = null
     ){
@@ -180,7 +221,7 @@ data class NoteRequest(
 
             }
         }
-    }
+    }*/
 
 
 
