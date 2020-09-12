@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
@@ -14,7 +14,7 @@ import java.util.*
 
 class PostNoteTask(
     //connectionInstance: ConnectionInstance,
-    connectionInformation: EncryptedConnectionInformation,
+    //connectionInformation: EncryptedConnectionInformation,
     encryption: Encryption,
     val draftNote: DraftNote?,
     val account: Account
@@ -28,7 +28,7 @@ class PostNoteTask(
         SPECIFIED("specified", false)
     }
 
-    private val i: String = connectionInformation.getI(encryption)!!
+    private val i: String = account.getI(encryption)!!
     private var visibleUserIds: List<String>? = null
     private var visibility: CreateNote.Visibility? = null
     private var isLocal: Boolean? = null
@@ -110,7 +110,7 @@ class PostNoteTask(
         }
 
         return DraftNote(
-            accountId = account.id,
+            accountId = account.remoteId,
             text = text,
             cw = cw,
             visibleUserIds = visibleUserIds,

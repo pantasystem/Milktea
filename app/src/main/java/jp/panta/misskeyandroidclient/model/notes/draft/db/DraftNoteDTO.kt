@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 
+// TODO 新生Accountに対応させる必要がある
 @Entity(tableName = "draft_note", foreignKeys = [
     ForeignKey(
         parentColumns = ["id"],
