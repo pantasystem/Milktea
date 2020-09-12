@@ -26,7 +26,7 @@ data class Account (
     val remoteId: String,
     val instanceDomain: String,
     val userName: String,
-    val name: String?,
+    /*val name: String?,
     val description: String?,
     val followersCount: Int,
     val followingCount: Int,
@@ -34,9 +34,9 @@ data class Account (
     val isBot: Boolean,
     val isCat: Boolean,
     val avatarUrl: String?,
-    val bannerUrl: String?,
+    val bannerUrl: String?,*/
     val encryptedToken: String,
-    @Ignore val emojis: List<Emoji>,
+    //@Ignore val emojis: List<Emoji>,
 
     @Ignore val pages: List<Page>
 
@@ -62,7 +62,7 @@ data class Account (
                 remoteId,
                 instanceDomain,
                 userName,
-                name,
+                /*name,
                 description,
                 followersCount,
                 followingCount,
@@ -70,13 +70,13 @@ data class Account (
                 isBot,
                 isCat,
                 avatarUrl,
-                bannerUrl,
+                bannerUrl,*/
                 encryptedToken,
-                emptyList(),
+                //emptyList(),
                 emptyList()
             )
 
-    fun update(user: User): Account{
+    /*fun update(user: User): Account{
         if(user.id != this.remoteId){
             return this
         }
@@ -92,7 +92,7 @@ data class Account (
             bannerUrl = user.bannerUrl,
             emojis = user.emojis?: emptyList()
         )
-    }
+    }*/
 
     fun getI(encryption: Encryption): String?{
         return try{
@@ -118,7 +118,7 @@ fun User.newAccount(instanceDomain: String, encryptedToken: String): Account{
         remoteId = this.id,
         instanceDomain = instanceDomain,
         userName = this.userName,
-        name = this.name,
+        /*name = this.name,
         description = this.description,
         followersCount = this.followersCount?: 0,
         followingCount = this.followingCount?: 0,
@@ -126,9 +126,9 @@ fun User.newAccount(instanceDomain: String, encryptedToken: String): Account{
         isBot = this.isBot,
         isCat = this.isCat,
         avatarUrl = this.avatarUrl,
-        bannerUrl = this.bannerUrl,
+        bannerUrl = this.bannerUrl,*/
         encryptedToken = encryptedToken,
-        emojis = this.emojis?: emptyList(),
+        //emojis = this.emojis?: emptyList(),
         pages = emptyList()
     )
 }
