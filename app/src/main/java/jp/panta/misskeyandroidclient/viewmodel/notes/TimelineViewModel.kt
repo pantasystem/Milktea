@@ -22,15 +22,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 
-class TimelineViewModel(
-    private val page: Page,
-    include: NoteRequest.Include,
-    private val miCore: MiCore,
-    private val settingStore: SettingStore,
-    encryption: Encryption,
-    val isGuest: Boolean = false
-) : ViewModel(){
-
+class TimelineViewModel : ViewModel{
     data class Request(
         val sinceId: String? = null,
         val untilId: String? = null,
@@ -104,69 +96,129 @@ class TimelineViewModel(
 
     private var isInitialized: Boolean = false
 
+    private val usingAccount = MediatorLiveData<Account>()
 
-    var account: Account? = null
+
+    /**
+     * このViewModelに紐づけられたAccountです。
+     * 特にアカウントが紐づけられていない場合はNullになります。
+     */
+    private var reservedAccount: Account? = null
 
     var misskeyAPI: MisskeyAPI? = null
         private set
 
-    init{
+    val miCore: MiCore
+
+    val settingStore: SettingStore
+
+    val include: NoteRequest.Include
+
+    val pageable: Pageable
+
+    constructor(page: Page, include: NoteRequest.Include, miCore: MiCore)
+            : this(miCore, include, page.pageable()) {
+
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                val account = miCore.getAccount(page.accountId)
-                timelineCapture = if(settingStore.isAutoLoadTimeline){
-                    miCore.getTimelineCapture(account)
-                }else{
-                    null
-                }
-                this@TimelineViewModel.account = account
+                val account = try{
+                    miCore.getAccount(page.accountId)
+                }catch(e: AccountNotFoundException){
+                    miCore.getCurrentAccount().value
+                }?: return@launch
 
-                noteCapture = miCore.getNoteCapture(account)
-                noteCapture?.addNoteDeletedListener(mNoteDeletedListener)
-                notePagingStore = when(page.pageable()){
-                    is Pageable.Favorite -> FavoriteNotePagingStore(account, page, miCore, encryption)
-                    else -> NoteTimelineStore(
-                        account,
-                        page,
-                        include,
-                        miCore,
-                        encryption
-                    )
-                }
-                misskeyAPI = miCore.getMisskeyAPI(account)
+                this@TimelineViewModel.reservedAccount = account
+                applyAccount(account, page.pageable())
+
                 isInitialized = true
             }catch(e: AccountNotFoundException){
+
             }
         }
     }
+    constructor(pageable: Pageable, account: Account?, include: NoteRequest.Include, miCore: MiCore)
+            : this(miCore, include, pageable){
+        usingAccount.postValue(account)
+        this.reservedAccount = account
+    }
 
+    constructor(miCore: MiCore, include: NoteRequest.Include, pageable: Pageable) : super(){
+        this.miCore = miCore
+        this.settingStore = miCore.getSettingStore()
+        this.include = include
+        this.pageable = pageable
+        usingAccount.addSource(miCore.getCurrentAccount()){ current ->
+            if(reservedAccount == null || reservedAccount?.accountId == current.accountId){
+                usingAccount.postValue(current)
+                applyAccount(current, pageable)
+            }
+        }
+
+    }
+
+    /**
+     * アカウントを変数やデータストアやイベントストリームなどに適応し
+     * 状態を初期化します
+     */
+    private fun applyAccount(account: Account, pageable: Pageable){
+        timelineCapture = if(settingStore.isAutoLoadTimeline){
+            miCore.getTimelineCapture(account)
+        }else{
+            null
+        }
+        noteCapture = miCore.getNoteCapture(account)
+        noteCapture?.addNoteDeletedListener(mNoteDeletedListener)
+        notePagingStore = when(pageable){
+            is Pageable.Favorite -> FavoriteNotePagingStore(account, pageable, miCore)
+            else -> NoteTimelineStore(
+                account,
+                pageable,
+                include,
+                miCore
+            )
+        }
+
+        misskeyAPI = miCore.getMisskeyAPI(account)
+        loadInit()
+        //this.account = account
+
+    }
 
     private var isActive: Boolean = false
     //private var mBeforeAccount: Account? = null
     private val timelineLiveData = object : MediatorLiveData<TimelineState>(){
         override fun onActive() {
             super.onActive()
-            isActive = true
 
-            if(!settingStore.isUpdateTimelineInBackground){
-                startNoteCapture()
-            }
-            if(isInitialized && value?.notes.isNullOrEmpty()){
-                loadInit()
-            }
+            active(this.value?.notes)
         }
 
         override fun onInactive() {
             super.onInactive()
-            isActive = false
 
-            if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
-                stopTimelineCapture()
-                stopNoteCapture()
-            }
+            inactive()
         }
     }
 
+    private fun active(notes: List<PlaneNoteViewData>?){
+        isActive = true
+
+        if(!settingStore.isUpdateTimelineInBackground){
+            startNoteCapture()
+        }
+        if(isInitialized && notes.isNullOrEmpty()){
+            loadInit()
+        }
+    }
+
+    private fun inactive(){
+        isActive = false
+
+        if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
+            stopTimelineCapture()
+            stopNoteCapture()
+        }
+    }
 
     private var mObserver: TimelineCapture.TimelineObserver? = null
 
@@ -377,7 +429,7 @@ class TimelineViewModel(
         val targetNote = try{
             misskeyAPI?.showNote(
                 NoteRequest(
-                    i = account?.getI(miCore.getEncryption()),
+                    i = reservedAccount?.getI(miCore.getEncryption()),
                     noteId = targetNoteId
                 )
             )?.execute()
@@ -412,7 +464,7 @@ class TimelineViewModel(
     private fun startTimelineCapture(){
         if(timelineCapture != null){
             //observer?.updateId()
-            val observer = TimelineCapture.TimelineObserver.create(page.pageable(), this.timelineObserver)
+            val observer = TimelineCapture.TimelineObserver.create(pageable, this.timelineObserver)
             if(observer != null && mObserver == null){
                 Log.d(tag, "タイムラインキャプチャーを開始しようとしている")
                 timelineCapture?.addChannelObserver(observer)
@@ -494,7 +546,7 @@ class TimelineViewModel(
     }
 
     private fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
-        val store = account?.let { ac ->
+        val store = reservedAccount?.let { ac ->
             miCore.getUrlPreviewStore(ac)
         }?: return
 

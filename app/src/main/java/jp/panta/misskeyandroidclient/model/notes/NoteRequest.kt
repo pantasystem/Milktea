@@ -5,6 +5,7 @@ import androidx.room.ForeignKey.CASCADE
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import java.io.Serializable
@@ -41,14 +42,14 @@ data class NoteRequest(
 
 
     class Builder(
-        val page: Page,
+        val pageable: Pageable,
         var i: String?,
         var includes: Include? = null,
         var limit: Int = 20
     ){
 
-        fun build(conditions: NoteRequest.Conditions?): NoteRequest{
-            val params = page.pageParams
+        fun build(conditions: Conditions?): NoteRequest{
+            val params = pageable.toParams()
             return NoteRequest(
                 i = i,
                 userId = params.userId,

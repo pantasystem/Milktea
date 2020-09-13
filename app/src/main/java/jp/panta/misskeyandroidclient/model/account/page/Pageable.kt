@@ -1,9 +1,11 @@
 package jp.panta.misskeyandroidclient.model.account.page
 
+import java.io.Serializable
+
 /**
  * Global, Local, Hybrid, Home, UserList, Mention, Show, SearchByTag, Featured, Notification, UserTimeline, Search, Antenna
  */
-sealed class Pageable{
+sealed class Pageable : Serializable{
 
     data class GlobalTimeline(
 

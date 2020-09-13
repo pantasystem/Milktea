@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.favorite
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
@@ -15,16 +16,15 @@ import retrofit2.Response
 @Suppress("BlockingMethodInNonBlockingContext")
 class FavoriteNotePagingStore(
     val account: Account,
-    override val pageableTimeline: Page,
-    private val miCore: MiCore,
-    private val encryption: Encryption
+    override val pageableTimeline: Pageable.Favorite,
+    private val miCore: MiCore
 ) : NotePagedStore{
 
     val favorites = miCore.getMisskeyAPI(account)::favorites
 
     //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 
-    private val builder = NoteRequest.Builder(pageableTimeline, account.getI(encryption))
+    private val builder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()))
 
     override suspend fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         return if(request == null){

@@ -77,7 +77,7 @@ class DriveActivity : AppCompatActivity() {
         }
 
         val miApplication = applicationContext as MiApplication
-        miApplication.mCurrentAccount.observe(this, Observer {
+        miApplication.getCurrentAccount().observe(this, Observer {
             val driveViewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
             mDriveViewModel = driveViewModel
             mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
@@ -205,7 +205,7 @@ class DriveActivity : AppCompatActivity() {
 
     private fun uploadFile(uri: Uri){
         val miCore = application as MiCore
-        miCore.currentAccount.value?.getCurrentConnectionInformation()?.let{ ci ->
+        miCore.getCurrentAccount().value?.let{ ci ->
             val uploader = OkHttpDriveFileUploader(this, ci, GsonFactory.create(), miCore.getEncryption())
             mFileViewModel?.uploadFile(uri.toFile(this), uploader)
         }

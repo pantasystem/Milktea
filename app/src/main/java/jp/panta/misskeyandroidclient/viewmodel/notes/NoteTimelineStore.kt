@@ -22,17 +22,16 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 class NoteTimelineStore(
     val account: Account,
     //override val timelineRequestBase: NoteRequest.Setting,
-    override val pageableTimeline: Page,
+    override val pageableTimeline: Pageable,
     val include: NoteRequest.Include,
-    private val miCore: MiCore,
-    private val encryption: Encryption
+    private val miCore: MiCore
 ) : NotePagedStore{
 
-    private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(encryption), include)
+    private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
 
     private fun getStore(): ((NoteRequest)-> Call<List<Note>?>)? {
         return try{
-            when(pageableTimeline.pageable()){
+            when(pageableTimeline){
                 is Pageable.GlobalTimeline -> miCore.getMisskeyAPI(account)::globalTimeline
                 is Pageable.LocalTimeline -> miCore.getMisskeyAPI(account)::localTimeline
                 is Pageable.HybridTimeline -> miCore.getMisskeyAPI(account)::hybridTimeline
@@ -64,7 +63,6 @@ class NoteTimelineStore(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){
-            val i = account.getI(encryption)!!
             val req = requestBuilder.build( null)
             getStore()?.invoke(req)?.execute()
         }else{
@@ -75,7 +73,6 @@ class NoteTimelineStore(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = account.getI(encryption)!!
 
         val req = requestBuilder.build(NoteRequest.Conditions(sinceId = sinceId))
         val res = getStore()?.invoke(req)?.execute()
@@ -85,7 +82,6 @@ class NoteTimelineStore(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = account.getI(encryption)!!
         val req = requestBuilder.build(NoteRequest.Conditions(untilId = untilId))
         val res = getStore()?.invoke(req)?.execute()
         return makeResponse(res?.body(), res)

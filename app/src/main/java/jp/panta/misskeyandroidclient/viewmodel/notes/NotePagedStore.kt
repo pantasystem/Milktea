@@ -4,10 +4,11 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 
 interface NotePagedStore {
     //val timelineRequestBase: NoteRequest.Setting
-    val pageableTimeline: Page
+    val pageableTimeline: Pageable
 
 
     suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?>
