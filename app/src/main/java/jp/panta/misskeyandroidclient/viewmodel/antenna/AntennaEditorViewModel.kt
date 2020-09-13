@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.list.ListId
@@ -28,15 +29,15 @@ import java.util.regex.Pattern
  * @param antenna 新規作成時はnullになる
  */
 class AntennaEditorViewModel (
-    val accountRelation: AccountRelation,
+    val account: Account,
     val miCore: MiCore,
     antenna: Antenna?
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val ar: AccountRelation, val miCore: MiCore, val antenna: Antenna?) : ViewModelProvider.Factory{
+    class Factory(val ac: Account, val miCore: MiCore, val antenna: Antenna?) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return AntennaEditorViewModel(ar,miCore, antenna) as T
+            return AntennaEditorViewModel(ac, miCore, antenna) as T
         }
     }
 
@@ -81,12 +82,10 @@ class AntennaEditorViewModel (
         }
 
         addSource(this){
-            val ci = accountRelation.getCurrentConnectionInformation()
-                ?: return@addSource
-            val i = ci.getI(miCore.getEncryption())
-                ?: return@addSource
+            val i = account.getI(miCore.getEncryption())?: return@addSource
+            ?: return@addSource
             it.forEach { uvd ->
-                uvd.setApi(i, miCore.getMisskeyAPI(ci))
+                uvd.setApi(i, miCore.getMisskeyAPI(account))
             }
         }
     }
@@ -95,11 +94,10 @@ class AntennaEditorViewModel (
 
     val userListList = MediatorLiveData<List<UserList>>().apply{
         fun loadUserListList(){
-            val ci = accountRelation.getCurrentConnectionInformation()
+
+            val i = account.getI(miCore.getEncryption())
                 ?: return
-            val i = ci.getI(miCore.getEncryption())
-                ?: return
-            miCore.getMisskeyAPI(ci).userList(I(i)).enqueue(object : Callback<List<UserList>>{
+            miCore.getMisskeyAPI(account).userList(I(i)).enqueue(object : Callback<List<UserList>>{
                 override fun onResponse(
                     call: Call<List<UserList>>,
                     response: Response<List<UserList>>
@@ -186,12 +184,11 @@ class AntennaEditorViewModel (
     val antennaAddedStateEvent = EventBus<Boolean>()
     
     fun addRemote(){
-        val ci = accountRelation.getCurrentConnectionInformation()
-            ?: return
-        val i = ci.getI(miCore.getEncryption())
+
+        val i = account.getI(miCore.getEncryption())
             ?: return
         val antenna = this.antenna.value
-        val api = miCore.getMisskeyAPI(ci) as? MisskeyAPIV12
+        val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
             ?: return
         val antennaAPI = if(antenna?.id == null){
             api::createAntenna
@@ -237,10 +234,10 @@ class AntennaEditorViewModel (
     val antennaRemovedEvent = EventBus<Unit>()
 
     fun removeRemote(){
-        val api = miCore.getMisskeyAPI(accountRelation) as? MisskeyAPIV12
+        val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
         api?.deleteAntenna(
             AntennaQuery(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption())!!,
+                i = account.getI(miCore.getEncryption())!!,
                 antennaId = antenna.value?.id,
                 limit = null
             )

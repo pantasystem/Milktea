@@ -2,22 +2,18 @@ package jp.panta.misskeyandroidclient.model.messaging
 
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.model.account.Account
 
 
 class MessageSubscriber(val miCore: MiCore){
 
     private var beforeAccounts: List<Account>? = null
-    private val accountMessagingObserverMap = HashMap<Account, UserMessagingObserver>()
+    private val accountMessagingObserverMap = HashMap<Long, UserMessagingObserver>()
 
     init{
-        miCore.accounts.observeForever {
-            val accounts = it.map{ ar ->
-                ar.account
-            }
+        miCore.getAccounts().observeForever { accounts ->
 
             (beforeAccounts?: emptyList())
                 .filter{ out ->
@@ -26,7 +22,7 @@ class MessageSubscriber(val miCore: MiCore){
                     }
                 }
                 .forEach {  a ->
-                    accountMessagingObserverMap.remove(a)
+                    accountMessagingObserverMap.remove(a.accountId)
                 }
             beforeAccounts = accounts
 
@@ -35,19 +31,19 @@ class MessageSubscriber(val miCore: MiCore){
     }
 
     fun getAllMergedAccountMessages(): Observable<Message>{
-        val observables = (miCore.accounts.value?: emptyList()).map{
+        val observables = (miCore.getAccounts().value?: emptyList()).map{
             getAccountMessageObservable(it)
         }
         return Observable.merge(observables)
     }
 
-    fun getObservable(messagingId: MessagingId, ar: AccountRelation): Observable<Message>{
+    fun getObservable(messagingId: MessagingId, ac: Account): Observable<Message>{
         synchronized(accountMessagingObserverMap){
-            var observer = accountMessagingObserverMap[ar.account]
+            var observer = accountMessagingObserverMap[ac.accountId]
             if(observer == null){
-                val mainCapture = miCore.getMainCapture(ar)
-                observer = UserMessagingObserver(ar.account)
-                accountMessagingObserverMap[ar.account] = observer
+                val mainCapture = miCore.getMainCapture(ac)
+                observer = UserMessagingObserver(ac)
+                accountMessagingObserverMap[ac.accountId] = observer
                 mainCapture.putListener(observer)
             }
             return observer.getObservable(messagingId)
@@ -55,13 +51,13 @@ class MessageSubscriber(val miCore: MiCore){
 
     }
 
-    fun getAccountMessageObservable(ar: AccountRelation): Observable<Message>{
+    fun getAccountMessageObservable(ac: Account): Observable<Message>{
         synchronized(accountMessagingObserverMap){
-            var observer = accountMessagingObserverMap[ar.account]
+            var observer = accountMessagingObserverMap[ac.accountId]
             if(observer == null){
-                val mainCapture = miCore.getMainCapture(ar)
-                observer = UserMessagingObserver(ar.account)
-                accountMessagingObserverMap[ar.account] = observer
+                val mainCapture = miCore.getMainCapture(ac)
+                observer = UserMessagingObserver(ac)
+                accountMessagingObserverMap[ac.accountId] = observer
                 mainCapture.putListener(observer)
             }
             return observer.getObservable()
@@ -69,13 +65,13 @@ class MessageSubscriber(val miCore: MiCore){
 
     }
 
-    fun getUnreadMessageStore(ar: AccountRelation): UnReadMessageStore{
+    fun getUnreadMessageStore(ac: Account): UnReadMessageStore{
         synchronized(accountMessagingObserverMap){
-            var observer = accountMessagingObserverMap[ar.account]
+            var observer = accountMessagingObserverMap[ac.accountId]
             if(observer == null){
-                observer = UserMessagingObserver(ar.account)
-                accountMessagingObserverMap[ar.account] = observer
-                miCore.getMainCapture(ar).putListener(observer)
+                observer = UserMessagingObserver(ac)
+                accountMessagingObserverMap[ac.accountId] = observer
+                miCore.getMainCapture(ac).putListener(observer)
             }
             return observer.unreadMessageStore
         }
@@ -83,7 +79,7 @@ class MessageSubscriber(val miCore: MiCore){
     }
 
     // アカウント１に対して１になる
-    inner class UserMessagingObserver(val account: Account) : MainCapture.AbsListener(){
+    class UserMessagingObserver(val account: Account) : MainCapture.AbsListener(){
 
         private val messageSubject = PublishSubject.create<Message>()
 

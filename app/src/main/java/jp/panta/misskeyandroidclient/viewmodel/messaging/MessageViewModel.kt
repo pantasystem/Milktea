@@ -3,23 +3,20 @@ package jp.panta.misskeyandroidclient.viewmodel.messaging
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.disposables.CompositeDisposable
-import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 import kotlin.collections.ArrayList
 
 class MessageViewModel(
-    private val accountRelation: AccountRelation,
+    private val account: Account,
     private val misskeyAPI: MisskeyAPI,
     messageHistory: Message,
     private val miCore: MiCore,
@@ -36,11 +33,10 @@ class MessageViewModel(
         }
     }
 
-    private val mMessageId = messageHistory.messagingId(accountRelation.account)
-    val connectionInformation = accountRelation.getCurrentConnectionInformation()
+    private val mMessageId = messageHistory.messagingId(account)
 
     val messagesLiveData = MutableLiveData<State>()
-    private val builder = RequestMessage.Builder(accountRelation, messageHistory).apply{
+    private val builder = RequestMessage.Builder(account, messageHistory).apply{
         this.limit = 20
     }
 
@@ -48,21 +44,21 @@ class MessageViewModel(
 
     private val messageObserver = MessageObserver()
 
-    private val unreadMessageStore = miCore.messageSubscriber.getUnreadMessageStore(accountRelation)
+    private val unreadMessageStore = miCore.messageSubscriber.getUnreadMessageStore(account)
     //private val mainCapture = miCore.getMainCapture(accountRelation)
     private val mCompositeDisposable = CompositeDisposable()
     init{
         //mainCapture.putListener(messageObserver)
-        val dis = miCore.messageSubscriber.getObservable(messageHistory.messagingId(accountRelation.account), accountRelation).subscribe { message ->
+        val dis = miCore.messageSubscriber.getObservable(messageHistory.messagingId(account), account).subscribe { message ->
             val messages = messagesLiveData.value?.messages.toArrayList()
 
 
-            if(message.messagingId(accountRelation.account) == mMessageId){
-                val msg = if(message.userId == accountRelation.account.id){
+            if(message.messagingId(account) == mMessageId){
+                val msg = if(message.userId == account.remoteId){
                     //me
-                    SelfMessageViewData(message, accountRelation.account)
+                    SelfMessageViewData(message, account)
                 }else{
-                    RecipientMessageViewData(message, accountRelation.account)
+                    RecipientMessageViewData(message, account)
                 }
                 messages.add(msg)
 
@@ -88,11 +84,11 @@ class MessageViewModel(
                 }
                 unreadMessageStore.readAll(mMessageId)
                 val viewDataList = rawMessages.map{
-                    if(it.user?.id == accountRelation.account.id){
+                    if(it.user?.id == account.remoteId){
                         //me
-                        SelfMessageViewData(it, accountRelation.account)
+                        SelfMessageViewData(it, account)
                     }else{
-                        RecipientMessageViewData(it, accountRelation.account)
+                        RecipientMessageViewData(it, account)
                     }
                 }
                 messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
@@ -126,10 +122,10 @@ class MessageViewModel(
                     return
                 }
                 val viewData = reversedMessages.map{
-                    if(it.userId == accountRelation.account.id){
-                        SelfMessageViewData(it, accountRelation.account)
+                    if(it.userId == account.remoteId){
+                        SelfMessageViewData(it, account)
                     }else{
-                        RecipientMessageViewData(it, accountRelation.account)
+                        RecipientMessageViewData(it, account)
                     }
                 }
 
@@ -167,11 +163,11 @@ class MessageViewModel(
                 }
 
                 val viewData = rawList.map{
-                    if(it.userId == accountRelation.account.id){
+                    if(it.userId == account.remoteId){
                         //me
-                        SelfMessageViewData(it, accountRelation.account)
+                        SelfMessageViewData(it, account)
                     }else{
-                        RecipientMessageViewData(it, accountRelation.account)
+                        RecipientMessageViewData(it, account)
                     }
                 }
 
@@ -192,12 +188,12 @@ class MessageViewModel(
             val messages = messagesLiveData.value?.messages.toArrayList()
 
 
-            if(message.messagingId(accountRelation.account) == mMessageId){
-                val msg = if(message.userId == accountRelation.account.id){
+            if(message.messagingId(account) == mMessageId){
+                val msg = if(message.userId == account.remoteId){
                     //me
-                    SelfMessageViewData(message, accountRelation.account)
+                    SelfMessageViewData(message, account)
                 }else{
-                    RecipientMessageViewData(message, accountRelation.account)
+                    RecipientMessageViewData(message, account)
                 }
                 messages.add(msg)
 

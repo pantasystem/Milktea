@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.model.messaging
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.mfm.Root
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
@@ -31,7 +31,7 @@ data class Message(
     }
 
     fun opponentUser(account: Account) : User?{
-        return if(recipient?.id == account.id){
+        return if(recipient?.id == account.remoteId){
             user
         }else{
             recipient

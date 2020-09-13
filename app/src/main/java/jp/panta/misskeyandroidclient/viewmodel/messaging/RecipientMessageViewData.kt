@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import java.lang.IllegalArgumentException
 

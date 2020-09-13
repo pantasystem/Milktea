@@ -62,15 +62,15 @@ class UserListEditorDialog : AppCompatDialogFragment(){
         }
 
         val miCore = view.context.applicationContext as MiCore
-        val accountRelation = miCore.currentAccount.value!!
+        val account = miCore.getCurrentAccount().value!!
 
-        val viewModel = ViewModelProvider(activity!!, UserListOperateViewModel.Factory(accountRelation, miCore))[UserListOperateViewModel::class.java]
+        val viewModel = ViewModelProvider(requireActivity(), UserListOperateViewModel.Factory(account, miCore))[UserListOperateViewModel::class.java]
         view.okButton.setOnClickListener{
             val name = view.editListName.text.toString()
             when(mode){
                 Mode.CREATE ->{
                     viewModel.create(CreateList(
-                        i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption())!!,
+                        i = account.getI(miCore.getEncryption())!!,
                         name = name
                     ))
                 }

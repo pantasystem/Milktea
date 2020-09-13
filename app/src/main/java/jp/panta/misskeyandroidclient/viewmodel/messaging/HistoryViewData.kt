@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessageStore
 
@@ -14,7 +14,7 @@ class HistoryViewData (account: Account, message: Message, unReadMessageStore: U
     val id = message.id
     val isGroup = message.group != null
     val group = message.group
-    val partner = if(message.recipient?.id == account.id){
+    val partner = if(message.recipient?.id == account.remoteId){
         message.user
     }else{
         message.recipient

@@ -3,12 +3,11 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.draft
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -35,17 +34,17 @@ class DraftNotesViewModel(
             }
         }
     }.apply{
-        addSource(miCore.currentAccount){
+        addSource(miCore.getCurrentAccount()){
             loadDraftNotes()
         }
     }
 
     val isLoading = MutableLiveData<Boolean>()
 
-    fun loadDraftNotes(ar: AccountRelation){
+    fun loadDraftNotes(ac: Account){
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val notes = draftNoteDao.findDraftNotesByAccount(ar.account.id)
+                val notes = draftNoteDao.findDraftNotesByAccount(ac.remoteId)
                 draftNotes.postValue(notes.map{
                     DraftNoteViewData(it)
                 }.asReversed())
@@ -58,7 +57,7 @@ class DraftNotesViewModel(
     }
 
     fun loadDraftNotes(){
-        miCore.currentAccount.value?.let{
+        miCore.getCurrentAccount().value?.let{
             loadDraftNotes(it)
         }
     }

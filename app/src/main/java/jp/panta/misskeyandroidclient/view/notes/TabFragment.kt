@@ -14,8 +14,8 @@ import androidx.viewpager.widget.PagerAdapter
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.ScrollableTop
@@ -47,17 +47,17 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
-        miApp.mCurrentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
-            val pages = accountRelation.pages
+        miApp.getCurrentAccount().observe(viewLifecycleOwner, Observer { account ->
+            val pages = account.pages
 
 
             Log.d("TabFragment", "pages:$pages")
 
 
             mPagerAdapter?.setList(
-                accountRelation.account,
+                account,
                 pages.sortedBy {
-                it.pageNumber
+                it.weight
             })
             //mPagerAdapter?.notifyDataSetChanged()
 
@@ -93,9 +93,9 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
         }
 
         override fun getItem(position: Int): Fragment {
-            Log.d("getItem", "$position, ${requestBaseList[position].pageable()?.javaClass}")
+            Log.d("getItem", "$position, ${requestBaseList[position].pageable().javaClass}")
             val item = requestBaseList[position]
-            val fragment = PageableFragmentFactory.create(account, item.pageable())
+            val fragment = PageableFragmentFactory.create(item)
 
             if(fragment is ScrollableTop){
                 scrollableTopFragments.add(fragment)
@@ -117,29 +117,6 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             }
             return PagerAdapter.POSITION_NONE
         }
-
-        private val diffCallback = object : DiffUtil.Callback(){
-            override fun areContentsTheSame(
-                oldItemPosition: Int,
-                newItemPosition: Int
-            ): Boolean {
-                return oldRequestBaseSetting[oldItemPosition] == requestBaseList[newItemPosition]
-            }
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return oldRequestBaseSetting[oldItemPosition].id == requestBaseList[newItemPosition].id
-            }
-
-            override fun getNewListSize(): Int {
-                return requestBaseList.size
-            }
-
-            override fun getOldListSize(): Int {
-                return oldRequestBaseSetting.size
-            }
-
-        }
-
 
 
         fun setList(account: Account, list: List<Page>){
