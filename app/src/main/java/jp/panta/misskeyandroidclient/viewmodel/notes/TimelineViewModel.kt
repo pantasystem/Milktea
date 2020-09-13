@@ -116,8 +116,8 @@ class TimelineViewModel : ViewModel{
 
     val pageable: Pageable
 
-    constructor(page: Page, include: NoteRequest.Include, miCore: MiCore)
-            : this(miCore, include, page.pageable()) {
+    constructor(page: Page, miCore: MiCore, include: NoteRequest.Include)
+            : this(page.pageable(),miCore, include) {
 
         viewModelScope.launch(Dispatchers.IO) {
             try{
@@ -136,13 +136,13 @@ class TimelineViewModel : ViewModel{
             }
         }
     }
-    constructor(pageable: Pageable, account: Account?, include: NoteRequest.Include, miCore: MiCore)
-            : this(miCore, include, pageable){
+    constructor(pageable: Pageable, miCore: MiCore, account: Account?, include: NoteRequest.Include)
+            : this(pageable, miCore, include){
         usingAccount.postValue(account)
         this.reservedAccount = account
     }
 
-    constructor(miCore: MiCore, include: NoteRequest.Include, pageable: Pageable) : super(){
+    constructor(pageable: Pageable, miCore: MiCore, include: NoteRequest.Include) : super(){
         this.miCore = miCore
         this.settingStore = miCore.getSettingStore()
         this.include = include
