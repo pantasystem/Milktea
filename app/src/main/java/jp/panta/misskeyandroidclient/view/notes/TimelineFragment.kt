@@ -71,6 +71,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     //private var mPageableTimeline: Page.Timeline? = null
     private var mPage: Page? = null
 
+    private var mPageable: Pageable? = null
+
     private var isShowing: Boolean = false
 
     private var mFirstVisibleItemPosition: Int? = null
@@ -93,6 +95,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         //データ受け取り
         mPage = arguments?.getSerializable(EXTRA_PAGE) as Page
 
+        mPageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
 
         val miApplication = context?.applicationContext as MiApplication
 
@@ -102,7 +105,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val notesViewModelFactory = NotesViewModelFactory(miApplication)
         val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
         mNotesViewModel = notesViewModel
-        val factory = TimelineViewModelFactory(mPage!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
+        val factory = TimelineViewModelFactory(mPage, null, mPage?.pageable()?: mPageable!!, miApplication)
         mViewModel = ViewModelProvider(this, factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
 
 
