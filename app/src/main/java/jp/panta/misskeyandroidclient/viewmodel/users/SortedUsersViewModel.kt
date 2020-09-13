@@ -99,7 +99,7 @@ class SortedUsersViewModel(
     val users = object : MediatorLiveData<List<UserViewData>>(){
         override fun onActive() {
             super.onActive()
-            miCore.currentAccount.value?.let{ ar ->
+            miCore.getCurrentAccount().value?.let{ ar ->
                 miCore.getMainCapture(ar).putListener(listener)
             }
 
@@ -108,12 +108,12 @@ class SortedUsersViewModel(
         override fun onInactive() {
             super.onInactive()
 
-            miCore.currentAccount.value?.let{ ar ->
+            miCore.getCurrentAccount().value?.let{ ar ->
                 miCore.getMainCapture(ar).removeListener(listener)
             }
         }
     }.apply{
-        addSource(miCore.currentAccount){
+        addSource(miCore.getCurrentAccount()){
             if(this.value.isNullOrEmpty()){
                 loadUsers()
             }
@@ -124,8 +124,8 @@ class SortedUsersViewModel(
 
     fun loadUsers(){
 
-        val ci = miCore.currentAccount.value?.getCurrentConnectionInformation()
-        val i = ci?.getI(miCore.getEncryption())
+        val account = miCore.getCurrentAccount().value
+        val i = account?.getI(miCore.getEncryption())
 
         if(i == null){
             isRefreshing.value = false
@@ -133,7 +133,7 @@ class SortedUsersViewModel(
         }else{
             isRefreshing.value = true
         }
-        miCore.getMisskeyAPI(ci).getUsers(orderBy.toRequestUser(i)).enqueue(object : Callback<List<User>>{
+        miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).enqueue(object : Callback<List<User>>{
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if(response.code() in 200 until 300){
                     users.postValue(response.body()?.map{

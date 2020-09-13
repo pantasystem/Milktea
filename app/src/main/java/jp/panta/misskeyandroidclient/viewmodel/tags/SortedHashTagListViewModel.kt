@@ -52,20 +52,21 @@ class SortedHashTagListViewModel(
     val isLoading = MutableLiveData<Boolean>()
 
     init{
-        hashTags.addSource(miCore.currentAccount){
+        hashTags.addSource(miCore.getCurrentAccount()){
             load()
         }
     }
     fun load(){
+        val account = miCore.getCurrentAccount().value
+            ?:return
         isLoading.value = true
-        val ci = miCore.currentAccount.value?.getCurrentConnectionInformation()
-        val i = ci?.getI(miCore.getEncryption())
+        val i = account.getI(miCore.getEncryption())
         if(i == null){
             isLoading.value = false
             return
         }
 
-        miCore.getMisskeyAPI(ci).getHashTagList(
+        miCore.getMisskeyAPI(account).getHashTagList(
             RequestHashTagList(
                 i = i,
                 sort = conditions.sort,

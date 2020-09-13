@@ -27,7 +27,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
 
         val miApplication = context?.applicationContext as MiApplication
         //miApplication.connectionInstanceDao?.findAll()
-        val accounts = miApplication.mAccounts.value
+        val accounts = miApplication.getAccounts().value
         if(accounts == null){
             Log.w("AccountSwitchDialog", "アカウント達の取得に失敗しました")
             Toast.makeText(this.context, "アカウントの取得に失敗しました", Toast.LENGTH_LONG).show()
@@ -74,12 +74,12 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
             oldItem: AccountViewData,
             newItem: AccountViewData
         ): Boolean {
-            return oldItem.accountRelation.account.id == newItem.accountRelation.account.id
+            return oldItem.account.accountId == newItem.account.accountId
         }
 
         override fun areItemsTheSame(oldItem: AccountViewData, newItem: AccountViewData): Boolean {
             return oldItem.user == newItem.user
-                    && oldItem.accountRelation.getCurrentConnectionInformation() == newItem.accountRelation.getCurrentConnectionInformation()
+                    && oldItem.account == newItem.account
         }
     }
 }

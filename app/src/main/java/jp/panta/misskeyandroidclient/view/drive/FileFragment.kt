@@ -60,7 +60,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
         files_view.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.mCurrentAccount.observe(viewLifecycleOwner, Observer {
+        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer {
             val activity = activity?: return@Observer
 
             val driveViewModelFactory = DriveViewModelFactory(maxSize)

@@ -3,10 +3,9 @@ package jp.panta.misskeyandroidclient.viewmodel.users.search
 import android.util.Log
 import androidx.lifecycle.*
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.SearchByUserAndHost
 import jp.panta.misskeyandroidclient.model.users.User
@@ -17,7 +16,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.concurrent.TimeUnit
-import javax.security.auth.Subject
 
 /**
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
@@ -62,7 +60,7 @@ class SearchUserViewModel(
         addSource(host){
             search()
         }
-        addSource(miCore.currentAccount){
+        addSource(miCore.getCurrentAccount()){
             setMainCapture(miCore.getMainCapture(it))
         }
     }
@@ -80,7 +78,7 @@ class SearchUserViewModel(
         val host = this.host.value
 
         val request = RequestUser(
-            i = getCi()?.getI(miCore.getEncryption())!!,
+            i = getAccount()?.getI(miCore.getEncryption())!!,
             userName = userName,
             userId = null,
             host = host,
@@ -113,14 +111,14 @@ class SearchUserViewModel(
 
     private fun getSearchByUserAndHost(): SearchByUserAndHost?{
         try{
-            val ci = miCore.currentAccount.value?.getCurrentConnectionInformation()
+            val account = miCore.getCurrentAccount().value
 
-            if(ci?.instanceBaseUrl == null){
+            if(account?.instanceDomain == null){
                 return null
             }
-            if(mNowInstanceBase != ci.instanceBaseUrl){
-                miCore.getMisskeyAPI(ci).let{ api ->
-                    mNowInstanceBase = ci.instanceBaseUrl
+            if(mNowInstanceBase != account.instanceDomain){
+                miCore.getMisskeyAPI(account).let{ api ->
+                    mNowInstanceBase = account.instanceDomain
                     mSearchByUserAndHost = SearchByUserAndHost(api)
                 }
             }
@@ -132,8 +130,8 @@ class SearchUserViewModel(
 
     }
 
-    private fun getCi(): EncryptedConnectionInformation?{
-        return miCore.currentAccount.value?.getCurrentConnectionInformation()
+    private fun getAccount(): Account?{
+        return miCore.getCurrentAccount().value
     }
 
     private fun addRequestSubscriber(){

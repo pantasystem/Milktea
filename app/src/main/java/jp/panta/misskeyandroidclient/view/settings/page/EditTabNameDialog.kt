@@ -28,8 +28,8 @@ class EditTabNameDialog : AppCompatDialogFragment(){
         view.okButton.setOnClickListener {
             val name = view.editTabName.text?.toString()
             if(name?.isNotBlank() == true){
-                page.title = name
-                pageSettingViewModel.updatePage(page)
+                val updated = page.copy(title = name)
+                pageSettingViewModel.updatePage(updated)
             }
             dismiss()
         }

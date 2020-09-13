@@ -5,7 +5,7 @@ import androidx.databinding.ObservableArrayList
 import androidx.databinding.ObservableList
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.CoroutineScope
@@ -112,7 +112,10 @@ class NoteCapture(
                 streamingAdapter?.send(gson.toJson(createCaptureRequest(key)))
             }else{
                 noteEvent.add(planeNoteViewData)
+                true
+
             }
+
         }
 
     }

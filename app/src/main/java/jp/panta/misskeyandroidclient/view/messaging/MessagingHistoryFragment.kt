@@ -30,7 +30,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
         mLinearLayoutManager = layoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.mCurrentAccount.observe(viewLifecycleOwner, Observer { ar ->
+        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { ar ->
 
             val historyViewModel = ViewModelProvider(this, MessageHistoryViewModelFactory(ar, miApplication))["$ar", MessageHistoryViewModel::class.java]
 

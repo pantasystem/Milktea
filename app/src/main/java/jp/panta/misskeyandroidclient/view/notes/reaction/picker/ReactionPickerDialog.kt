@@ -32,7 +32,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         dialog.setContentView(view)
 
         val miApplication = view.context.applicationContext as MiApplication
-        val ar = miApplication.mCurrentAccount.value
+        val ac = miApplication.getCurrentAccount().value
 
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         val adapter =
@@ -50,7 +50,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         GlobalScope.launch(Dispatchers.IO){
             var reactionSettings = miApplication.reactionUserSettingDao.findByInstanceDomain(
-                ar?.getCurrentConnectionInformation()?.instanceBaseUrl!!
+                ac?.instanceDomain!!
             )?.sortedBy {
                 it.weight
             }?.map{

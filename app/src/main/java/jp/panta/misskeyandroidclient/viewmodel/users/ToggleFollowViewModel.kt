@@ -3,13 +3,10 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,10 +22,10 @@ class ToggleFollowViewModel(val miCore: MiCore) : ViewModel(){
 
     fun toggleFollow(user: User?){
         user?: return
-        val ci = miCore.currentAccount.value?.getCurrentConnectionInformation()
-        val i = ci?.getI(miCore.getEncryption())
+        val ac = miCore.getCurrentAccount().value
+        val i = ac?.getI(miCore.getEncryption())
             ?: return
-        val misskeyAPI = miCore.getMisskeyAPI(ci)
+        val misskeyAPI = miCore.getMisskeyAPI(ac)
         val api = if(SafeUnbox.unbox(user.isFollowing)){
             misskeyAPI::unFollowUser
         }else{

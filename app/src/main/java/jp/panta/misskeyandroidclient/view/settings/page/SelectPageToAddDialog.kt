@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.PageType
+import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
@@ -28,7 +28,7 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
         })
 
         val pageTypeList = ArrayList(PageType.values().toList())
-        if(miCore.getMisskeyAPI(miCore.currentAccount.value) !is MisskeyAPIV12){
+        if(miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!) !is MisskeyAPIV12){
             pageTypeList.remove(PageType.ANTENNA)
         }
         val adapter = PageTypeListAdapter(viewModel)

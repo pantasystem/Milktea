@@ -22,8 +22,9 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
         }
     }
 
-    private var mUrlPreviewStore = miCore.urlPreviewStore
-
+    private var mUrlPreviewStore = miCore.getCurrentAccount().value?.let{ it ->
+        miCore.getUrlPreviewStore(it)
+    }
     val urlPreviewSourceType = object : MutableLiveData<Int>(settingStore.urlPreviewSetting.getSourceType()){
         override fun onInactive() {
             super.onInactive()
@@ -48,14 +49,14 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
                 (miCore as MiApplication).urlPreviewDAO,
                 it,
                 url,
-                miCore.mCurrentAccount.value
+                miCore.getCurrentAccount().value
             ).create()
         }
 
     }
 
     val previewTestUrl = MutableLiveData<String?>(
-        miCore.currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl?.replace("https://", "")
+        miCore.getCurrentAccount().value?.instanceDomain?.replace("https://", "")
     )
 
     val urlPreviewData = MediatorLiveData<UrlPreview>().apply{

@@ -57,7 +57,7 @@ class ReactionChoicesFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val notesViewModel = ViewModelProvider(activity!!)[NotesViewModel::class.java]
+        val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
 
         val columns = view.context.resources.getInteger(R.integer.reaction_choices_columns)
 
@@ -109,14 +109,14 @@ class ReactionChoicesFragment : Fragment(){
 
     private fun showFrequency(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
-        val ar = miApplication.mCurrentAccount.value?: return
+        val ac = miApplication.getCurrentAccount().value?: return
         val emojis = miApplication.getCurrentInstanceMeta()?.emojis
         if(emojis == null){
             Log.d(TAG, "emojiの取得に失敗しました")
             return
         }
         GlobalScope.launch(Dispatchers.IO){
-            val list = miApplication.reactionHistoryDao.sumReactions(ar.getCurrentConnectionInformation()?.instanceBaseUrl?: "").map{
+            val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map{
                 it.reaction
             }
 
@@ -140,8 +140,8 @@ class ReactionChoicesFragment : Fragment(){
         val miApplication = context?.applicationContext as MiApplication
         GlobalScope.launch(Dispatchers.IO){
             try{
-                val instance = miApplication.mCurrentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl!!
-                var reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance)?.map{
+                val instance = miApplication.getCurrentAccount().value?.instanceDomain
+                var reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance!!)?.map{
                     it.reaction
                 }?: ReactionResourceMap.defaultReaction
                 if(reactions.isEmpty()){
