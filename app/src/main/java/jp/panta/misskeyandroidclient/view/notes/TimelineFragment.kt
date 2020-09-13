@@ -58,14 +58,15 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     //private var isLoadInited: Boolean = false
     private var isLoadInit: Boolean = false
 
-    private var mPageableTimeline: Page.Timeline? = null
+    //private var mPageableTimeline: Page.Timeline? = null
+    private var mPage: Page? = null
+
     private var isShowing: Boolean = false
 
     private var mFirstVisibleItemPosition: Int? = null
 
     private lateinit var sharedPreference: SharedPreferences
 
-    private var mAccount: Account? = null
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -80,10 +81,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.layoutManager = mLinearLayoutManager
 
         //データ受け取り
+        mPage = arguments?.getSerializable(EXTRA_PAGE) as Page
 
-        mPageableTimeline = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE) as Page.Timeline?
-
-        mAccount = arguments?.getSerializable(EXTRA_ACCOUNT) as? Account?
 
         val miApplication = context?.applicationContext as MiApplication
 
@@ -93,8 +92,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val notesViewModelFactory = NotesViewModelFactory(miApplication)
         val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
         mNotesViewModel = notesViewModel
-        val factory = TimelineViewModelFactory(mAccount, mPageableTimeline!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
-        mViewModel = ViewModelProvider(this, factory).get("$mAccount$mPageableTimeline",TimelineViewModel::class.java)
+        val factory = TimelineViewModelFactory(mPage!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
+        mViewModel = ViewModelProvider(this, factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
 
 
 
