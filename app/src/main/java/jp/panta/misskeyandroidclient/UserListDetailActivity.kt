@@ -10,10 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
@@ -35,7 +35,7 @@ class UserListDetailActivity : AppCompatActivity() {
         private const val SELECT_USER_REQUEST_CODE = 252
     }
 
-    private var mAccountRelation: AccountRelation? = null
+    private var account: Account? = null
     private var mListId: String? = null
     private var mUserListDetailViewModel: UserListDetailViewModel? = null
     private var mUserListOperateViewModelProvider: UserListOperateViewModel? = null
@@ -56,19 +56,19 @@ class UserListDetailActivity : AppCompatActivity() {
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        miCore.currentAccount.observe(this, Observer{ ar ->
+        miCore.getCurrentAccount().observe(this, Observer{ ac ->
 
-            mAccountRelation = ar
-            val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ar, listId!!, miCore))[UserListDetailViewModel::class.java]
+            account = ac
+            val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ac, listId!!, miCore))[UserListDetailViewModel::class.java]
             mUserListDetailViewModel = userListDetailViewModel
 
-            mUserListOperateViewModelProvider = ViewModelProvider(this, UserListOperateViewModel.Factory(ar, miCore))[UserListOperateViewModel::class.java]
+            mUserListOperateViewModelProvider = ViewModelProvider(this, UserListOperateViewModel.Factory(ac, miCore))[UserListOperateViewModel::class.java]
 
             userListDetailViewModel.userList.observe(this, Observer<UserList>{ ul ->
                 supportActionBar?.title = ul.name
                 mUserListName = ul.name
 
-                userListDetailViewPager.adapter = PagerAdapter(ar, ul.id)
+                userListDetailViewPager.adapter = PagerAdapter(ac, ul.id)
                 userListDetailTab.setupWithViewPager(userListDetailViewPager)
             })
             invalidateOptionsMenu()
@@ -80,8 +80,8 @@ class UserListDetailActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_user_list_detail, menu)
         val addToTabItem = menu?.findItem(R.id.action_add_to_tab)
-        val page = mAccountRelation?.pages?.firstOrNull {
-            (it.pageable() as? Page.UserListTimeline)?.listId == mListId && mListId != null
+        val page = account?.pages?.firstOrNull {
+            (it.pageable() as? Pageable.UserListTimeline)?.listId == mListId && mListId != null
         }
         if(page == null){
             addToTabItem?.setIcon(R.drawable.ic_add_to_tab_24px)
@@ -147,9 +147,9 @@ class UserListDetailActivity : AppCompatActivity() {
 
 
     private fun toggleAddToTab(){
-        val page = mAccountRelation?.pages?.firstOrNull {
+        val page = account?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if(pageable is Page.UserListTimeline){
+            if(pageable is Pageable.UserListTimeline){
                 pageable.listId == mListId && mListId != null
             }else{
                 false
@@ -158,7 +158,7 @@ class UserListDetailActivity : AppCompatActivity() {
         val miCore = application as MiCore
         if(page == null){
             miCore.addPageInCurrentAccount(
-                Page(null, mUserListName, null, userListTimeline = Page.UserListTimeline(mListId!!))
+                Page(account?.accountId?: - 1, mUserListName, weight = -1, pageable = Pageable.UserListTimeline(mListId!!))
             )
         }else{
             miCore.removePageInCurrentAccount(page)
@@ -190,7 +190,7 @@ class UserListDetailActivity : AppCompatActivity() {
         finish()
     }
 
-    inner class PagerAdapter(val ar: AccountRelation, val listId: String) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class PagerAdapter(val ac: Account, val listId: String) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))
         override fun getCount(): Int {
             return titles.size
@@ -200,8 +200,7 @@ class UserListDetailActivity : AppCompatActivity() {
             return when(position){
                 0 ->{
                     TimelineFragment.newInstance(
-                        ar.account,
-                        Page.UserListTimeline(listId = listId)
+                        Pageable.UserListTimeline(listId = listId)
                     )
                 }
                 1 ->{

@@ -5,33 +5,26 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
-import jp.panta.misskeyandroidclient.model.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10
 import jp.panta.misskeyandroidclient.model.v10.RequestFollowFollower
 import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
 import java.lang.Exception
 import java.lang.IllegalArgumentException
-import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.reflect.KFunction1
 
 class FollowFollowerViewModel(
-    val accountRelation: AccountRelation,
+    val account: Account,
     val misskeyAPI: MisskeyAPI,
     val user: User?,
     val type: Type,
@@ -40,17 +33,17 @@ class FollowFollowerViewModel(
 ) : ViewModel(), ShowUserDetails{
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val accountRelation: AccountRelation,
+        val account: Account,
         val miApplication: MiApplication,
         val user: User?,
         val type: Type,
         val encryption: Encryption
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            val misskeyAPI = miApplication.getMisskeyAPI(accountRelation)!!
+            val misskeyAPI = miApplication.getMisskeyAPI(account)
             if(modelClass == FollowFollowerViewModel::class.java){
                 return FollowFollowerViewModel(
-                    accountRelation,
+                    account,
                     misskeyAPI,
                     user,
                     type,
@@ -68,12 +61,12 @@ class FollowFollowerViewModel(
 
     val tag = "FollowFollowerViewModel"
 
-    val userId = user?.id?: accountRelation.account.id
+    val userId = user?.id?: account.remoteId
 
 
 
     private val followFollowerUpdateListener = Listener()
-    private val mainCapture = miCore.getMainCapture(accountRelation)
+    private val mainCapture = miCore.getMainCapture(account)
 
     val isInitializing = MutableLiveData<Boolean>(false)
 
@@ -163,7 +156,7 @@ class FollowFollowerViewModel(
         override fun onLoadNext(nextId: String?): Result? {
             val res = store.invoke(
                 RequestFollowFollower(
-                    i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
+                    i = account.getI(miCore.getEncryption()),
                     userId = userId,
                     cursor = nextId
                 )
@@ -192,7 +185,7 @@ class FollowFollowerViewModel(
         override fun onLoadNext(nextId: String?): Result? {
             val res = store.invoke(
                 RequestUser(
-                    i = accountRelation.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
+                    i = account.getI(miCore.getEncryption()),
                     userId = userId,
                     untilId = nextId
                 )

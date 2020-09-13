@@ -9,7 +9,8 @@ import android.view.MenuItem
 import androidx.core.app.TaskStackBuilder
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -112,7 +113,7 @@ class NoteDetailActivity : AppCompatActivity() {
     private fun addToTab(){
         val title = getString(R.string.detail)
         (application as MiApplication).addPageInCurrentAccount(
-            Page(null, title, show = Page.Show(mNoteId!!), pageNumber = null)
+            Page(-1, title, pageable = Pageable.Show(mNoteId!!), weight = 0)
         )
     }
 }

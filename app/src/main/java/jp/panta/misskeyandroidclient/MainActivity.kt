@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        miApplication.mCurrentAccount.observe(this, Observer { ar ->
+        miApplication.getCurrentAccount().observe(this, Observer { ar ->
 
             miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
                 bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
@@ -228,8 +228,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun showNotification(notify: Notification){
-        val account = (application as MiApplication).mCurrentAccount.value?: return
-        val viewData = NotificationViewData(notify, account.account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore()))
+        val account = (application as MiApplication).getCurrentAccount().value?: return
+        val viewData = NotificationViewData(notify, account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore()))
         //Log.d("MainActivity")
         val name = notify.user.name?: notify.user.userName
         val msg = when(viewData.type){
@@ -429,15 +429,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume(){
         super.onResume()
-        (application as? MiApplication?)?.mCurrentAccount?.value?.let{
-            mNotificationService?.stopShowPushNotification(it.account)
+        (application as? MiApplication?)?.getCurrentAccount()?.value?.let{
+            mNotificationService?.stopShowPushNotification(it)
         }
     }
 
     override fun onPause() {
         super.onPause()
-        (application as? MiApplication?)?.mCurrentAccount?.value?.let{
-            mNotificationService?.startShowPushNotification(it.account)
+        (application as? MiApplication?)?.getCurrentAccount()?.value?.let{
+            mNotificationService?.startShowPushNotification(it)
         }
     }
 
@@ -459,8 +459,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
             val binder = p1 as NotificationService.NotificationBinder?
             mNotificationService = binder?.getService()
-            (application as MiApplication?)?.mCurrentAccount?.value?.let{
-                mNotificationService?.stopShowPushNotification(it.account)
+            (application as MiApplication?)?.getCurrentAccount()?.value?.let{
+                mNotificationService?.stopShowPushNotification(it)
             }
         }
 
