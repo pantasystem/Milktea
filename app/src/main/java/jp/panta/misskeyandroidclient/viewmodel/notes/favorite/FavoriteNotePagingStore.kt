@@ -12,8 +12,9 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotePagedStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Response
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class FavoriteNotePagingStore(
-    override val account: Account,
+    val account: Account,
     override val pageableTimeline: Page,
     private val miCore: MiCore,
     private val encryption: Encryption
@@ -25,7 +26,7 @@ class FavoriteNotePagingStore(
 
     private val builder = NoteRequest.Builder(pageableTimeline, account.getI(encryption))
 
-    override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+    override suspend fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         return if(request == null){
             val res =favorites(builder.build(NoteRequest.Conditions())).execute()
             makeResponse(res, false)
@@ -34,12 +35,12 @@ class FavoriteNotePagingStore(
         }
     }
 
-    override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+    override suspend fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = favorites(builder.build(NoteRequest.Conditions(sinceId = sinceId))).execute()
         return makeResponse(res, true)
     }
 
-    override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+    override suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = favorites(builder.build(NoteRequest.Conditions(untilId = untilId))).execute()
         return makeResponse(res, false)
     }

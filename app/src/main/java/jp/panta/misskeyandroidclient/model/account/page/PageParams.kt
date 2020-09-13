@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.account.page
 
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.account.page.PageType.*
+import java.io.Serializable
 
 data class PageParams (
     val type: PageType = HOME,
@@ -40,7 +41,7 @@ data class PageParams (
     var query: String? = null,
     var host: String? = null,
     val antennaId: String? = null
-){
+) : Serializable{
 
     fun toNoteRequest(i: String?) : NoteRequest{
 

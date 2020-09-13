@@ -20,7 +20,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 
 class NoteTimelineStore(
-    override val account: Account,
+    val account: Account,
     //override val timelineRequestBase: NoteRequest.Setting,
     override val pageableTimeline: Page,
     val include: NoteRequest.Include,
@@ -61,7 +61,8 @@ class NoteTimelineStore(
 
     }
 
-    override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){
             val i = account.getI(encryption)!!
             val req = requestBuilder.build( null)
@@ -72,7 +73,8 @@ class NoteTimelineStore(
         return makeResponse(res?.body(), res)
     }
 
-    override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val i = account.getI(encryption)!!
 
         val req = requestBuilder.build(NoteRequest.Conditions(sinceId = sinceId))
@@ -81,12 +83,14 @@ class NoteTimelineStore(
         return makeResponse(reversedList, res)
     }
 
-    override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val i = account.getI(encryption)!!
         val req = requestBuilder.build(NoteRequest.Conditions(untilId = untilId))
         val res = getStore()?.invoke(req)?.execute()
         return makeResponse(res?.body(), res)
     }
+
 
     private fun makeResponse(list: List<Note>?, response: Response<List<Note>?>?): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         if(response?.code() != 200){

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account.page
 
 import androidx.room.*
+import java.io.Serializable
 
 @Entity(
     tableName = "page_table",
@@ -11,7 +12,7 @@ data class Page(
     val title: String,
     var weight: Int,
     @Embedded val pageParams: PageParams
-){
+) : Serializable {
 
     constructor(accountId: Long, title: String, weight: Int, pageable: Pageable)
             : this(accountId, title, weight, pageable.toParams())

@@ -5,19 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import java.lang.IllegalArgumentException
+import jp.panta.misskeyandroidclient.model.account.page.Page
 
 @Suppress("UNCHECKED_CAST")
 class TimelineViewModelFactory(
-    private val account: Account?,
-    private val pageableTimeline: Page.Timeline,
+    private val page: Page,
     private val miApplication: MiApplication,
     private val settingStore: SettingStore
 ) : ViewModelProvider.Factory{
@@ -35,7 +32,7 @@ class TimelineViewModelFactory(
                 includeMyRenotes = includeMyRenotes
             )
 
-            return TimelineViewModel(account, pageableTimeline, include, miApplication, settingStore, miApplication.getEncryption()) as T
+            return TimelineViewModel(page, include, miApplication, settingStore, miApplication.getEncryption()) as T
 
         }
 

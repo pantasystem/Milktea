@@ -22,7 +22,6 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 
-// TODO ゲストとアカウントでの両方の方法を考え実現する
 class TimelineViewModel(
     private val page: Page,
     include: NoteRequest.Include,
@@ -109,6 +108,7 @@ class TimelineViewModel(
     var account: Account? = null
 
     var misskeyAPI: MisskeyAPI? = null
+        private set
 
     init{
         viewModelScope.launch(Dispatchers.IO) {
@@ -133,6 +133,7 @@ class TimelineViewModel(
                         encryption
                     )
                 }
+                misskeyAPI = miCore.getMisskeyAPI(account)
                 isInitialized = true
             }catch(e: AccountNotFoundException){
             }
@@ -162,15 +163,6 @@ class TimelineViewModel(
             if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
                 stopTimelineCapture()
                 stopNoteCapture()
-            }
-        }
-    }.apply{
-        addSource(accountRelation){ nowAr ->
-            if(isActive){
-                startNoteCapture()
-            }
-            if( nowAr != mBeforeAccount || value?.notes.isNullOrEmpty()){
-                loadInit()
             }
         }
     }
@@ -357,7 +349,8 @@ class TimelineViewModel(
         }
     }
 
-    private fun syncLoad(request: Request?, isRetry: Boolean = false): Pair<BodyLessResponse, List<PlaneNoteViewData>?>?{
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun syncLoad(request: Request?, isRetry: Boolean = false): Pair<BodyLessResponse, List<PlaneNoteViewData>?>?{
         if(request == null && isRetry){
             return null
         }
@@ -382,12 +375,12 @@ class TimelineViewModel(
         val targetNoteId = request?.untilId?: request?.sinceId ?: return null
 
         val targetNote = try{
-            miCore.getMisskeyAPI(account).showNote(
+            misskeyAPI?.showNote(
                 NoteRequest(
                     i = account?.getI(miCore.getEncryption()),
                     noteId = targetNoteId
                 )
-            ).execute()
+            )?.execute()
         }catch(e: Throwable){
             null
         }
@@ -419,7 +412,7 @@ class TimelineViewModel(
     private fun startTimelineCapture(){
         if(timelineCapture != null){
             //observer?.updateId()
-            val observer = TimelineCapture.TimelineObserver.create(pageableTimeline, this.timelineObserver)
+            val observer = TimelineCapture.TimelineObserver.create(page.pageable(), this.timelineObserver)
             if(observer != null && mObserver == null){
                 Log.d(tag, "タイムラインキャプチャーを開始しようとしている")
                 timelineCapture?.addChannelObserver(observer)
@@ -501,7 +494,7 @@ class TimelineViewModel(
     }
 
     private fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
-        val store = accountRelation.value?.let { ac ->
+        val store = account?.let { ac ->
             miCore.getUrlPreviewStore(ac)
         }?: return
 
@@ -516,6 +509,7 @@ class TimelineViewModel(
 
         }
     }
+
 
 
 

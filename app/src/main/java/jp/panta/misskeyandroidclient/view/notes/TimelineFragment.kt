@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.setMenuTint
@@ -29,23 +28,23 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 import java.lang.Exception
 import java.util.*
+import jp.panta.misskeyandroidclient.model.account.page.Page
 
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
 
     companion object{
         private const val EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.pageable_timeline"
 
+        private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
+
         private const val EXTRA_FIRST_VISIBLE_NOTE_DATE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.EXTRA_FIRST_VISIBLE_NOTE_DATE"
         private const val EXTRA_ACCOUNT = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.ACCOUNT"
 
-        fun newInstance(account: Account?, pageableTimeline: Page.Timeline): TimelineFragment{
-            return TimelineFragment().apply{
-                arguments = Bundle().apply{
-                    this.putSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE, pageableTimeline)
-                    account?.let{
-                        this.putSerializable(EXTRA_ACCOUNT, account)
 
-                    }
+        fun newInstance(page: Page): TimelineFragment{
+            return TimelineFragment().apply {
+                arguments = Bundle().apply{
+                    putSerializable(EXTRA_PAGE, page)
                 }
             }
         }
