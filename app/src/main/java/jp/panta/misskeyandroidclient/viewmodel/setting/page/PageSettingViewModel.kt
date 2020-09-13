@@ -2,13 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.setting.page
 
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.PageType
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
@@ -36,7 +34,7 @@ class PageSettingViewModel(
 
     val selectedPages = MediatorLiveData<List<Page>>()
 
-    var accountRelation = miCore.currentAccount.value
+    var account = miCore.getCurrentAccount().value
 
 
     val pageAddedEvent = EventBus<PageType>()
@@ -46,10 +44,10 @@ class PageSettingViewModel(
     val pageOnUpdateEvent = EventBus<Page>()
 
     init{
-        selectedPages.addSource(miCore.currentAccount){
-            accountRelation = it
+        selectedPages.addSource(miCore.getCurrentAccount()){
+            account = it
             selectedPages.value = it.pages.sortedBy { p ->
-                p.pageNumber
+                p.weight
             }
         }
 
@@ -58,14 +56,14 @@ class PageSettingViewModel(
     fun setList(pages: List<Page>){
         selectedPages.value = pages.mapIndexed { index, page ->
             page.apply{
-                pageNumber = index + 1
+                weight = index + 1
             }
         }
     }
     fun save(){
         val list = selectedPages.value?: emptyList()
         list.forEachIndexed { index, page ->
-            page.pageNumber = index + 1
+            page.weight = index + 1
         }
         Log.d("PageSettingVM", "pages:$list")
         miCore.replaceAllPagesInCurrentAccount(list)
@@ -77,11 +75,11 @@ class PageSettingViewModel(
         } ?: return
 
         var pageIndex = pages.indexOfFirst {
-            it.id == page.id && it.id != null
+            it.pageId == page.pageId && it.pageId > 0
         }
         if(pageIndex < 0){
             pageIndex = pages.indexOfFirst{
-                it.pageNumber == page.pageNumber && page.pageNumber != null
+                it.weight == page.weight && page.weight > 0
             }
         }
         if(pageIndex >= 0 && pageIndex < pages.size){
@@ -93,15 +91,15 @@ class PageSettingViewModel(
     }
     fun addPage(page: Page){
         val list = ArrayList<Page>(selectedPages.value?: emptyList())
-        page.pageNumber = list.size
+        page.weight = list.size
         list.add(page)
         setList(list)
     }
 
     fun addUserPageById(userId: String){
-        miCore.getMisskeyAPI(accountRelation)?.showUser(
-            RequestUser(userId = userId, i = accountRelation?.getCurrentConnectionInformation()?.getI(encryption))
-        )?.enqueue(object : Callback<User>{
+        miCore.getMisskeyAPI(account!!).showUser(
+            RequestUser(userId = userId, i = account?.getI(encryption))
+        ).enqueue(object : Callback<User>{
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 val user = response.body()
                 if(user != null){
@@ -116,9 +114,9 @@ class PageSettingViewModel(
     }
     fun addUserPage(user: User){
         val page = if(settingStore.isUserNameDefault){
-            PageableTemplate.user(user.id, title = user.getShortDisplayName())
+            PageableTemplate(account!!).user(user.id, title = user.getShortDisplayName())
         }else{
-            PageableTemplate.user(user.id, title = user.getDisplayName())
+            PageableTemplate(account!!).user(user.id, title = user.getDisplayName())
         }
         addPage(page)
     }
@@ -130,15 +128,15 @@ class PageSettingViewModel(
     }
 
     fun asyncAddUser(userId: String){
-        miCore.getMisskeyAPI(accountRelation)?.showUser(
+        miCore.getMisskeyAPI(account!!)?.showUser(
             RequestUser(
-                i = accountRelation?.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account?.getI(encryption)!!,
                 userId = userId
             )
-        )?.enqueue(object : Callback<User>{
+        ).enqueue(object : Callback<User>{
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if(response.code() in 200.until(300)){
-                    addPage(PageableTemplate.user(response.body()!!, settingStore.isUserNameDefault))
+                    addPage(PageableTemplate(account!!).user(response.body()!!, settingStore.isUserNameDefault))
                 }
             }
 
@@ -153,28 +151,28 @@ class PageSettingViewModel(
         val name = pageTypeNameMap.get(type)
         when(type){
             PageType.GLOBAL->{
-                addPage(PageableTemplate.globalTimeline(name))
+                addPage(PageableTemplate(account!!).globalTimeline(name))
             }
             PageType.SOCIAL->{
-                addPage(PageableTemplate.hybridTimeline(name))
+                addPage(PageableTemplate(account!!).hybridTimeline(name))
             }
             PageType.LOCAL -> {
-                addPage(PageableTemplate.localTimeline(name))
+                addPage(PageableTemplate(account!!).localTimeline(name))
             }
             PageType.HOME ->{
-                addPage(PageableTemplate.homeTimeline(name))
+                addPage(PageableTemplate(account!!).homeTimeline(name))
             }
             PageType.NOTIFICATION ->{
-                addPage(PageableTemplate.notification(name))
+                addPage(PageableTemplate(account!!).notification(name))
             }
             PageType.FAVORITE ->{
-                addPage(PageableTemplate.favorite(name))
+                addPage(PageableTemplate(account!!).favorite(name))
             }
             PageType.FEATURED ->{
-                addPage(PageableTemplate.featured(name))
+                addPage(PageableTemplate(account!!).featured(name))
             }
             PageType.MENTION ->{
-                addPage(PageableTemplate.mention(name))
+                addPage(PageableTemplate(account!!).mention(name))
             }
             else -> {
 
@@ -188,6 +186,6 @@ class PageSettingViewModel(
     }
 
     private fun writeTheNumberOfPages(index: Int, page: Page){
-        page.pageNumber = index + 1
+        page.weight = index + 1
     }
 }

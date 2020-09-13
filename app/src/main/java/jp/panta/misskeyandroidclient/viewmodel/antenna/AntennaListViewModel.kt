@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.viewmodel.antenna
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
@@ -39,10 +41,10 @@ class AntennaListViewModel (
 
     val isLoading = MutableLiveData<Boolean>(false)
 
-    val pagedAntennaIds = Transformations.map(miCore.currentAccount){
+    val pagedAntennaIds = Transformations.map(miCore.getCurrentAccount()){
         it.pages.mapNotNull { page ->
             val pageable = page.pageable()
-            if (pageable is Page.Antenna) {
+            if (pageable is Pageable.Antenna) {
                 pageable.antennaId
             } else {
                 null
@@ -50,11 +52,11 @@ class AntennaListViewModel (
         }.toSet()
     }
 
-    var account: AccountRelation? = null
+    var account: Account? = null
 
     init{
-        antennas.addSource(miCore.currentAccount){
-            if(account?.account != it?.account){
+        antennas.addSource(miCore.getCurrentAccount()){
+            if(account?.accountId != it?.accountId){
                 loadInit()
                 account = it
             }
@@ -65,7 +67,7 @@ class AntennaListViewModel (
 
     fun loadInit(){
         isLoading.value = true
-        val i = miCore.currentAccount.value?.getCurrentConnectionInformation()?.getI(miCore.getEncryption())
+        val i = miCore.getCurrentAccount().value?.getI(miCore.getEncryption())
             ?: return
         getMisskeyAPI()?.getAntennas(
             AntennaQuery(
@@ -89,10 +91,11 @@ class AntennaListViewModel (
     fun toggleTab(antenna: Antenna?){
         antenna?: return
         val paged = account?.pages?.firstOrNull {
-            it.antenna?.antennaId == antenna.id
+
+            it.pageParams.antennaId == antenna.id
         }
         if(paged == null){
-            miCore.addPageInCurrentAccount(PageableTemplate.antenna(antenna))
+            miCore.addPageInCurrentAccount(PageableTemplate(account!!).antenna(antenna))
         }else{
             miCore.removePageInCurrentAccount(paged)
         }
@@ -113,7 +116,7 @@ class AntennaListViewModel (
     }
 
     fun deleteAntenna(antenna: Antenna){
-        account?.getCurrentConnectionInformation()?.getI(miCore.getEncryption())?.let{ i ->
+        account?.getI(miCore.getEncryption())?.let{ i ->
             getMisskeyAPI()?.deleteAntenna(AntennaQuery(
                 i = i,
                 antennaId = antenna.id,
@@ -134,6 +137,6 @@ class AntennaListViewModel (
     }
 
     private fun getMisskeyAPI(): MisskeyAPIV12?{
-        return miCore.getMisskeyAPI(miCore.currentAccount.value) as? MisskeyAPIV12
+        return miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!) as? MisskeyAPIV12
     }
 }

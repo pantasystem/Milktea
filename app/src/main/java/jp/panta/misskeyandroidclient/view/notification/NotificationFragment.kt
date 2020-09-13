@@ -35,7 +35,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
 
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
-        miApplication.mCurrentAccount.observe(viewLifecycleOwner, Observer { ar ->
+        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { ar ->
             val factory = NotificationViewModelFactory(ar, miApplication)
             mViewModel = ViewModelProvider(this, factory).get("$ar",NotificationViewModel::class.java)
 

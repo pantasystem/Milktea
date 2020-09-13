@@ -52,7 +52,7 @@ class ReactionSettingActivity : AppCompatActivity() {
         val touchHelper = ItemTouchHelper(ItemTouchCallback())
         touchHelper.attachToRecyclerView(binding.reactionSettingListView)
         binding.reactionSettingListView.addItemDecoration(touchHelper)
-        miApplication.mCurrentAccount.observe(this, Observer {
+        miApplication.getCurrentAccount().observe(this, Observer {
             mEmojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
             mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
             binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel!!

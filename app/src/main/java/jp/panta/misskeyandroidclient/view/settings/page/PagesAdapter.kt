@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemPageSettingBinding
-import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 
 class PagesAdapter(val pageSettingViewModel: PageSettingViewModel) : ListAdapter<Page, PagesAdapter.VH>(ItemDiffUtil()){
@@ -17,7 +17,7 @@ class PagesAdapter(val pageSettingViewModel: PageSettingViewModel) : ListAdapter
         override fun areContentsTheSame(oldItem: Page, newItem: Page): Boolean {
             return oldItem.title == newItem.title
                     && oldItem.accountId == newItem.accountId
-                    && oldItem.id == newItem.id
+                    && oldItem.pageId == newItem.pageId
         }
 
         override fun areItemsTheSame(oldItem: Page, newItem: Page): Boolean {

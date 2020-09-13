@@ -18,8 +18,7 @@ import jp.panta.misskeyandroidclient.util.Hash
     indices = [
         Index("remoteId"),
         Index("instanceDomain"),
-        Index("userName"),
-        Index("name")
+        Index("userName")
     ]
 )
 data class Account (

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "49f27cf852d8eedb85bc3a8c14d59177",
+    "identityHash": "f529d2546bc0b353bf97c8a961cd79e4",
     "entities": [
       {
         "tableName": "connection_information",
@@ -869,7 +869,7 @@
       },
       {
         "tableName": "account_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `remoteId` TEXT NOT NULL, `instanceDomain` TEXT NOT NULL, `userName` TEXT NOT NULL, `name` TEXT, `description` TEXT, `followersCount` INTEGER NOT NULL, `followingCount` INTEGER NOT NULL, `notesCount` INTEGER NOT NULL, `isBot` INTEGER NOT NULL, `isCat` INTEGER NOT NULL, `avatarUrl` TEXT, `bannerUrl` TEXT, `encryptedToken` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `remoteId` TEXT NOT NULL, `instanceDomain` TEXT NOT NULL, `userName` TEXT NOT NULL, `encryptedToken` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "accountId",
@@ -894,60 +894,6 @@
             "columnName": "userName",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "followersCount",
-            "columnName": "followersCount",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "followingCount",
-            "columnName": "followingCount",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "notesCount",
-            "columnName": "notesCount",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isBot",
-            "columnName": "isBot",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isCat",
-            "columnName": "isCat",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "avatarUrl",
-            "columnName": "avatarUrl",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "bannerUrl",
-            "columnName": "bannerUrl",
-            "affinity": "TEXT",
-            "notNull": false
           },
           {
             "fieldPath": "encryptedToken",
@@ -986,14 +932,6 @@
               "userName"
             ],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_account_table_userName` ON `${TABLE_NAME}` (`userName`)"
-          },
-          {
-            "name": "index_account_table_name",
-            "unique": false,
-            "columnNames": [
-              "name"
-            ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_account_table_name` ON `${TABLE_NAME}` (`name`)"
           }
         ],
         "foreignKeys": []
@@ -1216,7 +1154,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '49f27cf852d8eedb85bc3a8c14d59177')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f529d2546bc0b353bf97c8a961cd79e4')"
     ]
   }
 }

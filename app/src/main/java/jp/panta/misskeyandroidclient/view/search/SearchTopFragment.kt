@@ -11,6 +11,7 @@ import androidx.viewpager.widget.PagerAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.view.explore.ExploreFragment
@@ -64,7 +65,7 @@ class SearchTopFragment : Fragment(){
 
         override fun getItem(position: Int): Fragment {
             return when(position){
-                0 -> TimelineFragment.newInstance(null, Page.Featured(null))
+                0 -> TimelineFragment.newInstance(Pageable.Featured(null))
                 1 -> ExploreFragment()
                 else -> throw IllegalArgumentException("range 0..1, list:$tabList")
             }

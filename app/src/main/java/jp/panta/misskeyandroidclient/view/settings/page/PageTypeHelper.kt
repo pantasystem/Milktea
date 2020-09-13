@@ -4,8 +4,8 @@ import android.content.Context
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.PageType.*
-import jp.panta.misskeyandroidclient.model.PageType
+import jp.panta.misskeyandroidclient.model.account.page.PageType.*
+import jp.panta.misskeyandroidclient.model.account.page.PageType
 
 
 object PageTypeHelper{
