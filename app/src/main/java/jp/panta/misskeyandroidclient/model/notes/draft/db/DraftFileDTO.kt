@@ -4,7 +4,7 @@ import androidx.room.*
 import jp.panta.misskeyandroidclient.model.file.File
 
 @Entity(
-    tableName = "draft_file",
+    tableName = "draft_file_table",
     foreignKeys = [
         ForeignKey(
             childColumns = ["draft_note_id"],

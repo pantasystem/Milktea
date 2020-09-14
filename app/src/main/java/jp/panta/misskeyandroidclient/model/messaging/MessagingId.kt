@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import java.io.Serializable
 
 class MessagingId(val message: Message, val account: Account) : Serializable{
@@ -20,7 +20,7 @@ class MessagingId(val message: Message, val account: Account) : Serializable{
 
         if (isGroup != other.isGroup) return false
         if (msgId != other.msgId) return false
-        if(account.id != other.account.id) return false
+        if(account.accountId != other.account.accountId) return false
 
         return true
     }
@@ -33,7 +33,7 @@ class MessagingId(val message: Message, val account: Account) : Serializable{
     }
 
     override fun toString(): String {
-        return "MessagingId(msgId=$msgId, account=${account.id})"
+        return "MessagingId(msgId=$msgId, account=${account.accountId})"
     }
 
 

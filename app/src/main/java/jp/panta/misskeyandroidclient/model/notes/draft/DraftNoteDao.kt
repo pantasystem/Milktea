@@ -50,19 +50,19 @@ abstract class DraftNoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertUserIds(userIds: List<UserIdDTO>)
 
-    fun findDraftNotesByAccount(accountId: String): List<DraftNote>{
+    fun findDraftNotesByAccount(accountId: Long): List<DraftNote>{
         return findDraftNotesRelation(accountId).map{
             it.toDraftNote()
         }
     }
 
-    fun searchDraftNotes(accountId: String, word: String): List<DraftNote>{
+    fun searchDraftNotes(accountId: Long, word: String): List<DraftNote>{
         return searchByWordDraftNotesRelation(accountId, word).map{
             it.toDraftNote()
         }
     }
 
-    fun getDraftNote(accountId: String, draftNoteId: Long): DraftNote?{
+    fun getDraftNote(accountId: Long, draftNoteId: Long): DraftNote?{
         return getDraftNoteRelation(accountId, draftNoteId)?.toDraftNote()
     }
 
@@ -73,23 +73,23 @@ abstract class DraftNoteDao {
     }
 
     @Transaction
-    @Query("select * from draft_note where accountId = :accountId")
-    abstract fun findDraftNotesRelation(accountId: String): List<DraftNoteRelation>
+    @Query("select * from draft_note_table where accountId = :accountId")
+    abstract fun findDraftNotesRelation(accountId: Long): List<DraftNoteRelation>
 
     @Transaction
-    @Query("select * from draft_note where accountId = :accountId and text like '%'||:word||'%'")
-    abstract fun searchByWordDraftNotesRelation(accountId: String, word: String): List<DraftNoteRelation>
+    @Query("select * from draft_note_table where accountId = :accountId and text like '%'||:word||'%'")
+    abstract fun searchByWordDraftNotesRelation(accountId: Long, word: String): List<DraftNoteRelation>
 
     @Transaction
-    @Query("select * from draft_note where accountId = :accountId and draft_note_id = :draftNoteId")
-    abstract fun getDraftNoteRelation(accountId: String, draftNoteId: Long): DraftNoteRelation?
+    @Query("select * from draft_note_table where accountId = :accountId and draft_note_id = :draftNoteId")
+    abstract fun getDraftNoteRelation(accountId: Long, draftNoteId: Long): DraftNoteRelation?
 
     @Transaction
-    @Query("delete from 'draft_note' where accountId = :accountId and draft_note_id = :draftNoteId")
-    abstract fun deleteDraftNote(accountId: String, draftNoteId: Long)
+    @Query("delete from 'draft_note_table' where accountId = :accountId and draft_note_id = :draftNoteId")
+    abstract fun deleteDraftNote(accountId: Long, draftNoteId: Long)
 
 
-    @Query("delete from 'draft_file' where draft_note_id = :draftNoteId and file_id = :fileId")
+    @Query("delete from 'draft_file_table' where draft_note_id = :draftNoteId and file_id = :fileId")
     abstract fun deleteFile(draftNoteId: Long, fileId: Long)
 
 }

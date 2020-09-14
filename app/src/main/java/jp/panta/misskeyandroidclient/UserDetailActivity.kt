@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.core.app.NavUtils
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -16,10 +15,6 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.users.PinNoteFragment
@@ -30,6 +25,9 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
 import java.lang.IllegalArgumentException
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 
 class UserDetailActivity : AppCompatActivity() {
     companion object{
@@ -40,7 +38,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     private var mViewModel: UserDetailViewModel? = null
 
-    private var mAccountRelation: AccountRelation? = null
+    private var mAccountRelation: Account? = null
 
     private var mUserId: String? = null
     private var mIsMainActive: Boolean = true
@@ -77,7 +75,7 @@ class UserDetailActivity : AppCompatActivity() {
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java])
             .initViewModelListener()
 
-        miApplication.currentAccount.observe(this, Observer {ar ->
+        miApplication.getCurrentAccount().observe(this, Observer { ar ->
             mAccountRelation = ar
             val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel
@@ -87,7 +85,7 @@ class UserDetailActivity : AppCompatActivity() {
 
             viewModel.load()
             viewModel.user.observe(this, Observer {
-                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar.account, it.id)
+                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, it.id)
                 //userTimelinePager.adapter = adapter
                 binding.userTimelinePager.adapter = adapter
                 binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
@@ -147,9 +145,9 @@ class UserDetailActivity : AppCompatActivity() {
     ) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
         private val titles = listOf(getString(R.string.post), getString(R.string.pin), getString(R.string.media))
-        private val requestMedia = Page.UserTimeline(userId, withFiles = true)
+        private val requestMedia = Pageable.UserTimeline(userId, withFiles = true)
 
-        private val requestTimeline = Page.UserTimeline(userId)
+        private val requestTimeline = Pageable.UserTimeline(userId)
         override fun getCount(): Int {
             return titles.size
         }
@@ -160,9 +158,9 @@ class UserDetailActivity : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             return when(position){
-                0 -> TimelineFragment.newInstance(null, requestTimeline)
+                0 -> TimelineFragment.newInstance(requestTimeline)
                 1 -> PinNoteFragment()
-                2 -> TimelineFragment.newInstance(null, requestMedia)
+                2 -> TimelineFragment.newInstance(requestMedia)
                 else -> throw IllegalArgumentException("こんなものはない！！")
             }
         }
@@ -189,7 +187,7 @@ class UserDetailActivity : AppCompatActivity() {
         val tab = menu?.findItem(R.id.nav_add_to_tab)
         val page = mAccountRelation?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if(pageable is Page.UserTimeline){
+            if(pageable is Pageable.UserTimeline){
                 pageable.userId == mUserId
             }else{
                 false
@@ -269,7 +267,7 @@ class UserDetailActivity : AppCompatActivity() {
 
         val page = mAccountRelation?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if(pageable is Page.UserTimeline){
+            if(pageable is Pageable.UserTimeline){
                 pageable.userId == mUserId && mUserId != null
             }else{
                 false
@@ -280,10 +278,10 @@ class UserDetailActivity : AppCompatActivity() {
             (application as MiCore).removePageInCurrentAccount(page!!)
         }else{
             (application as MiApplication).addPageInCurrentAccount(
-                Page(null,
+                Page(mAccountRelation?.accountId?: - 1,
                     title = user.getDisplayUserName(),
-                    pageNumber = null,
-                    userTimeline = Page.UserTimeline(userId = user.id)
+                    weight = -1,
+                    pageable = Pageable.UserTimeline(userId = user.id)
                 )
             )
 

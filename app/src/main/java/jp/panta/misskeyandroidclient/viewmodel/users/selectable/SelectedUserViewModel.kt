@@ -47,7 +47,7 @@ class SelectedUserViewModel(
     private val mSelectedUserIdUserMap = LinkedHashMap<String, UserViewData>()
 
     val selectedUsers = UsersLiveData().apply{
-        addSource(miCore.currentAccount){
+        addSource(miCore.getCurrentAccount()){
             it?.let{ ar ->
                 setMainCapture(miCore.getMainCapture(ar))
             }
@@ -71,7 +71,7 @@ class SelectedUserViewModel(
     init{
         val usersMap = HashMap<String, UserViewData>()
 
-        val misskeyAPI = miCore.getMisskeyAPI(miCore.currentAccount.value)
+        val misskeyAPI = miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!)
 
         val srcUser = exSelectedUsers.map{
             it.id to UserViewData(it)
@@ -80,8 +80,8 @@ class SelectedUserViewModel(
         usersMap.putAll(srcUser)
 
         val srcUserId = exSelectedUserIds.mapNotNull{
-            val call = misskeyAPI?.showUser(RequestUser(
-                i = miCore.currentAccount.value?.getCurrentConnectionInformation()?.getI(miCore.getEncryption()),
+            val call = misskeyAPI.showUser(RequestUser(
+                i = miCore.getCurrentAccount().value?.getI(miCore.getEncryption()),
                 userId = it
             ))
             if(usersMap.containsKey(it)){

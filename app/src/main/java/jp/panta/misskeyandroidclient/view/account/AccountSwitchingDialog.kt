@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,15 +14,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.AppAuthActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import kotlinx.android.synthetic.main.dialog_switch_account.view.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class AccountSwitchingDialog : BottomSheetDialogFragment(){
 
@@ -35,7 +27,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
 
         val miApplication = context?.applicationContext as MiApplication
         //miApplication.connectionInstanceDao?.findAll()
-        val accounts = miApplication.accounts.value
+        val accounts = miApplication.getAccounts().value
         if(accounts == null){
             Log.w("AccountSwitchDialog", "アカウント達の取得に失敗しました")
             Toast.makeText(this.context, "アカウントの取得に失敗しました", Toast.LENGTH_LONG).show()
@@ -82,12 +74,12 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
             oldItem: AccountViewData,
             newItem: AccountViewData
         ): Boolean {
-            return oldItem.accountRelation.account.id == newItem.accountRelation.account.id
+            return oldItem.account.accountId == newItem.account.accountId
         }
 
         override fun areItemsTheSame(oldItem: AccountViewData, newItem: AccountViewData): Boolean {
             return oldItem.user == newItem.user
-                    && oldItem.accountRelation.getCurrentConnectionInformation() == newItem.accountRelation.getCurrentConnectionInformation()
+                    && oldItem.account == newItem.account
         }
     }
 }

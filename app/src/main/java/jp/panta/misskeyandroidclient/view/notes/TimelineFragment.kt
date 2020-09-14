@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.setMenuTint
@@ -29,26 +28,36 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 import java.lang.Exception
 import java.util.*
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
 
     companion object{
         private const val EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.pageable_timeline"
 
+        private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
+        private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
+
         private const val EXTRA_FIRST_VISIBLE_NOTE_DATE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.EXTRA_FIRST_VISIBLE_NOTE_DATE"
-        private const val EXTRA_ACCOUNT = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.ACCOUNT"
 
-        fun newInstance(account: Account?, pageableTimeline: Page.Timeline): TimelineFragment{
-            return TimelineFragment().apply{
+
+        fun newInstance(page: Page): TimelineFragment{
+            return TimelineFragment().apply {
                 arguments = Bundle().apply{
-                    this.putSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE, pageableTimeline)
-                    account?.let{
-                        this.putSerializable(EXTRA_ACCOUNT, account)
-
-                    }
+                    putSerializable(EXTRA_PAGE, page)
                 }
             }
         }
+
+        fun newInstance(pageable: Pageable) : TimelineFragment{
+            return TimelineFragment().apply{
+                arguments = Bundle().apply{
+                    putSerializable(EXTRA_PAGEABLE, pageable)
+                }
+            }
+        }
+
     }
 
     private lateinit var mLinearLayoutManager: LinearLayoutManager
@@ -59,14 +68,17 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     //private var isLoadInited: Boolean = false
     private var isLoadInit: Boolean = false
 
-    private var mPageableTimeline: Page.Timeline? = null
+    //private var mPageableTimeline: Page.Timeline? = null
+    private var mPage: Page? = null
+
+    private var mPageable: Pageable? = null
+
     private var isShowing: Boolean = false
 
     private var mFirstVisibleItemPosition: Int? = null
 
     private lateinit var sharedPreference: SharedPreferences
 
-    private var mAccount: Account? = null
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -81,10 +93,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.layoutManager = mLinearLayoutManager
 
         //データ受け取り
+        mPage = arguments?.getSerializable(EXTRA_PAGE) as? Page
 
-        mPageableTimeline = arguments?.getSerializable(EXTRA_TIMELINE_FRAGMENT_PAGEABLE_TIMELINE) as Page.Timeline?
-
-        mAccount = arguments?.getSerializable(EXTRA_ACCOUNT) as? Account?
+        mPageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
 
         val miApplication = context?.applicationContext as MiApplication
 
@@ -94,8 +105,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val notesViewModelFactory = NotesViewModelFactory(miApplication)
         val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
         mNotesViewModel = notesViewModel
-        val factory = TimelineViewModelFactory(mAccount, mPageableTimeline!!, miApplication, SettingStore(requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)))
-        mViewModel = ViewModelProvider(this, factory).get("$mAccount$mPageableTimeline",TimelineViewModel::class.java)
+        Log.d("TimelineFM", "page:${mPage?.pageable()?: mPageable}")
+        val factory = TimelineViewModelFactory(mPage, null, mPage?.pageable()?: mPageable!!, miApplication)
+        mViewModel = ViewModelProvider(this, factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
 
 
 

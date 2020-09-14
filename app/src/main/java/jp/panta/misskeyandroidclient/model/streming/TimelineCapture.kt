@@ -4,8 +4,8 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.Expose
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
@@ -29,12 +29,12 @@ class TimelineCapture(
         val observer : Observer?
     ) : StreamingAction{
         companion object{
-            fun create(channel: Page.Timeline, observer: Observer): TimelineObserver?{
+            fun create(channel: Pageable, observer: Observer): TimelineObserver?{
                 val timelineType = when(channel){
-                    is Page.HomeTimeline -> "homeTimeline"
-                    is Page.HybridTimeline -> "hybridTimeline"
-                    is Page.LocalTimeline -> "localTimeline"
-                    is Page.GlobalTimeline -> "globalTimeline"
+                    is Pageable.HomeTimeline -> "homeTimeline"
+                    is Pageable.HybridTimeline -> "hybridTimeline"
+                    is Pageable.LocalTimeline -> "localTimeline"
+                    is Pageable.GlobalTimeline -> "globalTimeline"
                     else -> null
                 }
                 timelineType?: return null

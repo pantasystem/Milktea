@@ -38,8 +38,8 @@ class AntennaEditorActivity : AppCompatActivity() {
         }
 
         val miCore = applicationContext as MiCore
-        miCore.currentAccount.observe(this, Observer { ar ->
-            val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(ar, miCore, antenna))[AntennaEditorViewModel::class.java]
+        miCore.getCurrentAccount().observe(this, Observer { ac ->
+            val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(ac, miCore, antenna))[AntennaEditorViewModel::class.java]
             this.mViewModel = viewModel
             viewModel.selectUserEvent.observe(this, Observer {
                 showSearchAndSelectUserActivity(it)

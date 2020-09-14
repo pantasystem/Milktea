@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notification.Notification
@@ -21,13 +22,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class NotificationViewModel(
-    private val accountRelation: AccountRelation,
+    private val account: Account,
     private val misskeyAPI: MisskeyAPI,
     private val miCore: MiCore,
     private val encryption: Encryption = miCore.getEncryption()
     //private val noteCapture: NoteCapture
 ) : ViewModel(){
-    private val connectionInstance = accountRelation.getCurrentConnectionInformation()
 
 
 
@@ -37,7 +37,7 @@ class NotificationViewModel(
 
 
     // private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
-    private val noteCapture = miCore.getNoteCapture(accountRelation)
+    private val noteCapture = miCore.getNoteCapture(account)
 
     private var noteRegister = NoteRegister()
 
@@ -62,7 +62,7 @@ class NotificationViewModel(
             return
         }
         isLoadingFlag = true
-        val request = NotificationRequest(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, limit = 20)
+        val request = NotificationRequest(i = account.getI(encryption)!!, limit = 20)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
                 call: Call<List<Notification>?>,
@@ -71,7 +71,7 @@ class NotificationViewModel(
                 val list = try{
                     response.body()?.mapNotNull{
                         try{
-                            NotificationViewData((it), accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                            NotificationViewData((it), account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
 
                         }catch(e: Exception){
                             Log.e("NotificationViewModel", "error:${it}", e)
@@ -96,7 +96,7 @@ class NotificationViewModel(
 
                 isLoadingFlag = false
                 isLoading.postValue(false)
-                miCore.notificationSubscribeViewModel.readAllNotifications(accountRelation)
+                miCore.notificationSubscribeViewModel.readAllNotifications(account)
             }
             override fun onFailure(call: Call<List<Notification>?>, t: Throwable) {
                 isLoadingFlag = false
@@ -117,7 +117,7 @@ class NotificationViewModel(
             return
         }
 
-        val request = NotificationRequest(i = connectionInstance?.getI(encryption)!!, limit = 20, untilId = untilId)
+        val request = NotificationRequest(i = account.getI(encryption)!!, limit = 20, untilId = untilId)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
                 call: Call<List<Notification>?>,
@@ -130,7 +130,7 @@ class NotificationViewModel(
                 }
 
                 val list = rawList.map{
-                    NotificationViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                    NotificationViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
                 }
 
                 val notificationViewDataList = ArrayList<NotificationViewData>(exNotificationList).apply{

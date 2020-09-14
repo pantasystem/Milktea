@@ -1,9 +1,7 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.group.Group
+import jp.panta.misskeyandroidclient.model.account.Account
 
 data class RequestMessage(
     val i: String,
@@ -15,15 +13,15 @@ data class RequestMessage(
     val markAsRead: Boolean?
 
 ){
-    class Builder(private val accountRelation: AccountRelation, message: Message){
+    class Builder(private val account: Account, message: Message){
         val group = message.group
-        val user = message.opponentUser(accountRelation.account)
+        val user = message.opponentUser(account)
         var limit: Int? = null
         var markAsRead: Boolean? = null
 
         fun build(sinceId: String?, untilId: String?, encryption: Encryption): RequestMessage{
             return RequestMessage(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption)!!,
                 userId = if(group == null) user?.id else null,
                 groupId = group?.id,
                 limit = limit,

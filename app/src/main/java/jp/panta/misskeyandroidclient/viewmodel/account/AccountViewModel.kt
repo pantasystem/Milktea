@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.account
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -34,12 +34,11 @@ class AccountViewModel(
     }
 
     val accounts = MediatorLiveData<List<AccountViewData>>().apply{
-        addSource(miCore.accounts){ arList ->
-            value = arList.map{ ar ->
-                val avd = AccountViewData(ar)
-                val ci = ar.getCurrentConnectionInformation()
-                ci?.getI(miCore.getEncryption())?.let{ i ->
-                    miCore.getMisskeyAPI(ci).i(
+        addSource(miCore.getAccounts()){ arList ->
+            value = arList.map{ ac ->
+                val avd = AccountViewData(ac)
+                ac.getI(miCore.getEncryption())?.let{ i ->
+                    miCore.getMisskeyAPI(ac).i(
                         I(i)
                     ).enqueue(avd.accept)
                 }
@@ -48,7 +47,7 @@ class AccountViewModel(
         }
     }
 
-    private var mBeforeAccountRelation: AccountRelation? = null
+    private var mBeforeAccount: Account? = null
     val user = MediatorLiveData<User>()
 
     val switchAccount = EventBus<Int>()
@@ -62,11 +61,10 @@ class AccountViewModel(
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init{
-        user.addSource(miCore.currentAccount){
-            val ci = it.getCurrentConnectionInformation()
-            val nullableI = ci?.getI(miCore.getEncryption())
+        user.addSource(miCore.getCurrentAccount()){
+            val nullableI = it?.getI(miCore.getEncryption())
             nullableI?.let { i ->
-                miCore.getMisskeyAPI(ci).i(I(i)).enqueue(object : Callback<User>{
+                miCore.getMisskeyAPI(it).i(I(i)).enqueue(object : Callback<User>{
                     override fun onResponse(call: Call<User>, response: Response<User>) {
                         response.body()?.let{ u ->
                             user.postValue(u)
@@ -79,17 +77,17 @@ class AccountViewModel(
                     }
                 })
             }
-            mBeforeAccountRelation?.let{ before ->
+            mBeforeAccount?.let{ before ->
                 miCore.getMainCapture(before).removeListener(mainCaptureListener)
             }
             miCore.getMainCapture(it).putListener(mainCaptureListener)
-            mBeforeAccountRelation = it
+            mBeforeAccount = it
         }
     }
 
-    fun setSwitchTargetConnectionInstance(account: AccountRelation){
+    fun setSwitchTargetConnectionInstance(account: Account){
         switchTargetConnectionInstanceEvent.event = Unit
-        miCore.switchAccount(account.account)
+        miCore.setCurrentAccount(account)
     }
 
     fun showSwitchDialog(){
@@ -110,14 +108,14 @@ class AccountViewModel(
 
     fun signOut(accountViewData: AccountViewData){
         viewModelScope.launch(Dispatchers.IO){
-            miCore.logoutAccount(accountViewData.accountRelation.account)
+            miCore.logoutAccount(accountViewData.account)
             switchTargetConnectionInstanceEvent.event = Unit
         }
     }
 
     private val mainCaptureListener = object : MainCapture.AbsListener(){
         override fun meUpdated(user: User) {
-            if(user.id == miCore.currentAccount.value?.account?.id){
+            if(user.id == miCore.getCurrentAccount().value?.remoteId){
                 this@AccountViewModel.user.postValue(user)
             }
             accounts.value?.forEach {

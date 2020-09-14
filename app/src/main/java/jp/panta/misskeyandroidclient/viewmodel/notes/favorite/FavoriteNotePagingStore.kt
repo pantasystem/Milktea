@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.favorite
 
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
@@ -13,45 +13,42 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotePagedStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import retrofit2.Response
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class FavoriteNotePagingStore(
-    override val accountRelation: AccountRelation,
-    override val pageableTimeline: Page.Timeline,
-    private val miCore: MiCore,
-    private val encryption: Encryption
+    val account: Account,
+    override val pageableTimeline: Pageable.Favorite,
+    private val miCore: MiCore
 ) : NotePagedStore{
 
-    val favorites = miCore.getMisskeyAPI(accountRelation)!!::favorites
+    val favorites = miCore.getMisskeyAPI(account)::favorites
 
-    private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
+    //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 
-    private val builder = NoteRequest.Builder(pageableTimeline)
+    private val builder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()))
 
-    override fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+    override suspend fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         return if(request == null){
-            val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
-            val res =favorites(builder.build(i, NoteRequest.Conditions())).execute()
+            val res =favorites(builder.build(NoteRequest.Conditions())).execute()
             makeResponse(res, false)
         }else{
             makeResponse(favorites(request).execute(), false)
         }
     }
 
-    override fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
-        val res = favorites(builder.build(i, NoteRequest.Conditions(sinceId = sinceId))).execute()
+    override suspend fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+        val res = favorites(builder.build(NoteRequest.Conditions(sinceId = sinceId))).execute()
         return makeResponse(res, true)
     }
 
-    override fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!
-        val res = favorites(builder.build(i, NoteRequest.Conditions(untilId = untilId))).execute()
+    override suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
+        val res = favorites(builder.build(NoteRequest.Conditions(untilId = untilId))).execute()
         return makeResponse(res, false)
     }
 
     private fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
-            FavoriteNoteViewData(it, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+            FavoriteNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
         }
         return Pair(BodyLessResponse(res), list)
     }

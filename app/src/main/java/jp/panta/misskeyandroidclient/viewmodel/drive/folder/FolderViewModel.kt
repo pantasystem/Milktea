@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.drive.CreateFolder
@@ -14,13 +15,12 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class FolderViewModel(
-    val accountRelation: AccountRelation,
+    val account: Account,
     val misskeyAPI: MisskeyAPI,
     folderId: String?,
     private val encryption: Encryption
 ) : ViewModel(){
 
-    val connectionInformation = accountRelation.getCurrentConnectionInformation()
 
     val foldersLiveData = MutableLiveData<List<FolderViewData>>()
 
@@ -37,7 +37,7 @@ class FolderViewModel(
         isLoading = true
 
         isRefreshing.postValue(true)
-        misskeyAPI.getFolders(RequestFolder(i = connectionInformation?.getI(encryption)!!, folderId = currentFolder.value, limit = 20)).enqueue(object : Callback<List<FolderProperty>>{
+        misskeyAPI.getFolders(RequestFolder(i = account.getI(encryption)!!, folderId = currentFolder.value, limit = 20)).enqueue(object : Callback<List<FolderProperty>>{
             override fun onResponse(
                 call: Call<List<FolderProperty>>,
                 response: Response<List<FolderProperty>>
@@ -78,7 +78,7 @@ class FolderViewModel(
             return
         }
 
-        val request = RequestFolder(i = connectionInformation?.getI(encryption)!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
+        val request = RequestFolder(i = account.getI(encryption)!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
         misskeyAPI.getFolders(request).enqueue(object : Callback<List<FolderProperty>>{
             override fun onResponse(
                 call: Call<List<FolderProperty>>,
@@ -111,7 +111,7 @@ class FolderViewModel(
     fun createFolder(folderName: String){
         if(folderName.isNotBlank()){
             misskeyAPI.createFolder(CreateFolder(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption)!!,
                 name = folderName,
                 parentId = currentFolder.value
             )).enqueue(object : Callback<Unit>{

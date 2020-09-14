@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.url
 
 import android.os.Handler
-import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -10,9 +9,7 @@ import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStoreFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.*
 
 class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: SettingStore) : ViewModel(){
 
@@ -25,8 +22,9 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
         }
     }
 
-    private var mUrlPreviewStore = miCore.urlPreviewStore
-
+    private var mUrlPreviewStore = miCore.getCurrentAccount().value?.let{ it ->
+        miCore.getUrlPreviewStore(it)
+    }
     val urlPreviewSourceType = object : MutableLiveData<Int>(settingStore.urlPreviewSetting.getSourceType()){
         override fun onInactive() {
             super.onInactive()
@@ -51,14 +49,14 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
                 (miCore as MiApplication).urlPreviewDAO,
                 it,
                 url,
-                miCore.currentAccount.value
+                miCore.getCurrentAccount().value
             ).create()
         }
 
     }
 
     val previewTestUrl = MutableLiveData<String?>(
-        miCore.currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl?.replace("https://", "")
+        miCore.getCurrentAccount().value?.instanceDomain?.replace("https://", "")
     )
 
     val urlPreviewData = MediatorLiveData<UrlPreview>().apply{

@@ -142,7 +142,7 @@ object MediaPreviewHelper{
             val file = mediaViewData!!.files[fileIndex]
             this.visibility = View.VISIBLE
             val miCore = this.context.applicationContext as? MiCore
-            val instanceBaseUrl = miCore?.currentAccount?.value?.getCurrentConnectionInformation()?.instanceBaseUrl
+            val instanceBaseUrl = miCore?.getCurrentAccount()?.value?.instanceDomain
 
 
 
@@ -179,7 +179,7 @@ object MediaPreviewHelper{
     @JvmStatic
     fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?){
         val miCore = this.context.applicationContext as? MiCore
-        val instanceBaseUrl = miCore?.currentAccount?.value?.getCurrentConnectionInformation()?.instanceBaseUrl
+        val instanceBaseUrl = miCore?.getCurrentAccount()?.value?.instanceDomain
 
         try{
             this.visibility = View.VISIBLE

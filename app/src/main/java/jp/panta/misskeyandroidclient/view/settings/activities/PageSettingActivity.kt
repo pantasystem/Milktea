@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivityPageSettingBinding
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.PageType
+import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.view.settings.page.EditTabNameDialog
 import jp.panta.misskeyandroidclient.view.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.view.settings.page.PagesAdapter

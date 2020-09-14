@@ -32,7 +32,7 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
 
         val miApplication  = context?.applicationContext as MiApplication
 
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer{ ar ->
+        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer{ ar ->
             val folderViewModelFactory = FolderViewModelFactory(ar, miApplication, null)
             val folderViewModel = ViewModelProvider( requireActivity(), folderViewModelFactory).get(FolderViewModel::class.java)
             mFolderViewModel = folderViewModel

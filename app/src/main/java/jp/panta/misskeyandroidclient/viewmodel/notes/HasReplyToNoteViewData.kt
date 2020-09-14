@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import java.lang.IllegalArgumentException
 

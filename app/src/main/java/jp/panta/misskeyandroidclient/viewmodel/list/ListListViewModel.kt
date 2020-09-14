@@ -9,7 +9,9 @@ import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.UpdateList
@@ -24,16 +26,16 @@ import java.util.*
 import kotlin.collections.LinkedHashMap
 
 class ListListViewModel(
-    val accountRelation: AccountRelation,
+    val account: Account,
     val misskeyAPI: MisskeyAPI,
     val encryption: Encryption,
     val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val accountRelation: AccountRelation, val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(val account: Account, val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return ListListViewModel(accountRelation, miCore.getMisskeyAPI(accountRelation)!!, miCore.getEncryption(), miCore) as T
+            return ListListViewModel(account, miCore.getMisskeyAPI(account), miCore.getEncryption(), miCore) as T
         }
     }
 
@@ -44,9 +46,9 @@ class ListListViewModel(
 
     val pagedUserList = Transformations.map(userListList){ ulList ->
         ulList.filter{ ul ->
-            accountRelation.pages.any {
+            account.pages.any {
                 val pageable = it.pageable()
-                if(pageable is Page.UserListTimeline){
+                if(pageable is Pageable.UserListTimeline){
                     pageable.listId == ul.id
                 }else{
                     false
@@ -60,7 +62,7 @@ class ListListViewModel(
 
     val showUserDetailEvent = EventBus<UserList>()
 
-    private val mPublisher = UserListEventStore(misskeyAPI, accountRelation).getEventStream()
+    private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
 
     init{
         mPublisher.subscribe(UserListEventObserver())
@@ -68,7 +70,7 @@ class ListListViewModel(
 
 
     fun loadListList(){
-        val i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)
+        val i = account.getI(encryption)
             ?: return
         misskeyAPI.userList(I(i)).enqueue(object : Callback<List<UserList>>{
             override fun onResponse(
@@ -125,16 +127,16 @@ class ListListViewModel(
 
     fun toggleTab(userList: UserList?){
         userList?.let{ ul ->
-            val exPage = accountRelation.pages.firstOrNull {
+            val exPage = account.pages.firstOrNull {
                 val pageable = it.pageable()
-                if(pageable is Page.UserListTimeline){
+                if(pageable is Pageable.UserListTimeline){
                     pageable.listId == ul.id
                 }else{
                     false
                 }
             }
             if(exPage == null){
-                val page = Page(null, ul.name, userListTimeline = Page.UserListTimeline(ul.id), pageNumber = null)
+                val page = Page(account.accountId, ul.name, pageable =  Pageable.UserListTimeline(ul.id), weight = 0)
                 miCore.addPageInCurrentAccount(page)
             }else{
                 miCore.removePageInCurrentAccount(exPage)

@@ -50,7 +50,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer { accountRelation ->
+        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { accountRelation ->
             val encryption = miApplication.getEncryption()
             val followFollowerViewModel = ViewModelProvider(this, FollowFollowerViewModel.Factory(accountRelation, miApplication, user, type, encryption))[FollowFollowerViewModel::class.java]
             mViewModel = followFollowerViewModel

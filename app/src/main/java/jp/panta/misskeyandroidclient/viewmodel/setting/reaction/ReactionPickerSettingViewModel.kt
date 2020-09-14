@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.room.Transaction
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSetting
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
@@ -23,14 +23,14 @@ import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 class ReactionPickerSettingViewModel(
-    private val accountRelation: AccountRelation,
+    private val account: Account,
     private val reactionUserSettingDao: ReactionUserSettingDao,
     private val settingStore: SettingStore,
     private val miCore: MiCore
 ) : ViewModel(), ReactionSelection{
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val ar: AccountRelation, val miApplication: MiApplication) : ViewModelProvider.Factory{
+    class Factory(val ar: Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             val settingStore = SettingStore(
                 miApplication.getSharedPreferences(miApplication.getPreferenceName(), Context.MODE_PRIVATE)
@@ -59,7 +59,7 @@ class ReactionPickerSettingViewModel(
         viewModelScope.launch(Dispatchers.IO){
             try{
                 val rawSettings = reactionUserSettingDao
-                    .findByInstanceDomain(accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!)
+                    .findByInstanceDomain(account.instanceDomain)
                 mExistingSettingList = rawSettings?: emptyList()
                 var settingReactions = rawSettings
                     ?: ReactionResourceMap.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
@@ -119,7 +119,7 @@ class ReactionPickerSettingViewModel(
     fun addReaction(reaction: String){
         mReactionSettingReactionNameMap[reaction] = ReactionUserSetting(
             reaction,
-            accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!,
+            account.instanceDomain,
             mReactionSettingReactionNameMap.size
         )
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
@@ -139,6 +139,6 @@ class ReactionPickerSettingViewModel(
     }
 
     private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting{
-        return ReactionUserSetting(reaction, accountRelation.getCurrentConnectionInformation()?.instanceBaseUrl!!, index)
+        return ReactionUserSetting(reaction, account.instanceDomain, index)
     }
 }

@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
@@ -36,14 +37,14 @@ class NoteEditorViewModel(
 ) : ViewModel(){
 
 
-    val currentAccount = miCore.currentAccount
+    val currentAccount = miCore.getCurrentAccount()
 
-    val currentUser = Transformations.map(currentAccount){
-        UserViewData(it.account.id).apply{
-            val ci = it.getCurrentConnectionInformation()
-            val i = ci?.getI(miCore.getEncryption())
+    val currentUser = Transformations.map(currentAccount){ account ->
+        UserViewData(account.remoteId).apply{
+
+            val i = account.getI(miCore.getEncryption())
             i?.let{
-                setApi(i, miCore.getMisskeyAPI(ci))
+                setApi(i, miCore.getMisskeyAPI(account))
             }
         }
     }
@@ -165,18 +166,21 @@ class NoteEditorViewModel(
     }
 
     fun post(){
-        val noteTask = PostNoteTask(getCurrentInformation()!!, encryption, draftNote, currentAccount.value?.account!!)
-        noteTask.cw = if(cw.value.isNullOrBlank()) null else cw.value
-        noteTask.files = files.value
-        noteTask.text =text.value
-        noteTask.poll = poll.value?.buildCreatePoll()
-        noteTask.renoteId = quoteToNoteId
-        noteTask.replyId = replyToNoteId
-        noteTask.setVisibility(visibility.value, address.value?.map{
-            it.userId
-        })
-        noteTask.localOnly = this.isLocalOnly.value?: false
-        this.noteTask.postValue(noteTask)
+        currentAccount.value?.let{ account ->
+            val noteTask = PostNoteTask(encryption, draftNote, account)
+            noteTask.cw = if(cw.value.isNullOrBlank()) null else cw.value
+            noteTask.files = files.value
+            noteTask.text =text.value
+            noteTask.poll = poll.value?.buildCreatePoll()
+            noteTask.renoteId = quoteToNoteId
+            noteTask.replyId = replyToNoteId
+            noteTask.setVisibility(visibility.value, address.value?.map{
+                it.userId
+            })
+            noteTask.localOnly = this.isLocalOnly.value?: false
+            this.noteTask.postValue(noteTask)
+        }
+
     }
 
     fun add(file: File){
@@ -325,13 +329,10 @@ class NoteEditorViewModel(
         return pos + emoji.length
     }
 
-    private fun getCurrentInformation(): EncryptedConnectionInformation?{
-        return currentAccount.value?.getCurrentConnectionInformation()
-    }
 
     fun toDraftNote(): DraftNote{
         return DraftNote(
-            accountId = currentAccount.value?.account?.id!!,
+            accountId = currentAccount.value?.accountId!!,
             text = text.value,
             cw = cw.value,
             visibleUserIds = address.value?.map{
@@ -387,7 +388,7 @@ class NoteEditorViewModel(
     }
 
     private fun getInstanceBaseUrl(): String?{
-        return currentAccount.value?.getCurrentConnectionInformation()?.instanceBaseUrl
+        return currentAccount.value?.instanceDomain
     }
 
     fun clear(){
@@ -396,6 +397,10 @@ class NoteEditorViewModel(
         files.value = emptyList()
         address.value = emptyList()
         poll.value = null
+    }
+
+    private fun getCurrentInformation(): Account?{
+        return miCore.getCurrentAccount().value
     }
 
 }

@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.list
 
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
 

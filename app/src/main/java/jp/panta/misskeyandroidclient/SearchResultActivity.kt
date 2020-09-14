@@ -12,7 +12,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.Page
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.users.RequestUser
@@ -38,7 +40,7 @@ class SearchResultActivity : AppCompatActivity() {
     private var mSearchWord: String? = null
     private var mIsTag: Boolean? = null
 
-    private var mAccountRelation: AccountRelation? = null
+    private var mAccountRelation: Account? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +70,7 @@ class SearchResultActivity : AppCompatActivity() {
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         invalidateOptionsMenu()
-        (application as MiCore).currentAccount.observe(this, Observer { ar ->
+        (application as MiCore).getCurrentAccount().observe(this, Observer { ar ->
             mAccountRelation = ar
         })
 
@@ -111,9 +113,9 @@ class SearchResultActivity : AppCompatActivity() {
         val samePage = getSamePage()
         if(samePage == null){
             val page = if(mIsTag == true){
-                Page(null, word, null, searchByTag = Page.SearchByTag(tag = word.replace("#", "")))
+                Page(mAccountRelation?.accountId?: - 1, word, 0, pageable = Pageable.SearchByTag(tag = word.replace("#", "")))
             }else{
-                Page(null, mSearchWord?: "", null, search = Page.Search(word))
+                Page(mAccountRelation?.accountId?: - 1, mSearchWord?: "", -1, pageable = Pageable.Search(word))
             }
             miCore.addPageInCurrentAccount(
                 page
@@ -130,10 +132,10 @@ class SearchResultActivity : AppCompatActivity() {
     private fun getSamePage(): Page?{
         return mAccountRelation?.pages?.firstOrNull {
             when (val pageable = it.pageable()) {
-                is Page.Search -> {
+                is Pageable.Search -> {
                     pageable.query == mSearchWord
                 }
-                is Page.SearchByTag -> {
+                is Pageable.SearchByTag -> {
                     pageable.tag == mSearchWord
                 }
                 else -> {
@@ -165,25 +167,24 @@ class SearchResultActivity : AppCompatActivity() {
 
             return when(pages[position]){
                 SEARCH_NOTES, SEARCH_NOTES_WITH_FILES ->{
-                    val request = if(isTag){
+                    val request: Pageable = if(isTag){
                         if(pages[position] == SEARCH_NOTES){
-                            Page.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
+                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
                         }else{
-                            Page.SearchByTag(tag = keyword.replace("#", ""))
+                            Pageable.SearchByTag(tag = keyword.replace("#", ""))
                         }
 
                     }else{
-                        Page.Search(query = keyword)
+                        Pageable.Search(query = keyword)
                     }
-                    TimelineFragment.newInstance(null, request)
+                    TimelineFragment.newInstance(request)
                 }
                 SEARCH_USERS ->{
                     SearchUserFragment.newInstance(keyword, true)
                 }
                 else ->{
                     TimelineFragment.newInstance(
-                        null,
-                        Page.Search(query = keyword)
+                        Pageable.Search(query = keyword)
                     )
                 }
             }

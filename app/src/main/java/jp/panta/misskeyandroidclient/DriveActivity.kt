@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
-import jp.panta.misskeyandroidclient.model.drive.UploadFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
@@ -78,7 +77,7 @@ class DriveActivity : AppCompatActivity() {
         }
 
         val miApplication = applicationContext as MiApplication
-        miApplication.currentAccount.observe(this, Observer {
+        miApplication.getCurrentAccount().observe(this, Observer {
             val driveViewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
             mDriveViewModel = driveViewModel
             mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
@@ -206,7 +205,7 @@ class DriveActivity : AppCompatActivity() {
 
     private fun uploadFile(uri: Uri){
         val miCore = application as MiCore
-        miCore.currentAccount.value?.getCurrentConnectionInformation()?.let{ ci ->
+        miCore.getCurrentAccount().value?.let{ ci ->
             val uploader = OkHttpDriveFileUploader(this, ci, GsonFactory.create(), miCore.getEncryption())
             mFileViewModel?.uploadFile(uri.toFile(this), uploader)
         }

@@ -1,21 +1,17 @@
 package jp.panta.misskeyandroidclient
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.databinding.ActivityAppAuthBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityAppAuthCallbackBinding
 import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.model.account.newAccount
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.UserKey
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
-import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -71,10 +67,8 @@ class AppAuthCallbackActivity : AppCompatActivity() {
 
     private fun registerAccount(accessToken: AccessToken, data: CustomAuthBridge){
         val miApplication = applicationContext as MiApplication
-        val account = Account(accessToken.user.id)
-        val ci = EncryptedConnectionInformation.Creator(miApplication.getEncryption())
-            .create(accessToken, data)
-        miApplication.putConnectionInfo(account, ci)
+
+        miApplication.setCurrentAccount(accessToken.newAccount(data.instanceDomain, miApplication.getEncryption(), data.secret))
     }
 
     private fun onFailure(){

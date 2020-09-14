@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.view.settings.page
 
 import android.content.Context
-import jp.panta.misskeyandroidclient.model.PageType
+import jp.panta.misskeyandroidclient.model.account.page.PageType
 import java.lang.ref.WeakReference
 
 class PageTypeNameMap (

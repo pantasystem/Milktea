@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.streming
 
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import java.util.*
 
 interface Observer {

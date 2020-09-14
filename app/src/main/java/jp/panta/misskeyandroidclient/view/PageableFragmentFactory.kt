@@ -1,8 +1,9 @@
 package jp.panta.misskeyandroidclient.view
 
 import androidx.fragment.app.Fragment
-import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.Pageable
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
+
 import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
@@ -11,18 +12,18 @@ import java.lang.IllegalArgumentException
 
 object PageableFragmentFactory {
 
-    fun create(account: Account?, pageable: Pageable?): Fragment{
-        return when(pageable){
-            is Page.Timeline ->{
-                TimelineFragment.newInstance(account, pageable)
+    fun create(page: Page): Fragment{
+        return when(page.pageable()){
+            is Pageable.Show ->{
+                NoteDetailFragment.newInstance(page)
             }
-            is Page.Show ->{
-                NoteDetailFragment.newInstance(pageable)
-            }
-            is Page.Notification ->{
+            is Pageable.Notification ->{
                 NotificationFragment()
             }
-            else -> throw IllegalArgumentException("unknown type")
+            else ->{
+                TimelineFragment.newInstance(page)
+            }
         }
+
     }
 }

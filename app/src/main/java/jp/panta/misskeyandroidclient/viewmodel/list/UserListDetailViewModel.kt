@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.ListId
@@ -19,20 +20,20 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class UserListDetailViewModel(
-    val accountRelation: AccountRelation,
+    val account: Account,
     val listId: String,
     val misskeyAPI: MisskeyAPI,
     val encryption: Encryption
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val accountRelation: AccountRelation, val listId: String, private val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(val account: Account, val listId: String, private val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return UserListDetailViewModel(accountRelation, listId, miCore.getMisskeyAPI(accountRelation)!!, miCore.getEncryption()) as T
+            return UserListDetailViewModel(account, listId, miCore.getMisskeyAPI(account), miCore.getEncryption()) as T
         }
     }
 
-    private val tag = this.javaClass.simpleName.toString()
+    private val tag = this.javaClass.simpleName
 
 
     val userList = MutableLiveData<UserList>()
@@ -40,7 +41,7 @@ class UserListDetailViewModel(
 
     private val mUserMap = LinkedHashMap<String, ListUserViewData>()
 
-    private val mPublisher = UserListEventStore(misskeyAPI, accountRelation).getEventStream()
+    private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
 
     init{
         mPublisher.subscribe(UserListObserver())
@@ -49,7 +50,7 @@ class UserListDetailViewModel(
     fun load(){
         misskeyAPI.showList(
             ListId(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption)!!,
                 listId = listId
             )
         ).enqueue(object : Callback<UserList>{
@@ -75,7 +76,7 @@ class UserListDetailViewModel(
             ListUserViewData(userId).apply{
                 misskeyAPI.showUser(
                     RequestUser(
-                    i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                    i = account.getI(encryption)!!,
                     userId = userId
                 )).enqueue(this.accept)
             }
@@ -130,7 +131,7 @@ class UserListDetailViewModel(
     private fun loadAndPutUser(user: ListUserViewData){
         misskeyAPI.showUser(
             RequestUser(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption),
                 userId = user.userId
             )).enqueue(user.accept)
     }

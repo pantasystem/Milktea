@@ -35,7 +35,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         val activity = activity
         val miApplication = context?.applicationContext as MiApplication
-        val ar  = miApplication.currentAccount.value
+        val ar  = miApplication.getCurrentAccount().value
         /*val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
             ":${it.name}:"
         }*/

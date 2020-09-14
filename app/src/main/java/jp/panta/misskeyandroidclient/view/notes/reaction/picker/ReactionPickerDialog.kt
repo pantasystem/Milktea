@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.*
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
@@ -20,7 +19,6 @@ import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import kotlinx.android.synthetic.main.dialog_reaction_input.view.*
 import kotlinx.android.synthetic.main.dialog_reaction_picker.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,7 +32,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         dialog.setContentView(view)
 
         val miApplication = view.context.applicationContext as MiApplication
-        val ar = miApplication.currentAccount.value
+        val ac = miApplication.getCurrentAccount().value
 
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         val adapter =
@@ -52,7 +50,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         GlobalScope.launch(Dispatchers.IO){
             var reactionSettings = miApplication.reactionUserSettingDao.findByInstanceDomain(
-                ar?.getCurrentConnectionInformation()?.instanceBaseUrl!!
+                ac?.instanceDomain!!
             )?.sortedBy {
                 it.weight
             }?.map{

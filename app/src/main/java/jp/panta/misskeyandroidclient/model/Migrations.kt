@@ -1,31 +1,14 @@
 package jp.panta.misskeyandroidclient.model
 
+import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
+import jp.panta.misskeyandroidclient.model.account.newAccount
+import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
+import jp.panta.misskeyandroidclient.model.core.AccountDao
 
-val MIGRATION_33_34 = object : Migration(33, 34){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("alter table setting add antennaId TEXT")
-    }
-}
-
-val MIGRATION_34_35 = object : Migration(34, 35){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("alter table setting add listId TEXT")
-    }
-}
-
-val MIGRATION_35_36 = object : Migration(35, 36){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("create table 'reaction_user_setting'('reaction' TEXT not null, 'instance_domain' TEXT not null, 'weight' INTEGER not null, primary key('reaction', 'instance_domain'))")
-    }
-}
-
-val MIGRATION_36_37 = object : Migration(36, 37){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("alter table setting add weight INTEGER")
-    }
-}
 
 val MIGRATION_1_2 = object : Migration(1, 2){
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -58,5 +41,58 @@ val MIGRATION_3_4 = object : Migration(3, 4){
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS 'url_preview'")
         database.execSQL("CREATE TABLE IF NOT EXISTS 'url_preview'('url' TEXT NOT NULL, 'title' TEXT NOT NULL, 'icon' TEXT, 'description' TEXT, 'thumbnail' TEXT, 'siteName' TEXT, PRIMARY KEY('url'))")
+    }
+}
+
+val MIGRATION_4_5 = object : Migration(4, 5){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS 'draft_file_table'")
+        database.execSQL("DROP TABLE IF EXISTS 'poll_choice_table'")
+        database.execSQL("DROP TABLE IF EXISTS 'user_id'")
+        database.execSQL("DROP TABLE IF EXISTS 'draft_note'")
+
+
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'account_table' ('remoteId' TEXT NOT NULL, 'instanceDomain' TEXT NOT NULL, 'userName' TEXT NOT NULL, 'encryptedToken' TEXT NOT NULL, 'accountId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_remoteId' ON 'account_table'('remoteId')")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_instanceDomain' ON 'account_table' ('instanceDomain')")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_userName' ON 'account_table' ('userName')")
+        
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'page_table' ('accountId' INTEGER NOT NULL, 'title' TEXT NOT NULL, 'weight' INTEGER NOT NULL, 'pageId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'type' TEXT NOT NULL, 'withFiles' INTEGER, 'excludeNsfw' INTEGER, 'includeLocalRenotes' INTEGER, 'includeMyRenotes' INTEGER, 'includeRenotedMyRenotes' INTEGER, 'listId' TEXT, 'following' INTEGER, 'visibility' TEXT, 'noteId' TEXT, 'tag' TEXT, 'reply' INTEGER, 'renote' INTEGER, 'poll' INTEGER, 'offset' INTEGER, 'markAsRead' INTEGER, 'userId' TEXT, 'includeReplies' INTEGER, 'query' TEXT, 'host' TEXT, 'antennaId' TEXT)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_weight' ON 'page_table' ('weight')")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_accountId' ON 'page_table' ('accountId')")
+        
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'draft_note_table' ('draft_note_id' INTEGER PRIMARY KEY AUTOINCREMENT, 'accountId' INTEGER NOT NULL, 'visibility' TEXT NOT NULL, 'text' TEXT, 'cw' TEXT, 'viaMobile' INTEGER, 'localOnly' INTEGER, 'noExtractMentions' INTEGER, 'noExtractHashtags' INTEGER, 'noExtractEmojis' INTEGER, 'replyId' TEXT, 'renoteId' TEXT, 'multiple' INTEGER, 'expiresAt' INTEGER, FOREIGN KEY('accountId') REFERENCES 'account_table'('accountId') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_draft_note_table_accountId_text' ON 'draft_note_table' ('accountId', 'text')")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'draft_file_table' ('file_id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' TEXT NOT NULL DEFAULT 'name none', 'remote_file_id' TEXT, 'file_path' TEXT, 'is_sensitive' INTEGER, 'type' TEXT, 'thumbnailUrl' TEXT, 'draft_note_id' INTEGER NOT NULL, 'folder_id' TEXT, FOREIGN KEY('draft_note_id') REFERENCES 'draft_note_table'('draft_note_id') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_draft_file_table_draft_note_id' ON 'draft_file_table' ('draft_note_id')")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'poll_choice_table' ('choice' TEXT NOT NULL, 'draft_note_id' INTEGER NOT NULL, 'weight' INTEGER NOT NULL, PRIMARY KEY('choice', 'weight', 'draft_note_id'), FOREIGN KEY('draft_note_id') REFERENCES 'draft_note_table'('draft_note_id') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_poll_choice_table_draft_note_id_choice' ON 'poll_choice_table'('draft_note_id', 'choice')")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'user_id' ('userId' TEXT NOT NULL, 'draft_note_id' INTEGER NOT NULL, PRIMARY KEY('userId', 'draft_note_id'), FOREIGN KEY('draft_note_id') REFERENCES 'draft_note_table'('draft_note_id') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_user_id_draft_note_id' ON 'user_id' ('draft_note_id')")
+        
+    }
+}
+
+class AccountMigration(private val accountDao: AccountDao, private val accountRepository: AccountRepository){
+
+    suspend fun executeMigrate(){
+
+        try{
+            val oldAccounts = accountDao.findAllSetting()
+
+            val generated = oldAccounts.mapNotNull{ ar ->
+                ar.newAccount(null)
+            }
+            generated.forEach{
+                accountRepository.add(it, true)
+            }
+            accountDao.dropPageTable()
+            accountDao.dropTable()
+        }catch(e: Exception){
+            Log.d("AccountMigration", "エラー発生", e)
+        }
+
+
     }
 }

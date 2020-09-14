@@ -40,7 +40,7 @@ class MessageActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as MessagingId?
-        val accountRelation = (applicationContext as MiApplication).currentAccount.value
+        val account = (applicationContext as MiApplication).getCurrentAccount().value
 
 
         if(messagingId == null){
@@ -49,7 +49,7 @@ class MessageActivity : AppCompatActivity() {
             return
         }
 
-        if(accountRelation == null){
+        if(account == null){
             Log.d("MessageActivity", "ac not found")
             finish()
             return
@@ -63,7 +63,7 @@ class MessageActivity : AppCompatActivity() {
         }
         setTitle(messagingId.message)
 
-        val factory = MessageActionViewModel.Factory(accountRelation, application as MiApplication, messagingId.message)
+        val factory = MessageActionViewModel.Factory(account, application as MiApplication, messagingId.message)
         val messageActionViewModel = ViewModelProvider(this, factory)[MessageActionViewModel::class.java]
         mViewModel = messageActionViewModel
         binding.actionViewModel = messageActionViewModel
@@ -87,11 +87,11 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun setTitle(message: Message){
-        val ac = (applicationContext as MiApplication).currentAccount.value ?: return
+        val ac = (applicationContext as MiApplication).getCurrentAccount().value ?: return
         supportActionBar?.title = if(message.isGroup()){
             message.group?.name
         }else{
-            message.opponentUser(ac.account)?.getDisplayUserName()
+            message.opponentUser(ac)?.getDisplayUserName()
         }
     }
 

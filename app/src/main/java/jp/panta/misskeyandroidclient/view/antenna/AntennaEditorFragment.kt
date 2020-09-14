@@ -44,7 +44,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         val antenna = arguments?.getSerializable(EXTRA_ANTENNA) as? Antenna?
 
         val miCore: MiCore = view.context.applicationContext as MiApplication
-        miCore.currentAccount.observe(viewLifecycleOwner, Observer {  ar ->
+        miCore.getCurrentAccount().observe(viewLifecycleOwner, Observer {  ar ->
             val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(ar, miCore, antenna))[AntennaEditorViewModel::class.java]
             binding.antennaEditorViewModel = viewModel
 

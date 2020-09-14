@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.users.RequestUser
@@ -19,7 +20,7 @@ import retrofit2.Response
 import java.lang.IndexOutOfBoundsException
 
 class UserDetailViewModel(
-    val accountRelation: AccountRelation,
+    val account: Account,
     val misskeyAPI: MisskeyAPI,
     val userId: String?,
     val fqcnUserName: String?,
@@ -29,12 +30,12 @@ class UserDetailViewModel(
     val tag=  "userDetailViewModel"
 
     val user = MutableLiveData<User>()
-    val isMine = accountRelation.account.id == userId
+    val isMine = account.remoteId == userId
 
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply{
         addSource(user){
             this.value = it.pinnedNotes?.map{note ->
-                PlaneNoteViewData(note, accountRelation.account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                PlaneNoteViewData(note, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
             }
         }
     }
@@ -47,7 +48,7 @@ class UserDetailViewModel(
 
     val followButtonStatus = MediatorLiveData<String>().apply{
         addSource(isFollowing){
-            if(it){
+            if(it == true){
                 this.value = "フォロー中"
             }else{
                 this.value = "フォロー"
@@ -100,7 +101,7 @@ class UserDetailViewModel(
         }
         misskeyAPI.showUser(
             RequestUser(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption)!!,
                 userId = userId,
                 userName = userName,
                 host = host
@@ -124,7 +125,7 @@ class UserDetailViewModel(
     fun changeFollow(){
         val isFollowing = isFollowing.value?: false
         if(isFollowing){
-            misskeyAPI.unFollowUser(RequestUser(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, userId = userId)).enqueue(
+            misskeyAPI.unFollowUser(RequestUser(account.getI(encryption)!!, userId = userId)).enqueue(
                 object : Callback<User>{
                     override fun onResponse(call: Call<User>, response: Response<User>) {
                         if(response.code() == 200){
@@ -137,7 +138,7 @@ class UserDetailViewModel(
                 }
             )
         }else{
-            misskeyAPI.followUser(RequestUser(accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, userId = userId)).enqueue(object : Callback<User>{
+            misskeyAPI.followUser(RequestUser(account.getI(encryption)!!, userId = userId)).enqueue(object : Callback<User>{
                 override fun onResponse(call: Call<User>, response: Response<User>) {
                     if(response.code() == 200){
                         this@UserDetailViewModel.isFollowing.postValue(true)
@@ -189,7 +190,7 @@ class UserDetailViewModel(
     }
 
     private fun createUserIdOnlyRequest(): RequestUser{
-        return RequestUser(i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!, userId = userId)
+        return RequestUser(i = account.getI(encryption)!!, userId = userId)
     }
 
 

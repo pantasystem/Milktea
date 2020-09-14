@@ -1,41 +1,46 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.meta.Meta
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
+import jp.panta.misskeyandroidclient.model.account.page.Page
 
 interface MiCore{
-    val accounts: MutableLiveData<List<AccountRelation>>
+    //val accounts: MutableLiveData<List<Account>>
 
-    val currentAccount: MutableLiveData<AccountRelation>
+    //val currentAccount: MutableLiveData<Account>
 
     var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
     var messageSubscriber: MessageSubscriber
 
-    val urlPreviewStore: UrlPreviewStore?
 
-    fun getUrlPreviewStore(account: AccountRelation?): UrlPreviewStore?
+    fun getAccounts(): LiveData<List<Account>>
 
-    fun switchAccount(account: Account)
+    fun getCurrentAccount(): LiveData<Account>
+
+    @Throws(AccountNotFoundException::class)
+    suspend fun getAccount(accountId: Long) : Account
+
+    fun getUrlPreviewStore(account: Account): UrlPreviewStore?
+
+    fun setCurrentAccount(account: Account)
 
     fun logoutAccount(account: Account)
 
-    fun removeConnectSetting(connectionInformation: EncryptedConnectionInformation)
+    fun addAccount(account: Account)
 
     fun addPageInCurrentAccount(page: Page)
 
@@ -45,27 +50,24 @@ interface MiCore{
 
     fun removeAllPagesInCurrentAccount(pages: List<Page>)
 
-    fun putConnectionInfo(account: Account, ci: EncryptedConnectionInformation)
 
-    fun removeConnectionInfoInCurrentAccount(ci: EncryptedConnectionInformation)
+    fun getMisskeyAPI(instanceDomain: String): MisskeyAPI
 
-    fun getMisskeyAPI(ci: EncryptedConnectionInformation): MisskeyAPI
 
-    fun getMisskeyAPI(accountRelation: AccountRelation?): MisskeyAPI?
+    fun getMisskeyAPI(account: Account): MisskeyAPI
 
     fun getEncryption(): Encryption
 
-    fun getMainCapture(account: AccountRelation): MainCapture
+    fun getMainCapture(account: Account): MainCapture
 
-    fun setupObserver(account: AccountRelation, observer: Observer)
+    fun setupObserver(account: Account, observer: Observer)
 
-    fun getNoteCapture(account: AccountRelation): NoteCapture
+    fun getNoteCapture(account: Account): NoteCapture
 
     fun getCurrentInstanceMeta(): Meta?
 
-    fun getStreamingAdapter(account: AccountRelation): StreamingAdapter
 
-    fun getTimelineCapture(account: AccountRelation): TimelineCapture
+    fun getTimelineCapture(account: Account): TimelineCapture
 
     fun getSettingStore(): SettingStore
 

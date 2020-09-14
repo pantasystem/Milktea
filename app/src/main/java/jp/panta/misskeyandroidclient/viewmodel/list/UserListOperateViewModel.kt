@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.*
@@ -15,29 +16,29 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class UserListOperateViewModel(
-    val accountRelation: AccountRelation,
+    val account: Account,
     val misskeyAPI: MisskeyAPI,
     val encryption: Encryption
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val accountRelation: AccountRelation, val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(val account: Account, val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 
-            return UserListOperateViewModel(accountRelation, miCore.getMisskeyAPI(accountRelation)!!, miCore.getEncryption()) as T
+            return UserListOperateViewModel(account, miCore.getMisskeyAPI(account), miCore.getEncryption()) as T
         }
     }
 
     private val tag = this.javaClass.simpleName
 
-    private val mPublisher = UserListEventStore(misskeyAPI, accountRelation)
+    private val mPublisher = UserListEventStore(misskeyAPI, account)
 
     val updateUserListEvent = EventBus<UserList>()
 
     fun pushUser(userList: UserList, userId: String){
         misskeyAPI.pushUserToList(
             ListUserOperation(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption)!!,
                 listId = userList.id,
                 userId = userId
             )
@@ -57,7 +58,7 @@ class UserListOperateViewModel(
     fun pullUser(userListId: String, userId: String){
         misskeyAPI.pullUserFromList(
             ListUserOperation(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption)!!,
                 listId = userListId,
                 userId = userId
             )
@@ -80,7 +81,7 @@ class UserListOperateViewModel(
         Log.d(tag, "update listId:$listId, name:$name")
         misskeyAPI.updateList(
             UpdateList(
-                i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+                i = account.getI(encryption)!!,
                 name = name,
                 listId = listId
             )
@@ -116,7 +117,7 @@ class UserListOperateViewModel(
 
     fun delete(userList: UserList){
         misskeyAPI.deleteList(ListId(
-            i = accountRelation.getCurrentConnectionInformation()?.getI(encryption)!!,
+            i = account.getI(encryption)!!,
             listId = userList.id
         )).enqueue(
             object : Callback<Unit>{

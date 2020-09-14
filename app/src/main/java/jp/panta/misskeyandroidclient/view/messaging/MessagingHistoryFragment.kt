@@ -4,14 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MessageActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -32,7 +30,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
         mLinearLayoutManager = layoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.currentAccount.observe(viewLifecycleOwner, Observer {ar ->
+        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { ar ->
 
             val historyViewModel = ViewModelProvider(this, MessageHistoryViewModelFactory(ar, miApplication))["$ar", MessageHistoryViewModel::class.java]
 

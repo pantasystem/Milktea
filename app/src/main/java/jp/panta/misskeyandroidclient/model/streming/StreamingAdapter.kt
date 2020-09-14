@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.model.streming
 
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import okhttp3.*
 import okio.ByteString
@@ -14,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * StreamingAdapter、１につきアカウント１にしたい
  */
 class StreamingAdapter(
-    private val connectionInformation: EncryptedConnectionInformation?,
+    private val account: Account,
     private val encryption: Encryption
 ){
 
@@ -59,7 +61,7 @@ class StreamingAdapter(
                 observerMap[observer.id] = observer
                 observer.onConnect()
             }else{
-                Handler().postDelayed({
+                Handler(Looper.getMainLooper()).postDelayed({
                     putObserver(observer)
                 }, 100)
             }
@@ -123,7 +125,7 @@ class StreamingAdapter(
 
         if(mWebSocket == null){
             Log.d(TAG, "接続を試行する ${ format.format(Date()) }")
-            val wssUrl = connectionInformation?.instanceBaseUrl?.replace("https://", "wss://") + "/streaming?i=${connectionInformation?.getI(encryption)}"
+            val wssUrl = account.instanceDomain.replace("https://", "wss://") + "/streaming?i=${account.getI(encryption)}"
             val request = Request.Builder()
                 .url(wssUrl)
                 .build()

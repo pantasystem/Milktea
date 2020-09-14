@@ -23,14 +23,14 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
         activity?: return
 
         val miCore = view.context.applicationContext as MiCore
-        miCore.currentAccount.observe(viewLifecycleOwner, Observer {
+        miCore.getCurrentAccount().observe(viewLifecycleOwner, Observer {
             val viewModel = ViewModelProvider(requireActivity())[UserListDetailViewModel::class.java]
             val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(it, miCore))[UserListOperateViewModel::class.java]
             listUserList.layoutManager = LinearLayoutManager(view.context)
             val adapter = ListUserListAdapter(viewModel, userListOperateViewModel, viewLifecycleOwner)
             listUserList.adapter = adapter
-            viewModel.listUsers.observe(viewLifecycleOwner, Observer{
-                adapter.submitList(it)
+            viewModel.listUsers.observe(viewLifecycleOwner, Observer{ list ->
+                adapter.submitList(list)
             })
             //viewModel.load()
         })

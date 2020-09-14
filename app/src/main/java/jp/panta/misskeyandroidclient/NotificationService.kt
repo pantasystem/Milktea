@@ -8,16 +8,14 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.gson.GsonBuilder
 import io.reactivex.disposables.CompositeDisposable
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
-import java.lang.ref.WeakReference
 import java.util.*
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData.Type.*
 
@@ -41,7 +39,7 @@ class NotificationService : Service() {
 
     var isShowNotification: Boolean = true
 
-    private val mStopNotificationAccountMap = HashMap<String, Account>()
+    private val mStopNotificationAccountMap = HashMap<Long, Account>()
 
     override fun onBind(intent: Intent): IBinder? {
         return mBinder
@@ -64,14 +62,14 @@ class NotificationService : Service() {
 
     private fun startObserve(){
 
-        (applicationContext as MiApplication).accounts.observeForever {accountRelations ->
-            accountRelations?.forEach{ar ->
+        (applicationContext as MiApplication).getAccounts().observeForever { accounts ->
+            accounts?.forEach{ar ->
                 Log.d(TAG, "observerを登録しています")
 
-                ar.getCurrentConnectionInformation()?.let{ _ ->
+                ar.let{ _ ->
 
                     val mainCapture = (application as MiApplication).getMainCapture(ar)
-                    mainCapture.putListener(MainChannelObserver(ar.account))
+                    mainCapture.putListener(MainChannelObserver(ar))
                 }
 
             }
@@ -89,7 +87,7 @@ class NotificationService : Service() {
                 //val miApplication = applicationContext as MiApplication
                 synchronized(mStopNotificationAccountMap){
 
-                    if(mStopNotificationAccountMap[account.id] == null){
+                    if(mStopNotificationAccountMap[account.accountId] == null){
                         Log.d(TAG, "notification,:$notification")
                         showNotification(NotificationViewData(notification, account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore())))
                     }else{
@@ -260,14 +258,14 @@ E/MQSEventManagerDelegate: failed to get MQSService.
 
     fun stopShowPushNotification(account: Account){
         synchronized(mStopNotificationAccountMap){
-            mStopNotificationAccountMap[account.id] = account
+            mStopNotificationAccountMap[account.accountId] = account
             Log.d(TAG, "指定のアカウントのプッシュ通知を表示しない")
         }
     }
 
     fun startShowPushNotification(account: Account){
         synchronized(mStopNotificationAccountMap){
-            mStopNotificationAccountMap.remove(account.id)
+            mStopNotificationAccountMap.remove(account.accountId)
             Log.d(TAG, "プッシュ通知の表示を再開する")
 
         }
