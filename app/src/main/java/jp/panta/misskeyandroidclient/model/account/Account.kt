@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.Hash
+import java.io.Serializable
 
 @Entity(
     tableName = "account_table",
@@ -40,7 +41,7 @@ data class Account (
     @Ignore val pages: List<Page>,
     @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
-){
+): Serializable{
 
 
 
