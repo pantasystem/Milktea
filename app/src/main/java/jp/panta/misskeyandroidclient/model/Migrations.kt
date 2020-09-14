@@ -46,8 +46,12 @@ val MIGRATION_3_4 = object : Migration(3, 4){
 
 val MIGRATION_4_5 = object : Migration(4, 5){
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE IF EXISTS 'draft_note'")
+        database.execSQL("DROP TABLE IF EXISTS 'draft_file_table'")
+        database.execSQL("DROP TABLE IF EXISTS 'poll_choice_table'")
         database.execSQL("DROP TABLE IF EXISTS 'user_id'")
+        database.execSQL("DROP TABLE IF EXISTS 'draft_note'")
+
+
 
         database.execSQL("CREATE TABLE IF NOT EXISTS 'account_table' ('remoteId' TEXT NOT NULL, 'instanceDomain' TEXT NOT NULL, 'userName' TEXT NOT NULL, 'encryptedToken' TEXT NOT NULL, 'accountId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
         database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_remoteId' ON 'account_table'('remoteId')")
