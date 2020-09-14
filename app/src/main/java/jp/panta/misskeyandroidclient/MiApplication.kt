@@ -193,7 +193,8 @@ class MiApplication : Application(), MiCore {
     override fun setCurrentAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                mCurrentAccount.postValue(accountRepository.setCurrentAccount(account))
+                accountRepository.setCurrentAccount(account)
+                loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "switchAccount error", e)
             }

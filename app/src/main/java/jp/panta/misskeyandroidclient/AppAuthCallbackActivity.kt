@@ -68,7 +68,7 @@ class AppAuthCallbackActivity : AppCompatActivity() {
     private fun registerAccount(accessToken: AccessToken, data: CustomAuthBridge){
         val miApplication = applicationContext as MiApplication
 
-        miApplication.addAccount(accessToken.newAccount(data.instanceDomain, miApplication.getEncryption(), data.secret))
+        miApplication.setCurrentAccount(accessToken.newAccount(data.instanceDomain, miApplication.getEncryption(), data.secret))
     }
 
     private fun onFailure(){

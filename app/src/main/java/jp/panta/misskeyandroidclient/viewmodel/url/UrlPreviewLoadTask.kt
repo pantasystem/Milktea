@@ -52,7 +52,7 @@ class UrlPreviewLoadTask(
             callback.accept(list)
 
         }catch(e: Throwable){
-            Log.e("UrlPreviewLoadTask", "url load error", e)
+            Log.d("UrlPreviewLoadTask", "url load error", e)
         }
 
     }
