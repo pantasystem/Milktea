@@ -48,7 +48,7 @@ class UrlPreviewLoadTask(
             }.filterNot {
                 it.url.isBlank()
             }
-            Log.d("UrlPreviewLoadTask", list.toString())
+            //Log.d("UrlPreviewLoadTask", list.toString())
             callback.accept(list)
 
         }catch(e: Throwable){

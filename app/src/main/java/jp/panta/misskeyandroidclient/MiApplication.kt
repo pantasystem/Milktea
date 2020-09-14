@@ -200,17 +200,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    /*override fun switchAccount(account: Account) {
-        applicationScope.launch(Dispatchers.IO){
-            try{
-
-                setCurrentUserId(account.id)
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
-                Log.d(TAG, "add or change account error", e)
-            }
-        }
-    }*/
 
     override fun logoutAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
@@ -517,16 +506,6 @@ class MiApplication : Application(), MiCore {
         return mEncryption
     }
 
-    private fun setCurrentUserId(userId: String){
-        sharedPreferences.edit().apply{
-            putString(CURRENT_USER_ID, userId)
-        }.apply()
-
-    }
-
-    private fun getCurrentUserId(): String?{
-        return sharedPreferences.getString(CURRENT_USER_ID, null)
-    }
 
     override fun getMainCapture(account: Account): MainCapture{
         Log.d(TAG, "getMainCapture")
