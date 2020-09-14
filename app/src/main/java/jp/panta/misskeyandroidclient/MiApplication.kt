@@ -145,6 +145,7 @@ class MiApplication : Application(), MiCore {
         applicationScope.launch(Dispatchers.IO){
             try{
                 //val connectionInstances = connectionInstanceDao!!.findAll()
+                AccountMigration(database.accountDao(), accountRepository).executeMigrate()
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "load account error", e)

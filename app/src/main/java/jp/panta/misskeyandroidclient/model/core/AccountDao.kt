@@ -23,4 +23,11 @@ abstract class AccountDao{
 
     @Query("select * from account where account.id = :accountId")
     abstract fun findAccount(accountId: String): Account?
+
+    @Query("drop table account")
+    abstract fun dropTable()
+
+    @Query("drop table page")
+    abstract fun dropPageTable()
+
 }

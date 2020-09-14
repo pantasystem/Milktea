@@ -1,31 +1,14 @@
 package jp.panta.misskeyandroidclient.model
 
+import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
+import jp.panta.misskeyandroidclient.model.account.newAccount
+import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
+import jp.panta.misskeyandroidclient.model.core.AccountDao
 
-val MIGRATION_33_34 = object : Migration(33, 34){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("alter table setting add antennaId TEXT")
-    }
-}
-
-val MIGRATION_34_35 = object : Migration(34, 35){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("alter table setting add listId TEXT")
-    }
-}
-
-val MIGRATION_35_36 = object : Migration(35, 36){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("create table 'reaction_user_setting'('reaction' TEXT not null, 'instance_domain' TEXT not null, 'weight' INTEGER not null, primary key('reaction', 'instance_domain'))")
-    }
-}
-
-val MIGRATION_36_37 = object : Migration(36, 37){
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("alter table setting add weight INTEGER")
-    }
-}
 
 val MIGRATION_1_2 = object : Migration(1, 2){
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -73,6 +56,29 @@ val MIGRATION_4_5 = object : Migration(4, 5){
         database.execSQL("CREATE TABLE IF NOT EXISTS 'page_table' ('accountId' INTEGER NOT NULL, 'title' TEXT NOT NULL, 'weight' INTEGER NOT NULL, 'pageId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'type' TEXT NOT NULL, 'withFiles' INTEGER, 'excludeNsfw' INTEGER, 'includeLocalRenotes' INTEGER, 'includeMyRenotes' INTEGER, 'includeRenotedMyRenotes' INTEGER, 'listId' TEXT, 'following' INTEGER, 'visibility' TEXT, 'noteId' TEXT, 'tag' TEXT, 'reply' INTEGER, 'renote' INTEGER, 'poll' INTEGER, 'offset' INTEGER, 'markAsRead' INTEGER, 'userId' TEXT, 'includeReplies' INTEGER, 'query' TEXT, 'host' TEXT, 'antennaId' TEXT)")
         database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_weight' ON 'page_table' ('weight')")
         database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_accountId' ON 'page_table' ('accountId')")
+
+    }
+}
+
+class AccountMigration(private val accountDao: AccountDao, private val accountRepository: AccountRepository){
+
+    suspend fun executeMigrate(){
+
+        try{
+            val oldAccounts = accountDao.findAllSetting()
+
+            val generated = oldAccounts.mapNotNull{ ar ->
+                ar.newAccount(null)
+            }
+            generated.forEach{
+                accountRepository.add(it, true)
+            }
+            accountDao.dropPageTable()
+            accountDao.dropTable()
+        }catch(e: Exception){
+            Log.d("AccountMigration", "エラー発生", e)
+        }
+
 
     }
 }

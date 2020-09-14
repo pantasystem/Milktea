@@ -154,6 +154,9 @@ fun AccountRelation.newAccount(user: User?): Account?{
             isCat = false,
             avatarUrl = null,
             bannerUrl = null,*/
-            encryptedToken = ci.encryptedI
+            encryptedToken = ci.encryptedI,
+            pages = this.pages.mapNotNull{
+                it.toPage()
+            }
         )
 }
