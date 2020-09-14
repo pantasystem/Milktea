@@ -177,7 +177,8 @@ sealed class Pageable : Serializable{
                 PageType.USER,
                 includeReplies = includeReplies,
                 includeMyRenotes = includeMyRenotes,
-                withFiles = withFiles
+                withFiles = withFiles,
+                userId = userId
             )
         }
     }

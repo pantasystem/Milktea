@@ -149,6 +149,7 @@ class TimelineViewModel : ViewModel{
         this.pageable = pageable
         usingAccount.addSource(miCore.getCurrentAccount()){ current ->
             if(reservedAccount == null || reservedAccount?.accountId == current.accountId){
+                Log.d("TimelineVM", "アカウント初期化: $current,")
                 usingAccount.postValue(current)
                 applyAccount(current, pageable)
             }
@@ -161,6 +162,7 @@ class TimelineViewModel : ViewModel{
      * 状態を初期化します
      */
     private fun applyAccount(account: Account, pageable: Pageable){
+        Log.d("TimelineVM", "pageable:$pageable, param:${pageable.toParams()}")
         timelineCapture = if(settingStore.isAutoLoadTimeline){
             miCore.getTimelineCapture(account)
         }else{
@@ -185,7 +187,7 @@ class TimelineViewModel : ViewModel{
     }
 
     private var isActive: Boolean = false
-    //private var mBeforeAccount: Account? = null
+    private var mBeforeAccount: Account? = null
     private val timelineLiveData = object : MediatorLiveData<TimelineState>(){
         override fun onActive() {
             super.onActive()
@@ -197,6 +199,16 @@ class TimelineViewModel : ViewModel{
             super.onInactive()
 
             inactive()
+        }
+    }.apply{
+        addSource(usingAccount){ using ->
+            if(isActive){
+                startNoteCapture()
+            }
+            if( using != mBeforeAccount || value?.notes.isNullOrEmpty()){
+                loadInit()
+            }
+            mBeforeAccount = using
         }
     }
 

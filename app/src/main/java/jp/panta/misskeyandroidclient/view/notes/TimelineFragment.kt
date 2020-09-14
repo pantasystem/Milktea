@@ -105,6 +105,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val notesViewModelFactory = NotesViewModelFactory(miApplication)
         val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
         mNotesViewModel = notesViewModel
+        Log.d("TimelineFM", "page:${mPage?.pageable()?: mPageable}")
         val factory = TimelineViewModelFactory(mPage, null, mPage?.pageable()?: mPageable!!, miApplication)
         mViewModel = ViewModelProvider(this, factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
 
