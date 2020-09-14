@@ -13,6 +13,7 @@ import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.lang.IllegalStateException
 
 class RoomAccountRepositoryTest{
 
@@ -74,6 +75,10 @@ class RoomAccountRepositoryTest{
             val updatedResult = roomAccountRepository.add(updated, true)
             assertEquals(updatedResult.pages.size, 1)
 
+            val getResult = roomAccountRepository.get(updatedResult.accountId)
+            assertEquals(getResult.pages.size, 1)
+
+            assertNotEquals(getResult.pages.first().pageId, 0)
         }
     }
 

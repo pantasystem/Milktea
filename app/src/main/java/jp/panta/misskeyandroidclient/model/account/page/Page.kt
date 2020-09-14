@@ -12,11 +12,11 @@ data class Page(
     val title: String,
     var weight: Int,
     @Embedded val pageParams: PageParams,
-    @PrimaryKey(autoGenerate = true) var pageId: Long = 0
+    @PrimaryKey(autoGenerate = true) var pageId: Long
 ) : Serializable {
 
-    constructor(accountId: Long, title: String, weight: Int, pageable: Pageable)
-            : this(accountId, title, weight, pageable.toParams(), 0)
+    constructor(accountId: Long, title: String, weight: Int, pageable: Pageable, pageId: Long = 0)
+            : this(accountId, title, weight, pageable.toParams(), pageId)
 
 
 

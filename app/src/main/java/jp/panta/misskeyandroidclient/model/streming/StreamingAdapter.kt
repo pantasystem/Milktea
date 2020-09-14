@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.streming
 
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -60,7 +61,7 @@ class StreamingAdapter(
                 observerMap[observer.id] = observer
                 observer.onConnect()
             }else{
-                Handler().postDelayed({
+                Handler(Looper.getMainLooper()).postDelayed({
                     putObserver(observer)
                 }, 100)
             }

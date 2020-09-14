@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account.db
 
 import android.content.SharedPreferences
+import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.Single
 import jp.panta.misskeyandroidclient.model.account.*
@@ -40,6 +41,7 @@ class RoomAccountRepository(
                 }
             })
             exAccount = get(exAccount.accountId)
+            Log.d("Repo", "ex: $exAccount")
         }
 
         return exAccount
@@ -85,13 +87,13 @@ class RoomAccountRepository(
     @Throws(AccountNotFoundException::class)
     override suspend fun getCurrentAccount(): Account {
         val currentAccountId = sharedPreferences.getLong(CURRENT_ACCOUNT_ID_KEY, -1)
-        val current = accountDao.get(currentAccountId)
+        val current = accountDao.getAccountRelation(currentAccountId)
         return if(current == null){
             val first = accountDao.findAll().firstOrNull()?.toAccount()
                 ?: throw AccountNotFoundException("アカウントが一つも見つかりませんでした")
             setCurrentAccount(first)
         }else{
-            current
+            current.toAccount()
         }
 
     }

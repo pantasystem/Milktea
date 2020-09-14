@@ -391,7 +391,7 @@ class MiApplication : Application(), MiCore {
             Log.d(TAG, "accountId:${current.accountId}, account:$current")
             if(current.pages.isEmpty()){
                 saveDefaultPages(current, meta)
-                //return loadAndInitializeAccounts()
+                return loadAndInitializeAccounts()
             }
 
             mCurrentAccount.postValue(current)
