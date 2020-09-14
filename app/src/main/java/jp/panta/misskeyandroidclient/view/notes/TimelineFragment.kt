@@ -93,7 +93,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         list_view.layoutManager = mLinearLayoutManager
 
         //データ受け取り
-        mPage = arguments?.getSerializable(EXTRA_PAGE) as Page
+        mPage = arguments?.getSerializable(EXTRA_PAGE) as? Page
 
         mPageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
 

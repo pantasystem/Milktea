@@ -281,7 +281,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun removeAllPagesInCurrentAccount(pages: List<Page>) {
-        applicationScope.launch {
+        applicationScope.launch(Dispatchers.IO) {
 
             val account = getCurrentAccountErrorSafe()?: return@launch
             val removed = account.pages.filterNot{ i ->
@@ -301,7 +301,7 @@ class MiApplication : Application(), MiCore {
 
 
     override fun removePageInCurrentAccount(page: Page) {
-        applicationScope.launch{
+        applicationScope.launch(Dispatchers.IO){
             try{
                 val current = accountRepository.getCurrentAccount()
                 val removed = current.copy(pages = current.pages.filterNot{
@@ -316,7 +316,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun replaceAllPagesInCurrentAccount(pages: List<Page>) {
-        applicationScope.launch{
+        applicationScope.launch(Dispatchers.IO){
             try{
                 val updated = accountRepository.getCurrentAccount().copy(pages = pages)
                 accountRepository.add(updated, true)
@@ -388,9 +388,10 @@ class MiApplication : Application(), MiCore {
                 connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
             }
 
+            Log.d(TAG, "accountId:${current.accountId}, account:$current")
             if(current.pages.isEmpty()){
                 saveDefaultPages(current, meta)
-                return loadAndInitializeAccounts()
+                //return loadAndInitializeAccounts()
             }
 
             mCurrentAccount.postValue(current)
@@ -408,7 +409,7 @@ class MiApplication : Application(), MiCore {
     private suspend fun saveDefaultPages(account: Account, meta: Meta?){
         try{
             val pages = makeDefaultPages(account, meta)
-            accountRepository.add(account.copy(pages = pages))
+            accountRepository.add(account.copy(pages = pages), true)
         }catch(e: Exception){
             Log.e(TAG, "default pages create error", e)
         }

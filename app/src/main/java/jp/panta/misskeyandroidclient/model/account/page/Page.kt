@@ -8,17 +8,17 @@ import java.io.Serializable
     indices = [Index("weight"), Index("accountId")]
 )
 data class Page(
-    val accountId: Long,
+    var accountId: Long,
     val title: String,
     var weight: Int,
-    @Embedded val pageParams: PageParams
+    @Embedded val pageParams: PageParams,
+    @PrimaryKey(autoGenerate = true) var pageId: Long = 0
 ) : Serializable {
 
     constructor(accountId: Long, title: String, weight: Int, pageable: Pageable)
-            : this(accountId, title, weight, pageable.toParams())
+            : this(accountId, title, weight, pageable.toParams(), 0)
 
 
-    @PrimaryKey(autoGenerate = true) var pageId: Long = -1
 
 
     @Ignore

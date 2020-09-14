@@ -37,10 +37,10 @@ data class Account (
     val encryptedToken: String,
     //@Ignore val emojis: List<Emoji>,
 
-    @Ignore val pages: List<Page>
+    @Ignore val pages: List<Page>,
+    @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
 ){
-    @PrimaryKey(autoGenerate = true) var accountId: Long = -114514
 
 
 
@@ -95,7 +95,7 @@ data class Account (
 
     fun getI(encryption: Encryption): String?{
         return try{
-            encryption.encrypt(this.remoteId, this.encryptedToken)
+            encryption.decrypt(this.remoteId, this.encryptedToken)
         }catch(e: Exception){
             null
         }

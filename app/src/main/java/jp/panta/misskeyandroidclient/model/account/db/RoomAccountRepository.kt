@@ -5,6 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import jp.panta.misskeyandroidclient.model.account.*
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
+import java.lang.IllegalStateException
 
 const val CURRENT_ACCOUNT_ID_KEY = "CURRENT_ACCOUNT_ID"
 class RoomAccountRepository(
@@ -34,9 +35,11 @@ class RoomAccountRepository(
             pageDAO.clearByAccountId(exAccount.accountId)
             pageDAO.insertAll(account.pages.mapIndexed{ i, page ->
                 page.also{
+                    it.accountId = exAccount!!.accountId
                     it.weight = i
                 }
             })
+            exAccount = get(exAccount.accountId)
         }
 
         return exAccount
