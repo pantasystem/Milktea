@@ -332,7 +332,7 @@ class NoteEditorViewModel(
 
     fun toDraftNote(): DraftNote{
         return DraftNote(
-            accountId = currentAccount.value?.remoteId!!,
+            accountId = currentAccount.value?.accountId!!,
             text = text.value,
             cw = cw.value,
             visibleUserIds = address.value?.map{

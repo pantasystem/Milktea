@@ -43,11 +43,7 @@ abstract class AccountDAO{
     @Update
     abstract fun update(account: Account)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(accountWithEmoji: AccountEmoji)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(accountWithEmojis: List<AccountEmoji>)
 
 
 }

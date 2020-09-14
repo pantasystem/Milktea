@@ -1,14 +1,12 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
 import androidx.room.*
-import jp.panta.misskeyandroidclient.model.core.Account
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 
-// TODO 新生Accountに対応させる必要がある
 @Entity(tableName = "draft_note", foreignKeys = [
     ForeignKey(
-        parentColumns = ["id"],
+        parentColumns = ["accountId"],
         childColumns = ["accountId"],
         entity = Account::class,
         onDelete = ForeignKey.CASCADE,
@@ -17,7 +15,7 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 ],
 indices = [Index("accountId", "text")])
 data class DraftNoteDTO(
-    val accountId: String,
+    val accountId: Long,
     val visibility: String = "public",
     val text: String?,
     val cw: String? = null,

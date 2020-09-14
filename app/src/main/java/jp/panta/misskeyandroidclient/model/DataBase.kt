@@ -17,7 +17,6 @@ import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
-import jp.panta.misskeyandroidclient.model.account.db.AccountEmoji
 import jp.panta.misskeyandroidclient.model.account.page.TimelinePageTypeConverter
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
 
@@ -35,8 +34,7 @@ import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
 
         UrlPreview::class,
         Account::class,
-        Page::class,
-        AccountEmoji::class
+        Page::class
 
     ],
     version = 5,

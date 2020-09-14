@@ -5,7 +5,7 @@ import java.io.Serializable
 
 
 data class DraftNote(
-    val accountId: String,
+    val accountId: Long,
     val visibility: String = "public",
     var visibleUserIds: List<String>? = null,
     val text: String?,

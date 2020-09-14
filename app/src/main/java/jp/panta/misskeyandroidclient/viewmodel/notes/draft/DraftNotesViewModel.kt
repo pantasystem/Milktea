@@ -44,7 +44,7 @@ class DraftNotesViewModel(
     fun loadDraftNotes(ac: Account){
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val notes = draftNoteDao.findDraftNotesByAccount(ac.remoteId)
+                val notes = draftNoteDao.findDraftNotesByAccount(ac.accountId)
                 draftNotes.postValue(notes.map{
                     DraftNoteViewData(it)
                 }.asReversed())

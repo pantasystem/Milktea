@@ -60,3 +60,19 @@ val MIGRATION_3_4 = object : Migration(3, 4){
         database.execSQL("CREATE TABLE IF NOT EXISTS 'url_preview'('url' TEXT NOT NULL, 'title' TEXT NOT NULL, 'icon' TEXT, 'description' TEXT, 'thumbnail' TEXT, 'siteName' TEXT, PRIMARY KEY('url'))")
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS 'draft_note'")
+
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'account_table' ('remoteId' TEXT NOT NULL, 'instanceDomain' TEXT NOT NULL, 'userName' TEXT NOT NULL, 'encryptedToken' TEXT NOT NULL, 'accountId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_remoteId' ON 'account_table'('remoteId')")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_instanceDomain' ON 'account_table' ('instanceDomain')")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_userName' ON 'account_table' ('userName')")
+        
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'page_table' ('accountId' INTEGER NOT NULL, 'title' TEXT NOT NULL, 'weight' INTEGER NOT NULL, 'pageId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'type' TEXT NOT NULL, 'withFiles' INTEGER, 'excludeNsfw' INTEGER, 'includeLocalRenotes' INTEGER, 'includeMyRenotes' INTEGER, 'includeRenotedMyRenotes' INTEGER, 'listId' TEXT, 'following' INTEGER, 'visibility' TEXT, 'noteId' TEXT, 'tag' TEXT, 'reply' INTEGER, 'renote' INTEGER, 'poll' INTEGER, 'offset' INTEGER, 'markAsRead' INTEGER, 'userId' TEXT, 'includeReplies' INTEGER, 'query' TEXT, 'host' TEXT, 'antennaId' TEXT)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_weight' ON 'page_table' ('weight')")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_accountId' ON 'page_table' ('accountId')")
+
+    }
+}

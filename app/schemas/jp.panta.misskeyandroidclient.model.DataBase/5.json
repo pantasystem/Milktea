@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "f529d2546bc0b353bf97c8a961cd79e4",
+    "identityHash": "800c4413ce549149e4e25fcbe04ec64d",
     "entities": [
       {
         "tableName": "connection_information",
@@ -699,7 +699,7 @@
       },
       {
         "tableName": "draft_note",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`draft_note_id` INTEGER PRIMARY KEY AUTOINCREMENT, `accountId` TEXT NOT NULL, `visibility` TEXT NOT NULL, `text` TEXT, `cw` TEXT, `viaMobile` INTEGER, `localOnly` INTEGER, `noExtractMentions` INTEGER, `noExtractHashtags` INTEGER, `noExtractEmojis` INTEGER, `replyId` TEXT, `renoteId` TEXT, `multiple` INTEGER, `expiresAt` INTEGER, FOREIGN KEY(`accountId`) REFERENCES `Account`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`draft_note_id` INTEGER PRIMARY KEY AUTOINCREMENT, `accountId` INTEGER NOT NULL, `visibility` TEXT NOT NULL, `text` TEXT, `cw` TEXT, `viaMobile` INTEGER, `localOnly` INTEGER, `noExtractMentions` INTEGER, `noExtractHashtags` INTEGER, `noExtractEmojis` INTEGER, `replyId` TEXT, `renoteId` TEXT, `multiple` INTEGER, `expiresAt` INTEGER, FOREIGN KEY(`accountId`) REFERENCES `account_table`(`accountId`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "draftNoteId",
@@ -710,7 +710,7 @@
           {
             "fieldPath": "accountId",
             "columnName": "accountId",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -805,14 +805,14 @@
         ],
         "foreignKeys": [
           {
-            "table": "Account",
+            "table": "account_table",
             "onDelete": "CASCADE",
             "onUpdate": "CASCADE",
             "columns": [
               "accountId"
             ],
             "referencedColumns": [
-              "id"
+              "accountId"
             ]
           }
         ]
@@ -869,14 +869,8 @@
       },
       {
         "tableName": "account_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `remoteId` TEXT NOT NULL, `instanceDomain` TEXT NOT NULL, `userName` TEXT NOT NULL, `encryptedToken` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`remoteId` TEXT NOT NULL, `instanceDomain` TEXT NOT NULL, `userName` TEXT NOT NULL, `encryptedToken` TEXT NOT NULL, `accountId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
-          {
-            "fieldPath": "accountId",
-            "columnName": "accountId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "remoteId",
             "columnName": "remoteId",
@@ -899,6 +893,12 @@
             "fieldPath": "encryptedToken",
             "columnName": "encryptedToken",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -938,14 +938,8 @@
       },
       {
         "tableName": "page_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `accountId` INTEGER NOT NULL, `title` TEXT NOT NULL, `weight` INTEGER NOT NULL, `type` TEXT NOT NULL, `withFiles` INTEGER, `excludeNsfw` INTEGER, `includeLocalRenotes` INTEGER, `includeMyRenotes` INTEGER, `includeRenotedMyRenotes` INTEGER, `listId` TEXT, `following` INTEGER, `visibility` TEXT, `noteId` TEXT, `tag` TEXT, `reply` INTEGER, `renote` INTEGER, `poll` INTEGER, `offset` INTEGER, `markAsRead` INTEGER, `userId` TEXT, `includeReplies` INTEGER, `query` TEXT, `host` TEXT, `antennaId` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` INTEGER NOT NULL, `title` TEXT NOT NULL, `weight` INTEGER NOT NULL, `pageId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `withFiles` INTEGER, `excludeNsfw` INTEGER, `includeLocalRenotes` INTEGER, `includeMyRenotes` INTEGER, `includeRenotedMyRenotes` INTEGER, `listId` TEXT, `following` INTEGER, `visibility` TEXT, `noteId` TEXT, `tag` TEXT, `reply` INTEGER, `renote` INTEGER, `poll` INTEGER, `offset` INTEGER, `markAsRead` INTEGER, `userId` TEXT, `includeReplies` INTEGER, `query` TEXT, `host` TEXT, `antennaId` TEXT)",
         "fields": [
-          {
-            "fieldPath": "pageId",
-            "columnName": "pageId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "accountId",
             "columnName": "accountId",
@@ -961,6 +955,12 @@
           {
             "fieldPath": "weight",
             "columnName": "weight",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageId",
+            "columnName": "pageId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -1154,7 +1154,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f529d2546bc0b353bf97c8a961cd79e4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '800c4413ce549149e4e25fcbe04ec64d')"
     ]
   }
 }

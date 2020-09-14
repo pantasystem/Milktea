@@ -110,7 +110,7 @@ class PostNoteTask(
         }
 
         return DraftNote(
-            accountId = account.remoteId,
+            accountId = account.accountId,
             text = text,
             cw = cw,
             visibleUserIds = visibleUserIds,
