@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "800c4413ce549149e4e25fcbe04ec64d",
+    "identityHash": "4d4ea06174551643c866184ef5de6130",
     "entities": [
       {
         "tableName": "connection_information",
@@ -504,8 +504,8 @@
         ]
       },
       {
-        "tableName": "poll_choice",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`choice` TEXT NOT NULL, `draft_note_id` INTEGER NOT NULL, `weight` INTEGER NOT NULL, PRIMARY KEY(`choice`, `weight`, `draft_note_id`), FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "tableName": "poll_choice_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`choice` TEXT NOT NULL, `draft_note_id` INTEGER NOT NULL, `weight` INTEGER NOT NULL, PRIMARY KEY(`choice`, `weight`, `draft_note_id`), FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note_table`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "choice",
@@ -536,18 +536,18 @@
         },
         "indices": [
           {
-            "name": "index_poll_choice_draft_note_id_choice",
+            "name": "index_poll_choice_table_draft_note_id_choice",
             "unique": false,
             "columnNames": [
               "draft_note_id",
               "choice"
             ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_poll_choice_draft_note_id_choice` ON `${TABLE_NAME}` (`draft_note_id`, `choice`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_poll_choice_table_draft_note_id_choice` ON `${TABLE_NAME}` (`draft_note_id`, `choice`)"
           }
         ],
         "foreignKeys": [
           {
-            "table": "draft_note",
+            "table": "draft_note_table",
             "onDelete": "CASCADE",
             "onUpdate": "CASCADE",
             "columns": [
@@ -561,7 +561,7 @@
       },
       {
         "tableName": "user_id",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `draft_note_id` INTEGER NOT NULL, PRIMARY KEY(`userId`, `draft_note_id`), FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `draft_note_id` INTEGER NOT NULL, PRIMARY KEY(`userId`, `draft_note_id`), FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note_table`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "userId",
@@ -595,7 +595,7 @@
         ],
         "foreignKeys": [
           {
-            "table": "draft_note",
+            "table": "draft_note_table",
             "onDelete": "CASCADE",
             "onUpdate": "CASCADE",
             "columns": [
@@ -608,8 +608,8 @@
         ]
       },
       {
-        "tableName": "draft_file",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`file_id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL DEFAULT 'name none', `remote_file_id` TEXT, `file_path` TEXT, `is_sensitive` INTEGER, `type` TEXT, `thumbnailUrl` TEXT, `draft_note_id` INTEGER NOT NULL, `folder_id` TEXT, FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "tableName": "draft_file_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`file_id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL DEFAULT 'name none', `remote_file_id` TEXT, `file_path` TEXT, `is_sensitive` INTEGER, `type` TEXT, `thumbnailUrl` TEXT, `draft_note_id` INTEGER NOT NULL, `folder_id` TEXT, FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note_table`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "fileId",
@@ -675,17 +675,17 @@
         },
         "indices": [
           {
-            "name": "index_draft_file_draft_note_id",
+            "name": "index_draft_file_table_draft_note_id",
             "unique": false,
             "columnNames": [
               "draft_note_id"
             ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_draft_file_draft_note_id` ON `${TABLE_NAME}` (`draft_note_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_draft_file_table_draft_note_id` ON `${TABLE_NAME}` (`draft_note_id`)"
           }
         ],
         "foreignKeys": [
           {
-            "table": "draft_note",
+            "table": "draft_note_table",
             "onDelete": "CASCADE",
             "onUpdate": "CASCADE",
             "columns": [
@@ -698,7 +698,7 @@
         ]
       },
       {
-        "tableName": "draft_note",
+        "tableName": "draft_note_table",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`draft_note_id` INTEGER PRIMARY KEY AUTOINCREMENT, `accountId` INTEGER NOT NULL, `visibility` TEXT NOT NULL, `text` TEXT, `cw` TEXT, `viaMobile` INTEGER, `localOnly` INTEGER, `noExtractMentions` INTEGER, `noExtractHashtags` INTEGER, `noExtractEmojis` INTEGER, `replyId` TEXT, `renoteId` TEXT, `multiple` INTEGER, `expiresAt` INTEGER, FOREIGN KEY(`accountId`) REFERENCES `account_table`(`accountId`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
@@ -794,13 +794,13 @@
         },
         "indices": [
           {
-            "name": "index_draft_note_accountId_text",
+            "name": "index_draft_note_table_accountId_text",
             "unique": false,
             "columnNames": [
               "accountId",
               "text"
             ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_draft_note_accountId_text` ON `${TABLE_NAME}` (`accountId`, `text`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_draft_note_table_accountId_text` ON `${TABLE_NAME}` (`accountId`, `text`)"
           }
         ],
         "foreignKeys": [
@@ -1116,45 +1116,12 @@
           }
         ],
         "foreignKeys": []
-      },
-      {
-        "tableName": "account_emoji_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `accountId` INTEGER NOT NULL, `url` TEXT NOT NULL, PRIMARY KEY(`name`, `accountId`))",
-        "fields": [
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "accountId",
-            "columnName": "accountId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "url",
-            "columnName": "url",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "name",
-            "accountId"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '800c4413ce549149e4e25fcbe04ec64d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4d4ea06174551643c866184ef5de6130')"
     ]
   }
 }

@@ -4,7 +4,7 @@ import androidx.room.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
-@Entity(tableName = "draft_note", foreignKeys = [
+@Entity(tableName = "draft_note_table", foreignKeys = [
     ForeignKey(
         parentColumns = ["accountId"],
         childColumns = ["accountId"],

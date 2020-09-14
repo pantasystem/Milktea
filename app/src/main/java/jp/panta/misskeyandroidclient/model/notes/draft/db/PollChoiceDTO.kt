@@ -4,7 +4,7 @@ import androidx.room.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
 @Entity(
-    tableName = "poll_choice",
+    tableName = "poll_choice_table",
     primaryKeys = ["choice", "weight", "draft_note_id"],
     foreignKeys = [
         ForeignKey(

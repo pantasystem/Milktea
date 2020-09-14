@@ -73,23 +73,23 @@ abstract class DraftNoteDao {
     }
 
     @Transaction
-    @Query("select * from draft_note where accountId = :accountId")
+    @Query("select * from draft_note_table where accountId = :accountId")
     abstract fun findDraftNotesRelation(accountId: Long): List<DraftNoteRelation>
 
     @Transaction
-    @Query("select * from draft_note where accountId = :accountId and text like '%'||:word||'%'")
+    @Query("select * from draft_note_table where accountId = :accountId and text like '%'||:word||'%'")
     abstract fun searchByWordDraftNotesRelation(accountId: Long, word: String): List<DraftNoteRelation>
 
     @Transaction
-    @Query("select * from draft_note where accountId = :accountId and draft_note_id = :draftNoteId")
+    @Query("select * from draft_note_table where accountId = :accountId and draft_note_id = :draftNoteId")
     abstract fun getDraftNoteRelation(accountId: Long, draftNoteId: Long): DraftNoteRelation?
 
     @Transaction
-    @Query("delete from 'draft_note' where accountId = :accountId and draft_note_id = :draftNoteId")
+    @Query("delete from 'draft_note_table' where accountId = :accountId and draft_note_id = :draftNoteId")
     abstract fun deleteDraftNote(accountId: Long, draftNoteId: Long)
 
 
-    @Query("delete from 'draft_file' where draft_note_id = :draftNoteId and file_id = :fileId")
+    @Query("delete from 'draft_file_table' where draft_note_id = :draftNoteId and file_id = :fileId")
     abstract fun deleteFile(draftNoteId: Long, fileId: Long)
 
 }

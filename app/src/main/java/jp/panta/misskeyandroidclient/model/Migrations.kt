@@ -47,6 +47,7 @@ val MIGRATION_3_4 = object : Migration(3, 4){
 val MIGRATION_4_5 = object : Migration(4, 5){
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS 'draft_note'")
+        database.execSQL("DROP TABLE IF EXISTS 'user_id'")
 
         database.execSQL("CREATE TABLE IF NOT EXISTS 'account_table' ('remoteId' TEXT NOT NULL, 'instanceDomain' TEXT NOT NULL, 'userName' TEXT NOT NULL, 'encryptedToken' TEXT NOT NULL, 'accountId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
         database.execSQL("CREATE INDEX IF NOT EXISTS 'index_account_table_remoteId' ON 'account_table'('remoteId')")
@@ -56,7 +57,16 @@ val MIGRATION_4_5 = object : Migration(4, 5){
         database.execSQL("CREATE TABLE IF NOT EXISTS 'page_table' ('accountId' INTEGER NOT NULL, 'title' TEXT NOT NULL, 'weight' INTEGER NOT NULL, 'pageId' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'type' TEXT NOT NULL, 'withFiles' INTEGER, 'excludeNsfw' INTEGER, 'includeLocalRenotes' INTEGER, 'includeMyRenotes' INTEGER, 'includeRenotedMyRenotes' INTEGER, 'listId' TEXT, 'following' INTEGER, 'visibility' TEXT, 'noteId' TEXT, 'tag' TEXT, 'reply' INTEGER, 'renote' INTEGER, 'poll' INTEGER, 'offset' INTEGER, 'markAsRead' INTEGER, 'userId' TEXT, 'includeReplies' INTEGER, 'query' TEXT, 'host' TEXT, 'antennaId' TEXT)")
         database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_weight' ON 'page_table' ('weight')")
         database.execSQL("CREATE INDEX IF NOT EXISTS 'index_page_table_accountId' ON 'page_table' ('accountId')")
-
+        
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'draft_note_table' ('draft_note_id' INTEGER PRIMARY KEY AUTOINCREMENT, 'accountId' INTEGER NOT NULL, 'visibility' TEXT NOT NULL, 'text' TEXT, 'cw' TEXT, 'viaMobile' INTEGER, 'localOnly' INTEGER, 'noExtractMentions' INTEGER, 'noExtractHashtags' INTEGER, 'noExtractEmojis' INTEGER, 'replyId' TEXT, 'renoteId' TEXT, 'multiple' INTEGER, 'expiresAt' INTEGER, FOREIGN KEY('accountId') REFERENCES 'account_table'('accountId') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_draft_note_table_accountId_text' ON 'draft_note_table' ('accountId', 'text')")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'draft_file_table' ('file_id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' TEXT NOT NULL DEFAULT 'name none', 'remote_file_id' TEXT, 'file_path' TEXT, 'is_sensitive' INTEGER, 'type' TEXT, 'thumbnailUrl' TEXT, 'draft_note_id' INTEGER NOT NULL, 'folder_id' TEXT, FOREIGN KEY('draft_note_id') REFERENCES 'draft_note_table'('draft_note_id') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_draft_file_table_draft_note_id' ON 'draft_file_table' ('draft_note_id')")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'poll_choice_table' ('choice' TEXT NOT NULL, 'draft_note_id' INTEGER NOT NULL, 'weight' INTEGER NOT NULL, PRIMARY KEY('choice', 'weight', 'draft_note_id'), FOREIGN KEY('draft_note_id') REFERENCES 'draft_note_table'('draft_note_id') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_poll_choice_table_draft_note_id_choice' ON 'poll_choice_table'('draft_note_id', 'choice')")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'user_id' ('userId' TEXT NOT NULL, 'draft_note_id' INTEGER NOT NULL, PRIMARY KEY('userId', 'draft_note_id'), FOREIGN KEY('draft_note_id') REFERENCES 'draft_note_table'('draft_note_id') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_user_id_draft_note_id' ON 'user_id' ('draft_note_id')")
+        
     }
 }
 

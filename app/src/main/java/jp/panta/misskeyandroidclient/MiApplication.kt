@@ -288,7 +288,7 @@ class MiApplication : Application(), MiCore {
             val account = getCurrentAccountErrorSafe()?: return@launch
             val removed = account.pages.filterNot{ i ->
                 i.pageId == pages.firstOrNull { j ->
-                    i.pageId == i.pageId
+                    i.pageId == j.pageId
                 }?.pageId
             }
             try{
