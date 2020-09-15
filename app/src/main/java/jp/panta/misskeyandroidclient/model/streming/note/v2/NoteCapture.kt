@@ -29,6 +29,10 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
     data class NoteUpdated(override val type: String, val body: Body<NoteUpdatedBody>): StreamingAction
     data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?, val emoji: Emoji?)
 
+    /**
+     * ノートをまとめてキャプチャーするためのクライアント
+     * NoteCapture⇔Client⇔利用クラスのようにして取り扱います。
+     */
     class Client {
         val clientId: String = UUID.randomUUID().toString()
 
@@ -38,14 +42,23 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
 
         val subject = PublishSubject.create<NoteEvent>()
 
+        /**
+         * ノートをキャプチャーします。
+         * またノートをキャプチャーするためにはClientをNoteCapture#attachClientする必要があります。
+         */
         fun capture(noteId: String): Boolean{
+            captureNotes.add(noteId)
             return noteCapture?.capture(this, noteId)?: false
         }
 
         fun unCapture(noteId: String): Boolean{
+            captureNotes.remove(noteId)
             return noteCapture?.unCapture(this, noteId)?: false
         }
 
+        /**
+         * このClientがCaptureしているノートのイベントストリームを取得します。
+         */
         fun getObservable(): Observable<NoteEvent>{
             return subject
         }
@@ -61,12 +74,21 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
 
     override var streamingAdapter: StreamingAdapter? = null
 
-    private val notesClients = ConcurrentHashMap<String, Set<String>>()
+    /**
+     * noteIdとそのNoteをキャプチャーしているClientのclientId
+     */
+    private val noteIdsClients = ConcurrentHashMap<String, Set<String>>()
 
+    /**
+     * clientIdをKey、ClientをValueとするHashMap
+     */
     private val clients = ConcurrentHashMap<String, Client>()
 
 
-    fun putClient(client: Client){
+    /**
+     * Clientをここにセットすることによって取り扱えるようになります。
+     */
+    fun attachClient(client: Client){
         val added = clients[client.clientId]
         if(added == null){
             clients[client.clientId] = client
@@ -77,7 +99,12 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
         }
     }
 
-    fun removeClient(client: Client){
+    /**
+     * Clientを取り外します
+     * このClientの管轄であるノートのCaptureが解除されます。
+     * ここで他のClientにもCaptureされていた場合はCaptureが解除されることはありません。
+     */
+    fun detachClient(client: Client){
         val capturedClient = clients.remove(client.clientId)
             ?: return
 
@@ -90,25 +117,25 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
 
 
     fun capture(client: Client, noteId: String): Boolean{
-        val clients = HashSet<String>(notesClients[noteId]?: HashSet()?: emptySet())
+        val notesClients = HashSet<String>(noteIdsClients[noteId]?: HashSet()?: emptySet())
 
-        if(!clients.contains(client.clientId)){
-            val added = clients.add(client.clientId)
+        if(!notesClients.contains(client.clientId)){
+            val added = notesClients.add(client.clientId)
             captureRemote(noteId)
             return added
         }
-        return notesClients.put(noteId, clients) != null
+        return this.noteIdsClients.put(noteId, notesClients) != null
 
     }
 
     fun unCapture(client: Client, noteId: String): Boolean{
-        val clients = HashSet<String>(notesClients[noteId]?: emptySet())
-        val a = clients.remove(client.clientId)
-        if(clients.isEmpty() && a){
+        val notesClients = HashSet<String>(noteIdsClients[noteId]?: emptySet())
+        val a = notesClients.remove(client.clientId)
+        if(notesClients.isEmpty() && a){
             unCaptureRemote(noteId)
         }
 
-        notesClients[noteId] = clients
+        this.noteIdsClients[noteId] = notesClients
         return a
 
     }
@@ -171,7 +198,7 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
     }
 
     private fun onUpdate(noteEvent: NoteEvent){
-        val clientIds = notesClients[noteEvent.noteId]
+        val clientIds = noteIdsClients[noteEvent.noteId]
         clientIds?.forEach{ clientId ->
             clients[clientId]?.subject?.onNext(noteEvent)
         }
@@ -181,13 +208,13 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
 
 
     override fun onClosing() {
-        notesClients.keys.forEach{ noteId ->
+        noteIdsClients.keys.forEach{ noteId ->
             unCaptureRemote(noteId)
         }
     }
 
     override fun onConnect() {
-        notesClients.keys.forEach{ noteId ->
+        noteIdsClients.keys.forEach{ noteId ->
             captureRemote(noteId)
         }
     }
