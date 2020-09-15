@@ -186,6 +186,8 @@ class TimelineViewModel : ViewModel{
 
     }
 
+    private var mNoteIds = HashSet<String>()
+
     private var isActive: Boolean = false
     private var mBeforeAccount: Account? = null
     private val timelineLiveData = object : MediatorLiveData<TimelineState>(){
@@ -262,7 +264,7 @@ class TimelineViewModel : ViewModel{
                 try{
                     val res = syncLoad(request)
                         ?: return@launch
-                    val list = res.second
+                    val list = res.second?.filter(::filterDuplicate)
                     if(list.isNullOrEmpty()){
                         return@launch
                     }else{
@@ -291,6 +293,8 @@ class TimelineViewModel : ViewModel{
                                 TimelineState.State.LOAD_NEW
                             )
                         }
+
+                        mNoteIds.addAll(list.map(::mapId))
 
                         timelineLiveData.postValue(newState)
                     }
@@ -323,7 +327,7 @@ class TimelineViewModel : ViewModel{
             try {
                 val res = syncLoad(request)
                     ?: return@launch
-                val list = res.second
+                val list = res.second?.filter(::filterDuplicate)
                 if(list.isNullOrEmpty()){
                     return@launch
                 }else{
@@ -346,7 +350,7 @@ class TimelineViewModel : ViewModel{
                             TimelineState.State.LOAD_OLD
                         )
                     }
-
+                    mNoteIds.addAll(list.map(::mapId))
                     timelineLiveData.postValue(newState)
                 }
             }catch (e: IOException){
@@ -383,6 +387,9 @@ class TimelineViewModel : ViewModel{
                     noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
 
                     loadUrlPreviews(list)
+
+                    mNoteIds.clear()
+                    mNoteIds.addAll(list.map(::mapId))
 
                     timelineLiveData.postValue(state)
 
@@ -515,6 +522,10 @@ class TimelineViewModel : ViewModel{
             if(isLoadingFlag){
                 return
             }
+            if(mNoteIds.contains(note.id)){
+                Log.i("TM-VM", "重複を確認したためキャンセルする")
+                return
+            }
             noteCapture?.subscribe(noteCaptureRegister.registerId, note)
             loadUrlPreviews(listOf(note))
             val notes = timelineLiveData.value?.notes
@@ -524,6 +535,10 @@ class TimelineViewModel : ViewModel{
                 ArrayList<PlaneNoteViewData>(notes).apply{
                     add(0, note)
                 }
+            }
+            mNoteIds.add(note.id)
+            if(list.size > mNoteIds.size){
+                Log.d("TM-VM", "重複が発生しています ${mNoteIds.size}: ${list.size}")
             }
             timelineLiveData.postValue(
                 TimelineState(
@@ -576,6 +591,14 @@ class TimelineViewModel : ViewModel{
 
 
 
+    private fun mapId(planeNoteViewData: PlaneNoteViewData): String{
+        return planeNoteViewData.id
+    }
+
+    private fun filterDuplicate(planeNoteViewData: PlaneNoteViewData) : Boolean{
+        Log.d("TM-VM-Filter", "重複を発見したため排除しました")
+        return ! mNoteIds.contains(planeNoteViewData.id)
+    }
 
 
 
