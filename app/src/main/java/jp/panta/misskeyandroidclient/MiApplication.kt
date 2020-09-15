@@ -41,6 +41,11 @@ import java.lang.Exception
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
+import jp.panta.misskeyandroidclient.model.instance.MetaRepository
+import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
+import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -66,6 +71,10 @@ class MiApplication : Application(), MiCore {
     lateinit var urlPreviewDAO: UrlPreviewDAO
 
     lateinit var accountRepository: AccountRepository
+
+    lateinit var metaRepository: MetaRepository
+
+    lateinit var metaStore: MetaStore
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -135,6 +144,10 @@ class MiApplication : Application(), MiCore {
         mEncryption = KeyStoreSystemEncryption(this)
 
         urlPreviewDAO = database.urlPreviewDAO()
+
+        metaRepository = RoomMetaRepository(database.metaDAO())
+
+        metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
         messageSubscriber =
@@ -435,7 +448,7 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    private fun setUpMetaMap(accounts: List<Account>){
+    private suspend fun setUpMetaMap(accounts: List<Account>){
         try{
             accounts.forEach { ac ->
                 loadInstanceMetaAndSetupAPI(ac.instanceDomain)
@@ -446,7 +459,7 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    private fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
+    private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
             val meta = synchronized(mMisskeyAPIUrlMap){
                 try{
@@ -456,7 +469,7 @@ class MiApplication : Application(), MiCore {
                     null
                 }
             } ?: try{
-                MisskeyGetMeta.getMeta(instanceDomain).execute().body()
+                metaStore.get(instanceDomain)
             }catch(e: Exception){
                 Log.d(TAG, "metaをオンラインから取得するのに失敗したでち")
                 connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
