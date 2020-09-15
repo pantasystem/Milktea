@@ -7,8 +7,6 @@ import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.notes.Event
-import jp.panta.misskeyandroidclient.model.notes.NoteEvent
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.streming.AbsObserver
 import jp.panta.misskeyandroidclient.model.streming.Body

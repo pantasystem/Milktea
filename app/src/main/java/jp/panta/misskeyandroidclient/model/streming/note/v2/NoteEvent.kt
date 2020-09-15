@@ -1,7 +1,6 @@
-package jp.panta.misskeyandroidclient.model.notes
+package jp.panta.misskeyandroidclient.model.streming.note.v2
 
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import java.util.*
 
 
 class NoteEvent(
