@@ -20,6 +20,9 @@ import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
 import jp.panta.misskeyandroidclient.model.account.page.TimelinePageTypeConverter
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
 import jp.panta.misskeyandroidclient.model.instance.Meta
+import jp.panta.misskeyandroidclient.model.instance.db.EmojiDTO
+import jp.panta.misskeyandroidclient.model.instance.db.MetaDAO
+import jp.panta.misskeyandroidclient.model.instance.db.MetaDTO
 
 @Database(
     entities = [
@@ -35,8 +38,9 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 
         UrlPreview::class,
         Account::class,
-        Page::class/*,
-        Meta::class*/
+        Page::class,
+        MetaDTO::class,
+        EmojiDTO::class
 
     ],
     version = 6,
@@ -56,5 +60,7 @@ abstract class DataBase : RoomDatabase(){
 
     abstract fun accountDAO(): AccountDAO
     abstract fun pageDAO(): PageDAO
+
+    abstract fun metaDAO(): MetaDAO
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
 }

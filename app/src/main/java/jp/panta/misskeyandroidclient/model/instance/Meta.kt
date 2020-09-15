@@ -41,70 +41,9 @@ data class Meta(
     @Ignore @SerializedName("emojis") var emojis: List<Emoji>?
 ){
 
-    constructor(
-        uri: String,
-        bannerUrl: String?,
-        cacheRemoteFiles: Boolean?,
-        description: String,
-        disableGlobalTimeline: Boolean?,
-        disableLocalTimeline: Boolean?,
-        disableRegistration: Boolean?,
-        driveCapacityPerLocalUserMb: Int?,
-        driveCapacityPerRemoteUserMb: Int?,
-        enableDiscordIntegration: Boolean?,
-        enableEmail: Boolean?,
-        enableEmojiReaction: Boolean?,
-        enableGithubIntegration: Boolean?,
-        enableRecaptcha: Boolean?,
-        enableServiceWorker: Boolean?,
-        enableTwitterIntegration: Boolean?,
-        errorImageUrl: String?,
-        feedbackUrl: String?,
-        iconUrl: String?,
-        maintainerEmail: String?,
-        maintainerName: String?,
-        mascotImageUrl: String?,
-        maxNoteTextLength: Int?,
-        name: String?,
-        recaptchaSiteKey: String?,
-        secure: Boolean?,
-        swPublicKey: String?,
-        toSUrl: String?,
-        version: String
-    ) : this(
-        bannerUrl = bannerUrl,
-        cacheRemoteFiles = cacheRemoteFiles,
-        description = description,
-        disableGlobalTimeline = disableGlobalTimeline,
-        disableLocalTimeline = disableLocalTimeline,
-        disableRegistration = disableRegistration,
-        driveCapacityPerLocalUserMb = driveCapacityPerLocalUserMb,
-        driveCapacityPerRemoteUserMb = driveCapacityPerRemoteUserMb,
-        enableDiscordIntegration = enableDiscordIntegration,
-        enableEmail = enableEmail,
-        enableEmojiReaction = enableEmojiReaction,
-        enableGithubIntegration = enableGithubIntegration,
-        enableRecaptcha = enableRecaptcha,
-        enableServiceWorker = enableServiceWorker,
-        enableTwitterIntegration = enableTwitterIntegration,
-        errorImageUrl = errorImageUrl,
-        feedbackUrl = feedbackUrl,
-        iconUrl = iconUrl,
-        maintainerEmail = maintainerEmail,
-        maintainerName = maintainerName,
-        mascotImageUrl = mascotImageUrl,
-        maxNoteTextLength = maxNoteTextLength,
-        name = name,
-        recaptchaSiteKey = recaptchaSiteKey,
-        secure = secure,
-        swPublicKey = swPublicKey,
-        toSUrl = toSUrl,
-        version = version,
-        emojis = emptyList(),
-        uri = uri
-        )
 
 
+    @Ignore
     fun getVersion(): Version{
         return Version(version)
     }

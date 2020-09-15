@@ -7,16 +7,19 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 abstract class MetaDAO{
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(meta: Meta)
+    abstract fun insert(meta: MetaDTO)
 
     @Delete
-    abstract fun delete(meta: Meta)
+    abstract fun delete(meta: MetaDTO)
 
     @Query("select * from meta_table where uri = :instanceDomain")
-    abstract fun findByInstanceDomain(instanceDomain: String): Meta?
+    abstract fun findByInstanceDomain(instanceDomain: String): MetaRelation?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(emojiDTO: EmojiDTO)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertAll(emojis: List<EmojiDTO>)
 
     @Query("select * from emoji_table where name = :name and instanceDomain = :instanceDomain")
     abstract fun findByNameAndInstanceDomain(name: String, instanceDomain: String) : EmojiDTO

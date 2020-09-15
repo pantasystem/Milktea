@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 @Entity(
     tableName = "emoji_table",
     primaryKeys = ["name", "instanceDomain"],
-    foreignKeys = [ForeignKey(parentColumns = ["uri"], childColumns = ["instanceDomain"], entity = Meta::class, onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)]
+    foreignKeys = [ForeignKey(parentColumns = ["uri"], childColumns = ["instanceDomain"], entity = MetaDTO::class, onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)]
 )
 data class EmojiDTO(
     val name: String,
