@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.instance
 
+import android.util.Log
 import java.util.concurrent.ConcurrentHashMap
 
 class MediatorMetaStore(
@@ -12,16 +13,25 @@ class MediatorMetaStore(
         try{
             val local = metaRepository.get(instanceDomain)
             if(local == null || isUpdateRepository){
-                val remote = metaStore.get(instanceDomain)
+                val remote = try{
+                    metaStore.get(instanceDomain)
+                }catch(e: Exception){
+                    null
+                }
                 if(remote != null){
-                    return metaRepository.add(remote)
+                    return try{
+                        metaRepository.add(remote)
+                    }catch(e: Exception){
+                        Log.e("MediatorMetaStore", "データベースエラー", e)
+                        remote
+                    }
                 }
             }
+            return local
         }catch(e: Exception){
             return null
         }
 
-        return null
 
     }
 
