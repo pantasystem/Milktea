@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscrib
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 
 interface MiCore{
     //val accounts: MutableLiveData<List<Account>>
@@ -70,5 +71,5 @@ interface MiCore{
 
     fun getSettingStore(): SettingStore
 
-
+    fun getNoteRepository(account: Account) : NoteRepository
 }

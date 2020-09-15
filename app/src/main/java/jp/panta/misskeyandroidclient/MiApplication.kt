@@ -44,8 +44,11 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.db.InMemoryNoteRepository
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -75,6 +78,8 @@ class MiApplication : Application(), MiCore {
     lateinit var metaRepository: MetaRepository
 
     lateinit var metaStore: MetaStore
+
+    lateinit var noteRepositoryFactory: NoteRepository.Factory
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -155,6 +160,8 @@ class MiApplication : Application(), MiCore {
             MessageSubscriber(
                 this
             )
+
+        noteRepositoryFactory = InMemoryNoteRepository.Factory()
 
         applicationScope.launch(Dispatchers.IO){
             try{
@@ -521,6 +528,9 @@ class MiApplication : Application(), MiCore {
         return mEncryption
     }
 
+    override fun getNoteRepository(account: Account): NoteRepository {
+        return noteRepositoryFactory.create(account)
+    }
 
     override fun getMainCapture(account: Account): MainCapture{
         Log.d(TAG, "getMainCapture")
