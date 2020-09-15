@@ -7,9 +7,8 @@ import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 
-@Entity(tableName = "meta_table")
 data class Meta(
-    @PrimaryKey(autoGenerate = false) @SerializedName("uri") var uri: String,
+    @SerializedName("uri") var uri: String,
     @SerializedName("bannerUrl") var bannerUrl: String?,
     @SerializedName("cacheRemoteFiles") var cacheRemoteFiles: Boolean?,
     @SerializedName("description") var description: String?,
@@ -38,7 +37,7 @@ data class Meta(
     @SerializedName("swPublickey") var swPublicKey: String?,
     @SerializedName("ToSUrl") var toSUrl: String?,
     @SerializedName("version") var version: String,
-    @Ignore @SerializedName("emojis") var emojis: List<Emoji>?
+    @SerializedName("emojis") var emojis: List<Emoji>?
 ){
 
 
