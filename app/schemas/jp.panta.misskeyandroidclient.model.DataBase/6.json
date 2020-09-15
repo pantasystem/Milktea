@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "b7089db9bc685007fc4dc551e4574334",
+    "identityHash": "f0b44b577de14e836e23b7ff464647a6",
     "entities": [
       {
         "tableName": "connection_information",
@@ -1365,7 +1365,24 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_emoji_table_instanceDomain",
+            "unique": false,
+            "columnNames": [
+              "instanceDomain"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_emoji_table_instanceDomain` ON `${TABLE_NAME}` (`instanceDomain`)"
+          },
+          {
+            "name": "index_emoji_table_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_emoji_table_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "meta_table",
@@ -1384,7 +1401,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7089db9bc685007fc4dc551e4574334')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f0b44b577de14e836e23b7ff464647a6')"
     ]
   }
 }

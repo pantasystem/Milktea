@@ -2,13 +2,15 @@ package jp.panta.misskeyandroidclient.model.instance.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.instance.Meta
 
 @Entity(
     tableName = "emoji_table",
     primaryKeys = ["name", "instanceDomain"],
-    foreignKeys = [ForeignKey(parentColumns = ["uri"], childColumns = ["instanceDomain"], entity = MetaDTO::class, onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)]
+    foreignKeys = [ForeignKey(parentColumns = ["uri"], childColumns = ["instanceDomain"], entity = MetaDTO::class, onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)],
+    indices = [Index("instanceDomain"), Index("name")]
 )
 data class EmojiDTO(
     val name: String,
