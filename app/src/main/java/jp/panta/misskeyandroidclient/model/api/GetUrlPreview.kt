@@ -5,16 +5,12 @@ import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.mfm.Link
 import jp.panta.misskeyandroidclient.mfm.Node
 import jp.panta.misskeyandroidclient.mfm.Root
-import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

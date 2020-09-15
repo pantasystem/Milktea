@@ -19,6 +19,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
 import jp.panta.misskeyandroidclient.model.account.page.TimelinePageTypeConverter
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
+import jp.panta.misskeyandroidclient.model.instance.Meta
 
 @Database(
     entities = [
@@ -34,10 +35,11 @@ import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
 
         UrlPreview::class,
         Account::class,
-        Page::class
+        Page::class/*,
+        Meta::class*/
 
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class)

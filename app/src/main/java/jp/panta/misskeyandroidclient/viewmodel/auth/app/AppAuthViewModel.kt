@@ -10,10 +10,9 @@ import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CreateApp
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
-import jp.panta.misskeyandroidclient.model.meta.Meta
+import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.viewmodel.auth.DefaultPermission
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback

@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import jp.panta.misskeyandroidclient.model.meta.Meta
+import jp.panta.misskeyandroidclient.model.instance.Meta
 import java.lang.IndexOutOfBoundsException
 
 class Version : Comparable<Version>{
