@@ -92,7 +92,7 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
     /**
      * Clientをここにセットすることによって取り扱えるようになります。
      */
-    fun attachClient(client: Client){
+    fun attachClient(client: Client) : Boolean{
         val added = clients[client.clientId]
         if(added == null){
             clients[client.clientId] = client
@@ -101,6 +101,7 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
                 capture(client, note)
             }
         }
+        return added == null
     }
 
     /**

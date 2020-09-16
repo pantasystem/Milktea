@@ -524,28 +524,36 @@ class TimelineViewModel : ViewModel{
         }
     }
 
+    var counter: Int = 0
     private fun startNoteCapture(){
-        Log.d(tag, "ノートのキャプチャーを開始しようとしている")
+        counter++
+        Log.d(tag, "ノートのキャプチャーを開始しようとしている:$counter")
 
         //noteCapture?.attach(noteCaptureRegister)
         noteCaptureClient?.let{
             noteCapture?.attachClient(it)
         }
 
-        mNoteEventDisposable = noteEventStore?.getEventStream(stoppedAt)?./*filter {
-            !(it.event as? Event.Added != null && it.authorId == noteCaptureClient?.clientId)
-        }?.*/subscribe {
-            noteEventObserver(it)
+        if(mNoteEventDisposable == null){
+            mNoteEventDisposable = noteEventStore?.getEventStream(stoppedAt)?.filter {
+                !(it.event as? Event.Added != null && it.authorId == noteCaptureClient?.clientId)
+            }?.subscribe {
+                noteEventObserver(it)
+            }
         }
+
 
     }
 
     private fun stopNoteCapture(){
+        counter --
+        Log.d("TM-VM", "ノートキャプチャーを停止します。:$counter")
         noteCaptureClient?.let{
             noteCapture?.detachClient(it)
         }
         stoppedAt = Date()
         mNoteEventDisposable?.dispose()
+        mNoteEventDisposable = null
     }
 
 

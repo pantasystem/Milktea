@@ -11,7 +11,9 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
+import jp.panta.misskeyandroidclient.model.notes.Event
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteEvent
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
@@ -24,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 class NoteDetailViewModel(
     val account: Account,
@@ -43,6 +46,9 @@ class NoteDetailViewModel(
 
     private val noteCapture = miCore.getNoteCapture(account)
     private var noteRegister = NoteRegister()
+    private val client = jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture.Client()
+    val noteEventStore = miCore.getNoteEventStore(account)
+
 
     val notes = object : MutableLiveData<List<PlaneNoteViewData>>(){
         override fun onActive() {
@@ -63,12 +69,15 @@ class NoteDetailViewModel(
     private fun startStreaming(){
 
         //noteCapture.attach(noteRegister)
+        noteCapture.attachClient(client)
+        //TODO キャプチャーのイベントを反映する処理を実装する
+
 
     }
 
     private fun stopStreaming(){
         //noteCapture.detach(noteRegister)
-
+        noteCapture.detachClient(client)
     }
 
 
@@ -98,6 +107,20 @@ class NoteDetailViewModel(
                     notes.postValue(list)
                 }
                 //noteCapture.subscribeAll(noteRegister.registerId, list)
+
+                val noteIds = HashSet<String>()
+
+                for(note in list){
+                    noteEventStore.release(
+                        NoteEvent(
+                            noteId = note.id,
+                            event = Event.Added(note.note)
+                        )
+                    )
+                    noteIds.add(note.id)
+                    noteIds.add(note.toShowNote.id)
+                }
+                client.captureAll(noteIds.toList())
 
             }catch (e: Exception){
 
