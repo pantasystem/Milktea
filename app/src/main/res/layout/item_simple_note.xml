@@ -282,12 +282,12 @@
                     android:contentDescription="@string/reply_title"
                     />
             <TextView
-                    android:text='@{note.replyCount}'
+                    android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
                     android:layout_width="50dp"
                     android:layout_height="wrap_content" android:id="@+id/textView3" android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:singleLine="true"
-                    android:visibility='@{note.replyCount == null ? View.INVISIBLE : View.VISIBLE}'
+                    android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
                     />
             <ImageButton
                     android:layout_width="40dp"
@@ -301,8 +301,8 @@
                     android:contentDescription="@string/renote"
                     />
             <TextView
-                    android:text='@{note.reNoteCount}'
-                    android:visibility='@{note.reNoteCount == null ? View.INVISIBLE : View.VISIBLE}'
+                    android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
+                    android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                     android:layout_width="50dp"
                     android:layout_height="wrap_content" android:id="@+id/textView4" android:layout_weight="1"

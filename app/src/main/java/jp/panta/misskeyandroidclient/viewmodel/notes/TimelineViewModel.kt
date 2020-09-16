@@ -524,10 +524,7 @@ class TimelineViewModel : ViewModel{
         }
     }
 
-    var counter: Int = 0
     private fun startNoteCapture(){
-        counter++
-        Log.d(tag, "ノートのキャプチャーを開始しようとしている:$counter")
 
         //noteCapture?.attach(noteCaptureRegister)
         noteCaptureClient?.let{
@@ -546,8 +543,6 @@ class TimelineViewModel : ViewModel{
     }
 
     private fun stopNoteCapture(){
-        counter --
-        Log.d("TM-VM", "ノートキャプチャーを停止します。:$counter")
         noteCaptureClient?.let{
             noteCapture?.detachClient(it)
         }
@@ -616,7 +611,7 @@ class TimelineViewModel : ViewModel{
                 }
             }
             else -> timelineNotes.map{
-                var note: PlaneNoteViewData = it
+                val note: PlaneNoteViewData = it
                 if(note.toShowNote.id == noteEvent.noteId){
                     when(noteEvent.event){
                         is Event.Reacted ->{
@@ -629,9 +624,7 @@ class TimelineViewModel : ViewModel{
                             it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account?.remoteId)
                         }
                         is Event.Added ->{
-                            if(account != null){
-                                note = PlaneNoteViewData(noteEvent.event.note, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
-                            }
+                            note.update(noteEvent.event.note)
                         }
                     }
                 }
