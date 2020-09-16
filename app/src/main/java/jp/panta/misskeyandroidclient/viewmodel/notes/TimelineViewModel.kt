@@ -200,12 +200,7 @@ class TimelineViewModel : ViewModel{
         misskeyAPI = miCore.getMisskeyAPI(account)
         loadInit()
 
-        noteCaptureClient?.getObservable()?.subscribe {
-            Log.d("TimelineViewModel", "noteEvent: $it")
-            noteEventStore?.release(it)
-        }?.let{
-            mCompositeDisposable.add(it)
-        }
+
 
         noteEventStore?.getEventStream()
         //this.account = account
@@ -600,6 +595,7 @@ class TimelineViewModel : ViewModel{
     }
 
     private fun noteEventObserver(noteEvent: NoteEvent){
+        Log.d("TM-VM", "#noteEventObserver $noteEvent")
         val timelineNotes = timelineLiveData.value?.notes
             ?: return
 

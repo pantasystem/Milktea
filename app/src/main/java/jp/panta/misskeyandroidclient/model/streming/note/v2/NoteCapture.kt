@@ -7,10 +7,7 @@ import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.notes.Event
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteEvent
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.streming.AbsObserver
 import jp.panta.misskeyandroidclient.model.streming.Body
 import jp.panta.misskeyandroidclient.model.streming.StreamingAction
@@ -25,7 +22,7 @@ import kotlin.collections.HashSet
  * リモートの更新イベントをイベントデータとして返す
  *
  */
-class NoteCapture(override val account: Account) : AbsObserver(){
+class NoteCapture(override val account: Account, private val noteEventStore: NoteEventStore) : AbsObserver(){
     data class CaptureRequest(override val type: String = "sn", val body: CaptureRequestBody): StreamingAction
     data class CaptureRequestBody(private val id: String)
 
@@ -43,7 +40,6 @@ class NoteCapture(override val account: Account) : AbsObserver(){
 
         private val captureNotes = HashSet<String>()
 
-        val subject = PublishSubject.create<NoteEvent>()
 
         /**
          * ノートをキャプチャーします。
@@ -69,12 +65,6 @@ class NoteCapture(override val account: Account) : AbsObserver(){
             return noteIds.count{ noteId ->
                 unCapture(noteId)
             }
-        }
-        /**
-         * このClientがCaptureしているノートのイベントストリームを取得します。
-         */
-        fun getObservable(): Observable<NoteEvent>{
-            return subject
         }
 
         fun getCaptureNotes(): Set<String>{
@@ -226,10 +216,8 @@ class NoteCapture(override val account: Account) : AbsObserver(){
     private fun onUpdate(noteEvent: NoteEvent){
         val clientIds = noteIdsClients[noteEvent.noteId]
         Log.d("onUpdate", "client数: ${clientIds?.size}, event:$noteEvent")
-        clientIds?.forEach{ clientId ->
-            Log.d("NoteCapture", "更新先Client：$clientId")
-            clients[clientId]?.subject?.onNext(noteEvent)
-        }
+
+        noteEventStore.release(noteEvent)
     }
 
 

@@ -564,7 +564,7 @@ class MiApplication : Application(), MiCore {
         }
 
         if(noteCapture == null){
-            noteCapture = NoteCapture(account)
+            noteCapture = NoteCapture(account, getNoteEventStore(account))
             setupObserver(account, noteCapture)
             mNoteCaptureAccountMap[account.accountId] = noteCapture
         }
