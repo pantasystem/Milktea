@@ -7,6 +7,9 @@ import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.notes.Event
+import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteEvent
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.streming.AbsObserver
 import jp.panta.misskeyandroidclient.model.streming.Body
@@ -22,7 +25,7 @@ import kotlin.collections.HashSet
  * リモートの更新イベントをイベントデータとして返す
  *
  */
-class NoteCapture(override val account: Account, val noteRepositoryFactory: NoteRepository.Factory) : AbsObserver(){
+class NoteCapture(override val account: Account) : AbsObserver(){
     data class CaptureRequest(override val type: String = "sn", val body: CaptureRequestBody): StreamingAction
     data class CaptureRequestBody(private val id: String)
 
@@ -56,6 +59,17 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
             return noteCapture?.unCapture(this, noteId)?: false
         }
 
+        fun captureAll(noteIds: List<String>): Int{
+            return noteIds.count{
+                capture(it)
+            }
+        }
+
+        fun unCaptureAll(noteIds: List<String>): Int{
+            return noteIds.count{ noteId ->
+                unCapture(noteId)
+            }
+        }
         /**
          * このClientがCaptureしているノートのイベントストリームを取得します。
          */
@@ -114,19 +128,31 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
         capturedClient.noteCapture = null
     }
 
+    fun isAttachedClient(client: Client): Boolean{
+        return clients.contains(client.clientId)
+    }
 
 
     fun capture(client: Client, noteId: String): Boolean{
         val notesClients = HashSet<String>(noteIdsClients[noteId]?: HashSet()?: emptySet())
 
-        if(!notesClients.contains(client.clientId)){
-            val added = notesClients.add(client.clientId)
-            captureRemote(noteId)
-            return added
+        try{
+            if(!notesClients.contains(client.clientId)){
+                val added = notesClients.add(client.clientId)
+                captureRemote(noteId)
+                return added
+            }
+            return this.noteIdsClients.put(noteId, notesClients) != null
+        }catch(e: Exception){
+            Log.d("NoteCapture", "capture error",e)
+            return false
+        }finally{
+            noteIdsClients[noteId] = notesClients
         }
-        return this.noteIdsClients.put(noteId, notesClients) != null
+
 
     }
+
 
     fun unCapture(client: Client, noteId: String): Boolean{
         val notesClients = HashSet<String>(noteIdsClients[noteId]?: emptySet())
@@ -199,7 +225,9 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
 
     private fun onUpdate(noteEvent: NoteEvent){
         val clientIds = noteIdsClients[noteEvent.noteId]
+        Log.d("onUpdate", "client数: ${clientIds?.size}, event:$noteEvent")
         clientIds?.forEach{ clientId ->
+            Log.d("NoteCapture", "更新先Client：$clientId")
             clients[clientId]?.subject?.onNext(noteEvent)
         }
     }
@@ -223,3 +251,10 @@ class NoteCapture(override val account: Account, val noteRepositoryFactory: Note
 
 
 }
+
+fun NoteCapture.Client.captureAll(notes: List<Note>): Int{
+    return notes.count {
+        this.capture(it.id)
+    }
+}
+

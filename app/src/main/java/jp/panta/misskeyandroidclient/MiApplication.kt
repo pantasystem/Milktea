@@ -26,7 +26,7 @@ import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
@@ -47,8 +47,9 @@ import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
+import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
+import jp.panta.misskeyandroidclient.model.notes.NoteEventStoreFactory
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notes.db.InMemoryNoteRepository
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -79,7 +80,7 @@ class MiApplication : Application(), MiCore {
 
     lateinit var metaStore: MetaStore
 
-    lateinit var noteRepositoryFactory: NoteRepository.Factory
+    val noteEventStoreFactory: NoteEventStoreFactory = NoteEventStoreFactory()
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -161,7 +162,6 @@ class MiApplication : Application(), MiCore {
                 this
             )
 
-        noteRepositoryFactory = InMemoryNoteRepository.Factory()
 
         applicationScope.launch(Dispatchers.IO){
             try{
@@ -528,8 +528,10 @@ class MiApplication : Application(), MiCore {
         return mEncryption
     }
 
-    override fun getNoteRepository(account: Account): NoteRepository {
-        return noteRepositoryFactory.create(account)
+
+
+    override fun getNoteEventStore(account: Account): NoteEventStore {
+        return noteEventStoreFactory.create(account)
     }
 
     override fun getMainCapture(account: Account): MainCapture{

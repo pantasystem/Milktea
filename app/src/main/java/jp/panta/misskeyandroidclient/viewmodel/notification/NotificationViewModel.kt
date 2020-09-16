@@ -47,12 +47,12 @@ class NotificationViewModel(
         override fun onActive() {
             super.onActive()
             //streamingAdapter.addObserver(noteCaptureId, noteCapture)
-            noteCapture.attach(noteRegister)
+            //noteCapture.attach(noteRegister)
 
         }
         override fun onInactive() {
             super.onInactive()
-            noteCapture.detach(noteRegister)
+            //noteCapture.detach(noteRegister)
         }
 
     }
@@ -86,12 +86,12 @@ class NotificationViewModel(
                     list
                 )
                 if(list != null){
-                    noteCapture.detach(noteRegister)
+                    //noteCapture.detach(noteRegister)
                     noteRegister = NoteRegister()
-                    noteCapture.attach(noteRegister)
-                    noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull{
+                    //noteCapture.attach(noteRegister)
+                    /*noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull{
                         it.noteViewData
-                    })
+                    })*/
                 }
 
                 isLoadingFlag = false
@@ -139,9 +139,9 @@ class NotificationViewModel(
                     )
                 }
 
-                noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull {
+                /*noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull {
                     it.noteViewData
-                })
+                })*/
 
                 notificationsLiveData.postValue(notificationViewDataList)
                 isLoadingFlag = false

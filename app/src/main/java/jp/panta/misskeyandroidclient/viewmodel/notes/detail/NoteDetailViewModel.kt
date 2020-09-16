@@ -62,12 +62,12 @@ class NoteDetailViewModel(
 
     private fun startStreaming(){
 
-        noteCapture.attach(noteRegister)
+        //noteCapture.attach(noteRegister)
 
     }
 
     private fun stopStreaming(){
-        noteCapture.detach(noteRegister)
+        //noteCapture.detach(noteRegister)
 
     }
 
@@ -97,7 +97,7 @@ class NoteDetailViewModel(
                     }
                     notes.postValue(list)
                 }
-                noteCapture.subscribeAll(noteRegister.registerId, list)
+                //noteCapture.subscribeAll(noteRegister.registerId, list)
 
             }catch (e: Exception){
 

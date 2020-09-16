@@ -210,7 +210,6 @@ open class PlaneNoteViewData (
         }
 
     }
-
     fun changeContentFolding(){
         val isFolding = contentFolding.value?: return
         contentFolding.value = !isFolding

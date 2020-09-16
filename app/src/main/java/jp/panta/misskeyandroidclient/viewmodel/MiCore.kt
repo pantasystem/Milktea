@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscrib
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 
 interface MiCore{
@@ -71,5 +72,6 @@ interface MiCore{
 
     fun getSettingStore(): SettingStore
 
-    fun getNoteRepository(account: Account) : NoteRepository
+
+    fun getNoteEventStore(account: Account) : NoteEventStore
 }

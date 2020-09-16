@@ -2,12 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
-import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
+import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
@@ -21,6 +20,10 @@ import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.streming.note.v2.captureAll
+import kotlin.collections.HashSet
+import kotlin.collections.LinkedHashMap
 
 class TimelineViewModel : ViewModel{
     data class Request(
@@ -81,13 +84,13 @@ class TimelineViewModel : ViewModel{
     val tag = "TimelineViewModel"
     val errorState = MutableLiveData<Errors>()
 
-    private val noteCaptureRegister = NoteRegister()
-    //private val streamingAdapter = miCore.getStreamingAdapter(accountRelation)
-
-    private val mNoteDeletedListener = NoteDeletedListener()
 
     private var noteCapture: NoteCapture? = null
+    private var noteCaptureClient: NoteCapture.Client? = null
+
     private var timelineCapture: TimelineCapture? = null
+    //private var noteRepository: NoteRepository? = null
+    private var noteEventStore: NoteEventStore? = null
 
 
     val position = MutableLiveData<Int>()
@@ -115,6 +118,11 @@ class TimelineViewModel : ViewModel{
     val include: NoteRequest.Include
 
     val pageable: Pageable
+
+    private val mCompositeDisposable = CompositeDisposable()
+
+    private var stoppedAt: Date = Date()
+    private var mNoteEventDisposable: Disposable? = null
 
     constructor(page: Page, miCore: MiCore, include: NoteRequest.Include)
             : this(page.pageable(),miCore, include) {
@@ -163,13 +171,22 @@ class TimelineViewModel : ViewModel{
      */
     private fun applyAccount(account: Account, pageable: Pageable){
         Log.d("TimelineVM", "pageable:$pageable, param:${pageable.toParams()}")
+
+        if(mBeforeAccount != null){
+            noteCaptureClient?.let{
+                noteCapture?.detachClient(it)
+            }
+        }
         timelineCapture = if(settingStore.isAutoLoadTimeline){
             miCore.getTimelineCapture(account)
         }else{
             null
         }
+
         noteCapture = miCore.getNoteCapture(account)
-        noteCapture?.addNoteDeletedListener(mNoteDeletedListener)
+        noteCaptureClient = NoteCapture.Client()
+        //noteCapture?.addNoteDeletedListener(mNoteDeletedListener)
+        noteEventStore = miCore.getNoteEventStore(account)
         notePagingStore = when(pageable){
             is Pageable.Favorite -> FavoriteNotePagingStore(account, pageable, miCore)
             else -> NoteTimelineStore(
@@ -182,6 +199,15 @@ class TimelineViewModel : ViewModel{
 
         misskeyAPI = miCore.getMisskeyAPI(account)
         loadInit()
+
+        noteCaptureClient?.getObservable()?.subscribe {
+            Log.d("TimelineViewModel", "noteEvent: $it")
+            noteEventStore?.release(it)
+        }?.let{
+            mCompositeDisposable.add(it)
+        }
+
+        noteEventStore?.getEventStream()
         //this.account = account
 
     }
@@ -268,8 +294,7 @@ class TimelineViewModel : ViewModel{
                     if(list.isNullOrEmpty()){
                         return@launch
                     }else{
-                        noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
-                            ?: return@launch
+                        releaseAndCapture(list)
                         loadUrlPreviews(list)
 
                         val state = timelineLiveData.value
@@ -331,8 +356,7 @@ class TimelineViewModel : ViewModel{
                 if(list.isNullOrEmpty()){
                     return@launch
                 }else{
-                    noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
-                        ?: return@launch
+                    releaseAndCapture(list)
                     loadUrlPreviews(list)
                     val state = timelineLiveData.value
 
@@ -384,7 +408,8 @@ class TimelineViewModel : ViewModel{
                         list,
                         TimelineState.State.INIT
                     )
-                    noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
+                    //noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
+                    releaseAndCapture(list)
 
                     loadUrlPreviews(list)
 
@@ -507,12 +532,25 @@ class TimelineViewModel : ViewModel{
     private fun startNoteCapture(){
         Log.d(tag, "ノートのキャプチャーを開始しようとしている")
 
-        noteCapture?.attach(noteCaptureRegister)
+        //noteCapture?.attach(noteCaptureRegister)
+        noteCaptureClient?.let{
+            noteCapture?.attachClient(it)
+        }
+
+        mNoteEventDisposable = noteEventStore?.getEventStream(stoppedAt)?./*filter {
+            !(it.event as? Event.Added != null && it.authorId == noteCaptureClient?.clientId)
+        }?.*/subscribe {
+            noteEventObserver(it)
+        }
 
     }
 
     private fun stopNoteCapture(){
-        noteCapture?.detach(noteCaptureRegister)
+        noteCaptureClient?.let{
+            noteCapture?.detachClient(it)
+        }
+        stoppedAt = Date()
+        mNoteEventDisposable?.dispose()
     }
 
 
@@ -526,7 +564,7 @@ class TimelineViewModel : ViewModel{
                 Log.i("TM-VM", "重複を確認したためキャンセルする")
                 return
             }
-            noteCapture?.subscribe(noteCaptureRegister.registerId, note)
+            noteCaptureClient?.capture(note.id)
             loadUrlPreviews(listOf(note))
             val notes = timelineLiveData.value?.notes
             val list = if(notes == null){
@@ -549,28 +587,59 @@ class TimelineViewModel : ViewModel{
         }
     }
 
-    inner class NoteDeletedListener : NoteCapture.DeletedListener(){
-        override fun onDeleted(noteId: String) {
-            val list = timelineLiveData.value?.notes
-            if(list == null){
-                return
-            }else{
-                val timeline = ArrayList<PlaneNoteViewData>(list)
-                timeline.filter{
-                    it.toShowNote.id == noteId
-                }.forEach{
-                    timeline.remove(it)
-                }
-                timelineLiveData.postValue(
-                    TimelineState(
-                        timeline,
-                        TimelineState.State.REMOVED
-                    )
-                )
-            }
-
+    private fun releaseAndCapture(notes: List<PlaneNoteViewData>){
+        val captureNoteIds = HashSet<String>()
+        for(note in notes){
+            captureNoteIds.add(note.id)
+            captureNoteIds.add(note.toShowNote.id)
+        }
+        val successCount = noteCaptureClient?.captureAll(captureNoteIds.toList())
+        if(successCount != captureNoteIds.size){
+            Log.d("TM-VM", "Captureへの登録に失敗したようです。試みた件数:${captureNoteIds.size}, 成功した件数:$successCount")
         }
     }
+
+    private fun noteEventObserver(noteEvent: NoteEvent){
+        val timelineNotes = timelineLiveData.value?.notes
+            ?: return
+
+        val account = usingAccount.value
+        val updatedNotes = when(noteEvent.event){
+
+            is Event.Deleted ->{
+                timelineNotes.filterNot{ note ->
+                    note.id == noteEvent.noteId || note.toShowNote.id == noteEvent.noteId
+                }
+            }
+            else -> timelineNotes.map{
+                var note: PlaneNoteViewData = it
+                if(note.toShowNote.id == noteEvent.noteId){
+                    when(noteEvent.event){
+                        is Event.Reacted ->{
+                            it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account?.remoteId)
+                        }
+                        is Event.UnReacted ->{
+                            it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account?.remoteId)
+                        }
+                        is Event.Voted ->{
+                            it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account?.remoteId)
+                        }
+                        is Event.Added ->{
+                            if(account != null){
+                                note = PlaneNoteViewData(noteEvent.event.note, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                            }
+                        }
+                    }
+                }
+
+                note
+            }
+        }
+        if(noteEvent.event is Event.Deleted){
+            timelineLiveData.postValue(TimelineState(state = TimelineState.State.REMOVED, notes = updatedNotes))
+        }
+    }
+
 
     private fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
         val store = reservedAccount?.let { ac ->
