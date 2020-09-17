@@ -24,7 +24,7 @@ sealed class Event{
             return note
         }
     }
-    class Voted(
+    data class Voted(
         val choice: Int,
         val userId: String?
     ) : Event(){
@@ -40,7 +40,7 @@ sealed class Event{
         }
     }
 
-    class Reacted(
+    data class Reacted(
         val userId: String?,
         val reaction: String,
         val emoji: Emoji?
@@ -60,7 +60,7 @@ sealed class Event{
         }
     }
 
-    class UnReacted(
+    data class UnReacted(
         val userId: String?,
         val reaction: String
     ) : Event(){
@@ -78,12 +78,12 @@ sealed class Event{
         }
     }
 
-    class Added(
+    /*data class Added(
         val note: Note
     ) : Event(){
 
         override fun adaptationAndCreate(note: Note, account: Account): Note? {
             return note
         }
-    }
+    }*/
 }

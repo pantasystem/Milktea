@@ -532,9 +532,7 @@ class TimelineViewModel : ViewModel{
         }
 
         if(mNoteEventDisposable == null){
-            mNoteEventDisposable = noteEventStore?.getEventStream(stoppedAt)?.filter {
-                !(it.event as? Event.Added != null && it.authorId == noteCaptureClient?.clientId)
-            }?.subscribe {
+            mNoteEventDisposable = noteEventStore?.getEventStream(stoppedAt)?.subscribe {
                 noteEventObserver(it)
             }
         }
@@ -623,9 +621,10 @@ class TimelineViewModel : ViewModel{
                         is Event.Voted ->{
                             it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account?.remoteId)
                         }
-                        is Event.Added ->{
-                            note.update(noteEvent.event.note)
-                        }
+                        /*is Event.Added ->{
+                            // FIXME 他画面の起こった変更で、リアクション系のイベントとAddイベント両方が発生しすでに変更が適応された結果AddedにReactedが追加されるなどの不具合が発生する。
+                            //note.update(noteEvent.event.note)
+                        }*/
                     }
                 }
 

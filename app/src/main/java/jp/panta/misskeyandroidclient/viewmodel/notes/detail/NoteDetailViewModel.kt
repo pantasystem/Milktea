@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -21,6 +22,7 @@ import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,9 +47,8 @@ class NoteDetailViewModel(
 
 
     private val noteCapture = miCore.getNoteCapture(account)
-    private var noteRegister = NoteRegister()
     private val client = jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture.Client()
-    val noteEventStore = miCore.getNoteEventStore(account)
+    private val noteEventStore = miCore.getNoteEventStore(account)
 
 
     val notes = object : MutableLiveData<List<PlaneNoteViewData>>(){
@@ -64,20 +65,27 @@ class NoteDetailViewModel(
         }
     }
 
-    private val mNoteDetailId = UUID.randomUUID().toString()
+    //private val mNoteDetailId = UUID.randomUUID().toString()
+
+    private var mNoteCaptureDisposable: Disposable? = null
 
     private fun startStreaming(){
 
         //noteCapture.attach(noteRegister)
         noteCapture.attachClient(client)
-        //TODO キャプチャーのイベントを反映する処理を実装する
-
+        if(mNoteCaptureDisposable == null){
+            mNoteCaptureDisposable = noteEventStore.getEventStream(Date()).subscribe {
+                noteEventObserver(it)
+            }
+        }
 
     }
 
     private fun stopStreaming(){
         //noteCapture.detach(noteRegister)
         noteCapture.detachClient(client)
+        mNoteCaptureDisposable?.dispose()
+        mNoteCaptureDisposable = null
     }
 
 
@@ -111,12 +119,7 @@ class NoteDetailViewModel(
                 val noteIds = HashSet<String>()
 
                 for(note in list){
-                    noteEventStore.release(
-                        NoteEvent(
-                            noteId = note.id,
-                            event = Event.Added(note.note)
-                        )
-                    )
+
                     noteIds.add(note.id)
                     noteIds.add(note.toShowNote.id)
                 }
@@ -204,5 +207,43 @@ class NoteDetailViewModel(
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
+    private fun noteEventObserver(noteEvent: NoteEvent){
+        Log.d("TM-VM", "#noteEventObserver $noteEvent")
+        val timelineNotes = notes.value
+            ?: return
+
+        val updatedNotes = when(noteEvent.event){
+
+            is Event.Deleted ->{
+                timelineNotes.filterNot{ note ->
+                    note.id == noteEvent.noteId || note.toShowNote.id == noteEvent.noteId
+                }
+            }
+            else -> timelineNotes.map{
+                val note: PlaneNoteViewData = it
+                if(note.toShowNote.id == noteEvent.noteId){
+                    when(noteEvent.event){
+                        is Event.Reacted ->{
+                            it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
+                        }
+                        is Event.UnReacted ->{
+                            it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
+                        }
+                        is Event.Voted ->{
+                            it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
+                        }
+                        /*is Event.Added ->{
+                            note.update(noteEvent.event.note)
+                        }*/
+                    }
+                }
+
+                note
+            }
+        }
+        if(noteEvent.event is Event.Deleted){
+            notes.postValue(updatedNotes)
+        }
+    }
 
 }
