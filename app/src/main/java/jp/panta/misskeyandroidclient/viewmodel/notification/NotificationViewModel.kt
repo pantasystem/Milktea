@@ -2,17 +2,15 @@ package jp.panta.misskeyandroidclient.viewmodel.notification
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.notes.Event
+import jp.panta.misskeyandroidclient.model.notes.NoteEvent
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
-import jp.panta.misskeyandroidclient.model.streming.NoteCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
-import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import retrofit2.Call
@@ -20,6 +18,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 import kotlin.collections.ArrayList
+import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
+import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
 class NotificationViewModel(
     private val account: Account,
@@ -39,20 +39,27 @@ class NotificationViewModel(
     // private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
     private val noteCapture = miCore.getNoteCapture(account)
 
-    private var noteRegister = NoteRegister()
+    private val noteCaptureClient = NoteCapture.Client()
 
-    val noteCaptureId = UUID.randomUUID().toString()
+    var mEventStoreStreamDisposable: Disposable? = null
 
     val notificationsLiveData = object : MutableLiveData<List<NotificationViewData>>(){
         override fun onActive() {
             super.onActive()
-            //streamingAdapter.addObserver(noteCaptureId, noteCapture)
-            //noteCapture.attach(noteRegister)
+            noteCapture.attachClient(noteCaptureClient)
+            if(mEventStoreStreamDisposable == null){
+                mEventStoreStreamDisposable = miCore.getNoteEventStore(account).getEventStream().subscribe {
+                    noteEventObserver(it)
+                }
+            }
+
 
         }
         override fun onInactive() {
             super.onInactive()
             //noteCapture.detach(noteRegister)
+            noteCapture.detachClient(noteCaptureClient)
+            mEventStoreStreamDisposable?.dispose()
         }
 
     }
@@ -86,12 +93,12 @@ class NotificationViewModel(
                     list
                 )
                 if(list != null){
-                    //noteCapture.detach(noteRegister)
-                    noteRegister = NoteRegister()
-                    //noteCapture.attach(noteRegister)
-                    /*noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull{
-                        it.noteViewData
-                    })*/
+                    noteCaptureClient.unCaptureAll()
+                    noteCapture.attachClient(noteCaptureClient)
+                    noteCaptureClient.captureAll(
+                        list.pickNoteIds()
+                    )
+
                 }
 
                 isLoadingFlag = false
@@ -139,9 +146,8 @@ class NotificationViewModel(
                     )
                 }
 
-                /*noteCapture.subscribeAll(noteRegister.registerId, list.mapNotNull {
-                    it.noteViewData
-                })*/
+                noteCaptureClient.captureAll(list.pickNoteIds())
+
 
                 notificationsLiveData.postValue(notificationViewDataList)
                 isLoadingFlag = false
@@ -154,5 +160,52 @@ class NotificationViewModel(
     }
 
 
+    private fun List<NotificationViewData>.pickNoteIds(): List<String>{
+        val hashSet = HashSet<String>()
+        for(notify in this){
+            if(notify.noteViewData != null){
+                hashSet.add(notify.noteViewData.id)
+                hashSet.add(notify.noteViewData.toShowNote.id)
+            }
+        }
+        return hashSet.toList()
+    }
+    private fun noteEventObserver(noteEvent: NoteEvent){
+        Log.d("TM-VM", "#noteEventObserver $noteEvent")
+        val timelineNotes = notificationsLiveData.value
+            ?: return
+
+
+        val updatedNotification = when(noteEvent.event){
+
+            is Event.Deleted ->{
+                timelineNotes.filterNot{ notification ->
+                    notification.noteViewData?.id == noteEvent.noteId || notification.noteViewData?.toShowNote?.id == noteEvent.noteId
+                }
+            }
+            else -> timelineNotes.map{
+                val note: PlaneNoteViewData? = it.noteViewData
+                if(note?.toShowNote?.id == noteEvent.noteId){
+                    when(noteEvent.event){
+                        is Event.Reacted ->{
+                            note.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
+                        }
+                        is Event.UnReacted ->{
+                            note.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
+                        }
+                        is Event.Voted ->{
+                            note.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
+                        }
+
+                    }
+                }
+
+                it
+            }
+        }
+        if(noteEvent.event is Event.Deleted){
+            notificationsLiveData.postValue(updatedNotification)
+        }
+    }
 
 }

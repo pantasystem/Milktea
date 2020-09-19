@@ -61,7 +61,7 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
             }
         }
 
-        fun unCaptureAll(noteIds: List<String>): Int{
+        fun unCaptureAll(noteIds: List<String> = captureNotes.toList()): Int{
             return noteIds.count{ noteId ->
                 unCapture(noteId)
             }
