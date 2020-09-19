@@ -109,6 +109,8 @@ class MiApplication : Application(), MiCore {
 
     private val mStreamingAccountMap = HashMap<Long, StreamingAdapter>()
     private val mMainCaptureAccountMap = HashMap<Long, MainCapture>()
+    private val mMainCaptureFactory: MainCapture.Factory = MainCapture.Factory(GsonFactory.create(), ::setupObserver)
+
     private val mNoteCaptureAccountMap = HashMap<Long, NoteCapture>()
     private val mTimelineCaptureAccountMap = HashMap<Long, TimelineCapture>()
 
@@ -166,7 +168,7 @@ class MiApplication : Application(), MiCore {
         applicationScope.launch(Dispatchers.IO){
             try{
                 //val connectionInstances = connectionInstanceDao!!.findAll()
-                AccountMigration(database.accountDao(), accountRepository).executeMigrate()
+                AccountMigration(database.accountDao(), accountRepository, sharedPreferences).executeMigrate()
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "load account error", e)
@@ -356,13 +358,7 @@ class MiApplication : Application(), MiCore {
 
     override fun setupObserver(account: Account, observer: Observer) {
         synchronized(mStreamingAccountMap) {
-            var streaming = mStreamingAccountMap[account.accountId]
-            if (streaming == null) {
-                streaming = StreamingAdapter(account, getEncryption())
-                mStreamingAccountMap[account.accountId] = streaming
-
-            }
-
+            val streaming = getStreamingAdapter(account)
             synchronized(streaming.observerMap) {
                 if (streaming.observerMap[observer.id] == null) {
                     streaming.putObserver(observer)
@@ -537,22 +533,8 @@ class MiApplication : Application(), MiCore {
     override fun getMainCapture(account: Account): MainCapture{
         Log.d(TAG, "getMainCapture")
 
-        val isMainCaptureCreated: Boolean
-
-        val mainCapture = synchronized(mMainCaptureAccountMap){
-            val tmp = mMainCaptureAccountMap[account.accountId]
-            isMainCaptureCreated = tmp == null
-            (tmp?: MainCapture(account, GsonFactory.create())).apply{
-                mMainCaptureAccountMap[account.accountId] = this
-            }
-        }
-
-        if(isMainCaptureCreated){
-            setupObserver(account, mainCapture)
-        }
+        val mainCapture = mMainCaptureFactory.create(account)
         validateObserverAccount(mainCapture, account)
-
-
         return mainCapture
     }
 

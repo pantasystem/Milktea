@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.users.User
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 
 /**
@@ -84,6 +85,24 @@ class MainCapture(
         }
 
 
+    }
+
+    class Factory(val gson: Gson, val setUpFunction: (Account, Observer)-> Unit){
+
+        private val accountAndMainCapture = ConcurrentHashMap<Long, MainCapture>()
+
+        fun create(account: Account) : MainCapture{
+            synchronized(this){
+                var mainCapture = accountAndMainCapture[account.accountId]
+                if(mainCapture == null) {
+
+                    mainCapture = MainCapture(account, gson)
+                    accountAndMainCapture[account.accountId] = mainCapture
+                    setUpFunction.invoke(account, mainCapture)
+                }
+                return mainCapture
+            }
+        }
     }
 
     private data class Channel<T>(val type: String, val body: Body<T>)
