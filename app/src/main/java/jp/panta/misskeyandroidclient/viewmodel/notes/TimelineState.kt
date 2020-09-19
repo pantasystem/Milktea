@@ -9,6 +9,7 @@ data class TimelineState(
         LOAD_NEW,
         LOAD_OLD,
         RECEIVED_NEW,
+        UPDATED,
         REMOVED
     }
 

@@ -333,8 +333,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:singleLine="true"
-                        android:text='@{note.replyCount}'
-                        android:visibility='@{note.replyCount == null ? View.INVISIBLE : View.VISIBLE}' />
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
+                        android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
 
                 <ImageButton
                         android:id="@+id/imageButton2"
@@ -356,8 +356,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:singleLine="true"
-                        android:text='@{String.valueOf(SafeUnbox.unboxString(note.reNoteCount))}'
-                        android:visibility='@{note.reNoteCount == null ? View.INVISIBLE : View.VISIBLE}'
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
+                        android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                         />
 

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -11,7 +12,9 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
+import jp.panta.misskeyandroidclient.model.notes.Event
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteEvent
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
@@ -19,11 +22,13 @@ import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 class NoteDetailViewModel(
     val account: Account,
@@ -42,7 +47,9 @@ class NoteDetailViewModel(
 
 
     private val noteCapture = miCore.getNoteCapture(account)
-    private var noteRegister = NoteRegister()
+    private val client = jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture.Client()
+    private val noteEventStore = miCore.getNoteEventStore(account)
+
 
     val notes = object : MutableLiveData<List<PlaneNoteViewData>>(){
         override fun onActive() {
@@ -58,17 +65,27 @@ class NoteDetailViewModel(
         }
     }
 
-    private val mNoteDetailId = UUID.randomUUID().toString()
+    //private val mNoteDetailId = UUID.randomUUID().toString()
+
+    private var mNoteCaptureDisposable: Disposable? = null
 
     private fun startStreaming(){
 
-        noteCapture.attach(noteRegister)
+        //noteCapture.attach(noteRegister)
+        noteCapture.attachClient(client)
+        if(mNoteCaptureDisposable == null){
+            mNoteCaptureDisposable = noteEventStore.getEventStream(Date()).subscribe {
+                noteEventObserver(it)
+            }
+        }
 
     }
 
     private fun stopStreaming(){
-        noteCapture.detach(noteRegister)
-
+        //noteCapture.detach(noteRegister)
+        noteCapture.detachClient(client)
+        mNoteCaptureDisposable?.dispose()
+        mNoteCaptureDisposable = null
     }
 
 
@@ -97,7 +114,16 @@ class NoteDetailViewModel(
                     }
                     notes.postValue(list)
                 }
-                noteCapture.subscribeAll(noteRegister.registerId, list)
+                //noteCapture.subscribeAll(noteRegister.registerId, list)
+
+                val noteIds = HashSet<String>()
+
+                for(note in list){
+
+                    noteIds.add(note.id)
+                    noteIds.add(note.toShowNote.id)
+                }
+                client.captureAll(noteIds.toList())
 
             }catch (e: Exception){
 
@@ -181,5 +207,43 @@ class NoteDetailViewModel(
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
+    private fun noteEventObserver(noteEvent: NoteEvent){
+        Log.d("TM-VM", "#noteEventObserver $noteEvent")
+        val timelineNotes = notes.value
+            ?: return
+
+        val updatedNotes = when(noteEvent.event){
+
+            is Event.Deleted ->{
+                timelineNotes.filterNot{ note ->
+                    note.id == noteEvent.noteId || note.toShowNote.id == noteEvent.noteId
+                }
+            }
+            else -> timelineNotes.map{
+                val note: PlaneNoteViewData = it
+                if(note.toShowNote.id == noteEvent.noteId){
+                    when(noteEvent.event){
+                        is Event.Reacted ->{
+                            it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
+                        }
+                        is Event.UnReacted ->{
+                            it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
+                        }
+                        is Event.Voted ->{
+                            it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
+                        }
+                        /*is Event.Added ->{
+                            note.update(noteEvent.event.note)
+                        }*/
+                    }
+                }
+
+                note
+            }
+        }
+        if(noteEvent.event is Event.Deleted){
+            notes.postValue(updatedNotes)
+        }
+    }
 
 }

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -74,11 +75,15 @@ val MIGRATION_4_5 = object : Migration(4, 5){
     }
 }
 
-class AccountMigration(private val accountDao: AccountDao, private val accountRepository: AccountRepository){
+class AccountMigration(private val accountDao: AccountDao, private val accountRepository: AccountRepository, private val sharedPreferences: SharedPreferences){
 
     suspend fun executeMigrate(){
 
         try{
+            val isMigrate = sharedPreferences.getBoolean("milktea.migrate_account", false)
+            if(isMigrate){
+                return
+            }
             val oldAccounts = accountDao.findAllSetting()
 
             val generated = oldAccounts.mapNotNull{ ar ->
@@ -89,10 +94,22 @@ class AccountMigration(private val accountDao: AccountDao, private val accountRe
             }
             accountDao.dropPageTable()
             accountDao.dropTable()
+            sharedPreferences.edit().apply{
+                putBoolean("milktea.migrate_account", true)
+            }.apply()
         }catch(e: Exception){
             Log.d("AccountMigration", "エラー発生", e)
         }
 
 
+    }
+}
+
+val MIGRATION_5_6 = object : Migration(5, 6){
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'meta_table' ('uri' TEXT NOT NULL, 'bannerUrl' TEXT, 'cacheRemoteFiles' INTEGER, 'description' TEXT, 'disableGlobalTimeline' INTEGER, 'disableLocalTimeline' INTEGER, 'disableRegistration' INTEGER, 'driveCapacityPerLocalUserMb' INTEGER, 'driveCapacityPerRemoteUserMb' INTEGER, 'enableDiscordIntegration' INTEGER, 'enableEmail' INTEGER, 'enableEmojiReaction' INTEGER, 'enableGithubIntegration' INTEGER, 'enableRecaptcha' INTEGER, 'enableServiceWorker' INTEGER, 'enableTwitterIntegration' INTEGER, 'errorImageUrl' TEXT, 'feedbackUrl' TEXT, 'iconUrl' TEXT, 'maintainerEmail' TEXT, 'maintainerName' TEXT, 'mascotImageUrl' TEXT, 'maxNoteTextLength' INTEGER, 'name' TEXT, 'recaptchaSiteKey' TEXT, 'secure' INTEGER, 'swPublicKey' TEXT, 'toSUrl' TEXT, 'version' TEXT NOT NULL, PRIMARY KEY('uri'))")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'emoji_table' ('name' TEXT NOT NULL, 'instanceDomain' TEXT NOT NULL, 'host' TEXT, 'url' TEXT, 'uri' TEXT, 'type' TEXT, 'category' TEXT, 'id' TEXT, PRIMARY KEY('name', 'instanceDomain'), FOREIGN KEY('instanceDomain') REFERENCES 'meta_table'('uri') ON UPDATE CASCADE ON DELETE CASCADE )")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_emoji_table_instanceDomain' ON 'emoji_table' ('instanceDomain')")
+        database.execSQL("CREATE INDEX IF NOT EXISTS 'index_emoji_table_name' ON 'emoji_table' ('name')")
     }
 }

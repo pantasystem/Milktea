@@ -17,7 +17,7 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.model.meta.Meta
+import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
@@ -26,7 +26,7 @@ import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
@@ -41,6 +41,15 @@ import java.lang.Exception
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
+import jp.panta.misskeyandroidclient.model.instance.MetaRepository
+import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
+import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
+import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
+import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
+import jp.panta.misskeyandroidclient.model.notes.NoteEventStoreFactory
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -66,6 +75,12 @@ class MiApplication : Application(), MiCore {
     lateinit var urlPreviewDAO: UrlPreviewDAO
 
     lateinit var accountRepository: AccountRepository
+
+    lateinit var metaRepository: MetaRepository
+
+    lateinit var metaStore: MetaStore
+
+    val noteEventStoreFactory: NoteEventStoreFactory = NoteEventStoreFactory()
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -94,6 +109,8 @@ class MiApplication : Application(), MiCore {
 
     private val mStreamingAccountMap = HashMap<Long, StreamingAdapter>()
     private val mMainCaptureAccountMap = HashMap<Long, MainCapture>()
+    private val mMainCaptureFactory: MainCapture.Factory = MainCapture.Factory(GsonFactory.create(), ::setupObserver)
+
     private val mNoteCaptureAccountMap = HashMap<Long, NoteCapture>()
     private val mTimelineCaptureAccountMap = HashMap<Long, TimelineCapture>()
 
@@ -120,6 +137,7 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
+            .addMigrations(MIGRATION_5_6)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         accountRepository = RoomAccountRepository(database.accountDAO(), database.pageDAO(), sharedPreferences)
@@ -136,16 +154,21 @@ class MiApplication : Application(), MiCore {
 
         urlPreviewDAO = database.urlPreviewDAO()
 
+        metaRepository = RoomMetaRepository(database.metaDAO())
+
+        metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
+
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
         messageSubscriber =
             MessageSubscriber(
                 this
             )
 
+
         applicationScope.launch(Dispatchers.IO){
             try{
                 //val connectionInstances = connectionInstanceDao!!.findAll()
-                AccountMigration(database.accountDao(), accountRepository).executeMigrate()
+                AccountMigration(database.accountDao(), accountRepository, sharedPreferences).executeMigrate()
                 loadAndInitializeAccounts()
             }catch(e: Exception){
                 Log.e(TAG, "load account error", e)
@@ -335,13 +358,7 @@ class MiApplication : Application(), MiCore {
 
     override fun setupObserver(account: Account, observer: Observer) {
         synchronized(mStreamingAccountMap) {
-            var streaming = mStreamingAccountMap[account.accountId]
-            if (streaming == null) {
-                streaming = StreamingAdapter(account, getEncryption())
-                mStreamingAccountMap[account.accountId] = streaming
-
-            }
-
+            val streaming = getStreamingAdapter(account)
             synchronized(streaming.observerMap) {
                 if (streaming.observerMap[observer.id] == null) {
                     streaming.putObserver(observer)
@@ -435,7 +452,7 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    private fun setUpMetaMap(accounts: List<Account>){
+    private suspend fun setUpMetaMap(accounts: List<Account>){
         try{
             accounts.forEach { ac ->
                 loadInstanceMetaAndSetupAPI(ac.instanceDomain)
@@ -446,7 +463,7 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    private fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
+    private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
             val meta = synchronized(mMisskeyAPIUrlMap){
                 try{
@@ -456,7 +473,7 @@ class MiApplication : Application(), MiCore {
                     null
                 }
             } ?: try{
-                MisskeyGetMeta.getMeta(instanceDomain).execute().body()
+                metaStore.get(instanceDomain)
             }catch(e: Exception){
                 Log.d(TAG, "metaをオンラインから取得するのに失敗したでち")
                 connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
@@ -508,25 +525,16 @@ class MiApplication : Application(), MiCore {
     }
 
 
+
+    override fun getNoteEventStore(account: Account): NoteEventStore {
+        return noteEventStoreFactory.create(account)
+    }
+
     override fun getMainCapture(account: Account): MainCapture{
         Log.d(TAG, "getMainCapture")
 
-        val isMainCaptureCreated: Boolean
-
-        val mainCapture = synchronized(mMainCaptureAccountMap){
-            val tmp = mMainCaptureAccountMap[account.accountId]
-            isMainCaptureCreated = tmp == null
-            (tmp?: MainCapture(account, GsonFactory.create())).apply{
-                mMainCaptureAccountMap[account.accountId] = this
-            }
-        }
-
-        if(isMainCaptureCreated){
-            setupObserver(account, mainCapture)
-        }
+        val mainCapture = mMainCaptureFactory.create(account)
         validateObserverAccount(mainCapture, account)
-
-
         return mainCapture
     }
 
@@ -538,7 +546,7 @@ class MiApplication : Application(), MiCore {
         }
 
         if(noteCapture == null){
-            noteCapture = NoteCapture(account)
+            noteCapture = NoteCapture(account, getNoteEventStore(account))
             setupObserver(account, noteCapture)
             mNoteCaptureAccountMap[account.accountId] = noteCapture
         }

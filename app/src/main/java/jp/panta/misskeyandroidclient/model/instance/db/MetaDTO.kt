@@ -1,12 +1,15 @@
-package jp.panta.misskeyandroidclient.model.meta
+package jp.panta.misskeyandroidclient.model.instance.db
 
+import androidx.room.Entity
 import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.instance.Meta
 
-data class Meta(
-    @SerializedName("announcements") val announcements: List<Any?>?,
+@Entity(tableName = "meta_table")
+data class MetaDTO(
+    @PrimaryKey(autoGenerate = false) @SerializedName("uri") val uri: String,
     @SerializedName("bannerUrl") val bannerUrl: String?,
     @SerializedName("cacheRemoteFiles") val cacheRemoteFiles: Boolean?,
     @SerializedName("description") val description: String?,
@@ -15,7 +18,6 @@ data class Meta(
     @SerializedName("disableRegistration") val disableRegistration: Boolean?,
     @SerializedName("driveCapacityPerLocalUserMb") val driveCapacityPerLocalUserMb: Int?,
     @SerializedName("driveCapacityPerRemoteUserMb") val driveCapacityPerRemoteUserMb: Int?,
-    @SerializedName("emojis") val emojis: List<Emoji>?,
     @SerializedName("enableDiscordIntegration") val enableDiscordIntegration: Boolean?,
     @SerializedName("enableEmail") val enableEmail: Boolean?,
     @SerializedName("enableEmojiReaction") val enableEmojiReaction: Boolean?,
@@ -26,29 +28,49 @@ data class Meta(
     @SerializedName("errorImageUrl") val errorImageUrl: String?,
     @SerializedName("feedbackUrl") val feedbackUrl: String?,
     @SerializedName("iconUrl") val iconUrl: String?,
-    @SerializedName("langs") val langs: List<Any?>?,
-    @SerializedName("machine") val machine: String?,
     @SerializedName("maintainerEmail") val maintainerEmail: String?,
     @SerializedName("maintainerName") val maintainerName: String?,
     @SerializedName("mascotImageUrl") val mascotImageUrl: String?,
     @SerializedName("maxNoteTextLength") val maxNoteTextLength: Int?,
     @SerializedName("name") val name: String?,
-    @SerializedName("node") val node: String?,
-    @SerializedName("os") val os: String?,
     @SerializedName("recaptchaSiteKey") val recaptchaSiteKey: String?,
-    @SerializedName("repositoryUrl") val repositoryUrl: String?,
     @SerializedName("secure") val secure: Boolean?,
-    @SerializedName("swPublickey") val swPublickey: String?,
+    @SerializedName("swPublickey") val swPublicKey: String?,
     @SerializedName("ToSUrl") val toSUrl: String?,
-    @SerializedName("uri") val uri: String?,
     @SerializedName("version") val version: String
 ){
-    @Ignore
-    fun getVersion(): Version{
-        return Version(version)
-    }
+    
+    constructor(meta: Meta) : this(
+        bannerUrl = meta.bannerUrl,
+        cacheRemoteFiles = meta.cacheRemoteFiles,
+        description = meta.description,
+        disableGlobalTimeline = meta.disableGlobalTimeline,
+        disableLocalTimeline = meta.disableLocalTimeline,
+        disableRegistration = meta.disableRegistration,
+        driveCapacityPerLocalUserMb = meta.driveCapacityPerLocalUserMb,
+        driveCapacityPerRemoteUserMb = meta.driveCapacityPerRemoteUserMb,
+        enableDiscordIntegration = meta.enableDiscordIntegration,
+        enableEmail = meta.enableEmail,
+        enableEmojiReaction = meta.enableEmojiReaction,
+        enableGithubIntegration = meta.enableGithubIntegration,
+        enableRecaptcha = meta.enableRecaptcha,
+        enableServiceWorker = meta.enableServiceWorker,
+        enableTwitterIntegration = meta.enableTwitterIntegration,
+        errorImageUrl = meta.errorImageUrl,
+        feedbackUrl = meta.feedbackUrl,
+        iconUrl = meta.iconUrl,
+        maintainerEmail = meta.maintainerEmail,
+        maintainerName = meta.maintainerName,
+        mascotImageUrl = meta.mascotImageUrl,
+        maxNoteTextLength = meta.maxNoteTextLength,
+        name = meta.name,
+        recaptchaSiteKey = meta.recaptchaSiteKey,
+        secure = meta.secure,
+        swPublicKey = meta.swPublicKey,
+        toSUrl = meta.toSUrl,
+        version = meta.version,
+        uri = meta.uri
+    )
 
-    val emojiNameMap: Map<String, Emoji> = emojis?.map{
-        it.name to it
-    }?.toMap()?: emptyMap()
+
 }

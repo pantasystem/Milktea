@@ -53,4 +53,5 @@ class PollViewData(private val poll: Poll, val noteId: String){
         }
     }
 
+
 }

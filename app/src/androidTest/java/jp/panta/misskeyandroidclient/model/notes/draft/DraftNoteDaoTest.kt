@@ -25,7 +25,7 @@ class DraftNoteDaoTest{
         accountDao = db.accountDao()
     }
 
-    @Test
+    /*@Test
     fun writeAndReadTest(){
         val testAccountId = "PantaIsCute"
 
@@ -79,7 +79,7 @@ class DraftNoteDaoTest{
         assertEquals(afterDeletedDraftNotes.isEmpty(), true)
 
 
-    }
+    }*/
 
 
 }

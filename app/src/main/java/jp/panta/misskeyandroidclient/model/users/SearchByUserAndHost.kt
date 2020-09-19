@@ -1,20 +1,12 @@
 package jp.panta.misskeyandroidclient.model.users
 
-import com.google.gson.reflect.TypeToken
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.meta.RequestMeta
 import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
-import okhttp3.MediaType
-import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.IOException
 
 class SearchByUserAndHost(val misskeyAPI: MisskeyAPI){
 

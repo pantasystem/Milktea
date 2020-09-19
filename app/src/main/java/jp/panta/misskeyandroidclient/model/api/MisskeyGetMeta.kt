@@ -2,8 +2,8 @@ package jp.panta.misskeyandroidclient.model.api
 
 import com.google.gson.JsonSyntaxException
 import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.model.meta.Meta
-import jp.panta.misskeyandroidclient.model.meta.RequestMeta
+import jp.panta.misskeyandroidclient.model.instance.Meta
+import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request

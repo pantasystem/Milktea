@@ -1,14 +1,13 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.meta.Meta
+import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.streming.Observer
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.NoteCapture
+import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
@@ -16,6 +15,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscrib
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 
 interface MiCore{
     //val accounts: MutableLiveData<List<Account>>
@@ -72,4 +73,5 @@ interface MiCore{
     fun getSettingStore(): SettingStore
 
 
+    fun getNoteEventStore(account: Account) : NoteEventStore
 }

@@ -127,10 +127,12 @@ open class PlaneNoteViewData (
         }
     }
 
-    var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
+    //var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
+    val replyCount = MutableLiveData<Int>(toShowNote.replyCount)
 
     val reNoteCount: String?
         get() = if(toShowNote.reNoteCount > 0) toShowNote.reNoteCount.toString() else null
+    val renoteCount = MutableLiveData<Int>(toShowNote.reNoteCount)
 
     val reactionCounts = MutableLiveData<LinkedHashMap<String, Int>>(toShowNote.reactionCounts)
 
@@ -143,9 +145,6 @@ open class PlaneNoteViewData (
     }
 
     val myReaction = MutableLiveData<String>(toShowNote.myReaction)
-    val isReacted = Transformations.map(myReaction){
-        !it.isNullOrBlank()
-    }
 
     val poll = if(toShowNote.poll == null) null else PollViewData(toShowNote.poll!!, toShowNote.id)
 
@@ -210,7 +209,6 @@ open class PlaneNoteViewData (
         }
 
     }
-
     fun changeContentFolding(){
         val isFolding = contentFolding.value?: return
         contentFolding.value = !isFolding
@@ -229,6 +227,17 @@ open class PlaneNoteViewData (
         override fun accept(list: List<UrlPreview>) {
             urlPreviewList.postValue(list)
         }
+    }
+
+    fun update(note: Note){
+        emojiMap.clear()
+        emojiMap.putAll(note.emojis?.map{
+            it.name to it
+        }?: emptyList())
+        renoteCount.postValue(note.reNoteCount)
+
+        myReaction.postValue(note.myReaction)
+        reactionCounts.postValue(note.reactionCounts)
     }
 
 }

@@ -18,4 +18,6 @@ data class Emoji(
                 || url?.contains("svg") == true
                 || type?.contains("svg") == true
     }
+
+    constructor(name: String) : this(null, name, null, null, null, null, null)
 }

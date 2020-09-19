@@ -1,11 +1,6 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import jp.panta.misskeyandroidclient.model.meta.Meta
-import org.junit.Assert.*
 import org.junit.Test
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MisskeyGetMetaTest{
 
