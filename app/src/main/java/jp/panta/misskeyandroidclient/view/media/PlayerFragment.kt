@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import kotlinx.android.synthetic.main.fragment_player.*
 
@@ -18,25 +19,29 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
     companion object{
         const val TAG = "PlayerFragment"
         private const val EXTRA_MEDIA_SOURCE_URI = "jp.panta.misskeyandroidclient.view.media.PlayerFragment.EXTRA_MEDIA_SOURCE_URI"
+        private const val EXTRA_INDEX = "jp.panta.misskeyandroidclient.view.media.PlayerFragment.extra.INDEX"
 
-        fun newInstance(uri: String): PlayerFragment{
+        fun newInstance(index: Int, uri: String): PlayerFragment{
             return PlayerFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_MEDIA_SOURCE_URI, uri)
+                    putInt(EXTRA_INDEX, index)
                 }
             }
         }
 
-        fun newInstance(uri: Uri): PlayerFragment{
+        fun newInstance(index: Int, uri: Uri): PlayerFragment{
             return PlayerFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_MEDIA_SOURCE_URI, uri.toString())
+                    putInt(EXTRA_INDEX, index)
                 }
             }
         }
     }
 
     private var mExoPlayer: ExoPlayer? = null
+    private var index: Int = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,6 +49,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
         val extraUri = arguments?.getString(EXTRA_MEDIA_SOURCE_URI)
         Log.d(TAG, "extraUri: $extraUri")
         val uri = if(extraUri == null) null else Uri.parse(extraUri)
+
+        index = arguments?.getInt(EXTRA_INDEX) ?: 0
 
         if(uri == null){
             Log.e(TAG, "uri must not null")
@@ -59,6 +66,14 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
         player_view.player = simpleExoPlayer
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val activity = requireActivity()
+        if(activity is MediaActivity){
+            activity.setCurrentFileIndex(index)
+        }
+    }
 
     override fun onStop(){
         super.onStop()

@@ -13,7 +13,7 @@ abstract class MessageViewData (val message: Message, account: Account){
     abstract val avatarIcon: String
     val text = message.text
     val textNode = MFMParser.parse(message.text, message.emojis)
-    val file = if(message.file == null) null else FileViewData(message.file)
+    val file = if(message.file == null) null else FileViewData(message.file.toFile(account.instanceDomain))
     val isRead = message.isRead
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

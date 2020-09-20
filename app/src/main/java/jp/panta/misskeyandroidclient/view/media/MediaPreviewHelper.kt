@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.util.CircleOutlineProvider
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
@@ -54,7 +55,7 @@ object MediaPreviewHelper{
         baseFrameBottomRight: FrameLayout,
         shieldLeft: LinearLayout,
         shieldRight: LinearLayout,
-        previewMediaFiles: List<FileProperty>?
+        previewMediaFiles: List<File>?
     ){
         val thumbnailViews = listOf(thumbnailTopLeft, thumbnailTopRight, thumbnailBottomLeft, thumbnailBottomRight)
         val actionButtons = listOf(actionButtonTopLeft, actionButtonTopRight, actionButtonBottomLeft, actionButtonBottomRight)
@@ -102,7 +103,7 @@ object MediaPreviewHelper{
         }
     }
 
-    fun setPreview(thumbnail: ImageView, actionButton: ImageButton, frame: FrameLayout, file: FileProperty){
+    fun setPreview(thumbnail: ImageView, actionButton: ImageButton, frame: FrameLayout, file: File){
         //VISIBLEにしかしない
         frame.visibility =View.VISIBLE
         thumbnail.visibility = View.VISIBLE
@@ -141,21 +142,17 @@ object MediaPreviewHelper{
         try{
             val file = mediaViewData!!.files[fileIndex]
             this.visibility = View.VISIBLE
-            val miCore = this.context.applicationContext as? MiCore
-            val instanceBaseUrl = miCore?.getCurrentAccount()?.value?.instanceDomain
-
-
 
             Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
-            setPreview(thumbnailView, playButton, file, instanceBaseUrl?: "")
+            setPreview(thumbnailView, playButton, file)
 
             val listener = View.OnClickListener {
                 val context = it.context
                 val intent = Intent(context, MediaActivity::class.java)
-                intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY_LIST, ArrayList(mediaViewData.files.map{ fvd ->
-                    fvd.fileProperty
+                intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(mediaViewData.files.map{ fvd ->
+                    fvd.file
                 }))
-                intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY_LIST_CURRENT_INDEX, fileIndex)
+                intent.putExtra(MediaActivity.EXTRA_FILE_CURRENT_INDEX, fileIndex)
                 if(context is Activity){
                     val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(context, thumbnailView, "image")
                     context.startActivity(intent, compat.toBundle())
@@ -178,23 +175,21 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView", "playButton", "fileViewData")
     @JvmStatic
     fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?){
-        val miCore = this.context.applicationContext as? MiCore
-        val instanceBaseUrl = miCore?.getCurrentAccount()?.value?.instanceDomain
 
         try{
             this.visibility = View.VISIBLE
-            setPreview(thumbnailView, playButton, fileViewData!!, instanceBaseUrl?: "")
+            this@MediaPreviewHelper.setPreview(thumbnailView, playButton, fileViewData!!)
 
         }catch(e: Exception){
             this.visibility = View.GONE
         }
     }
 
-    fun setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData, instanceBaseUrl: String){
+    fun setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData){
         when(fileViewData.type){
             FileViewData.Type.IMAGE, FileViewData.Type.VIDEO -> {
                 Glide.with(thumbnailView)
-                    .load(fileViewData.fileProperty.getThumbnailUrl(instanceBaseUrl))
+                    .load(fileViewData.file.thumbnailUrl)
                     .centerCrop()
                     .into(thumbnailView)
 

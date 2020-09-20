@@ -2,28 +2,24 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.media
 
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.file.File
 
-class FileViewData(val fileProperty: FileProperty) {
+class FileViewData(val file: File) {
     enum class Type{
         VIDEO, IMAGE, SOUND, OTHER
     }
-    val id = fileProperty.id
-    val name = fileProperty.name
+    val name = file.name
     val type = when{
-        fileProperty.type == null -> Type.OTHER
-        fileProperty.type.startsWith("image") -> Type.IMAGE
-        fileProperty.type.startsWith("video") -> Type.VIDEO
-        fileProperty.type.startsWith("audio") -> Type.SOUND
+        file.type == null -> Type.OTHER
+        file.type.startsWith("image") -> Type.IMAGE
+        file.type.startsWith("video") -> Type.VIDEO
+        file.type.startsWith("audio") -> Type.SOUND
         else -> Type.OTHER
     }
-    val md5 = fileProperty.md5
-    val size = fileProperty.size
-    val userId = fileProperty.userId
-    val folderId = fileProperty.folderId
-    val comment = fileProperty.comment
-    val isSensitive = fileProperty.isSensitive?: false
-    val url = fileProperty.url
-    val thumbnailUrl = fileProperty.thumbnailUrl?: url
+    val folderId = file.folderId
+    val isSensitive = file.isSensitive?: false
+    val url = file.path
+    val thumbnailUrl = file.thumbnailUrl?: url
 
     val isHiding = MutableLiveData<Boolean>(isSensitive)
 

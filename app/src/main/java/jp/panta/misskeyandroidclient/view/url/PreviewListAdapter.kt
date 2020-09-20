@@ -48,17 +48,17 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
     }
     class FilePreviewViewHolder(val binding: ItemFilePreviewBinding) : BaseHolder<Preview.FileWrapper>(binding.root){
         override fun bind(preview: Preview.FileWrapper) {
-            binding.fileProperty = preview.file
+            binding.file = preview.file
             val context = this.binding.filePropertyView.context
             binding.filePropertyView.setOnClickListener {
                 if(preview.file.type?.startsWith("audio") == true){
                     val intent = Intent(binding.root.context, MediaActivity::class.java)
-                    intent.putExtra(MediaActivity.EXTRA_FILE_PROPERTY, preview.file)
+                    intent.putExtra(MediaActivity.EXTRA_FILE, preview.file)
                     context?.startActivity(intent)
                 }else{
                     context?.startActivity(
-                        Intent(Intent.ACTION_VIEW).apply{
-                            data = Uri.parse(preview.file.url)
+                        Intent().apply{
+                            data = Uri.parse(preview.file.path)
                             type = preview.file.type
                         }
                     )

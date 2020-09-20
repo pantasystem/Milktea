@@ -4,8 +4,8 @@
         xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
-                name="fileProperty"
-                type="jp.panta.misskeyandroidclient.model.drive.FileProperty" />
+                name="file"
+                type="jp.panta.misskeyandroidclient.model.file.File" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
 
@@ -27,7 +27,7 @@
                 tools:background="@color/black_overlay"
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_selectable_file"
-                app:urlPreviewThumbnailUrl="@{fileProperty.thumbnailUrl}"
+                app:urlPreviewThumbnailUrl="@{file.thumbnailUrl}"
                 android:layout_marginStart="3dp"
                 />
 
@@ -46,7 +46,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/fileTypeView"
                 tools:text="site title"
-                android:text="@{fileProperty.name}"
+                android:text="@{file.name}"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:textSize="12sp"
@@ -65,7 +65,7 @@
                 app:layout_constraintStart_toEndOf="@id/fileThumbnailView"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="@{fileProperty.type}"
+                android:text="@{file.type}"
                 android:layout_marginTop="2dp"
                 android:layout_marginStart="8dp"
                 android:textSize="12sp"
