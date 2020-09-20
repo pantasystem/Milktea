@@ -314,4 +314,5 @@
     <string name="text_length_limit">Text length limit</string>
     <string name="returns_limit">Returns limit</string>
     <string name="auto_note_folding">Automatic note folding</string>
+    <string name="download">Download</string>
 </resources>
