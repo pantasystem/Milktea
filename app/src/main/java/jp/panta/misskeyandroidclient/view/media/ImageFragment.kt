@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.file.File
 import kotlinx.android.synthetic.main.fragment_image.*
@@ -16,27 +17,32 @@ class ImageFragment : Fragment(R.layout.fragment_image){
         private const val TAG = "ImageFragment"
         private const val EXTRA_IMAGE_URL = "jp.panta.misskeyandroidclient.view.media.EXTRA_IMAGE_URL"
         private const val EXTRA_IMAGE_URI = "jp.panta.misskeyandroidclient.view.media.EXTRA_IMAGE_URI"
-        fun newInstance(url: String): ImageFragment{
+        private const val EXTRA_INDEX = "jp.panta.misskeyandroidclient.view.media.EXTRA_INDEX"
+        fun newInstance(index: Int, url: String): ImageFragment{
             val bundle = Bundle().apply{
                 putString(EXTRA_IMAGE_URL, url)
+                putInt(EXTRA_INDEX, index)
             }
             return ImageFragment().apply{
                 arguments = bundle
             }
         }
 
-        fun newInstance(uri: Uri): ImageFragment{
+        fun newInstance(index: Int, uri: Uri): ImageFragment{
             return ImageFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_IMAGE_URI, uri.toString())
+                    putInt(EXTRA_INDEX, index)
                 }
             }
         }
 
-        fun newInstance(file: File): ImageFragment{
-            return newInstance(file.path)
+        fun newInstance(index: Int, file: File): ImageFragment{
+            return newInstance(index, file.path)
         }
     }
+
+    var index = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,6 +50,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
         val url = arguments?.getString(EXTRA_IMAGE_URL)
         val extraUri = arguments?.getString(EXTRA_IMAGE_URI)
         val uri = if(extraUri == null) null else Uri.parse(extraUri)
+        index = arguments?.getInt(EXTRA_INDEX)?: 0
 
         if(url == null && uri == null){
             Log.e(TAG, "EXTRA_IMAGE_URL must not null")
@@ -57,5 +64,15 @@ class ImageFragment : Fragment(R.layout.fragment_image){
                 it.load(uri)
             }
         }.into(imageView)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val activity = requireActivity()
+        if(activity is MediaActivity){
+            activity.setCurrentFileIndex(index)
+        }
+
     }
 }

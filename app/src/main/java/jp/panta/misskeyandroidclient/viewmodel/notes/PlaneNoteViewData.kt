@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
@@ -101,8 +102,10 @@ open class PlaneNoteViewData (
         it.name to it
     }?.toMap()?: mapOf())
 
-    val files = toShowNote.files?: emptyList()
-    private val previewableFiles = toShowNote.files?.filter{
+    val files = toShowNote.files?.map{ fileProperty ->
+        fileProperty.toFile(account.instanceDomain)
+    }
+    private val previewableFiles = files?.filter{
         it.type?.startsWith("image") == true || it.type?.startsWith("video") == true
     }?: emptyList()
     val media = MediaViewData(previewableFiles)
@@ -111,13 +114,15 @@ open class PlaneNoteViewData (
     val urlPreviewList = MutableLiveData<List<UrlPreview>>()
 
     val previews = MediatorLiveData<List<Preview>>().apply{
-        addSource(urlPreviewList){
-            val otherFiles: List<Preview> = toShowNote.files?.filterNot{ fp ->
-                fp.type?.startsWith("image") == true || fp.type?.startsWith("video") == true
-            }?.map{ fp ->
-                Preview.FileWrapper(fp)
-            }?: emptyList()
-            val list = ArrayList(otherFiles)
+        val otherFiles = getNotMediaFiles().map{ file ->
+            Preview.FileWrapper(file)
+        }
+
+        postValue(otherFiles)
+
+        this.addSource(urlPreviewList){
+
+            val list: ArrayList<Preview> = ArrayList(otherFiles)
             val urlPreviews = it?.map{ url ->
                 Preview.UrlWrapper(url)
             }?: emptyList()
@@ -165,9 +170,10 @@ open class PlaneNoteViewData (
     val subContentFoldingStatusMessage = Transformations.map(subContentFolding){
         if(it) "もっと見る: ${subNoteText?.length}" else "閉じる"
     }
-    val subNoteFiles = subNote?.files?: emptyList()
-    val subNoteMedia =
-        MediaViewData(subNoteFiles)
+    val subNoteFiles = subNote?.files?.map{
+        it.toFile(account.instanceDomain)
+    }?: emptyList()
+    val subNoteMedia = MediaViewData(subNoteFiles)
 
     fun addReaction(reaction: String, emoji: Emoji?, isMyReaction: Boolean = false){
         val reactions = reactionCounts.value?: LinkedHashMap()
@@ -238,6 +244,12 @@ open class PlaneNoteViewData (
 
         myReaction.postValue(note.myReaction)
         reactionCounts.postValue(note.reactionCounts)
+    }
+
+    private fun getNotMediaFiles() : List<File>{
+        return  files?.filterNot{ fp ->
+            fp.type?.startsWith("image") == true || fp.type?.startsWith("video") == true
+        }?: emptyList()
     }
 
 }

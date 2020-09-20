@@ -1,9 +1,10 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.media
 
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.file.File
 import java.lang.IndexOutOfBoundsException
 
-class MediaViewData(files: List<FileProperty>) {
+class MediaViewData(files: List<File>) {
 
     val files = files.map{
         FileViewData(it)

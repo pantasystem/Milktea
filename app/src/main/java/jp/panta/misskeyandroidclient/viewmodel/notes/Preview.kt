@@ -12,6 +12,6 @@ sealed class Preview : Serializable {
     ) : Preview()
 
     data class FileWrapper(
-        val file: FileProperty
+        val file: File
     ) : Preview()
 }
