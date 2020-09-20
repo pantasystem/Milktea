@@ -57,7 +57,7 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
                     context?.startActivity(intent)
                 }else{
                     context?.startActivity(
-                        Intent(Intent.ACTION_VIEW).apply{
+                        Intent().apply{
                             data = Uri.parse(preview.file.path)
                             type = preview.file.type
                         }
