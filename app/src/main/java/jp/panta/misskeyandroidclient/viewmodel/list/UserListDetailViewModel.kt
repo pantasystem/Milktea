@@ -41,10 +41,10 @@ class UserListDetailViewModel(
 
     private val mUserMap = LinkedHashMap<String, ListUserViewData>()
 
-    private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
+    //private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
 
     init{
-        mPublisher.subscribe(UserListObserver())
+        //mPublisher.subscribe(UserListObserver())
     }
 
     fun load(){

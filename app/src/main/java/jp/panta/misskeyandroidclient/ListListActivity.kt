@@ -42,26 +42,24 @@ class ListListActivity : AppCompatActivity() {
         val miCore = application as MiCore
 
         val layoutManager = LinearLayoutManager(this)
-        miCore.getCurrentAccount().observe(this, Observer{ ac ->
-            mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(ac, miCore))[ListListViewModel::class.java]
-            val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(ac, miCore))[UserListOperateViewModel::class.java]
-            mListOperateViewModel = userListOperateViewModel
-            val listAdapter =
-                ListListAdapter(
-                    mListListViewModel!!,
-                    this,
-                    userListOperateViewModel
-                    )
-            listListView.adapter = listAdapter
-            listListView.layoutManager = layoutManager
-            mListListViewModel?.userListList?.observe(this, Observer{ userListList ->
-                listAdapter.submitList(userListList)
-            })
-            mListListViewModel?.loadListList()
+        mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(miCore))[ListListViewModel::class.java]
+        val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(miCore))[UserListOperateViewModel::class.java]
 
-            setUpObservers()
+        mListOperateViewModel = userListOperateViewModel
+        val listAdapter =
+            ListListAdapter(
+                mListListViewModel!!,
+                this,
+                userListOperateViewModel
+            )
+        listListView.adapter = listAdapter
+        listListView.layoutManager = layoutManager
+        mListListViewModel?.userListList?.observe(this, Observer{ userListList ->
+            listAdapter.submitList(userListList)
         })
+        mListListViewModel?.loadListList()
 
+        setUpObservers()
         addListButton.setOnClickListener {
             val dialog = UserListEditorDialog.newInstance()
             dialog.show(supportFragmentManager, "")

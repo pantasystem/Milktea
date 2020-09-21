@@ -3,12 +3,8 @@ package jp.panta.misskeyandroidclient.viewmodel.list
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.list.*
-import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
@@ -16,9 +12,10 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class UserListOperateViewModel(
-    val account: Account,
-    val misskeyAPI: MisskeyAPI,
-    val encryption: Encryption
+    val miCore: MiCore
+    //val account: Account,
+    //val misskeyAPI: MisskeyAPI,
+    //val encryption: Encryption
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
@@ -31,21 +28,26 @@ class UserListOperateViewModel(
 
     private val tag = this.javaClass.simpleName
 
-    private val mPublisher = UserListEventStore(misskeyAPI, account)
+    private var userListEventStore: UserListEventStore? = null
 
     val updateUserListEvent = EventBus<UserList>()
 
-    fun pushUser(userList: UserList, userId: String){
-        misskeyAPI.pushUserToList(
+    init{
+        miCore.getCurrentAccount()
+    }
+
+
+    fun pushUser(account: Account, userList: UserList, userId: String){
+        miCore.getMisskeyAPI(account).pushUserToList(
             ListUserOperation(
-                i = account.getI(encryption)!!,
+                i = account.getI(miCore.getEncryption())!!,
                 listId = userList.id,
                 userId = userId
             )
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){
-                    mPublisher.onPushUser(userList.id, userId)
+                    userListEventStore.onPushUser(userList.id, userId)
                 }
             }
 
@@ -65,7 +67,7 @@ class UserListOperateViewModel(
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){
-                    mPublisher.onPullUser(userListId, userId)
+                    userListEventStore.onPullUser(userListId, userId)
                 }else{
                     Log.d(tag, "pull user failure: $response")
                 }
@@ -89,7 +91,7 @@ class UserListOperateViewModel(
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 Log.d(tag, "update list, response:$response")
                 if(response.code() in 200 until 300){
-                    mPublisher.onUpdateUserList(listId, name)
+                    userListEventStore.onUpdateUserList(listId, name)
                 }
             }
 
@@ -105,7 +107,7 @@ class UserListOperateViewModel(
         ).enqueue(object : Callback<UserList>{
             override fun onResponse(call: Call<UserList>, response: Response<UserList>) {
                 if(response.code() in 200 until 300){
-                    mPublisher.onCreateUserList(response.body()!!)
+                    userListEventStore.onCreateUserList(response.body()!!)
                 }
             }
 
@@ -123,7 +125,7 @@ class UserListOperateViewModel(
             object : Callback<Unit>{
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if(response.code() in 200 until 300){
-                        mPublisher.onDeleteUserList(userList)
+                        userListEventStore.onDeleteUserList(userList)
                     }
                 }
 

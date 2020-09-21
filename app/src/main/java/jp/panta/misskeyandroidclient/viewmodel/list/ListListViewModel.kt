@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.list
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
@@ -26,33 +23,36 @@ import java.util.*
 import kotlin.collections.LinkedHashMap
 
 class ListListViewModel(
-    val account: Account,
-    val misskeyAPI: MisskeyAPI,
-    val encryption: Encryption,
     val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val account: Account, val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return ListListViewModel(account, miCore.getMisskeyAPI(account), miCore.getEncryption(), miCore) as T
+            return ListListViewModel( miCore) as T
         }
     }
 
     companion object{
         private const val TAG = "ListListViewModel"
     }
-    val userListList = MutableLiveData<List<UserList>>()
 
-    val pagedUserList = Transformations.map(userListList){ ulList ->
-        ulList.filter{ ul ->
-            account.pages.any {
-                val pageable = it.pageable()
-                if(pageable is Pageable.UserListTimeline){
-                    pageable.listId == ul.id
-                }else{
-                    false
-                }
+    val encryption = miCore.getEncryption()
+
+    var account: Account? = null
+    val userListList = MediatorLiveData<List<UserList>>().apply{
+        addSource(miCore.getCurrentAccount()){
+            account = it
+            loadListList(it)
+        }
+    }
+
+    val pagedUserList = MediatorLiveData<Set<UserList>>().apply{
+        addSource(userListList){ userLists ->
+            userLists.filter{ ul ->
+                account?.pages?.any {
+                    (it.pageable() as? Pageable.UserListTimeline)?.listId == ul.id
+                }?:false
             }
         }
     }
@@ -62,17 +62,17 @@ class ListListViewModel(
 
     val showUserDetailEvent = EventBus<UserList>()
 
-    private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
+    //private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
 
     init{
-        mPublisher.subscribe(UserListEventObserver())
+        //mPublisher.subscribe(UserListEventObserver())
     }
 
 
-    fun loadListList(){
-        val i = account.getI(encryption)
+    fun loadListList(account: Account? = this.account){
+        val i = account?.getI(encryption)
             ?: return
-        misskeyAPI.userList(I(i)).enqueue(object : Callback<List<UserList>>{
+        miCore.getMisskeyAPI(account).userList(I(i)).enqueue(object : Callback<List<UserList>>{
             override fun onResponse(
                 call: Call<List<UserList>>,
                 response: Response<List<UserList>>
@@ -127,7 +127,7 @@ class ListListViewModel(
 
     fun toggleTab(userList: UserList?){
         userList?.let{ ul ->
-            val exPage = account.pages.firstOrNull {
+            val exPage = account?.pages?.firstOrNull {
                 val pageable = it.pageable()
                 if(pageable is Pageable.UserListTimeline){
                     pageable.listId == ul.id
@@ -135,10 +135,10 @@ class ListListViewModel(
                     false
                 }
             }
-            if(exPage == null){
-                val page = Page(account.accountId, ul.name, pageable =  Pageable.UserListTimeline(ul.id), weight = 0)
+            if(exPage == null && account != null){
+                val page = Page(account!!.accountId, ul.name, pageable =  Pageable.UserListTimeline(ul.id), weight = 0)
                 miCore.addPageInCurrentAccount(page)
-            }else{
+            }else if(exPage != null){
                 miCore.removePageInCurrentAccount(exPage)
             }
         }
