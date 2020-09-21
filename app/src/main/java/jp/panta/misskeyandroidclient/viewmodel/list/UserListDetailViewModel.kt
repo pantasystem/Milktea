@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.ConcurrentLinkedDeque
 
 class UserListDetailViewModel(
     val accountId: Long,
@@ -41,7 +42,7 @@ class UserListDetailViewModel(
     private val mUserMap = LinkedHashMap<String, UserViewData>()
 
     //private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
-    val updateEvents = ReplaySubject.create<UserListEvent>()
+    val updateEvents = ConcurrentLinkedDeque<UserListEvent>()
 
 
     private val mAccount = MutableLiveData<Account>()
@@ -115,7 +116,7 @@ class UserListDetailViewModel(
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){
-                    updateEvents.onNext(
+                    updateEvents.add(
                         UserListEvent(userListId = listId, account = account, type = UserListEvent.Type.UPDATED_NAME)
                     )
                     load()
@@ -210,7 +211,7 @@ class UserListDetailViewModel(
         loadAndPutUser(account, newUser)
         adaptUsers()
 
-        updateEvents.onNext(UserListEvent(
+        updateEvents.add(UserListEvent(
             account = account,
             userListId = listId,
             userId = userId,
@@ -222,7 +223,7 @@ class UserListDetailViewModel(
         mUserMap.remove(userId)
         adaptUsers()
 
-        updateEvents.onNext(UserListEvent(
+        updateEvents.add(UserListEvent(
             account = account,
             userListId = listId,
             userId = userId,
