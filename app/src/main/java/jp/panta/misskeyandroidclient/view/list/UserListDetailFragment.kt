@@ -28,7 +28,7 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
             listUserList.layoutManager = LinearLayoutManager(view.context)
             val adapter = ListUserListAdapter(viewModel, userListOperateViewModel, viewLifecycleOwner)
             listUserList.adapter = adapter
-            viewModel.mListUsers.observe(viewLifecycleOwner, Observer{ list ->
+            viewModel.listUsers.observe(viewLifecycleOwner, Observer{ list ->
                 adapter.submitList(list)
             })
             //viewModel.load()

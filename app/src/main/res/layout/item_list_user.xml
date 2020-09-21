@@ -4,16 +4,14 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
-        <variable
-                name="listUserViewData"
-                type="jp.panta.misskeyandroidclient.viewmodel.list.ListUserViewData" />
+        <variable name="userViewData"
+                  type="jp.panta.misskeyandroidclient.viewmodel.users.UserViewData"/>
 
         <variable
                 name="userListDetailViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel" />
-        <variable
-                name="userListOperateViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel" />
+
+
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -26,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                app:user="@{listUserViewData.user}"
+                app:user="@{userViewData.user}"
                 app:mainNameView="@{mainName}"
                 app:subNameView="@{subName}"
                 >
@@ -38,8 +36,8 @@
                     tools:ignore="ContentDescription"
                     android:layout_marginEnd="8dp"
                     tools:src="@drawable/ic_follow"
-                    app:circleIcon="@{listUserViewData.user.avatarUrl}"
-                    app:transitionDestinationUser="@{listUserViewData.user}"
+                    app:circleIcon="@{userViewData.user.avatarUrl}"
+                    app:transitionDestinationUser="@{userViewData.user}"
                     />
 
             <TextView
@@ -73,7 +71,7 @@
                     tools:ignore="ContentDescription,PrivateResource"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:tint="?attr/colorNoteActionButtonTint"
-                    android:onClick="@{()-> userListOperateViewModel.pullUser(userListDetailViewModel.listId, listUserViewData.userId)}"
+                    android:onClick="@{()-> userListDetailViewModel.pullUser(userViewData.userId)}"
                     />
 
 
