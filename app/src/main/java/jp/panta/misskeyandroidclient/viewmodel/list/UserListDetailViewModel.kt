@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.ListUserOperation
+import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -98,6 +99,34 @@ class UserListDetailViewModel(
         })
     }
 
+    fun updateName(name: String){
+        val account = mAccount.value
+        if(account == null){
+            Log.i(tag, "#load アカウントがまだ読み込めていません。")
+            return
+        }
+
+        miCore.getMisskeyAPI(account).updateList(
+            UpdateList(
+                i = account.getI(miCore.getEncryption())!!,
+                listId = listId,
+                name = name
+            )
+        ).enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if(response.code() in 200 until 300){
+                    updateEvents.onNext(
+                        UserListEvent(userListId = listId, account = account, type = UserListEvent.Type.UPDATED_NAME)
+                    )
+                    load()
+                }
+            }
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+
+            }
+        })
+    }
+
     fun pushUser(userId: String){
         val account = mAccount.value
         if(account == null){
@@ -141,7 +170,7 @@ class UserListDetailViewModel(
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){
-                    onPulledUser(userId)
+                    onPulledUser(account, userId)
                 }else{
                     Log.d(tag, "pull user failure: $response")
                 }
@@ -180,11 +209,25 @@ class UserListDetailViewModel(
         mUserMap[userId] = newUser
         loadAndPutUser(account, newUser)
         adaptUsers()
+
+        updateEvents.onNext(UserListEvent(
+            account = account,
+            userListId = listId,
+            userId = userId,
+            type = UserListEvent.Type.PUSH_USER
+        ))
     }
 
-    private fun onPulledUser(userId: String){
+    private fun onPulledUser(account: Account, userId: String){
         mUserMap.remove(userId)
         adaptUsers()
+
+        updateEvents.onNext(UserListEvent(
+            account = account,
+            userListId = listId,
+            userId = userId,
+            type = UserListEvent.Type.PULL_USER
+        ))
     }
 
 
