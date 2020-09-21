@@ -10,15 +10,13 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListEvent.Type.*
 
 class UserListEventStore (
-    val misskeyAPI: MisskeyAPI,
-    val account: Account
+    val misskeyAPI: MisskeyAPI
 ){
 
-    companion object{
-        private val eventSubject = PublishSubject.create<UserListEvent>()
-    }
+    private val eventSubject = PublishSubject.create<UserListEvent>()
 
-    fun onPullUser(userListId: String, userId: String){
+
+    fun onPullUser(account: Account, userListId: String, userId: String){
         eventSubject.onNext(
             UserListEvent(
                 type = PULL_USER,
@@ -29,7 +27,7 @@ class UserListEventStore (
         )
     }
 
-    fun onPushUser(userListId: String, userId: String){
+    fun onPushUser(account: Account, userListId: String, userId: String){
         eventSubject.onNext(
             UserListEvent(
                 type = PUSH_USER,
@@ -40,7 +38,7 @@ class UserListEventStore (
         )
     }
 
-    fun onCreateUserList(userList: UserList){
+    fun onCreateUserList(account: Account, userList: UserList){
         eventSubject.onNext(
             UserListEvent(
                 type = CREATE,
@@ -52,7 +50,7 @@ class UserListEventStore (
         )
     }
 
-    fun onDeleteUserList(userList: UserList){
+    fun onDeleteUserList(account: Account, userList: UserList){
         eventSubject.onNext(
             UserListEvent(
                 type = DELETE,
@@ -63,7 +61,7 @@ class UserListEventStore (
         )
     }
 
-    fun onUpdateUserList(listId: String, name: String){
+    fun onUpdateUserList(account: Account, listId: String, name: String){
         eventSubject.onNext(
             UserListEvent(
                 type = UPDATED_NAME,
@@ -74,7 +72,7 @@ class UserListEventStore (
         )
     }
 
-    fun getEventStream(): Observable<UserListEvent>{
+    fun getEventStream(account: Account): Observable<UserListEvent>{
         return eventSubject.filter {
             it.account.accountId == account.accountId
         }

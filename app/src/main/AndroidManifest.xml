@@ -16,7 +16,6 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".UserListActivity"></activity>
         <activity android:name=".view.settings.activities.UrlPreviewSourceSettingActivity" />
         <activity android:name=".DraftNotesActivity" />
         <activity android:name=".SortedHashTagsActivity" />

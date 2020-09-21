@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.view.list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -29,7 +28,7 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
             listUserList.layoutManager = LinearLayoutManager(view.context)
             val adapter = ListUserListAdapter(viewModel, userListOperateViewModel, viewLifecycleOwner)
             listUserList.adapter = adapter
-            viewModel.listUsers.observe(viewLifecycleOwner, Observer{ list ->
+            viewModel.mListUsers.observe(viewLifecycleOwner, Observer{ list ->
                 adapter.submitList(list)
             })
             //viewModel.load()

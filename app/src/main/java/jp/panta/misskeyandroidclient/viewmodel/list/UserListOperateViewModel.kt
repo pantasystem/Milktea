@@ -12,10 +12,11 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class UserListOperateViewModel(
-    val miCore: MiCore
+    val miCore: MiCore,
+    val userListEventStore: UserListEventStore
     //val account: Account,
     //val misskeyAPI: MisskeyAPI,
-    //val encryption: Encryption
+    //val miCore.getEncryption(): Encryption
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
@@ -28,8 +29,7 @@ class UserListOperateViewModel(
 
     private val tag = this.javaClass.simpleName
 
-    private var userListEventStore: UserListEventStore? = null
-
+    
     val updateUserListEvent = EventBus<UserList>()
 
     init{
@@ -60,7 +60,7 @@ class UserListOperateViewModel(
     fun pullUser(userListId: String, userId: String){
         misskeyAPI.pullUserFromList(
             ListUserOperation(
-                i = account.getI(encryption)!!,
+                i = account.getI(miCore.getEncryption())!!,
                 listId = userListId,
                 userId = userId
             )
@@ -83,7 +83,7 @@ class UserListOperateViewModel(
         Log.d(tag, "update listId:$listId, name:$name")
         misskeyAPI.updateList(
             UpdateList(
-                i = account.getI(encryption)!!,
+                i = account.getI(miCore.getEncryption())!!,
                 name = name,
                 listId = listId
             )
@@ -119,7 +119,7 @@ class UserListOperateViewModel(
 
     fun delete(userList: UserList){
         misskeyAPI.deleteList(ListId(
-            i = account.getI(encryption)!!,
+            i = account.getI(miCore.getEncryption())!!,
             listId = userList.id
         )).enqueue(
             object : Callback<Unit>{

@@ -64,7 +64,7 @@ class UserListDetailActivity : AppCompatActivity() {
 
             mUserListOperateViewModelProvider = ViewModelProvider(this, UserListOperateViewModel.Factory(ac, miCore))[UserListOperateViewModel::class.java]
 
-            userListDetailViewModel.userList.observe(this, Observer<UserList>{ ul ->
+            userListDetailViewModel.mUserList.observe(this, Observer<UserList>{ ul ->
                 supportActionBar?.title = ul.name
                 mUserListName = ul.name
 
@@ -104,12 +104,12 @@ class UserListDetailActivity : AppCompatActivity() {
             }
             android.R.id.home ->{
                 if(mIsNameUpdated){
-                    updatedResultFinish(mUserListDetailViewModel?.userList?.value?.name)
+                    updatedResultFinish(mUserListDetailViewModel?.mUserList?.value?.name)
                 }
             }
             R.id.action_add_user ->{
                 val intent = Intent(this, SearchAndSelectUserActivity::class.java)
-                val selected = mUserListDetailViewModel?.listUsers?.value?.map{
+                val selected = mUserListDetailViewModel?.mListUsers?.value?.map{
                     it.userId
                 }?.toTypedArray()?: return false
                 intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, selected)
@@ -128,7 +128,7 @@ class UserListDetailActivity : AppCompatActivity() {
                 val added = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
                 val removed = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
                 Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
-                val userList = mUserListDetailViewModel?.userList?.value?: return
+                val userList = mUserListDetailViewModel?.mUserList?.value?: return
                 added?.forEach{
                     mUserListOperateViewModelProvider?.pushUser(userList, it)
                 }
