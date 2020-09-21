@@ -68,7 +68,7 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
         }
 
         fun getCaptureNotes(): Set<String>{
-            return captureNotes
+            return HashSet(captureNotes)
         }
 
 
@@ -93,15 +93,18 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
      * Clientをここにセットすることによって取り扱えるようになります。
      */
     fun attachClient(client: Client) : Boolean{
-        val added = clients[client.clientId]
-        if(added == null){
-            clients[client.clientId] = client
-            client.noteCapture = this
-            client.getCaptureNotes().forEach { note->
-                capture(client, note)
+        synchronized(clients){
+            val added = clients[client.clientId]
+            if(added == null){
+                clients[client.clientId] = client
+                client.noteCapture = this
+                client.getCaptureNotes().forEach { note->
+                    capture(client, note)
+                }
             }
+            return added == null
         }
-        return added == null
+
     }
 
     /**
@@ -110,13 +113,16 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
      * ここで他のClientにもCaptureされていた場合はCaptureが解除されることはありません。
      */
     fun detachClient(client: Client){
-        val capturedClient = clients.remove(client.clientId)
-            ?: return
+        synchronized(clients){
+            val capturedClient = clients.remove(client.clientId)
+                ?: return
 
-        capturedClient.getCaptureNotes().forEach { note ->
-            unCapture(capturedClient, note)
+            capturedClient.getCaptureNotes().forEach { note ->
+                unCapture(capturedClient, note)
+            }
+            capturedClient.noteCapture = null
         }
-        capturedClient.noteCapture = null
+
     }
 
     fun isAttachedClient(client: Client): Boolean{
