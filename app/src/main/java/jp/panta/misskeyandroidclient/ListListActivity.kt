@@ -28,7 +28,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         const val ACTION_SELECT = "jp.panta.misskeyandroidclient.ACTION_SELECT"
 
         private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
-        private const val USER_LIST_EDIT_RESULT_CODE = 3
     }
 
     private var mListListViewModel: ListListViewModel? = null
@@ -78,10 +77,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
     }
 
-    private val showListUpdateDialogObserver = Observer<UserList>{ ul ->
-        val dialog = UserListEditorDialog.newInstance(ul.id, ul.name)
-        dialog.show(supportFragmentManager, "")
-    }
+
 
     override fun onEdit(userList: UserList?) {
         userList?: return
@@ -92,11 +88,27 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
             intent.putExtra(UserListDetailActivity.EXTRA_LIST_ID, userList.id)
                 .putExtra(UserListDetailActivity.EXTRA_ACCOUNT_ID, account.accountId)
             intent.action = UserListDetailActivity.ACTION_EDIT_NAME
-            startActivityForResult(intent, USER_LIST_EDIT_RESULT_CODE)
+            startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
         }
     }
 
     override fun onSubmit(name: String) {
         mListListViewModel?.createUserList(name)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            USER_LIST_ACTIVITY_RESULT_CODE ->{
+                if(resultCode == RESULT_OK){
+                    val updated = data?.getSerializableExtra(UserListDetailActivity.EXTRA_UPDATED_USER_LIST) as? UserList
+                    if(updated != null){
+                        mListListViewModel?.onUserListUpdated(updated)
+                    }
+
+                }
+            }
+        }
+
     }
 }

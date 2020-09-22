@@ -99,9 +99,9 @@ class ListListViewModel(
     /**
      * 他Activityで変更を加える場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListUpdated(listId: String, name: String){
-        val updated = mUserListIdMap[listId]?.copy(name = name)?: return
-        mUserListIdMap[listId] = updated
+    fun onUserListUpdated(userList: UserList?){
+        userList?: return
+        mUserListIdMap[userList.id] = userList
         userListList.postValue(mUserListIdMap.values.toList())
     }
 
@@ -188,27 +188,5 @@ class ListListViewModel(
         })
     }
 
-    inner class UserListEventObserver : Observer<UserListEvent>{
-        override fun onComplete() = Unit
-        override fun onError(e: Throwable){
-            Log.e("UserListViewModel", "error", e)
-        }
 
-        override fun onSubscribe(d: Disposable) = Unit
-
-        override fun onNext(t: UserListEvent) {
-            when(t.type){
-                UserListEvent.Type.UPDATED_NAME ->{
-                    onUserListUpdated(t.userListId, t.name!!)
-                }
-                UserListEvent.Type.CREATE ->{
-                    mUserListIdMap[t.userListId] = t.userList!!
-                    userListList.postValue(mUserListIdMap.values.toList())
-                }
-                else ->{
-
-                }
-            }
-        }
-    }
 }

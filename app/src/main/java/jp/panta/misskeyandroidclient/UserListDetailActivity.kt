@@ -37,6 +37,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
         const val ACTION_SHOW = "ACTION_SHOW"
         const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
+
+        const val EXTRA_UPDATED_USER_LIST = "EXTRA_UPDATED_USER_LIST"
     }
 
     private var account: Account? = null
@@ -119,7 +121,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             }
             android.R.id.home ->{
                 if(mIsNameUpdated){
-                    updatedResultFinish(mUserListDetailViewModel?.userList?.value?.name)
+                    updatedResultFinish()
                 }
             }
             R.id.action_add_user ->{
@@ -132,6 +134,10 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        updatedResultFinish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -179,13 +185,15 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }
     }
 
-    private fun updatedResultFinish(name: String?){
+    private fun updatedResultFinish(){
+        val updatedEvent = mUserListDetailViewModel?.updateEvents?.toList()?: emptyList()
+
         val data = Intent().apply{
-            putExtra(ListListActivity.EXTRA_USER_LIST_NAME, name)
-            putExtra(ListListActivity.EXTRA_USER_LIST_ID, mListId)
-            action = ListListActivity.ACTION_USER_LIST_UPDATED
+            if(updatedEvent.isNotEmpty()){
+                putExtra(EXTRA_UPDATED_USER_LIST, mUserListDetailViewModel?.userList?.value)
+            }
         }
-        if(mListId == null || name == null){
+        if(mListId == null || updatedEvent.isEmpty()){
             setResult(RESULT_CANCELED)
         }else{
             setResult(RESULT_OK, data)
