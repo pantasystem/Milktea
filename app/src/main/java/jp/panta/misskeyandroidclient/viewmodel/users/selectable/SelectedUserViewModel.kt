@@ -44,7 +44,7 @@ class SelectedUserViewModel(
         val removed: List<String>
     )
 
-    private val mSelectedUserIdUserMap = LinkedHashMap<String, UserViewData>()
+    private val mSelectedUserIdUserMap: HashMap<String, UserViewData>
 
     val selectedUsers = UsersLiveData().apply{
         addSource(miCore.getCurrentAccount()){
@@ -88,7 +88,7 @@ class SelectedUserViewModel(
                 null
             }else{
                 it to UserViewData(it).apply{
-                    call?.enqueue(accept)
+                    call.enqueue(accept)
                 }
             }
 
@@ -96,7 +96,8 @@ class SelectedUserViewModel(
 
         usersMap.putAll(srcUserId)
 
-
+        mSelectedUserIdUserMap = LinkedHashMap(usersMap)
+        selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
     }
 
     fun selectUser(user: User?){
