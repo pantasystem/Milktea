@@ -78,15 +78,18 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
             userListDetailViewPager.adapter = PagerAdapter(ul.id)
             userListDetailTab.setupWithViewPager(userListDetailViewPager)
+
+            if(intent.action == ACTION_EDIT_NAME){
+                intent.action = ACTION_SHOW
+                showEditUserListDialog()
+            }
         })
 
         userListDetailViewModel.userList.observe(this, Observer {
             invalidateOptionsMenu()
         })
 
-        if(intent.action == ACTION_EDIT_NAME){
-            showEditUserListDialog()
-        }
+
 
     }
 
