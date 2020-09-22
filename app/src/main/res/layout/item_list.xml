@@ -13,9 +13,10 @@
         <variable
                 name="listListViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel" />
+
         <variable
-                name="userListOperateViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel" />
+                name="tryToEditCallback"
+                type="jp.panta.misskeyandroidclient.view.list.ListListAdapter.OnTryToEditCallback" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -71,7 +72,7 @@
                     android:tint="?attr/colorNoteActionButtonTint"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:onClick="@{ ()-> userListOperateViewModel.showUserListUpdateDialog(list) }"
+                    android:onClick="@{ ()->tryToEditCallback.onEdit(list) }"
                     />
 
 

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
@@ -19,26 +20,30 @@ import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListEditorDialog
+import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.android.synthetic.main.activity_user_list_detail.*
 
-class UserListDetailActivity : AppCompatActivity() {
+class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmittedListener {
 
     companion object {
         private const val TAG = "UserListDetailActivity"
         const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_LIST_ID"
+        const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.extra.ACCOUNT_ID"
 
         private const val SELECT_USER_REQUEST_CODE = 252
+
+        const val ACTION_SHOW = "ACTION_SHOW"
+        const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
+
+        const val EXTRA_UPDATED_USER_LIST = "EXTRA_UPDATED_USER_LIST"
     }
 
     private var account: Account? = null
     private var mListId: String? = null
     private var mUserListDetailViewModel: UserListDetailViewModel? = null
-    private var mUserListOperateViewModelProvider: UserListOperateViewModel? = null
 
     private var mIsNameUpdated: Boolean = false
     private var mUserListName: String = ""
@@ -51,30 +56,45 @@ class UserListDetailActivity : AppCompatActivity() {
         setSupportActionBar(userListToolbar)
 
         val listId = intent.getStringExtra(EXTRA_LIST_ID)
+        val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
+
+        if(accountId < 0 || listId == null){
+            Toast.makeText(this, R.string.auth_error, Toast.LENGTH_SHORT).show()
+            return finish()
+        }
+
         mListId = listId
         val miCore = application as MiCore
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
+
+        val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(accountId, listId, miCore))[UserListDetailViewModel::class.java]
+        mUserListDetailViewModel = userListDetailViewModel
+
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        miCore.getCurrentAccount().observe(this, Observer{ ac ->
+        userListDetailViewModel.userList.observe(this, Observer<UserList>{ ul ->
+            supportActionBar?.title = ul.name
+            mUserListName = ul.name
 
-            account = ac
-            val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(ac, listId!!, miCore))[UserListDetailViewModel::class.java]
-            mUserListDetailViewModel = userListDetailViewModel
+            userListDetailViewPager.adapter = PagerAdapter(ul.id)
+            userListDetailTab.setupWithViewPager(userListDetailViewPager)
 
-            mUserListOperateViewModelProvider = ViewModelProvider(this, UserListOperateViewModel.Factory(ac, miCore))[UserListOperateViewModel::class.java]
-
-            userListDetailViewModel.userList.observe(this, Observer<UserList>{ ul ->
-                supportActionBar?.title = ul.name
-                mUserListName = ul.name
-
-                userListDetailViewPager.adapter = PagerAdapter(ac, ul.id)
-                userListDetailTab.setupWithViewPager(userListDetailViewPager)
-            })
-            invalidateOptionsMenu()
-
-            userListDetailViewModel.load()
+            if(intent.action == ACTION_EDIT_NAME){
+                intent.action = ACTION_SHOW
+                showEditUserListDialog()
+            }
         })
+
+        userListDetailViewModel.userList.observe(this, Observer {
+            invalidateOptionsMenu()
+        })
+
+
+
+    }
+
+    override fun onSubmit(name: String) {
+        mUserListDetailViewModel?.updateName(name)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -104,7 +124,7 @@ class UserListDetailActivity : AppCompatActivity() {
             }
             android.R.id.home ->{
                 if(mIsNameUpdated){
-                    updatedResultFinish(mUserListDetailViewModel?.userList?.value?.name)
+                    updatedResultFinish()
                 }
             }
             R.id.action_add_user ->{
@@ -119,6 +139,10 @@ class UserListDetailActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onBackPressed() {
+        updatedResultFinish()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -128,12 +152,11 @@ class UserListDetailActivity : AppCompatActivity() {
                 val added = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
                 val removed = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
                 Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
-                val userList = mUserListDetailViewModel?.userList?.value?: return
                 added?.forEach{
-                    mUserListOperateViewModelProvider?.pushUser(userList, it)
+                    mUserListDetailViewModel?.pushUser(it)
                 }
                 removed?.forEach{
-                    mUserListOperateViewModelProvider?.pullUser(userList.id, it)
+                    mUserListDetailViewModel?.pullUser(it)
                 }
             }
         }
@@ -165,13 +188,15 @@ class UserListDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun updatedResultFinish(name: String?){
+    private fun updatedResultFinish(){
+        val updatedEvent = mUserListDetailViewModel?.updateEvents?.toList()?: emptyList()
+
         val data = Intent().apply{
-            putExtra(ListListActivity.EXTRA_USER_LIST_NAME, name)
-            putExtra(ListListActivity.EXTRA_USER_LIST_ID, mListId)
-            action = ListListActivity.ACTION_USER_LIST_UPDATED
+            if(updatedEvent.isNotEmpty()){
+                putExtra(EXTRA_UPDATED_USER_LIST, mUserListDetailViewModel?.userList?.value)
+            }
         }
-        if(mListId == null || name == null){
+        if(mListId == null || updatedEvent.isEmpty()){
             setResult(RESULT_CANCELED)
         }else{
             setResult(RESULT_OK, data)
@@ -190,7 +215,7 @@ class UserListDetailActivity : AppCompatActivity() {
         finish()
     }
 
-    inner class PagerAdapter(val ac: Account, val listId: String) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class PagerAdapter(val listId: String) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))
         override fun getCount(): Int {
             return titles.size

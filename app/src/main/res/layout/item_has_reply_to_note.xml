@@ -31,6 +31,10 @@
                     android:paddingEnd="8dp"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
+
+                    app:mainNameView="@{replyToUserName}"
+                    app:subNameView="@{replyToName}"
+                    app:user="@{hasReplyToNote.replyTo.toShowNote.user}"
                     >
                 <ImageView
                         android:id="@+id/replyToAvatarIcon"
@@ -45,7 +49,6 @@
                 <TextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/replyToAvatarIcon"
-                        android:text='@{hasReplyToNote.replyTo.userName, default="@Panta"}'
                         android:id="@+id/replyToUserName"
                         android:textStyle="bold"
                         android:textSize="15sp"
@@ -57,14 +60,10 @@
                         android:id="@+id/replyToName"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/replyToUserName"
-                        android:text='@{hasReplyToNote.replyTo.name, default="name name"}'
                         android:textStyle="italic"
                         android:singleLine="true"
                         android:ellipsize="end"
                         android:textSize="15sp"
-                        app:text='@{hasReplyToNote.replyTo.name}'
-                        app:emojis='@{hasReplyToNote.replyTo.toShowNote.user.emojis}'
-                        app:clickableLink="@{false}"
                         />
 
                 <TextView

@@ -9,38 +9,35 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListUserBinding
-import jp.panta.misskeyandroidclient.viewmodel.list.ListUserViewData
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 
 class ListUserListAdapter(
     private val userListDetailViewModel: UserListDetailViewModel,
-    private val userListOperateViewModel: UserListOperateViewModel,
     val lifecycleOwner: LifecycleOwner
-) : ListAdapter<ListUserViewData, ListUserListAdapter.VH>(ItemCallback()){
+) : ListAdapter<UserViewData, ListUserListAdapter.VH>(ItemCallback()){
     class VH(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)
-    class ItemCallback : DiffUtil.ItemCallback<ListUserViewData>(){
+    class ItemCallback : DiffUtil.ItemCallback<UserViewData>(){
         override fun areContentsTheSame(
-            oldItem: ListUserViewData,
-            newItem: ListUserViewData
+            oldItem: UserViewData,
+            newItem: UserViewData
         ): Boolean {
             return oldItem.userId == newItem.userId
                     && oldItem.user.value == newItem.user.value
         }
 
         override fun areItemsTheSame(
-            oldItem: ListUserViewData,
-            newItem: ListUserViewData
+            oldItem: UserViewData,
+            newItem: UserViewData
         ): Boolean {
             return oldItem.userId == newItem.userId
         }
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.binding.listUserViewData = getItem(position)
+        holder.binding.userViewData = getItem(position)
         holder.binding.userListDetailViewModel = userListDetailViewModel
         holder.binding.lifecycleOwner = lifecycleOwner
-        holder.binding.userListOperateViewModel = userListOperateViewModel
         holder.binding.executePendingBindings()
     }
 

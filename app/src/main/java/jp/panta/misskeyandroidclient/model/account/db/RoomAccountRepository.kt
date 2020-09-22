@@ -25,9 +25,15 @@ class RoomAccountRepository(
         if(exAccount == null){
             exAccount = accountDao.findByUserNameAndInstanceDomain(account.userName, account.instanceDomain)?.toAccount()
         }
+
+        if(exAccount == null){
+            exAccount = accountDao.findByRemoteIdAndInstanceDomain(account.remoteId, account.instanceDomain)?.toAccount()
+        }
+
         if(exAccount == null){
             val id = accountDao.insert(account)
             exAccount = accountDao.get(id)?: throw AccountRegistrationFailedException()
+            Log.d("RoomAccountRepository", "insertしました: $exAccount")
             isNeedDeepUpdate = true
         }
         

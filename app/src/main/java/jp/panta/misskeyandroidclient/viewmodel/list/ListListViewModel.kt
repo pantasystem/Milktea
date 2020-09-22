@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.list
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.Encryption
@@ -14,6 +11,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.list.CreateList
+import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -26,34 +25,37 @@ import java.util.*
 import kotlin.collections.LinkedHashMap
 
 class ListListViewModel(
-    val account: Account,
-    val misskeyAPI: MisskeyAPI,
-    val encryption: Encryption,
     val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val account: Account, val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return ListListViewModel(account, miCore.getMisskeyAPI(account), miCore.getEncryption(), miCore) as T
+            return ListListViewModel( miCore) as T
         }
     }
 
     companion object{
         private const val TAG = "ListListViewModel"
     }
-    val userListList = MutableLiveData<List<UserList>>()
 
-    val pagedUserList = Transformations.map(userListList){ ulList ->
-        ulList.filter{ ul ->
-            account.pages.any {
-                val pageable = it.pageable()
-                if(pageable is Pageable.UserListTimeline){
-                    pageable.listId == ul.id
-                }else{
-                    false
-                }
-            }
+    val encryption = miCore.getEncryption()
+
+    var account: Account? = null
+    val userListList = MediatorLiveData<List<UserList>>().apply{
+        addSource(miCore.getCurrentAccount()){
+            account = it
+            loadListList(it)
+        }
+    }
+
+    val pagedUserList = MediatorLiveData<Set<UserList>>().apply{
+        addSource(userListList){ userLists ->
+            this.value = userLists.filter{ ul ->
+                account?.pages?.any {
+                    (it.pageable() as? Pageable.UserListTimeline)?.listId == ul.id
+                }?:false
+            }.toSet()
         }
     }
 
@@ -62,17 +64,12 @@ class ListListViewModel(
 
     val showUserDetailEvent = EventBus<UserList>()
 
-    private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
+   
 
-    init{
-        mPublisher.subscribe(UserListEventObserver())
-    }
-
-
-    fun loadListList(){
-        val i = account.getI(encryption)
+    fun loadListList(account: Account? = this.account){
+        val i = account?.getI(encryption)
             ?: return
-        misskeyAPI.userList(I(i)).enqueue(object : Callback<List<UserList>>{
+        miCore.getMisskeyAPI(account).userList(I(i)).enqueue(object : Callback<List<UserList>>{
             override fun onResponse(
                 call: Call<List<UserList>>,
                 response: Response<List<UserList>>
@@ -97,23 +94,18 @@ class ListListViewModel(
     /**
      * 他Activityで変更を加える場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListUpdated(listId: String, name: String){
-        val updated = mUserListIdMap[listId]?.copy(name = name)?: return
-        mUserListIdMap[listId] = updated
+    fun onUserListUpdated(userList: UserList?){
+        userList?: return
+        mUserListIdMap[userList.id] = userList
         userListList.postValue(mUserListIdMap.values.toList())
     }
 
     /**
      * 他Activity等でUserListを正常に作成できた場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListCreated(listId: String, createdAt: Date, name: String, userIds: List<String>){
-        val createdUser = UserList(
-            id = listId,
-            createdAt = createdAt,
-            name = name,
-            userIds = userIds
-        )
-        mUserListIdMap[createdUser.id] = createdUser
+    fun onUserListCreated(userList: UserList){
+
+        mUserListIdMap[userList.id] = userList
         userListList.postValue(mUserListIdMap.values.toList())
     }
 
@@ -127,7 +119,7 @@ class ListListViewModel(
 
     fun toggleTab(userList: UserList?){
         userList?.let{ ul ->
-            val exPage = account.pages.firstOrNull {
+            val exPage = account?.pages?.firstOrNull {
                 val pageable = it.pageable()
                 if(pageable is Pageable.UserListTimeline){
                     pageable.listId == ul.id
@@ -135,36 +127,61 @@ class ListListViewModel(
                     false
                 }
             }
-            if(exPage == null){
-                val page = Page(account.accountId, ul.name, pageable =  Pageable.UserListTimeline(ul.id), weight = 0)
+            if(exPage == null && account != null){
+                val page = Page(account!!.accountId, ul.name, pageable =  Pageable.UserListTimeline(ul.id), weight = 0)
                 miCore.addPageInCurrentAccount(page)
-            }else{
+            }else if(exPage != null){
                 miCore.removePageInCurrentAccount(exPage)
             }
         }
     }
 
-    inner class UserListEventObserver : Observer<UserListEvent>{
-        override fun onComplete() = Unit
-        override fun onError(e: Throwable){
-            Log.e("UserListViewModel", "error", e)
+    fun delete(userList: UserList?){
+        val account = this.account
+        val misskeyAPI = account?.let{
+            miCore.getMisskeyAPI(it)
         }
+        if(misskeyAPI == null || userList == null){
+            return
+        }
+        misskeyAPI.deleteList(ListId(
+            i = account.getI(miCore.getEncryption())!!,
+            listId = userList.id
+        )).enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                userListList.postValue(userListList.value?.let{ ulList ->
+                    ulList.filterNot{
+                        it.id == userList.id
+                    }
+                })
+            }
 
-        override fun onSubscribe(d: Disposable) = Unit
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
 
-        override fun onNext(t: UserListEvent) {
-            when(t.type){
-                UserListEvent.Type.UPDATED_NAME ->{
-                    onUserListUpdated(t.userListId, t.name!!)
-                }
-                UserListEvent.Type.CREATE ->{
-                    mUserListIdMap[t.userListId] = t.userList!!
-                    userListList.postValue(mUserListIdMap.values.toList())
-                }
-                else ->{
+            }
+        })
+    }
 
+    fun createUserList(name: String){
+        val api = account?.let{
+            miCore.getMisskeyAPI(it)
+        }
+        api?.createList(CreateList(
+            account?.getI(miCore.getEncryption())!!,
+            name = name
+        ))?.enqueue(object : Callback<UserList>{
+            override fun onResponse(call: Call<UserList>, response: Response<UserList>) {
+                val ul = response.body()
+                if(ul != null){
+
+                    onUserListCreated(ul)
                 }
             }
-        }
+            override fun onFailure(call: Call<UserList>, t: Throwable) {
+
+            }
+        })
     }
+
+
 }

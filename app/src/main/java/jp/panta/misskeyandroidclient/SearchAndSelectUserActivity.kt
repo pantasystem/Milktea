@@ -48,6 +48,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         val selectableMaximumSize = intent.getIntExtra(EXTRA_SELECTABLE_MAXIMUM_SIZE, Int.MAX_VALUE)
         val selectedUserIdList = intent.getStringArrayExtra(EXTRA_SELECTED_USER_IDS)?.toList()?: emptyList()
         mSelectedUserIds = selectedUserIdList
+        Log.d(this.localClassName, "selected user ids :$selectedUserIdList")
 
         val linearLayoutManager = LinearLayoutManager(this)
 
