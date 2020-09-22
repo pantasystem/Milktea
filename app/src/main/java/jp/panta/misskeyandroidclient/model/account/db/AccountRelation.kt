@@ -13,6 +13,8 @@ class AccountRelation{
 
     @Ignore
     fun toAccount(): Account{
-        return account.copy(pages = pages)
+        return account.copy(pages = pages.sortedBy {
+            it.weight
+        })
     }
 }

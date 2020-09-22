@@ -51,11 +51,11 @@ class ListListViewModel(
 
     val pagedUserList = MediatorLiveData<Set<UserList>>().apply{
         addSource(userListList){ userLists ->
-            userLists.filter{ ul ->
+            this.value = userLists.filter{ ul ->
                 account?.pages?.any {
                     (it.pageable() as? Pageable.UserListTimeline)?.listId == ul.id
                 }?:false
-            }
+            }.toSet()
         }
     }
 
@@ -64,12 +64,7 @@ class ListListViewModel(
 
     val showUserDetailEvent = EventBus<UserList>()
 
-    //private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
-
-    init{
-        //mPublisher.subscribe(UserListEventObserver())
-    }
-
+   
 
     fun loadListList(account: Account? = this.account){
         val i = account?.getI(encryption)
