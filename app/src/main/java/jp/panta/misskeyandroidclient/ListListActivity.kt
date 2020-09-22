@@ -27,6 +27,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         const val ACTION_VIEW = "jp.panta.misskeyandroidclient.ACTION_VIEW"
         const val ACTION_SELECT = "jp.panta.misskeyandroidclient.ACTION_SELECT"
 
+        const val ACTION_ADD_USER = "jp.panta.misskeyandroidclient.ACTION_ADD_USER"
+
         private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
     }
 
