@@ -11,12 +11,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListBinding
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 
 class ListListAdapter(
     private val listListViewModel: ListListViewModel,
     val lifecycleOwner: LifecycleOwner,
-    private val userListOperateViewModel: UserListOperateViewModel
+    var onTryToEditCallback: OnTryToEditCallback? = null
 ) : ListAdapter<UserList, ListListAdapter.VH>(
     ItemCallback()
 ){
@@ -32,11 +31,16 @@ class ListListAdapter(
         }
     }
 
+    interface OnTryToEditCallback{
+
+        fun onEdit(userList: UserList?)
+    }
+
     override fun onBindViewHolder(holder: VH, position: Int) {
         holder.binding.list = getItem(position)
         holder.binding.listListViewModel = listListViewModel
         holder.binding.lifecycleOwner = lifecycleOwner
-        holder.binding.userListOperateViewModel = userListOperateViewModel
+        holder.binding.tryToEditCallback = onTryToEditCallback
         holder.binding.executePendingBindings()
     }
 

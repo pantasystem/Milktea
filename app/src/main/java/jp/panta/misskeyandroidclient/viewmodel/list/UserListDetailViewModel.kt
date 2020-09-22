@@ -46,7 +46,7 @@ class UserListDetailViewModel(
 
 
     private val mAccount = MutableLiveData<Account>()
-    val mUserList = MutableLiveData<UserList>()
+    private val mUserList = MutableLiveData<UserList>()
 
     private val mListUsers = MutableLiveData<List<UserViewData>>()
 
@@ -75,7 +75,7 @@ class UserListDetailViewModel(
         }
     }
 
-    private fun load(){
+    fun load(){
         val account = mAccount.value
         if(account == null){
             Log.i(tag, "#load アカウントがまだ読み込めていません。")

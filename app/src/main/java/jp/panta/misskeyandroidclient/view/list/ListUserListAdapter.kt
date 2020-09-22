@@ -10,12 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListUserBinding
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 
 class ListUserListAdapter(
     private val userListDetailViewModel: UserListDetailViewModel,
-    private val userListOperateViewModel: UserListOperateViewModel,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<UserViewData, ListUserListAdapter.VH>(ItemCallback()){
     class VH(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)

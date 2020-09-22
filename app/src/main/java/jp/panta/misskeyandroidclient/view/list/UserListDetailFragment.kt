@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 import kotlinx.android.synthetic.main.fragment_list_user_list.*
 
 class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
@@ -24,9 +23,8 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
         val miCore = view.context.applicationContext as MiCore
         miCore.getCurrentAccount().observe(viewLifecycleOwner, Observer {
             val viewModel = ViewModelProvider(requireActivity())[UserListDetailViewModel::class.java]
-            val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(it, miCore))[UserListOperateViewModel::class.java]
             listUserList.layoutManager = LinearLayoutManager(view.context)
-            val adapter = ListUserListAdapter(viewModel, userListOperateViewModel, viewLifecycleOwner)
+            val adapter = ListUserListAdapter(viewModel, viewLifecycleOwner)
             listUserList.adapter = adapter
             viewModel.listUsers.observe(viewLifecycleOwner, Observer{ list ->
                 adapter.submitList(list)

@@ -9,13 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.view.list.ListListAdapter
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListEditorDialog
+import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListOperateViewModel
 import kotlinx.android.synthetic.main.activity_list_list.*
 import kotlinx.android.synthetic.main.content_list_list.*
 
-class ListListActivity : AppCompatActivity() {
+class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback{
 
     companion object{
         const val EXTRA_USER_LIST_NAME = "jp.panta.misskeyandroidclient.EXTRA_USER_LIST_NAME"
@@ -29,10 +28,10 @@ class ListListActivity : AppCompatActivity() {
         const val ACTION_SELECT = "jp.panta.misskeyandroidclient.ACTION_SELECT"
 
         private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
+        private const val USER_LIST_EDIT_RESULT_CODE = 3
     }
 
     private var mListListViewModel: ListListViewModel? = null
-    private var mListOperateViewModel: UserListOperateViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +42,12 @@ class ListListActivity : AppCompatActivity() {
 
         val layoutManager = LinearLayoutManager(this)
         mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(miCore))[ListListViewModel::class.java]
-        val userListOperateViewModel = ViewModelProvider(this, UserListOperateViewModel.Factory(miCore))[UserListOperateViewModel::class.java]
 
-        mListOperateViewModel = userListOperateViewModel
         val listAdapter =
             ListListAdapter(
                 mListListViewModel!!,
                 this,
-                userListOperateViewModel
+                this
             )
         listListView.adapter = listAdapter
         listListView.layoutManager = layoutManager
@@ -72,8 +69,6 @@ class ListListActivity : AppCompatActivity() {
         mListListViewModel?.showUserDetailEvent?.removeObserver(showUserListDetail)
         mListListViewModel?.showUserDetailEvent?.observe(this, showUserListDetail)
 
-        mListOperateViewModel?.updateUserListEvent?.removeObserver(showListUpdateDialogObserver)
-        mListOperateViewModel?.updateUserListEvent?.observe(this, showListUpdateDialogObserver)
     }
 
     private val showUserListDetail = Observer<UserList>{ ul ->
@@ -86,4 +81,19 @@ class ListListActivity : AppCompatActivity() {
         val dialog = UserListEditorDialog.newInstance(ul.id, ul.name)
         dialog.show(supportFragmentManager, "")
     }
+
+    override fun onEdit(userList: UserList?) {
+        userList?: return
+
+        val intent = Intent(this, UserListDetailActivity::class.java)
+        val account = mListListViewModel?.account
+        if(account != null){
+            intent.putExtra(UserListDetailActivity.EXTRA_LIST_ID, userList.id)
+                .putExtra(UserListDetailActivity.EXTRA_ACCOUNT_ID, account.accountId)
+            intent.action = UserListDetailActivity.ACTION_EDIT_NAME
+            startActivityForResult(intent, USER_LIST_EDIT_RESULT_CODE)
+        }
+    }
+
+
 }

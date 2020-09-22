@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.notes.NoteRequest
@@ -142,6 +143,32 @@ class ListListViewModel(
                 miCore.removePageInCurrentAccount(exPage)
             }
         }
+    }
+
+    fun delete(userList: UserList?){
+        val account = this.account
+        val misskeyAPI = account?.let{
+            miCore.getMisskeyAPI(it)
+        }
+        if(misskeyAPI == null || userList == null){
+            return
+        }
+        misskeyAPI.deleteList(ListId(
+            i = account.getI(miCore.getEncryption())!!,
+            listId = userList.id
+        )).enqueue(object : Callback<Unit>{
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                userListList.postValue(userListList.value?.let{ ulList ->
+                    ulList.filterNot{
+                        it.id == userList.id
+                    }
+                })
+            }
+
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+
+            }
+        })
     }
 
     inner class UserListEventObserver : Observer<UserListEvent>{

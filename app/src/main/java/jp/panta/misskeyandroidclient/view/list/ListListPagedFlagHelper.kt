@@ -10,12 +10,10 @@ object ListListPagedFlagHelper {
 
     @JvmStatic
     @BindingAdapter("list", "pagedList")
-    fun ImageButton.setListListTogglePageIcon(list: UserList?, pagedList: List<UserList>?){
+    fun ImageButton.setListListTogglePageIcon(list: UserList?, pagedList: Set<UserList>?){
         list?: return
         pagedList?: return
-        val isPaged = pagedList.any {
-            it.id == list.id
-        }
+        val isPaged = pagedList.contains(list)
         if(isPaged){
             this.setImageResource(R.drawable.ic_remove_to_tab_24px)
         }else{
