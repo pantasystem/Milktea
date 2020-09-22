@@ -14,7 +14,7 @@ import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
 import kotlinx.android.synthetic.main.activity_list_list.*
 import kotlinx.android.synthetic.main.content_list_list.*
 
-class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback{
+class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback, UserListEditorDialog.OnSubmittedListener{
 
     companion object{
         const val EXTRA_USER_LIST_NAME = "jp.panta.misskeyandroidclient.EXTRA_USER_LIST_NAME"
@@ -74,6 +74,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     private val showUserListDetail = Observer<UserList>{ ul ->
         val intent = Intent(this, UserListDetailActivity::class.java)
         intent.putExtra(UserListDetailActivity.EXTRA_LIST_ID, ul.id)
+        intent.putExtra(UserListDetailActivity.EXTRA_ACCOUNT_ID, mListListViewModel?.account?.accountId?: - 1)
         startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
     }
 
@@ -95,5 +96,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         }
     }
 
-
+    override fun onSubmit(name: String) {
+        mListListViewModel?.createUserList(name)
+    }
 }

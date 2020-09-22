@@ -101,6 +101,7 @@ class UserListDetailViewModel(
     }
 
     fun updateName(name: String){
+        Log.d(tag, "更新しようとしています:$name")
         val account = mAccount.value
         if(account == null){
             Log.i(tag, "#load アカウントがまだ読み込めていません。")
@@ -120,10 +121,12 @@ class UserListDetailViewModel(
                         UserListEvent(userListId = listId, account = account, type = UserListEvent.Type.UPDATED_NAME)
                     )
                     load()
+                }else{
+                    Log.d(tag, "更新に失敗しました:$response")
                 }
             }
             override fun onFailure(call: Call<Unit>, t: Throwable) {
-
+                Log.e(tag, "更新に失敗した:$call", t)
             }
         })
     }

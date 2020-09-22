@@ -66,6 +66,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
 
         val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(accountId, listId, miCore))[UserListDetailViewModel::class.java]
+        mUserListDetailViewModel = userListDetailViewModel
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 

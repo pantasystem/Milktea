@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
+import jp.panta.misskeyandroidclient.model.list.CreateList
 import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
@@ -107,14 +108,9 @@ class ListListViewModel(
     /**
      * 他Activity等でUserListを正常に作成できた場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListCreated(listId: String, createdAt: Date, name: String, userIds: List<String>){
-        val createdUser = UserList(
-            id = listId,
-            createdAt = createdAt,
-            name = name,
-            userIds = userIds
-        )
-        mUserListIdMap[createdUser.id] = createdUser
+    fun onUserListCreated(userList: UserList){
+
+        mUserListIdMap[userList.id] = userList
         userListList.postValue(mUserListIdMap.values.toList())
     }
 
@@ -166,6 +162,27 @@ class ListListViewModel(
             }
 
             override fun onFailure(call: Call<Unit>, t: Throwable) {
+
+            }
+        })
+    }
+
+    fun createUserList(name: String){
+        val api = account?.let{
+            miCore.getMisskeyAPI(it)
+        }
+        api?.createList(CreateList(
+            account?.getI(miCore.getEncryption())!!,
+            name = name
+        ))?.enqueue(object : Callback<UserList>{
+            override fun onResponse(call: Call<UserList>, response: Response<UserList>) {
+                val ul = response.body()
+                if(ul != null){
+
+                    onUserListCreated(ul)
+                }
+            }
+            override fun onFailure(call: Call<UserList>, t: Throwable) {
 
             }
         })
