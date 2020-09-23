@@ -62,21 +62,27 @@ class NotificationService : Service() {
 
     private fun startObserve(){
 
-        (applicationContext as MiApplication).getAccounts().observeForever { accounts ->
-            accounts?.forEach{ar ->
-                Log.d(TAG, "observerを登録しています")
+        val miApplication = applicationContext
+        if(miApplication is MiApplication){
+            miApplication.getAccounts().observeForever { accounts ->
+                accounts?.forEach{ar ->
+                    Log.d(TAG, "observerを登録しています")
 
-                ar.let{ _ ->
+                    ar.let{ _ ->
 
-                    val mainCapture = (application as MiApplication).getMainCapture(ar)
-                    mainCapture.putListener(MainChannelObserver(ar))
+                        val mainCapture = (application as MiApplication).getMainCapture(ar)
+                        mainCapture.putListener(MainChannelObserver(ar))
+                    }
+
                 }
-
             }
+
+            mDisposable.add(miApplication.messageSubscriber.getAllMergedAccountMessages().subscribe {
+                showMessageNotification(it)
+            })
         }
-        mDisposable.add((applicationContext as MiApplication).messageSubscriber.getAllMergedAccountMessages().subscribe {
-            showMessageNotification(it)
-        })
+
+
     }
 
     private inner class MainChannelObserver(
