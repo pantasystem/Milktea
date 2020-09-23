@@ -319,4 +319,5 @@
     <string name="returns_limit">改行数制限（自動的に投稿が折りたたまれます）</string>
     <string name="download">ダウンロード</string>
     <string name="start_downloading_placeholder">%sのダウンロードを開始します。</string>
+    <string name="add_to_list">リストに追加する</string>
 </resources>

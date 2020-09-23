@@ -4,13 +4,16 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.view.list.ListListAdapter
 import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
+import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
 import kotlinx.android.synthetic.main.activity_list_list.*
 import kotlinx.android.synthetic.main.content_list_list.*
 
@@ -29,6 +32,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
     private var mListListViewModel: ListListViewModel? = null
 
+    private var mPullPushUserViewModelEventDisposable: Disposable? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -42,11 +47,35 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(miCore))[ListListViewModel::class.java]
 
         val listAdapter =
+        if(addUserId == null){
             ListListAdapter(
                 mListListViewModel!!,
                 this,
                 this
             )
+        }else{
+            val pullPushUserViewModel = ViewModelProvider(this, UserListPullPushUserViewModel.Factory(miCore))[UserListPullPushUserViewModel::class.java]
+
+            miCore.getCurrentAccount().observe(this, Observer {
+                pullPushUserViewModel.account.value = it
+            })
+
+            if(mPullPushUserViewModelEventDisposable?.isDisposed == true){
+                mPullPushUserViewModelEventDisposable = pullPushUserViewModel.pullPushEvent.subscribe {
+                    mListListViewModel?.loadListList()
+                }
+            }
+
+            ListListAdapter(
+                mListListViewModel!!,
+                this,
+                this,
+                addUserId,
+                pullPushUserViewModel
+            )
+        }
+
+
         listListView.adapter = listAdapter
         listListView.layoutManager = layoutManager
         mListListViewModel?.userListList?.observe(this, Observer{ userListList ->
@@ -109,5 +138,12 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
             }
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        mPullPushUserViewModelEventDisposable?.dispose()
+        mPullPushUserViewModelEventDisposable = null
     }
 }

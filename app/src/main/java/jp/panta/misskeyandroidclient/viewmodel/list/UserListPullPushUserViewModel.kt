@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.list
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -26,6 +27,13 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
         val userId: String,
         val listId: String
     )
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return UserListPullPushUserViewModel(miCore) as T
+        }
+    }
 
     val account = MutableLiveData<Account>(miCore.getCurrentAccount().value)
 
