@@ -23,4 +23,7 @@
             android:id="@+id/unblock"
             android:title="@string/unblock"
             />
+    <item
+            android:id="@+id/add_list"
+            android:title="@string/add_to_list"/>
 </menu>

@@ -229,6 +229,11 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.nav_add_to_tab ->{
                 addPageToTab()
             }
+            R.id.add_list ->{
+                val intent = Intent(this, ListListActivity::class.java)
+                intent.putExtra(ListListActivity.EXTRA_ADD_USER_ID, mUserId)
+                startActivity(intent)
+            }
             else -> return false
 
         }
