@@ -21,13 +21,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         const val EXTRA_USER_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_USER_LIST_ID"
         const val EXTRA_CREATED_AT = "jp.panta.misskeyandroidclient.EXTRA_CREATED_AT"
         const val EXTRA_USER_ID_ARRAY = "jp.panta.misskeyandroidclient.EXTRA_USER_ID_ARRAY"
-        const val ACTION_USER_LIST_CREATED = "jp.panta.misskeyandroidclient.ACTION_USER_LIST_CREATED"
-        const val ACTION_USER_LIST_UPDATED = "jp.panta.misskeyandroidclient.ACTION_USER_LIST_UPDATED"
 
-        const val ACTION_VIEW = "jp.panta.misskeyandroidclient.ACTION_VIEW"
-        const val ACTION_SELECT = "jp.panta.misskeyandroidclient.ACTION_SELECT"
-
-        const val ACTION_ADD_USER = "jp.panta.misskeyandroidclient.ACTION_ADD_USER"
+        const val EXTRA_ADD_USER_ID = "jp.panta.misskeyandroidclient.extra.ADD_USER_ID"
 
         private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
     }
