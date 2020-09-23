@@ -34,6 +34,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         setTheme()
         setContentView(R.layout.activity_list_list)
 
+        val addUserId = intent.getStringExtra(EXTRA_ADD_USER_ID)
+
         val miCore = application as MiCore
 
         val layoutManager = LinearLayoutManager(this)
