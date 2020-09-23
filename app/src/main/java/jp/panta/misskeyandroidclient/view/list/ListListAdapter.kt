@@ -77,11 +77,11 @@ class ListListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return if(addUserId == null || pullPushUserViewModel == null){
-            // ユーザーをリストに加える pull or push
-            1
-        }else{
             // ユーザーリストを一覧表示する
             2
+        }else{
+            // ユーザーをリストに加える pull or push
+            1
         }
     }
 
