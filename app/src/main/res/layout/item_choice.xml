@@ -13,11 +13,10 @@
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
     </data>
-    <LinearLayout
+    <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp"
+            android:layout_marginBottom="4dp"
             >
 
 
@@ -32,6 +31,7 @@
                 android:onClick="@{()-> notesViewModel.vote(poll, choice)}"
                 android:checked="@{SafeUnbox.unbox(choice.isVoted)}"
                 android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginBottom="4dp"
                 />
 
         <ProgressBar
@@ -43,8 +43,9 @@
                 android:progress="@{SafeUnbox.unboxInt(choice.voteCount)}"
                 tools:max="200"
                 tools:progress="50"
+                android:layout_gravity="bottom"
                 />
 
 
-    </LinearLayout>
+    </FrameLayout>
 </layout>

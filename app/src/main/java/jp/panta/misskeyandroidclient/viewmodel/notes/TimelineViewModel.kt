@@ -21,9 +21,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.streming.note.v2.captureAll
 import kotlin.collections.HashSet
-import kotlin.collections.LinkedHashMap
 
 class TimelineViewModel : ViewModel{
     data class Request(
@@ -289,7 +287,7 @@ class TimelineViewModel : ViewModel{
                     if(list.isNullOrEmpty()){
                         return@launch
                     }else{
-                        releaseAndCapture(list)
+                        captureNotes(list)
                         loadUrlPreviews(list)
 
                         val state = timelineLiveData.value
@@ -351,7 +349,7 @@ class TimelineViewModel : ViewModel{
                 if(list.isNullOrEmpty()){
                     return@launch
                 }else{
-                    releaseAndCapture(list)
+                    captureNotes(list)
                     loadUrlPreviews(list)
                     val state = timelineLiveData.value
 
@@ -404,7 +402,7 @@ class TimelineViewModel : ViewModel{
                         TimelineState.State.INIT
                     )
                     //noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
-                    releaseAndCapture(list)
+                    captureNotes(list)
 
                     loadUrlPreviews(list)
 
@@ -560,7 +558,7 @@ class TimelineViewModel : ViewModel{
                 Log.i("TM-VM", "重複を確認したためキャンセルする")
                 return
             }
-            noteCaptureClient?.capture(note.id)
+            captureNotes(listOf(note))
             loadUrlPreviews(listOf(note))
             val notes = timelineLiveData.value?.notes
             val list = if(notes == null){
@@ -583,7 +581,7 @@ class TimelineViewModel : ViewModel{
         }
     }
 
-    private fun releaseAndCapture(notes: List<PlaneNoteViewData>){
+    private fun captureNotes(notes: List<PlaneNoteViewData>){
         val captureNoteIds = HashSet<String>()
         for(note in notes){
             captureNoteIds.add(note.id)
@@ -622,7 +620,6 @@ class TimelineViewModel : ViewModel{
                             it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account?.remoteId)
                         }
                         /*is Event.Added ->{
-                            // FIXME 他画面の起こった変更で、リアクション系のイベントとAddイベント両方が発生しすでに変更が適応された結果AddedにReactedが追加されるなどの不具合が発生する。
                             //note.update(noteEvent.event.note)
                         }*/
                     }

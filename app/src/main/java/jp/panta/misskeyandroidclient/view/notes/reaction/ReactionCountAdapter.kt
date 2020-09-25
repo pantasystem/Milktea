@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.databinding.ItemReactionBinding
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
-class ReactionCountAdapter(private val note: PlaneNoteViewData, private val notesViewModel: NotesViewModel) : ListAdapter<Pair<String, Int>, ReactionCountAdapter.ReactionHolder>(
+class ReactionCountAdapter(val note: PlaneNoteViewData, private val notesViewModel: NotesViewModel) : ListAdapter<Pair<String, Int>, ReactionCountAdapter.ReactionHolder>(
     reactionDiffUtilItemCallback){
     class ReactionHolder(val binding: ItemReactionBinding): RecyclerView.ViewHolder(binding.root)
 
