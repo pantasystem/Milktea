@@ -95,7 +95,7 @@ class StreamingAdapter(
     }
 
     private var requestCounter = 0
-    private val connectionLimiterHandler = Handler()
+    private val connectionLimiterHandler = Handler(Looper.getMainLooper())
     private var connectingCounter = 0
     private val connectCallback = object : Runnable {
         override fun run() {

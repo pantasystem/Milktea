@@ -46,12 +46,16 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
          * またノートをキャプチャーするためにはClientをNoteCapture#attachClientする必要があります。
          */
         fun capture(noteId: String): Boolean{
-            captureNotes.add(noteId)
+            synchronized(captureNotes){
+                captureNotes.add(noteId)
+            }
             return noteCapture?.capture(this, noteId)?: false
         }
 
         fun unCapture(noteId: String): Boolean{
-            captureNotes.remove(noteId)
+            synchronized(captureNotes){
+                captureNotes.remove(noteId)
+            }
             return noteCapture?.unCapture(this, noteId)?: false
         }
 
@@ -61,7 +65,11 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
             }
         }
 
-        fun unCaptureAll(noteIds: List<String> = captureNotes.toList()): Int{
+        fun unCaptureAll(
+            noteIds: List<String> = synchronized(captureNotes){
+                captureNotes.toList()
+            }
+        ): Int{
             return noteIds.count{ noteId ->
                 unCapture(noteId)
             }
@@ -126,40 +134,48 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
     }
 
     fun isAttachedClient(client: Client): Boolean{
-        return clients.contains(client.clientId)
+        return synchronized(clients){
+            clients.contains(client.clientId)
+        }
     }
 
 
     fun capture(client: Client, noteId: String): Boolean{
-        val notesClients = HashSet<String>(noteIdsClients[noteId]?: HashSet()?: emptySet())
 
-        try{
-            if(!notesClients.contains(client.clientId)){
-                val added = notesClients.add(client.clientId)
-                captureRemote(noteId)
-                return added
+        synchronized(noteIdsClients){
+            val notesClients = HashSet<String>(noteIdsClients[noteId]?: HashSet()?: emptySet())
+
+            try{
+                if(!notesClients.contains(client.clientId)){
+                    val added = notesClients.add(client.clientId)
+                    captureRemote(noteId)
+                    return added
+                }
+                return this.noteIdsClients.put(noteId, notesClients) != null
+            }catch(e: Exception){
+                Log.d("NoteCapture", "capture error",e)
+                return false
+            }finally{
+                noteIdsClients[noteId] = notesClients
             }
-            return this.noteIdsClients.put(noteId, notesClients) != null
-        }catch(e: Exception){
-            Log.d("NoteCapture", "capture error",e)
-            return false
-        }finally{
-            noteIdsClients[noteId] = notesClients
         }
+
 
 
     }
 
 
     fun unCapture(client: Client, noteId: String): Boolean{
-        val notesClients = HashSet<String>(noteIdsClients[noteId]?: emptySet())
-        val a = notesClients.remove(client.clientId)
-        if(notesClients.isEmpty() && a){
-            unCaptureRemote(noteId)
-        }
+        synchronized(noteIdsClients){
+            val notesClients = HashSet<String>(noteIdsClients[noteId]?: emptySet())
+            val a = notesClients.remove(client.clientId)
+            if(notesClients.isEmpty() && a){
+                unCaptureRemote(noteId)
+            }
 
-        this.noteIdsClients[noteId] = notesClients
-        return a
+            this.noteIdsClients[noteId] = notesClients
+            return a
+        }
 
     }
 
@@ -221,8 +237,8 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
     }
 
     private fun onUpdate(noteEvent: NoteEvent){
-        val clientIds = noteIdsClients[noteEvent.noteId]
-        Log.d("onUpdate", "client数: ${clientIds?.size}, event:$noteEvent")
+        //val clientIds = noteIdsClients[noteEvent.noteId]
+        //Log.d("onUpdate", "client数: ${clientIds?.size}, event:$noteEvent")
 
         noteEventStore.release(noteEvent)
     }
@@ -231,15 +247,21 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
 
 
     override fun onClosing() {
-        noteIdsClients.keys.forEach{ noteId ->
-            unCaptureRemote(noteId)
+        synchronized(noteIdsClients){
+            noteIdsClients.keys.forEach { noteId ->
+                unCaptureRemote(noteId)
+            }
         }
+
     }
 
     override fun onConnect() {
-        noteIdsClients.keys.forEach{ noteId ->
-            captureRemote(noteId)
+        synchronized(noteIdsClients){
+            noteIdsClients.keys.forEach{ noteId ->
+                captureRemote(noteId)
+            }
         }
+
     }
 
     override fun onDisconnect() = Unit
