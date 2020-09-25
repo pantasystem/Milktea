@@ -5,6 +5,7 @@ import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.Single
 import jp.panta.misskeyandroidclient.model.account.*
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
 import java.lang.IllegalStateException
 
@@ -20,7 +21,7 @@ class RoomAccountRepository(
         var isNeedDeepUpdate = isUpdatePages
         
         if(account.accountId > 0){
-            exAccount = accountDao.get(account.accountId)
+            exAccount = accountDao.getAccountRelation(account.accountId)?.toAccount()
         }
         if(exAccount == null){
             exAccount = accountDao.findByUserNameAndInstanceDomain(account.userName, account.instanceDomain)?.toAccount()
@@ -39,13 +40,46 @@ class RoomAccountRepository(
         
 
         if(isNeedDeepUpdate){
-            pageDAO.clearByAccountId(exAccount.accountId)
-            pageDAO.insertAll(account.pages.mapIndexed{ i, page ->
+            val exPages = exAccount.pages
+            val pages = account.pages.mapIndexed{ i, page ->
                 page.also{
                     it.accountId = exAccount!!.accountId
                     it.weight = i
                 }
-            })
+            }
+
+            val pageMap = account.pages.map{
+                it.pageId to it
+            }.toMap()
+
+            val exPageMap = exAccount.pages.map{
+                it.pageId to it
+            }.toMap()
+
+            val addedPages = ArrayList<Page>()
+            val updatedPages = ArrayList<Page>()
+
+            for(page in pages){
+                when{
+                    page.pageId == 0L ->{
+                        addedPages.add(page)
+                    }
+                    page != exPageMap[page.pageId] ->{
+                        updatedPages.add(page)
+                    }
+
+                }
+            }
+
+            val removedPages = exPages.filter{
+                pageMap[it.pageId] == null
+            }
+            Log.d("Repo", "削除されたページ:$removedPages ${exPages.size}, ${pages.size}")
+
+            pageDAO.deleteAll(removedPages)
+            pageDAO.updateAll(updatedPages)
+            pageDAO.insertAll(addedPages)
+
             exAccount = get(exAccount.accountId)
             Log.d("Repo", "ex: $exAccount")
         }

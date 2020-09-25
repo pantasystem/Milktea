@@ -102,7 +102,8 @@ class AccountViewModel(
         showFollowings.event = Unit
     }
 
-    fun showProfile(user: User){
+    fun showProfile(user: User?){
+        user?: return
         showProfile.event = user
     }
 

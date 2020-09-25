@@ -6,11 +6,17 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 @Dao
 interface PageDAO{
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(pages: List<Page>)
 
     @Update
     fun update(page: Page)
+
+    @Update
+    fun updateAll(pages: List<Page>)
+
+    @Delete
+    fun deleteAll(pages: List<Page>)
 
     @Query("delete from page_table where accountId = :accountId")
     fun clearByAccountId(accountId: Long)
@@ -20,5 +26,6 @@ interface PageDAO{
 
     @Query("select * from page_table where pageId = :pageId")
     fun get(pageId: Long): Page?
+
 }
 
