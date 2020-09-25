@@ -47,6 +47,8 @@ class AccountViewModel(
         }
     }
 
+    val currentAccount = miCore.getCurrentAccount()
+
     private var mBeforeAccount: Account? = null
     val user = MediatorLiveData<User>()
 
@@ -56,7 +58,7 @@ class AccountViewModel(
     val showFollowers = EventBus<Unit>()
     val showFollowings = EventBus<Unit>()
 
-    val showProfile = EventBus<User>()
+    val showProfile = EventBus<Account>()
 
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
@@ -102,9 +104,9 @@ class AccountViewModel(
         showFollowings.event = Unit
     }
 
-    fun showProfile(user: User?){
-        user?: return
-        showProfile.event = user
+    fun showProfile(account: Account?){
+        account?: return
+        showProfile.event = account
     }
 
     fun signOut(accountViewData: AccountViewData){
