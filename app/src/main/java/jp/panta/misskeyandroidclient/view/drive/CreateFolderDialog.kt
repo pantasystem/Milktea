@@ -14,7 +14,7 @@ class CreateFolderDialog : AppCompatDialogFragment(){
         val dialog =  super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_create_folder, null)
         dialog.setContentView(view)
-        val folderViewModel = ViewModelProvider(activity!!)[FolderViewModel::class.java]
+        val folderViewModel = ViewModelProvider(requireActivity())[FolderViewModel::class.java]
         view.okButton.setOnClickListener {
             val name = view.editFolderName.text.toString()
             if(name.isNotBlank()){

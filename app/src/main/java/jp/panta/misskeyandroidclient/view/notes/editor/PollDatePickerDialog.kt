@@ -15,14 +15,14 @@ class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateS
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val viewModel  = ViewModelProvider(activity!!)[NoteEditorViewModel::class.java]
+        val viewModel  = ViewModelProvider(requireActivity())[NoteEditorViewModel::class.java]
         mViewModel = viewModel
         val date = viewModel.poll.value?.expiresAt?.value?: Date()
 
         val calendar = Calendar.getInstance()
         calendar.time = date
 
-        return DatePickerDialog(activity!!, this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+        return DatePickerDialog(requireActivity(), this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
 
     }
 
