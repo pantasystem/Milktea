@@ -28,10 +28,10 @@ import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.api.Version
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.util.getPreferenceName
@@ -276,10 +276,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(intent)
     }
 
-    private val showProfileObserver = Observer<User>{
+    private val showProfileObserver = Observer<Account>{
         closeDrawerWhenOpenedDrawer()
         val intent = Intent(this, UserDetailActivity::class.java)
-        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.remoteId)
         intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }

@@ -14,7 +14,7 @@ class DriveFragment : Fragment(R.layout.fragment_drive){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        drive_view_pager.adapter = DrivePagerAdapter(context!!, activity?.supportFragmentManager!!)
+        drive_view_pager.adapter = DrivePagerAdapter(requireContext(), activity?.supportFragmentManager!!)
         drive_tab.setupWithViewPager(drive_view_pager)
     }
 

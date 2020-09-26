@@ -12,6 +12,7 @@ abstract class MetaDAO{
     @Delete
     abstract fun delete(meta: MetaDTO)
 
+    @Transaction
     @Query("select * from meta_table where uri = :instanceDomain")
     abstract fun findByInstanceDomain(instanceDomain: String): MetaRelation?
 
