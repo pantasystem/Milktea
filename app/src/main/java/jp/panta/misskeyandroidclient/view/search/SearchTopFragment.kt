@@ -31,8 +31,7 @@ class SearchTopFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val activity = activity ?: return
-        search_view_pager.adapter = SearchPagerAdapter(activity.supportFragmentManager, requireContext())
+        search_view_pager.adapter = SearchPagerAdapter(this.childFragmentManager, requireContext())
         search_tab_layout.setupWithViewPager(search_view_pager)
     }
 
