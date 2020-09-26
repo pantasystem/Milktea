@@ -541,19 +541,19 @@ class MiApplication : Application(), MiCore {
 
 
     override fun getNoteCapture(account: Account): NoteCapture {
-        var noteCapture = synchronized(mNoteCaptureAccountMap){
-            mNoteCaptureAccountMap[account.accountId]
+
+        synchronized(mNoteCaptureAccountMap){
+            var noteCapture = mNoteCaptureAccountMap[account.accountId]
+
+            if(noteCapture == null){
+                noteCapture = NoteCapture(account, getNoteEventStore(account))
+                setupObserver(account, noteCapture)
+                mNoteCaptureAccountMap[account.accountId] = noteCapture
+            }
+            validateObserverAccount(noteCapture, account)
+
+            return noteCapture
         }
-
-        if(noteCapture == null){
-            noteCapture = NoteCapture(account, getNoteEventStore(account))
-            setupObserver(account, noteCapture)
-            mNoteCaptureAccountMap[account.accountId] = noteCapture
-        }
-        validateObserverAccount(noteCapture, account)
-
-        return noteCapture
-
 
     }
 
@@ -571,17 +571,18 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getTimelineCapture(account: Account): TimelineCapture {
-         var timelineCapture = synchronized(mTimelineCaptureAccountMap){
-             mTimelineCaptureAccountMap[account.accountId]
-         }
+        synchronized(mTimelineCaptureAccountMap){
+            var timelineCapture = mTimelineCaptureAccountMap[account.accountId]
 
-        if(timelineCapture == null){
-            timelineCapture = TimelineCapture(account, getSettingStore())
-            setupObserver(account, timelineCapture)
-            mTimelineCaptureAccountMap[account.accountId] = timelineCapture
+            if(timelineCapture == null){
+                timelineCapture = TimelineCapture(account, getSettingStore())
+                setupObserver(account, timelineCapture)
+                mTimelineCaptureAccountMap[account.accountId] = timelineCapture
+            }
+            validateObserverAccount(timelineCapture, account)
+            return timelineCapture
         }
-        validateObserverAccount(timelineCapture, account)
-        return timelineCapture
+
     }
 
     private fun validateObserverAccount(observer: Observer, account: Account){
