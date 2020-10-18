@@ -16,7 +16,7 @@
             android:visibility="@{user == null ? View.GONE : View.VISIBLE }"
             tools:context=".AuthCallBackActivity">
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textView11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
                 app:layout_constraintStart_toEndOf="@+id/textView8"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textView12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                     android:layout_height="70dp"
                     app:circleIcon="@{user.avatarUrl}"
                     tools:ignore="ContentDescription" />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/subName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                     android:textSize="20sp"
                     android:text="@{user.name}"
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
 
                     />
 
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{user.description}"

@@ -66,7 +66,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/textCounter"/>
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textCounter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

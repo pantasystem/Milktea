@@ -47,7 +47,7 @@
                 app:transitionDestinationUser="@{note.toShowNote.user}"
                 />
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/avatarIcon"
                 android:id="@+id/mainName"
@@ -56,7 +56,7 @@
 
                 android:layout_marginEnd="8dp"
                 />
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/subName"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/mainName"
@@ -66,7 +66,7 @@
                 android:textSize="15sp"
 
                 />
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
@@ -80,7 +80,7 @@
                 tools:text="16分前"
                 android:id="@+id/elapsedTime"
                 />
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/cw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                 />
 
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/contentFoldingButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -110,7 +110,7 @@
                 android:layout_below="@+id/contentFoldingButton"
                 android:layout_toEndOf="@id/avatarIcon"
                 >
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@id/text"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:textSize="15sp"
@@ -180,7 +180,7 @@
                         app:transitionDestinationUser="@{note.subNote.user}"
                         />
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_toEndOf="@+id/subAvatarIcon"
                         android:id="@+id/subNoteMainName"
@@ -189,7 +189,7 @@
 
                         android:layout_marginEnd="8dp"
                         />
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:layout_toEndOf="@id/subNoteMainName"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:textStyle="italic"
@@ -199,7 +199,7 @@
 
                         />
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/subCw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -210,7 +210,7 @@
                         />
 
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/subContentFoldingButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -224,7 +224,7 @@
                         android:onClick="@{()-> note.changeSubContentFolding() }"
 
                         />
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_below="@+id/subContentFoldingButton"
                         android:textSize="15sp"
@@ -279,7 +279,7 @@
                     android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                     android:contentDescription="@string/reply_title"
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
                     android:layout_width="50dp"
                     android:layout_height="wrap_content" android:id="@+id/textView3" android:layout_weight="1"
@@ -298,7 +298,7 @@
                     android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
                     android:contentDescription="@string/renote"
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
                     android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
@@ -321,7 +321,7 @@
                     android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
                     android:contentDescription="@string/reaction"
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
 
                     android:visibility="@{SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE}"

@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -79,54 +80,74 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private lateinit var sharedPreference: SharedPreferences
 
+    lateinit var miApplication: MiApplication
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        mPage = arguments?.getSerializable(EXTRA_PAGE) as? Page
+
+        mPageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
+
+        sharedPreference = requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)
+
+        miApplication = context?.applicationContext as MiApplication
+
+
+
+        Log.d("TimelineFM", "page:${mPage?.pageable()?: mPageable}")
+
+        val factory = TimelineViewModelFactory(mPage, null, mPage?.pageable()?: mPageable!!, miApplication)
+        mViewModel = if(mPage == null){
+            ViewModelProvider(this, factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
+
+        }else{
+            ViewModelProvider(requireActivity(), factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
+
+        }
+
+
+
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         setHasOptionsMenu(true)
+        val notesViewModelFactory = NotesViewModelFactory(miApplication)
 
-        sharedPreference = requireContext().getSharedPreferences(requireContext().getPreferenceName(), MODE_PRIVATE)
+        val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
+        mNotesViewModel = notesViewModel
         //sharedPreference = view.context.getSharedPreferences()
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
         list_view.layoutManager = mLinearLayoutManager
 
         //データ受け取り
-        mPage = arguments?.getSerializable(EXTRA_PAGE) as? Page
 
-        mPageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
 
-        val miApplication = context?.applicationContext as MiApplication
 
         list_view.addOnScrollListener(mScrollListener)
         list_view.layoutManager = mLinearLayoutManager
-
-        val notesViewModelFactory = NotesViewModelFactory(miApplication)
-        val notesViewModel = ViewModelProvider(requireActivity(), notesViewModelFactory).get(NotesViewModel::class.java)
-        mNotesViewModel = notesViewModel
-        Log.d("TimelineFM", "page:${mPage?.pageable()?: mPageable}")
-        val factory = TimelineViewModelFactory(mPage, null, mPage?.pageable()?: mPageable!!, miApplication)
-        mViewModel = ViewModelProvider(this, factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
-
 
 
         refresh.setOnRefreshListener {
             mViewModel?.loadNew()
         }
 
-        mViewModel?.isLoading?.observe(viewLifecycleOwner, Observer<Boolean> {
+        mViewModel?.isLoading?.observe(viewLifecycleOwner){
             if(it != null && !it){
                 refresh?.isRefreshing = false
             }
-        })
+        }
 
         //mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
         list_view.adapter = adapter
 
         var  timelineState: TimelineState.State? = null
-        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner, Observer { tm ->
+        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner){ tm ->
             if( tm != null){
 
                 adapter.submitList(tm.notes)
@@ -142,9 +163,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             timelineProgressBar.visibility = View.GONE
 
 
-        })
+        }
 
-        mViewModel?.isInitLoading?.observe( viewLifecycleOwner, Observer {
+        mViewModel?.isInitLoading?.observe( viewLifecycleOwner){
             if(it){
 
                 timelineProgressBar.visibility = View.VISIBLE
@@ -154,9 +175,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 timelineProgressBar.visibility = View.GONE
 
             }
-        })
+        }
 
-        mViewModel?.errorState?.observe( viewLifecycleOwner, Observer { error ->
+        mViewModel?.errorState?.observe( viewLifecycleOwner) { error ->
             Log.d("TimelineFragment", "error:$error")
             when(error){
                 TimelineViewModel.Errors.AUTHENTICATION ->{
@@ -181,7 +202,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     Log.d("TimelineViewModel", "不明なエラー")
                 }
             }
-        })
+        }
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
 

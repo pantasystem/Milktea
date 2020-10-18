@@ -33,7 +33,7 @@
                 android:padding="8dp"
                 android:onClick="@{()-> listListViewModel.showUserListDetail(list)}">
 
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/listTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

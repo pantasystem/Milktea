@@ -27,7 +27,7 @@
                 tools:srcCompat="@mipmap/ic_launcher"
                 android:layout_marginEnd="4dp"
                 tools:ignore="ContentDescription" />
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/reactionStringPreview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
                 android:layout_gravity="center"
             />
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
