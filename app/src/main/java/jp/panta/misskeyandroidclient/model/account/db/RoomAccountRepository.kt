@@ -4,87 +4,98 @@ import android.content.SharedPreferences
 import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.Single
+import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.account.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
+import kotlinx.coroutines.runBlocking
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
+import java.util.concurrent.Callable
 
 const val CURRENT_ACCOUNT_ID_KEY = "CURRENT_ACCOUNT_ID"
 class RoomAccountRepository(
+    private val roomDataBase: DataBase,
+    private val sharedPreferences: SharedPreferences,
     private val accountDao: AccountDAO,
     private val pageDAO: PageDAO,
-    private val sharedPreferences: SharedPreferences
 ) : AccountRepository{
 
     override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
-        var exAccount: Account? = null
-        var isNeedDeepUpdate = isUpdatePages
-        
-        if(account.accountId > 0){
-            exAccount = accountDao.getAccountRelation(account.accountId)?.toAccount()
-        }
-        if(exAccount == null){
-            exAccount = accountDao.findByUserNameAndInstanceDomain(account.userName, account.instanceDomain)?.toAccount()
-        }
+        return roomDataBase.runInTransaction(Callable<Account> {
+            var exAccount: Account? = null
+            var isNeedDeepUpdate = isUpdatePages
 
-        if(exAccount == null){
-            exAccount = accountDao.findByRemoteIdAndInstanceDomain(account.remoteId, account.instanceDomain)?.toAccount()
-        }
-
-        if(exAccount == null){
-            val id = accountDao.insert(account)
-            exAccount = accountDao.get(id)?: throw AccountRegistrationFailedException()
-            Log.d("RoomAccountRepository", "insertしました: $exAccount")
-            isNeedDeepUpdate = true
-        }
-        
-
-        if(isNeedDeepUpdate){
-            val exPages = exAccount.pages
-            val pages = account.pages.mapIndexed{ i, page ->
-                page.also{
-                    it.accountId = exAccount!!.accountId
-                    it.weight = i
-                }
+            if(account.accountId > 0){
+                exAccount = accountDao.getAccountRelation(account.accountId)?.toAccount()
+            }
+            if(exAccount == null){
+                exAccount = accountDao.findByUserNameAndInstanceDomain(account.userName, account.instanceDomain)?.toAccount()
             }
 
-            val pageMap = account.pages.map{
-                it.pageId to it
-            }.toMap()
+            if(exAccount == null){
+                exAccount = accountDao.findByRemoteIdAndInstanceDomain(account.remoteId, account.instanceDomain)?.toAccount()
+            }
 
-            val exPageMap = exAccount.pages.map{
-                it.pageId to it
-            }.toMap()
+            if(exAccount == null){
+                val id = accountDao.insert(account)
+                exAccount = accountDao.get(id)?: throw AccountRegistrationFailedException()
+                Log.d("RoomAccountRepository", "insertしました: $exAccount")
+                isNeedDeepUpdate = true
+            }
 
-            val addedPages = ArrayList<Page>()
-            val updatedPages = ArrayList<Page>()
 
-            for(page in pages){
-                when{
-                    page.pageId == 0L ->{
-                        addedPages.add(page)
+            if(isNeedDeepUpdate){
+                val exPages = exAccount.pages
+                val pages = account.pages.mapIndexed{ i, page ->
+                    page.also{
+                        it.accountId = exAccount!!.accountId
+                        it.weight = i
                     }
-                    page != exPageMap[page.pageId] ->{
-                        updatedPages.add(page)
-                    }
-
                 }
+
+                val pageMap = account.pages.map{
+                    it.pageId to it
+                }.toMap()
+
+                val exPageMap = exAccount.pages.map{
+                    it.pageId to it
+                }.toMap()
+
+                val addedPages = ArrayList<Page>()
+                val updatedPages = ArrayList<Page>()
+
+                for(page in pages){
+                    when{
+                        page.pageId == 0L ->{
+                            addedPages.add(page)
+                        }
+                        page != exPageMap[page.pageId] ->{
+                            updatedPages.add(page)
+                        }
+
+                    }
+                }
+
+                val removedPages = exPages.filter{
+                    pageMap[it.pageId] == null
+                }
+                Log.d("Repo", "削除されたページ:$removedPages ${exPages.size}, ${pages.size}")
+
+                pageDAO.deleteAll(removedPages)
+                pageDAO.updateAll(updatedPages)
+                pageDAO.insertAll(addedPages)
+
+                exAccount = runBlocking {
+                    get(exAccount!!.accountId)
+                }
+                Log.d("Repo", "ex: $exAccount")
+
             }
 
-            val removedPages = exPages.filter{
-                pageMap[it.pageId] == null
-            }
-            Log.d("Repo", "削除されたページ:$removedPages ${exPages.size}, ${pages.size}")
+            exAccount
+        })
 
-            pageDAO.deleteAll(removedPages)
-            pageDAO.updateAll(updatedPages)
-            pageDAO.insertAll(addedPages)
-
-            exAccount = get(exAccount.accountId)
-            Log.d("Repo", "ex: $exAccount")
-        }
-
-        return exAccount
     }
 
     override suspend fun delete(account: Account) {

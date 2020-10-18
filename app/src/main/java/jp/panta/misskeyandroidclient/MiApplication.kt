@@ -155,7 +155,7 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_5_6)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
-        accountRepository = RoomAccountRepository(database.accountDAO(), database.pageDAO(), sharedPreferences)
+        accountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
 
 
 
