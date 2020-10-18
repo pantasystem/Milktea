@@ -126,6 +126,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.7.3'
 
     // EmojiCompat
-    implementation "androidx.emoji:emoji:1.2.0-alpha01"
+    implementation "androidx.emoji:emoji-bundled:1.2.0-alpha01"
 
 }

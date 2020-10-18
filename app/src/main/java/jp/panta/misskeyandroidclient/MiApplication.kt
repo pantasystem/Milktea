@@ -3,7 +3,12 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import android.provider.FontRequest
 import android.util.Log
+import androidx.emoji.bundled.BundledEmojiCompatConfig
+import androidx.emoji.text.EmojiCompat
+import androidx.emoji.text.FontRequestEmojiCompatConfig
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
@@ -127,6 +132,9 @@ class MiApplication : Application(), MiCore {
 
     override fun onCreate() {
         super.onCreate()
+
+        val config = BundledEmojiCompatConfig(this)
+        EmojiCompat.init(config)
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
