@@ -3,7 +3,9 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Build
+import android.provider.CalendarContract
 import android.provider.FontRequest
 import android.util.Log
 import androidx.emoji.bundled.BundledEmojiCompatConfig
@@ -134,6 +136,11 @@ class MiApplication : Application(), MiCore {
         super.onCreate()
 
         val config = BundledEmojiCompatConfig(this)
+            .setReplaceAll(true)
+        if(BuildConfig.DEBUG){
+            config.setEmojiSpanIndicatorColor(Color.GREEN)
+                .setEmojiSpanIndicatorEnabled(true)
+        }
         EmojiCompat.init(config)
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
