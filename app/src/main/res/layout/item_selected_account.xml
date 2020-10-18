@@ -37,7 +37,7 @@
                     android:layout_marginEnd="8dp"
                     tools:ignore="ContentDescription"
                     app:transitionDestinationUser="@{accountViewData.user}"/>
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                     android:textStyle="bold"
                     android:layout_toStartOf="@id/moreAccount"
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/subName"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/history_icon"
@@ -72,7 +72,7 @@
                     android:tint="?attr/colorNoteActionButtonTint"
                     tools:ignore="ContentDescription" />
 
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="misskey.io"

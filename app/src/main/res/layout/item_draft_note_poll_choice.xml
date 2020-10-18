@@ -6,7 +6,7 @@
                 name="choice"
                 type="String" />
     </data>
-    <TextView android:layout_height="wrap_content"
+    <androidx.emoji.widget.EmojiTextView android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"

@@ -14,7 +14,7 @@
             android:padding="8dp"
             >
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/shared_checkbox_title"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

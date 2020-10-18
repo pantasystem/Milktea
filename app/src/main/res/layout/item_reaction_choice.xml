@@ -27,7 +27,7 @@
                 tools:srcCompat="@mipmap/ic_launcher"
                 tools:visibility="gone"
                 tools:ignore="ContentDescription" />
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/reactionStringPreview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

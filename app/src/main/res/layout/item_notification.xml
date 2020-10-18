@@ -61,7 +61,7 @@
                         tools:srcCompat="@drawable/ic_reaction_like"
 
                         tools:ignore="ContentDescription" />
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/reactionString"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
 
 
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/mainName"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
                         android:text="@{notification.userName}"
                         tools:text="name"
                         android:layout_weight="1"/>
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="16min"

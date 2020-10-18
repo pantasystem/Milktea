@@ -36,7 +36,7 @@
                     app:circleIcon="@{user.user.avatarUrl}"
                     app:transitionDestinationUser="@{user.user}"
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/nameMain"
                     android:layout_toEndOf="@id/avatarIcon"
                     android:layout_width="match_parent"
@@ -47,7 +47,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginBottom="8dp"
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/nameSub"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

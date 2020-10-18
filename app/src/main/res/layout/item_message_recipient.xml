@@ -28,7 +28,7 @@
                 tools:ignore="ContentDescription"
                 app:transitionDestinationUser="@{message.message.user}"/>
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/mainName"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:singleLine="true"
@@ -59,7 +59,7 @@
                 android:orientation="vertical"
 
                 >
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/message_text"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     tools:text="aaaaaaa"
@@ -75,7 +75,7 @@
                     app:fileViewData="@{message.file}"/>
         </LinearLayout>
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/elapsed_time"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_below="@+id/content_view"

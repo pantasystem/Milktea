@@ -41,7 +41,7 @@
                 android:id="@+id/content_view"
                 android:orientation="vertical"
                 >
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/message_text"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
 
@@ -55,7 +55,7 @@
                     app:fileViewData="@{message.file}"/>
 
         </LinearLayout>
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/elapsed_time"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_below="@+id/content_view"

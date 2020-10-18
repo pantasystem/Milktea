@@ -32,7 +32,7 @@
                 app:subNameView="@{subName}"
                 app:user="@{userViewData.user}"
                 >
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/followeeState"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
                     android:onClick="@{()-> showUserDetails.show(userViewData.user) }"
                     tools:ignore="ContentDescription" />
 
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
                     android:layout_below="@id/followeeState"
                 />
 
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/subName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
                     android:onClick="@{()-> toggleFollowViewModel.toggleFollow(userViewData.user)}"
 
                     />
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

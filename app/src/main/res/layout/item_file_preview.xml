@@ -31,7 +31,7 @@
                 android:layout_marginStart="3dp"
                 />
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/fileNameView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
                 android:textSize="12sp"
                 />
 
-        <TextView
+        <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/fileTypeView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

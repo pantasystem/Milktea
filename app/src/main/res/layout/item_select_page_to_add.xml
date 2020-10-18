@@ -10,7 +10,7 @@
                 name="selectPageTypeToAdd"
                 type="jp.panta.misskeyandroidclient.viewmodel.setting.page.SelectPageTypeToAdd" />
     </data>
-    <TextView
+    <androidx.emoji.widget.EmojiTextView
             android:padding="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

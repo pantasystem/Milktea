@@ -36,7 +36,7 @@
                 android:paddingBottom="8dp"
                 android:onClick="@{ ()-> draftNoteAction.onSelect(note.note) }"
                 >
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/cw"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                     />
 
 
-            <TextView
+            <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/contentFoldingButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
                     android:visibility='@{ SafeUnbox.unbox(note.isFoldingContent) ? View.GONE : View.VISIBLE }'
 
                     >
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@id/text"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:textSize="16sp"

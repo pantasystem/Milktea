@@ -62,7 +62,7 @@
                 </FrameLayout>
 
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/file_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                         android:text="@{fileViewData.name}"
                         />
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/file_meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
 
                         />
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/file_size"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
                         android:text="@{fileViewData.size.toString()}"
                         />
 
-                <TextView
+                <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/updated_at"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
