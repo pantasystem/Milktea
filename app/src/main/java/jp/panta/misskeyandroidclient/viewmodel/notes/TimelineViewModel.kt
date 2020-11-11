@@ -221,6 +221,7 @@ class TimelineViewModel : ViewModel{
 
             inactive()
         }
+
     }.apply{
         addSource(usingAccount){ using ->
             if(isActive){
@@ -247,9 +248,8 @@ class TimelineViewModel : ViewModel{
     private fun inactive(){
         isActive = false
 
-        if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground){
+        if(settingStore.isAutoLoadTimeline){
             stopTimelineCapture()
-            stopNoteCapture()
         }
     }
 
@@ -489,13 +489,6 @@ class TimelineViewModel : ViewModel{
         }
     }
 
-    fun stop(){
-
-        if(settingStore.isUpdateTimelineInBackground){
-            stopTimelineCapture()
-            stopNoteCapture()
-        }
-    }
 
 
     private fun startTimelineCapture(){
@@ -538,14 +531,6 @@ class TimelineViewModel : ViewModel{
 
     }
 
-    private fun stopNoteCapture(){
-        noteCaptureClient?.let{
-            noteCapture?.detachClient(it)
-        }
-        stoppedAt = Date()
-        mNoteEventDisposable?.dispose()
-        mNoteEventDisposable = null
-    }
 
 
 
@@ -660,6 +645,23 @@ class TimelineViewModel : ViewModel{
     private fun filterDuplicate(planeNoteViewData: PlaneNoteViewData) : Boolean{
         Log.d("TM-VM-Filter", "重複を発見したため排除しました")
         return ! mNoteIds.contains(planeNoteViewData.id)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        // リソース解放を行う
+        stopNoteCapture()
+    }
+
+    private fun stopNoteCapture(){
+        Log.d("TimelineViewModel", "キャプチャーを停止する")
+        noteCaptureClient?.let{
+            noteCapture?.detachClient(it)
+        }
+        stoppedAt = Date()
+        mNoteEventDisposable?.dispose()
+        mNoteEventDisposable = null
     }
 
 
