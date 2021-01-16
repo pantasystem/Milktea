@@ -31,7 +31,7 @@
             android:tint="?attr/colorNoteActionButtonTint"
             tools:ignore="ContentDescription" />
 
-    <androidx.viewpager.widget.ViewPager
+    <jp.panta.misskeyandroidclient.view.BottomSheetViewPager
             android:id="@+id/reaction_choices_view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
