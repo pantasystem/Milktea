@@ -10,7 +10,6 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
-import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionPreviewAdapter
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 
 object EmojiHelper{
