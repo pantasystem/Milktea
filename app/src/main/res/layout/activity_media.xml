@@ -9,7 +9,7 @@
 
 
 
-    <androidx.viewpager.widget.ViewPager
+    <jp.panta.misskeyandroidclient.view.PhotoViewViewPager
             android:id="@+id/mediaViewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
