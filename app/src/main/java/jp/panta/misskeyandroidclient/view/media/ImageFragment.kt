@@ -1,15 +1,19 @@
 package jp.panta.misskeyandroidclient.view.media
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.file.File
 import kotlinx.android.synthetic.main.fragment_image.*
+import java.lang.IllegalArgumentException
 
 class ImageFragment : Fragment(R.layout.fragment_image){
 
