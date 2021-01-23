@@ -1,0 +1,20 @@
+package jp.panta.misskeyandroidclient.model.notes
+
+
+
+/**
+ * アクションと状態の保持を責務とする
+ */
+interface NoteModel {
+
+    suspend fun get(noteId: String): Note?
+
+
+
+    suspend fun renote(note: Note)
+    suspend fun delete(note: Note)
+    suspend fun reaction(reaction: String, reactionTo: Note)
+    suspend fun unreaction(reaction: String, unreactionTo: Note)
+    suspend fun create(creation: CreateNote)
+
+}

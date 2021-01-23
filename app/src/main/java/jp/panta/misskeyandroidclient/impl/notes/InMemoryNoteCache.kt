@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.impl.notes
 
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteEntity
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 
-class InMemoryNoteRepository : NoteRepository {
+class InMemoryNoteCache{
 
-    private val notes = HashMap<String, Note>()
+    private val notes = HashMap<String, NoteEntity>()
 
-    override suspend fun get(noteId: String): Note? {
+    fun get(noteId: String): NoteEntity? {
         synchronized(notes){
             return notes[noteId]
         }
@@ -17,7 +17,7 @@ class InMemoryNoteRepository : NoteRepository {
      * @param note 追加するノート
      * @return ノートが新たに追加されるとtrue、上書きされた場合はfalseが返されます。
      */
-    fun add(note: Note): Boolean {
+    fun add(note: NoteEntity): Boolean {
         synchronized(notes){
             val n = this.notes[note.id]
             this.notes[note.id] = note

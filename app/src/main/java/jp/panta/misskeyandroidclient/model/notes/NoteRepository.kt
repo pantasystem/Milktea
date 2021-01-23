@@ -1,16 +1,11 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import io.reactivex.Observable
 import jp.panta.misskeyandroidclient.model.account.Account
-import java.util.*
 
 /**
- * Noteを管理するRepository
- * getしかない理由として
- * APIとLocalを抽象化する目的がある。
- * これはあくまでもViewModelなどに対してのインターフェースであって、実装クラスのためのものではないため
- * 削除や追加などのアクションはない。
- * add やremoveはAPIやローカルストレージが知ることである。
+ * キャッシュやデータベースの実装の差をなくすためのRepository
+ * 要するに抽象化したいだけで意味はない
+ * ※またAPIを抽象化するためのものではない
  */
 interface NoteRepository {
 
@@ -20,5 +15,8 @@ interface NoteRepository {
 
     suspend fun get(noteId: String) : Note?
 
+    suspend fun delete(noteId: String) : Boolean
+
+    suspend fun add(note: Note) : Boolean
 
 }
