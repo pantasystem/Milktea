@@ -6,7 +6,7 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.Expose
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData
@@ -41,7 +41,7 @@ class TimelineCapture(
                 return TimelineObserver(body = RequestBody(id = UUID.randomUUID().toString(), channel = timelineType), observer = observer)
             }
 
-            fun createDisconnect(id: String): TimelineObserver?{
+            fun createDisconnect(id: String): TimelineObserver{
                 return TimelineObserver(type = "disconnect",
                     body = RequestBody(id = id, channel = null), observer = null)
             }

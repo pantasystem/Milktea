@@ -1,15 +1,15 @@
-package jp.panta.misskeyandroidclient.model
+package jp.panta.misskeyandroidclient.api
 
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.MisskeyAuthAPI
 import jp.panta.misskeyandroidclient.model.api.Version
-import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10
-import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10Diff
-import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11
-import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11Diff
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12Diff
+import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
+import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10Diff
+import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
+import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11Diff
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12Diff
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

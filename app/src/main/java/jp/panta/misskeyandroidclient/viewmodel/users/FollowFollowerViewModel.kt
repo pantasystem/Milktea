@@ -12,9 +12,9 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10
-import jp.panta.misskeyandroidclient.model.v10.RequestFollowFollower
-import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11
+import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
+import jp.panta.misskeyandroidclient.api.v10.RequestFollowFollower
+import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers

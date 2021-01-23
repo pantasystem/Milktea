@@ -13,7 +13,7 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
@@ -44,7 +44,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         val antenna = arguments?.getSerializable(EXTRA_ANTENNA) as? Antenna?
 
         val miCore: MiCore = view.context.applicationContext as MiApplication
-        miCore.getCurrentAccount().observe(viewLifecycleOwner, Observer {  ar ->
+        miCore.getCurrentAccount().observe(viewLifecycleOwner, {  ar ->
             val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(ar, miCore, antenna))[AntennaEditorViewModel::class.java]
             binding.antennaEditorViewModel = viewModel
 
@@ -64,7 +64,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
 
-            viewModel.source.observe(viewLifecycleOwner, Observer {
+            viewModel.source.observe(viewLifecycleOwner, {
 
                 val srcIndex = receivedSourceStringArray.indexOf(sourceToResourceString(it))
                 Log.d("AntennaEditorViewModel", "srcIndex:$srcIndex, type:$it")
@@ -74,7 +74,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
             })
 
 
-            viewModel.userListList.observe( viewLifecycleOwner, Observer { list ->
+            viewModel.userListList.observe( viewLifecycleOwner, { list ->
                 val userListListAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, list.map{
                     it.name
                 })
@@ -95,7 +95,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                 }
 
             })
-            viewModel.userList.observe(viewLifecycleOwner, Observer {
+            viewModel.userList.observe(viewLifecycleOwner, {
                 it?.let{ ul ->
                     val index = viewModel.userListList.value?.indexOfFirst { list ->
                         ul.id == list.id
@@ -107,7 +107,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
             })
 
 
-            viewModel.groupList.observe( viewLifecycleOwner, Observer {
+            viewModel.groupList.observe( viewLifecycleOwner, {
                 it?.let{ groups ->
                     val groupsAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, groups.map{ group ->
                         group.name
@@ -130,7 +130,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
                 }
             })
 
-            viewModel.group.observe( viewLifecycleOwner, Observer { g ->
+            viewModel.group.observe( viewLifecycleOwner, { g ->
                 g?.let{
                     val index = viewModel.groupList.value?.indexOfFirst { inG ->
                         g.id == inG.id
@@ -150,7 +150,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
             flexBoxLayoutManager.alignItems = AlignItems.STRETCH
             binding.specifiedUserListView.layoutManager = flexBoxLayoutManager
 
-            viewModel.users.observe( viewLifecycleOwner, Observer {
+            viewModel.users.observe( viewLifecycleOwner, {
                 userChipAdapter.submitList(it)
             })
         })

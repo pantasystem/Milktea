@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.auth.app
 
 import android.util.Log
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
 import jp.panta.misskeyandroidclient.model.auth.AppSecret
 import jp.panta.misskeyandroidclient.model.auth.Session

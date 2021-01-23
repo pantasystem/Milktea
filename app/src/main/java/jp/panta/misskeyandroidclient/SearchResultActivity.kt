@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
@@ -15,10 +14,6 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import jp.panta.misskeyandroidclient.view.users.SearchUserFragment
@@ -70,7 +65,7 @@ class SearchResultActivity : AppCompatActivity() {
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         invalidateOptionsMenu()
-        (application as MiCore).getCurrentAccount().observe(this, Observer { ar ->
+        (application as MiCore).getCurrentAccount().observe(this, { ar ->
             mAccountRelation = ar
         })
 

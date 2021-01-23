@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
 import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture

@@ -1,5 +1,6 @@
-package jp.panta.misskeyandroidclient.model.v10
+package jp.panta.misskeyandroidclient.api.v10
 
+import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
@@ -17,7 +18,6 @@ import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
-import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest

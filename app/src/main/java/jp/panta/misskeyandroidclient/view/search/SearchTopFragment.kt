@@ -7,12 +7,9 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.viewpager.widget.PagerAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.view.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
@@ -70,7 +67,7 @@ class SearchTopFragment : Fragment(){
             }
         }
 
-        override fun getPageTitle(position: Int): CharSequence? {
+        override fun getPageTitle(position: Int): CharSequence {
             return tabList[position]
         }
     }

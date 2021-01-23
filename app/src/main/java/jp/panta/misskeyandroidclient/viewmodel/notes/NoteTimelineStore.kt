@@ -1,14 +1,10 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
-import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
@@ -16,7 +12,6 @@ import retrofit2.Response
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
-import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 
 class NoteTimelineStore(

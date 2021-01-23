@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import io.reactivex.Observable
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.account.Account
 import java.util.*
 

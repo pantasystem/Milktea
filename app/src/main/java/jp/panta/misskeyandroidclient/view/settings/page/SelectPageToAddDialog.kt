@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 import kotlinx.android.synthetic.main.dialog_select_page_to_add.view.*
@@ -23,7 +23,7 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
         val miCore = view.context.applicationContext as MiCore
 
         val viewModel = ViewModelProvider(requireActivity())[PageSettingViewModel::class.java]
-        viewModel.pageAddedEvent.observe(requireActivity(), Observer {
+        viewModel.pageAddedEvent.observe(requireActivity(), {
             dismiss()
         })
 

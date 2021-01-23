@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.detail
 
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLength
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 

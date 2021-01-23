@@ -2,9 +2,8 @@ package jp.panta.misskeyandroidclient.model.streming.note.v2
 
 import android.util.Log
 import com.google.gson.JsonSyntaxException
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.GsonFactory
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.*

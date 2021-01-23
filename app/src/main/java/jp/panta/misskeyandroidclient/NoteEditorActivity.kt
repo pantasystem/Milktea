@@ -20,13 +20,12 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
-import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
@@ -130,10 +129,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
-        accountViewModel.switchAccount.observe(this, Observer {
+        accountViewModel.switchAccount.observe(this, {
             AccountSwitchingDialog().show(supportFragmentManager, "tag")
         })
-        accountViewModel.showProfile.observe(this, Observer {
+        accountViewModel.showProfile.observe(this, {
             val intent = Intent(this, UserDetailActivity::class.java)
             intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
             intent.putActivity(Activities.ACTIVITY_IN_APP)
@@ -175,10 +174,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
 
-        viewModel.files.observe(this, Observer{list ->
+        viewModel.files.observe(this, {list ->
             simpleImagePreviewAdapter.submitList(list)
         })
-        viewModel.poll.observe(this, Observer { poll ->
+        viewModel.poll.observe(this, { poll ->
             if(poll == null){
                 removePollFragment()
             }else{
@@ -186,7 +185,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
         })
 
-        viewModel.noteTask.observe(this, Observer{postNote->
+        viewModel.noteTask.observe(this, {postNote->
             Log.d("NoteEditorActivity", "$postNote")
             val intent = Intent(this, PostNoteService::class.java)
             intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
@@ -194,21 +193,21 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             finish()
         })
 
-        viewModel.showVisibilitySelectionEvent.observe(this, Observer {
+        viewModel.showVisibilitySelectionEvent.observe(this, {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(supportFragmentManager, "NoteEditor")
         })
 
-        viewModel.address.observe(this, Observer{
+        viewModel.address.observe(this, {
             userChipAdapter.submitList(it)
         })
 
-        viewModel.showPollTimePicker.observe(this, Observer{
+        viewModel.showPollTimePicker.observe(this, {
             PollTimePickerDialog().show(supportFragmentManager, "TimePicker")
         })
 
-        viewModel.showPollDatePicker.observe(this, Observer {
+        viewModel.showPollDatePicker.observe(this, {
             PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
         })
 
@@ -234,7 +233,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             CustomEmojiPickerDialog().show(supportFragmentManager, "Editor")
         }
 
-        (applicationContext as? MiApplication)?.connectionStatus?.observe(this, Observer{ status ->
+        (applicationContext as? MiApplication)?.connectionStatus?.observe(this, { status ->
             when(status){
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
                 ConnectionStatus.ACCOUNT_ERROR ->{
@@ -248,7 +247,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
         })
 
-        mConfirmViewModel.confirmedEvent.observe(this, Observer {
+        mConfirmViewModel.confirmedEvent.observe(this, {
             when(it.eventType){
                 CONFIRM_SAVE_AS_DRAFT_OR_DELETE ->{
                     if(it.resultType == ResultType.POSITIVE){
@@ -260,11 +259,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
         })
 
-        mConfirmViewModel.confirmEvent.observe( this, Observer {
+        mConfirmViewModel.confirmEvent.observe( this, {
             ConfirmDialog().show(supportFragmentManager, "confirm")
         })
 
-        mViewModel?.isSaveNoteAsDraft?.observe(this, Observer {
+        mViewModel?.isSaveNoteAsDraft?.observe(this, {
             runOnUiThread {
                 if(it == null){
                     Toast.makeText(this, "下書きに失敗しました", Toast.LENGTH_LONG).show()

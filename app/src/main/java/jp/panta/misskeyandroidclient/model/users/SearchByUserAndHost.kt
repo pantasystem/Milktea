@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.model.users
 
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback

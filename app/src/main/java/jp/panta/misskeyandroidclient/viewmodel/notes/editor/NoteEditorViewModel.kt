@@ -4,11 +4,10 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.users.User
@@ -306,7 +305,7 @@ class NoteEditorViewModel(
         users.forEachIndexed { index, it ->
             val userName = it.getDisplayUserName()
             if(index < users.size - 1){
-                mentionBuilder.appendln(userName)
+                mentionBuilder.appendLine(userName)
             }else{
                 mentionBuilder.append(userName)
             }

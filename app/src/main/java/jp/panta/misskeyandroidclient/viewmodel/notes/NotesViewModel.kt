@@ -4,16 +4,13 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -27,7 +24,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
 
 class NotesViewModel(
     val miCore: MiCore,
@@ -175,11 +171,13 @@ class NotesViewModel(
                 if(reaction == myReaction){
                     return@launch
                 }
-                val res = getMisskeyAPI()?.createReaction(CreateReaction(
+                val res = getMisskeyAPI()?.createReaction(
+                    CreateReaction(
                     i = getAccount()?.getI(encryption)!!,
                     reaction = reaction,
                     noteId = planeNoteViewData.toShowNote.id
-                ))?.execute()
+                )
+                )?.execute()
                 if(res?.code() in 200 until 300){
                     syncAddReactionHistory(reaction)
                 }
@@ -197,10 +195,12 @@ class NotesViewModel(
      */
     private fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
         planeNoteViewData.myReaction.value?: return
-        getMisskeyAPI()?.deleteReaction(DeleteNote(
+        getMisskeyAPI()?.deleteReaction(
+            DeleteNote(
             i = getAccount()?.getI(encryption)!!,
             noteId = planeNoteViewData.toShowNote.id
-        ))?.execute()
+        )
+        )?.execute()
     }
 
     private fun syncAddReactionHistory(reaction: String){

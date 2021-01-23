@@ -1,13 +1,7 @@
-package jp.panta.misskeyandroidclient.model.notes
+package jp.panta.misskeyandroidclient.api.notes
 
-import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
 import com.google.gson.annotations.SerializedName
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.core.Account
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import java.io.Serializable
 
 data class NoteRequest(
@@ -48,7 +42,7 @@ data class NoteRequest(
         var limit: Int = 20
     ){
 
-        fun build(conditions: Conditions?): NoteRequest{
+        fun build(conditions: Conditions?): NoteRequest {
             val params = pageable.toParams()
             return NoteRequest(
                 i = i,
@@ -238,10 +232,10 @@ data class NoteRequest(
         val includeMyRenotes: Boolean? = null,
         val includeRenotedMyNotes: Boolean? = null
     )
-    fun makeSinceId(id: String): NoteRequest{
+    fun makeSinceId(id: String): NoteRequest {
         return this.copy(sinceId = id, untilId = null, untilDate = null, sinceDate = null)
     }
-    fun makeUntilId(id: String): NoteRequest{
+    fun makeUntilId(id: String): NoteRequest {
         return this.copy(sinceId = null, untilId = id, untilDate = null, sinceDate = null)
     }
 

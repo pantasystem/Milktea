@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.notes
+package jp.panta.misskeyandroidclient.api.notes
 
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.auth.custom.App

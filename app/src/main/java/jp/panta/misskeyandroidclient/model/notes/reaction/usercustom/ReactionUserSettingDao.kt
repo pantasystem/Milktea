@@ -1,6 +1,7 @@
-package jp.panta.misskeyandroidclient.model.notes.reaction
+package jp.panta.misskeyandroidclient.model.notes.reaction.usercustom
 
 import androidx.room.*
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSetting
 
 @Dao
 interface ReactionUserSettingDao{

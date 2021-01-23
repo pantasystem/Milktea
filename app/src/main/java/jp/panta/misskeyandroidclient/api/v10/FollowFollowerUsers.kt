@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.v10
+package jp.panta.misskeyandroidclient.api.v10
 
 import jp.panta.misskeyandroidclient.model.users.User
 

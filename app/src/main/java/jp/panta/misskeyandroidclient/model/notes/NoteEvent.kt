@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import java.util.*

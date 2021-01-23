@@ -8,7 +8,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
@@ -38,22 +38,22 @@ class AntennaEditorActivity : AppCompatActivity() {
         }
 
         val miCore = applicationContext as MiCore
-        miCore.getCurrentAccount().observe(this, Observer { ac ->
+        miCore.getCurrentAccount().observe(this, { ac ->
             val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(ac, miCore, antenna))[AntennaEditorViewModel::class.java]
             this.mViewModel = viewModel
-            viewModel.selectUserEvent.observe(this, Observer {
+            viewModel.selectUserEvent.observe(this, {
                 showSearchAndSelectUserActivity(it)
             })
-            viewModel.name.observe(this, Observer {
+            viewModel.name.observe(this, {
                 supportActionBar?.title = it
             })
-            viewModel.antennaRemovedEvent.observe(this, Observer {
+            viewModel.antennaRemovedEvent.observe(this, {
                 Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
                 finish()
             })
 
-            viewModel.antennaAddedStateEvent.observe(this, Observer {
+            viewModel.antennaAddedStateEvent.observe(this, {
                 if(it){
                     Toast.makeText(this, getString(R.string.success), Toast.LENGTH_LONG).show()
                 }else{

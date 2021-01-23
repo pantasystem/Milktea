@@ -8,10 +8,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData

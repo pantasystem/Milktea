@@ -2,13 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.antenna
 
 import android.util.Log
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
-import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate

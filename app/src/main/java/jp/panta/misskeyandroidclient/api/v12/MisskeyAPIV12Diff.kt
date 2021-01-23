@@ -1,13 +1,12 @@
-package jp.panta.misskeyandroidclient.model.v12
+package jp.panta.misskeyandroidclient.api.v12
 
-import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
-import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
-import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaToAdd
+import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.v12.antenna
+package jp.panta.misskeyandroidclient.api.v12.antenna
 
 data class AntennaQuery (
     val i: String,

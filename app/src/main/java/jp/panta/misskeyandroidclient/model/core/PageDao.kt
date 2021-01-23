@@ -1,9 +1,7 @@
 package jp.panta.misskeyandroidclient.model.core
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 
 @Dao
 interface PageDao {

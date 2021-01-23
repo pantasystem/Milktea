@@ -3,8 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import java.lang.IllegalArgumentException
 

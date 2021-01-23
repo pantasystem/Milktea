@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.notes.reaction
+package jp.panta.misskeyandroidclient.model.notes.reaction.usercustom
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

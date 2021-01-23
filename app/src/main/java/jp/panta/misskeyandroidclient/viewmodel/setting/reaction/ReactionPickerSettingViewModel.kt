@@ -8,9 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSetting
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSetting
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -138,7 +137,7 @@ class ReactionPickerSettingViewModel(
         reactionPickerType = type
     }
 
-    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting{
+    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting {
         return ReactionUserSetting(reaction, account.instanceDomain, index)
     }
 }

@@ -1,7 +1,7 @@
-package jp.panta.misskeyandroidclient.model.notes
+package jp.panta.misskeyandroidclient.api.notes
 
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
-import java.lang.IllegalArgumentException
 
 data class CreateNote(
     val i: String,

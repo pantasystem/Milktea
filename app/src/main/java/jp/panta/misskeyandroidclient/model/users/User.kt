@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.model.users
 
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import java.io.Serializable
 
 data class User(

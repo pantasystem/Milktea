@@ -1,8 +1,7 @@
-package jp.panta.misskeyandroidclient.model.v11
+package jp.panta.misskeyandroidclient.api.v11
 
 import jp.panta.misskeyandroidclient.model.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

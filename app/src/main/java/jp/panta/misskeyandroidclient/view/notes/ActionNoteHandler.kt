@@ -10,7 +10,7 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.User

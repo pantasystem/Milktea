@@ -5,17 +5,14 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.model.group.Group
-import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
-import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaQuery
-import jp.panta.misskeyandroidclient.model.v12.antenna.AntennaToAdd
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
@@ -83,7 +80,6 @@ class AntennaEditorViewModel (
 
         addSource(this){
             val i = account.getI(miCore.getEncryption())?: return@addSource
-            ?: return@addSource
             it.forEach { uvd ->
                 uvd.setApi(i, miCore.getMisskeyAPI(account))
             }

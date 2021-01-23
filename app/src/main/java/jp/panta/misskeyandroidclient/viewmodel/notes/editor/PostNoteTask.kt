@@ -2,10 +2,9 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.CreateNote
+import jp.panta.misskeyandroidclient.api.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll

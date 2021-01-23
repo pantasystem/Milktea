@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notification
 
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
 import java.util.*

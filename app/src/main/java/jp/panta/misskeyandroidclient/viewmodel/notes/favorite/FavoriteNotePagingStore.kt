@@ -1,11 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.favorite
 
-import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore

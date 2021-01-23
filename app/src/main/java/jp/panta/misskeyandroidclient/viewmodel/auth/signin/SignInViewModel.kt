@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.auth.signin
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.core.Account

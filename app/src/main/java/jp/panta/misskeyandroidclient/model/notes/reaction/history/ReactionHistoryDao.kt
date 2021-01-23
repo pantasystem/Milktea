@@ -1,9 +1,11 @@
-package jp.panta.misskeyandroidclient.model.notes.reaction
+package jp.panta.misskeyandroidclient.model.notes.reaction.history
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryCount
 
 @Dao
 interface ReactionHistoryDao{

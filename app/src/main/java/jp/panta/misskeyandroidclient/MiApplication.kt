@@ -4,29 +4,25 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.Build
-import android.provider.CalendarContract
-import android.provider.FontRequest
 import android.util.Log
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.emoji.text.FontRequestEmojiCompatConfig
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
+import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
@@ -51,12 +47,10 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
-import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
 import jp.panta.misskeyandroidclient.model.notes.NoteEventStoreFactory
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -205,12 +199,12 @@ class MiApplication : Application(), MiCore {
         return accountRepository.get(accountId)
     }
 
-    override fun getUrlPreviewStore(account: Account): UrlPreviewStore? {
+    override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
         return getUrlPreviewStore(account, false)
     }
 
 
-    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore?{
+    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->
             val url = mSettingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
 

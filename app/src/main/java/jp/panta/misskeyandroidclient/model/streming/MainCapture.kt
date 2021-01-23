@@ -6,12 +6,11 @@ import com.google.gson.reflect.TypeToken
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.users.User
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.ArrayList
 
 /**
  * アカウント一つにつきMainCaptureを一つにしたい

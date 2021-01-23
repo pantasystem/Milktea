@@ -4,11 +4,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
 import kotlinx.android.synthetic.main.activity_antenna_list.*
 
@@ -32,10 +31,10 @@ class AntennaListActivity : AppCompatActivity() {
         )[AntennaListViewModel::class.java]
 
 
-        mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, Observer {
+        mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, {
             confirmDeleteAntenna(it)
         })
-        mAntennaListViewModel.editAntennaEvent.observe( this, Observer {
+        mAntennaListViewModel.editAntennaEvent.observe( this, {
             val intent = Intent(this, AntennaEditorActivity::class.java)
             intent.putExtra(AntennaEditorActivity.EXTRA_ANTENNA, it)
             startActivityForResult(intent, REQUEST_ANTENNA_EDITOR_CODE)

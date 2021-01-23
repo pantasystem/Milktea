@@ -1,9 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.Note
 import java.lang.IllegalArgumentException
 
 class HasReplyToNoteViewData(note: Note, account: Account, determineTextLength: DetermineTextLength)  : PlaneNoteViewData(note, account, determineTextLength){
