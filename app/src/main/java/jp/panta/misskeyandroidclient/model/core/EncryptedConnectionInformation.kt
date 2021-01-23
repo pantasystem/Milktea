@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import java.lang.StringBuilder
 import java.security.MessageDigest
 import java.util.*

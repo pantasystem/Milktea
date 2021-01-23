@@ -2,16 +2,13 @@ package jp.panta.misskeyandroidclient.viewmodel.list
 
 import android.util.Log
 import androidx.lifecycle.*
-import io.reactivex.Observer
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.ReplaySubject
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.ListUserOperation
 import jp.panta.misskeyandroidclient.model.list.UpdateList
 import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.Dispatchers
@@ -196,7 +193,8 @@ class UserListDetailViewModel(
                     RequestUser(
                     i = account.getI(miCore.getEncryption())!!,
                     userId = userId
-                )).enqueue(this.accept)
+                )
+                ).enqueue(this.accept)
             }
         }
 
@@ -240,7 +238,8 @@ class UserListDetailViewModel(
             RequestUser(
                 i = account.getI(miCore.getEncryption()),
                 userId = user.userId
-            )).enqueue(user.accept)
+            )
+        ).enqueue(user.accept)
     }
 
     private fun adaptUsers(){

@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import java.io.Serializable
 import java.util.*
 

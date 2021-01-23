@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog

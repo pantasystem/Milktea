@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import java.lang.IllegalArgumentException
 

@@ -4,10 +4,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -37,7 +36,7 @@ class SortedUsersViewModel(
         val sort: String?,
         val state: RequestUser.State?
     ): Serializable{
-        fun toRequestUser(i: String): RequestUser{
+        fun toRequestUser(i: String): RequestUser {
             return RequestUser(
                 i = i,
                 origin = origin?.origin,

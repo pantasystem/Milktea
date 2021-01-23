@@ -20,8 +20,8 @@ import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

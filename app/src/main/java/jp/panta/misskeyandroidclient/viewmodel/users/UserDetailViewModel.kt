@@ -7,9 +7,8 @@ import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
@@ -189,7 +188,7 @@ class UserDetailViewModel(
         })
     }
 
-    private fun createUserIdOnlyRequest(): RequestUser{
+    private fun createUserIdOnlyRequest(): RequestUser {
         return RequestUser(i = account.getI(encryption)!!, userId = userId)
     }
 

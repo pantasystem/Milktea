@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.view.users.selectable
 import android.view.View
 import android.widget.CheckBox
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 
 object SelectableUserHelper {
 

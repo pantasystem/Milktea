@@ -10,8 +10,8 @@ import jp.panta.misskeyandroidclient.model.core.Account
 import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -83,11 +83,13 @@ class SignInViewModel(
         }
 
         user.addSource(userName){
-            misskeyAPI?.showUser(RequestUser(
+            misskeyAPI?.showUser(
+                RequestUser(
                 i = null,
                 userName = it,
                 userId = null
-            ))?.enqueue(object : Callback<User>{
+            )
+            )?.enqueue(object : Callback<User>{
                 override fun onResponse(call: Call<User>, response: Response<User>) {
                     user.postValue(response.body())
                 }

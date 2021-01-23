@@ -1,16 +1,13 @@
 package jp.panta.misskeyandroidclient.viewmodel.users.selectable
 
-import android.util.Log
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
-import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 
 
 class SelectedUserViewModel(
@@ -80,10 +77,12 @@ class SelectedUserViewModel(
         usersMap.putAll(srcUser)
 
         val srcUserId = exSelectedUserIds.mapNotNull{
-            val call = misskeyAPI.showUser(RequestUser(
+            val call = misskeyAPI.showUser(
+                RequestUser(
                 i = miCore.getCurrentAccount().value?.getI(miCore.getEncryption()),
                 userId = it
-            ))
+            )
+            )
             if(usersMap.containsKey(it)){
                 null
             }else{

@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.MediatorLiveData
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 
 open class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
 

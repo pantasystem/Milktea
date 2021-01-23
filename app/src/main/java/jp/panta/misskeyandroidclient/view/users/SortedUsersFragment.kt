@@ -11,8 +11,8 @@ import jp.panta.misskeyandroidclient.Activities
 
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
@@ -71,7 +71,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         val toggleFollowViewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miCore))[ToggleFollowViewModel::class.java]
 
 
-        exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner, Observer {
+        exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner, {
             exploreUsersSwipeRefresh.isRefreshing = it?: false
         })
 
@@ -82,7 +82,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
         exploreUsersView.adapter = adapter
         exploreUsersView.layoutManager = LinearLayoutManager(view.context)
-        exploreUsersViewModel.users.observe( viewLifecycleOwner, Observer {
+        exploreUsersViewModel.users.observe( viewLifecycleOwner, {
             adapter.submitList(it)
         })
     }

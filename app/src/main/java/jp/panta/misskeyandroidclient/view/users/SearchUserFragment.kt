@@ -1,13 +1,12 @@
 package jp.panta.misskeyandroidclient.view.users
 
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
@@ -46,10 +45,10 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
         val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
         searchUsersView.adapter = adapter
         searchUsersView.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.getUsers().observe(viewLifecycleOwner, Observer{
+        viewModel.getUsers().observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer {
+        viewModel.isLoading.observe(viewLifecycleOwner, {
             searchUserSwipeRefresh.isRefreshing = it?: false
         })
         searchUserSwipeRefresh.setOnRefreshListener {

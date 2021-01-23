@@ -8,8 +8,8 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -128,7 +128,7 @@ class PageSettingViewModel(
     }
 
     fun asyncAddUser(userId: String){
-        miCore.getMisskeyAPI(account!!)?.showUser(
+        miCore.getMisskeyAPI(account!!).showUser(
             RequestUser(
                 i = account?.getI(encryption)!!,
                 userId = userId

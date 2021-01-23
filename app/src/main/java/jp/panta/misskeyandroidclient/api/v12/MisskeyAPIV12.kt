@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.api.v12
 import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11Diff
 import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna

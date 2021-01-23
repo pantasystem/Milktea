@@ -2,8 +2,8 @@ package jp.panta.misskeyandroidclient.api.v12
 
 import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd

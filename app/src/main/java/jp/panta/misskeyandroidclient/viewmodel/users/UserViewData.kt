@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

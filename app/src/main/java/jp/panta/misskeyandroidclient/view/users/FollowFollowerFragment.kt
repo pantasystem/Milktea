@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import kotlinx.android.synthetic.main.fragment_follow_follwer.*
@@ -50,7 +50,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { accountRelation ->
+        miApplication.getCurrentAccount().observe(viewLifecycleOwner, { accountRelation ->
             val encryption = miApplication.getEncryption()
             val followFollowerViewModel = ViewModelProvider(this, FollowFollowerViewModel.Factory(accountRelation, miApplication, user, type, encryption))[FollowFollowerViewModel::class.java]
             mViewModel = followFollowerViewModel
@@ -60,17 +60,17 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
             follow_follower_list.adapter = adapter
 
-            followFollowerViewModel.users.observe(viewLifecycleOwner, Observer {
+            followFollowerViewModel.users.observe(viewLifecycleOwner,  {
                 adapter.submitList(it)
             })
 
             followFollowerViewModel.loadInit()
 
-            mViewModel?.isInitializing?.observe(viewLifecycleOwner, Observer {
+            mViewModel?.isInitializing?.observe(viewLifecycleOwner,  {
                 swipe_refresh.isRefreshing = it
             })
 
-            mViewModel?.showUserEventBus?.observe(viewLifecycleOwner, Observer {
+            mViewModel?.showUserEventBus?.observe(viewLifecycleOwner,  {
                 val intent = Intent(activity, UserDetailActivity::class.java)
                 intent.putActivity(Activities.ACTIVITY_IN_APP)
 

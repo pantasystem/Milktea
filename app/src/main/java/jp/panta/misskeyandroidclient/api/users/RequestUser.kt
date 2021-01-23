@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.users
+package jp.panta.misskeyandroidclient.api.users
 
 import com.google.gson.annotations.SerializedName
 
@@ -19,15 +19,15 @@ data class RequestUser(
 ){
 
     class Sort{
-        fun follower(): OrderBy{
+        fun follower(): OrderBy {
             return OrderBy("follower")
         }
 
-        fun createdAt(): OrderBy{
+        fun createdAt(): OrderBy {
             return OrderBy("createdAt")
         }
 
-        fun updatedAt(): OrderBy{
+        fun updatedAt(): OrderBy {
             return OrderBy("updatedAt")
         }
     }

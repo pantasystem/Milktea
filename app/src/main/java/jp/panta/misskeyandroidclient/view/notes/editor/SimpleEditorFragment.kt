@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,7 +22,7 @@ import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
@@ -31,7 +30,6 @@ import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
-import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
@@ -87,10 +85,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
-        accountViewModel.switchAccount.observe(this, Observer {
+        accountViewModel.switchAccount.observe(this,  {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         })
-        accountViewModel.showProfile.observe(this, Observer {
+        accountViewModel.showProfile.observe(this,  {
             val intent = Intent(requireContext(), UserDetailActivity::class.java)
             intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
             intent.putActivity(Activities.ACTIVITY_IN_APP)
@@ -129,10 +127,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
         binding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        viewModel.files.observe(viewLifecycleOwner, Observer{list ->
+        viewModel.files.observe(viewLifecycleOwner, {list ->
             simpleImagePreviewAdapter.submitList(list)
         })
-        viewModel.poll.observe(viewLifecycleOwner, Observer { poll ->
+        viewModel.poll.observe(viewLifecycleOwner,  { poll ->
             if(poll == null){
                 removePollFragment()
             }else{
@@ -140,7 +138,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             }
         })
 
-        viewModel.noteTask.observe(viewLifecycleOwner, Observer{postNote->
+        viewModel.noteTask.observe(viewLifecycleOwner, {postNote->
             Log.d("NoteEditorActivity", "$postNote")
             val intent = Intent(requireContext(), PostNoteService::class.java)
             intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
@@ -148,21 +146,21 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             viewModel.clear()
         })
 
-        viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner, Observer {
+        viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner,  {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(childFragmentManager, "NoteEditor")
         })
 
-        viewModel.address.observe(viewLifecycleOwner, Observer{
+        viewModel.address.observe(viewLifecycleOwner, {
             userChipAdapter.submitList(it)
         })
 
-        viewModel.showPollTimePicker.observe(this, Observer{
+        viewModel.showPollTimePicker.observe(this, {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
         })
 
-        viewModel.showPollDatePicker.observe(this, Observer {
+        viewModel.showPollDatePicker.observe(this,  {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
         })
 
@@ -194,8 +192,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         }
 
         val emojiSelectionViewModel = ViewModelProvider(requireActivity())[EmojiSelectionViewModel::class.java]
-        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, Observer(::onSelect))
-        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, Observer(::onSelect))
+        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, (::onSelect))
+        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, (::onSelect))
 
     }
 

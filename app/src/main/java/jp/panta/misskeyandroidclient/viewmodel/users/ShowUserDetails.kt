@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 
 interface ShowUserDetails {
 

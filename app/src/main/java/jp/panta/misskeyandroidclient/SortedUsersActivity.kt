@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.view.users.SortedUsersFragment
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.android.synthetic.main.activity_sorted_uses.*

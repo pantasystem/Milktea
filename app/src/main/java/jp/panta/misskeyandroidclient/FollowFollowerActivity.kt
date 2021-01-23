@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.User
 import jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import kotlinx.android.synthetic.main.activity_follow_follower.*
@@ -52,7 +52,7 @@ class FollowFollowerActivity : AppCompatActivity() {
             return titleList.size
         }
 
-        override fun getPageTitle(position: Int): CharSequence? {
+        override fun getPageTitle(position: Int): CharSequence {
             return titleList[position]
         }
 

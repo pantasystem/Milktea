@@ -6,7 +6,7 @@
     <data>
         <variable
                 name="user"
-                type="jp.panta.misskeyandroidclient.model.users.User" />
+                type="jp.panta.misskeyandroidclient.api.users.User" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
