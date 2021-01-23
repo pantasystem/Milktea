@@ -2,11 +2,10 @@ package jp.panta.misskeyandroidclient.view.users
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
@@ -57,7 +56,7 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
     }
 
 
-    override fun show(user: User?) {
+    override fun show(user: UserDTO?) {
 
     }
 }

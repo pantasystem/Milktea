@@ -4,7 +4,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
@@ -14,7 +14,7 @@ class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,
     val exSelectedUserIds: List<String> = emptyList(),
-    val exSelectedUsers: List<User> = emptyList()
+    val exSelectedUsers: List<UserDTO> = emptyList()
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
@@ -22,7 +22,7 @@ class SelectedUserViewModel(
         val miCore: MiCore,
         val selectableSize: Int,
         val selectedUserIds: List<String>?,
-        val selectedUsers: List<User>?
+        val selectedUsers: List<UserDTO>?
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return SelectedUserViewModel(
@@ -99,7 +99,7 @@ class SelectedUserViewModel(
         selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
     }
 
-    fun selectUser(user: User?){
+    fun selectUser(user: UserDTO?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap[user.id] = UserViewData(user)
@@ -107,7 +107,7 @@ class SelectedUserViewModel(
         }
     }
 
-    fun unSelectUser(user: User?){
+    fun unSelectUser(user: UserDTO?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.remove(user.id)
@@ -115,7 +115,7 @@ class SelectedUserViewModel(
         }
     }
 
-    fun toggleSelectUser(user: User?){
+    fun toggleSelectUser(user: UserDTO?){
         user?: return
 
         synchronized(mSelectedUserIdUserMap){
@@ -127,7 +127,7 @@ class SelectedUserViewModel(
         }
     }
 
-    fun isSelectedUser(user: User?): Boolean{
+    fun isSelectedUser(user: UserDTO?): Boolean{
         user?: return false
         return synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.containsKey(user.id)

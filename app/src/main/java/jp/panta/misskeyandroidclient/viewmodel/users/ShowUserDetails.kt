@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 
 interface ShowUserDetails {
 
-    fun show(user: User?)
+    fun show(user: UserDTO?)
 }

@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import kotlinx.android.synthetic.main.fragment_follow_follwer.*
@@ -20,7 +19,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
     companion object{
         private const val EXTRA_USER = "jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment.EXTRA_USER"
         private const val EXTRA_TYPE = "jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment.EXTRA_TYPE"
-        fun newInstance(type: FollowFollowerViewModel.Type, user: User? = null) : FollowFollowerFragment{
+        fun newInstance(type: FollowFollowerViewModel.Type, user: UserDTO? = null) : FollowFollowerFragment{
             return FollowFollowerFragment().apply{
                 arguments = Bundle().apply{
                     if(user != null){
@@ -41,7 +40,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
         val typeOrdinal = arguments?.getInt(EXTRA_TYPE)?: 0
 
         val type = FollowFollowerViewModel.Type.values()[typeOrdinal]
-        val user = arguments?.getSerializable(EXTRA_USER) as User?
+        val user = arguments?.getSerializable(EXTRA_USER) as UserDTO?
 
         mLinearLayoutManager = LinearLayoutManager(view.context)
 

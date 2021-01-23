@@ -6,9 +6,9 @@ import com.google.gson.reflect.TypeToken
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -24,26 +24,26 @@ class MainCapture(
         fun notification(notification: Notification)
         fun readAllNotifications()
         fun unreadMessagingMessage(message: Message)
-        fun mention(note: Note)
+        fun mention(note: NoteDTO)
         fun unreadMention(id: String)
-        fun renote(note: Note)
+        fun renote(note: NoteDTO)
         fun messagingMessage(message: Message)
-        fun meUpdated(user: User)
+        fun meUpdated(user: UserDTO)
 
         /**
          * フォロー解除したときに呼び出される
          */
-        fun unFollowed(user: User)
+        fun unFollowed(user: UserDTO)
 
         /**
          * ユーザーにフォローされたときに呼び出される
          */
-        fun followed(user: User)
+        fun followed(user: UserDTO)
 
         /**
          * ユーザーをフォローしたときに呼び出される
          */
-        fun follow(user: User)
+        fun follow(user: UserDTO)
 
         fun fileCreated(fileProperty: FileProperty)
         fun fileDeleted(id: String)
@@ -53,17 +53,17 @@ class MainCapture(
     abstract class AbsListener : Listener{
         override val id: String = UUID.randomUUID().toString()
 
-        override fun followed(user: User) {}
+        override fun followed(user: UserDTO) {}
         override fun notification(notification: Notification) {}
-        override fun meUpdated(user: User) {}
-        override fun mention(note: Note) {}
+        override fun meUpdated(user: UserDTO) {}
+        override fun mention(note: NoteDTO) {}
         override fun messagingMessage(message: Message) {}
         override fun readAllNotifications() {}
-        override fun renote(note: Note) {}
-        override fun unFollowed(user: User) {}
+        override fun renote(note: NoteDTO) {}
+        override fun unFollowed(user: UserDTO) {}
         override fun unreadMention(id: String) {}
         override fun unreadMessagingMessage(message: Message) = Unit
-        override fun follow(user: User) = Unit
+        override fun follow(user: UserDTO) = Unit
         override fun fileDeleted(id: String) = Unit
         override fun fileUpdated(fileProperty: FileProperty) = Unit
         override fun fileCreated(fileProperty: FileProperty) = Unit
@@ -117,8 +117,8 @@ class MainCapture(
 
     private val notificationType = TypeToken.getParameterized(Channel::class.java, Notification::class.java).type
     private val messageType = TypeToken.getParameterized(Channel::class.java, Message::class.java).type
-    private val noteType = TypeToken.getParameterized(Channel::class.java, Note::class.java).type
-    private val userType = TypeToken.getParameterized(Channel::class.java, User::class.java).type
+    private val noteType = TypeToken.getParameterized(Channel::class.java, NoteDTO::class.java).type
+    private val userType = TypeToken.getParameterized(Channel::class.java, UserDTO::class.java).type
     private val stringType = TypeToken.getParameterized(Channel::class.java, String::class.java).type
     private val fileType = TypeToken.getParameterized(Channel::class.java, FileProperty::class.java).type
 
@@ -235,13 +235,13 @@ class MainCapture(
         observer(notification.body.body)
     }
 
-    private fun notifyUser(msg: String, observer: (User)-> Unit){
-        val user: Channel<User> = gson.fromJson(msg, userType)
+    private fun notifyUser(msg: String, observer: (UserDTO)-> Unit){
+        val user: Channel<UserDTO> = gson.fromJson(msg, userType)
         observer(user.body.body)
     }
 
-    private fun notifyNote(msg: String, observer: (Note)-> Unit){
-        val note: Channel<Note> = gson.fromJson(msg, noteType)
+    private fun notifyNote(msg: String, observer: (NoteDTO)-> Unit){
+        val note: Channel<NoteDTO> = gson.fromJson(msg, noteType)
         observer(note.body.body)
     }
 

@@ -24,9 +24,9 @@ import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
@@ -103,7 +103,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val replyToNoteId: String? = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)
         val quoteToNoteId: String? = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)
 
-        val note: Note? = intent.getSerializableExtra(EXTRA_NOTE) as Note?
+        val note: NoteDTO? = intent.getSerializableExtra(EXTRA_NOTE) as NoteDTO?
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
@@ -455,7 +455,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             SELECT_MENTION_TO_USER_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK && data != null){
                     val users = (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USERS) as ArrayList<*>).mapNotNull {
-                        it as? User
+                        it as? UserDTO
                     }
                     val pos = mBinding.inputMain.selectionEnd
                     mViewModel?.addMentionUsers(users, pos)?.let{ newPos ->

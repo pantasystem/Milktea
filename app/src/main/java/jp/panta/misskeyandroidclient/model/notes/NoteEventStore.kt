@@ -7,7 +7,7 @@ import java.util.*
 interface NoteEventStore {
     val account: Account
 
-    fun release(event: NoteEvent)
+    fun release(event: NoteCaptureEvent)
 
-    fun getEventStream(date: Date = Date()): Observable<NoteEvent>
+    fun getEventStream(date: Date = Date()): Observable<NoteCaptureEvent>
 }

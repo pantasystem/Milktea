@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.api.v12
 
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
@@ -20,7 +20,7 @@ interface MisskeyAPIV12Diff {
     fun deleteAntenna(@Body query: AntennaQuery): Call<Unit>
 
     @POST("api/antennas/notes")
-    fun antennasNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun antennasNotes(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/antennas/show")
     fun showAntenna(@Body antennaQuery: AntennaQuery): Call<Antenna>
@@ -32,5 +32,5 @@ interface MisskeyAPIV12Diff {
     fun getAntennas(@Body query: AntennaQuery): Call<List<Antenna>>
 
     @POST("api/users/search-by-username-and-host")
-    fun searchByUserNameAndHost(@Body requestUser: RequestUser): Call<List<User>>
+    fun searchByUserNameAndHost(@Body requestUser: RequestUser): Call<List<UserDTO>>
 }

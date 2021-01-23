@@ -22,7 +22,7 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
 
 open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI{
@@ -41,7 +41,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun createReaction(reaction: CreateReaction) = misskey.createReaction(reaction)
 
-    override fun mentions(noteRequest: NoteRequest): Call<List<Note>?> = misskey.mentions(noteRequest)
+    override fun mentions(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.mentions(noteRequest)
 
     override fun delete(deleteNote: DeleteNote) = misskey.delete(deleteNote)
 
@@ -53,9 +53,9 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun favorites(noteRequest: NoteRequest): Call<List<Favorite>?> = misskey.favorites(noteRequest)
 
-    override fun featured(noteRequest: NoteRequest): Call<List<Note>?> = misskey.featured(noteRequest)
+    override fun featured(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.featured(noteRequest)
 
-    override fun followUser(requestUser: RequestUser): Call<User> = misskey.followUser(requestUser)
+    override fun followUser(requestUser: RequestUser): Call<UserDTO> = misskey.followUser(requestUser)
 
     open fun following(followFollower: RequestFollowFollower): Call<FollowFollowerUsers> = diff.following(followFollower)
 
@@ -73,15 +73,15 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun getMeta(requestMeta: RequestMeta): Call<Meta> = misskey.getMeta(requestMeta)
 
-    override fun globalTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.globalTimeline(noteRequest)
+    override fun globalTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.globalTimeline(noteRequest)
 
-    override fun homeTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.homeTimeline(noteRequest)
+    override fun homeTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.homeTimeline(noteRequest)
 
-    override fun hybridTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.hybridTimeline(noteRequest)
+    override fun hybridTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.hybridTimeline(noteRequest)
 
-    override fun i(i: I): Call<User> = misskey.i(i)
+    override fun i(i: I): Call<UserDTO> = misskey.i(i)
 
-    override fun localTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.localTimeline(noteRequest)
+    override fun localTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.localTimeline(noteRequest)
 
     override fun muteUser(requestUser: RequestUser): Call<Unit> = misskey.muteUser(requestUser)
 
@@ -93,31 +93,31 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun readMessage(messageAction: MessageAction): Call<Unit> = misskey.readMessage(messageAction)
 
-    override fun searchByTag(noteRequest: NoteRequest): Call<List<Note>?> = misskey.searchByTag(noteRequest)
+    override fun searchByTag(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.searchByTag(noteRequest)
 
-    override fun searchNote(noteRequest: NoteRequest): Call<List<Note>?> = misskey.searchNote(noteRequest)
+    override fun searchNote(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.searchNote(noteRequest)
 
     override fun showApp(showApp: ShowApp): Call<App> = misskey.showApp(showApp)
 
-    override fun showNote(requestNote: NoteRequest): Call<Note> = misskey.showNote(requestNote)
+    override fun showNote(requestNote: NoteRequest): Call<NoteDTO> = misskey.showNote(requestNote)
 
-    override fun showUser(requestUser: RequestUser): Call<User> = misskey.showUser(requestUser)
+    override fun showUser(requestUser: RequestUser): Call<UserDTO> = misskey.showUser(requestUser)
 
-    override fun searchUser(requestUser: RequestUser): Call<List<User>> = misskey.searchUser(requestUser)
+    override fun searchUser(requestUser: RequestUser): Call<List<UserDTO>> = misskey.searchUser(requestUser)
 
     override fun signIn(signIn: SignIn): Call<I> = misskey.signIn(signIn)
 
-    override fun unFollowUser(requestUser: RequestUser): Call<User> = misskey.unFollowUser(requestUser)
+    override fun unFollowUser(requestUser: RequestUser): Call<UserDTO> = misskey.unFollowUser(requestUser)
 
     override fun unblockUser(requestUser: RequestUser): Call<Unit> = misskey.unblockUser(requestUser)
 
     override fun unmuteUser(requestUser: RequestUser): Call<Unit> = misskey.unmuteUser(requestUser)
 
-    override fun userNotes(noteRequest: NoteRequest): Call<List<Note>?> = misskey.userNotes(noteRequest)
+    override fun userNotes(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.userNotes(noteRequest)
 
     override fun vote(vote: Vote): Call<Unit> = misskey.vote(vote)
 
-    override fun userListTimeline(noteRequest: NoteRequest): Call<List<Note>?> = misskey.userListTimeline(noteRequest)
+    override fun userListTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.userListTimeline(noteRequest)
 
     override fun createList(createList: CreateList): Call<UserList> = misskey.createList(createList)
 
@@ -137,5 +137,5 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun getHashTagList(requestHashTagList: RequestHashTagList): Call<List<HashTag>> = misskey.getHashTagList(requestHashTagList)
 
-    override fun getUsers(requestUser: RequestUser): Call<List<User>> = misskey.getUsers(requestUser)
+    override fun getUsers(requestUser: RequestUser): Call<List<UserDTO>> = misskey.getUsers(requestUser)
 }

@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import java.lang.StringBuilder
 import java.security.MessageDigest
 import java.util.*
@@ -57,7 +57,7 @@ data class EncryptedConnectionInformation(
             )
         }
 
-        fun create(i: String, user: User, instanceDomain: String): EncryptedConnectionInformation{
+        fun create(i: String, user: UserDTO, instanceDomain: String): EncryptedConnectionInformation{
             return EncryptedConnectionInformation(
                 accountId = user.id,
                 instanceBaseUrl = instanceDomain,

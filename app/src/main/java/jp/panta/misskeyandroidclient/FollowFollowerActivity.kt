@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import kotlinx.android.synthetic.main.activity_follow_follower.*
@@ -26,7 +26,7 @@ class FollowFollowerActivity : AppCompatActivity() {
         setSupportActionBar(follow_follower_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val user = intent.getSerializableExtra(EXTRA_USER) as User?
+        val user = intent.getSerializableExtra(EXTRA_USER) as UserDTO?
 
         follow_follower_pager.adapter = FollowFollowerPagerAdapter(user)
         follow_follower_tab.setupWithViewPager(follow_follower_pager)
@@ -44,7 +44,7 @@ class FollowFollowerActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    inner class FollowFollowerPagerAdapter(val user: User?) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class FollowFollowerPagerAdapter(val user: UserDTO?) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
         private val titleList = arrayOf(getString(R.string.following), getString(R.string.follower))
 

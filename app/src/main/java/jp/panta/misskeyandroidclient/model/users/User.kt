@@ -9,8 +9,8 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 data class User(
     val id: String,
     val userName: String,
-    val name: String,
-    val avatarUrl: String,
+    val name: String?,
+    val avatarUrl: String?,
     val emojis: List<Emoji>,
     val isCat: Boolean,
     val isBot: Boolean

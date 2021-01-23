@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.MediatorLiveData
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 
 open class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
 
@@ -26,7 +26,7 @@ open class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
 
     val listener = object : MainCapture.AbsListener(){
 
-        override fun follow(user: User) {
+        override fun follow(user: UserDTO) {
             super.follow(user)
 
             value?.forEach {
@@ -36,7 +36,7 @@ open class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
             }
         }
 
-        override fun unFollowed(user: User) {
+        override fun unFollowed(user: UserDTO) {
             value?.forEach {
                 if(it.userId == user.id){
                     it.user.postValue(user)

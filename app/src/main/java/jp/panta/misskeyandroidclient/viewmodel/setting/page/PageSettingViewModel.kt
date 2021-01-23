@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -99,20 +99,20 @@ class PageSettingViewModel(
     fun addUserPageById(userId: String){
         miCore.getMisskeyAPI(account!!).showUser(
             RequestUser(userId = userId, i = account?.getI(encryption))
-        ).enqueue(object : Callback<User>{
-            override fun onResponse(call: Call<User>, response: Response<User>) {
+        ).enqueue(object : Callback<UserDTO>{
+            override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                 val user = response.body()
                 if(user != null){
                     addUserPage(user)
                 }
             }
 
-            override fun onFailure(call: Call<User>, t: Throwable) {
+            override fun onFailure(call: Call<UserDTO>, t: Throwable) {
                 Log.e("PageSettingVM", "ユーザーの取得に失敗した", t)
             }
         })
     }
-    fun addUserPage(user: User){
+    fun addUserPage(user: UserDTO){
         val page = if(settingStore.isUserNameDefault){
             PageableTemplate(account!!).user(user.id, title = user.getShortDisplayName())
         }else{
@@ -133,14 +133,14 @@ class PageSettingViewModel(
                 i = account?.getI(encryption)!!,
                 userId = userId
             )
-        ).enqueue(object : Callback<User>{
-            override fun onResponse(call: Call<User>, response: Response<User>) {
+        ).enqueue(object : Callback<UserDTO>{
+            override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                 if(response.code() in 200.until(300)){
                     addPage(PageableTemplate(account!!).user(response.body()!!, settingStore.isUserNameDefault))
                 }
             }
 
-            override fun onFailure(call: Call<User>, t: Throwable) {
+            override fun onFailure(call: Call<UserDTO>, t: Throwable) {
             }
         })
     }

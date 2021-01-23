@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.api.notes
 
-import jp.panta.misskeyandroidclient.api.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 
 data class CreateNote(
@@ -21,7 +20,7 @@ data class CreateNote(
 
 
 ){
-    data class Response(val createdNote: Note)
+    data class Response(val createdNote: NoteDTO)
 
     enum class Visibility(val isLocalOnlyPossible: Boolean){
         PUBLIC(true),

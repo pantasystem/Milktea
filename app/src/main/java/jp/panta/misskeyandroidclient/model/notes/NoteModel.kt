@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import kotlinx.coroutines.flow.Flow
 
 
 /**
@@ -15,6 +16,5 @@ interface NoteModel {
     suspend fun delete(note: Note)
     suspend fun reaction(reaction: String, reactionTo: Note)
     suspend fun unreaction(reaction: String, unreactionTo: Note)
-    suspend fun create(creation: CreateNote)
 
 }

@@ -10,10 +10,10 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
@@ -49,7 +49,7 @@ class ActionNoteHandler(
         Log.d("MainActivity", "share clicked :$it")
         ShareBottomSheetDialog().show(activity.supportFragmentManager, "MainActivity")
     }
-    private val targetUserObserver = Observer<User>{
+    private val targetUserObserver = Observer<UserDTO>{
         Log.d("MainActivity", "user clicked :$it")
         val intent = Intent(activity, UserDetailActivity::class.java)
         intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
@@ -88,7 +88,7 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
-    private val showNoteEventObserver = Observer<Note>{
+    private val showNoteEventObserver = Observer<NoteDTO>{
         val intent = Intent(activity, NoteDetailActivity::class.java)
         intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.id)
         intent.putActivity(Activities.ACTIVITY_IN_APP)
@@ -112,7 +112,7 @@ class ActionNoteHandler(
         dialog.show(activity.supportFragmentManager, "")
     }
 
-    private val openNoteEditor = Observer<Note?>{ note ->
+    private val openNoteEditor = Observer<NoteDTO?>{ note ->
         val intent = Intent(activity, NoteEditorActivity::class.java).apply{
             if(note != null){
                 putExtra(NoteEditorActivity.EXTRA_NOTE, note)
@@ -149,12 +149,12 @@ class ActionNoteHandler(
         }
         when(it.eventType){
             "delete_note" ->{
-                if(it.args is Note){
+                if(it.args is NoteDTO){
                     mNotesViewModel.removeNote(it.args)
                 }
             }
             "delete_and_edit_note" ->{
-                if(it.args is Note){
+                if(it.args is NoteDTO){
                     mNotesViewModel.removeAndEditNote(it.args)
                 }
             }

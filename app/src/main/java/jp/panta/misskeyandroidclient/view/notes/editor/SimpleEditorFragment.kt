@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
@@ -22,7 +21,7 @@ import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
@@ -372,7 +371,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             SELECT_MENTION_TO_USER_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK && data != null){
                     val users = (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USERS) as ArrayList<*>).mapNotNull {
-                        it as? User
+                        it as? UserDTO
                     }
                     val pos = mBinding.inputMainText.selectionEnd
                     mViewModel?.addMentionUsers(users, pos)?.let{ newPos ->

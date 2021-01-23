@@ -3,13 +3,13 @@ package jp.panta.misskeyandroidclient.view.users.selectable
 import android.view.View
 import android.widget.CheckBox
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 
 object SelectableUserHelper {
 
     @JvmStatic
     @BindingAdapter("selectedUsers", "selectableUserEnabled", "selectableMaxCount")
-    fun CheckBox.setSelectableUserEnabled(selectedUsers: Set<String>?, selectableUserEnabled: User?, selectableMaxCount: Int?){
+    fun CheckBox.setSelectableUserEnabled(selectedUsers: Set<String>?, selectableUserEnabled: UserDTO?, selectableMaxCount: Int?){
         val max = selectableMaxCount?: 0
         if(selectableUserEnabled == null || max <= 0){
             this.visibility = View.GONE

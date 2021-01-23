@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
@@ -28,7 +28,7 @@ class UserDetailViewModel(
 ) : ViewModel(){
     val tag=  "userDetailViewModel"
 
-    val user = MutableLiveData<User>()
+    val user = MutableLiveData<UserDTO>()
     val isMine = account.remoteId == userId
 
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply{
@@ -84,8 +84,8 @@ class UserDetailViewModel(
             value = it.url != null
         }
     }
-    val showFollowers = EventBus<User?>()
-    val showFollows = EventBus<User?>()
+    val showFollowers = EventBus<UserDTO?>()
+    val showFollows = EventBus<UserDTO?>()
 
     fun load(){
         val userNameList = fqcnUserName?.split("@")?.filter{
@@ -100,13 +100,13 @@ class UserDetailViewModel(
         }
         misskeyAPI.showUser(
             RequestUser(
-                i = account.getI(encryption)!!,
+                i = account.getI(encryption),
                 userId = userId,
                 userName = userName,
                 host = host
             )
-        ).enqueue(object : Callback<User>{
-            override fun onResponse(call: Call<User>, response: Response<User>) {
+        ).enqueue(object : Callback<UserDTO>{
+            override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                 val user = response.body()
                 if(user != null){
                     this@UserDetailViewModel.user.postValue(user)
@@ -115,7 +115,7 @@ class UserDetailViewModel(
                 }
             }
 
-            override fun onFailure(call: Call<User>, t: Throwable) {
+            override fun onFailure(call: Call<UserDTO>, t: Throwable) {
                 Log.e(tag, "ユーザーの読み込みに失敗しました", t)
             }
         })
@@ -124,27 +124,27 @@ class UserDetailViewModel(
     fun changeFollow(){
         val isFollowing = isFollowing.value?: false
         if(isFollowing){
-            misskeyAPI.unFollowUser(RequestUser(account.getI(encryption)!!, userId = userId)).enqueue(
-                object : Callback<User>{
-                    override fun onResponse(call: Call<User>, response: Response<User>) {
+            misskeyAPI.unFollowUser(RequestUser(account.getI(encryption), userId = userId)).enqueue(
+                object : Callback<UserDTO>{
+                    override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                         if(response.code() == 200){
                             this@UserDetailViewModel.isFollowing.postValue(false)
                         }
                     }
 
-                    override fun onFailure(call: Call<User>, t: Throwable) {
+                    override fun onFailure(call: Call<UserDTO>, t: Throwable) {
                     }
                 }
             )
         }else{
-            misskeyAPI.followUser(RequestUser(account.getI(encryption)!!, userId = userId)).enqueue(object : Callback<User>{
-                override fun onResponse(call: Call<User>, response: Response<User>) {
+            misskeyAPI.followUser(RequestUser(account.getI(encryption), userId = userId)).enqueue(object : Callback<UserDTO>{
+                override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                     if(response.code() == 200){
                         this@UserDetailViewModel.isFollowing.postValue(true)
                     }
                 }
 
-                override fun onFailure(call: Call<User>, t: Throwable) {
+                override fun onFailure(call: Call<UserDTO>, t: Throwable) {
                 }
             })
         }
@@ -189,7 +189,7 @@ class UserDetailViewModel(
     }
 
     private fun createUserIdOnlyRequest(): RequestUser {
-        return RequestUser(i = account.getI(encryption)!!, userId = userId)
+        return RequestUser(i = account.getI(encryption), userId = userId)
     }
 
 

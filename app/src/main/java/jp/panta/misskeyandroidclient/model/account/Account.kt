@@ -9,7 +9,8 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.util.Hash
 import java.io.Serializable
 
@@ -93,11 +94,12 @@ data class Account (
         )
     }*/
 
-    fun getI(encryption: Encryption): String?{
+    fun getI(encryption: Encryption): String{
         return try{
             encryption.decrypt(this.remoteId, this.encryptedToken)
+                ?: throw UnauthorizedException()
         }catch(e: Exception){
-            null
+            throw UnauthorizedException()
         }
     }
 
@@ -112,7 +114,7 @@ fun AccessToken.newAccount(instanceDomain: String, encryption: Encryption, appSe
     )
 }
 
-fun User.newAccount(instanceDomain: String, encryptedToken: String): Account{
+fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account{
     return Account(
         remoteId = this.id,
         instanceDomain = instanceDomain,
@@ -132,11 +134,11 @@ fun User.newAccount(instanceDomain: String, encryptedToken: String): Account{
     )
 }
 
-fun User.newAccount(instanceDomain: String, encryption: Encryption, token: String): Account{
+fun UserDTO.newAccount(instanceDomain: String, encryption: Encryption, token: String): Account{
     return newAccount(instanceDomain, encryption.encrypt(this.id, token))
 }
 
-fun AccountRelation.newAccount(user: User?): Account?{
+fun AccountRelation.newAccount(user: UserDTO?): Account?{
     val ci = getCurrentConnectionInformation()
         ?: return null
     return user?.newAccount(ci.instanceBaseUrl, ci.encryptedI)

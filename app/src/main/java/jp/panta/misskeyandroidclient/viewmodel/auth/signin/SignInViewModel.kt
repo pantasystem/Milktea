@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ class SignInViewModel(
     val userName = MutableLiveData<String>()
     val password = MutableLiveData<String>()
 
-    val user = MediatorLiveData<User>()
+    val user = MediatorLiveData<UserDTO>()
     val token = MutableLiveData<String>()
 
     val isValidDomain = MutableLiveData<Boolean>(false)
@@ -89,11 +89,11 @@ class SignInViewModel(
                 userName = it,
                 userId = null
             )
-            )?.enqueue(object : Callback<User>{
-                override fun onResponse(call: Call<User>, response: Response<User>) {
+            )?.enqueue(object : Callback<UserDTO>{
+                override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                     user.postValue(response.body())
                 }
-                override fun onFailure(call: Call<User>, t: Throwable) {
+                override fun onFailure(call: Call<UserDTO>, t: Throwable) {
                     user.postValue(null)
                 }
             })

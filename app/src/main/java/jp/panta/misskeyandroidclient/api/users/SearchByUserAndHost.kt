@@ -15,7 +15,7 @@ class SearchByUserAndHost(val misskeyAPI: MisskeyAPI){
 
     }
 
-    fun search(reqUser: RequestUser): Call<List<User>>{
+    fun search(reqUser: RequestUser): Call<List<UserDTO>>{
 
 
         val requestUser = reqUser.copy(
@@ -29,40 +29,40 @@ class SearchByUserAndHost(val misskeyAPI: MisskeyAPI){
         }
     }
 
-    private class SearchUserCall(val call: Call<List<User>>, val reqUser: RequestUser) : Call<List<User>>{
+    private class SearchUserCall(val call: Call<List<UserDTO>>, val reqUser: RequestUser) : Call<List<UserDTO>>{
         override fun cancel() {
             call.cancel()
         }
 
-        override fun clone(): Call<List<User>> {
+        override fun clone(): Call<List<UserDTO>> {
             return call.clone()
         }
 
-        override fun enqueue(callback: Callback<List<User>>) {
+        override fun enqueue(callback: Callback<List<UserDTO>>) {
             if(reqUser.host.isNullOrBlank()){
                 call.enqueue(callback)
                 return
             }
 
-            call.enqueue(object : Callback<List<User>>{
-                override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
+            call.enqueue(object : Callback<List<UserDTO>>{
+                override fun onResponse(call: Call<List<UserDTO>>, response: Response<List<UserDTO>>) {
                     val list = response.body()?.filter{
                         it.host?.contains(reqUser.host) == true
                     }
                     Response.success(list)
                 }
 
-                override fun onFailure(call: Call<List<User>>, t: Throwable) {
+                override fun onFailure(call: Call<List<UserDTO>>, t: Throwable) {
                     callback.onFailure(call, t)
                 }
             })
         }
 
-        override fun execute(): Response<List<User>> {
+        override fun execute(): Response<List<UserDTO>> {
             if(reqUser.host.isNullOrBlank()){
                 return call.execute()
             }
-            val list: List<User>? = call.execute().body()?.filter{
+            val list: List<UserDTO>? = call.execute().body()?.filter{
                 it.host?.contains(reqUser.host) == true
             }
             return Response.success(list)

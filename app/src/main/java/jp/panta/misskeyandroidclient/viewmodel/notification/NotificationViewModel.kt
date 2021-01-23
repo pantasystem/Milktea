@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.Event
-import jp.panta.misskeyandroidclient.model.notes.NoteEvent
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureEvent
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -69,7 +69,7 @@ class NotificationViewModel(
             return
         }
         isLoadingFlag = true
-        val request = NotificationRequest(i = account.getI(encryption)!!, limit = 20)
+        val request = NotificationRequest(i = account.getI(encryption), limit = 20)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
                 call: Call<List<Notification>?>,
@@ -124,7 +124,7 @@ class NotificationViewModel(
             return
         }
 
-        val request = NotificationRequest(i = account.getI(encryption)!!, limit = 20, untilId = untilId)
+        val request = NotificationRequest(i = account.getI(encryption), limit = 20, untilId = untilId)
         misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
             override fun onResponse(
                 call: Call<List<Notification>?>,
@@ -170,7 +170,7 @@ class NotificationViewModel(
         }
         return hashSet.toList()
     }
-    private fun noteEventObserver(noteEvent: NoteEvent){
+    private fun noteEventObserver(noteEvent: NoteCaptureEvent){
         Log.d("TM-VM", "#noteEventObserver $noteEvent")
         val timelineNotes = notificationsLiveData.value
             ?: return
@@ -187,13 +187,13 @@ class NotificationViewModel(
                 val note: PlaneNoteViewData? = it.noteViewData
                 if(note?.toShowNote?.id == noteEvent.noteId){
                     when(noteEvent.event){
-                        is Event.Reacted ->{
+                        is Event.NewNote.Reacted ->{
                             note.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
                         }
-                        is Event.UnReacted ->{
+                        is Event.NewNote.UnReacted ->{
                             note.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
                         }
-                        is Event.Voted ->{
+                        is Event.NewNote.Voted ->{
                             note.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
                         }
 

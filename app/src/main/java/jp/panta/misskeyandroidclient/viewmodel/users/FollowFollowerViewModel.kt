@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
 import jp.panta.misskeyandroidclient.api.v10.RequestFollowFollower
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
@@ -26,7 +26,7 @@ import kotlin.collections.ArrayList
 class FollowFollowerViewModel(
     val account: Account,
     val misskeyAPI: MisskeyAPI,
-    val user: User?,
+    val user: UserDTO?,
     val type: Type,
     val miCore: MiCore,
     private val encryption: Encryption = miCore.getEncryption()
@@ -35,7 +35,7 @@ class FollowFollowerViewModel(
     class Factory(
         val account: Account,
         val miApplication: MiApplication,
-        val user: User?,
+        val user: UserDTO?,
         val type: Type,
         val encryption: Encryption
     ) : ViewModelProvider.Factory{
@@ -82,7 +82,7 @@ class FollowFollowerViewModel(
     }
     private var mIsLoading: Boolean = false
 
-    private data class Result(val nextId: String?, val users: List<User>)
+    private data class Result(val nextId: String?, val users: List<UserDTO>)
     private abstract inner class Loader{
         private var result: Result? = null
         abstract fun onLoadInit(): Result?
@@ -227,7 +227,7 @@ class FollowFollowerViewModel(
     }
 
     private inner class Listener : MainCapture.AbsListener(){
-        override fun follow(user: User) {
+        override fun follow(user: UserDTO) {
 
             users.value?.forEach { uvd ->
                 if(uvd.userId == user.id){
@@ -236,7 +236,7 @@ class FollowFollowerViewModel(
             }
         }
 
-        override fun unFollowed(user: User) {
+        override fun unFollowed(user: UserDTO) {
             users.value?.forEach { uvd ->
                 if(uvd.userId == user.id){
                     uvd.user.postValue(user)
@@ -246,9 +246,9 @@ class FollowFollowerViewModel(
     }
 
 
-    val showUserEventBus = EventBus<User>()
+    val showUserEventBus = EventBus<UserDTO>()
 
-    override fun show(user: User?) {
+    override fun show(user: UserDTO?) {
         showUserEventBus.event = user
     }
 

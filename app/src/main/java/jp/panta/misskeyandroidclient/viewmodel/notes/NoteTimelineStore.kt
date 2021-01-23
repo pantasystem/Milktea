@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
@@ -24,7 +24,7 @@ class NoteTimelineStore(
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
 
-    private fun getStore(): ((NoteRequest)-> Call<List<Note>?>)? {
+    private fun getStore(): ((NoteRequest)-> Call<List<NoteDTO>?>)? {
         return try{
             when(pageableTimeline){
                 is Pageable.GlobalTimeline -> miCore.getMisskeyAPI(account)::globalTimeline
@@ -83,7 +83,7 @@ class NoteTimelineStore(
     }
 
 
-    private fun makeResponse(list: List<Note>?, response: Response<List<Note>?>?): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
+    private fun makeResponse(list: List<NoteDTO>?, response: Response<List<NoteDTO>?>?): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         if(response?.code() != 200){
             Log.e("NoteTimelineStore", "異常ステータス受信:${response?.code()}, :${response?.errorBody()?.string()}")
             Log.e("NoteTMStore", "pageable:$pageableTimeline, params: ${pageableTimeline.toParams()}")

@@ -7,10 +7,10 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
@@ -31,7 +31,7 @@ class NoteEditorViewModel(
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
-    val note: Note? = null,
+    val note: NoteDTO? = null,
     val draftNote: DraftNote? = null
 ) : ViewModel(){
 
@@ -42,7 +42,7 @@ class NoteEditorViewModel(
         UserViewData(account.remoteId).apply{
 
             val i = account.getI(miCore.getEncryption())
-            i?.let{
+            i.let{
                 setApi(i, miCore.getMisskeyAPI(account))
             }
         }
@@ -300,7 +300,7 @@ class NoteEditorViewModel(
     }
 
 
-    fun addMentionUsers(users: List<User>, pos: Int): Int{
+    fun addMentionUsers(users: List<UserDTO>, pos: Int): Int{
         val mentionBuilder = StringBuilder()
         users.forEachIndexed { index, it ->
             val userName = it.getDisplayUserName()

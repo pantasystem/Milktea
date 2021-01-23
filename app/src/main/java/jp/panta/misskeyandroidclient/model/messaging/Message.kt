@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import java.io.Serializable
 import java.util.*
 
@@ -16,9 +16,9 @@ data class Message(
     @SerializedName("createdAt") val createdAt: Date,
     @SerializedName("text") val text: String?,
     @SerializedName("userId") val userId: String?,
-    @SerializedName("user") val user: User?,
+    @SerializedName("user") val user: UserDTO?,
     @SerializedName("recipientId") val recipientId: String?,
-    @SerializedName("recipient") val recipient: User?,
+    @SerializedName("recipient") val recipient: UserDTO?,
     @SerializedName("groupId") val groupId: String?,
     @SerializedName("group") val group: Group?,
     @SerializedName("fileId") val fileId: String?,
@@ -30,7 +30,7 @@ data class Message(
         return group != null
     }
 
-    fun opponentUser(account: Account) : User?{
+    fun opponentUser(account: Account) : UserDTO?{
         return if(recipient?.id == account.remoteId){
             user
         }else{

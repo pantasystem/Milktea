@@ -5,7 +5,7 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +37,7 @@ class AccountViewModel(
         addSource(miCore.getAccounts()){ arList ->
             value = arList.map{ ac ->
                 val avd = AccountViewData(ac)
-                ac.getI(miCore.getEncryption())?.let{ i ->
+                ac.getI(miCore.getEncryption()).let{ i ->
                     miCore.getMisskeyAPI(ac).i(
                         I(i)
                     ).enqueue(avd.accept)
@@ -50,7 +50,7 @@ class AccountViewModel(
     val currentAccount = miCore.getCurrentAccount()
 
     private var mBeforeAccount: Account? = null
-    val user = MediatorLiveData<User>()
+    val user = MediatorLiveData<UserDTO>()
 
     val switchAccount = EventBus<Int>()
 
@@ -66,14 +66,14 @@ class AccountViewModel(
         user.addSource(miCore.getCurrentAccount()){
             val nullableI = it?.getI(miCore.getEncryption())
             nullableI?.let { i ->
-                miCore.getMisskeyAPI(it).i(I(i)).enqueue(object : Callback<User>{
-                    override fun onResponse(call: Call<User>, response: Response<User>) {
+                miCore.getMisskeyAPI(it).i(I(i)).enqueue(object : Callback<UserDTO>{
+                    override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                         response.body()?.let{ u ->
                             user.postValue(u)
                         }
                     }
 
-                    override fun onFailure(call: Call<User>, t: Throwable) {
+                    override fun onFailure(call: Call<UserDTO>, t: Throwable) {
                         user.postValue(null)
                         Log.d(TAG, "user load error", t)
                     }
@@ -117,7 +117,7 @@ class AccountViewModel(
     }
 
     private val mainCaptureListener = object : MainCapture.AbsListener(){
-        override fun meUpdated(user: User) {
+        override fun meUpdated(user: UserDTO) {
             if(user.id == miCore.getCurrentAccount().value?.remoteId){
                 this@AccountViewModel.user.postValue(user)
             }

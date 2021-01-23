@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.db.InMemoryNoteEventStore
+import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteEventStore
 import java.util.concurrent.ConcurrentHashMap
 
 class NoteEventStoreFactory {

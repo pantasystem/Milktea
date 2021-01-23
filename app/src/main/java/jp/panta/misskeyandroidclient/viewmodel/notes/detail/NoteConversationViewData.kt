@@ -2,12 +2,12 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.detail
 
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLength
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
 //viewはRecyclerView
-class NoteConversationViewData(note: Note, var nextChildren: List<PlaneNoteViewData>?, account: Account, determineTextLength: DetermineTextLength) : PlaneNoteViewData(note, account, determineTextLength){
+class NoteConversationViewData(note: NoteDTO, var nextChildren: List<PlaneNoteViewData>?, account: Account, determineTextLength: DetermineTextLength) : PlaneNoteViewData(note, account, determineTextLength){
 
     val conversation = MutableLiveData<List<PlaneNoteViewData>>()
     val hasConversation = MutableLiveData<Boolean>()

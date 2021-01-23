@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 
 class PageableTemplate(val account: Account?) {
@@ -42,7 +42,7 @@ class PageableTemplate(val account: Account?) {
     fun user(userId: String, title: String): Page{
         return Page(account?.accountId?: - 1, title, 0, Pageable.UserTimeline(userId))
     }
-    fun user(user: User, isUserNameDefault: Boolean): Page{
+    fun user(user: UserDTO, isUserNameDefault: Boolean): Page{
         val title = if(isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
         return Page(account?.accountId?: - 1, title, 0, Pageable.UserTimeline(userId = user.id))
     }

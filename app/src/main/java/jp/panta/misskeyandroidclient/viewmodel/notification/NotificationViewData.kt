@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notification
 
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLength
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
@@ -27,7 +27,7 @@ class NotificationViewData(val notification: Notification, account: Account, det
         it.default == notification.type
     }
 
-    val user: User = notification.user
+    val user: UserDTO = notification.user
     val avatarIconUrl = notification.user.avatarUrl
     val name = notification.user.name
     val userName = notification.user.userName

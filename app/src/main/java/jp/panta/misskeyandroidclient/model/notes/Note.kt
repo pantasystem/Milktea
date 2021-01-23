@@ -32,6 +32,7 @@ data class Note(
     val repliesCount: Int,
     val files: List<FileProperty>?,
     val poll: Poll?,
+    val myReaction: String?,
 
 
     val app: App

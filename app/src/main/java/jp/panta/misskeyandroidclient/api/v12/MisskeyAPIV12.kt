@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.api.v12
 
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.users.RequestUser
@@ -15,7 +15,7 @@ open class MisskeyAPIV12(misskey: MisskeyAPI, private val misskeyAPIV12Diff: Mis
 
 
 
-    override fun antennasNotes(noteRequest: NoteRequest): Call<List<Note>?> = misskeyAPIV12Diff.antennasNotes(noteRequest)
+    override fun antennasNotes(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskeyAPIV12Diff.antennasNotes(noteRequest)
 
     override fun createAntenna(antennaToAdd: AntennaToAdd): Call<Antenna> = misskeyAPIV12Diff.createAntenna(antennaToAdd)
 

@@ -21,7 +21,7 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -48,17 +48,17 @@ interface MisskeyAPI {
 
 
     @POST("api/i")
-    fun i(@Body i: I): Call<User>
+    fun i(@Body i: I): Call<UserDTO>
 
     //users
     @POST("api/users")
-    fun getUsers(@Body requestUser: RequestUser): Call<List<User>>
+    fun getUsers(@Body requestUser: RequestUser): Call<List<UserDTO>>
 
     @POST("api/users/show")
-    fun showUser(@Body requestUser: RequestUser): Call<User>
+    fun showUser(@Body requestUser: RequestUser): Call<UserDTO>
 
     @POST("api/users/search")
-    fun searchUser(@Body requestUser: RequestUser): Call<List<User>>
+    fun searchUser(@Body requestUser: RequestUser): Call<List<UserDTO>>
 
     @POST("api/users/lists/list")
     fun userList(@Body i: I): Call<List<UserList>>
@@ -82,10 +82,10 @@ interface MisskeyAPI {
     fun pullUserFromList(@Body listUserOperation: ListUserOperation): Call<Unit>
 
     @POST("api/following/delete")
-    fun unFollowUser(@Body requestUser: RequestUser): Call<User>
+    fun unFollowUser(@Body requestUser: RequestUser): Call<UserDTO>
 
     @POST("api/following/create")
-    fun followUser(@Body requestUser: RequestUser): Call<User>
+    fun followUser(@Body requestUser: RequestUser): Call<UserDTO>
 
     //account
     @POST("api/i/favorites")
@@ -115,51 +115,51 @@ interface MisskeyAPI {
     fun unrenote(@Body deleteNote: DeleteNote): Call<Unit>
 
     @POST("api/notes/search")
-    fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun searchNote(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/state")
     fun noteState(@Body noteRequest: NoteRequest): Call<State>
 
     @POST("api/notes/show")
-    fun showNote(@Body requestNote: NoteRequest): Call<Note>
+    fun showNote(@Body requestNote: NoteRequest): Call<NoteDTO>
 
     @POST("api/notes/children")
-    fun children(@Body noteRequest: NoteRequest): Call<List<Note>>
+    fun children(@Body noteRequest: NoteRequest): Call<List<NoteDTO>>
 
     @POST("api/notes/conversation")
-    fun conversation(@Body noteRequest: NoteRequest): Call<List<Note>>
+    fun conversation(@Body noteRequest: NoteRequest): Call<List<NoteDTO>>
 
     @POST("api/notes/featured")
-    fun featured(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun featured(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     //timeline
     @POST("api/notes/timeline")
-    fun homeTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun homeTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
 
     @POST("api/notes/hybrid-timeline")
-    fun hybridTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun hybridTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/local-timeline")
-    fun localTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun localTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/global-timeline")
-    fun globalTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun globalTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/polls/vote")
     fun vote(@Body vote: Vote) : Call<Unit>
 
     @POST("api/notes/search-by-tag")
-    fun searchByTag(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun searchByTag(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/user-list-timeline")
-    fun userListTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun userListTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
     //user
     @POST("api/users/notes")
-    fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun userNotes(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/mentions")
-    fun mentions(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun mentions(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
 
 

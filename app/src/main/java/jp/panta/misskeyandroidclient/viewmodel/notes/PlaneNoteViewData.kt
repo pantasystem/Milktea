@@ -10,14 +10,14 @@ import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 
 open class PlaneNoteViewData (
-    val note: Note,
+    val note: NoteDTO,
     val account: Account,
     var determineTextLength: DetermineTextLength
 ) : NoteViewData{
@@ -29,7 +29,7 @@ open class PlaneNoteViewData (
         return id
     }
 
-    val toShowNote: Note
+    val toShowNote: NoteDTO
         get() {
             return if(note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()){
                 note.reNote?: note
@@ -153,7 +153,7 @@ open class PlaneNoteViewData (
     val poll = if(toShowNote.poll == null) null else PollViewData(toShowNote.poll!!, toShowNote.id)
 
     //reNote先
-    val subNote: Note? = toShowNote.reNote
+    val subNote: NoteDTO? = toShowNote.reNote
 
     val subNoteUserName = subNote?.user?.userName
     val subNoteName = subNote?.user?.name
@@ -234,7 +234,7 @@ open class PlaneNoteViewData (
         }
     }
 
-    fun update(note: Note){
+    fun update(note: NoteDTO){
         emojiMap.clear()
         emojiMap.putAll(note.emojis?.map{
             it.name to it

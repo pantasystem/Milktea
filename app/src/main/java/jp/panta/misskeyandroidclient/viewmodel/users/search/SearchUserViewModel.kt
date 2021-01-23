@@ -7,7 +7,7 @@ import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.SearchByUserAndHost
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
@@ -89,8 +89,8 @@ class SearchUserViewModel(
 
 
         isLoading.postValue(true)
-        getSearchByUserAndHost()?.search(request)?.enqueue(object : Callback<List<User>> {
-            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
+        getSearchByUserAndHost()?.search(request)?.enqueue(object : Callback<List<UserDTO>> {
+            override fun onResponse(call: Call<List<UserDTO>>, response: Response<List<UserDTO>>) {
                 users.postValue(
                     response.body()?.map{
                         UserViewData(it)
@@ -101,7 +101,7 @@ class SearchUserViewModel(
 
             }
 
-            override fun onFailure(call: Call<List<User>>, t: Throwable) {
+            override fun onFailure(call: Call<List<UserDTO>>, t: Throwable) {
                 Log.e("SearchUserViewModel", "search and select user error", t)
                 isLoading.postValue(false)
             }

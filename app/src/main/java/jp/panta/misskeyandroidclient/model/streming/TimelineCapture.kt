@@ -6,7 +6,7 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.Expose
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData
@@ -58,7 +58,7 @@ class TimelineCapture(
     )
 
     private data class Response(override val type: String, val body: Body): StreamingAction
-    private data class Body(val id: String, val type: String, val body: Note?)
+    private data class Body(val id: String, val type: String, val body: NoteDTO?)
     /*
     main
     {

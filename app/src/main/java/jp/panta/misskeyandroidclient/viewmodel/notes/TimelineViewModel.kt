@@ -579,7 +579,7 @@ class TimelineViewModel : ViewModel{
         }
     }
 
-    private fun noteEventObserver(noteEvent: NoteEvent){
+    private fun noteEventObserver(noteEvent: NoteCaptureEvent){
         Log.d("TM-VM", "#noteEventObserver $noteEvent")
         val timelineNotes = timelineLiveData.value?.notes
             ?: return
@@ -596,13 +596,13 @@ class TimelineViewModel : ViewModel{
                 val note: PlaneNoteViewData = it
                 if(note.toShowNote.id == noteEvent.noteId){
                     when(noteEvent.event){
-                        is Event.Reacted ->{
+                        is Event.NewNote.Reacted ->{
                             it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account?.remoteId)
                         }
-                        is Event.UnReacted ->{
+                        is Event.NewNote.UnReacted ->{
                             it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account?.remoteId)
                         }
-                        is Event.Voted ->{
+                        is Event.NewNote.Voted ->{
                             it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account?.remoteId)
                         }
                         /*is Event.Added ->{

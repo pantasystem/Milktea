@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.Activities
@@ -12,7 +11,7 @@ import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
@@ -87,7 +86,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         })
     }
 
-    override fun show(user: User?) {
+    override fun show(user: UserDTO?) {
         user?: return
 
         val intent = Intent(requireContext(), UserDetailActivity::class.java)

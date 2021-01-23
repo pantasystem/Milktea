@@ -10,8 +10,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.Event
-import jp.panta.misskeyandroidclient.api.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteEvent
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureEvent
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
@@ -188,7 +188,7 @@ class NoteDetailViewModel(
 
     }
 
-    private fun loadChildren(id: String): List<Note>?{
+    private fun loadChildren(id: String): List<NoteDTO>?{
         return misskeyAPI.children(NoteRequest(i = account.getI(encryption), limit = 100, noteId = id)).execute().body()
     }
 
@@ -200,7 +200,7 @@ class NoteDetailViewModel(
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
-    private fun noteEventObserver(noteEvent: NoteEvent){
+    private fun noteEventObserver(noteEvent: NoteCaptureEvent){
         Log.d("TM-VM", "#noteEventObserver $noteEvent")
         val timelineNotes = notes.value
             ?: return
@@ -216,13 +216,13 @@ class NoteDetailViewModel(
                 val note: PlaneNoteViewData = it
                 if(note.toShowNote.id == noteEvent.noteId){
                     when(noteEvent.event){
-                        is Event.Reacted ->{
+                        is Event.NewNote.Reacted ->{
                             it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
                         }
-                        is Event.UnReacted ->{
+                        is Event.NewNote.UnReacted ->{
                             it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
                         }
-                        is Event.Voted ->{
+                        is Event.NewNote.Voted ->{
                             it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
                         }
                         /*is Event.Added ->{

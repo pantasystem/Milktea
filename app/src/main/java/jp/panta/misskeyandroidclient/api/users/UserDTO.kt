@@ -2,10 +2,11 @@ package jp.panta.misskeyandroidclient.api.users
 
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
 
-data class User(
+data class UserDTO(
     @SerializedName("id") val id:String,
     @SerializedName("username") val userName: String,
     @SerializedName("name") val name: String?,
@@ -26,7 +27,7 @@ data class User(
     //@SerializedName("profile") val profile: Any?,
     //@SerializedName("settings") val settings: Any?,
     @SerializedName("pinnedNoteIds") val pinnedNoteIds: List<String>?,
-    @SerializedName("pinnedNotes") val pinnedNotes: List<Note>?,
+    @SerializedName("pinnedNotes") val pinnedNotes: List<NoteDTO>?,
     //("twitter") val twitter: Any?,
     val twoFactorEnabled: Boolean?,
     @SerializedName("isAdmin") val isAdmin: Boolean?,
@@ -61,4 +62,16 @@ data class User(
     fun getShortDisplayName(): String{
         return "@" + this.userName
     }
+}
+
+fun UserDTO.toUser(): User{
+    return User(
+        id = this.id,
+        avatarUrl = this.avatarUrl,
+        emojis = this.emojis?: emptyList(),
+        isBot = this.isBot,
+        isCat = this.isCat,
+        name = this.name,
+        userName = this.userName
+    )
 }

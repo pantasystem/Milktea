@@ -6,7 +6,7 @@ data class FollowFollowerUser(
     val id: String,
     val createdAt: Date,
     val followeeId: String,
-    val followee: User?,
+    val followee: UserDTO?,
     val followerId: String,
-    val follower: User?
+    val follower: UserDTO?
 )

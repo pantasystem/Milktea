@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.model.streming.note.v2
 import android.util.Log
 import com.google.gson.JsonSyntaxException
 import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -212,13 +212,13 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
 
             val body = when (
                 receivedObject.body.type) {
-                "reacted" -> Event.Reacted(reaction = reaction!!, userId = userId, emoji = receivedObject.body.body.emoji)
-                "unreacted" -> Event.UnReacted(reaction = reaction!!, userId = userId)
-                "pollVoted" -> Event.Voted(receivedObject.body.body?.choice!!, userId = userId)
+                "reacted" -> Event.NewNote.Reacted(reaction = reaction!!, userId = userId, emoji = receivedObject.body.body.emoji)
+                "unreacted" -> Event.NewNote.UnReacted(reaction = reaction!!, userId = userId)
+                "pollVoted" -> Event.NewNote.Voted(receivedObject.body.body?.choice!!, userId = userId)
                 "deleted" -> Event.Deleted
                 else -> return
             }
-            val noteEvent = NoteEvent(
+            val noteEvent = NoteCaptureEvent(
                 noteId = id,
                 event = body
             )
@@ -235,7 +235,7 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
         }
     }
 
-    private fun onUpdate(noteEvent: NoteEvent){
+    private fun onUpdate(noteEvent: NoteCaptureEvent){
         //val clientIds = noteIdsClients[noteEvent.noteId]
         //Log.d("onUpdate", "client数: ${clientIds?.size}, event:$noteEvent")
 
@@ -268,7 +268,7 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
 
 }
 
-fun NoteCapture.Client.captureAll(notes: List<Note>): Int{
+fun NoteCapture.Client.captureAll(notes: List<NoteDTO>): Int{
     return notes.count {
         this.capture(it.id)
     }

@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.notes.Note
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import java.lang.IllegalArgumentException
 
-class HasReplyToNoteViewData(note: Note, account: Account, determineTextLength: DetermineTextLength)  : PlaneNoteViewData(note, account, determineTextLength){
+class HasReplyToNoteViewData(note: NoteDTO, account: Account, determineTextLength: DetermineTextLength)  : PlaneNoteViewData(note, account, determineTextLength){
     val reply = note.reply
 
     /*val replyToAvatarUrl = reply?.user?.avatarUrl

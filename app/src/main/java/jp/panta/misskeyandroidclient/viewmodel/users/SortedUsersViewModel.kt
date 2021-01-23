@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -132,8 +132,8 @@ class SortedUsersViewModel(
         }else{
             isRefreshing.value = true
         }
-        miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).enqueue(object : Callback<List<User>>{
-            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
+        miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).enqueue(object : Callback<List<UserDTO>>{
+            override fun onResponse(call: Call<List<UserDTO>>, response: Response<List<UserDTO>>) {
                 if(response.code() in 200 until 300){
                     users.postValue(response.body()?.map{
                         UserViewData(it)
@@ -142,7 +142,7 @@ class SortedUsersViewModel(
                 isRefreshing.postValue(false)
             }
 
-            override fun onFailure(call: Call<List<User>>, t: Throwable) {
+            override fun onFailure(call: Call<List<UserDTO>>, t: Throwable) {
                 isRefreshing.postValue(false)
             }
         })
@@ -150,21 +150,21 @@ class SortedUsersViewModel(
     }
 
     inner class Listener : MainCapture.AbsListener(){
-        override fun follow(user: User) {
+        override fun follow(user: UserDTO) {
             super.follow(user)
             updateUser(user)
         }
 
-        override fun unFollowed(user: User) {
+        override fun unFollowed(user: UserDTO) {
             super.unFollowed(user)
             updateUser(user)
         }
-        override fun followed(user: User) {
+        override fun followed(user: UserDTO) {
             super.followed(user)
             updateUser(user)
         }
 
-        private fun updateUser(user: User){
+        private fun updateUser(user: UserDTO){
             val list = ArrayList(users.value?: emptyList())
             list.forEach {
                 if(it.userId == user.id){
