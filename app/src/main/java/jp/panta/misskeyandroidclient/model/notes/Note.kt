@@ -36,4 +36,11 @@ data class Note(
 
 
     val app: App
-)
+) {
+    val instanceCreatedAt = Date()
+    var instanceUpdatedAt = Date()
+
+    fun updated(){
+        this.instanceUpdatedAt = Date()
+    }
+}

@@ -1,10 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import io.reactivex.disposables.Disposable
-import jp.panta.misskeyandroidclient.api.notes.DeleteNote
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.notes.NoteRequest
-import jp.panta.misskeyandroidclient.api.notes.toNote
+import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.UnauthorizedException
@@ -13,12 +9,7 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.io.IOException
 import java.net.SocketTimeoutException
 import kotlin.jvm.Throws
@@ -30,11 +21,8 @@ class NoteModelImp(
     private val encryption: Encryption,
     private val misskeyAPI: MisskeyAPI,
     private val noteCapture: NoteCapture,
-    private val coroutineScope: CoroutineScope
 ) : NoteModel{
 
-    private var mNoteCaptureObserverDisposable: Disposable? = null
-    private val mutex = Mutex()
 
 
 
@@ -61,29 +49,35 @@ class NoteModelImp(
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(IOException::class, UnauthorizedException::class, SocketTimeoutException::class)
     override suspend fun reaction(reaction: String, reactionTo: Note) {
-        TODO("Not yet implemented")
+        misskeyAPI.createReaction(CreateReaction(
+            i = account.getI(encryption),
+            reaction = reaction,
+            noteId = reactionTo.id
+        )).execute()
+
     }
 
-    @Throws(IOException::class, UnauthorizedException::class, SocketTimeoutException::class)
-    override suspend fun renote(note: Note) {
-        TODO("Not yet implemented")
-    }
+
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun unreaction(reaction: String, unreactionTo: Note) {
-        TODO("Not yet implemented")
+        misskeyAPI.deleteReaction(
+            DeleteNote(
+                i = account.getI(encryption),
+                noteId = unreactionTo.id
+            )
+        ).execute()
     }
 
     suspend fun add(note: NoteDTO): Note?{
-        if(noteRepository.add(note.toNote())){
+        if(noteRepository.add(note.toNote()) == NoteRepository.AddResult.CREATED){
             noteCapture.capture(note.id)
         }
         userRepository.add(note.user.toUser())
 
-        if(note.reNote != null){
+        if(note.reNote != null) {
             this.add(note.reNote)
         }
-
         if(note.reply != null){
             this.add(note.reply)
         }
@@ -93,26 +87,21 @@ class NoteModelImp(
 
     }
 
-    private suspend fun add(note: Note){
-        noteRepository.add(note)
-    }
 
-    fun dispose(){
 
-    }
 
-    private suspend fun startCapture(){
+
+    suspend fun startCapture(){
         noteCapture.observer().collect {
-            mutex.withLock {
-                val note = noteRepository.get(it.noteId)
-                    ?: return@withLock
-                when(it.event){
-                    is Event.Deleted ->{
-                        delete(note)
+            val note = noteRepository.get(it.noteId)
+            if(note != null) {
+                when (it.event) {
+                    is Event.Deleted -> {
+                        noteRepository.remove(it.noteId)
                     }
-                    is Event.NewNote ->{
+                    is Event.NewNote -> {
                         val newNote = it.event.newNote(note, account)
-                        add(newNote)
+                        noteRepository.add(newNote)
                     }
                 }
             }

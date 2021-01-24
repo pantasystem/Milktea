@@ -14,6 +14,15 @@ interface NoteRepository {
         fun create(account: Account) : NoteRepository
     }
 
+    /**
+     * addした時の結果の戻り値
+     */
+    enum class AddResult {
+        UPDATED,
+        CREATED,
+        CANCEL
+    }
+
     sealed class Event{
         data class Deleted(val noteId: String) : Event()
         data class Added(val note: Note): Event()
@@ -24,6 +33,6 @@ interface NoteRepository {
 
     suspend fun remove(noteId: String) : Boolean
 
-    suspend fun add(note: Note) : Boolean
+    suspend fun add(note: Note) : AddResult
 
 }
