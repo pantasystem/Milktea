@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.api.users
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.model.users.Profile
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
 
@@ -64,7 +65,30 @@ data class UserDTO(
     }
 }
 
-fun UserDTO.toUser(): User{
+fun UserDTO.toUser(isDetail: Boolean = false): User{
+    var state: User.State? = null
+    var profile: Profile? = null
+    if(isDetail){
+        state = User.State(
+            isFollowing = this.isFollowing?: false,
+            isFollower = this.isFollowed?: false,
+            isBlocking = this.isBlocking?: false,
+            isMuting = this.isMuted?: false
+        )
+
+        profile = Profile(
+            bannerUrl = this.bannerUrl,
+            description = this.description,
+            followersCount = this.followersCount,
+            followingCount = this.followingCount,
+            host = this.host,
+            url = this.url,
+            hostLower = this.hostLower,
+            links = this.links,
+            notesCount = this.notesCount,
+            pinnedNoteIds = this.pinnedNoteIds
+        )
+    }
     return User(
         id = this.id,
         avatarUrl = this.avatarUrl,
@@ -72,6 +96,8 @@ fun UserDTO.toUser(): User{
         isBot = this.isBot,
         isCat = this.isCat,
         name = this.name,
-        userName = this.userName
+        userName = this.userName,
+        state = state,
+        profile = profile
     )
 }
