@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
+import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,17 +37,17 @@ class InMemoryNoteRepository : NoteRepository{
      * @return ノートが新たに追加されるとtrue、上書きされた場合はfalseが返されます。
      */
     @ExperimentalCoroutinesApi
-    override suspend fun add(note: Note): NoteRepository.AddResult {
+    override suspend fun add(note: Note): AddResult {
         mutex.withLock{
             val n = this.notes[note.id]
             if(n != null && n.instanceUpdatedAt != note.instanceUpdatedAt){
-                return NoteRepository.AddResult.CANCEL
+                return AddResult.CANCEL
             }
             this.notes[note.id] = note
             note.updated()
             eventBroadcastChannel.send(NoteRepository.Event.Added(note))
 
-            return if(n == null) NoteRepository.AddResult.CREATED else NoteRepository.AddResult.UPDATED
+            return if(n == null) AddResult.CREATED else AddResult.UPDATED
         }
     }
 
@@ -64,6 +65,17 @@ class InMemoryNoteRepository : NoteRepository{
             }
             eventBroadcastChannel.send(NoteRepository.Event.Deleted(noteId = noteId))
             return true
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    override suspend fun removeByUserId(userId: String): Int {
+        return mutex.withLock {
+            notes.values.filter {
+                it.userId == userId
+            }.count {
+                this.remove(it.id)
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.coroutines.flow.Flow
 
@@ -14,14 +15,7 @@ interface NoteRepository {
         fun create(account: Account) : NoteRepository
     }
 
-    /**
-     * addした時の結果の戻り値
-     */
-    enum class AddResult {
-        UPDATED,
-        CREATED,
-        CANCEL
-    }
+
 
     sealed class Event{
         data class Deleted(val noteId: String) : Event()
@@ -34,5 +28,12 @@ interface NoteRepository {
     suspend fun remove(noteId: String) : Boolean
 
     suspend fun add(note: Note) : AddResult
+
+    /**
+     * 投稿者のuserIdに基づいて削除をします
+     * @param userId 対称のUser#id
+     * @return 削除されたNote数
+     */
+    suspend fun removeByUserId(userId: String) : Int
 
 }

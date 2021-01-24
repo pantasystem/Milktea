@@ -1,7 +1,9 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
+import android.util.Log
 import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -11,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.users.UserRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.io.IOException
+import java.lang.Exception
 import java.net.SocketTimeoutException
 import kotlin.jvm.Throws
 
@@ -70,7 +73,7 @@ class NoteModelImp(
     }
 
     suspend fun add(note: NoteDTO): Note?{
-        if(noteRepository.add(note.toNote()) == NoteRepository.AddResult.CREATED){
+        if(noteRepository.add(note.toNote()) == AddResult.CREATED){
             noteCapture.capture(note.id)
         }
         userRepository.add(note.user.toUser())
@@ -89,9 +92,27 @@ class NoteModelImp(
 
 
 
+    fun startListen(coroutineScope: CoroutineScope){
+        coroutineScope.launch(Dispatchers.IO) {
+            try{
+                startCapture()
+            } catch (e: Exception){
+                Log.e("NoteModelImpl", "capture中に致命的なエラー発生", e)
+            }
+
+        }
+
+        coroutineScope.launch(Dispatchers.IO) {
+            try{
+                listenUserRepository()
+            } catch (e: Exception){
+                Log.e("NoteModelImpl", "listen user repository中に致命的なエラー発生", e)
+            }
+        }
+    }
 
 
-    suspend fun startCapture(){
+    private suspend fun startCapture(){
         noteCapture.observer().collect {
             val note = noteRepository.get(it.noteId)
             if(note != null) {
@@ -109,5 +130,13 @@ class NoteModelImp(
 
         }
 
+    }
+
+    private suspend fun listenUserRepository(){
+        userRepository.observable().collect {
+            if(it is UserRepository.Event.Removed){
+                noteRepository.removeByUserId(it.userId)
+            }
+        }
     }
 }

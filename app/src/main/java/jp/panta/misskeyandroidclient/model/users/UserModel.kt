@@ -8,5 +8,8 @@ interface UserModel {
 
     suspend fun unfollow(userId: String)
 
+    suspend fun block(user: User)
+
+    suspend fun unblock(user: User)
 
 }
