@@ -159,23 +159,24 @@ class UserDetailViewModel(
     }
 
     fun mute(){
-       sendUserIdAndStateChange(misskeyAPI::muteUser, isMuted, true, 204)
+        misskeyAPI::muteUser.postUserIdAndStateChange(isMuted, true, 204)
     }
 
     fun unmute(){
-        sendUserIdAndStateChange(misskeyAPI::unmuteUser, isMuted, false, 204)
+        misskeyAPI::muteUser.postUserIdAndStateChange(isMuted, false, 204)
     }
 
     fun block(){
-        sendUserIdAndStateChange(misskeyAPI::blockUser, isBlocking, true, 200)
+        misskeyAPI::blockUser.postUserIdAndStateChange(isBlocking, true, 200)
     }
 
     fun unblock(){
-        sendUserIdAndStateChange(misskeyAPI::unblockUser, isBlocking, false, 200)
+        misskeyAPI::unblockUser.postUserIdAndStateChange(isBlocking, false, 200)
     }
 
-    private fun sendUserIdAndStateChange(apiFunction: (RequestUser)->Call<Unit>, liveData: MediatorLiveData<Boolean>, valueOnSuccess: Boolean, codeOnSuccess: Int){
-        apiFunction(createUserIdOnlyRequest()).enqueue(object :Callback<Unit>{
+
+    private fun ((RequestUser)->Call<Unit>).postUserIdAndStateChange(liveData: MediatorLiveData<Boolean>, valueOnSuccess: Boolean, codeOnSuccess: Int){
+        this(createUserIdOnlyRequest()).enqueue(object :Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() == codeOnSuccess){
                     liveData.postValue(valueOnSuccess)
@@ -191,6 +192,5 @@ class UserDetailViewModel(
     private fun createUserIdOnlyRequest(): RequestUser {
         return RequestUser(i = account.getI(encryption), userId = userId)
     }
-
 
 }
