@@ -14,6 +14,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.io.IOException
 import java.lang.Exception
+import java.lang.IllegalStateException
 import java.net.SocketTimeoutException
 import kotlin.jvm.Throws
 
@@ -32,18 +33,31 @@ class NoteModelImp(
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(IOException::class, UnauthorizedException::class, SocketTimeoutException::class)
     override suspend fun delete(note: Note) {
-        misskeyAPI.delete(DeleteNote(i = account.getI(encryption), note.id)).execute()
+        misskeyAPI.delete(DeleteNote(i = account.getI(encryption), note.id.noteId)).execute()
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     @Throws(IOException::class, UnauthorizedException::class, SocketTimeoutException::class)
-    override suspend fun get(noteId: String): Note? {
+    override suspend fun get(noteId: Note.Id): Note? {
         var n = noteRepository.get(noteId)
         if(n == null){
-            val res = misskeyAPI.showNote(NoteRequest(i = account.getI(encryption), noteId = noteId)).execute()
+            val res = misskeyAPI.showNote(NoteRequest(i = account.getI(encryption), noteId = noteId.noteId)).execute()
             val noteDTO = res.body()
             if(noteDTO != null){
-                n = this.add(noteDTO)
+                //n = this.add(noteDTO)
+                val entities = noteDTO.toEntities()
+                val notesAddedCount = entities.second.count {
+                    noteRepository.add(it) != AddResult.CANCEL || userRepository.get(it.userId) != null
+                }
+                val usersAddedCount = entities.third.count {
+                    userRepository.add(it) != AddResult.CANCEL || userRepository.get(it.id) != null
+                }
+
+                // repositoryに正常に加えられなかった場合異常
+                if( !(notesAddedCount == entities.second.size && usersAddedCount == entities.third.size)){
+                    throw IllegalStateException("Repositoryに正常に加えられませんでした")
+                }
+                n = entities.first
             }
         }
         return n
@@ -55,7 +69,7 @@ class NoteModelImp(
         misskeyAPI.createReaction(CreateReaction(
             i = account.getI(encryption),
             reaction = reaction,
-            noteId = reactionTo.id
+            noteId = reactionTo.id.noteId
         )).execute()
 
     }
@@ -67,12 +81,12 @@ class NoteModelImp(
         misskeyAPI.deleteReaction(
             DeleteNote(
                 i = account.getI(encryption),
-                noteId = unreactionTo.id
+                noteId = unreactionTo.id.noteId
             )
         ).execute()
     }
 
-    suspend fun add(note: NoteDTO): Note?{
+    /*suspend fun add(note: NoteDTO): Note?{
         if(noteRepository.add(note.toNote()) == AddResult.CREATED){
             noteCapture.capture(note.id)
         }
@@ -88,7 +102,7 @@ class NoteModelImp(
         return noteRepository.get(note.id)
 
 
-    }
+    }*/
 
 
 
@@ -135,7 +149,7 @@ class NoteModelImp(
     private suspend fun listenUserRepository(){
         userRepository.observable().collect {
             if(it is UserRepository.Event.Removed){
-                noteRepository.removeByUserId(it.userId)
+                noteRepository.removeByUserId(it.userId.id)
             }
         }
     }

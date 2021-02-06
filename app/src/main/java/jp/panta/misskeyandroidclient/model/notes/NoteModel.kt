@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface NoteModel {
 
-    suspend fun get(noteId: String): Note?
+    suspend fun get(noteId: Note.Id): Note?
 
 
 

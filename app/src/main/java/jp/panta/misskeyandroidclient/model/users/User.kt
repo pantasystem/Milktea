@@ -8,7 +8,7 @@ import java.util.*
  * Userはfollowやunfollowに関連しないため
  */
 data class User(
-    val id: String,
+    val id: Id,
     val userName: String,
     val name: String?,
     val avatarUrl: String?,
@@ -19,6 +19,11 @@ data class User(
     val profile: Profile? = null,
     var instanceUpdatedAt: Date = Date()
 ){
+
+    data class Id(
+        val accountId: Long,
+        val id: String,
+    )
     val isDetail: Boolean
         get() = this.profile != null
 

@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryUserRepository : UserRepository{
 
-    private val userMap = ConcurrentHashMap<String, User>()
-    private val recordLocks = ConcurrentHashMap<String, Mutex>()
+    private val userMap = ConcurrentHashMap<User.Id, User>()
+    private val recordLocks = ConcurrentHashMap<User.Id, Mutex>()
     private val tableLock = Mutex()
 
     @ExperimentalCoroutinesApi
@@ -55,7 +55,14 @@ class InMemoryUserRepository : UserRepository{
         }
     }
 
-    override suspend fun get(userId: String): User? {
+    @ExperimentalCoroutinesApi
+    override suspend fun addAll(users: List<User>): List<AddResult> {
+        return users.map {
+            add(it)
+        }
+    }
+
+    override suspend fun get(userId: User.Id): User? {
         return recordLocks[userId]?.withLock {
             userMap[userId]
         }

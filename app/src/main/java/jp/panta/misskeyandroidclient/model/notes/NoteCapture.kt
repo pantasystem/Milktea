@@ -12,7 +12,7 @@ interface NoteCapture {
 
     fun observer(): Flow<NoteCaptureEvent>
 
-    fun capture(noteId: String): Boolean
+    fun capture(noteId: Note.Id): Boolean
 
-    fun unCapture(noteId: String): Boolean
+    fun unCapture(noteId: Note.Id): Boolean
 }

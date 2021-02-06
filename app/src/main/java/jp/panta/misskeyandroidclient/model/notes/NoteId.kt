@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 data class NoteId (
-    val noteId: String,
-    val futureId: String?
+    val noteId: Note.Id,
+    val featureId: String?
 )

@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -18,22 +19,24 @@ interface NoteRepository {
 
 
     sealed class Event{
-        data class Deleted(val noteId: String) : Event()
-        data class Added(val note: Note): Event()
+        data class Deleted(val noteId: Note.Id) : Event()
+        data class Added(val note: Note.Id): Event()
     }
     fun observer(): Flow<Event>
 
-    suspend fun get(noteId: String) : Note?
+    suspend fun get(noteId: Note.Id) : Note?
 
-    suspend fun remove(noteId: String) : Boolean
+    suspend fun remove(noteId: Note.Id) : Boolean
 
     suspend fun add(note: Note) : AddResult
+
+    suspend fun addAll(notes: List<Note>) : List<AddResult>
 
     /**
      * 投稿者のuserIdに基づいて削除をします
      * @param userId 対称のUser#id
      * @return 削除されたNote数
      */
-    suspend fun removeByUserId(userId: String) : Int
+    suspend fun removeByUserId(userId: User.Id) : Int
 
 }

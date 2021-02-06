@@ -10,7 +10,7 @@ import kotlin.collections.LinkedHashMap
 
 
 class NoteCaptureEvent(
-    val noteId: String,
+    val noteId: Note.Id,
     val event: Event,
     val eventAt: Date = Date(),
     val authorId: String = ""

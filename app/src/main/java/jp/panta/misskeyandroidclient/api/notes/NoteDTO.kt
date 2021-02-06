@@ -6,8 +6,12 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
+import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserRepository
 import java.io.Serializable
 import java.util.*
 import kotlin.collections.LinkedHashMap
@@ -18,7 +22,7 @@ data class NoteDTO(
     val createdAt: Date,
     val text: String?,
     val cw: String?,
-    val userId: String?,
+    val userId: String,
 
     val replyId: String?,
 
@@ -51,13 +55,13 @@ data class NoteDTO(
     val app: App
 ): Serializable
 
-fun NoteDTO.toNote(): Note{
+fun NoteDTO.toNote(account: Account): Note{
     return Note(
-        id = this.id,
+        id = Note.Id(account.accountId, this.id),
         createdAt = this.createdAt,
         text = this.text,
         cw = this.cw,
-        userId = this.userId,
+        userId = User.Id(account.accountId, this.userId),
         replyId = this.replyId,
         renoteId = this.reNoteId,
         viaMobile = this.viaMobile,
@@ -74,7 +78,36 @@ fun NoteDTO.toNote(): Note{
         repliesCount = this.replyCount,
         uri = this.uri,
         url = this.url,
-        visibleUserIds = this.visibleUserIds,
+        visibleUserIds = this.visibleUserIds?.map{
+            User.Id(account.accountId, it)
+        }?: emptyList(),
         myReaction = this.myReaction
     )
+}
+
+fun NoteDTO.toNoteAndUser(account: Account): Pair<Note, User> {
+    val note = this.toNote(account)
+    val user = this.user.toUser(false)
+    return note to user
+}
+
+fun NoteDTO.toEntities(account: Account): Triple<Note, List<Note>, List<User>>{
+    val users = mutableListOf<User>()
+    val notes = mutableListOf<Note>()
+    val note = this.toNote(account)
+    notes.add(note)
+    users.add(this.user.toUser(false))
+    if(this.reply != null){
+        val nAndU = this.reply.toNoteAndUser(account)
+        notes.add(nAndU.first)
+        users.add(nAndU.second)
+    }
+
+    if(this.reNote != null){
+        val nAndU = this.reNote.toNoteAndUser(account)
+        notes.add(nAndU.first)
+        users.add(nAndU.second)
+    }
+
+    return Triple(note, notes, users)
 }
