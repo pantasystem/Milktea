@@ -1,4 +1,5 @@
-package jp.panta.misskeyandroidclient.model.streming.note.v2
+package jp.panta.misskeyandroidclient.model.notes.impl
+
 
 import android.util.Log
 import com.google.gson.JsonSyntaxException
@@ -11,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.streming.AbsObserver
 import jp.panta.misskeyandroidclient.model.streming.Body
 import jp.panta.misskeyandroidclient.model.streming.StreamingAction
 import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
+import kotlinx.coroutines.flow.Flow
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -21,65 +23,27 @@ import kotlin.collections.HashSet
  * リモートの更新イベントをイベントデータとして返す
  *
  */
-class NoteCapture(override val account: Account, private val noteEventStore: NoteEventStore) : AbsObserver(){
+class NoteCaptureImpl :  NoteCapture{
     data class CaptureRequest(override val type: String = "sn", val body: CaptureRequestBody): StreamingAction
     data class CaptureRequestBody(private val id: String)
 
     data class NoteUpdated(override val type: String, val body: Body<NoteUpdatedBody>): StreamingAction
     data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?, val emoji: Emoji?)
 
-    /**
-     * ノートをまとめてキャプチャーするためのクライアント
-     * NoteCapture⇔Client⇔利用クラスのようにして取り扱います。
-     */
-    class Client {
-        val clientId: String = UUID.randomUUID().toString()
 
-        var noteCapture: NoteCapture? = null
-
-        private val captureNotes = HashSet<String>()
-
-
-        /**
-         * ノートをキャプチャーします。
-         * またノートをキャプチャーするためにはClientをNoteCapture#attachClientする必要があります。
-         */
-        fun capture(noteId: String): Boolean{
-            synchronized(captureNotes){
-                captureNotes.add(noteId)
-            }
-            return noteCapture?.capture(this, noteId)?: false
-        }
-
-        fun unCapture(noteId: String): Boolean{
-            synchronized(captureNotes){
-                captureNotes.remove(noteId)
-            }
-            return noteCapture?.unCapture(this, noteId)?: false
-        }
-
-        fun captureAll(noteIds: List<String>): Int{
-            return noteIds.count{
-                capture(it)
-            }
-        }
-
-        fun unCaptureAll(
-            noteIds: List<String> = synchronized(captureNotes){
-                captureNotes.toList()
-            }
-        ): Int{
-            return noteIds.count{ noteId ->
-                unCapture(noteId)
-            }
-        }
-
-        fun getCaptureNotes(): Set<String>{
-            return HashSet(captureNotes)
-        }
-
-
+    override fun capture(noteId: Note.Id): Boolean {
+        TODO("Not yet implemented")
     }
+
+    override fun unCapture(noteId: Note.Id): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun observer(): Flow<NoteCaptureEvent> {
+        TODO("Not yet implemented")
+    }
+
+
 
     private val mGson = GsonFactory.create()
 
@@ -96,47 +60,6 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
     private val clients = ConcurrentHashMap<String, Client>()
 
 
-    /**
-     * Clientをここにセットすることによって取り扱えるようになります。
-     */
-    fun attachClient(client: Client) : Boolean{
-        synchronized(clients){
-            val added = clients[client.clientId]
-            if(added == null){
-                clients[client.clientId] = client
-                client.noteCapture = this
-                client.getCaptureNotes().forEach { note->
-                    capture(client, note)
-                }
-            }
-            return added == null
-        }
-
-    }
-
-    /**
-     * Clientを取り外します
-     * このClientの管轄であるノートのCaptureが解除されます。
-     * ここで他のClientにもCaptureされていた場合はCaptureが解除されることはありません。
-     */
-    fun detachClient(client: Client){
-        synchronized(clients){
-            val capturedClient = clients.remove(client.clientId)
-                ?: return
-
-            capturedClient.getCaptureNotes().forEach { note ->
-                unCapture(capturedClient, note)
-            }
-            capturedClient.noteCapture = null
-        }
-
-    }
-
-    fun isAttachedClient(client: Client): Boolean{
-        return synchronized(clients){
-            clients.contains(client.clientId)
-        }
-    }
 
 
     fun capture(client: Client, noteId: String): Boolean{
@@ -175,6 +98,20 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
             this.noteIdsClients[noteId] = notesClients
             return a
         }
+
+    }
+
+    /**
+     * キャプチャー状態にかかわらずキャプチャーメッセージをサーバーへ転送します。
+     */
+    fun sendUnCapture(noteId: String) {
+
+    }
+
+    /**
+     * キャプチャー状態にかかわらずキャプチャーメッセージをサーバーへ転送します。
+     */
+    fun sendCapture(noteId: Note.Id) {
 
     }
 
@@ -219,7 +156,7 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
                 else -> return
             }
             val noteEvent = NoteCaptureEvent(
-                noteId = Note.Id(account.accountId, id),
+                noteId = id,
                 event = body
             )
 
@@ -274,3 +211,95 @@ fun NoteCapture.Client.captureAll(notes: List<NoteDTO>): Int{
     }
 }
 
+/**
+ * ノートキャプチャーの送受信を行う
+ * またアカウント１に対し１で対応付けられる
+ */
+class NoteCaptureObserver(override val account: Account) : AbsObserver(){
+
+    override var streamingAdapter: StreamingAdapter? = null
+
+    data class CaptureRequest(override val type: String = "sn", val body: CaptureRequestBody): StreamingAction
+    data class CaptureRequestBody(private val id: String)
+
+    data class NoteUpdated(override val type: String, val body: Body<NoteUpdatedBody>): StreamingAction
+    data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?, val emoji: Emoji?)
+
+
+    private val mGson = GsonFactory.create()
+
+
+    private fun captureRemote(noteId: String){
+        streamingAdapter?.send(mGson.toJson(createCaptureRequest(noteId))).let{
+            if(it == null || it == false){
+                Log.w("NoteCapture", "ノートの登録に失敗した")
+            }
+
+        }
+    }
+
+    private fun unCaptureRemote(noteId: String){
+        streamingAdapter?.send(mGson.toJson(createUnCaptureRequest(noteId)))
+    }
+
+    private fun createCaptureRequest(noteId: String): CaptureRequest {
+        return CaptureRequest(body = CaptureRequestBody(noteId))
+    }
+
+    private fun createUnCaptureRequest(noteId: String): CaptureRequest {
+        return CaptureRequest(
+            type = "unsubNote",
+            body = CaptureRequestBody(noteId)
+        )
+    }
+
+    override fun onReceived(msg: String) {
+        try{
+            val receivedObject = mGson.fromJson(msg, NoteUpdated::class.java)
+            val id = receivedObject.body.id
+            val userId = receivedObject.body.body?.userId
+            val reaction = receivedObject.body.body?.reaction
+
+
+            val body = when (
+                receivedObject.body.type) {
+                "reacted" -> Event.NewNote.Reacted(reaction = reaction!!, userId = userId, emoji = receivedObject.body.body.emoji)
+                "unreacted" -> Event.NewNote.UnReacted(reaction = reaction!!, userId = userId)
+                "pollVoted" -> Event.NewNote.Voted(receivedObject.body.body?.choice!!, userId = userId)
+                "deleted" -> Event.Deleted
+                else -> return
+            }
+
+
+            onUpdate(id, body)
+
+        }catch(e: JsonSyntaxException){
+            //他のイベントが流れてくるので回避する
+        }catch(e: Exception){
+
+        }
+    }
+
+    private fun onUpdate(noteId: String, noteEvent: Event) {
+        // TODO 上位レイヤに更新を伝える
+    }
+
+
+
+
+    override fun onClosing() {
+
+
+    }
+
+    override fun onConnect() {
+        synchronized(noteIdsClients){
+            noteIdsClients.keys.forEach{ noteId ->
+                captureRemote(noteId)
+            }
+        }
+
+    }
+
+    override fun onDisconnect() = Unit
+}
