@@ -36,15 +36,14 @@ data class Note(
     val myReaction: String?,
 
 
-    val app: App
+    val app: App,
+    var instanceUpdatedAt: Date = Date()
 ) {
 
     data class Id(
         val accountId: Long,
         val noteId: String
     )
-    val instanceCreatedAt = Date()
-    var instanceUpdatedAt = Date()
 
     fun updated(){
         this.instanceUpdatedAt = Date()
