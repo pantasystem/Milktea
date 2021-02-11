@@ -1,19 +1,28 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteCapture
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import jp.panta.misskeyandroidclient.streaming.notes.NoteSubscriber
+import jp.panta.misskeyandroidclient.streaming.notes.NoteSubscriberProvider
+import jp.panta.misskeyandroidclient.streaming.notes.NoteUpdated
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class InMemoryNoteRepository: NoteRepository{
+class InMemoryNoteRepository(
+    val noteSubscriberProvider: NoteSubscriberProvider,
+    val accountRepository: AccountRepository,
+    val coroutineScope: CoroutineScope
+): NoteRepository{
 
     private val notes = HashMap<Note.Id, Note>()
 
@@ -50,6 +59,7 @@ class InMemoryNoteRepository: NoteRepository{
             eventBroadcastChannel.send(NoteRepository.Event.Added(note.id))
 
             return if(n == null){
+                subscribe(note.id)
                 AddResult.CREATED
             } else AddResult.UPDATED
         }
@@ -89,4 +99,57 @@ class InMemoryNoteRepository: NoteRepository{
             }
         }
     }
+
+    @ExperimentalCoroutinesApi
+    private fun subscribe(noteId: Note.Id) {
+        coroutineScope.launch(Dispatchers.IO) {
+            noteSubscriberProvider.get(noteId.accountId)?.subscribe(noteId.noteId)
+                ?.collect { e->
+                    when(e.type){
+                        is NoteUpdated.Type.Deleted -> {
+                            remove(noteId)
+                        }
+                        is NoteUpdated.Type.Reacted -> {
+                            var note = get(noteId)
+                            if(note != null){
+                                val counts = ArrayList(note.reactionCounts)
+                                var isFind = false
+                                for(i in 0 until counts.size) {
+                                    val count = counts[i]
+                                    if(count.reaction == e.type.reaction) {
+                                        counts[i] = count.copy(count = count.count + 1)
+                                        isFind = true
+                                        break
+                                    }
+                                }
+                                if(!isFind){
+                                    counts.add(ReactionCount(e.type.reaction, 1))
+                                }
+
+                                note = note.copy(
+                                    reactionCounts = counts
+                                )
+                                add(note)
+                            }
+                        }
+
+                        is NoteUpdated.Type.Unreacted -> {
+                            val note = get(noteId)
+                            if(note != null){
+                                val counts = note.reactionCounts
+                                    .filterNot {
+                                        it.reaction == e.type.reaction && it.count <= 1
+                                    }
+                                val myReaction = if(e.type.userId == accountRepository.get(noteId.accountId).remoteId) null else note.myReaction
+                                add(note.copy(reactionCounts = counts, myReaction = myReaction))
+                            }
+                        }
+                        is NoteUpdated.Type.PollVoted -> {
+
+                        }
+                    }
+                }
+        }
+    }
+
 }

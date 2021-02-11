@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.streaming
+package jp.panta.misskeyandroidclient.streaming.network
 
 /**
  * WebSocketを表すインターフェース

@@ -1,18 +1,11 @@
 package jp.panta.misskeyandroidclient.model.streming
 
-import android.util.Log
-import androidx.databinding.ObservableArrayList
-import androidx.databinding.ObservableList
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.lang.Exception
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
