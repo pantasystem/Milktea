@@ -125,9 +125,11 @@ class InMemoryNoteRepository(
                                 if(!isFind){
                                     counts.add(ReactionCount(e.type.reaction, 1))
                                 }
+                                val myReaction = if(e.type.userId == accountRepository.get(noteId.accountId).remoteId) e.type.reaction else note.myReaction
 
                                 note = note.copy(
-                                    reactionCounts = counts
+                                    reactionCounts = counts,
+                                    myReaction = myReaction
                                 )
                                 add(note)
                             }
@@ -145,7 +147,24 @@ class InMemoryNoteRepository(
                             }
                         }
                         is NoteUpdated.Type.PollVoted -> {
-
+                            val note = get(noteId)
+                            if(note != null){
+                                val poll = note.poll?.let{
+                                    val choices = ArrayList(it.choices)
+                                        .mapIndexed{ i, c ->
+                                            if(e.type.choice == i){
+                                                val isVoted =  c.isVoted || accountRepository.get(noteId.accountId).remoteId == e.type.userId
+                                                c.copy(votes = c.votes + 1, isVoted = isVoted)
+                                            }else{
+                                                c
+                                            }
+                                        }
+                                    it.copy(
+                                        choices = choices
+                                    )
+                                }
+                                add(note.copy(poll = poll))
+                            }
                         }
                     }
                 }
