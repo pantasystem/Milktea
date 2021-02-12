@@ -2,6 +2,8 @@ package jp.panta.misskeyandroidclient.streaming.notes
 
 import com.google.gson.Gson
 import io.reactivex.Observable
+import jp.panta.misskeyandroidclient.streaming.Send
+import jp.panta.misskeyandroidclient.streaming.SendBody
 import jp.panta.misskeyandroidclient.streaming.network.ConnectionManager
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,7 +15,6 @@ import kotlin.collections.HashSet
 
 class NoteSubscriber(
     val socket: Socket,
-    val connectionManager: ConnectionManager,
     val gson: Gson
 ) {
 
@@ -41,25 +42,36 @@ class NoteSubscriber(
     private val noteIdListenMap = ConcurrentHashMap<String, ConcurrentHashMap<String, Listener>>()
 
     private fun subscribe(noteId: String, listenId: String ,listener: (NoteUpdated)->Unit) {
-        val listeners = noteIdListenMap.getOrNew(noteId)
-        if(listeners.isEmpty()){
-            // TODO remoteに対してsubscribeする
-        }else if(listeners.contains(listenId)) {
-            listeners[listenId] = Listener(listenId, listener)
+        synchronized(noteIdListenMap){
+            val listeners = noteIdListenMap.getOrNew(noteId)
+            if(listeners.isEmpty()){
+                socket.send(gson.toJson(
+                    Send(SendBody.SubscribeNote(noteId))
+                ))
+            }else if(listeners.contains(listenId)) {
+                listeners[listenId] = Listener(listenId, listener)
+            }
+            noteIdListenMap[noteId] = listeners
         }
-        noteIdListenMap[noteId] = listeners
+
     }
 
     private fun unSubscribe(noteId: String, listenId: String) {
-        val listeners = noteIdListenMap.getOrNew(noteId)
-        if(listeners.isEmpty()) {
-            return
+        synchronized(noteIdListenMap){
+
+            val listeners = noteIdListenMap.getOrNew(noteId)
+            if(listeners.isEmpty()) {
+                return
+            }
+
+            if(listeners.remove(listenId) != null && listeners.isEmpty()) {
+                socket.send(gson.toJson(
+                    Send(SendBody.UnSubscribeNote(noteId))
+                ))
+            }
+            noteIdListenMap[noteId] = listeners
         }
 
-        if(listeners.remove(listenId) != null && listeners.isEmpty()) {
-            // TODO remoteへのsubscribeを解除する
-        }
-        noteIdListenMap[noteId] = listeners
     }
 
 
