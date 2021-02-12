@@ -9,14 +9,15 @@ import jp.panta.misskeyandroidclient.model.notification.Notification as Notifica
  */
 sealed class ChannelEvent {
 
+    abstract val id: String
 
-    sealed class Timeline {
+    data class ReceiveNote(
+        override val id: String,
+        val body: NoteDTO
+    ) : ChannelEvent()
 
-    }
 
-
-    sealed class Main {
-        abstract val id: String
+    sealed class Main : ChannelEvent(){
 
         data class Notification(
             override val id: String,
