@@ -16,6 +16,8 @@ interface Socket {
          */
         object Connecting: State()
 
+        object Closing: State()
+
         /**
          * 接続が失われていることを表す
          */
