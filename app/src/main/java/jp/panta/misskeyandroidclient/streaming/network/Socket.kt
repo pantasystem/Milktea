@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.streaming.network
 
+import okhttp3.Response
+
 /**
  * WebSocketを表すインターフェース
  */
@@ -16,12 +18,25 @@ interface Socket {
          */
         object Connecting: State()
 
-        object Closing: State()
+        data class Closing(
+            val code: Int,
+            val reason: String
+        ): State()
+
+        object  NeverConnected : State()
 
         /**
          * 接続が失われていることを表す
          */
-        object Closed: State()
+        data class Closed(
+            val code: Int,
+            val reason: String
+        ): State()
+
+        data class Failure(
+            val throwable: Throwable,
+            val response: Response?
+        ) : State()
     }
 
     /**
