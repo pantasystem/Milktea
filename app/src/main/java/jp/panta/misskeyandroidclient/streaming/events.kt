@@ -4,6 +4,10 @@ import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notification.Notification as NotificationDTO
 
 
+data class EventMessage(
+    val body: StreamingEvent
+)
+
 sealed class StreamingEvent
 
 /**
@@ -55,25 +59,25 @@ sealed class ChannelEvent : StreamingEvent(){
 
 data class NoteUpdated (
     val id: String,
-    val type: Type
+    val body: Body
 ) : StreamingEvent() {
-    sealed class Type {
+    sealed class Body {
         class Reacted (
             val reaction: String,
             val userId: String,
-        ) : Type()
+        ) : Body()
 
         class Unreacted (
             val reaction: String,
             val userId: String,
-        ) : Type()
+        ) : Body()
 
         class PollVoted(
             val choice: Int,
             val userId: String
-        ) : Type()
+        ) : Body()
 
-        object Deleted : Type()
+        object Deleted : Body()
     }
 
 
