@@ -1,13 +1,15 @@
-package jp.panta.misskeyandroidclient.streaming.channel
+package jp.panta.misskeyandroidclient.streaming
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.notification.Notification as NotificationDTO
+
+
+sealed class StreamingEvent
 
 /**
  * bodyとして機能する
  */
-sealed class ChannelEvent {
+sealed class ChannelEvent : StreamingEvent(){
 
     abstract val id: String
 
@@ -30,7 +32,7 @@ sealed class ChannelEvent {
 
         data class UnreadMessagingMessage(
             override val id: String,
-            val body: Message
+            val body: StreamingEvent
         ) : Main()
 
         data class Mention(
@@ -45,8 +47,34 @@ sealed class ChannelEvent {
         data class MeUpdated(
             override val id: String,
 
-        ) : Main()
+            ) : Main()
 
 
     }
+}
+
+data class NoteUpdated (
+    val id: String,
+    val type: Type
+) : StreamingEvent() {
+    sealed class Type {
+        class Reacted (
+            val reaction: String,
+            val userId: String,
+        ) : Type()
+
+        class Unreacted (
+            val reaction: String,
+            val userId: String,
+        ) : Type()
+
+        class PollVoted(
+            val choice: Int,
+            val userId: String
+        ) : Type()
+
+        object Deleted : Type()
+    }
+
+
 }
