@@ -128,4 +128,6 @@ dependencies {
     // EmojiCompat
     implementation "androidx.emoji:emoji-bundled:1.2.0-alpha01"
 
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
+
 }

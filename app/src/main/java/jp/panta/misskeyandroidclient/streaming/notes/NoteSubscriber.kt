@@ -2,9 +2,11 @@ package jp.panta.misskeyandroidclient.streaming.notes
 
 import com.google.gson.Gson
 import io.reactivex.Observable
+import jp.panta.misskeyandroidclient.streaming.Reconnectable
 import jp.panta.misskeyandroidclient.streaming.Send
 import jp.panta.misskeyandroidclient.streaming.SendBody
 import jp.panta.misskeyandroidclient.streaming.network.ConnectionManager
+import jp.panta.misskeyandroidclient.streaming.network.MessageReceiveListener
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -16,7 +18,7 @@ import kotlin.collections.HashSet
 class NoteSubscriber(
     val socket: Socket,
     val gson: Gson
-) {
+) : Reconnectable, MessageReceiveListener {
 
     @ExperimentalCoroutinesApi
     fun subscribe(noteId: String): Flow<NoteUpdated> {
@@ -33,25 +35,24 @@ class NoteSubscriber(
         }
 
     }
-    private data class Listener(
-        val listenId: String,
-        val listener: (NoteUpdated)-> Unit
-    )
 
 
-    private val noteIdListenMap = ConcurrentHashMap<String, ConcurrentHashMap<String, Listener>>()
+
+    private val noteIdListenMap = ConcurrentHashMap<String, ConcurrentHashMap<String, (NoteUpdated)->Unit>>()
 
     private fun subscribe(noteId: String, listenId: String ,listener: (NoteUpdated)->Unit) {
         synchronized(noteIdListenMap){
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(listeners.isEmpty()){
-                socket.send(gson.toJson(
-                    Send(SendBody.SubscribeNote(noteId))
-                ))
-            }else if(listeners.contains(listenId)) {
-                listeners[listenId] = Listener(listenId, listener)
+                if(sendSub(noteId)){
+                    return@synchronized
+                }
+            }
+            if(listeners.contains(listenId)) {
+                listeners[listenId] = listener
             }
             noteIdListenMap[noteId] = listeners
+
         }
 
     }
@@ -65,9 +66,7 @@ class NoteSubscriber(
             }
 
             if(listeners.remove(listenId) != null && listeners.isEmpty()) {
-                socket.send(gson.toJson(
-                    Send(SendBody.UnSubscribeNote(noteId))
-                ))
+                sendUnSub(noteId)
             }
             noteIdListenMap[noteId] = listeners
         }
@@ -75,9 +74,40 @@ class NoteSubscriber(
     }
 
 
-    private fun Map<String, ConcurrentHashMap<String, Listener>>.getOrNew(noteId: String) : ConcurrentHashMap<String, Listener> {
+    private fun Map<String, ConcurrentHashMap<String, (NoteUpdated)->Unit>>.getOrNew(noteId: String) : ConcurrentHashMap<String, (NoteUpdated)->Unit> {
         val listeners = this[noteId]
-        return listeners ?: ConcurrentHashMap<String, Listener>()
+        return listeners ?: ConcurrentHashMap<String, (NoteUpdated)->Unit>()
+    }
+
+    override fun onReconnect() {
+        synchronized(noteIdListenMap) {
+            noteIdListenMap.keys.forEach {
+                sendSub(it)
+            }
+        }
+    }
+
+    override fun onReceiveMessage(message: String): Boolean {
+        // TODO メッセージを受信したときの処理を実装する
+        return false
+    }
+
+    private fun sendSub(noteId: String) : Boolean{
+        return socket.send(
+            gson.toJson(
+                Send(
+                    SendBody.SubscribeNote(noteId)
+                )
+            )
+        )
+    }
+
+    private fun sendUnSub(noteId: String) : Boolean{
+        return socket.send(
+            gson.toJson(
+                SendBody.UnSubscribeNote(noteId)
+            )
+        )
     }
 
 }

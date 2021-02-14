@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
 import com.google.gson.Gson
+import jp.panta.misskeyandroidclient.streaming.Reconnectable
 import jp.panta.misskeyandroidclient.streaming.Send
 import jp.panta.misskeyandroidclient.streaming.SendBody
+import jp.panta.misskeyandroidclient.streaming.network.MessageReceiveListener
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -14,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
 class ChannelAPI(
     val socket: Socket,
     val gson: Gson
-) {
+) : Reconnectable, MessageReceiveListener {
 
     enum class Type {
         MAIN, HOME, LOCAL, HYBRID, GLOBAL
@@ -48,7 +50,6 @@ class ChannelAPI(
     }
 
     private fun connect(type: Type, listenId: String, listener: (ChannelEvent)->Unit) {
-        // TODO メッセージを受信したときの処理を実装する
         synchronized(listenersMap) {
             if(listenersMap[type]?.contains(listenId) == true){
                 return@synchronized
@@ -62,6 +63,11 @@ class ChannelAPI(
             }
 
         }
+    }
+
+    override fun onReceiveMessage(message: String): Boolean {
+        // TODO メッセージ受信時の処理をする
+        return false
     }
 
     /**
@@ -119,7 +125,7 @@ class ChannelAPI(
     /**
      * 再接続処理
      */
-    fun onReconnect() {
+    override fun onReconnect() {
         synchronized(listenersMap) {
             val types = typeIdMap.keys
             typeIdMap.clear()
