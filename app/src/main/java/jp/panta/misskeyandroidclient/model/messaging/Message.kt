@@ -8,24 +8,27 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.api.users.UserDTO
-import java.io.Serializable
-import java.util.*
+import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
+import java.util.Date
 
+@Serializable
 data class Message(
-    @SerializedName("id") val id: String,
-    @SerializedName("createdAt") val createdAt: Date,
-    @SerializedName("text") val text: String?,
-    @SerializedName("userId") val userId: String?,
-    @SerializedName("user") val user: UserDTO?,
-    @SerializedName("recipientId") val recipientId: String?,
-    @SerializedName("recipient") val recipient: UserDTO?,
-    @SerializedName("groupId") val groupId: String?,
-    @SerializedName("group") val group: Group?,
-    @SerializedName("fileId") val fileId: String?,
-    @SerializedName("file") val file: FileProperty?,
-    @SerializedName("isRead") val isRead: Boolean?,
+    val id: String,
+    @Serializable(with = DateSerializer::class) val createdAt: Date,
+    val text: String?,
+    val userId: String?,
+    val user: UserDTO?,
+    val recipientId: String?,
+    val recipient: UserDTO?,
+    val groupId: String?,
+    val group: Group?,
+    val fileId: String?,
+    val file: FileProperty?,
+    val isRead: Boolean?,
     val emojis: List<Emoji>?
-): Serializable{
+): JavaSerializable{
     fun isGroup(): Boolean{
         return group != null
     }

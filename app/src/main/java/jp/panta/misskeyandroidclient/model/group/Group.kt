@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.group
 
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class Group(
     val id: String,
     val createdAt: String,

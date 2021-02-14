@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.api.v12.antenna
 
+import kotlinx.serialization.Serializable
+
 /**
  * @param i ユーザーのの認証
  * @param antennaId updateのときはUpdate対象のアンテナのIdを指定します
@@ -15,6 +17,7 @@ package jp.panta.misskeyandroidclient.api.v12.antenna
  * @param withFile ファイルが添付されたーノートのみ
  * @param notify 新しいノートを通知する
  */
+@Serializable
 data class AntennaToAdd(
     val i: String,
     val antennaId: String?,

@@ -1,5 +1,8 @@
 package jp.panta.misskeyandroidclient.model.hashtag
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class HashTag(
     val tag: String,
     val mentionedUserCount: Int?,

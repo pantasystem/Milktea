@@ -1,11 +1,14 @@
 package jp.panta.misskeyandroidclient.api.users
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestUser(
     val i: String?,
     val userId: String? = null,
-    @SerializedName("username") val userName: String? = null,
+    @SerialName("username") @SerializedName("username") val userName: String? = null,
     val host: String? = null,
     val sort: String? = null,
     val state: String? = null,

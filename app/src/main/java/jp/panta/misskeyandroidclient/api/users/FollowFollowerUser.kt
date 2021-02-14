@@ -1,10 +1,13 @@
 package jp.panta.misskeyandroidclient.api.users
 
+import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.serialization.Serializable
 import java.util.*
 
+@Serializable
 data class FollowFollowerUser(
     val id: String,
-    val createdAt: Date,
+    @Serializable(with = DateSerializer::class) val createdAt: Date,
     val followeeId: String,
     val followee: UserDTO?,
     val followerId: String,

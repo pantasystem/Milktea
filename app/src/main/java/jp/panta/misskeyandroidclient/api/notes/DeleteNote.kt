@@ -1,3 +1,5 @@
 package jp.panta.misskeyandroidclient.api.notes
 
-data class DeleteNote(val i: String, val noteId: String)
+import kotlinx.serialization.Serializable
+
+@Serializable data class DeleteNote(val i: String, val noteId: String)

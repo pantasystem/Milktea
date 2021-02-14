@@ -2,7 +2,9 @@ package jp.panta.misskeyandroidclient.model.messaging
 
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RequestMessage(
     val i: String,
     val userId: String?,
@@ -21,7 +23,7 @@ data class RequestMessage(
 
         fun build(sinceId: String?, untilId: String?, encryption: Encryption): RequestMessage{
             return RequestMessage(
-                i = account.getI(encryption)!!,
+                i = account.getI(encryption),
                 userId = if(group == null) user?.id else null,
                 groupId = group?.id,
                 limit = limit,

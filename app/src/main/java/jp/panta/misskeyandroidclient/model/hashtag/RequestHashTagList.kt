@@ -1,5 +1,8 @@
 package jp.panta.misskeyandroidclient.model.hashtag
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class RequestHashTagList (
     val i: String?,
     val sort: String,

@@ -1,3 +1,5 @@
 package jp.panta.misskeyandroidclient.model.auth
 
-data class UserKey(val appSecret: String, val token: String)
+import kotlinx.serialization.Serializable
+
+@Serializable data class UserKey(val appSecret: String, val token: String)

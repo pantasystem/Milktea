@@ -2,27 +2,29 @@ package jp.panta.misskeyandroidclient.api.notes
 
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import java.io.Serializable
+import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
 
+@Serializable
 data class NoteRequest(
-    @SerializedName("i") val i: String? = null,
-    @SerializedName("userId") val userId: String? = null,
-    @SerializedName("withFiles") val withFiles: Boolean? = null,
-    @SerializedName("fileType") val fileType: String? = null,
-    @SerializedName("excludeNsfw") val excludeNsfw: Boolean? = null,
-    @SerializedName("limit") val limit: Int? = 20,
-    @SerializedName("sinceId") val sinceId: String? = null,
-    @SerializedName("untilId") val untilId: String? = null,
-    @SerializedName("sinceDate") val sinceDate: Long? = null,
-    @SerializedName("untilDate") val untilDate: Long? = null,
-    @SerializedName("query") val query: String? = null,
-    @SerializedName("tag") val tag: String? = null,
-    @SerializedName("includeLocalRenotes") val includeLocalRenotes: Boolean? = null,
-    @SerializedName("includeMyRenotes") val includeMyRenotes: Boolean? = null,
-    @SerializedName("includeRenotedMyNotes") val includeRenotedMyNotes: Boolean? = null,
-    @SerializedName("noteId") val noteId: String? = null,
-    @SerializedName("antennaId") val antennaId: String? = null,
-    @SerializedName("listId") val listId: String? = null,
+    val i: String? = null,
+    val userId: String? = null,
+    val withFiles: Boolean? = null,
+    val fileType: String? = null,
+    val excludeNsfw: Boolean? = null,
+    val limit: Int? = 20,
+    val sinceId: String? = null,
+    val untilId: String? = null,
+    val sinceDate: Long? = null,
+    val untilDate: Long? = null,
+    val query: String? = null,
+    val tag: String? = null,
+    val includeLocalRenotes: Boolean? = null,
+    val includeMyRenotes: Boolean? = null,
+    val includeRenotedMyNotes: Boolean? = null,
+    val noteId: String? = null,
+    val antennaId: String? = null,
+    val listId: String? = null,
     val following: Boolean? = null,
     val visibility: String? = null,
     val reply: Boolean? = null,
@@ -32,7 +34,7 @@ data class NoteRequest(
     val includeReplies: Boolean? = null,
     val host: String? = null,
     val markAsRead: Boolean? = null
-): Serializable{
+): JavaSerializable{
 
 
     class Builder(

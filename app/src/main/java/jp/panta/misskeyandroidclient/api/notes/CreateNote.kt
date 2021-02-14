@@ -1,7 +1,9 @@
 package jp.panta.misskeyandroidclient.api.notes
 
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CreateNote(
     val i: String,
     val visibility: String = "public",
