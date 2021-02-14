@@ -180,12 +180,12 @@ class NotificationViewModel(
 
             is Event.Deleted ->{
                 timelineNotes.filterNot{ notification ->
-                    notification.noteViewData?.id == noteEvent.noteId || notification.noteViewData?.toShowNote?.id == noteEvent.noteId
+                    notification.noteViewData?.id == noteEvent.noteId.noteId || notification.noteViewData?.toShowNote?.id == noteEvent.noteId.noteId
                 }
             }
             else -> timelineNotes.map{
                 val note: PlaneNoteViewData? = it.noteViewData
-                if(note?.toShowNote?.id == noteEvent.noteId){
+                if(note?.toShowNote?.id == noteEvent.noteId.noteId){
                     when(noteEvent.event){
                         is Event.NewNote.Reacted ->{
                             note.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)

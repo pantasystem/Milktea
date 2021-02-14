@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashSet
+import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 
 class NoteSubscriber(
     val socket: Socket,

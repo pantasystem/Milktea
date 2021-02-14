@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.notes.NoteSubscriber
 import jp.panta.misskeyandroidclient.streaming.notes.NoteSubscriberProvider
-import jp.panta.misskeyandroidclient.streaming.notes.NoteUpdated
+import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
@@ -105,27 +105,27 @@ class InMemoryNoteRepository(
         coroutineScope.launch(Dispatchers.IO) {
             noteSubscriberProvider.get(noteId.accountId)?.subscribe(noteId.noteId)
                 ?.collect { e->
-                    when(e.type){
-                        is NoteUpdated.Type.Deleted -> {
+                    when(e.body){
+                        is NoteUpdated.Body.Deleted -> {
                             remove(noteId)
                         }
-                        is NoteUpdated.Type.Reacted -> {
+                        is NoteUpdated.Body.Reacted -> {
                             var note = get(noteId)
                             if(note != null){
                                 val counts = ArrayList(note.reactionCounts)
                                 var isFind = false
                                 for(i in 0 until counts.size) {
                                     val count = counts[i]
-                                    if(count.reaction == e.type.reaction) {
+                                    if(count.reaction == e.body.reaction) {
                                         counts[i] = count.copy(count = count.count + 1)
                                         isFind = true
                                         break
                                     }
                                 }
                                 if(!isFind){
-                                    counts.add(ReactionCount(e.type.reaction, 1))
+                                    counts.add(ReactionCount(e.body.reaction, 1))
                                 }
-                                val myReaction = if(e.type.userId == accountRepository.get(noteId.accountId).remoteId) e.type.reaction else note.myReaction
+                                val myReaction = if(e.body.userId == accountRepository.get(noteId.accountId).remoteId) e.body.reaction else note.myReaction
 
                                 note = note.copy(
                                     reactionCounts = counts,
@@ -135,25 +135,25 @@ class InMemoryNoteRepository(
                             }
                         }
 
-                        is NoteUpdated.Type.Unreacted -> {
+                        is NoteUpdated.Body.Unreacted -> {
                             val note = get(noteId)
                             if(note != null){
                                 val counts = note.reactionCounts
                                     .filterNot {
-                                        it.reaction == e.type.reaction && it.count <= 1
+                                        it.reaction == e.body.reaction && it.count <= 1
                                     }
-                                val myReaction = if(e.type.userId == accountRepository.get(noteId.accountId).remoteId) null else note.myReaction
+                                val myReaction = if(e.body.userId == accountRepository.get(noteId.accountId).remoteId) null else note.myReaction
                                 add(note.copy(reactionCounts = counts, myReaction = myReaction))
                             }
                         }
-                        is NoteUpdated.Type.PollVoted -> {
+                        is NoteUpdated.Body.PollVoted -> {
                             val note = get(noteId)
                             if(note != null){
                                 val poll = note.poll?.let{
                                     val choices = ArrayList(it.choices)
                                         .mapIndexed{ i, c ->
-                                            if(e.type.choice == i){
-                                                val isVoted =  c.isVoted || accountRepository.get(noteId.accountId).remoteId == e.type.userId
+                                            if(e.body.choice == i){
+                                                val isVoted =  c.isVoted || accountRepository.get(noteId.accountId).remoteId == e.body.userId
                                                 c.copy(votes = c.votes + 1, isVoted = isVoted)
                                             }else{
                                                 c

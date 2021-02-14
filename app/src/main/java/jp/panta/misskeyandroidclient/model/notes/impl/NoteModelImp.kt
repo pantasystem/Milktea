@@ -45,7 +45,7 @@ class NoteModelImp(
             val noteDTO = res.body()
             if(noteDTO != null){
                 //n = this.add(noteDTO)
-                val entities = noteDTO.toEntities()
+                val entities = noteDTO.toEntities(account)
                 val notesAddedCount = entities.second.count {
                     noteRepository.add(it) != AddResult.CANCEL || userRepository.get(it.userId) != null
                 }
@@ -149,7 +149,7 @@ class NoteModelImp(
     private suspend fun listenUserRepository(){
         userRepository.observable().collect {
             if(it is UserRepository.Event.Removed){
-                noteRepository.removeByUserId(it.userId.id)
+                noteRepository.removeByUserId(it.userId)
             }
         }
     }

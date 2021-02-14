@@ -209,12 +209,12 @@ class NoteDetailViewModel(
 
             is Event.Deleted ->{
                 timelineNotes.filterNot{ note ->
-                    note.id == noteEvent.noteId || note.toShowNote.id == noteEvent.noteId
+                    note.id == noteEvent.noteId.noteId || note.toShowNote.id == noteEvent.noteId.noteId
                 }
             }
             else -> timelineNotes.map{
                 val note: PlaneNoteViewData = it
-                if(note.toShowNote.id == noteEvent.noteId){
+                if(note.toShowNote.id == noteEvent.noteId.noteId){
                     when(noteEvent.event){
                         is Event.NewNote.Reacted ->{
                             it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)

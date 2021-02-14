@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import jp.panta.misskeyandroidclient.streaming.ChannelEvent
 
 class ChannelAPI(
     val socket: Socket,
