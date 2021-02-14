@@ -31,7 +31,7 @@ open class PlaneNoteViewData (
 
     val toShowNote: NoteDTO
         get() {
-            return if(note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()){
+            return if(note.renoteId != null && note.text == null && note.files.isNullOrEmpty()){
                 note.reNote?: note
             }else{
                 note
@@ -40,21 +40,21 @@ open class PlaneNoteViewData (
 
     val isMyNote = account.remoteId == toShowNote.user.id
 
-    val isRenotedByMe = (note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()) && note.user.id == account.remoteId
+    val isRenotedByMe = (note.renoteId != null && note.text == null && note.files.isNullOrEmpty()) && note.user.id == account.remoteId
 
     val statusMessage: String?
         get(){
             if(note.reply != null){
                 //reply
                 return "${note.user.getDisplayUserName()}が返信しました"
-            }else if(note.reNoteId == null && (note.text != null || note.files != null)){
+            }else if(note.renoteId == null && (note.text != null || note.files != null)){
                 //Note
                 return null
-            }else if(note.reNoteId != null && note.text == null && note.files.isNullOrEmpty()){
+            }else if(note.renoteId != null && note.text == null && note.files.isNullOrEmpty()){
                 //reNote
                 return "${note.user.getDisplayUserName()}がリノートしました"
 
-            }else if(note.reNoteId != null && (note.text != null || note.files != null)){
+            }else if(note.renoteId != null && (note.text != null || note.files != null)){
                 //quote
                 //"${note.user.name}が引用リノートしました"
                 return null
@@ -135,8 +135,8 @@ open class PlaneNoteViewData (
     val replyCount = MutableLiveData<Int>(toShowNote.replyCount)
 
     val reNoteCount: String?
-        get() = if(toShowNote.reNoteCount > 0) toShowNote.reNoteCount.toString() else null
-    val renoteCount = MutableLiveData<Int>(toShowNote.reNoteCount)
+        get() = if(toShowNote.renoteCount > 0) toShowNote.renoteCount.toString() else null
+    val renoteCount = MutableLiveData<Int>(toShowNote.renoteCount)
 
     val reactionCounts = MutableLiveData<LinkedHashMap<String, Int>>(toShowNote.reactionCounts)
 
@@ -239,7 +239,7 @@ open class PlaneNoteViewData (
         emojiMap.putAll(note.emojis?.map{
             it.name to it
         }?: emptyList())
-        renoteCount.postValue(note.reNoteCount)
+        renoteCount.postValue(note.renoteCount)
 
         myReaction.postValue(note.myReaction)
         reactionCounts.postValue(note.reactionCounts)

@@ -25,7 +25,7 @@ object StatusMessageHelper {
             note.reply != null ->{
                 "$name " + context.getString(R.string.replied_by)
             }
-            note.reNoteId != null && note.text == null && note.files.isNullOrEmpty() ->{
+            note.renoteId != null && note.text == null && note.files.isNullOrEmpty() ->{
                 "$name " + context.getString(R.string.renoted_by)
             }
             else -> null

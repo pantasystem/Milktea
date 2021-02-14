@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.auth.custom
 
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class App(
     val id: String,
     val name: String,

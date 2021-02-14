@@ -9,7 +9,6 @@ data class Profile(
     val followingCount: Int?,
     val hostLower: String?,
     val notesCount: Int?,
-    val links: String?,
     val pinnedNoteIds: List<String>?,
     val bannerUrl: String?,
 

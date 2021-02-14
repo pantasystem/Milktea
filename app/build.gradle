@@ -8,6 +8,8 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'com.google.gms.oss.licenses.plugin'
 
+apply plugin: "org.jetbrains.kotlin.plugin.serialization"
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -129,5 +131,6 @@ dependencies {
     implementation "androidx.emoji:emoji-bundled:1.2.0-alpha01"
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
 
 }

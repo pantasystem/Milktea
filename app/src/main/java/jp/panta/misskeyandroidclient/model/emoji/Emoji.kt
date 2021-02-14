@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.emoji
 
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class Emoji(
     val id: String?,
     val name: String,

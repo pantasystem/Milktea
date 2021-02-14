@@ -3,46 +3,53 @@ package jp.panta.misskeyandroidclient.api.users
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.users.Profile
 import jp.panta.misskeyandroidclient.model.users.User
+import kotlinx.serialization.SerialName
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class UserDTO(
-    @SerializedName("id") val id:String,
-    @SerializedName("username") val userName: String,
-    @SerializedName("name") val name: String?,
-    @SerializedName("host") val host: String?,
-    @SerializedName("description") val description: String?,
+    val id:String,
+
+    @SerializedName("username")
+    @SerialName("username")
+    val userName: String,
+
+    val name: String?,
+    val host: String?,
+    val description: String?,
     //@SerializedName("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date?,
-    @SerializedName("followersCount") val followersCount: Int?,
-    @SerializedName("followingCount") val followingCount: Int?,
-    @SerializedName("hostLower") val hostLower: String?,
-    @SerializedName("notesCount") val notesCount: Int?,
+    val followersCount: Int?,
+    val followingCount: Int?,
+    val hostLower: String?,
+    val notesCount: Int?,
     //@JsonProperty("clientSettings") val clientSettings: ClientSetting?,
-    @SerializedName("email") val email: String?,
-    @SerializedName("isBot") val isBot: Boolean,
-    @SerializedName("isCat") val isCat: Boolean,
+    val email: String?,
+    val isBot: Boolean,
+    val isCat: Boolean,
     //@SerializedName("lastUsedAt") val lastUsedAt: String?,
-    @SerializedName("line") val line: String?,
-    @SerializedName("links") val links: String?,
+    //val line: String?,
+    //@SerializedName("links") val links: String?,
     //@SerializedName("profile") val profile: Any?,
     //@SerializedName("settings") val settings: Any?,
-    @SerializedName("pinnedNoteIds") val pinnedNoteIds: List<String>?,
-    @SerializedName("pinnedNotes") val pinnedNotes: List<NoteDTO>?,
+    val pinnedNoteIds: List<String>?,
+    val pinnedNotes: List<NoteDTO>?,
     //("twitter") val twitter: Any?,
     val twoFactorEnabled: Boolean?,
-    @SerializedName("isAdmin") val isAdmin: Boolean?,
-    @SerializedName("avatarUrl") val avatarUrl: String?,
-    @SerializedName("bannerUrl") val bannerUrl: String?,
+    val isAdmin: Boolean?,
+    val avatarUrl: String?,
+    val bannerUrl: String?,
     //@SerializedName("avatarColor") val avatarColor: Any?,
-    @SerializedName("emojis") val emojis: List<Emoji>?,
+    val emojis: List<Emoji>?,
 
-    @SerializedName("isFollowing") val isFollowing: Boolean?,
-    @SerializedName("isFollowed") val isFollowed: Boolean?,
+    val isFollowing: Boolean?,
+    val isFollowed: Boolean?,
 
 
-    @SerializedName("isBlocking") val isBlocking: Boolean?,
-    @SerializedName("isMuted") val isMuted: Boolean?,
+    val isBlocking: Boolean?,
+    val isMuted: Boolean?,
     val url: String?
 
     //JsonProperty("isVerified") val isVerified: Boolean,
@@ -65,7 +72,7 @@ data class UserDTO(
     }
 }
 
-fun UserDTO.toUser(isDetail: Boolean = false): User{
+fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User{
     var state: User.State? = null
     var profile: Profile? = null
     if(isDetail){
@@ -84,13 +91,12 @@ fun UserDTO.toUser(isDetail: Boolean = false): User{
             host = this.host,
             url = this.url,
             hostLower = this.hostLower,
-            links = this.links,
             notesCount = this.notesCount,
             pinnedNoteIds = this.pinnedNoteIds
         )
     }
     return User(
-        id = this.id,
+        id = User.Id(account.accountId, this.id),
         avatarUrl = this.avatarUrl,
         emojis = this.emojis?: emptyList(),
         isBot = this.isBot,
