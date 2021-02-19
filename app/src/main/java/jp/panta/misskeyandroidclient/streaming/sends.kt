@@ -1,10 +1,11 @@
 package jp.panta.misskeyandroidclient.streaming
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
-
+/*
 @Serializable
 data class Send(
     val body: SendBody,
@@ -20,31 +21,31 @@ sealed class SendBody {
         abstract val channel: String
 
         @Serializable
-        class Main(
+        data class Main(
             override val id: String = UUID.randomUUID().toString(),
             override val channel: String = "main"
         ) : Connect()
 
         @Serializable
-        class HomeTimeline(
+        data class HomeTimeline(
             override val id: String = UUID.randomUUID().toString(),
             override val channel: String = "homeTimeline"
         ) : Connect()
 
         @Serializable
-        class GlobalTimeline(
+        data class GlobalTimeline(
             override val id: String = UUID.randomUUID().toString(),
             override val channel: String = "globalTimeline"
         ) : Connect()
 
         @Serializable
-        class HybridTimeline(
+        data class HybridTimeline(
             override val id: String = UUID.randomUUID().toString(),
             override val channel: String = "hybridTimeline"
         ) : Connect()
 
         @Serializable
-        class LocalTimeline(
+        data class LocalTimeline(
             override val id: String = UUID.randomUUID().toString(),
             override val channel: String = "localTimeline"
         ) : Connect()
@@ -70,4 +71,36 @@ sealed class SendBody {
 
 
 }
+*/
+// FIXME Kotlin serializationの仕様による出力とJSONの入力が合わないことが発覚した
+sealed class Send {
 
+    @SerialName("connect")
+    data class Connect(
+        val body: Body,
+        // type(channel)
+    ) : Send() {
+
+        sealed class Body
+
+
+    }
+
+    @SerialName("sn")
+    data class SubscribeNote(
+        val body: Body
+    ) : Send() {
+        data class Body(
+            @SerialName("id") val noteId: String
+        )
+    }
+
+    @SerialName("un")
+    data class UnSubscribeNote(
+        val body: Body
+    ) {
+        data class Body(
+            @SerialName("id") val noteId: String
+        )
+    }
+}
