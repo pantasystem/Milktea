@@ -3,79 +3,11 @@ package jp.panta.misskeyandroidclient.streaming
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/*
+/**
+ * 注意：decode時やparse時はSendのserializerを使わないとうまくtypeフィールドが追加されない。
+ */
 @Serializable
-data class Send(
-    val body: SendBody,
-
-)
-
-@Serializable
-sealed class SendBody {
-
-    @SerialName("connect")
-    sealed class Connect : SendBody(){
-        abstract val id: String
-        abstract val channel: String
-
-        @Serializable
-        data class Main(
-            override val id: String = UUID.randomUUID().toString(),
-            override val channel: String = "main"
-        ) : Connect()
-
-        @Serializable
-        data class HomeTimeline(
-            override val id: String = UUID.randomUUID().toString(),
-            override val channel: String = "homeTimeline"
-        ) : Connect()
-
-        @Serializable
-        data class GlobalTimeline(
-            override val id: String = UUID.randomUUID().toString(),
-            override val channel: String = "globalTimeline"
-        ) : Connect()
-
-        @Serializable
-        data class HybridTimeline(
-            override val id: String = UUID.randomUUID().toString(),
-            override val channel: String = "hybridTimeline"
-        ) : Connect()
-
-        @Serializable
-        data class LocalTimeline(
-            override val id: String = UUID.randomUUID().toString(),
-            override val channel: String = "localTimeline"
-        ) : Connect()
-    }
-
-    @Serializable
-    data class Disconnect(
-        val id: String
-    ) : SendBody()
-
-    // type sn
-    @Serializable
-    @SerialName("sn")
-    class SubscribeNote(
-        @SerializedName("id") val noteId: String
-    ) : SendBody()
-    // type un
-    @Serializable
-    @SerialName("un")
-    class UnSubscribeNote(
-        @SerializedName("id") val noteId: String
-    ) : SendBody()
-
-
-}
-*/
-@Serializable
-data class Send(val body: Body)
-
-// FIXME Kotlin serializationの仕様による出力とJSONの入力が合わないことが発覚した
-@Serializable
-sealed class Body {
+sealed class Send {
 
 
     @SerialName("connect")
@@ -83,7 +15,7 @@ sealed class Body {
     data class Connect(
         val body: Body,
         // type(channel)
-    ) : Body() {
+    ) : Send() {
 
         @Serializable
         enum class Type {
@@ -103,8 +35,8 @@ sealed class Body {
     @SerialName("disconnect")
     @Serializable
     data class Disconnect(
-        val body: Disconnect.Body
-    ) : Body(){
+        val body: Body
+    ) : Send(){
         @Serializable
         data class Body(val id: String)
     }
@@ -113,7 +45,7 @@ sealed class Body {
     @Serializable
     data class SubscribeNote(
         val body: Body
-    ) : Body() {
+    ) : Send() {
 
         @Serializable
         data class Body(
@@ -125,7 +57,7 @@ sealed class Body {
     @Serializable
     data class UnSubscribeNote(
         val body: Body
-    ) : Body(){
+    ) : Send(){
         @Serializable
         data class Body(
             @SerialName("id") val noteId: String
