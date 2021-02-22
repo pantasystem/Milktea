@@ -2,6 +2,9 @@ package jp.panta.misskeyandroidclient.streaming
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * 注意：decode時やparse時はSendのserializerを使わないとうまくtypeフィールドが追加されない。
@@ -63,4 +66,12 @@ sealed class Send {
             @SerialName("id") val noteId: String
         )
     }
+}
+
+fun Send.toJson(): String {
+    return Json.encodeToString(this)
+}
+
+fun String.fromJson(): Send {
+    return Json.decodeFromString(this)
 }
