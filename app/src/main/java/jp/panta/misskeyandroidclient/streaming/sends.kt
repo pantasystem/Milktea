@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.SerialInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.*
+
 /*
 @Serializable
 data class Send(
@@ -72,33 +70,63 @@ sealed class SendBody {
 
 }
 */
+@Serializable
+data class Send(val body: Body)
+
 // FIXME Kotlin serializationの仕様による出力とJSONの入力が合わないことが発覚した
-sealed class Send {
+@Serializable
+sealed class Body {
+
 
     @SerialName("connect")
+    @Serializable
     data class Connect(
         val body: Body,
         // type(channel)
-    ) : Send() {
+    ) : Body() {
 
-        sealed class Body
+        @Serializable
+        enum class Type {
+            @SerialName("main") MAIN,
+            @SerialName("homeTimeline") HOME_TIMELINE,
+            @SerialName("localTimeline") LOCAL_TIMELINE,
+            @SerialName("hybridTimeline") HYBRID_TIMELINE,
+            @SerialName("globalTimeline") GLOBAL_TIMELINE,
+        }
+
+        @Serializable
+        data class Body (val id: String, val channel: Type)
 
 
     }
 
+    @SerialName("disconnect")
+    @Serializable
+    data class Disconnect(
+        val body: Disconnect.Body
+    ) : Body(){
+        @Serializable
+        data class Body(val id: String)
+    }
+
     @SerialName("sn")
+    @Serializable
     data class SubscribeNote(
         val body: Body
-    ) : Send() {
+    ) : Body() {
+
+        @Serializable
         data class Body(
             @SerialName("id") val noteId: String
         )
     }
 
     @SerialName("un")
+    @Serializable
     data class UnSubscribeNote(
         val body: Body
-    ) {
+    ) : Body(){
+        @Serializable
         data class Body(
             @SerialName("id") val noteId: String
         )

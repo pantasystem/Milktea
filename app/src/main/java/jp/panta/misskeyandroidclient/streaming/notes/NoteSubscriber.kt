@@ -1,11 +1,8 @@
 package jp.panta.misskeyandroidclient.streaming.notes
 
 import com.google.gson.Gson
-import io.reactivex.Observable
 import jp.panta.misskeyandroidclient.streaming.Reconnectable
-import jp.panta.misskeyandroidclient.streaming.Send
-import jp.panta.misskeyandroidclient.streaming.SendBody
-import jp.panta.misskeyandroidclient.streaming.network.ConnectionManager
+import jp.panta.misskeyandroidclient.streaming.Body
 import jp.panta.misskeyandroidclient.streaming.network.MessageReceiveListener
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,8 +10,10 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashSet
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
+import jp.panta.misskeyandroidclient.streaming.Send
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class NoteSubscriber(
     val socket: Socket,
@@ -95,9 +94,11 @@ class NoteSubscriber(
 
     private fun sendSub(noteId: String) : Boolean{
         return socket.send(
-            gson.toJson(
+            Json.encodeToString(
                 Send(
-                    SendBody.SubscribeNote(noteId)
+                    Body.SubscribeNote(
+                        Body.SubscribeNote.Body(noteId)
+                    )
                 )
             )
         )
@@ -105,8 +106,12 @@ class NoteSubscriber(
 
     private fun sendUnSub(noteId: String) : Boolean{
         return socket.send(
-            gson.toJson(
-                SendBody.UnSubscribeNote(noteId)
+            Json.encodeToString(
+                Send(
+                    Body.UnSubscribeNote(
+                        Body.UnSubscribeNote.Body(noteId)
+                    )
+                )
             )
         )
     }

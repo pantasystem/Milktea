@@ -2,8 +2,7 @@ package jp.panta.misskeyandroidclient.streaming.channel
 
 import com.google.gson.Gson
 import jp.panta.misskeyandroidclient.streaming.Reconnectable
-import jp.panta.misskeyandroidclient.streaming.Send
-import jp.panta.misskeyandroidclient.streaming.SendBody
+import jp.panta.misskeyandroidclient.streaming.Body
 import jp.panta.misskeyandroidclient.streaming.network.MessageReceiveListener
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +12,9 @@ import kotlinx.coroutines.flow.channelFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import jp.panta.misskeyandroidclient.streaming.ChannelEvent
+import jp.panta.misskeyandroidclient.streaming.Send
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class ChannelAPI(
     val socket: Socket,
@@ -76,18 +78,16 @@ class ChannelAPI(
      */
     private fun sendConnect(type: Type): Boolean {
         val body = when(type){
-            Type.GLOBAL -> SendBody.Connect.GlobalTimeline()
-            Type.HYBRID -> SendBody.Connect.HybridTimeline()
-            Type.LOCAL -> SendBody.Connect.LocalTimeline()
-            Type.HOME -> SendBody.Connect.HomeTimeline()
-            Type.MAIN -> SendBody.Connect.Main()
+            Type.GLOBAL -> Body.Connect.Type.GLOBAL_TIMELINE
+            Type.HYBRID -> Body.Connect.Type.HYBRID_TIMELINE
+            Type.LOCAL -> Body.Connect.Type.LOCAL_TIMELINE
+            Type.HOME -> Body.Connect.Type.HOME_TIMELINE
+            Type.MAIN -> Body.Connect.Type.MAIN
         }
 
-        val id = body.id
+        val id = UUID.randomUUID().toString()
         if(
-            socket.send(gson.toJson(
-                Send(body)
-            ))
+            socket.send(Json.encodeToString(Send(Body.Connect(Body.Connect.Body(channel = body, id = id)))))
         ){
             typeIdMap[type] = id
             return true
@@ -107,7 +107,7 @@ class ChannelAPI(
             if(listenersMap[type].isNullOrEmpty()){
                 val id = typeIdMap.remove(type)
                 if(id != null){
-                    socket.send(gson.toJson(Send(SendBody.Disconnect(id))))
+                    socket.send(Json.encodeToString(Send(Body.Disconnect(Body.Disconnect.Body(id)))))
                 }
             }
 
@@ -118,7 +118,7 @@ class ChannelAPI(
         if(listenersMap[type].isNullOrEmpty()){
             val id = typeIdMap.remove(type)
             if(id != null){
-                socket.send(gson.toJson(Send(SendBody.Disconnect(id))))
+                socket.send(Json.encodeToString(Send(Body.Disconnect(Body.Disconnect.Body(id)))))
             }
         }
     }

@@ -1,7 +1,5 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import com.google.gson.Gson
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Assert
@@ -12,7 +10,7 @@ class SendBodyTest {
 
     @Test
     fun testParseMain() {
-        val main = Send(SendBody.Connect.HomeTimeline(channel = "homeTimeline"))
+        val main = Send(Body.Connect(Body.Connect.Body(channel = Body.Connect.Type.HOME_TIMELINE, id = "hoge")));
 
         val h = Json.encodeToString(main)
         println(h)
