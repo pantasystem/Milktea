@@ -1,8 +1,11 @@
 package jp.panta.misskeyandroidclient.streaming
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import java.util.*
 import jp.panta.misskeyandroidclient.model.notification.Notification as NotificationDTO
 
 @Serializable
@@ -85,32 +88,67 @@ sealed class ChannelBody : StreamingEvent(){
 @Serializable
 @SerialName("noteUpdated")
 data class NoteUpdated (
-    val id: String,
     val body: Body
 ) : StreamingEvent() {
 
+
     @Serializable
-    sealed class Body {
-        @Serializable
-        class Reacted (
-            val reaction: String,
-            val userId: String,
-        ) : Body()
+    sealed class Body{
+        abstract val id: String
 
         @Serializable
-        class Unreacted (
-            val reaction: String,
-            val userId: String,
-        ) : Body()
+        @SerialName("reacted")
+        data class Reacted (
+            override val id: String,
+            val body: Body
+        ) : Body() {
+
+            @Serializable
+            data class Body(
+                val reaction: String,
+                val userId: String
+            )
+        }
 
         @Serializable
-        class PollVoted(
-            val choice: Int,
-            val userId: String
-        ) : Body()
+        @SerialName("unreacted")
+        data class Unreacted (
+            override val id: String,
+            val body: Body
+        ) : Body() {
+
+            @Serializable
+            data class Body(
+                val reaction: String,
+                val userId: String,
+            )
+        }
 
         @Serializable
-        object Deleted : Body()
+        @SerialName("pollVoted")
+        data class PollVoted(
+            override val id: String,
+            val body: Body
+        ) : Body() {
+
+            @Serializable
+            data class Body(
+                val choice: Int,
+                val userId: String
+            )
+
+        }
+
+        @Serializable
+        @SerialName("deleted")
+        data class Deleted(override val id: String, val body: Body) : Body() {
+
+            @Serializable
+            data class Body(
+                @Serializable(with = DateSerializer::class)
+                val deletedAt: Date
+            )
+        }
     }
 
 

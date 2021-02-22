@@ -116,16 +116,16 @@ class InMemoryNoteRepository(
                                 var isFind = false
                                 for(i in 0 until counts.size) {
                                     val count = counts[i]
-                                    if(count.reaction == e.body.reaction) {
+                                    if(count.reaction == e.body.body.reaction) {
                                         counts[i] = count.copy(count = count.count + 1)
                                         isFind = true
                                         break
                                     }
                                 }
                                 if(!isFind){
-                                    counts.add(ReactionCount(e.body.reaction, 1))
+                                    counts.add(ReactionCount(e.body.body.reaction, 1))
                                 }
-                                val myReaction = if(e.body.userId == accountRepository.get(noteId.accountId).remoteId) e.body.reaction else note.myReaction
+                                val myReaction = if(e.body.body.userId == accountRepository.get(noteId.accountId).remoteId) e.body.body.reaction else note.myReaction
 
                                 note = note.copy(
                                     reactionCounts = counts,
@@ -140,9 +140,9 @@ class InMemoryNoteRepository(
                             if(note != null){
                                 val counts = note.reactionCounts
                                     .filterNot {
-                                        it.reaction == e.body.reaction && it.count <= 1
+                                        it.reaction == e.body.body.reaction && it.count <= 1
                                     }
-                                val myReaction = if(e.body.userId == accountRepository.get(noteId.accountId).remoteId) null else note.myReaction
+                                val myReaction = if(e.body.body.userId == accountRepository.get(noteId.accountId).remoteId) null else note.myReaction
                                 add(note.copy(reactionCounts = counts, myReaction = myReaction))
                             }
                         }
@@ -152,8 +152,8 @@ class InMemoryNoteRepository(
                                 val poll = note.poll?.let{
                                     val choices = ArrayList(it.choices)
                                         .mapIndexed{ i, c ->
-                                            if(e.body.choice == i){
-                                                val isVoted =  c.isVoted || accountRepository.get(noteId.accountId).remoteId == e.body.userId
+                                            if(e.body.body.choice == i){
+                                                val isVoted =  c.isVoted || accountRepository.get(noteId.accountId).remoteId == e.body.body.userId
                                                 c.copy(votes = c.votes + 1, isVoted = isVoted)
                                             }else{
                                                 c

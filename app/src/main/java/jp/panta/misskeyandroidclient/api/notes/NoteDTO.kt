@@ -22,52 +22,52 @@ data class NoteDTO(
     val id: String,
     //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date,
     @kotlinx.serialization.Serializable(with = DateSerializer::class) val createdAt: Date,
-    val text: String?,
-    val cw: String?,
+    val text: String? = null,
+    val cw: String? = null,
     val userId: String,
 
-    val replyId: String?,
+    val replyId: String? = null,
 
-    val renoteId: String?,
+    val renoteId: String? = null,
 
-    val viaMobile: Boolean?,
-    val visibility: String?,
-    val localOnly: Boolean?,
+    val viaMobile: Boolean? = null,
+    val visibility: String? = null,
+    val localOnly: Boolean? = null,
 
     @SerializedName("visibleUserIds")
-    val visibleUserIds: List<String>?,
+    val visibleUserIds: List<String>? = null,
 
-    val url: String?,
-    val uri: String?,
+    val url: String? = null,
+    val uri: String? = null,
 
     val renoteCount: Int,
 
     @SerializedName("reactions")
     @SerialName("reactions")
-    val reactionCounts: LinkedHashMap<String, Int>?,
+    val reactionCounts: LinkedHashMap<String, Int>? = null,
 
-    @SerializedName("emojis") val emojis: List<Emoji>?,
+    @SerializedName("emojis") val emojis: List<Emoji>? = null,
 
     @SerializedName("repliesCount")
     @SerialName("repliesCount")
     val replyCount: Int,
     val user: UserDTO,
-    val files: List<FileProperty>?,
-    //@JsonProperty("fileIds") val mediaIds: List<String?>?,    //v10, v11の互換性が取れない
-    val poll: Poll?,
+    val files: List<FileProperty>? = null,
+    //@JsonProperty("fileIds") val mediaIds: List<String?>? = null,    //v10, v11の互換性が取れない
+    val poll: Poll? = null,
     @SerializedName("renote")
     @SerialName("renote")
-    val reNote: NoteDTO?,
-    val reply: NoteDTO?,
+    val reNote: NoteDTO? = null,
+    val reply: NoteDTO? = null,
 
     @SerializedName("myReaction")
-    val myReaction: String?,
+    val myReaction: String? = null,
 
     @SerializedName("_featuredId_")
     @SerialName("_featuredId_")
-    val tmpFeaturedId: String?,
+    val tmpFeaturedId: String? = null,
 
-    val app: App?
+    val app: App? = null
 ): Serializable
 
 fun NoteDTO.toNote(account: Account): Note{

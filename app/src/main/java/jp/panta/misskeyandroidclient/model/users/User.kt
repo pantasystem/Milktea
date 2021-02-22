@@ -13,8 +13,8 @@ data class User(
     val name: String?,
     val avatarUrl: String?,
     val emojis: List<Emoji>,
-    val isCat: Boolean,
-    val isBot: Boolean,
+    val isCat: Boolean?,
+    val isBot: Boolean?,
     val state: State? = null,
     val profile: Profile? = null,
     var instanceUpdatedAt: Date = Date()

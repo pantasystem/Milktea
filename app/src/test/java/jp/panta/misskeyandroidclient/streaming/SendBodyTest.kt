@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.streaming
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
