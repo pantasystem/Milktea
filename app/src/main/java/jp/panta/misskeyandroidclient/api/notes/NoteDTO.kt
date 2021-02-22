@@ -67,7 +67,7 @@ data class NoteDTO(
     @SerialName("_featuredId_")
     val tmpFeaturedId: String?,
 
-    val app: App
+    val app: App?
 ): Serializable
 
 fun NoteDTO.toNote(account: Account): Note{

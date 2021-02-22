@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.streaming
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import jp.panta.misskeyandroidclient.model.notification.Notification as NotificationDTO
 
@@ -12,51 +13,66 @@ data class EventMessage(
 @Serializable
 sealed class StreamingEvent
 
-/**
- * bodyとして機能する
- */
-sealed class ChannelEvent : StreamingEvent(){
+/*data class ChannelEvent : StreamingEvent() {
+
+}*/
+
+@Serializable
+@SerialName("channel")
+data class ChannelEvent(
+    val body: ChannelBody
+) : StreamingEvent()
+
+@Serializable
+sealed class ChannelBody : StreamingEvent(){
 
     abstract val id: String
 
     @Serializable
+    @SerialName("note")
     data class ReceiveNote(
         override val id: String,
         val body: NoteDTO
-    ) : ChannelEvent()
+    ) : ChannelBody()
 
     @Serializable
-    sealed class Main : ChannelEvent(){
+    sealed class Main : ChannelBody(){
 
         @Serializable
+        @SerialName("notification")
         data class Notification(
             override val id: String,
             val body: NotificationDTO
         ) : Main()
 
         @Serializable
+        @SerialName("readAllNotification")
         data class ReadAllNotification(
             override val id: String,
         ) : Main()
 
         @Serializable
+        @SerialName("unreadMessagingMessage")
         data class UnreadMessagingMessage(
             override val id: String,
             val body: StreamingEvent
         ) : Main()
 
         @Serializable
+        @SerialName("mention")
         data class Mention(
             override val id: String,
             val body: NoteDTO
         ) : Main()
 
         @Serializable
+        @SerialName("unreadMention")
         data class UnreadMention(
             override val id: String
         ) : Main()
 
         @Serializable
+        @SerialName("meUpdated")
         data class MeUpdated(
             override val id: String,
 
@@ -67,6 +83,7 @@ sealed class ChannelEvent : StreamingEvent(){
 }
 
 @Serializable
+@SerialName("noteUpdated")
 data class NoteUpdated (
     val id: String,
     val body: Body

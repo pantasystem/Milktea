@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import jp.panta.misskeyandroidclient.streaming.ChannelEvent
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.toJson
 
 class ChannelAPI(
@@ -24,7 +24,7 @@ class ChannelAPI(
     }
 
 
-    private val listenersMap = ConcurrentHashMap<Type, HashMap<String,(ChannelEvent)->Unit>>(
+    private val listenersMap = ConcurrentHashMap<Type, HashMap<String,(ChannelBody)->Unit>>(
         mapOf(
             Type.MAIN to hashMapOf(),
             Type.HOME to hashMapOf(),
@@ -37,7 +37,7 @@ class ChannelAPI(
     private val typeIdMap = ConcurrentHashMap<Type, String>()
 
     @ExperimentalCoroutinesApi
-    fun connect(type: Type) : Flow<ChannelEvent> {
+    fun connect(type: Type) : Flow<ChannelBody> {
         return channelFlow {
             val listenId = UUID.randomUUID().toString()
             connect(type, listenId){
@@ -50,7 +50,7 @@ class ChannelAPI(
         }
     }
 
-    private fun connect(type: Type, listenId: String, listener: (ChannelEvent)->Unit) {
+    private fun connect(type: Type, listenId: String, listener: (ChannelBody)->Unit) {
         synchronized(listenersMap) {
             if(listenersMap[type]?.contains(listenId) == true){
                 return@synchronized

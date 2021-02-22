@@ -36,7 +36,7 @@ data class Note(
     val myReaction: String?,
 
 
-    val app: App,
+    val app: App?,
     var instanceUpdatedAt: Date = Date()
 ) {
 
