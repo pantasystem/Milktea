@@ -49,8 +49,8 @@
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
                         tools:srcCompat="@drawable/ic_follow"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription"
+                        app:tint="?attr/colorNoteActionButtonTint" />
 
                 <ImageView
                         android:id="@+id/reactionImage"
