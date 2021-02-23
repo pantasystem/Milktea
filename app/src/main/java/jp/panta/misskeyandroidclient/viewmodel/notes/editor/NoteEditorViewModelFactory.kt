@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import java.lang.IllegalArgumentException
@@ -23,9 +22,9 @@ class NoteEditorViewModelFactory(
                 replyToNoteId = replyToNoteId,
                 quoteToNoteId = quoteToNoteId,
                 encryption = miApplication.getEncryption(),
-                note = note,
+                n = note,
                 draftNoteDao = miApplication.draftNoteDao,
-                draftNote = draftNote,
+                dn = draftNote,
                 loggerFactory = miApplication.loggerFactory
             ) as T
         }

@@ -5,7 +5,8 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.notes.CreateNote
+import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.api.notes.CreateNote as CreateNoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
@@ -15,7 +16,8 @@ import java.util.*
 class PostNoteTask(
     //connectionInstance: ConnectionInstance,
     //connectionInformation: EncryptedConnectionInformation,
-    encryption: Encryption,
+    val encryption: Encryption,
+    val createNote: CreateNote,
     val draftNote: DraftNote?,
     val account: Account,
     loggerFactory: Logger.Factory
@@ -23,69 +25,49 @@ class PostNoteTask(
 ): Serializable{
 
 
-    enum class Visibility(val visibility: String, val canLocalOnly: Boolean){
-        PUBLIC("public", true),
-        HOME("home", true),
-        FOLLOWERS("followers", true),
-        SPECIFIED("specified", false)
-    }
 
     private val logger = loggerFactory.create("PostNoteTask")
-
-    private val i: String = account.getI(encryption)
-    private var visibleUserIds: List<String>? = null
-    private var visibility: CreateNote.Visibility? = null
-    private var isLocal: Boolean? = null
-    var files: List<File>? = null
     private var filesIds: List<String>? = null
+
+    /*private val i: String = account.getI(encryption)
+    private var visibleUserIds: List<String>? = null
+    var visibility: Visibility = Visibility.Public(true)
+    var files: List<File>? = null
     var text: String? = null
     var cw: String? = null
     var viaMobile: Boolean? = null
-    var localOnly: Boolean? = null
     var noExtractMentions: Boolean? = null
     var noExtractHashtags: Boolean? = null
     var noExtractEmojis: Boolean? = null
     var replyId: String? = null
     var renoteId: String? = null
-    var poll: CreatePoll? = null
+    var poll: CreatePoll? = null*/
     //　世界か美優か？いい加減にしろ美優に決まってんだろ！！！
     //  でもその迷いが発せしてしまう純心さと優しさが尊い！！
-    fun setVisibility(visibility: Visibility?, visibilityUsers: List<String>? = null){
-        visibility?: return
 
-        val v = when(visibility){
-            Visibility.PUBLIC -> CreateNote.Visibility.PUBLIC
-            Visibility.HOME -> CreateNote.Visibility.HOME
-            Visibility.FOLLOWERS -> CreateNote.Visibility.FOLLOWERS
-            Visibility.SPECIFIED -> CreateNote.Visibility.SPECIFIED
-        }
-        //require(canLocalVisibility == isLocal) { "" }
-        this.visibility = v
-        this.visibleUserIds = visibilityUsers
-    }
     
-    fun execute(fileUploader: FileUploader): CreateNote?{
-         val ok = if(files.isNullOrEmpty()){
+    fun execute(fileUploader: FileUploader): CreateNoteDTO?{
+         val ok = if(createNote.files.isNullOrEmpty()){
              true
          }else{
              executeFileUpload(fileUploader)
         }
         return if(ok){
             logger.debug("投稿データを作成しました。")
-            CreateNote(
-                i = i,
-                visibility = visibility?.name?.toLowerCase(Locale.ENGLISH)?: "public",
-                visibleUserIds = visibleUserIds,
-                text = text,
-                cw =cw,
-                viaMobile = viaMobile,
-                localOnly = localOnly,
-                noExtractEmojis = noExtractEmojis,
-                noExtractMentions = noExtractMentions,
-                noExtractHashtags = noExtractHashtags,
-                replyId = replyId,
-                renoteId = renoteId,
-                poll = poll,
+            CreateNoteDTO(
+                i = createNote.author.getI(encryption),
+                visibility = createNote.visibility.type(),
+                localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly,
+                visibleUserIds = createNote.visibleUserIds(),
+                text = createNote.text,
+                cw = createNote.cw,
+                viaMobile = createNote.viaMobile,
+                noExtractEmojis = createNote.noExtractEmojis,
+                noExtractMentions = createNote.noExtractMentions,
+                noExtractHashtags = createNote.noExtractHashtags,
+                replyId = createNote.replyId?.noteId,
+                renoteId = createNote.renoteId?.noteId,
+                poll = createNote.poll,
                 fileIds = filesIds
                 )
         }else{
@@ -96,7 +78,7 @@ class PostNoteTask(
     }
 
     private fun executeFileUpload(fileUploader: FileUploader): Boolean{
-        val tmpFiles = files
+        val tmpFiles = createNote.files
         filesIds = tmpFiles?.mapNotNull {
             try{
                 it.remoteFileId ?: fileUploader.upload(it, true)?.id
@@ -113,23 +95,25 @@ class PostNoteTask(
 
     fun toDraftNote(): DraftNote{
         logger.debug("下書きノートが作成された")
-        val draftPoll = poll?.let{
+        val draftPoll = createNote.poll?.let{
             DraftPoll(it.choices, it.multiple, it.expiresAt)
         }
 
         return DraftNote(
             accountId = account.accountId,
-            text = text,
-            cw = cw,
-            visibleUserIds = visibleUserIds,
+            text = createNote.text,
+            cw = createNote.cw,
+            visibleUserIds = createNote.visibleUserIds(),
             draftPoll = draftPoll,
-            visibility = visibility?.name?: "public",
-            localOnly = isLocal,
-            renoteId = renoteId,
-            replyId = replyId
+            visibility = createNote.visibility.type(),
+            localOnly = createNote.visibility.isLocalOnly(),
+            renoteId = createNote.renoteId?.noteId,
+            replyId = createNote.replyId?.noteId
         ).apply{
             this.draftNoteId = draftNote?.draftNoteId
         }
     }
+
+
 
 }

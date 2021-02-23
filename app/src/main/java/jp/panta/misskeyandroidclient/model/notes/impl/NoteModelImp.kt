@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -17,6 +18,7 @@ import java.lang.Exception
 import java.lang.IllegalStateException
 import java.net.SocketTimeoutException
 import kotlin.jvm.Throws
+import jp.panta.misskeyandroidclient.api.notes.CreateNote as CreateNoteDTO
 
 class NoteModelImp(
     private val noteRepository: NoteRepository,
@@ -86,6 +88,30 @@ class NoteModelImp(
         ).execute()
     }
 
+    override suspend fun create(createNote: CreateNote) {
+        val cnDTO = CreateNoteDTO(
+            i = createNote.author.getI(encryption),
+            visibility = when(createNote.visibility) {
+                is Visibility.Home -> "home"
+                is Visibility.Followers -> "followers"
+                is Visibility.Public -> "public"
+                is Visibility.Specified -> "specified"
+            },
+            visibleUserIds = (createNote.visibility as? Visibility.Specified)?.visibleUserIds?.map {
+                require(it.accountId == createNote.author.accountId){
+                    "visibilityUserIdsに設定されたUser.Idの所有者が一致しませんでした。"
+                }
+                it.id
+            },
+            text = createNote.text,
+            cw = createNote.cw,
+            viaMobile = createNote.viaMobile,
+            localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly,
+            noExtractEmojis = createNote.noExtractEmojis,
+            noExtractHashtags = createNote.noExtractHashtags,
+            noExtractMentions = createNote.noExtractMentions,
+        )
+    }
     /*suspend fun add(note: NoteDTO): Note?{
         if(noteRepository.add(note.toNote()) == AddResult.CREATED){
             noteCapture.capture(note.id)

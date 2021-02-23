@@ -15,5 +15,6 @@ interface NoteModel {
     suspend fun delete(note: Note)
     suspend fun reaction(reaction: String, reactionTo: Note)
     suspend fun unreaction(reaction: String, unreactionTo: Note)
+    suspend fun create(createNote: CreateNote)
 
 }
