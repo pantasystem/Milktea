@@ -19,7 +19,7 @@ class NoteEditorViewModelFactory(
         if(modelClass == NoteEditorViewModel::class.java){
             return NoteEditorViewModel(
                 miApplication,
-                replyToNoteId = replyToNoteId,
+                replyId = replyToNoteId,
                 quoteToNoteId = quoteToNoteId,
                 encryption = miApplication.getEncryption(),
                 n = note,
