@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 
-import jp.panta.misskeyandroidclient.api.notes.CreateNote
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import jp.panta.misskeyandroidclient.model.users.User
@@ -12,7 +12,8 @@ import jp.panta.misskeyandroidclient.model.users.User
  * @param noExtractHashtags 本文からハッシュタグを展開しないか否か
  */
 data class CreateNote(
-    val visibility: CreateNote.Visibility,
+    val author: Account,
+    val visibility: Visibility,
     val text: String?,
     val cw: String? = null,
     val viaMobile: Boolean? = null,
@@ -21,8 +22,8 @@ data class CreateNote(
     val noExtractHashtags: Boolean? = null,
     val noExtractEmojis: Boolean? = null,
     var files: List<File>? = null,
-    val replyId: String? = null,
-    val renoteId: String? = null,
+    val replyId: Note.Id? = null,
+    val renoteId: Note.Id? = null,
     val poll: CreatePoll? = null
 
 
@@ -31,21 +32,28 @@ data class CreateNote(
 sealed class Visibility {
     data class Public(
         override val isLocalOnly: Boolean
-    ) : LocalOnly, Visibility()
+    ) : CanLocalOnly, Visibility()
 
     data class Home(
         override val isLocalOnly: Boolean
-    ) : Visibility(), LocalOnly
+    ) : Visibility(), CanLocalOnly
 
     data class Followers(
         override val isLocalOnly: Boolean
-    ) : Visibility(), LocalOnly
+    ) : Visibility(), CanLocalOnly
 
     data class Specified(
-        val visibleUserIds: List<String>
+        val visibleUserIds: List<User.Id>
     ) : Visibility()
+
+    /*
+    NOTE: LocalOnlyはPub,Ho,Fのいずれかを選択し、そのうちLocalのユーザーに限定に公開されるというものなので、LocalOnlyというVisibilityは存在しない
+    object LocalOnly : Visibility(), CanLocalOnly {
+        override val isLocalOnly: Boolean = true
+    }*/
+
 }
 
-interface LocalOnly {
+interface CanLocalOnly {
     val isLocalOnly: Boolean
 }
