@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
@@ -16,9 +17,11 @@ class PostNoteTask(
     //connectionInformation: EncryptedConnectionInformation,
     encryption: Encryption,
     val draftNote: DraftNote?,
-    val account: Account
+    val account: Account,
+    loggerFactory: Logger.Factory
     //private val fileUploader: FileUploader
 ): Serializable{
+
 
     enum class Visibility(val visibility: String, val canLocalOnly: Boolean){
         PUBLIC("public", true),
@@ -27,7 +30,9 @@ class PostNoteTask(
         SPECIFIED("specified", false)
     }
 
-    private val i: String = account.getI(encryption)!!
+    private val logger = loggerFactory.create("PostNoteTask")
+
+    private val i: String = account.getI(encryption)
     private var visibleUserIds: List<String>? = null
     private var visibility: CreateNote.Visibility? = null
     private var isLocal: Boolean? = null
@@ -66,6 +71,7 @@ class PostNoteTask(
              executeFileUpload(fileUploader)
         }
         return if(ok){
+            logger.debug("投稿データを作成しました。")
             CreateNote(
                 i = i,
                 visibility = visibility?.name?.toLowerCase(Locale.ENGLISH)?: "public",
@@ -83,6 +89,7 @@ class PostNoteTask(
                 fileIds = filesIds
                 )
         }else{
+            logger.error("投稿データ作成に失敗しました。")
             null
         }
 
@@ -94,6 +101,7 @@ class PostNoteTask(
             try{
                 it.remoteFileId ?: fileUploader.upload(it, true)?.id
             }catch( e: Exception ){
+                logger.error("ファイルのアップロードに失敗しました: path=${it.path}", e)
                 null
             }
             //skip
@@ -104,6 +112,7 @@ class PostNoteTask(
     }
 
     fun toDraftNote(): DraftNote{
+        logger.debug("下書きノートが作成された")
         val draftPoll = poll?.let{
             DraftPoll(it.choices, it.multiple, it.expiresAt)
         }

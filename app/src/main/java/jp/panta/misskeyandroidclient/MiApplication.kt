@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
@@ -124,6 +125,8 @@ class MiApplication : Application(), MiCore {
     override lateinit var messageSubscriber: MessageSubscriber
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override var loggerFactory: Logger.Factory = AndroidDefaultLogger.Factory
 
 
     override fun onCreate() {

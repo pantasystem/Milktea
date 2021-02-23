@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
 import android.util.Log
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -31,10 +32,12 @@ class NoteEditorViewModel(
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
+    private val loggerFactory: Logger.Factory,
     val note: NoteDTO? = null,
     val draftNote: DraftNote? = null
 ) : ViewModel(){
 
+    private val logger = loggerFactory.create("NoteEditorViewModel")
 
     val currentAccount = miCore.getCurrentAccount()
 
@@ -80,7 +83,7 @@ class NoteEditorViewModel(
     val totalImageCount = MediatorLiveData<Int>().apply{
 
         this.addSource(files){
-            Log.d("NoteEditorViewModel", "list$it, sizeは: ${it.size}")
+            logger.debug( "list$it, sizeは: ${it.size}")
             this.value = it.size
         }
     }
@@ -166,7 +169,7 @@ class NoteEditorViewModel(
 
     fun post(){
         currentAccount.value?.let{ account ->
-            val noteTask = PostNoteTask(encryption, draftNote, account)
+            val noteTask = PostNoteTask(encryption, draftNote, account, loggerFactory)
             noteTask.cw = if(cw.value.isNullOrBlank()) null else cw.value
             noteTask.files = files.value
             noteTask.text =text.value
@@ -177,6 +180,8 @@ class NoteEditorViewModel(
                 it.userId
             })
             noteTask.localOnly = this.isLocalOnly.value?: false
+
+            // FIXME Model層に依頼すべきだがServiceを呼び出したいがためにViewへ通知してしまっている
             this.noteTask.postValue(noteTask)
         }
 
@@ -324,7 +329,7 @@ class NoteEditorViewModel(
         val builder = StringBuilder(text.value?: "")
         builder.insert(pos, emoji)
         text.value = builder.toString()
-        Log.d("NoteEditorViewModel", "position:${pos + emoji.length - 1}")
+        logger.debug( "position:${pos + emoji.length - 1}")
         return pos + emoji.length
     }
 
@@ -358,15 +363,15 @@ class NoteEditorViewModel(
                 try{
                     isSaveNoteAsDraft.event = draftNoteDao.fullInsert(dfNote)
                 }catch(e: Exception){
-                    Log.e("NoteEditorVM", "下書き書き込み中にエラー発生：失敗してしまった", e)
+                    logger.error( "下書き書き込み中にエラー発生：失敗してしまった", e)
                 }
             }catch(e: IOException){
 
             }catch(e: NullPointerException){
-                Log.e("NoteEditorVM", "下書き保存に失敗した", e)
+                logger.error( "下書き保存に失敗した", e)
 
             }catch (e: Throwable){
-                Log.e("NoteEditorVM", "下書き保存に失敗した", e)
+                logger.error( "下書き保存に失敗した", e)
 
             }
 

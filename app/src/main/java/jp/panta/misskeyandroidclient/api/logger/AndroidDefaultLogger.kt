@@ -11,7 +11,7 @@ class AndroidDefaultLogger(
         Log.d(tag, msg, e)
     }
 
-    override fun error(msg: String, e: Exception?, tag: String) {
+    override fun error(msg: String, e: Throwable?, tag: String) {
         Log.e(tag, msg, e)
     }
 
@@ -23,5 +23,10 @@ class AndroidDefaultLogger(
         Log.w(tag, msg, e)
     }
 
+    object Factory : Logger.Factory {
+        override fun create(tag: String): Logger {
+            return AndroidDefaultLogger(tag)
+        }
+    }
 
 }

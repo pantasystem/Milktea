@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
 import androidx.lifecycle.LiveData
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.instance.Meta
@@ -27,6 +28,7 @@ interface MiCore{
 
     var messageSubscriber: MessageSubscriber
 
+    val loggerFactory: Logger.Factory
 
     fun getAccounts(): LiveData<List<Account>>
 
@@ -74,4 +76,5 @@ interface MiCore{
 
 
     fun getNoteEventStore(account: Account) : NoteEventStore
+
 }
