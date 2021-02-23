@@ -1,9 +1,8 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
 import com.google.gson.Gson
-import jp.panta.misskeyandroidclient.streaming.Reconnectable
-import jp.panta.misskeyandroidclient.streaming.Send
-import jp.panta.misskeyandroidclient.streaming.network.MessageReceiveListener
+import jp.panta.misskeyandroidclient.streaming.*
+import jp.panta.misskeyandroidclient.streaming.network.StreamingEventListener
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -11,13 +10,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.toJson
 
 class ChannelAPI(
     val socket: Socket,
     val gson: Gson
-) : Reconnectable, MessageReceiveListener {
+) : Reconnectable, StreamingEventListener {
 
     enum class Type {
         MAIN, HOME, LOCAL, HYBRID, GLOBAL
@@ -66,8 +63,23 @@ class ChannelAPI(
         }
     }
 
-    override fun onReceiveMessage(message: String): Boolean {
-        // TODO メッセージ受信時の処理をする
+
+
+    override fun handle(e: StreamingEvent): Boolean {
+        if(e is ChannelEvent) {
+            synchronized(listenersMap) {
+
+                listenersMap.values.forEach { listeners ->
+                    listeners.filter {
+                        it.key == e.body.id
+                    }.values.forEach { callback ->
+                        callback.invoke(e.body)
+                    }
+                }
+            }
+            return true
+        }
+
         return false
     }
 
@@ -102,17 +114,12 @@ class ChannelAPI(
             listenersMap[type]?.remove(listenId)
 
             // 誰にも使われていなければサーバーからChannelへの接続を開放する
-            if(listenersMap[type].isNullOrEmpty()){
-                val id = typeIdMap.remove(type)
-                if(id != null){
-                    socket.send(Send.Disconnect(Send.Disconnect.Body(id)).toJson())
-                }
-            }
+            trySendDisconnect(type)
 
         }
     }
 
-    private fun sendDisconnect(type: Type) {
+    private fun trySendDisconnect(type: Type) {
         if(listenersMap[type].isNullOrEmpty()){
             val id = typeIdMap.remove(type)
             if(id != null){

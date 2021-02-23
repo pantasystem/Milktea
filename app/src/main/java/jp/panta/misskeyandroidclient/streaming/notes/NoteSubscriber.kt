@@ -1,22 +1,25 @@
 package jp.panta.misskeyandroidclient.streaming.notes
 
 import com.google.gson.Gson
-import jp.panta.misskeyandroidclient.streaming.Reconnectable
-import jp.panta.misskeyandroidclient.streaming.Send
-import jp.panta.misskeyandroidclient.streaming.network.MessageReceiveListener
+import jp.panta.misskeyandroidclient.streaming.*
+import jp.panta.misskeyandroidclient.streaming.network.StreamingEventListener
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.decodeFromString
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import jp.panta.misskeyandroidclient.streaming.NoteUpdated
-import jp.panta.misskeyandroidclient.streaming.toJson
+import kotlinx.serialization.json.Json
 
 class NoteSubscriber(
     val socket: Socket,
     val gson: Gson
-) : Reconnectable, MessageReceiveListener {
+) : Reconnectable, StreamingEventListener {
+
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     @ExperimentalCoroutinesApi
     fun subscribe(noteId: String): Flow<NoteUpdated> {
@@ -85,8 +88,15 @@ class NoteSubscriber(
         }
     }
 
-    override fun onReceiveMessage(message: String): Boolean {
-        // TODO メッセージを受信したときの処理を実装する
+    override fun handle(e: StreamingEvent): Boolean {
+        if(e is NoteUpdated) {
+            synchronized(noteIdListenMap) {
+                noteIdListenMap[e.body.id]?.values?.forEach {
+                    it.invoke(e)
+                }
+            }
+            return true
+        }
         return false
     }
 
