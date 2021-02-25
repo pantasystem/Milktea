@@ -1,33 +1,30 @@
 package jp.panta.misskeyandroidclient.streaming.notes
 
 import com.google.gson.Gson
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.network.StreamingEventListener
 import jp.panta.misskeyandroidclient.streaming.network.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.decodeFromString
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.serialization.json.Json
 
-class NoteSubscriber(
+class NoteCaptureAPI(
     val socket: Socket,
-    val gson: Gson
 ) : Reconnectable, StreamingEventListener {
 
-    val json = Json {
-        ignoreUnknownKeys = true
-    }
+
 
     @ExperimentalCoroutinesApi
-    fun subscribe(noteId: String): Flow<NoteUpdated> {
+    fun capture(noteId: String): Flow<NoteUpdated.Body> {
 
         return channelFlow {
             val listenId = UUID.randomUUID().toString()
-            subscribe(noteId, listenId){ noteUpdated ->
-                offer(noteUpdated)
+            capture(noteId, listenId){ noteUpdated ->
+                offer(noteUpdated.body)
             }
 
             awaitClose {
@@ -41,7 +38,7 @@ class NoteSubscriber(
 
     private val noteIdListenMap = ConcurrentHashMap<String, ConcurrentHashMap<String, (NoteUpdated)->Unit>>()
 
-    private fun subscribe(noteId: String, listenId: String ,listener: (NoteUpdated)->Unit) {
+    private fun capture(noteId: String, listenId: String, listener: (NoteUpdated)->Unit) {
         synchronized(noteIdListenMap){
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(listeners.isEmpty()){
