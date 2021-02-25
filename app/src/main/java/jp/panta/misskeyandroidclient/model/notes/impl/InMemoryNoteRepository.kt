@@ -1,41 +1,35 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteCapture
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.streaming.notes.NoteSubscriber
 import jp.panta.misskeyandroidclient.streaming.notes.NoteSubscriberProvider
-import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class InMemoryNoteRepository(
     val noteSubscriberProvider: NoteSubscriberProvider,
     val accountRepository: AccountRepository,
-    val coroutineScope: CoroutineScope
+    val coroutineScope: CoroutineScope,
+    loggerFactory: Logger.Factory
 ): NoteRepository{
+
+    val logger = loggerFactory.create("InMemoryNoteRepository")
 
     private val notes = HashMap<Note.Id, Note>()
 
     private val mutex = Mutex()
 
-    @ExperimentalCoroutinesApi
-    private val eventBroadcastChannel = BroadcastChannel<NoteRepository.Event>(1)
-
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    override fun observer(): Flow<NoteRepository.Event> {
-        return eventBroadcastChannel.asFlow()
+    override var listener: NoteRepository.Listener = object : NoteRepository.Listener {
+        override fun on(e: NoteRepository.Event) {
+            logger.warning("リスナーが未設定です。 event:$e")
+        }
     }
+
 
     override suspend fun get(noteId: Note.Id): Note? {
         mutex.withLock{
@@ -47,7 +41,6 @@ class InMemoryNoteRepository(
      * @param note 追加するノート
      * @return ノートが新たに追加されるとtrue、上書きされた場合はfalseが返されます。
      */
-    @ExperimentalCoroutinesApi
     override suspend fun add(note: Note): AddResult {
         mutex.withLock{
             val n = this.notes[note.id]
@@ -56,16 +49,17 @@ class InMemoryNoteRepository(
             }
             this.notes[note.id] = note
             note.updated()
-            eventBroadcastChannel.send(NoteRepository.Event.Added(note.id))
 
             return if(n == null){
-                subscribe(note.id)
+                listener.on(NoteRepository.Event.Created(note.id))
                 AddResult.CREATED
-            } else AddResult.UPDATED
+            } else {
+                listener.on(NoteRepository.Event.Updated(note.id))
+                AddResult.UPDATED
+            }
         }
     }
 
-    @ExperimentalCoroutinesApi
     override suspend fun addAll(notes: List<Note>): List<AddResult> {
         return notes.map{
             this.add(it)
@@ -76,7 +70,6 @@ class InMemoryNoteRepository(
      * @param noteId 削除するNoteのid
      * @return 実際に削除されるとtrue、そもそも存在していなかった場合にはfalseが返されます
      */
-    @ExperimentalCoroutinesApi
     override suspend fun remove(noteId: Note.Id): Boolean {
         mutex.withLock{
             val n = this.notes[noteId]
@@ -84,12 +77,11 @@ class InMemoryNoteRepository(
             if(n == null){
                 return false
             }
-            eventBroadcastChannel.send(NoteRepository.Event.Deleted(noteId = noteId))
+            listener.on(NoteRepository.Event.Deleted(noteId = noteId))
             return true
         }
     }
 
-    @ExperimentalCoroutinesApi
     override suspend fun removeByUserId(userId: User.Id): Int {
         return mutex.withLock {
             notes.values.filter {
@@ -100,7 +92,7 @@ class InMemoryNoteRepository(
         }
     }
 
-    @ExperimentalCoroutinesApi
+    /*@ExperimentalCoroutinesApi
     private fun subscribe(noteId: Note.Id) {
         coroutineScope.launch(Dispatchers.IO) {
             noteSubscriberProvider.get(noteId.accountId)?.subscribe(noteId.noteId)
@@ -170,5 +162,5 @@ class InMemoryNoteRepository(
                 }
         }
     }
-
+*/
 }

@@ -16,13 +16,19 @@ interface NoteRepository {
         fun create(account: Account) : NoteRepository
     }
 
+    interface Listener {
+        fun on(e: Event)
+    }
 
 
     sealed class Event{
         data class Deleted(val noteId: Note.Id) : Event()
-        data class Added(val note: Note.Id): Event()
+        data class Updated(val note: Note.Id): Event()
+        data class Created(val note: Note.Id): Event()
     }
-    fun observer(): Flow<Event>
+
+    var listener: Listener
+
 
     suspend fun get(noteId: Note.Id) : Note?
 

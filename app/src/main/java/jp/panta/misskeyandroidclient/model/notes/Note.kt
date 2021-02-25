@@ -6,6 +6,12 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 
 data class Note(
@@ -15,9 +21,9 @@ data class Note(
     val cw: String?,
     val userId: User.Id,
 
-    val replyId: String?,
+    val replyId: Id?,
 
-    val renoteId: String?,
+    val renoteId: Id?,
 
     val viaMobile: Boolean?,
     val visibility: String?,
@@ -47,5 +53,45 @@ data class Note(
 
     fun updated(){
         this.instanceUpdatedAt = Date()
+    }
+}
+
+
+class StatefulNote(
+    val noteEventStream: Flow<NoteRepository.Event>,
+    val userEventStream: Flow<UserRepository.Event>,
+    coroutineScope: CoroutineScope,
+    val note: Note,
+    val user: User,
+    val renote: StatefulNote?,
+
+
+) {
+    class Factory(
+        val noteId: Note.Id,
+        val noteRepository: NoteRepository,
+        val userRepository: UserRepository,
+        val coroutineScope: CoroutineScope
+    ) {
+        suspend fun create() {
+            val note = noteRepository.get(noteId)
+            val user = note?.let{
+                userRepository.get(it.userId)
+            }
+            val reply = note?.replyId?.let{
+                noteRepository.get(it)
+            }
+
+            val renote = note?.renoteId?.let{
+                noteRepository.get(it)
+            }
+        }
+    }
+    init {
+
+
+        coroutineScope.launch(Dispatchers.IO) {
+
+        }
     }
 }

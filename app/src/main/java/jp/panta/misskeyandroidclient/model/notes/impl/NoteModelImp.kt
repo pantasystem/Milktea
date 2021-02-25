@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.io.IOException
@@ -89,28 +90,7 @@ class NoteModelImp(
     }
 
     override suspend fun create(createNote: CreateNote) {
-        val cnDTO = CreateNoteDTO(
-            i = createNote.author.getI(encryption),
-            visibility = when(createNote.visibility) {
-                is Visibility.Home -> "home"
-                is Visibility.Followers -> "followers"
-                is Visibility.Public -> "public"
-                is Visibility.Specified -> "specified"
-            },
-            visibleUserIds = (createNote.visibility as? Visibility.Specified)?.visibleUserIds?.map {
-                require(it.accountId == createNote.author.accountId){
-                    "visibilityUserIdsに設定されたUser.Idの所有者が一致しませんでした。"
-                }
-                it.id
-            },
-            text = createNote.text,
-            cw = createNote.cw,
-            viaMobile = createNote.viaMobile,
-            localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly,
-            noExtractEmojis = createNote.noExtractEmojis,
-            noExtractHashtags = createNote.noExtractHashtags,
-            noExtractMentions = createNote.noExtractMentions,
-        )
+        
     }
     /*suspend fun add(note: NoteDTO): Note?{
         if(noteRepository.add(note.toNote()) == AddResult.CREATED){
