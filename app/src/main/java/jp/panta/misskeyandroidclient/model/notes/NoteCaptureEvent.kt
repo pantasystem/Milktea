@@ -16,7 +16,7 @@ class NoteCaptureEvent(
     val authorId: String = ""
 )
 
-
+@Deprecated("古く扱いにくいため非推奨")
 sealed class Event{
 
     abstract fun adaptationAndCreateNoteDTO(note: NoteDTO, account: Account) : NoteDTO?
