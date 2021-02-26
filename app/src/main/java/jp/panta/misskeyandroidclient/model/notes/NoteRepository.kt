@@ -22,9 +22,10 @@ interface NoteRepository {
 
 
     sealed class Event{
-        data class Deleted(val noteId: Note.Id) : Event()
-        data class Updated(val note: Note.Id): Event()
-        data class Created(val note: Note.Id): Event()
+        abstract val noteId: Note.Id
+        data class Deleted(override val noteId: Note.Id) : Event()
+        data class Updated(override val noteId: Note.Id, val note: Note): Event()
+        data class Created(override val noteId: Note.Id, val note: Note): Event()
     }
 
     var listener: Listener

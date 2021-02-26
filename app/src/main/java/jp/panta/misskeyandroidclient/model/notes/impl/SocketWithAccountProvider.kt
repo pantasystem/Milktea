@@ -11,7 +11,7 @@ import okhttp3.OkHttpClient
 /**
  * SocketをAccountに基づきいい感じにリソースを取得できるようにする
  */
-class SocketProvider(
+class SocketWithAccountProvider(
     val encryption: Encryption,
     loggerFactory: Logger.Factory,
     val instanceCreatedListener: (account: Account, socket: Socket)-> Unit = { _, s -> s.connect() },
