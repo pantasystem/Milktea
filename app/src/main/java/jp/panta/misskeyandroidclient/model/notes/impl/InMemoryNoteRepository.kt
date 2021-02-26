@@ -12,9 +12,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class InMemoryNoteRepository(
-    val noteSubscriberProvider: NoteCaptureAPIProvider,
-    val accountRepository: AccountRepository,
-    val coroutineScope: CoroutineScope,
     loggerFactory: Logger.Factory
 ): NoteRepository{
 
@@ -51,10 +48,10 @@ class InMemoryNoteRepository(
             note.updated()
 
             return if(n == null){
-                listener.on(NoteRepository.Event.Created(note.id))
+                listener.on(NoteRepository.Event.Created(note.id, note))
                 AddResult.CREATED
             } else {
-                listener.on(NoteRepository.Event.Updated(note.id))
+                listener.on(NoteRepository.Event.Updated(note.id, note))
                 AddResult.UPDATED
             }
         }
@@ -92,75 +89,4 @@ class InMemoryNoteRepository(
         }
     }
 
-    /*@ExperimentalCoroutinesApi
-    private fun subscribe(noteId: Note.Id) {
-        coroutineScope.launch(Dispatchers.IO) {
-            noteSubscriberProvider.get(noteId.accountId)?.subscribe(noteId.noteId)
-                ?.collect { e->
-                    when(e.body){
-                        is NoteUpdated.Body.Deleted -> {
-                            remove(noteId)
-                        }
-                        is NoteUpdated.Body.Reacted -> {
-                            var note = get(noteId)
-                            if(note != null){
-                                val counts = ArrayList(note.reactionCounts)
-                                var isFind = false
-                                for(i in 0 until counts.size) {
-                                    val count = counts[i]
-                                    if(count.reaction == e.body.body.reaction) {
-                                        counts[i] = count.copy(count = count.count + 1)
-                                        isFind = true
-                                        break
-                                    }
-                                }
-                                if(!isFind){
-                                    counts.add(ReactionCount(e.body.body.reaction, 1))
-                                }
-                                val myReaction = if(e.body.body.userId == accountRepository.get(noteId.accountId).remoteId) e.body.body.reaction else note.myReaction
-
-                                note = note.copy(
-                                    reactionCounts = counts,
-                                    myReaction = myReaction
-                                )
-                                add(note)
-                            }
-                        }
-
-                        is NoteUpdated.Body.Unreacted -> {
-                            val note = get(noteId)
-                            if(note != null){
-                                val counts = note.reactionCounts
-                                    .filterNot {
-                                        it.reaction == e.body.body.reaction && it.count <= 1
-                                    }
-                                val myReaction = if(e.body.body.userId == accountRepository.get(noteId.accountId).remoteId) null else note.myReaction
-                                add(note.copy(reactionCounts = counts, myReaction = myReaction))
-                            }
-                        }
-                        is NoteUpdated.Body.PollVoted -> {
-                            val note = get(noteId)
-                            if(note != null){
-                                val poll = note.poll?.let{
-                                    val choices = ArrayList(it.choices)
-                                        .mapIndexed{ i, c ->
-                                            if(e.body.body.choice == i){
-                                                val isVoted =  c.isVoted || accountRepository.get(noteId.accountId).remoteId == e.body.body.userId
-                                                c.copy(votes = c.votes + 1, isVoted = isVoted)
-                                            }else{
-                                                c
-                                            }
-                                        }
-                                    it.copy(
-                                        choices = choices
-                                    )
-                                }
-                                add(note.copy(poll = poll))
-                            }
-                        }
-                    }
-                }
-        }
-    }
-*/
 }
