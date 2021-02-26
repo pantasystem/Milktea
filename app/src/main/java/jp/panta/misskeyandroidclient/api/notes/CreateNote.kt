@@ -24,11 +24,5 @@ data class CreateNote(
 ){
     data class Response(val createdNote: NoteDTO)
 
-    enum class Visibility(val isLocalOnlyPossible: Boolean){
-        PUBLIC(true),
-        HOME(true),
-        FOLLOWERS(true),
-        SPECIFIED(false)
 
-    }
 }

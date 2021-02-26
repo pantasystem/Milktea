@@ -128,7 +128,7 @@ class NoteEditorViewModel(
         }
     }
 
-    // FIXME リモートのVisbilityを参照するようにする
+    // FIXME リモートのVisibilityを参照するようにする
     val visibility = MediatorLiveData<Visibility>().apply {
         addSourceFromNoteAndDraft { noteDTO, draftNote ->
             val type = noteDTO?.visibility?: draftNote?.visibility
@@ -304,6 +304,11 @@ class NoteEditorViewModel(
         this.visibilitySelectedEvent.event = Unit
     }
 
+    fun toggleLocalOnly() {
+        if(this.isLocalOnlyEnabled.value == true){
+            this.isLocalOnly.value = !(this.isLocalOnly.value?: false)
+        }
+    }
 
 
     private fun List<File>?.toArrayList(): ArrayList<File>{
