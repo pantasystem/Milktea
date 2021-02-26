@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.streaming.notes
 
 import com.google.gson.Gson
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.network.StreamingEventListener
@@ -11,23 +12,29 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.serialization.json.Json
+import kotlin.math.log
 
 class NoteCaptureAPI(
     val socket: Socket,
+    loggerFactory: Logger.Factory? = null
 ) : Reconnectable, StreamingEventListener {
 
 
+    val logger = loggerFactory?.create("NoteCaptureAPI")
 
     @ExperimentalCoroutinesApi
     fun capture(noteId: String): Flow<NoteUpdated.Body> {
 
         return channelFlow {
+            logger?.debug("channelFlow起動")
             val listenId = UUID.randomUUID().toString()
             capture(noteId, listenId){ noteUpdated ->
+                logger?.debug("受信:$noteUpdated")
                 offer(noteUpdated.body)
             }
 
             awaitClose {
+                logger?.debug("captureを終了する noteId=$noteId, listenId=$listenId")
                 unSubscribe(noteId, listenId)
             }
         }
@@ -42,11 +49,12 @@ class NoteCaptureAPI(
         synchronized(noteIdListenMap){
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(listeners.isEmpty()){
-                if(sendSub(noteId)){
+                logger?.debug("リモートへCaptureができていなかったので開始する")
+                if(!sendSub(noteId)){
                     return@synchronized
                 }
             }
-            if(listeners.contains(listenId)) {
+            if(!listeners.contains(listenId)) {
                 listeners[listenId] = listener
             }
             noteIdListenMap[noteId] = listeners
@@ -88,9 +96,14 @@ class NoteCaptureAPI(
     override fun handle(e: StreamingEvent): Boolean {
         if(e is NoteUpdated) {
             synchronized(noteIdListenMap) {
-                noteIdListenMap[e.body.id]?.values?.forEach {
-                    it.invoke(e)
+                if(noteIdListenMap[e.body.id].isNullOrEmpty()) {
+                    logger?.warning("listenerは未登録ですが、何か受信したようです。")
+                }else{
+                    noteIdListenMap[e.body.id]?.values?.forEach {
+                        it.invoke(e)
+                    }
                 }
+
             }
             return true
         }
@@ -104,6 +117,7 @@ class NoteCaptureAPI(
     }
 
     private fun sendUnSub(noteId: String) : Boolean{
+        logger?.debug("NoteのRemoteへの購読を解除します noteId:$noteId")
         return socket.send(
             Send.UnSubscribeNote(Send.UnSubscribeNote.Body(noteId)).toJson()
         )

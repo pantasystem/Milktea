@@ -59,7 +59,7 @@ class NoteCaptureAPIAdapter(
 
         synchronized(noteIdWithJob) {
             if(addRepositoryEventListener(id, repositoryEventListener)){
-
+                logger.debug("未登録だったのでRemoteに対して購読を開始する")
                 val job = noteCaptureAPIWithAccountProvider.get(account)
                     .capture(id.noteId)
                     .onEach {
@@ -76,7 +76,7 @@ class NoteCaptureAPIAdapter(
                 if(removeRepositoryEventListener(id, repositoryEventListener)){
 
                     // すべてのリスナーが解除されていればRemoteへの購読も解除する
-                    noteIdWithJob[id]?.cancel()?: run{
+                    noteIdWithJob.remove(id)?.cancel()?: run{
                         logger.warning("購読解除しようとしたところすでに解除されていた")
                     }
                 }
@@ -91,7 +91,7 @@ class NoteCaptureAPIAdapter(
     private fun addRepositoryEventListener(noteId: Note.Id, listener: (NoteRepository.Event)-> Unit): Boolean {
         synchronized(noteIdWithListeners) {
             val listeners = noteIdWithListeners[noteId]
-            return if(listeners == null) {
+            return if(listeners.isNullOrEmpty()) {
                 noteIdWithListeners[noteId] = mutableSetOf(listener)
                 true
             }else{
@@ -184,7 +184,7 @@ class NoteCaptureAPIAdapter(
                 count
             }
         }
-        if(hasItem) {
+        if(!hasItem) {
             val added = list.toMutableList()
             added.add(ReactionCount(reaction = e.body.reaction, count = 1))
             list = added
