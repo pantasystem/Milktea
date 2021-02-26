@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.onEach
 import org.junit.Assert.*
 import org.junit.Test
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class NoteCaptureAPIAdapterTest {
 
@@ -62,6 +63,7 @@ class NoteCaptureAPIAdapterTest {
                 note
             )
 
+            var sendCount = AtomicInteger()
             val job = launch {
 
                 for(n in 0 until 10){
@@ -75,6 +77,7 @@ class NoteCaptureAPIAdapterTest {
 
                 delay(400)
                 noteCapture.handle(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+                sendCount.incrementAndGet()
 
             }
 
@@ -85,32 +88,48 @@ class NoteCaptureAPIAdapterTest {
             val job2 = launch {
                 noteCaptureAPIAdapter.capture(note.id).onEach {
                     println("job2: on ev")
-                }.launchIn(this)
+                }.launchIn(this + Dispatchers.IO)
             }
 
             val job3 = launch {
                 noteCaptureAPIAdapter.capture(note.id).onEach {
                     println("job3: on ev")
-                }.launchIn(this)
+                }.launchIn(this + Dispatchers.IO)
             }
 
             val job4 = launch {
                 noteCaptureAPIAdapter.capture(note.id).onEach {
                     println("job4: on ev: $it")
-                    assertTrue(noteRepository.get(note.id)!!.reactionCounts[0].count == 3)
-                }.launchIn(this)
+                }.launchIn(this + Dispatchers.IO)
             }
 
 
             delay(1000)
             noteCapture.handle(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-
+            sendCount.incrementAndGet()
             job2.cancel()
             job3.cancel()
 
-            noteCapture.handle(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+            delay(100)
 
-            job4.cancel()
+            launch {
+                println("nowCount:$sendCount")
+                for(n in 0 until 100) {
+                    if(n % 2 == 0){
+                        noteCapture.handle(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+                        sendCount.incrementAndGet()
+                    }else{
+                        noteCapture.handle(NoteUpdated(NoteUpdated.Body.Unreacted(id = note.id.noteId, body = NoteUpdated.Body.Unreacted.Body(reaction = "hoge", account.remoteId))))
+                        sendCount.decrementAndGet()
+                    }
+
+                    println("sendMsg:$sendCount, n:$n")
+
+                }
+
+            }
+
+            delay(1000)
         }
 
     }

@@ -36,6 +36,16 @@ class NoteCaptureAPIAdapter(
 
     private val noteIdWithJob = mutableMapOf<Note.Id, Job>()
 
+    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>()
+
+    init{
+        coroutineScope.launch(dispatcher) {
+            noteUpdatedDispatcher.collect {
+                handleRemoteEvent(it.first, it.second)
+            }
+        }
+    }
+
     override fun on(e: NoteRepository.Event) {
 
         synchronized(noteIdWithListeners) {
@@ -63,7 +73,7 @@ class NoteCaptureAPIAdapter(
                 val job = noteCaptureAPIWithAccountProvider.get(account)
                     .capture(id.noteId)
                     .onEach {
-                        handleRemoteEvent(account, it)
+                        noteUpdatedDispatcher.emit(account to it)
                     }.launchIn(coroutineScope)
                 noteIdWithJob[id] = job
             }

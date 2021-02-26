@@ -7,19 +7,19 @@ class TestLogger(
 ) : Logger{
 
     override fun debug(msg: String, tag: String, e: Exception?) {
-        println("$tag:$msg, error:$e")
+        println("debug:$tag:$msg, error:$e")
     }
 
     override fun error(msg: String, e: Throwable?, tag: String) {
-        println("$tag:$msg, error:$e")
+        println("error:$tag:$msg, error:$e")
     }
 
     override fun info(msg: String, tag: String, e: Exception?) {
-        println("$tag:$msg, error:$e")
+        println("info:$tag:$msg, error:$e")
     }
 
     override fun warning(msg: String, tag: String, e: Exception?) {
-        println("$tag:$msg, error:$e")
+        println("warning:$tag:$msg, error:$e")
 
     }
 
