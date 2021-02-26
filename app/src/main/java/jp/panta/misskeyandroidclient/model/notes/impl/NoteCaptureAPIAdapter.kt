@@ -7,16 +7,9 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
-import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.*
 
 /**
  * model層とNoteCaptureAPIをいい感じに接続する
@@ -25,20 +18,23 @@ class NoteCaptureAPIAdapter(
     private val accountRepository: AccountRepository,
     private val noteRepository: NoteRepository,
     private val noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
-    private val coroutineScope: CoroutineScope,
-    loggerFactory: Logger.Factory
+    loggerFactory: Logger.Factory,
+    cs: CoroutineScope,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : NoteRepository.Listener {
 
     private val logger = loggerFactory.create("NoteCaptureAPIAdapter")
 
-    private val accountWithNoteCaptureAPI = mutableMapOf<Long, NoteCaptureAPI>()
-    private val lock = Mutex()
+    private val coroutineScope = CoroutineScope(cs.coroutineContext + dispatcher)
+
 
     init {
         noteRepository.listener = this
     }
 
     private val noteIdWithListeners = mutableMapOf<Note.Id, MutableSet<(NoteRepository.Event)->Unit>>()
+
+    private val noteIdWithJob = mutableMapOf<Note.Id, Job>()
 
     override fun on(e: NoteRepository.Event) {
 
@@ -54,70 +50,79 @@ class NoteCaptureAPIAdapter(
     }
 
     @ExperimentalCoroutinesApi
-    suspend fun capture(id: Note.Id) : Flow<NoteRepository.Event> {
+    fun capture(id: Note.Id) : Flow<NoteRepository.Event> = channelFlow {
         val account = accountRepository.get(id.accountId)
 
-        return channelFlow {
+        val repositoryEventListener: (NoteRepository.Event)->Unit = { ev ->
+            offer(ev)
+        }
 
-            val remoteNoteCaptureJob = launch {
-                noteCaptureAPIWithAccountProvider.get(account)
+        synchronized(noteIdWithJob) {
+            if(addRepositoryEventListener(id, repositoryEventListener)){
+
+                val job = noteCaptureAPIWithAccountProvider.get(account)
                     .capture(id.noteId)
-                    .collect {
-                        launch {
-                            handleRemoteEvent(account, it)
-                        }
-                    }
+                    .onEach {
+                        handleRemoteEvent(account, it)
+                    }.launchIn(coroutineScope)
+                noteIdWithJob[id] = job
             }
+        }
 
-            val repositoryEventListener: (NoteRepository.Event)->Unit = { ev ->
-                offer(ev)
-            }
-
-            addRepositoryEventListener(id, repositoryEventListener)
-
-            awaitClose {
-                // NoteCaptureの購読を解除する
-                remoteNoteCaptureJob.cancel()
-
+        awaitClose {
+            // NoteCaptureの購読を解除する
+            synchronized(noteIdWithJob) {
                 // リスナーを解除する
-                removeRepositoryEventListener(id, repositoryEventListener)
+                if(removeRepositoryEventListener(id, repositoryEventListener)){
+
+                    // すべてのリスナーが解除されていればRemoteへの購読も解除する
+                    noteIdWithJob[id]?.cancel()?: run{
+                        logger.warning("購読解除しようとしたところすでに解除されていた")
+                    }
+                }
             }
-
-
         }
-
-
-
-
     }
 
-    private fun addRepositoryEventListener(noteId: Note.Id, listener: (NoteRepository.Event)-> Unit) {
-        coroutineScope.launch {
-            lock.withLock {
-                var listeners = noteIdWithListeners[noteId]
-                if(listeners == null) {
-                    listeners = mutableSetOf(listener)
-                }else{
-                    listeners.add(listener)
-                }
+
+    /**
+     * @return Note.Idが初めてListenerに登録されるとtrueが返されます。
+     */
+    private fun addRepositoryEventListener(noteId: Note.Id, listener: (NoteRepository.Event)-> Unit): Boolean {
+        synchronized(noteIdWithListeners) {
+            val listeners = noteIdWithListeners[noteId]
+            return if(listeners == null) {
+                noteIdWithListeners[noteId] = mutableSetOf(listener)
+                true
+            }else{
+                listeners.add(listener)
                 noteIdWithListeners[noteId] = listeners
+                false
             }
         }
+
     }
 
-    private fun removeRepositoryEventListener(noteId: Note.Id, listener: (NoteRepository.Event)-> Unit) {
+    /**
+     * @return Note.Idに関連するListenerすべてが解除されるとfalseが返されます。
+     */
+    private fun removeRepositoryEventListener(noteId: Note.Id, listener: (NoteRepository.Event)-> Unit): Boolean {
 
-        coroutineScope.launch {
-            lock.withLock {
-                val listeners: MutableSet<(NoteRepository.Event) -> Unit> =
-                    noteIdWithListeners[noteId] ?: return@withLock
+        synchronized(noteIdWithListeners) {
+            val listeners: MutableSet<(NoteRepository.Event) -> Unit> =
+                noteIdWithListeners[noteId] ?: return false
 
-                if(!listeners.remove(listener)){
-                    logger.warning("リスナーの削除に失敗しました。")
-                }
-
+            if(!listeners.remove(listener)){
+                logger.warning("リスナーの削除に失敗しました。")
+                return false
             }
+
+            if(listeners.isEmpty()) {
+                return true
+            }
+            return false
         }
+
     }
 
     /**
