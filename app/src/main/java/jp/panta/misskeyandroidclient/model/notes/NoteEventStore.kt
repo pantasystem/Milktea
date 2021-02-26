@@ -4,6 +4,7 @@ import io.reactivex.Observable
 import jp.panta.misskeyandroidclient.model.account.Account
 import java.util.*
 
+@Deprecated("NoteRepository, NoteCaptureAPI, NoteCaptureAPIAdapterに置き換える予定のため非推奨")
 interface NoteEventStore {
     val account: Account
 

@@ -5,14 +5,12 @@ import jp.panta.misskeyandroidclient.api.notes.toNote
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.streming.NoteCapture
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
-import jp.panta.misskeyandroidclient.streaming.StreamingEvent
 import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.junit.Assert.*

@@ -1,10 +1,8 @@
-package jp.panta.misskeyandroidclient.model.notes.impl
+package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import kotlinx.coroutines.*

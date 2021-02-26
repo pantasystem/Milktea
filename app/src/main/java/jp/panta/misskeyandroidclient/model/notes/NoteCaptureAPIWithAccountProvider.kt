@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.notes.impl
+package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account

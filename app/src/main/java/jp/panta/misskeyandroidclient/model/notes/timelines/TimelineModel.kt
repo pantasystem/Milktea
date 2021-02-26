@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteId
+import jp.panta.misskeyandroidclient.model.notes.TimelineItemId
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +17,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Call
@@ -42,14 +41,14 @@ class TimelineModel(
 
     sealed class State {
         object NotesEmpty : State()
-        data class Init(val noteIds: List<NoteId>) : State()
-        data class LoadFuture(val noteIds: List<NoteId>, val newNoteIds: List<NoteId>) : State()
-        data class LoadPast(val noteIds: List<NoteId>, val newNoteIds: List<NoteId>) : State()
-        data class Receive(val noteIds: List<NoteId>, val newNoteId: String) : State()
+        data class Init(val timelineItemIds: List<TimelineItemId>) : State()
+        data class LoadFuture(val timelineItemIds: List<TimelineItemId>, val newTimelineItemIds: List<TimelineItemId>) : State()
+        data class LoadPast(val timelineItemIds: List<TimelineItemId>, val newTimelineItemIds: List<TimelineItemId>) : State()
+        data class Receive(val timelineItemIds: List<TimelineItemId>, val newNoteId: String) : State()
     }
 
     private class StateWrapper{
-        private var mNoteIds: List<NoteId> = emptyList()
+        private var mTimelineItemIds: List<TimelineItemId> = emptyList()
         @ExperimentalCoroutinesApi
         private val mTimelineState = BroadcastChannel<State>(Channel.CONFLATED)
         @FlowPreview
@@ -141,12 +140,12 @@ class TimelineModel(
         }
     }
 
-    private suspend fun NoteDTO.toId(): NoteId{
+    private suspend fun NoteDTO.toId(): TimelineItemId{
         val entities = this.toEntities(account)
 
         userRepository.addAll(entities.third)
         noteRepository.addAll(entities.second)
-        return NoteId(Note.Id(account.accountId, this.id), this.tmpFeaturedId)
+        return TimelineItemId(Note.Id(account.accountId, this.id), this.tmpFeaturedId)
     }
 
 }

@@ -10,7 +10,6 @@ import jp.panta.misskeyandroidclient.model.users.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -71,6 +70,7 @@ class StatefulNote(
         val noteId: Note.Id,
         val noteRepository: NoteRepository,
         val userRepository: UserRepository,
+        val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
         val coroutineScope: CoroutineScope
     ) {
         suspend fun create() {
