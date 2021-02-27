@@ -44,13 +44,13 @@ class InMemoryUserRepository : UserRepository{
                 userMap[user.id] = user.copy(profile = u.profile)
             }
             user.updated()
-            broadcast.send(UserRepository.Event.Added(user))
+            broadcast.send(UserRepository.Event.Added(user.id, user))
             return AddResult.UPDATED
 
         }?: tableLock.withLock {
             userMap[user.id] = user
             recordLocks[user.id] = Mutex()
-            broadcast.send(UserRepository.Event.Added(user))
+            broadcast.send(UserRepository.Event.Added(user.id, user))
             return AddResult.CREATED
         }
     }

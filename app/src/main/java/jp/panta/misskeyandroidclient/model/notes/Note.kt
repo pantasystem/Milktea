@@ -9,8 +9,9 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.*
 
 data class Note(
@@ -55,43 +56,79 @@ data class Note(
     }
 }
 
+sealed class NoteState {
+    data class Removed(val id: Note.Id) : NoteState()
+    data class Success(val note: Note) : NoteState()
+    data class Error(val id: Note.Id, val exception: Exception) : NoteState()
+    object None : NoteState()
+    object Loading : NoteState()
+}
 
 class StatefulNote(
-    val noteEventStream: Flow<NoteRepository.Event>,
-    val userEventStream: Flow<UserRepository.Event>,
+    val noteId: Note.Id,
     coroutineScope: CoroutineScope,
-    val note: Note,
-    val user: User,
+    nState: MutableStateFlow<NoteState>,
+    u: User,
     val renote: StatefulNote?,
+    val reply: StatefulNote?,
 
+    noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
 ) {
     class Factory(
-        val noteId: Note.Id,
+
         val noteRepository: NoteRepository,
         val userRepository: UserRepository,
         val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
         val coroutineScope: CoroutineScope
     ) {
-        suspend fun create() {
+        suspend fun create(noteId: Note.Id, isRecursive: Boolean = true): StatefulNote? {
             val note = noteRepository.get(noteId)
-            val user = note?.let{
+            val user = note.let{
                 userRepository.get(it.userId)
-            }
-            val reply = note?.replyId?.let{
-                noteRepository.get(it)
-            }
+            }?: return null
+            val nState = note?.let {
+                NoteState.Success(it)
+            }?: NoteState.None
 
-            val renote = note?.renoteId?.let{
-                noteRepository.get(it)
-            }
+
+            return StatefulNote(
+                noteId,
+                coroutineScope,
+                ,
+                user,
+                noteCaptureAPIAdapter = noteCaptureAPIAdapter,
+                reply = note.replyId?.let{
+                    if(isRecursive){
+                        create(it, false)
+                    }else{
+                        null
+                    }
+                },
+                renote = note.renoteId?.let{
+                    if(isRecursive){
+                        create(it, false)
+                    }else{
+                        null
+                    }
+                }
+            )
         }
     }
+
+    private val _noteState = nState
+    val note: StateFlow<NoteState> = _noteState
+
+
     init {
 
 
         coroutineScope.launch(Dispatchers.IO) {
-
+            noteCaptureAPIAdapter.capture(n.id).onEach {
+                if(it is NoteRepository.Event.Updated) {
+                    _noteState.value = NoteState.Success(it.note)
+                }
+            }.launchIn(this)
         }
     }
 }

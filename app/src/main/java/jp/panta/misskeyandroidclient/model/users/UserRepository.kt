@@ -8,8 +8,9 @@ interface UserRepository {
     fun observable(): Flow<Event>
 
     sealed class Event{
-        data class Added(val user: User): Event()
-        data class Removed(val userId: User.Id): Event()
+        abstract val userId: User.Id
+        data class Added(override val userId: User.Id, val user: User): Event()
+        data class Removed(override val userId: User.Id): Event()
     }
 
     suspend fun get(userId: User.Id): User?
