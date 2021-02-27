@@ -1,9 +1,8 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
-import com.google.gson.Gson
 import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.network.StreamingEventListener
-import jp.panta.misskeyandroidclient.streaming.network.Socket
+import jp.panta.misskeyandroidclient.streaming.SocketEventListener
+import jp.panta.misskeyandroidclient.streaming.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ChannelAPI(
     val socket: Socket,
-) : Reconnectable, StreamingEventListener {
+) : SocketEventListener {
 
     enum class Type {
         MAIN, HOME, LOCAL, HYBRID, GLOBAL
@@ -31,6 +30,10 @@ class ChannelAPI(
     )
 
     private val typeIdMap = ConcurrentHashMap<Type, String>()
+
+    init {
+        socket.addSocketEventListener(this)
+    }
 
     @ExperimentalCoroutinesApi
     fun connect(type: Type) : Flow<ChannelBody> {
@@ -64,7 +67,7 @@ class ChannelAPI(
 
 
 
-    override fun handle(e: StreamingEvent): Boolean {
+    override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
             synchronized(listenersMap) {
 
@@ -127,15 +130,15 @@ class ChannelAPI(
         }
     }
 
-    /**
-     * 再接続処理
-     */
-    override fun onReconnect() {
-        synchronized(listenersMap) {
-            val types = typeIdMap.keys
-            typeIdMap.clear()
-            types.forEach {
-                sendConnect(it)
+
+    override fun onStateChanged(e: Socket.State) {
+        if(e is Socket.State.Connected) {
+            synchronized(listenersMap) {
+                val types = typeIdMap.keys
+                typeIdMap.clear()
+                types.forEach {
+                    sendConnect(it)
+                }
             }
         }
     }

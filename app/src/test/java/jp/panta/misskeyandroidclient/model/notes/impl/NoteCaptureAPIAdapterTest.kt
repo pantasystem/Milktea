@@ -74,7 +74,7 @@ class NoteCaptureAPIAdapterTest {
 
 
                 delay(400)
-                noteCapture.handle(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+                noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
                 sendCount.incrementAndGet()
 
             }
@@ -103,7 +103,7 @@ class NoteCaptureAPIAdapterTest {
 
 
             delay(1000)
-            noteCapture.handle(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
             sendCount.incrementAndGet()
             job2.cancel()
             job3.cancel()
@@ -114,10 +114,10 @@ class NoteCaptureAPIAdapterTest {
                 println("nowCount:$sendCount")
                 for(n in 0 until 100) {
                     if(n % 2 == 0){
-                        noteCapture.handle(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+                        noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
                         sendCount.incrementAndGet()
                     }else{
-                        noteCapture.handle(NoteUpdated(NoteUpdated.Body.Unreacted(id = note.id.noteId, body = NoteUpdated.Body.Unreacted.Body(reaction = "hoge", account.remoteId))))
+                        noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Unreacted(id = note.id.noteId, body = NoteUpdated.Body.Unreacted.Body(reaction = "hoge", account.remoteId))))
                         sendCount.decrementAndGet()
                     }
 

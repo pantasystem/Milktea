@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.streaming.network
+package jp.panta.misskeyandroidclient.streaming
 
 import okhttp3.Response
 
@@ -61,4 +61,6 @@ interface Socket {
      * @return Queueに追加された場合はtrueそうでない場合はfalseが返されます。
      */
     fun send(msg: String): Boolean
+
+    fun addSocketEventListener(listener: SocketEventListener)
 }

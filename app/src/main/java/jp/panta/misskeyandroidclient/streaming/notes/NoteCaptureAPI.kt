@@ -1,26 +1,26 @@
 package jp.panta.misskeyandroidclient.streaming.notes
 
-import com.google.gson.Gson
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.network.StreamingEventListener
-import jp.panta.misskeyandroidclient.streaming.network.Socket
+import jp.panta.misskeyandroidclient.streaming.SocketEventListener
+import jp.panta.misskeyandroidclient.streaming.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlinx.serialization.json.Json
-import kotlin.math.log
 
 class NoteCaptureAPI(
     val socket: Socket,
     loggerFactory: Logger.Factory? = null
-) : Reconnectable, StreamingEventListener {
+) : SocketEventListener {
 
 
     val logger = loggerFactory?.create("NoteCaptureAPI")
+
+    init {
+        socket.addSocketEventListener(this)
+    }
 
     @ExperimentalCoroutinesApi
     fun capture(noteId: String): Flow<NoteUpdated.Body> {
@@ -85,15 +85,9 @@ class NoteCaptureAPI(
         return listeners ?: ConcurrentHashMap<String, (NoteUpdated)->Unit>()
     }
 
-    override fun onReconnect() {
-        synchronized(noteIdListenMap) {
-            noteIdListenMap.keys.forEach {
-                sendSub(it)
-            }
-        }
-    }
 
-    override fun handle(e: StreamingEvent): Boolean {
+
+    override fun onMessage(e: StreamingEvent): Boolean {
         if(e is NoteUpdated) {
             synchronized(noteIdListenMap) {
                 if(noteIdListenMap[e.body.id].isNullOrEmpty()) {
@@ -108,6 +102,22 @@ class NoteCaptureAPI(
             return true
         }
         return false
+    }
+
+    override fun onStateChanged(e: Socket.State) {
+        if(e is Socket.State.Connected) {
+            synchronized(noteIdListenMap) {
+                noteIdListenMap.keys.forEach {
+                    sendSub(it)
+                }
+            }
+        }else if(e is Socket.State.Closing) {
+            synchronized(noteIdListenMap) {
+                noteIdListenMap.keys.forEach {
+                    sendUnSub(it)
+                }
+            }
+        }
     }
 
     private fun sendSub(noteId: String) : Boolean{

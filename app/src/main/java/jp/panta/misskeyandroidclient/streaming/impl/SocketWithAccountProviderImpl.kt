@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.streaming.network.Socket
+import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.network.SocketImpl
 import okhttp3.OkHttpClient
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider as ISocketWithAccountProvider
@@ -12,7 +12,7 @@ import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider as ISoc
 /**
  * SocketをAccountに基づきいい感じにリソースを取得できるようにする
  */
-class SocketWithAccountProvider(
+class SocketWithAccountProviderImpl(
     val encryption: Encryption,
     loggerFactory: Logger.Factory,
     val instanceCreatedListener: (account: Account, socket: Socket)-> Unit = { _, s -> s.connect() },

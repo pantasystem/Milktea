@@ -1,7 +1,12 @@
 package jp.panta.misskeyandroidclient.streaming.network
 
+import jp.panta.misskeyandroidclient.streaming.Socket
+import jp.panta.misskeyandroidclient.streaming.SocketEventListener
+import jp.panta.misskeyandroidclient.streaming.StreamingEvent
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.*
-import okio.ByteString
 
 class SocketImpl(
     val url: String,
@@ -9,9 +14,26 @@ class SocketImpl(
 ) : Socket, WebSocketListener() {
 
 
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     private var mWebSocket: WebSocket? = null
     private var mState: Socket.State = Socket.State.NeverConnected
+        set(value) {
+            field = value
+            listeners.forEach {
+                it.onStateChanged(value)
+            }
+        }
+
+    private val listeners = mutableSetOf<SocketEventListener>()
+
+    override fun addSocketEventListener(listener: SocketEventListener) {
+        synchronized(listeners) {
+            listeners.add(listener)
+        }
+    }
 
     override fun connect(): Boolean {
         synchronized(this){
@@ -87,6 +109,13 @@ class SocketImpl(
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
+        synchronized(listeners) {
+            for(listener in listeners) {
+                if(listener.onMessage(json.decodeFromString(text))) {
+                    break
+                }
+            }
+        }
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
