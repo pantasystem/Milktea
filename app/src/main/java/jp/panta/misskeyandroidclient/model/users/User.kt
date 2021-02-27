@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.users
 
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.notes.Note
+import java.lang.Exception
 import java.util.*
 
 /**
@@ -68,4 +70,12 @@ data class User(
         result = 31 * result + (profile?.hashCode() ?: 0)
         return result
     }
+}
+
+sealed class UserState {
+    data class Removed(val id: User.Id) : UserState()
+    data class Success(val note: User) : UserState()
+    data class Error(val exception: Exception) : UserState()
+    object None : UserState()
+    object Loading : UserState()
 }

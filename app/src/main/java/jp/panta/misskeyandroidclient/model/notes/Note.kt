@@ -7,10 +7,9 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import jp.panta.misskeyandroidclient.model.users.UserState
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.util.*
 
@@ -56,79 +55,85 @@ data class Note(
     }
 }
 
-sealed class NoteState {
-    data class Removed(val id: Note.Id) : NoteState()
-    data class Success(val note: Note) : NoteState()
-    data class Error(val id: Note.Id, val exception: Exception) : NoteState()
-    object None : NoteState()
-    object Loading : NoteState()
-}
 
+
+/**
+ * noteに基づいて関連したオブジェクトなどをとってきてくれる
+ */
 class StatefulNote(
-    val noteId: Note.Id,
-    coroutineScope: CoroutineScope,
-    nState: MutableStateFlow<NoteState>,
-    u: User,
-    val renote: StatefulNote?,
+    val note: StateFlow<NoteState>,
+    val user: StateFlow<UserState>,
     val reply: StatefulNote?,
+    val renote: StatefulNote?,
+    var job: Job? = null
+){
+    sealed class NoteState {
+        data class Removed(val id: Note.Id) : NoteState()
+        data class Success(val note: Note) : NoteState()
+        data class Error(val exception: Exception) : NoteState()
+        object None : NoteState()
+    }
 
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter
-
-) {
-    class Factory(
-
-        val noteRepository: NoteRepository,
-        val userRepository: UserRepository,
-        val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-        val coroutineScope: CoroutineScope
+    class Loader(
+        private val noteRepository: NoteRepository,
+        private val userRepository: UserRepository,
+        private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+        private val coroutineScope: CoroutineScope,
+        private val dispatcher: CoroutineDispatcher = Dispatchers.IO
     ) {
-        suspend fun create(noteId: Note.Id, isRecursive: Boolean = true): StatefulNote? {
-            val note = noteRepository.get(noteId)
-            val user = note.let{
-                userRepository.get(it.userId)
-            }?: return null
-            val nState = note?.let {
-                NoteState.Success(it)
-            }?: NoteState.None
+        suspend fun load(id: Note.Id, recursive: Boolean = true): StatefulNote {
+            var note: Note? = null
+            val noteState = try{
+                noteRepository.get(id)?.let{
+                    note = it
+                    NoteState.Success(it)
+                }?: NoteState.None
+            }catch (t: Exception){
+                NoteState.Error(exception = t)
+            }
+            val noteStateFlow = MutableStateFlow<NoteState>(noteState)
+            val job = captureNote(id, noteStateFlow).launchIn(coroutineScope + dispatcher)
 
+            val userState = try{
+                note?.let{
+                    userRepository.get(it.userId)?.let{ u->
+                        UserState.Success(u)
+                    }
+                }?: UserState.None
 
-            return StatefulNote(
-                noteId,
-                coroutineScope,
-                ,
-                user,
-                noteCaptureAPIAdapter = noteCaptureAPIAdapter,
-                reply = note.replyId?.let{
-                    if(isRecursive){
-                        create(it, false)
-                    }else{
-                        null
-                    }
-                },
-                renote = note.renoteId?.let{
-                    if(isRecursive){
-                        create(it, false)
-                    }else{
-                        null
-                    }
+            }catch(e: Exception) {
+                UserState.Error(e)
+            }
+            val userStateFlow = MutableStateFlow<UserState>(userState)
+
+            var reply: StatefulNote? = null
+            var renote: StatefulNote? = null
+            if(recursive && note != null) {
+                note?.renoteId?.let{ renoteId ->
+                    renote = load(renoteId, false)
                 }
-            )
+                note?.replyId?.let{ replyId ->
+                    reply = load(replyId, false)
+                }
+
+            }
+
+            return StatefulNote(noteStateFlow, userStateFlow, reply = reply, renote = renote, job = job)
+        }
+
+        private fun captureNote(id: Note.Id, noteStateFlow: MutableStateFlow<NoteState>) = noteCaptureAPIAdapter.capture(id).onEach {
+            when(it){
+                is NoteRepository.Event.Updated -> {
+                    noteStateFlow.value = NoteState.Success(it.note)
+                }
+                is NoteRepository.Event.Deleted -> {
+                    noteStateFlow.value = NoteState.Removed(it.noteId)
+                }
+                is NoteRepository.Event.Created -> {
+                    noteStateFlow.value = NoteState.Success(it.note)
+                }
+            }
         }
     }
 
-    private val _noteState = nState
-    val note: StateFlow<NoteState> = _noteState
-
-
-    init {
-
-
-        coroutineScope.launch(Dispatchers.IO) {
-            noteCaptureAPIAdapter.capture(n.id).onEach {
-                if(it is NoteRepository.Event.Updated) {
-                    _noteState.value = NoteState.Success(it.note)
-                }
-            }.launchIn(this)
-        }
-    }
 }
