@@ -26,11 +26,6 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistor
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.streming.Observer
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
-import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
@@ -50,13 +45,18 @@ import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
-import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
-import jp.panta.misskeyandroidclient.model.notes.NoteEventStoreFactory
+import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteRepository
+import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserRepository
+import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
+import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
     companion object{
-        const val CURRENT_USER_ID = "jp.panta.misskeyandroidclient.MiApplication.CurrentUserId"
         const val TAG = "MiApplication"
     }
 
@@ -82,7 +82,6 @@ class MiApplication : Application(), MiCore {
 
     lateinit var metaStore: MetaStore
 
-    val noteEventStoreFactory: NoteEventStoreFactory = NoteEventStoreFactory()
 
 
     //private var nowInstanceMeta: Meta? = null
@@ -109,12 +108,16 @@ class MiApplication : Application(), MiCore {
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIUrlMap = HashMap<String, Pair<Version?, MisskeyAPI>>()
 
-    private val mStreamingAccountMap = HashMap<Long, StreamingAdapter>()
-    private val mMainCaptureAccountMap = HashMap<Long, MainCapture>()
-    private val mMainCaptureFactory: MainCapture.Factory = MainCapture.Factory(GsonFactory.create(), ::setupObserver)
+    private lateinit var mNoteRepository: NoteRepository
+    private lateinit var mUserRepository: UserRepository
 
-    private val mNoteCaptureAccountMap = HashMap<Long, NoteCapture>()
-    private val mTimelineCaptureAccountMap = HashMap<Long, TimelineCapture>()
+    private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+
+    private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
+
+    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+
+    private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
@@ -170,6 +173,30 @@ class MiApplication : Application(), MiCore {
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 
+        mNoteRepository = InMemoryNoteRepository(loggerFactory)
+        mUserRepository = InMemoryUserRepository()
+
+        mSocketWithAccountProvider = SocketWithAccountProviderImpl(
+            getEncryption(),
+            loggerFactory,
+            { _, socket ->
+               socket.connect()
+            }
+        )
+
+        mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
+
+        mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
+            accountRepository,
+            mNoteRepository,
+            mNoteCaptureAPIWithAccountProvider,
+            loggerFactory,
+            applicationScope,
+            Dispatchers.IO
+        )
+
+        mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
+
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
         messageSubscriber =
             MessageSubscriber(
@@ -204,6 +231,11 @@ class MiApplication : Application(), MiCore {
 
     override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
         return getUrlPreviewStore(account, false)
+    }
+
+
+    override fun getNoteCaptureAPIAdapter(): NoteCaptureAPIAdapter {
+        return mNoteCaptureAPIAdapter
     }
 
 
@@ -261,21 +293,7 @@ class MiApplication : Application(), MiCore {
 
 
     private fun closeAccountResource(account: Account){
-        synchronized(mStreamingAccountMap){
-            mStreamingAccountMap.remove(account.accountId)?.disconnect()
-        }
-
-        synchronized(mMainCaptureAccountMap){
-            mStreamingAccountMap.remove(account.accountId)
-        }
-
-        synchronized(mTimelineCaptureAccountMap){
-            mStreamingAccountMap.remove(account.accountId)
-        }
-
-        synchronized(mNoteCaptureAccountMap){
-            mNoteCaptureAccountMap.remove(account.accountId)
-        }
+        mSocketWithAccountProvider.get(account).disconnect()
     }
 
     override fun addAccount(account: Account) {
@@ -368,22 +386,24 @@ class MiApplication : Application(), MiCore {
 
 
 
-    override fun setupObserver(account: Account, observer: Observer) {
-        synchronized(mStreamingAccountMap) {
-            val streaming = getStreamingAdapter(account)
-            synchronized(streaming.observerMap) {
-                if (streaming.observerMap[observer.id] == null) {
-                    streaming.putObserver(observer)
-                }
-            }
-        }
-    }
-
 
 
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
+    }
+
+    override fun getNoteRepository(): NoteRepository {
+        return mNoteRepository
+    }
+
+
+    override fun getUserRepository(): UserRepository {
+        return mUserRepository
+    }
+
+    override fun getChannelAPI(account: Account): ChannelAPI {
+        return mChannelAPIWithAccountProvider.get(account)
     }
 
 
@@ -538,72 +558,6 @@ class MiApplication : Application(), MiCore {
 
 
 
-    override fun getNoteEventStore(account: Account): NoteEventStore {
-        return noteEventStoreFactory.create(account)
-    }
-
-    override fun getMainCapture(account: Account): MainCapture{
-        Log.d(TAG, "getMainCapture")
-
-        val mainCapture = mMainCaptureFactory.create(account)
-        validateObserverAccount(mainCapture, account)
-        return mainCapture
-    }
-
-
-
-    override fun getNoteCapture(account: Account): NoteCapture {
-
-        synchronized(mNoteCaptureAccountMap){
-            var noteCapture = mNoteCaptureAccountMap[account.accountId]
-
-            if(noteCapture == null){
-                noteCapture = NoteCapture(account, getNoteEventStore(account))
-                setupObserver(account, noteCapture)
-                mNoteCaptureAccountMap[account.accountId] = noteCapture
-            }
-            validateObserverAccount(noteCapture, account)
-
-            return noteCapture
-        }
-
-    }
-
-
-    private fun getStreamingAdapter(account: Account): StreamingAdapter {
-
-        synchronized(mStreamingAccountMap){
-            var streaming = mStreamingAccountMap[account.accountId]
-            if(streaming == null){
-                streaming = StreamingAdapter(account, getEncryption())
-            }
-            mStreamingAccountMap[account.accountId] = streaming
-            return streaming
-        }
-    }
-
-    override fun getTimelineCapture(account: Account): TimelineCapture {
-        synchronized(mTimelineCaptureAccountMap){
-            var timelineCapture = mTimelineCaptureAccountMap[account.accountId]
-
-            if(timelineCapture == null){
-                timelineCapture = TimelineCapture(account, getSettingStore())
-                setupObserver(account, timelineCapture)
-                mTimelineCaptureAccountMap[account.accountId] = timelineCapture
-            }
-            validateObserverAccount(timelineCapture, account)
-            return timelineCapture
-        }
-
-    }
-
-    private fun validateObserverAccount(observer: Observer, account: Account){
-        if(observer.account == account){
-            Log.d("MiApplication", "Observerのアカウント一致正常です！！")
-        }else{
-            Log.e("MiApplication" ,"Observerのアカウントが一致しません！！エラー")
-        }
-    }
 
     private val sharedPreferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->

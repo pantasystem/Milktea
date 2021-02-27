@@ -5,10 +5,6 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.streming.Observer
-import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
 import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
@@ -16,8 +12,10 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscrib
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 
 interface MiCore{
     //val accounts: MutableLiveData<List<Account>>
@@ -38,6 +36,10 @@ interface MiCore{
     suspend fun getAccount(accountId: Long) : Account
 
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?
+
+    fun getNoteRepository(): NoteRepository
+
+    fun getUserRepository(): UserRepository
 
     fun setCurrentAccount(account: Account)
 
@@ -61,20 +63,17 @@ interface MiCore{
 
     fun getEncryption(): Encryption
 
-    fun getMainCapture(account: Account): MainCapture
 
-    fun setupObserver(account: Account, observer: Observer)
+    fun getChannelAPI(account: Account): ChannelAPI
 
-    fun getNoteCapture(account: Account): NoteCapture
+    fun getNoteCaptureAPIAdapter(): NoteCaptureAPIAdapter
 
     fun getCurrentInstanceMeta(): Meta?
 
 
-    fun getTimelineCapture(account: Account): TimelineCapture
 
     fun getSettingStore(): SettingStore
 
 
-    fun getNoteEventStore(account: Account) : NoteEventStore
 
 }
