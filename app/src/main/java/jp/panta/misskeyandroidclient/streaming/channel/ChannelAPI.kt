@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ChannelAPI(
     val socket: Socket,
-    val gson: Gson
 ) : Reconnectable, StreamingEventListener {
 
     enum class Type {
