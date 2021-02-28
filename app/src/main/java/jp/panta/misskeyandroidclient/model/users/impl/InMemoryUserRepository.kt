@@ -34,7 +34,9 @@ class InMemoryUserRepository : UserRepository{
         this.listeners.add(listener)
     }
 
-
+    override fun removeEventListener(listener: UserRepository.Listener) {
+        this.listeners.remove(listener)
+    }
 
     @ExperimentalCoroutinesApi
     override suspend fun add(user: User): AddResult {
@@ -43,12 +45,27 @@ class InMemoryUserRepository : UserRepository{
             if(u.instanceUpdatedAt > user.instanceUpdatedAt){
                 return AddResult.CANCEL
             }
-            if(user.isDetail){
-                userMap[user.id] = user
+            when {
+                user is User.Detail -> {
+                    userMap[user.id] = user
+                }
+                u is User.Detail -> {
+                    // RepositoryのUserがDetailで与えられたUserがSimpleの時Simpleと一致する部分のみ更新する
+                    userMap[user.id] = u.copy(
+                        name = user.name,
+                        userName = user.userName,
+                        avatarUrl = user.avatarUrl,
+                        emojis = user.emojis,
+                        isCat = user.isCat,
+                        isBot = user.isBot,
+                        host = user.host
+                    )
+                }
+                else -> {
+                    userMap[user.id] = user
+                }
             }
-            if(u.isDetail){
-                userMap[user.id] = user.copy(profile = u.profile)
-            }
+
             user.updated()
             publish(UserRepository.Event.Updated(user.id, user))
             return AddResult.UPDATED
