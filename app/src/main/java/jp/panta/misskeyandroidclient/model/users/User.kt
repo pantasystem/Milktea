@@ -18,6 +18,7 @@ sealed class User{
     abstract val emojis: List<Emoji>
     abstract val isCat: Boolean?
     abstract val isBot: Boolean?
+    abstract val host: String?
     abstract var instanceUpdatedAt: Date
 
     data class Id(
@@ -33,6 +34,7 @@ sealed class User{
         override val emojis: List<Emoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
+        override val host: String?,
         override var instanceUpdatedAt: Date = Date()
     ) : User()
 
@@ -44,7 +46,7 @@ sealed class User{
         override val emojis: List<Emoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
-        val host: String?,
+        override val host: String?,
         val description: String?,
         val followersCount: Int?,
         val followingCount: Int?,

@@ -108,6 +108,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User{
             isCat = this.isCat,
             name = this.name,
             userName = this.userName,
+            host = this.host
         )
     }
 

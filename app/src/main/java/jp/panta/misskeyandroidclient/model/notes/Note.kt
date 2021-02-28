@@ -55,90 +55,9 @@ data class Note(
     }
 }
 
-class NoteRelated(
+class NoteRelation(
     val note: Note,
     val user: User,
-    val reply: NoteRelated?,
-    val renote: NoteRelated?,
+    val reply: NoteRelation?,
+    val renote: NoteRelation?,
 )
-
-/**
- * noteに基づいて関連したオブジェクトなどをとってきてくれる
- */
-class StatefulNote(
-    val note: StateFlow<State>,
-    val user: StateFlow<UserState>,
-    val reply: StatefulNote?,
-    val renote: StatefulNote?,
-    var job: Job? = null
-){
-    sealed class State {
-        data class Removed(val id: Note.Id) : State()
-        data class Success(val note: Note) : State()
-        data class Error(val exception: Exception) : State()
-        object None : State()
-    }
-
-    class Loader(
-        private val noteRepository: NoteRepository,
-        private val userRepository: UserRepository,
-        private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-        private val coroutineScope: CoroutineScope,
-        private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-    ) {
-        suspend fun load(id: Note.Id, recursive: Boolean = true): StatefulNote {
-            var note: Note? = null
-            val noteState = try{
-                noteRepository.get(id).let{
-                    note = it
-                    State.Success(it)
-                }
-            }catch (t: Exception){
-                State.Error(exception = t)
-            }
-            val noteStateFlow = MutableStateFlow<State>(noteState)
-            val job = captureNote(id, noteStateFlow).launchIn(coroutineScope + dispatcher)
-
-            val userState = try{
-                note?.let{
-                    userRepository.get(it.userId)?.let{ u->
-                        UserState.Success(u)
-                    }
-                }?: UserState.None
-
-            }catch(e: Exception) {
-                UserState.Error(e)
-            }
-            val userStateFlow = MutableStateFlow<UserState>(userState)
-
-            var reply: StatefulNote? = null
-            var renote: StatefulNote? = null
-            if(recursive && note != null) {
-                note?.renoteId?.let{ renoteId ->
-                    renote = load(renoteId, false)
-                }
-                note?.replyId?.let{ replyId ->
-                    reply = load(replyId, false)
-                }
-
-            }
-
-            return StatefulNote(noteStateFlow, userStateFlow, reply = reply, renote = renote, job = job)
-        }
-
-        private fun captureNote(id: Note.Id, noteStateFlow: MutableStateFlow<State>) = noteCaptureAPIAdapter.capture(id).onEach {
-            when(it){
-                is NoteRepository.Event.Updated -> {
-                    noteStateFlow.value = State.Success(it.note)
-                }
-                is NoteRepository.Event.Deleted -> {
-                    noteStateFlow.value = State.Removed(it.noteId)
-                }
-                is NoteRepository.Event.Created -> {
-                    noteStateFlow.value = State.Success(it.note)
-                }
-            }
-        }
-    }
-
-}
