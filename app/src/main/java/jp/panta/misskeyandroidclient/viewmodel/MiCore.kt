@@ -14,8 +14,12 @@ import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.StatefulNote
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 interface MiCore{
     //val accounts: MutableLiveData<List<Account>>
@@ -40,6 +44,8 @@ interface MiCore{
     fun getNoteRepository(): NoteRepository
 
     fun getUserRepository(): UserRepository
+
+    fun getStatefulNoteLoader(coroutineScope: CoroutineScope, dispatcher: CoroutineDispatcher = Dispatchers.IO) : StatefulNote.Loader
 
     fun setCurrentAccount(account: Account)
 

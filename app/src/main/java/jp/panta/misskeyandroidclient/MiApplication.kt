@@ -238,6 +238,15 @@ class MiApplication : Application(), MiCore {
         return mNoteCaptureAPIAdapter
     }
 
+    override fun getStatefulNoteLoader(coroutineScope: CoroutineScope, dispatcher: CoroutineDispatcher): StatefulNote.Loader {
+        return StatefulNote.Loader(
+            noteCaptureAPIAdapter = getNoteCaptureAPIAdapter(),
+            noteRepository = getNoteRepository(),
+            userRepository = getUserRepository(),
+            dispatcher = dispatcher,
+            coroutineScope = coroutineScope
+        )
+    }
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->

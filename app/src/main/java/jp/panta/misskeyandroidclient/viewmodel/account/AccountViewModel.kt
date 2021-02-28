@@ -4,11 +4,14 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import java.lang.IllegalArgumentException
@@ -50,6 +53,8 @@ class AccountViewModel(
     val currentAccount = miCore.getCurrentAccount()
 
     private var mBeforeAccount: Account? = null
+    private var mainCaptureJob: Job? = null
+
     val user = MediatorLiveData<UserDTO>()
 
     val switchAccount = EventBus<Int>()
@@ -79,10 +84,13 @@ class AccountViewModel(
                     }
                 })
             }
-            mBeforeAccount?.let{ before ->
-                miCore.getMainCapture(before).removeListener(mainCaptureListener)
-            }
-            miCore.getMainCapture(it).putListener(mainCaptureListener)
+
+            mainCaptureJob?.cancel()
+            val job = miCore.getChannelAPI(it).connect(ChannelAPI.Type.MAIN)
+                .onEach {
+
+                }.launchIn(viewModelScope)
+            mainCaptureJob = job
             mBeforeAccount = it
         }
     }
@@ -116,17 +124,5 @@ class AccountViewModel(
         }
     }
 
-    private val mainCaptureListener = object : MainCapture.AbsListener(){
-        override fun meUpdated(user: UserDTO) {
-            if(user.id == miCore.getCurrentAccount().value?.remoteId){
-                this@AccountViewModel.user.postValue(user)
-            }
-            accounts.value?.forEach {
-                if(it.userId == user.id){
-                    it.user.postValue(user)
-                }
-            }
-        }
-    }
 
 }
