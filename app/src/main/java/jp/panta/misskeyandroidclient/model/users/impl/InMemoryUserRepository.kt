@@ -19,14 +19,7 @@ class InMemoryUserRepository : UserRepository{
     private val recordLocks = ConcurrentHashMap<User.Id, Mutex>()
     private val tableLock = Mutex()
 
-    @ExperimentalCoroutinesApi
-    private val broadcast = BroadcastChannel<UserRepository.Event>(1)
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    override fun observable(): Flow<UserRepository.Event> {
-        return broadcast.asFlow()
-    }
 
     private val listeners = mutableSetOf<UserRepository.Listener>()
 
@@ -111,6 +104,5 @@ class InMemoryUserRepository : UserRepository{
             }
         }
 
-        broadcast.offer(e)
     }
 }

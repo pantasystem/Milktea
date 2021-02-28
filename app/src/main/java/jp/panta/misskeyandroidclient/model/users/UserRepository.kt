@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
-    fun observable(): Flow<Event>
 
     sealed class Event{
         abstract val userId: User.Id
