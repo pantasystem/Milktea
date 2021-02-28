@@ -27,7 +27,7 @@ class NoteCaptureAPIAdapter(
 
 
     init {
-        noteRepository.listener = this
+        noteRepository.addEventListener(this)
     }
 
     private val noteIdWithListeners = mutableMapOf<Note.Id, MutableSet<(NoteRepository.Event)->Unit>>()
