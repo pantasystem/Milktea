@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.users.Profile
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.serialization.SerialName
 import java.io.Serializable
@@ -73,17 +73,16 @@ data class UserDTO(
 }
 
 fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User{
-    var state: User.State? = null
-    var profile: Profile? = null
     if(isDetail){
-        state = User.State(
-            isFollowing = this.isFollowing?: false,
-            isFollower = this.isFollowed?: false,
-            isBlocking = this.isBlocking?: false,
-            isMuting = this.isMuted?: false
-        )
 
-        profile = Profile(
+        return User.Detail(
+            id = User.Id(account.accountId, this.id),
+            avatarUrl = this.avatarUrl,
+            emojis = this.emojis?: emptyList(),
+            isBot = this.isBot,
+            isCat = this.isCat,
+            name = this.name,
+            userName = this.userName,
             bannerUrl = this.bannerUrl,
             description = this.description,
             followersCount = this.followersCount,
@@ -92,18 +91,24 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User{
             url = this.url,
             hostLower = this.hostLower,
             notesCount = this.notesCount,
-            pinnedNoteIds = this.pinnedNoteIds
+            pinnedNoteIds = this.pinnedNoteIds?.map{
+                Note.Id(account.accountId, it)
+            },
+            isFollowing = this.isFollowing?: false,
+            isFollower = this.isFollowed?: false,
+            isBlocking = this.isBlocking?: false,
+            isMuting = this.isMuted?: false
+        )
+    }else{
+        return User.Simple(
+            id = User.Id(account.accountId, this.id),
+            avatarUrl = this.avatarUrl,
+            emojis = this.emojis?: emptyList(),
+            isBot = this.isBot,
+            isCat = this.isCat,
+            name = this.name,
+            userName = this.userName,
         )
     }
-    return User(
-        id = User.Id(account.accountId, this.id),
-        avatarUrl = this.avatarUrl,
-        emojis = this.emojis?: emptyList(),
-        isBot = this.isBot,
-        isCat = this.isCat,
-        name = this.name,
-        userName = this.userName,
-        state = state,
-        profile = profile
-    )
+
 }

@@ -9,67 +9,62 @@ import java.util.*
  * Userはfollowやunfollowなどは担当しない
  * Userはfollowやunfollowに関連しないため
  */
-data class User(
-    val id: Id,
-    val userName: String,
-    val name: String?,
-    val avatarUrl: String?,
-    val emojis: List<Emoji>,
-    val isCat: Boolean?,
-    val isBot: Boolean?,
-    val state: State? = null,
-    val profile: Profile? = null,
-    var instanceUpdatedAt: Date = Date()
-){
+sealed class User{
+
+    abstract val id: Id
+    abstract val userName: String
+    abstract val name: String?
+    abstract val avatarUrl: String?
+    abstract val emojis: List<Emoji>
+    abstract val isCat: Boolean?
+    abstract val isBot: Boolean?
+    abstract var instanceUpdatedAt: Date
 
     data class Id(
         val accountId: Long,
         val id: String,
     )
-    val isDetail: Boolean
-        get() = this.profile != null
 
+    data class Simple(
+        override val id: Id,
+        override val userName: String,
+        override val name: String?,
+        override val avatarUrl: String?,
+        override val emojis: List<Emoji>,
+        override val isCat: Boolean?,
+        override val isBot: Boolean?,
+        override var instanceUpdatedAt: Date = Date()
+    ) : User()
+
+    data class Detail(
+        override val id: Id,
+        override val userName: String,
+        override val name: String?,
+        override val avatarUrl: String?,
+        override val emojis: List<Emoji>,
+        override val isCat: Boolean?,
+        override val isBot: Boolean?,
+        val host: String?,
+        val description: String?,
+        val followersCount: Int?,
+        val followingCount: Int?,
+        val hostLower: String?,
+        val notesCount: Int?,
+        val pinnedNoteIds: List<Note.Id>?,
+        val bannerUrl: String?,
+        val url: String?,
+        val isFollowing: Boolean,
+        val isFollower: Boolean,
+        val isBlocking: Boolean,
+        val isMuting: Boolean,
+        override var instanceUpdatedAt: Date = Date()
+    ) : User()
 
     fun updated(){
         instanceUpdatedAt = Date()
     }
 
-    data class State(
-        val isFollowing: Boolean,
-        val isFollower: Boolean,
-        val isBlocking: Boolean,
-        val isMuting: Boolean
-    )
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as User
-
-        if (id != other.id) return false
-        if (userName != other.userName) return false
-        if (name != other.name) return false
-        if (avatarUrl != other.avatarUrl) return false
-        if (emojis != other.emojis) return false
-        if (isCat != other.isCat) return false
-        if (isBot != other.isBot) return false
-        if (profile != other.profile) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + userName.hashCode()
-        result = 31 * result + (name?.hashCode() ?: 0)
-        result = 31 * result + (avatarUrl?.hashCode() ?: 0)
-        result = 31 * result + emojis.hashCode()
-        result = 31 * result + isCat.hashCode()
-        result = 31 * result + isBot.hashCode()
-        result = 31 * result + (profile?.hashCode() ?: 0)
-        return result
-    }
 }
 
 sealed class UserState {
