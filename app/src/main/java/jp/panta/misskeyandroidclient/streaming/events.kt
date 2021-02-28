@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.streaming
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -78,6 +79,7 @@ sealed class ChannelBody : StreamingEvent(){
         @SerialName("meUpdated")
         data class MeUpdated(
             override val id: String,
+            val body: UserDTO
 
             ) : Main()
 

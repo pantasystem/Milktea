@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -87,8 +88,18 @@ class AccountViewModel(
 
             mainCaptureJob?.cancel()
             val job = miCore.getChannelAPI(it).connect(ChannelAPI.Type.MAIN)
-                .onEach {
-
+                .onEach { cb ->
+                    if(cb is ChannelBody.Main.MeUpdated) {
+                        val user = cb.body
+                        if(user.id == miCore.getCurrentAccount().value?.remoteId){
+                            this@AccountViewModel.user.postValue(user)
+                        }
+                        accounts.value?.forEach { avd ->
+                            if(avd.userId == user.id){
+                                avd.user.postValue(user)
+                            }
+                        }
+                    }
                 }.launchIn(viewModelScope)
             mainCaptureJob = job
             mBeforeAccount = it
