@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -42,7 +41,6 @@ class MessageViewModel(
 
     private var isLoading = false
 
-    private val messageObserver = MessageObserver()
 
     private val unreadMessageStore = miCore.messageSubscriber.getUnreadMessageStore(account)
     //private val mainCapture = miCore.getMainCapture(accountRelation)
@@ -183,27 +181,7 @@ class MessageViewModel(
         })
     }
 
-    inner class MessageObserver : MainCapture.AbsListener(){
-        override fun messagingMessage(message: Message) {
-            val messages = messagesLiveData.value?.messages.toArrayList()
 
-
-            if(message.messagingId(account) == mMessageId){
-                val msg = if(message.userId == account.remoteId){
-                    //me
-                    SelfMessageViewData(message, account)
-                }else{
-                    RecipientMessageViewData(message, account)
-                }
-                messages.add(msg)
-
-                messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
-
-            }
-
-
-        }
-    }
 
     private fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData>{
         return if(this == null){
