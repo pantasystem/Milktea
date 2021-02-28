@@ -2,11 +2,10 @@ package jp.panta.misskeyandroidclient.model.notes.impl
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.AddResult
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteNotFoundException
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPIProvider
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -27,9 +26,10 @@ class InMemoryNoteRepository(
     }
 
 
-    override suspend fun get(noteId: Note.Id): Note? {
+    override suspend fun get(noteId: Note.Id): Note {
         mutex.withLock{
             return notes[noteId]
+                ?: throw NoteNotFoundException(noteId)
         }
     }
 

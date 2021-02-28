@@ -28,6 +28,12 @@ class InMemoryUserRepository : UserRepository{
         return broadcast.asFlow()
     }
 
+    private val listeners = mutableSetOf<UserRepository.Listener>()
+
+    override fun addEventListener(listener: UserRepository.Listener) {
+        this.listeners.add(listener)
+    }
+
 
 
     @ExperimentalCoroutinesApi
@@ -44,13 +50,13 @@ class InMemoryUserRepository : UserRepository{
                 userMap[user.id] = user.copy(profile = u.profile)
             }
             user.updated()
-            broadcast.send(UserRepository.Event.Added(user.id, user))
+            publish(UserRepository.Event.Updated(user.id, user))
             return AddResult.UPDATED
 
         }?: tableLock.withLock {
             userMap[user.id] = user
             recordLocks[user.id] = Mutex()
-            broadcast.send(UserRepository.Event.Added(user.id, user))
+            publish(UserRepository.Event.Created(user.id, user))
             return AddResult.CREATED
         }
     }
@@ -73,10 +79,21 @@ class InMemoryUserRepository : UserRepository{
         return tableLock.withLock {
             recordLocks[user.id]?.withLock {
                 userMap.remove(user.id)
-                broadcast.send(UserRepository.Event.Removed(user.id))
+                publish(UserRepository.Event.Removed(user.id))
                 true
             }?: false
         }
 
+    }
+
+    @ExperimentalCoroutinesApi
+    private fun publish(e: UserRepository.Event) {
+        synchronized(listeners) {
+            listeners.forEach { listener ->
+                listener.on(e)
+            }
+        }
+
+        broadcast.offer(e)
     }
 }

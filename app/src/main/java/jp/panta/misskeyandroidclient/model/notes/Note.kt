@@ -61,17 +61,17 @@ data class Note(
  * noteに基づいて関連したオブジェクトなどをとってきてくれる
  */
 class StatefulNote(
-    val note: StateFlow<NoteState>,
+    val note: StateFlow<State>,
     val user: StateFlow<UserState>,
     val reply: StatefulNote?,
     val renote: StatefulNote?,
     var job: Job? = null
 ){
-    sealed class NoteState {
-        data class Removed(val id: Note.Id) : NoteState()
-        data class Success(val note: Note) : NoteState()
-        data class Error(val exception: Exception) : NoteState()
-        object None : NoteState()
+    sealed class State {
+        data class Removed(val id: Note.Id) : State()
+        data class Success(val note: Note) : State()
+        data class Error(val exception: Exception) : State()
+        object None : State()
     }
 
     class Loader(
@@ -86,12 +86,12 @@ class StatefulNote(
             val noteState = try{
                 noteRepository.get(id)?.let{
                     note = it
-                    NoteState.Success(it)
-                }?: NoteState.None
+                    State.Success(it)
+                }?: State.None
             }catch (t: Exception){
-                NoteState.Error(exception = t)
+                State.Error(exception = t)
             }
-            val noteStateFlow = MutableStateFlow<NoteState>(noteState)
+            val noteStateFlow = MutableStateFlow<State>(noteState)
             val job = captureNote(id, noteStateFlow).launchIn(coroutineScope + dispatcher)
 
             val userState = try{
@@ -121,16 +121,16 @@ class StatefulNote(
             return StatefulNote(noteStateFlow, userStateFlow, reply = reply, renote = renote, job = job)
         }
 
-        private fun captureNote(id: Note.Id, noteStateFlow: MutableStateFlow<NoteState>) = noteCaptureAPIAdapter.capture(id).onEach {
+        private fun captureNote(id: Note.Id, noteStateFlow: MutableStateFlow<State>) = noteCaptureAPIAdapter.capture(id).onEach {
             when(it){
                 is NoteRepository.Event.Updated -> {
-                    noteStateFlow.value = NoteState.Success(it.note)
+                    noteStateFlow.value = State.Success(it.note)
                 }
                 is NoteRepository.Event.Deleted -> {
-                    noteStateFlow.value = NoteState.Removed(it.noteId)
+                    noteStateFlow.value = State.Removed(it.noteId)
                 }
                 is NoteRepository.Event.Created -> {
-                    noteStateFlow.value = NoteState.Success(it.note)
+                    noteStateFlow.value = State.Success(it.note)
                 }
             }
         }
