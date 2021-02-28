@@ -55,7 +55,12 @@ data class Note(
     }
 }
 
-
+class NoteRelated(
+    val note: Note,
+    val user: User,
+    val reply: NoteRelated?,
+    val renote: NoteRelated?,
+)
 
 /**
  * noteに基づいて関連したオブジェクトなどをとってきてくれる
