@@ -19,10 +19,10 @@ class InMemoryNoteRepository(
 
     private val mutex = Mutex()
 
-    override var listener: NoteRepository.Listener = object : NoteRepository.Listener {
-        override fun on(e: NoteRepository.Event) {
-            logger.warning("リスナーが未設定です。 event:$e")
-        }
+    private val listeners = mutableSetOf<NoteRepository.Listener>()
+
+    override fun addEventListener(listener: NoteRepository.Listener) {
+        listeners.add(listener)
     }
 
 
@@ -47,10 +47,10 @@ class InMemoryNoteRepository(
             note.updated()
 
             return if(n == null){
-                listener.on(NoteRepository.Event.Created(note.id, note))
+                publish(NoteRepository.Event.Created(note.id, note))
                 AddResult.CREATED
             } else {
-                listener.on(NoteRepository.Event.Updated(note.id, note))
+                publish(NoteRepository.Event.Updated(note.id, note))
                 AddResult.UPDATED
             }
         }
@@ -73,7 +73,7 @@ class InMemoryNoteRepository(
             if(n == null){
                 return false
             }
-            listener.on(NoteRepository.Event.Deleted(noteId = noteId))
+            publish(NoteRepository.Event.Deleted(noteId = noteId))
             return true
         }
     }
@@ -84,6 +84,14 @@ class InMemoryNoteRepository(
                 it.userId == userId
             }.count {
                 this.remove(it.id)
+            }
+        }
+    }
+
+    private fun publish(ev: NoteRepository.Event) {
+        synchronized(listeners) {
+            listeners.forEach { 
+                it.on(ev)
             }
         }
     }

@@ -19,13 +19,10 @@ data class Note(
     val text: String?,
     val cw: String?,
     val userId: User.Id,
-    val user: User,
 
     val replyId: Id?,
-    val reply: Note?,
 
     val renoteId: Id?,
-    val renote: Note?,
 
     val viaMobile: Boolean?,
     val visibility: String?,
@@ -87,10 +84,10 @@ class StatefulNote(
         suspend fun load(id: Note.Id, recursive: Boolean = true): StatefulNote {
             var note: Note? = null
             val noteState = try{
-                noteRepository.get(id)?.let{
+                noteRepository.get(id).let{
                     note = it
                     State.Success(it)
-                }?: State.None
+                }
             }catch (t: Exception){
                 State.Error(exception = t)
             }
