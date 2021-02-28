@@ -138,26 +138,27 @@ class NoteCaptureAPIAdapter(
      */
     private suspend fun handleRemoteEvent(account: Account, e: NoteUpdated.Body) {
         val noteId = Note.Id(account.accountId, e.id)
-        val note = noteRepository.get(noteId)
-        if(note == null) {
-            logger.warning("更新対称のノートが存在しませんでした:$noteId")
-            return
-        }
-        when(e) {
-            is NoteUpdated.Body.Deleted -> {
-                noteRepository.remove(noteId)
-            }
-            is NoteUpdated.Body.Reacted-> {
-                onReacted(note, account, e)
-            }
-            is NoteUpdated.Body.Unreacted -> {
-                onUnReacted(note, account, e)
-            }
-            is NoteUpdated.Body.PollVoted -> {
-                onPollVoted(note, account, e)
-            }
+        try{
+            val note = noteRepository.get(noteId)
+            when(e) {
+                is NoteUpdated.Body.Deleted -> {
+                    noteRepository.remove(noteId)
+                }
+                is NoteUpdated.Body.Reacted-> {
+                    onReacted(note, account, e)
+                }
+                is NoteUpdated.Body.Unreacted -> {
+                    onUnReacted(note, account, e)
+                }
+                is NoteUpdated.Body.PollVoted -> {
+                    onPollVoted(note, account, e)
+                }
 
+            }
+        }catch(e: Exception){
+            logger.warning("更新対称のノートが存在しませんでした:$noteId", e = e)
         }
+
 
     }
 
