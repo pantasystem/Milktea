@@ -48,6 +48,7 @@ import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserRepository
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
@@ -110,6 +111,7 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mNoteRepository: NoteRepository
     private lateinit var mUserRepository: UserRepository
+    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
 
@@ -175,6 +177,7 @@ class MiApplication : Application(), MiCore {
 
         mNoteRepository = InMemoryNoteRepository(loggerFactory)
         mUserRepository = InMemoryUserRepository()
+        mUserRepositoryEventToFlow = UserRepositoryEventToFlow()
 
         mSocketWithAccountProvider = SocketWithAccountProviderImpl(
             getEncryption(),
@@ -238,15 +241,7 @@ class MiApplication : Application(), MiCore {
         return mNoteCaptureAPIAdapter
     }
 
-    override fun getStatefulNoteLoader(coroutineScope: CoroutineScope, dispatcher: CoroutineDispatcher): StatefulNote.Loader {
-        return StatefulNote.Loader(
-            noteCaptureAPIAdapter = getNoteCaptureAPIAdapter(),
-            noteRepository = getNoteRepository(),
-            userRepository = getUserRepository(),
-            dispatcher = dispatcher,
-            coroutineScope = coroutineScope
-        )
-    }
+
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->
@@ -409,6 +404,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getUserRepository(): UserRepository {
         return mUserRepository
+    }
+
+    override fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow {
+        return mUserRepositoryEventToFlow
     }
 
     override fun getChannelAPI(account: Account): ChannelAPI {
