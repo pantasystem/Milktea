@@ -4,6 +4,7 @@ import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.coroutines.flow.Flow
+import kotlin.jvm.Throws
 
 /**
  * キャッシュやデータベースの実装の差をなくすためのRepository
@@ -31,7 +32,8 @@ interface NoteRepository {
     var listener: Listener
 
 
-    suspend fun get(noteId: Note.Id) : Note?
+    @Throws(NoteNotFoundException::class)
+    suspend fun get(noteId: Note.Id) : Note
 
     suspend fun remove(noteId: Note.Id) : Boolean
 
