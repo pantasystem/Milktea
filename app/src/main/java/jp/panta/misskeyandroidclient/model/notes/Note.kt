@@ -19,10 +19,13 @@ data class Note(
     val text: String?,
     val cw: String?,
     val userId: User.Id,
+    val user: User,
 
     val replyId: Id?,
+    val reply: Note?,
 
     val renoteId: Id?,
+    val renote: Note?,
 
     val viaMobile: Boolean?,
     val visibility: String?,

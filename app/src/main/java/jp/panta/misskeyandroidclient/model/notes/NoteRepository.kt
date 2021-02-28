@@ -17,7 +17,7 @@ interface NoteRepository {
         fun create(account: Account) : NoteRepository
     }
 
-    interface Listener {
+    fun interface Listener {
         fun on(e: Event)
     }
 
@@ -29,7 +29,7 @@ interface NoteRepository {
         data class Created(override val noteId: Note.Id, val note: Note): Event()
     }
 
-    var listener: Listener
+    fun addEventListener(listener: Listener)
 
 
     @Throws(NoteNotFoundException::class)
