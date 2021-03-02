@@ -43,6 +43,14 @@ sealed class ChannelBody : StreamingEvent(){
     @Serializable
     sealed class Main : ChannelBody(){
 
+        interface HavingMessagingBody {
+            val body: Message
+        }
+
+        interface HavingNoteBody {
+            val body: NoteDTO
+        }
+
         @Serializable
         @SerialName("notification")
         data class Notification(
@@ -60,15 +68,15 @@ sealed class ChannelBody : StreamingEvent(){
         @SerialName("unreadMessagingMessage")
         data class UnreadMessagingMessage(
             override val id: String,
-            val body: Message
-        ) : Main()
+            override val body: Message
+        ) : Main(), HavingMessagingBody
 
         @Serializable
         @SerialName("mention")
         data class Mention(
             override val id: String,
-            val body: NoteDTO
-        ) : Main()
+            override val body: NoteDTO
+        ) : Main(), HavingNoteBody
 
 
         @Serializable
@@ -82,15 +90,15 @@ sealed class ChannelBody : StreamingEvent(){
         @SerialName("renote")
         data class Renote(
             override val id: String,
-            val body: NoteDTO
-        ) : Main()
+            override val body: NoteDTO
+        ) : Main(), HavingNoteBody
 
         @Serializable
         @SerialName("messagingMessage")
         data class MessagingMessage(
             override val id: String,
-            val body: Message
-        ) : Main()
+            override val body: Message
+        ) : Main(), HavingMessagingBody
 
         @Serializable
         @SerialName("meUpdated")
