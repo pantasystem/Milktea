@@ -11,6 +11,10 @@ interface AccountRepository{
         data class Deleted(val accountId: Long) : Event()
     }
 
+    interface Listener {
+        fun on(e: Event)
+    }
+
     suspend fun get(accountId: Long): Account
 
     suspend fun findByRemoteIdAndInstanceDomain(remoteId: String, instanceDomain: String): Account?
