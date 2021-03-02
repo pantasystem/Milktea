@@ -15,6 +15,10 @@ interface AccountRepository{
         fun on(e: Event)
     }
 
+    fun addEventListener(listener: Listener)
+
+    fun removeEventListener(listener: Listener)
+
     suspend fun get(accountId: Long): Account
 
     suspend fun findByRemoteIdAndInstanceDomain(remoteId: String, instanceDomain: String): Account?
