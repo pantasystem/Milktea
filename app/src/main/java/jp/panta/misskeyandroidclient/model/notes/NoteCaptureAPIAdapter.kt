@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.*
 /**
  * model層とNoteCaptureAPIをいい感じに接続する
  */
+@Deprecated("NoteCaptureのイベントを直接Repositoryに流し込む仕組みに変更する。")
 class NoteCaptureAPIAdapter(
     private val accountRepository: AccountRepository,
     private val noteRepository: NoteRepository,
