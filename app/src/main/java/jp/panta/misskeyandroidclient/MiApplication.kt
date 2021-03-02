@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.util.Log
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
@@ -28,7 +27,7 @@ import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
+import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.url.*
@@ -54,6 +53,7 @@ import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
+import kotlinx.coroutines.flow.Flow
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -117,7 +117,6 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
-    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
     private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
@@ -127,7 +126,8 @@ class MiApplication : Application(), MiCore {
         private set
 
     override lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
-    override lateinit var messageSubscriber: MessageSubscriber
+    override lateinit var messageStreamFilter: MessageStreamFilter
+
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -189,20 +189,12 @@ class MiApplication : Application(), MiCore {
 
         mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
 
-        mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
-            accountRepository,
-            mNoteRepository,
-            mNoteCaptureAPIWithAccountProvider,
-            loggerFactory,
-            applicationScope,
-            Dispatchers.IO
-        )
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
-        messageSubscriber =
-            MessageSubscriber(
+        messageStreamFilter =
+            MessageStreamFilter(
                 this
             )
 
@@ -220,12 +212,12 @@ class MiApplication : Application(), MiCore {
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
     }
 
-    override fun getAccounts(): LiveData<List<Account>> {
-        return mAccounts
+    override fun getAccounts(): Flow<List<Account>> {
+        TODO("Not yet implemented")
     }
 
-    override fun getCurrentAccount(): LiveData<Account> {
-        return mCurrentAccount
+    override fun getCurrentAccount(): Flow<Account> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun getAccount(accountId: Long): Account {
@@ -237,10 +229,19 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getNoteCaptureAPIAdapter(): NoteCaptureAPIAdapter {
-        return mNoteCaptureAPIAdapter
+    override fun getNoteCapture(
+        coroutineScope: CoroutineScope,
+        dispatcher: CoroutineDispatcher
+    ): ScopedNoteCapture {
+        return ScopedNoteCapture(
+            coroutineScope,
+            dispatcher,
+            mNoteCaptureAPIWithAccountProvider,
+            accountRepository,
+            mNoteRepository,
+            loggerFactory
+        )
     }
-
 
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{

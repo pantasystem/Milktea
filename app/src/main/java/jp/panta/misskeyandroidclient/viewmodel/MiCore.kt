@@ -1,22 +1,25 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
-import androidx.lifecycle.LiveData
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
+import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.ScopedNoteCapture
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 
 interface MiCore{
     //val accounts: MutableLiveData<List<Account>>
@@ -25,13 +28,13 @@ interface MiCore{
 
     var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
-    var messageSubscriber: MessageSubscriber
+    var messageStreamFilter: MessageStreamFilter
 
     val loggerFactory: Logger.Factory
 
-    fun getAccounts(): LiveData<List<Account>>
+    fun getAccounts(): Flow<List<Account>>
 
-    fun getCurrentAccount(): LiveData<Account>
+    fun getCurrentAccount(): Flow<Account>
 
     @Throws(AccountNotFoundException::class)
     suspend fun getAccount(accountId: Long) : Account
@@ -70,7 +73,7 @@ interface MiCore{
 
     fun getChannelAPI(account: Account): ChannelAPI
 
-    fun getNoteCaptureAPIAdapter(): NoteCaptureAPIAdapter
+    fun getNoteCapture(coroutineScope: CoroutineScope, dispatcher: CoroutineDispatcher = Dispatchers.IO): ScopedNoteCapture
 
     fun getCurrentInstanceMeta(): Meta?
 
