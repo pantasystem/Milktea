@@ -5,6 +5,12 @@ import io.reactivex.Single
 
 interface AccountRepository{
 
+    sealed class Event {
+        data class Created(val account: Account) : Event()
+        data class Updated(val account: Account) : Event()
+        data class Deleted(val accountId: Long) : Event()
+    }
+
     suspend fun get(accountId: Long): Account
 
     suspend fun findByRemoteIdAndInstanceDomain(remoteId: String, instanceDomain: String): Account?
