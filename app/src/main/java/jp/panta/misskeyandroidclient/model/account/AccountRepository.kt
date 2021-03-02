@@ -11,7 +11,7 @@ interface AccountRepository{
         data class Deleted(val accountId: Long) : Event()
     }
 
-    interface Listener {
+    fun interface Listener {
         fun on(e: Event)
     }
 

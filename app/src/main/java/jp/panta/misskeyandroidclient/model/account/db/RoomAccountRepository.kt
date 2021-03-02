@@ -21,6 +21,20 @@ class RoomAccountRepository(
     private val pageDAO: PageDAO,
 ) : AccountRepository{
 
+    private val listeners = mutableSetOf<AccountRepository.Listener>()
+
+    override fun addEventListener(listener: AccountRepository.Listener) {
+        synchronized(listeners) {
+            listeners.add(listener)
+        }
+    }
+
+    override fun removeEventListener(listener: AccountRepository.Listener) {
+        synchronized(listeners) {
+            listeners.remove(listener)
+        }
+    }
+
     override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
         return roomDataBase.runInTransaction(Callable<Account> {
             var exAccount: Account? = null
@@ -90,7 +104,9 @@ class RoomAccountRepository(
                     get(exAccount!!.accountId)
                 }
                 Log.d("Repo", "ex: $exAccount")
-
+                publish(AccountRepository.Event.Created(account))
+            }else{
+                publish(AccountRepository.Event.Updated(account))
             }
 
             exAccount
@@ -100,6 +116,7 @@ class RoomAccountRepository(
 
     override suspend fun delete(account: Account) {
         accountDao.delete(account)
+        publish(AccountRepository.Event.Deleted(account.accountId))
     }
 
     override suspend fun findAllByUserName(userName: String): List<Account> {
@@ -164,6 +181,14 @@ class RoomAccountRepository(
         return ac
     }
 
+
+    private fun publish(e: AccountRepository.Event) {
+        synchronized(listeners) {
+            listeners.forEach {
+                it.on(e)
+            }
+        }
+    }
 
 
 }
