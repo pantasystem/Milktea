@@ -34,7 +34,7 @@ interface MiCore{
 
     fun getAccounts(): Flow<List<Account>>
 
-    fun getCurrentAccount(): Flow<Account>
+    fun getCurrentAccount(): Flow<Account?>
 
     @Throws(AccountNotFoundException::class)
     suspend fun getAccount(accountId: Long) : Account

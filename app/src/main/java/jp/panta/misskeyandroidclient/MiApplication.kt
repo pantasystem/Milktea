@@ -54,6 +54,7 @@ import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -97,8 +98,10 @@ class MiApplication : Application(), MiCore {
 
     // private var mConnectionInstance: ConnectionInstance? = null
 
-    private val mAccounts = MutableLiveData<List<Account>>()
-    private val mCurrentAccount = MutableLiveData<Account>()
+    //private val mAccounts = MutableLiveData<List<Account>>()
+    //private val mCurrentAccount = MutableLiveData<Account>()
+    private val mAccountsState = MutableStateFlow(emptyList<Account>())
+    private val mCurrentAccountState = MutableStateFlow<Account?>(null)
 
 
     //var isSuccessCurrentAccount = MutableLiveData<Boolean>()
@@ -213,11 +216,11 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getAccounts(): Flow<List<Account>> {
-        TODO("Not yet implemented")
+        return mAccountsState
     }
 
-    override fun getCurrentAccount(): Flow<Account> {
-        TODO("Not yet implemented")
+    override fun getCurrentAccount(): Flow<Account?> {
+        return mCurrentAccountState
     }
 
     override suspend fun getAccount(accountId: Long): Account {
@@ -254,7 +257,7 @@ class MiApplication : Application(), MiCore {
                     urlPreviewDAO
                     ,mSettingStore.urlPreviewSetting.getSourceType(),
                     mSettingStore.urlPreviewSetting.getSummalyUrl(),
-                    mCurrentAccount.value
+                    mCurrentAccountState.value
                 ).create()
             }
             mUrlPreviewStoreInstanceBaseUrlMap[url] = store
@@ -322,7 +325,7 @@ class MiApplication : Application(), MiCore {
             pages.add(page)
             try{
                 val updated= accountRepository.add(account.copy(pages = pages), true)
-                mCurrentAccount.postValue(updated)
+                mCurrentAccountState.emit(updated)
             }catch(e: Exception){
                 Log.e(TAG, "アカウント更新処理中にエラー発生", e)
             }
@@ -444,8 +447,8 @@ class MiApplication : Application(), MiCore {
                 return loadAndInitializeAccounts()
             }
 
-            mCurrentAccount.postValue(current)
-            mAccounts.postValue(tmpAccounts)
+            mCurrentAccountState.emit(current)
+            mAccountsState.emit(tmpAccounts)
             connectionStatus.postValue(ConnectionStatus.SUCCESS)
 
             setUpMetaMap(tmpAccounts)
@@ -487,7 +490,7 @@ class MiApplication : Application(), MiCore {
 
     override fun getCurrentInstanceMeta(): Meta?{
         return synchronized(mMetaInstanceUrlMap){
-            mCurrentAccount.value?.instanceDomain?.let{ url ->
+            mCurrentAccountState.value?.instanceDomain?.let{ url ->
                 mMetaInstanceUrlMap[url]
             }
         }
@@ -572,7 +575,7 @@ class MiApplication : Application(), MiCore {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when(key){
                 UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
-                    mAccounts.value?.forEach {
+                    mAccountsState.value.forEach {
                         getUrlPreviewStore(it, true)
                     }
                 }
