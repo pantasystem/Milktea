@@ -51,6 +51,10 @@ sealed class ChannelBody : StreamingEvent(){
             val body: NoteDTO
         }
 
+        interface HavingUserBody {
+            val body: UserDTO
+        }
+
         @Serializable
         @SerialName("notification")
         data class Notification(
@@ -102,29 +106,29 @@ sealed class ChannelBody : StreamingEvent(){
 
         @Serializable
         @SerialName("meUpdated")
-        data class MeUpdated(override val id: String) : Main()
+        data class MeUpdated(override val id: String, override val body: UserDTO) : Main(), HavingUserBody
 
         @Serializable
         @SerialName("unfollow")
         data class UnFollow(
             override val id: String,
-            val body: UserDTO
-        ) : Main()
+            override val body: UserDTO
+        ) : Main(), HavingUserBody
 
 
         @Serializable
         @SerialName("followed")
         data class Follow(
             override val id: String,
-            val body: UserDTO
-        ) : Main()
+            override val body: UserDTO
+        ) : Main(), HavingUserBody
 
         @Serializable
         @SerialName("follow")
         data class Followed(
             override val id: String,
-            val body: UserDTO
-        ) : Main()
+            override val body: UserDTO
+        ) : Main(), HavingUserBody
 
         @Serializable
         @SerialName("fileUpdated")
