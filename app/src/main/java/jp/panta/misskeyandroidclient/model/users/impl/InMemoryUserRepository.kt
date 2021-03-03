@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.users.impl
 
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -78,10 +79,10 @@ class InMemoryUserRepository : UserRepository{
         }
     }
 
-    override suspend fun get(userId: User.Id): User? {
+    override suspend fun get(userId: User.Id): User {
         return recordLocks[userId]?.withLock {
             userMap[userId]
-        }
+        }?: throw UserNotFoundException(userId)
     }
 
     @ExperimentalCoroutinesApi

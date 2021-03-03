@@ -21,7 +21,7 @@ interface UserRepository {
 
     fun removeEventListener(listener: Listener)
 
-    suspend fun get(userId: User.Id): User?
+    suspend fun get(userId: User.Id): User
 
     suspend fun add(user: User): AddResult
 
