@@ -1,48 +1,16 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.MediatorLiveData
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
-open class UsersLiveData : MediatorLiveData<List<UserViewData>>(){
 
-    private var mMainCapture: MainCapture? = null
-
-    override fun onActive() {
-        super.onActive()
-
-        mMainCapture?.putListener(listener)
-    }
-    override fun onInactive() {
-        super.onInactive()
-
-        mMainCapture?.removeListener(listener)
-    }
-    fun setMainCapture(mainCapture: MainCapture){
-        mMainCapture?.removeListener(listener)
-        mMainCapture = mainCapture
-        mainCapture.putListener(listener)
-    }
-
-    val listener = object : MainCapture.AbsListener(){
-
-        override fun follow(user: UserDTO) {
-            super.follow(user)
-
-            value?.forEach {
-                if(it.userId == user.id){
-                    it.user.postValue(user)
-                }
-            }
-        }
-
-        override fun unFollowed(user: UserDTO) {
-            value?.forEach {
-                if(it.userId == user.id){
-                    it.user.postValue(user)
-                }
-            }
-        }
-    }
-
-}
+@Deprecated("UserViewDataが今までの機能を完全に引き継いだため不要になった")
+open class UsersLiveData(
+    val miCore: MiCore,
+) : MediatorLiveData<List<UserViewData>>()
