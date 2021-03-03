@@ -17,17 +17,17 @@ import java.util.Date
 data class Message(
     val id: String,
     @Serializable(with = DateSerializer::class) val createdAt: Date,
-    val text: String?,
-    val userId: String?,
-    val user: UserDTO?,
-    val recipientId: String?,
-    val recipient: UserDTO?,
-    val groupId: String?,
-    val group: Group?,
-    val fileId: String?,
-    val file: FileProperty?,
-    val isRead: Boolean?,
-    val emojis: List<Emoji>?
+    val text: String? = null,
+    val userId: String? = null,
+    val user: UserDTO? = null,
+    val recipientId: String? = null,
+    val recipient: UserDTO? = null,
+    val groupId: String? = null,
+    val group: Group? = null,
+    val fileId: String? = null,
+    val file: FileProperty? = null,
+    val isRead: Boolean? = null,
+    val emojis: List<Emoji>
 ): JavaSerializable{
     fun isGroup(): Boolean{
         return group != null
