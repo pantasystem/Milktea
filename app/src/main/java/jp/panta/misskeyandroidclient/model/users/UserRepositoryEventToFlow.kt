@@ -10,9 +10,15 @@ import kotlin.reflect.KClass
 /**
  * UserRepositoryのイベントをFlowに変換する
  */
-class UserRepositoryEventToFlow : UserRepository.Listener{
+class UserRepositoryEventToFlow(
+    val userRepository: UserRepository
+) : UserRepository.Listener{
 
     private val userIdWithListener = mutableMapOf<User.Id, MutableSet<(e: UserRepository.Event)->Unit>>()
+
+    init {
+        userRepository.addEventListener(this)
+    }
 
     @ExperimentalCoroutinesApi
     fun from(userId: User.Id): Flow<UserRepository.Event> {
