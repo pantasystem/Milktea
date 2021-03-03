@@ -5,15 +5,14 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import retrofit2.Call
 import java.lang.IllegalArgumentException
 import retrofit2.Callback
@@ -38,8 +37,8 @@ class AccountViewModel(
     }
 
     val accounts = MediatorLiveData<List<AccountViewData>>().apply{
-        addSource(miCore.getAccounts()){ arList ->
-            value = arList.map{ ac ->
+        miCore.getAccounts().onEach { accounts ->
+            value = accounts.map{ ac ->
                 val avd = AccountViewData(ac)
                 ac.getI(miCore.getEncryption()).let{ i ->
                     miCore.getMisskeyAPI(ac).i(
@@ -48,13 +47,10 @@ class AccountViewModel(
                 }
                 avd
             }
-        }
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     val currentAccount = miCore.getCurrentAccount()
-
-    private var mBeforeAccount: Account? = null
-    private var mainCaptureJob: Job? = null
 
     val user = MediatorLiveData<UserDTO>()
 
@@ -69,41 +65,32 @@ class AccountViewModel(
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init{
-        user.addSource(miCore.getCurrentAccount()){
-            val nullableI = it?.getI(miCore.getEncryption())
-            nullableI?.let { i ->
-                miCore.getMisskeyAPI(it).i(I(i)).enqueue(object : Callback<UserDTO>{
-                    override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
-                        response.body()?.let{ u ->
-                            user.postValue(u)
-                        }
-                    }
-
-                    override fun onFailure(call: Call<UserDTO>, t: Throwable) {
-                        user.postValue(null)
-                        Log.d(TAG, "user load error", t)
-                    }
-                })
-            }
-
-            mainCaptureJob?.cancel()
-            val job = miCore.getChannelAPI(it).connect(ChannelAPI.Type.MAIN)
-                .onEach { cb ->
-                    if(cb is ChannelBody.Main.MeUpdated) {
-                        val user = cb.body
-                        if(user.id == miCore.getCurrentAccount().value?.remoteId){
-                            this@AccountViewModel.user.postValue(user)
-                        }
-                        accounts.value?.forEach { avd ->
-                            if(avd.userId == user.id){
-                                avd.user.postValue(user)
+        miCore.getCurrentAccount().onEach {
+            runCatching {
+                it?.getI(miCore.getEncryption())?.let{ i ->
+                    miCore.getMisskeyAPI(it).i(I(i)).enqueue(object : Callback<UserDTO>{
+                        override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
+                            response.body()?.let{ u ->
+                                user.postValue(u)
                             }
                         }
-                    }
-                }.launchIn(viewModelScope)
-            mainCaptureJob = job
-            mBeforeAccount = it
-        }
+
+                        override fun onFailure(call: Call<UserDTO>, t: Throwable) {
+                            user.postValue(null)
+                            Log.d(TAG, "user load error", t)
+                        }
+                    })
+                }
+            }
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        miCore.getCurrentAccount().filterNotNull().flatMapMerge { ac->
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN)
+        }.map {
+            it as? ChannelBody.Main.MeUpdated
+        }.filterNotNull().onEach {
+            user.postValue(it.body)
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     fun setSwitchTargetConnectionInstance(account: Account){
