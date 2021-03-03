@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder
 import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.notification.*
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
@@ -19,13 +20,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingS
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import java.util.*
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData.Type.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class NotificationService : Service() {
     companion object{
@@ -75,31 +71,32 @@ class NotificationService : Service() {
         coroutineScope.cancel()
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun startObserve(){
 
         val miApplication = applicationContext
         if(miApplication is MiApplication){
-            miApplication.getAccounts().observeForever { accounts ->
-                accounts?.forEach{ar ->
-                    Log.d(TAG, "observerを登録しています")
 
-                    ar.let{ ac ->
-
-                        val mainCapture = (application as MiApplication).getChannelAPI(ac)
-                        mainCapture.connect(ChannelAPI.Type.MAIN).onEach {
-                            if(it is ChannelBody.Main && it is ChannelBody.Main.Notification){
-                                showNotification(it.body)
-                            }
-                        }.launchIn(coroutineScope)
-                        mainCapture.putListener(MainChannelObserver(ar))
+            miApplication.getAccounts().flatMapLatest { acList ->
+                acList.map{ a ->
+                    miApplication.getChannelAPI(a).connect(ChannelAPI.Type.MAIN).map {
+                        a to it
                     }
+                }.merge()
+            }.filterNot {
+                mStopNotificationAccountMap.contains(it.first.accountId)
+            }.map {
+                it.second as? ChannelBody.Main.Notification
+            }.filterNotNull().onEach {
+                showNotification(it.body)
+            }.launchIn(coroutineScope + Dispatchers.IO)
 
-                }
-            }
 
-            mDisposable.add(miApplication.messageSubscriber.getAllMergedAccountMessages().subscribe {
+            miApplication.messageStreamFilter.getAllMergedAccountMessages().onEach {
                 showMessageNotification(it)
-            })
+            }.launchIn(coroutineScope)
+
         }
 
 
@@ -112,7 +109,7 @@ class NotificationService : Service() {
 
                 if(mStopNotificationAccountMap[account.accountId] == null){
                     Log.d(TAG, "notification,:$notification")
-                    showNotification(NotificationViewData(notification, account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore())))
+                    showNotification(notification)
                 }else{
                     Log.d(TAG, "通知を表示しなかった")
                 }
@@ -122,88 +119,46 @@ class NotificationService : Service() {
         }
     }
 
-    private fun showNotification(notification: NotificationViewData){
+    private fun showNotification(notification: Notification) {
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
         builder.setSmallIcon(R.mipmap.ic_launcher_foreground)
 
-        when(notification.type){
-            FOLLOW ->{
-                //builder.setSmallIcon(R.drawable.ic_follow)
+        when(notification) {
+            is FollowNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName() + " " +applicationContext.getString(R.string.followed_by))
-
             }
-            MENTION ->{
-                //builder.setSmallIcon(R.drawable.ic_mention)
+            is MentionNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.mention_by))
-                builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
-
+                builder.setContentText(SafeUnbox.unbox(notification.note.text))
             }
-            REPLY ->{
-                //builder.setSmallIcon(R.drawable.ic_reply_black_24dp)
+            is ReplyNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.replied_by))
-                builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.text))
+                builder.setContentText(SafeUnbox.unbox(notification.note.text))
             }
-            QUOTE ->{
-                //builder.setSmallIcon(R.drawable.ic_format_quote_black_24dp)
+            is QuoteNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.quoted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
+                builder.setContentText(SafeUnbox.unbox(notification.note.text))
             }
-            POLL_VOTE->{
-                //builder.setSmallIcon(R.drawable.ic_poll_black_24dp)
+            is PollVoteNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.voted_by))
             }
-            REACTION ->{
-                //builder.setSmallIcon(R.drawable.ic_reaction_like)
+            is ReactionNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.reacted_by))
                 builder.setContentText(SafeUnbox.unbox(notification.reaction))
             }
-            RENOTE ->{
+            is RenoteNotification -> {
                 // builder.setSmallIcon(R.drawable.ic_re_note)
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.renoted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.noteViewData?.toShowNote?.text))
+                builder.setContentText(SafeUnbox.unbox(notification.note.reNote?.text?: ""))
             }
-            RECEIVE_FOLLOW_REQUEST ->{
-                /*
-                E/AndroidRuntime: FATAL EXCEPTION: main
-Process: jp.panta.misskeyandroidclient, PID: 27540
-java.lang.IllegalArgumentException: Invalid notification (no valid small icon): Notification(channel=jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID pri=0 contentView=null vibrate=null sound=null defaults=0x0 flags=0x0 color=0x00000000 vis=PRIVATE)
-    at android.app.NotificationManager.fixNotification(NotificationManager.java:519)
-    at android.app.NotificationManager.notifyAsUser(NotificationManager.java:498)
-    at android.app.NotificationManager.notify(NotificationManager.java:447)
-    at android.app.NotificationManager.notify(NotificationManager.java:423)
-    at jp.panta.misskeyandroidclient.NotificationService.showNotification(NotificationService.kt:134)
-    at jp.panta.misskeyandroidclient.NotificationService.access$showNotification(NotificationService.kt:28)
-    at jp.panta.misskeyandroidclient.NotificationService$MainChannelObserver$notification$1.run(NotificationService.kt:70)
-    at android.os.Handler.handleCallback(Handler.java:883)
-    at android.os.Handler.dispatchMessage(Handler.java:100)
-    at android.os.Looper.loop(Looper.java:224)
-    at android.app.ActivityThread.main(ActivityThread.java:7520)
-    at java.lang.reflect.Method.invoke(Native Method)
-    at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:539)
-    at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:950)
-E/MQSEventManagerDelegate: failed to get MQSService.
-                 */
-                //builder.setSmallIcon(R.drawable.ic_supervisor_account_black_24dp)
+            is ReceiveFollowRequestNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.request_follow))
-                //
-
-                // 通知をタップした時の動作
-                // PendingIntent.getBroadcast()
-                // builder.setContentIntent()
-                return
-
             }
-            FOLLOW_REQUEST_ACCEPTED ->{
+            is FollowRequestAcceptedNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName() + " " + getString(R.string.follow_request_accepted))
             }
-            else ->{
-                Log.d("NotificationService", "unknown notification: $notification")
-                return
-            }
-            /*else ->{
-                builder.setSmallIcon(R.mipmap.ic_launcher)
 
-            }*/
+
 
         }
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
@@ -218,20 +173,25 @@ E/MQSEventManagerDelegate: failed to get MQSService.
             notify(5, builder.build())
             this
         }
-
     }
 
-    private fun makeResultActivityIntent(notificationViewData: NotificationViewData): Intent{
-        return when(notificationViewData.type){
-            FOLLOW, RECEIVE_FOLLOW_REQUEST->{
+    private fun makeResultActivityIntent(notification: Notification): Intent{
+        return when(notification){
+            is FollowNotification -> {
                 Intent(this, UserDetailActivity::class.java).apply{
-                    putExtra(UserDetailActivity.EXTRA_USER_ID, notificationViewData.user.id)
+                    putExtra(UserDetailActivity.EXTRA_USER_ID, notification.user.id)
                     putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }
-            MENTION, REPLY, RENOTE, QUOTE, REACTION, POLL_VOTE ->{
+            is ReceiveFollowRequestNotification -> {
+                Intent(this, UserDetailActivity::class.java).apply{
+                    putExtra(UserDetailActivity.EXTRA_USER_ID, notification.user.id)
+                    putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
+                }
+            }
+            is HasNote -> {
                 Intent(this, NoteDetailActivity::class.java).apply{
-                    putExtra(NoteDetailActivity.EXTRA_NOTE_ID, notificationViewData.noteViewData?.id)
+                    putExtra(NoteDetailActivity.EXTRA_NOTE_ID, notification.note.id)
                     putExtra(NoteDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }
@@ -292,34 +252,6 @@ E/MQSEventManagerDelegate: failed to get MQSService.
         }
     }
 
-    /*class ClientMessageHandler(service: NotificationService) : Handler(){
-
-        private val mService: WeakReference<NotificationService> = WeakReference(service)
-
-        fun getService(): NotificationService?{
-            return mService.get()
-        }
-
-        // client（Activity）などからメッセージを受信したとき
-        override fun handleMessage(msg: android.os.Message?) {
-            super.handleMessage(msg)
-
-            when(msg?.what){
-                SUBSCRIBE_ALL_NOTIFICATIONS ->{
-                    mService.get()?.cancelAllNotification()
-                }
-                STOP_PUSH_NOTIFICATION ->{
-                    mService.get()?.isShowNotification = false
-                }
-                START_PUSH_NOTIFICATION->{
-                    mService.get()?.isShowNotification = true
-                }
-            }
-
-            //msg?.replyTo?.send()
-
-        }
-    }*/
 
     inner class NotificationBinder : Binder() {
 
