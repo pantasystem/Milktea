@@ -127,3 +127,9 @@ class ScopedNoteCapture(
         )
     }
 }
+
+fun ScopedNoteCapture.captureAll(collection: Collection<Note.Id>) {
+    collection.forEach {
+        capture(it)
+    }
+}
