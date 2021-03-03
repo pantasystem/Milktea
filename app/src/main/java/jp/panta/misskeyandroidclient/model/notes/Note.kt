@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.io.Serializable
 import java.lang.Exception
 import java.util.*
 
@@ -48,7 +49,7 @@ data class Note(
     data class Id(
         val accountId: Long,
         val noteId: String
-    )
+    ) : Serializable
 
     fun updated(){
         this.instanceUpdatedAt = Date()
