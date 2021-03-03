@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,6 +20,8 @@ class SortedUsersViewModel(
     orderBy: UserRequestConditions?
 ) : ViewModel(){
     val orderBy: UserRequestConditions = type?.conditions?: orderBy!!
+
+    val logger = miCore.loggerFactory.create("SortedUsersViewModel")
 
     class Factory(val miCore: MiCore, val type: Type?, private val orderBy: UserRequestConditions?) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -93,29 +95,12 @@ class SortedUsersViewModel(
 
     }
 
-    private val listener = Listener()
 
     val users = object : MediatorLiveData<List<UserViewData>>(){
-        override fun onActive() {
-            super.onActive()
-            miCore.getCurrentAccount().value?.let{ ar ->
-                miCore.getMainCapture(ar).putListener(listener)
-            }
 
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-
-            miCore.getCurrentAccount().value?.let{ ar ->
-                miCore.getMainCapture(ar).removeListener(listener)
-            }
-        }
     }.apply{
-        addSource(miCore.getCurrentAccount()){
-            if(this.value.isNullOrEmpty()){
-                loadUsers()
-            }
+        miCore.getCurrentAccount().onEach {
+            loadUsers()
         }
     }
 
@@ -132,46 +117,27 @@ class SortedUsersViewModel(
         }else{
             isRefreshing.value = true
         }
-        miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).enqueue(object : Callback<List<UserDTO>>{
-            override fun onResponse(call: Call<List<UserDTO>>, response: Response<List<UserDTO>>) {
-                if(response.code() in 200 until 300){
-                    users.postValue(response.body()?.map{
-                        UserViewData(it)
-                    })
-                }
-                isRefreshing.postValue(false)
-            }
 
-            override fun onFailure(call: Call<List<UserDTO>>, t: Throwable) {
-                isRefreshing.postValue(false)
-            }
-        })
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).execute().body() }
+                .map {
+                    it?.map{ dto ->
+                        dto.toUser(account).also{ u ->
+                            miCore.getUserRepository().add(u)
+                        }
+                    }?.map{ u->
+                        UserViewData(u, miCore, viewModelScope, Dispatchers.IO)
+                    }?.let{ viewDataList ->
+                        users.postValue(viewDataList)
+                    }
+                }.onFailure { t ->
+                    logger.error("ユーザーを取得しようとしたところエラーが発生しました", t)
+                }
+            isRefreshing.postValue(false)
+        }
+
 
     }
 
-    inner class Listener : MainCapture.AbsListener(){
-        override fun follow(user: UserDTO) {
-            super.follow(user)
-            updateUser(user)
-        }
 
-        override fun unFollowed(user: UserDTO) {
-            super.unFollowed(user)
-            updateUser(user)
-        }
-        override fun followed(user: UserDTO) {
-            super.followed(user)
-            updateUser(user)
-        }
-
-        private fun updateUser(user: UserDTO){
-            val list = ArrayList(users.value?: emptyList())
-            list.forEach {
-                if(it.userId == user.id){
-                    it.user.postValue(user)
-                }
-            }
-        }
-
-    }
 }

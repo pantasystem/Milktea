@@ -9,9 +9,9 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
 import jp.panta.misskeyandroidclient.api.v10.RequestFollowFollower
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
@@ -65,21 +65,12 @@ class FollowFollowerViewModel(
 
 
 
-    private val followFollowerUpdateListener = Listener()
-    private val mainCapture = miCore.getMainCapture(account)
 
     val isInitializing = MutableLiveData<Boolean>(false)
 
 
-    val users = object : MutableLiveData<List<UserViewData>>(){
-        override fun onActive() {
-            mainCapture.putListener(followFollowerUpdateListener)
-        }
+    val users = MutableLiveData<List<UserViewData>>()
 
-        override fun onInactive() {
-            mainCapture.removeListener(followFollowerUpdateListener)
-        }
-    }
     private var mIsLoading: Boolean = false
 
     private data class Result(val nextId: String?, val users: List<UserDTO>)
@@ -123,8 +114,10 @@ class FollowFollowerViewModel(
 
                     result?: return@launch
                     this@Loader.result = result
-                    val viewDataList = result.users.map{
-                        UserViewData(it)
+                    val viewDataList = result.users.map{ dto ->
+                        val u = dto.toUser(account)
+                        miCore.getUserRepository().add(u)
+                        UserViewData(u, miCore, viewModelScope)
                     }
                     val arrayList = ArrayList(users.value?: emptyList())
                     arrayList.addAll(viewDataList)
@@ -224,25 +217,6 @@ class FollowFollowerViewModel(
 
     fun loadOld(){
         loader?.loadNext()
-    }
-
-    private inner class Listener : MainCapture.AbsListener(){
-        override fun follow(user: UserDTO) {
-
-            users.value?.forEach { uvd ->
-                if(uvd.userId == user.id){
-                    uvd.user.postValue(user)
-                }
-            }
-        }
-
-        override fun unFollowed(user: UserDTO) {
-            users.value?.forEach { uvd ->
-                if(uvd.userId == user.id){
-                    uvd.user.postValue(user)
-                }
-            }
-        }
     }
 
 
