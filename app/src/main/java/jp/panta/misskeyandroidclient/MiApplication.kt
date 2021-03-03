@@ -46,14 +46,14 @@ import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserRepository
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -103,6 +103,7 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
+
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
     lateinit var colorSettingStore: ColorSettingStore
@@ -118,6 +119,7 @@ class MiApplication : Application(), MiCore {
     private val logger = loggerFactory.create("MiApplication")
 
 
+    @ExperimentalCoroutinesApi
     override fun onCreate() {
         super.onCreate()
 
@@ -143,18 +145,6 @@ class MiApplication : Application(), MiCore {
         //connectionInstanceDao = database.connectionInstanceDao()
         mAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
 
-        mAccountRepository.addEventListener { ev ->
-            applicationScope.launch(Dispatchers.IO) {
-                try{
-                    if(ev is AccountRepository.Event.Deleted) {
-                        mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
-                    }
-                    loadAndInitializeAccounts()
-                }catch(e: Exception) {
-                    logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
-                }
-            }
-        }
 
         reactionHistoryDao = database.reactionHistoryDao()
 
@@ -198,11 +188,27 @@ class MiApplication : Application(), MiCore {
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
-        messageStreamFilter =
-            MessageStreamFilter(
-                this
-            )
 
+        val userRepositoryAndMainChanelAPIAdapter = UserRepositoryAndMainChannelAdapter(mUserRepository, mChannelAPIWithAccountProvider)
+        // NOTE: 何度もchannelの接続と切断が繰り返される可能性があるがAccountに対してそこまでアクションをとる可能性は低い
+        mAccountsState.flatMapLatest { list ->
+            list.map{ ac ->
+                userRepositoryAndMainChanelAPIAdapter.listen(ac)
+            }.merge()
+        }.launchIn(applicationScope)
+
+        mAccountRepository.addEventListener { ev ->
+            applicationScope.launch(Dispatchers.IO) {
+                try{
+                    if(ev is AccountRepository.Event.Deleted) {
+                        mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
+                    }
+                    loadAndInitializeAccounts()
+                }catch(e: Exception) {
+                    logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
+                }
+            }
+        }
 
         applicationScope.launch(Dispatchers.IO){
             try{
