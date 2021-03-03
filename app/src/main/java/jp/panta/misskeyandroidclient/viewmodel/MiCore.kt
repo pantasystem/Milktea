@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscrib
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.ScopedNoteCapture
 import jp.panta.misskeyandroidclient.model.users.UserRepository
@@ -73,7 +74,7 @@ interface MiCore{
 
     fun getChannelAPI(account: Account): ChannelAPI
 
-    fun getNoteCapture(coroutineScope: CoroutineScope, dispatcher: CoroutineDispatcher = Dispatchers.IO): ScopedNoteCapture
+    fun getNoteCaptureAdapter() : NoteCaptureAPIAdapter
 
     fun getCurrentInstanceMeta(): Meta?
 

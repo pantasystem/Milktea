@@ -123,6 +123,8 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
+    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
     lateinit var colorSettingStore: ColorSettingStore
@@ -192,6 +194,15 @@ class MiApplication : Application(), MiCore {
 
         mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
 
+        mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
+            accountRepository,
+            mNoteRepository,
+            mNoteCaptureAPIWithAccountProvider,
+            loggerFactory,
+            applicationScope,
+            Dispatchers.IO
+        )
+
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
 
@@ -232,18 +243,9 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getNoteCapture(
-        coroutineScope: CoroutineScope,
-        dispatcher: CoroutineDispatcher
-    ): ScopedNoteCapture {
-        return ScopedNoteCapture(
-            coroutineScope,
-            dispatcher,
-            mNoteCaptureAPIWithAccountProvider,
-            accountRepository,
-            mNoteRepository,
-            loggerFactory
-        )
+
+    override fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter {
+        return mNoteCaptureAPIAdapter
     }
 
 
