@@ -2,6 +2,11 @@ package jp.panta.misskeyandroidclient.model.account
 
 import io.reactivex.Completable
 import io.reactivex.Single
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 
 interface AccountRepository{
 
@@ -36,4 +41,19 @@ interface AccountRepository{
     suspend fun setCurrentAccount(account: Account): Account
 
     suspend fun getCurrentAccount(): Account
+}
+
+@ExperimentalCoroutinesApi
+fun AccountRepository.listenEvent(): Flow<AccountRepository.Event> {
+    return channelFlow {
+
+        val listener: (e: AccountRepository.Event)-> Unit = {
+            offer(it)
+        }
+        addEventListener(listener)
+
+        awaitClose {
+            removeEventListener(listener)
+        }
+    }
 }
