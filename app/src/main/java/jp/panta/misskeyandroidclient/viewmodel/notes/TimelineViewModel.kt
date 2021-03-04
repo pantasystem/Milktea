@@ -55,13 +55,6 @@ class TimelineViewModel(
 
     val position = MutableLiveData<Int>()
 
-
-
-
-    private var isInitialized: Boolean = false
-
-
-
     private var mNoteIds = HashSet<Note.Id>()
 
     private val timelineLiveData = MediatorLiveData<TimelineState>()
@@ -123,7 +116,7 @@ class TimelineViewModel(
 
 
 
-    fun getTimelineLiveData() : LiveData<TimelineState>{
+    fun getTimelineLiveData() : LiveData<TimelineState?>{
         return timelineLiveData
     }
 
@@ -394,32 +387,32 @@ class TimelineViewModel(
 
 
 
-    private fun TimelineState?.makeUntilIdRequest(substituteSize: Int = 2): TimelineViewModel.Request? {
+    private fun TimelineState?.makeUntilIdRequest(substituteSize: Int = 2): Request? {
         val ids = this?.getUntilIds(substituteSize)?: emptyList()
         return ids.makeUntilIdRequest()
     }
 
-    private fun List<String>.makeUntilIdRequest(index: Int = 0): TimelineViewModel.Request? {
+    private fun List<String>.makeUntilIdRequest(index: Int = 0): Request? {
         if(this.size <= index) {
             return null
         }
 
-        val now = TimelineViewModel.Request(
+        val now = Request(
             untilId = this[index]
         )
         now.substitute = this.makeUntilIdRequest(index + 1)
         return now
     }
 
-    fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): TimelineViewModel.Request?{
+    fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): Request?{
         return (this?.getSinceIds(substituteSize)?: emptyList()).makeSinceIdRequest()
     }
 
-    private fun List<String>.makeSinceIdRequest(index: Int = 0): TimelineViewModel.Request?{
+    private fun List<String>.makeSinceIdRequest(index: Int = 0): Request?{
         if(this.size <= index){
             return null
         }
-        val now = TimelineViewModel.Request(
+        val now = Request(
             sinceId = this[index]
         )
         now.substitute = makeUntilIdRequest(index + 1)
