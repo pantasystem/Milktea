@@ -2,34 +2,30 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.lifecycle.*
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.*
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
-import kotlinx.coroutines.flow.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
-import kotlin.math.acos
 
 @ExperimentalCoroutinesApi
 class TimelineViewModel(
-    val account: Account,
+    val account: Account?,
+    val accountId: Long? = account?.accountId,
     val pageable: Pageable,
     val miCore: MiCore,
     val settingStore: SettingStore,
@@ -55,27 +51,15 @@ class TimelineViewModel(
     private val mErrorEvent = MutableSharedFlow<Errors>()
     val errorEvent: SharedFlow<Errors> = mErrorEvent
 
+    private val accountRepository = miCore.getAccountRepository()
+
     val position = MutableLiveData<Int>()
 
 
-    private var notePagingStore: NotePagedStore = when(pageable){
-        is Pageable.Favorite -> FavoriteNotePagingStore(account, pageable, miCore, miCore.getNoteCaptureAdapter(),
-            viewModelScope,
-            Dispatchers.IO)
-        else -> NoteTimelineStore(
-            account,
-            pageable,
-            include,
-            miCore,
-            miCore.getNoteCaptureAdapter(),
-            viewModelScope,
-            Dispatchers.IO
-        )
-    }
+
 
     private var isInitialized: Boolean = false
 
-    val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(account)
 
 
     private var mNoteIds = HashSet<Note.Id>()
@@ -89,34 +73,42 @@ class TimelineViewModel(
     private var isLoadingFlag = false
 
     init {
-        val flow = when(pageable) {
-            is Pageable.GlobalTimeline -> {
-                miCore.getChannelAPI(account).connect(ChannelAPI.Type.GLOBAL)
-            }
-            is Pageable.HybridTimeline -> {
-                miCore.getChannelAPI(account).connect(ChannelAPI.Type.HYBRID)
+        flow<Account> {
+            getAccount()
+        }.filter {
+            pageable is Pageable.GlobalTimeline
+                    || pageable is Pageable.HybridTimeline
+                    || pageable is Pageable.LocalTimeline
+                    || pageable is Pageable.HomeTimeline
+        }.flatMapLatest { account ->
+            when(pageable) {
+                is Pageable.GlobalTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.GLOBAL)
+                }
+                is Pageable.HybridTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.HYBRID)
 
-            }
-            is Pageable.LocalTimeline -> {
-                miCore.getChannelAPI(account).connect(ChannelAPI.Type.LOCAL)
+                }
+                is Pageable.LocalTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.LOCAL)
 
+                }
+                is Pageable.HomeTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.HOME)
+                }
+                else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
             }
-            is Pageable.HomeTimeline -> {
-                miCore.getChannelAPI(account).connect(ChannelAPI.Type.HOME)
-            }
-            else -> null
-        }
-        flow?.map {
+        }.map {
           it as? ChannelBody.ReceiveNote
-        }?.filterNotNull()?.map{
-            miCore.getGetters().noteRelationGetter.get(account, it.body)
-        }?.filter {
+        }.filterNotNull().map{
+            miCore.getGetters().noteRelationGetter.get(getAccount(), it.body)
+        }.filter {
            !mNoteIds.contains(it.note.id) && !this.isLoadingFlag
-        }?.map{
-            PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
-        }?.onEach {
+        }.map{
+            PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+        }.onEach {
             this.mNoteIds.add(it.id)
-            captureNotes(listOf(it))
+            listOf(it).captureNotes()
             val list = ArrayList<PlaneNoteViewData>(this.timelineLiveData.value?.notes?: emptyList<PlaneNoteViewData>())
             list.add(0, it)
             this.timelineLiveData.postValue(
@@ -125,7 +117,7 @@ class TimelineViewModel(
                     notes = list
                 )
             )
-        }?.launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
     }
 
 
@@ -154,7 +146,7 @@ class TimelineViewModel(
                     if(list.isNullOrEmpty()){
                         return@launch
                     }else{
-                        captureNotes(list)
+                        list.captureNotes()
                         loadUrlPreviews(list)
 
                         val state = timelineLiveData.value
@@ -216,7 +208,7 @@ class TimelineViewModel(
                 if(list.isNullOrEmpty()){
                     return@launch
                 }else{
-                    captureNotes(list)
+                    list.captureNotes()
                     loadUrlPreviews(list)
                     val state = timelineLiveData.value
 
@@ -262,14 +254,15 @@ class TimelineViewModel(
 
             viewModelScope.launch(Dispatchers.IO){
                 try{
-                    val response = notePagingStore?.loadInit()!!
+                    val account = getAccount()
+                    val response = account.getPagedStore().loadInit()
                     val list = response.second?: emptyList()
                     val state = TimelineState(
                         list,
                         TimelineState.State.INIT
                     )
                     //noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
-                    captureNotes(list)
+                    list.captureNotes()
 
                     loadUrlPreviews(list)
 
@@ -310,16 +303,16 @@ class TimelineViewModel(
         if(request == null && isRetry){
             return null
         }
-
+        val account = getAccount()
         val res = when {
             request?.untilId != null -> {
-                notePagingStore.loadOld(untilId = request.untilId)
+                account.getPagedStore().loadOld(untilId = request.untilId)
             }
             request?.sinceId != null -> {
-                notePagingStore.loadNew(sinceId = request.sinceId)
+                account.getPagedStore().loadNew(sinceId = request.sinceId)
             }
             else -> {
-                notePagingStore.loadInit()
+                account.getPagedStore().loadInit()
             }
         }
         val notes = res.second
@@ -331,7 +324,7 @@ class TimelineViewModel(
         val targetNoteId = request?.untilId?: request?.sinceId ?: return null
 
         val targetNote = try{
-            misskeyAPI.showNote(
+            account.getMisskeyAPI().showNote(
                 NoteRequest(
                     i = account.getI(miCore.getEncryption()),
                     noteId = targetNoteId
@@ -350,8 +343,8 @@ class TimelineViewModel(
     }
 
 
-    private fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
-
+    private suspend fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
+        val account  = getAccount()
 
         list.forEach{ note ->
             note.textNode?.getUrls()?.let{ urls ->
@@ -378,8 +371,9 @@ class TimelineViewModel(
 
 
 
-    private fun captureNotes(notes: List<PlaneNoteViewData>) {
+    private fun List<PlaneNoteViewData>.captureNotes() {
         val scope = viewModelScope + Dispatchers.IO
+        val notes = this
         viewModelScope.launch(Dispatchers.IO) {
             notes.forEach { note ->
                 note.eventFlow.onEach {
@@ -400,7 +394,7 @@ class TimelineViewModel(
 
 
 
-    fun TimelineState?.makeUntilIdRequest(substituteSize: Int = 2): TimelineViewModel.Request? {
+    private fun TimelineState?.makeUntilIdRequest(substituteSize: Int = 2): TimelineViewModel.Request? {
         val ids = this?.getUntilIds(substituteSize)?: emptyList()
         return ids.makeUntilIdRequest()
     }
@@ -432,5 +426,49 @@ class TimelineViewModel(
         return now
     }
 
+    //
+    private var mAccountCache: Account? = account
+    private suspend fun getAccount(): Account {
+        if(mAccountCache != null) {
+            mAccountCache
+        }
+
+        if(accountId != null) {
+            val ac = accountRepository.get(accountId)
+            mAccountCache = ac
+            return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
+        }
+
+        mAccountCache = accountRepository.getCurrentAccount()
+        return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
+    }
+
+
+
+    private fun Account.getMisskeyAPI(): MisskeyAPI {
+        return miCore.getMisskeyAPI(this)
+    }
+
+    private fun Account.getPagedStore(): NotePagedStore {
+        return when(pageable){
+            is Pageable.Favorite -> FavoriteNotePagingStore(
+                this,
+                pageable,
+                miCore,
+                miCore.getNoteCaptureAdapter(),
+                viewModelScope,
+                Dispatchers.IO
+            )
+            else -> NoteTimelineStore(
+                this,
+                pageable,
+                include,
+                miCore,
+                miCore.getNoteCaptureAdapter(),
+                viewModelScope,
+                Dispatchers.IO
+            )
+        }
+    }
 
 }
