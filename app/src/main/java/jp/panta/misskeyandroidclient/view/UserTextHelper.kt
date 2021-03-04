@@ -5,13 +5,14 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 
 object UserTextHelper{
 
     @JvmStatic
     @BindingAdapter("mainNameView", "subNameView", "user")
-    fun View.setUserInfo(mainNameView: TextView?, subNameView: TextView?, user: UserDTO?){
+    fun View.setUserInfo(mainNameView: TextView?, subNameView: TextView?, user: User?){
         user?: return
         val isUserNameDefault = (this.context.applicationContext as MiApplication).getSettingStore().isUserNameDefault
         val userName: TextView?

@@ -8,13 +8,14 @@ import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 
 object UserTransitionHelper {
 
     @JvmStatic
     @BindingAdapter("transitionDestinationUser")
-    fun View.showUserDetail(user: UserDTO?){
+    fun View.showUserDetail(user: User?){
         user?: return
         this.setOnClickListener { view ->
             val context = view.context
