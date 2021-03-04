@@ -14,5 +14,6 @@ data class NotificationDTO(
     val userId: String,
     val user: UserDTO,
     val note: NoteDTO? = null,
+    val noteId: String? = null,
     val reaction: String? = null
 )
