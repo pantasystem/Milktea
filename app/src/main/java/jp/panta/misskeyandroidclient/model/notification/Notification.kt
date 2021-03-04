@@ -2,6 +2,8 @@ package jp.panta.misskeyandroidclient.model.notification
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -9,139 +11,107 @@ import java.util.*
 
 
 
-@Serializable
 sealed class Notification {
-    abstract val id: String
-    abstract val userId: String
-    abstract val user: UserDTO
+    abstract val id: Id
+    abstract val userId: User.Id
     abstract val createdAt: Date
     abstract val isRead: Boolean
+
+    data class Id(
+        val accountId: Long,
+        val notificationId: String
+    ) : java.io.Serializable
 }
+
 
 interface HasNote {
-    val note: NoteDTO
+    val noteId: Note.Id
 }
 
-@SerialName("follow")
-@Serializable
 data class FollowNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
+    override val userId: User.Id,
     override val isRead: Boolean
 ) : Notification()
 
-@SerialName("followRequestAccepted")
-@Serializable
 data class FollowRequestAcceptedNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
+    override val userId: User.Id,
     override val isRead: Boolean
 
 ) : Notification()
 
-@SerialName("receiveFollowRequest")
-@Serializable
 data class ReceiveFollowRequestNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
+    override val userId: User.Id,
     override val isRead: Boolean
 
 ) : Notification()
 
-@Serializable
-@SerialName("mention")
 data class MentionNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
-    override val note: NoteDTO,
+    override val userId: User.Id,
+    override val noteId: Note.Id,
     override val isRead: Boolean
 
 ) : Notification(), HasNote
 
 
-@Serializable
-@SerialName("reply")
 data class ReplyNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
-    override val note: NoteDTO,
+    override val userId: User.Id,
+    override val noteId: Note.Id,
     override val isRead: Boolean
 
 ) : Notification(), HasNote
 
-@Serializable
-@SerialName("renote")
 data class RenoteNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
-    override val note: NoteDTO,
+    override val userId: User.Id,
+    override val noteId: Note.Id,
     override val isRead: Boolean
 
 ) : Notification(), HasNote
 
-@SerialName("quote")
-@Serializable
 data class QuoteNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
-    override val note: NoteDTO,
+    override val userId: User.Id,
+    override val noteId: Note.Id,
     override val isRead: Boolean
 
 ) : Notification(), HasNote
 
-@SerialName("reaction")
-@Serializable
 data class ReactionNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
-    override val note: NoteDTO,
+    override val userId: User.Id,
+    override val noteId: Note.Id,
     val reaction: String,
     override val isRead: Boolean
 
 ) : Notification(), HasNote
 
-@SerialName("pollVote")
-@Serializable
 data class PollVoteNotification(
-    override val id: String,
-    override val user: UserDTO,
+    override val id: Id,
+    override val noteId: Note.Id,
 
-    @kotlinx.serialization.Serializable(with = DateSerializer::class)
     override val createdAt: Date,
-    override val userId: String,
-    override val note: NoteDTO,
+    override val userId: User.Id,
     val choice: Int,
     override val isRead: Boolean
 
