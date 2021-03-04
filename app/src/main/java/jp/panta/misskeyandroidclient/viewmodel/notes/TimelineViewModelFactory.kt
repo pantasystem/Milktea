@@ -15,8 +15,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 
 @Suppress("UNCHECKED_CAST")
 class TimelineViewModelFactory(
-    private val page: Page?,
-    private val account: Account?,
+    private val account: Account,
     private val pageable: Pageable,
     private val miApplication: MiApplication
 ) : ViewModelProvider.Factory{
@@ -33,12 +32,8 @@ class TimelineViewModelFactory(
                 includeRenotedMyNotes = includeRenotedMyNotes,
                 includeMyRenotes = includeMyRenotes
             )
+            return TimelineViewModel(account, pageable, miApplication, miApplication.getSettingStore(), include) as T
 
-            return if(page == null){
-                TimelineViewModel(pageable, miApplication, account, include)
-            }else{
-                TimelineViewModel(page, miApplication, include)
-            } as T
 
         }
 
