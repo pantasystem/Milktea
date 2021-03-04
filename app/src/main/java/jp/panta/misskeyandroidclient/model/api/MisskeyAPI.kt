@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.api
 
 import jp.panta.misskeyandroidclient.api.notes.*
+import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CreateApp
@@ -18,8 +19,7 @@ import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
@@ -98,7 +98,7 @@ interface MisskeyAPI {
     fun deleteFavorite(@Body noteRequest: NoteRequest): Call<Unit>
 
     @POST("api/i/notifications")
-    fun notification(@Body notificationRequest: NotificationRequest): Call<List<Notification>?>
+    fun notification(@Body notificationRequest: NotificationRequest): Call<List<NotificationDTO>?>
 
     @POST("api/notes/create")
     fun create(@Body createNote: CreateNote): Call<CreateNote.Response>

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.notification
+package jp.panta.misskeyandroidclient.api.notification
 
 data class NotificationRequest (
     val i: String,

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.api.v10
 
 import jp.panta.misskeyandroidclient.api.notes.*
+import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
@@ -19,8 +20,7 @@ import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
@@ -89,7 +89,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun noteState(noteRequest: NoteRequest): Call<State> = misskey.noteState(noteRequest)
 
-    override fun notification(notificationRequest: NotificationRequest): Call<List<Notification>?> = misskey.notification(notificationRequest)
+    override fun notification(notificationRequest: NotificationRequest): Call<List<NotificationDTO>?> = misskey.notification(notificationRequest)
 
     override fun readMessage(messageAction: MessageAction): Call<Unit> = misskey.readMessage(messageAction)
 

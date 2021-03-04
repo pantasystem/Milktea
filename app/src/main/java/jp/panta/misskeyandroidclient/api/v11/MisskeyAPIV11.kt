@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.api.v11
 
 import jp.panta.misskeyandroidclient.api.notes.*
+import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
@@ -19,8 +20,7 @@ import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
@@ -62,7 +62,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override fun followUser(requestUser: RequestUser): Call<UserDTO> = misskeyAPI.followUser(requestUser)
     override fun myApps(i: I): Call<List<App>> = misskeyAPI.myApps(i)
     override fun noteState(noteRequest: NoteRequest): Call<State> = misskeyAPI.noteState(noteRequest)
-    override fun notification(notificationRequest: NotificationRequest): Call<List<Notification>?> = misskeyAPI.notification(notificationRequest)
+    override fun notification(notificationRequest: NotificationRequest): Call<List<NotificationDTO>?> = misskeyAPI.notification(notificationRequest)
     override fun pullUserFromList(listUserOperation: ListUserOperation): Call<Unit> = misskeyAPI.pullUserFromList(listUserOperation)
     override fun pushUserToList(listUserOperation: ListUserOperation): Call<Unit> = misskeyAPI.pushUserToList(listUserOperation)
     override fun readMessage(messageAction: MessageAction): Call<Unit> = misskeyAPI.readMessage(messageAction)
