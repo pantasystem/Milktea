@@ -15,6 +15,9 @@ interface NotificationRepository {
         fun on(event: Event)
     }
 
+    fun addEventListener(listener: Listener)
+    fun removeEventListener(listener: Listener)
+
     suspend fun get(notificationId: Notification.Id): Notification
     suspend fun add(notification: Notification): AddResult
     suspend fun remove(notificationId: Notification.Id) : Boolean
