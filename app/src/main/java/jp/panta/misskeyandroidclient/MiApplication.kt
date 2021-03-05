@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
+import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
@@ -45,6 +46,8 @@ import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteRepository
+import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
+import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -92,6 +95,8 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mNoteRepository: NoteRepository
     private lateinit var mUserRepository: UserRepository
+    private lateinit var mNotificationRepository: NotificationRepository
+
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -102,6 +107,8 @@ class MiApplication : Application(), MiCore {
     private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
     private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+
+    private lateinit var mGetters: Getters
 
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
@@ -162,6 +169,8 @@ class MiApplication : Application(), MiCore {
 
         mNoteRepository = InMemoryNoteRepository(loggerFactory)
         mUserRepository = InMemoryUserRepository()
+        mNotificationRepository = InMemoryNotificationRepository()
+
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserRepository)
 
         mSocketWithAccountProvider = SocketWithAccountProviderImpl(
@@ -186,6 +195,8 @@ class MiApplication : Application(), MiCore {
 
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
+
+        mGetters = Getters(mNoteRepository, mUserRepository, mNotificationRepository)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
 
@@ -249,6 +260,13 @@ class MiApplication : Application(), MiCore {
         return mAccountRepository
     }
 
+    override fun getNotificationRepository(): NotificationRepository {
+        return mNotificationRepository
+    }
+
+    override fun getGetters(): Getters {
+        return mGetters
+    }
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->

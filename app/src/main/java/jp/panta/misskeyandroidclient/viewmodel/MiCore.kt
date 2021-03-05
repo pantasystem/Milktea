@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
 import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.instance.Meta
@@ -14,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
@@ -45,6 +47,8 @@ interface MiCore{
     fun getNoteRepository(): NoteRepository
 
     fun getUserRepository(): UserRepository
+
+    fun getNotificationRepository(): NotificationRepository
 
     fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow
 
@@ -82,6 +86,6 @@ interface MiCore{
 
     fun getSettingStore(): SettingStore
 
-
+    fun getGetters(): Getters
 
 }
