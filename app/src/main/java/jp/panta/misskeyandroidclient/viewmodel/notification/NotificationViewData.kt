@@ -2,11 +2,13 @@ package jp.panta.misskeyandroidclient.viewmodel.notification
 
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notification.*
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLength
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
-class NotificationViewData(val notification: Notification, account: Account, determineTextLength: DetermineTextLength) {
+class NotificationViewData(val notification: NotificationRelation, account: Account, determineTextLength: DetermineTextLength, noteCaptureAPIAdapter: NoteCaptureAPIAdapter) {
     enum class Type(val default: String){
         FOLLOW("follow"),
         MENTION("mention"),
@@ -19,10 +21,10 @@ class NotificationViewData(val notification: Notification, account: Account, det
         FOLLOW_REQUEST_ACCEPTED("followRequestAccepted")
 
     }
-    val id = notification.id
-    val noteViewData: PlaneNoteViewData? = if(notification is HasNote) PlaneNoteViewData(notification.note, account,determineTextLength) else null
+    val id = notification.notification.id
+    val noteViewData: PlaneNoteViewData? = if(notification.notification is HasNote) PlaneNoteViewData(notification.note!!, account,determineTextLength, noteCaptureAPIAdapter) else null
 
-    val type: Type = when(notification){
+    val type: Type = when(notification.notification){
         is FollowNotification -> Type.FOLLOW
         is MentionNotification -> Type.MENTION
         is ReplyNotification -> Type.REPLY
@@ -35,7 +37,7 @@ class NotificationViewData(val notification: Notification, account: Account, det
     }
     val statusType: String = type.default
 
-    val user: UserDTO = notification.user
+    val user: User = notification.user
     val avatarIconUrl = notification.user.avatarUrl
     val name = notification.user.name
     val userName = notification.user.userName

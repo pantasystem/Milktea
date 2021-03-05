@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.streaming
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.Message
@@ -8,7 +9,6 @@ import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
-import jp.panta.misskeyandroidclient.model.notification.Notification as NotificationDTO
 
 @Serializable
 data class EventMessage(
