@@ -7,4 +7,8 @@ class TestSocketWithAccountProviderImpl : SocketWithAccountProvider{
     override fun get(account: Account): Socket {
         return TestSocketImpl()
     }
+
+    override fun get(accountId: Long): Socket {
+        return TestSocketImpl()
+    }
 }

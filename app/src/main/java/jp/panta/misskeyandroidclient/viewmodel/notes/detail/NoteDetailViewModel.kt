@@ -13,11 +13,14 @@ import jp.panta.misskeyandroidclient.model.notes.Event
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureEvent
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.notes.toEntities
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
@@ -36,50 +39,9 @@ class NoteDetailViewModel(
     )
 
     private val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(account)
-    //private val streamingAdapter = StreamingAdapter(connectionInformation, encryption)
 
+    val notes = MutableLiveData<List<PlaneNoteViewData>>()
 
-    private val noteCapture = miCore.getNoteCapture(account)
-    private val client = jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture.Client()
-    private val noteEventStore = miCore.getNoteEventStore(account)
-
-
-    val notes = object : MutableLiveData<List<PlaneNoteViewData>>(){
-        override fun onActive() {
-            super.onActive()
-
-            startStreaming()
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-
-            stopStreaming()
-        }
-    }
-
-    //private val mNoteDetailId = UUID.randomUUID().toString()
-
-    private var mNoteCaptureDisposable: Disposable? = null
-
-    private fun startStreaming(){
-
-        //noteCapture.attach(noteRegister)
-        noteCapture.attachClient(client)
-        if(mNoteCaptureDisposable == null){
-            mNoteCaptureDisposable = noteEventStore.getEventStream(Date()).subscribe {
-                noteEventObserver(it)
-            }
-        }
-
-    }
-
-    private fun stopStreaming(){
-        //noteCapture.detach(noteRegister)
-        noteCapture.detachClient(client)
-        mNoteCaptureDisposable?.dispose()
-        mNoteCaptureDisposable = null
-    }
 
 
     fun loadDetail(){
@@ -88,7 +50,15 @@ class NoteDetailViewModel(
             try{
                 val rawDetail = misskeyAPI.showNote(request).execute().body()
                     ?:return@launch
-                val detail = NoteDetailViewData(rawDetail, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+
+                val noteDetail = miCore.getGetters().noteRelationGetter.get(account, rawDetail)
+
+                val detail = NoteDetailViewData(
+                    noteDetail,
+                    account,
+                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                    miCore.getNoteCaptureAdapter()
+                )
                 loadUrlPreview(detail)
                 var list: List<PlaneNoteViewData> = listOf(detail)
                 notes.postValue(list)
@@ -98,6 +68,7 @@ class NoteDetailViewModel(
                     list = ArrayList<PlaneNoteViewData>(conversation).apply{
                         addAll(list)
                     }
+                    list.captureAll()
                     notes.postValue(list)
                 }
                 val children = loadChildren()
@@ -105,18 +76,9 @@ class NoteDetailViewModel(
                     list = ArrayList<PlaneNoteViewData>(list).apply{
                         addAll(children)
                     }
+                    list.captureAll()
                     notes.postValue(list)
                 }
-                //noteCapture.subscribeAll(noteRegister.registerId, list)
-
-                val noteIds = HashSet<String>()
-
-                for(note in list){
-
-                    noteIds.add(note.id)
-                    noteIds.add(note.toShowNote.id)
-                }
-                client.captureAll(noteIds.toList())
 
             }catch (e: Exception){
 
@@ -139,7 +101,8 @@ class NoteDetailViewModel(
         }
     }
 
-    private fun getChildrenToIterate(
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun getChildrenToIterate(
         noteConversationViewData: NoteConversationViewData,
         conversation: ArrayList<PlaneNoteViewData>
     ): NoteConversationViewData{
@@ -152,8 +115,13 @@ class NoteDetailViewModel(
             noteConversationViewData
         }else{
             conversation.add(next)
-            val children = misskeyAPI.children(NoteRequest(account.getI(encryption), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
-                PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+            val children = misskeyAPI.children(NoteRequest(account.getI(encryption), limit = 100,noteId =  next.toShowNote.note.id.noteId)).execute().body()?.map{
+                PlaneNoteViewData(
+                    miCore.getGetters().noteRelationGetter.get(account, it),
+                    account,
+                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                    miCore.getNoteCaptureAdapter()
+                ).apply{
                     loadUrlPreview(this)
                 }
             }
@@ -162,26 +130,41 @@ class NoteDetailViewModel(
         }
     }
 
-
-    private fun loadConversation(): List<PlaneNoteViewData>?{
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun loadConversation(): List<PlaneNoteViewData>?{
         return misskeyAPI.conversation(request).execute().body()?.map{
-            PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+            miCore.getGetters().noteRelationGetter.get(account, it)
+        }?.map{
+            PlaneNoteViewData(
+                it,
+                account,
+                DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                miCore.getNoteCaptureAdapter()
+            ).apply{
                 loadUrlPreview(this)
             }
         }
     }
 
-    private fun loadChildren(): List<NoteConversationViewData>?{
+    private suspend fun loadChildren(): List<NoteConversationViewData>?{
         return loadChildren(id = show.noteId)?.filter{
             it.reNote?.id != show.noteId
         }?.map{
-            val planeNoteViewData = PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
-            val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->
-                PlaneNoteViewData(n, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+            miCore.getGetters().noteRelationGetter.get(account, it)
+        }?.map{
+            val planeNoteViewData = PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            val childInChild = loadChildren(planeNoteViewData.toShowNote.note.id.noteId)?.map{n ->
+                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(account, n), account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter()).apply{
                     loadUrlPreview(this)
                 }
             }
-            NoteConversationViewData(it, childInChild, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+            NoteConversationViewData(
+                it,
+                childInChild,
+                account,
+                DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                miCore.getNoteCaptureAdapter()
+            ).apply{
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }
         }
@@ -200,42 +183,17 @@ class NoteDetailViewModel(
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
-    private fun noteEventObserver(noteEvent: NoteCaptureEvent){
-        Log.d("TM-VM", "#noteEventObserver $noteEvent")
-        val timelineNotes = notes.value
-            ?: return
-
-        val updatedNotes = when(noteEvent.event){
-
-            is Event.Deleted ->{
-                timelineNotes.filterNot{ note ->
-                    note.id == noteEvent.noteId.noteId || note.toShowNote.id == noteEvent.noteId.noteId
-                }
-            }
-            else -> timelineNotes.map{
-                val note: PlaneNoteViewData = it
-                if(note.toShowNote.id == noteEvent.noteId.noteId){
-                    when(noteEvent.event){
-                        is Event.NewNote.Reacted ->{
-                            it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
-                        }
-                        is Event.NewNote.UnReacted ->{
-                            it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
-                        }
-                        is Event.NewNote.Voted ->{
-                            it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
-                        }
-                        /*is Event.Added ->{
-                            note.update(noteEvent.event.note)
-                        }*/
-                    }
-                }
-
-                note
-            }
+    private fun<T: PlaneNoteViewData> T.capture():  T{
+        val self = this
+        viewModelScope.launch(Dispatchers.IO) {
+            self.eventFlow.collect()
         }
-        if(noteEvent.event is Event.Deleted){
-            notes.postValue(updatedNotes)
+        return this
+    }
+
+    private fun<T: PlaneNoteViewData> List<T>.captureAll() {
+        this.forEach {
+            it.capture()
         }
     }
 

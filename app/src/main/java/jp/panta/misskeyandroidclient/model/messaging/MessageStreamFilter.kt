@@ -6,17 +6,19 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
 
-class MessageSubscriber(val miCore: MiCore){
+class MessageStreamFilter(val miCore: MiCore){
 
 
     fun getAllMergedAccountMessages(): Flow<Message>{
-        val observables = (miCore.getAccounts().value?: emptyList()).map{
-            getAccountMessageObservable(it)
+        return miCore.getAccounts().flatMapMerge {
+            it.map{ ac ->
+                getAccountMessageObservable(ac)
+            }.merge()
         }
-        return observables.merge()
     }
 
     fun getObservable(messagingId: MessagingId, ac: Account): Flow<Message>{

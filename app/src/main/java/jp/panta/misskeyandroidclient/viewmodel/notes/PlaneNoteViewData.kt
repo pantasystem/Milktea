@@ -29,9 +29,7 @@ open class PlaneNoteViewData (
     val note: NoteRelation,
     val account: Account,
     var determineTextLength: DetermineTextLength,
-    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    coroutineScope: CoroutineScope,
-    dispatcher: CoroutineDispatcher
+    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
 ) : NoteViewData{
 
 
@@ -211,11 +209,11 @@ open class PlaneNoteViewData (
         }?: emptyList()
     }
 
-    val captureJob: Job = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
+    val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
         if(it is NoteRepository.Event.Updated){
             update(it.note)
         }
-    }.launchIn(coroutineScope + dispatcher)
+    }
 
     init {
 

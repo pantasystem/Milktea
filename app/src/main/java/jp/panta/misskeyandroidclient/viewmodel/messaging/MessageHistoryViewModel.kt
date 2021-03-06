@@ -30,13 +30,13 @@ class MessageHistoryViewModel(
     val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
 
 
-    val messageSubscriber = miCore.messageSubscriber
+    val messageSubscriber = miCore.messageStreamFilter
     val unreadMessageStore = messageSubscriber.getUnreadMessageStore(account)
 
     val historyGroupAndUserLiveData = object : MediatorLiveData<List<HistoryViewData>>(){
         override fun onActive() {
             super.onActive()
-            val disposable = miCore.messageSubscriber.getAccountMessageObservable(account)
+            val disposable = miCore.messageStreamFilter.getAccountMessageObservable(account)
                 .subscribe { msg ->
                     val messagingId = msg.messagingId(account)
                     fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: Message){

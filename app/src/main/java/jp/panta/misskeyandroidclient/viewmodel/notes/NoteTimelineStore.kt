@@ -13,16 +13,24 @@ import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 
 class NoteTimelineStore(
     val account: Account,
     //override val timelineRequestBase: NoteRequest.Setting,
     override val pageableTimeline: Pageable,
     val include: NoteRequest.Include,
-    private val miCore: MiCore
+    private val miCore: MiCore,
+    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    private val coroutineScope: CoroutineScope,
+    private val coroutineDispatcher: CoroutineDispatcher
 ) : NotePagedStore{
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
+
 
     private fun getStore(): ((NoteRequest)-> Call<List<NoteDTO>?>)? {
         return try{
@@ -83,17 +91,19 @@ class NoteTimelineStore(
     }
 
 
-    private fun makeResponse(list: List<NoteDTO>?, response: Response<List<NoteDTO>?>?): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
+    private suspend fun makeResponse(list: List<NoteDTO>?, response: Response<List<NoteDTO>?>?): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         if(response?.code() != 200){
             Log.e("NoteTimelineStore", "異常ステータス受信:${response?.code()}, :${response?.errorBody()?.string()}")
             Log.e("NoteTMStore", "pageable:$pageableTimeline, params: ${pageableTimeline.toParams()}")
         }
         return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
             try{
+                val related = miCore.getGetters().noteRelationGetter.get(account, it)
+                val store = DetermineTextLengthSettingStore(miCore.getSettingStore())
                 if(it.reply == null){
-                    PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                    PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter)
                 }else{
-                    HasReplyToNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                    HasReplyToNoteViewData(related, account, store, noteCaptureAPIAdapter)
                 }
             }catch(e: Exception){
                 Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)

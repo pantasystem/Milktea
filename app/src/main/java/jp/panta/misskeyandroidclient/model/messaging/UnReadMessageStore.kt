@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 /**
  * アカウント１に対して１
  */
+@Deprecated("使いにくいので廃止")
 class UnReadMessageStore(val account: Account) {
 
     private val mUnreadMessagesMap = HashMap<MessagingId, HashSet<Message>>()

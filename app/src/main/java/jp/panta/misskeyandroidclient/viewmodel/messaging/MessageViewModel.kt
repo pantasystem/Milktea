@@ -42,12 +42,12 @@ class MessageViewModel(
     private var isLoading = false
 
 
-    private val unreadMessageStore = miCore.messageSubscriber.getUnreadMessageStore(account)
+    private val unreadMessageStore = miCore.messageStreamFilter.getUnreadMessageStore(account)
     //private val mainCapture = miCore.getMainCapture(accountRelation)
     private val mCompositeDisposable = CompositeDisposable()
     init{
         //mainCapture.putListener(messageObserver)
-        val dis = miCore.messageSubscriber.getObservable(messageHistory.messagingId(account), account).subscribe { message ->
+        val dis = miCore.messageStreamFilter.getObservable(messageHistory.messagingId(account), account).subscribe { message ->
             val messages = messagesLiveData.value?.messages.toArrayList()
 
 

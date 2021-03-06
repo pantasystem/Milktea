@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModelF
 import kotlinx.android.synthetic.main.fragment_note_detail.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.notes.Note
 
 class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
@@ -38,6 +39,10 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
                     putSerializable(EXTRA_PAGE,  page)
                 }
             }
+        }
+
+        fun newInstance(noteId: Note.Id): NoteDetailFragment {
+
         }
     }
 

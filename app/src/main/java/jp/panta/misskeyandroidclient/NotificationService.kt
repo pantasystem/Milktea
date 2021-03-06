@@ -15,9 +15,6 @@ import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.view.SafeUnbox
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import java.util.*
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData.Type.*
 import kotlinx.coroutines.*

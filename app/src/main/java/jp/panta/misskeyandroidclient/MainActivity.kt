@@ -55,6 +55,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.coroutines.flow.map
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -109,9 +110,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
+        miApplication.getCurrentAccount().map{
+            miApplication.messageStreamFilter.getAccountMessageObservable(it)
+        }.map {
+
+        }
+
         miApplication.getCurrentAccount().observe(this, Observer { ar ->
 
-            miApplication.messageSubscriber.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
+            miApplication.messageStreamFilter.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
                 bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
                     it.isVisible = count > 0
                     it.number = count

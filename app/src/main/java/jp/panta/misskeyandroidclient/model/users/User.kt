@@ -67,7 +67,21 @@ sealed class User{
         instanceUpdatedAt = Date()
     }
 
+    fun getDisplayUserName(): String{
+        return "@" + this.userName + if(this.host == null){
+            ""
+        }else{
+            "@" + this.host
+        }
+    }
 
+    fun getDisplayName(): String{
+        return name?: userName
+    }
+
+    fun getShortDisplayName(): String{
+        return "@" + this.userName
+    }
 }
 
 sealed class UserState {
