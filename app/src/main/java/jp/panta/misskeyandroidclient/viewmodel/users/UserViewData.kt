@@ -39,10 +39,10 @@ open class UserViewData(
         miCore.getUserRepositoryEventToFlow().from(userId).onEach {
             when(it) {
                 is UserRepository.Event.Created -> {
-                    user.postValue(it.user)
+                    tryPost(it.user)
                 }
                 is UserRepository.Event.Updated -> {
-                    user.postValue(it.user)
+                    tryPost(it.user)
                 }
                 is UserRepository.Event.Removed -> {
                     user.postValue(null)
@@ -67,7 +67,7 @@ open class UserViewData(
             }.getOrNull()
 
             if(u != null) {
-                user.postValue(u)
+                tryPost(u)
                 return
             }
 
@@ -87,6 +87,12 @@ open class UserViewData(
             if(u != null){
                 miCore.getUserRepository().add(u)
             }
+        }
+    }
+
+    private fun tryPost(user: User) {
+        if(user is User.Detail || this.user.value is User.Simple) {
+            this.user.postValue(user)
         }
     }
 
