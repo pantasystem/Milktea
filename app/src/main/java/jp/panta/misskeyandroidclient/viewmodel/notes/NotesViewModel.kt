@@ -99,7 +99,7 @@ class NotesViewModel(
     }
 
     fun postRenote(){
-        val renoteId = reNoteTarget.event?.toShowNote?.id
+        val renoteId = reNoteTarget.event?.toShowNote?.note?.id?.noteId
         if(renoteId != null){
             val request = CreateNote(i = getAccount()?.getI(encryption)!!, text = null, renoteId = renoteId)
             getMisskeyAPI()?.create(request)?.enqueue(object : Callback<CreateNote.Response>{
@@ -177,7 +177,7 @@ class NotesViewModel(
                     CreateReaction(
                     i = getAccount()?.getI(encryption)!!,
                     reaction = reaction,
-                    noteId = planeNoteViewData.toShowNote.id
+                    noteId = planeNoteViewData.toShowNote.note.id.noteId
                 )
                 )?.execute()
                 if(res?.code() in 200 until 300){
@@ -200,7 +200,7 @@ class NotesViewModel(
         getMisskeyAPI()?.deleteReaction(
             DeleteNote(
             i = getAccount()?.getI(encryption)!!,
-            noteId = planeNoteViewData.toShowNote.id
+            noteId = planeNoteViewData.toShowNote.note.id.noteId
         )
         )?.execute()
     }
@@ -220,7 +220,7 @@ class NotesViewModel(
         getMisskeyAPI()?.createFavorite(
             NoteRequest(
                 i = getAccount()?.getI(encryption)!!,
-                noteId = note.toShowNote.id
+                noteId = note.toShowNote.note.id.noteId
             )
         )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -241,7 +241,7 @@ class NotesViewModel(
         getMisskeyAPI()?.deleteFavorite(
             NoteRequest(
                 i = getAccount()?.getI(encryption)!!,
-                noteId = note.toShowNote.id
+                noteId = note.toShowNote.note.id.noteId
             )
         )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -299,7 +299,7 @@ class NotesViewModel(
     fun unRenote(planeNoteViewData: PlaneNoteViewData){
         if(planeNoteViewData.isRenotedByMe){
             getMisskeyAPI()?.delete(
-                DeleteNote(i = getAccount()?.getI(miCore.getEncryption())!!, noteId = planeNoteViewData.note.id)
+                DeleteNote(i = getAccount()?.getI(miCore.getEncryption())!!, noteId = planeNoteViewData.note.note.id.noteId)
             )?.enqueue(object : Callback<Unit>{
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if(response.code() in 200 until 300){
@@ -316,11 +316,11 @@ class NotesViewModel(
     }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
-        getMisskeyAPI()?.noteState(NoteRequest(i = getAccount()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.id))
+        getMisskeyAPI()?.noteState(NoteRequest(i = getAccount()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.note.id.noteId))
             ?.enqueue(object : Callback<State>{
                 override fun onResponse(call: Call<State>, response: Response<State>) {
-                    val nowNoteId = shareTarget.event?.toShowNote?.id
-                    if(nowNoteId == planeNoteViewData.toShowNote.id){
+                    val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
+                    if(nowNoteId == planeNoteViewData.toShowNote.note.id.noteId){
                         val state = response.body()?: return
                         Log.d(TAG, "state: $state")
                         shareNoteState.postValue(state)
