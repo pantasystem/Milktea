@@ -39,20 +39,14 @@ class AccountViewModel(
     val accounts = MediatorLiveData<List<AccountViewData>>().apply{
         miCore.getAccounts().onEach { accounts ->
             value = accounts.map{ ac ->
-                val avd = AccountViewData(ac)
-                ac.getI(miCore.getEncryption()).let{ i ->
-                    miCore.getMisskeyAPI(ac).i(
-                        I(i)
-                    ).enqueue(avd.accept)
-                }
-                avd
+                AccountViewData(ac, miCore, viewModelScope, Dispatchers.IO)
             }
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     val currentAccount = miCore.getCurrentAccount()
 
-    val user = MediatorLiveData<UserDTO>()
+    val user = MediatorLiveData<User.Detail>()
 
     val switchAccount = EventBus<Int>()
 
@@ -65,31 +59,35 @@ class AccountViewModel(
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init{
-        miCore.getCurrentAccount().onEach {
-            runCatching {
-                it?.getI(miCore.getEncryption())?.let{ i ->
-                    miCore.getMisskeyAPI(it).i(I(i)).enqueue(object : Callback<UserDTO>{
-                        override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
-                            response.body()?.let{ u ->
-                                user.postValue(u)
-                            }
-                        }
-
-                        override fun onFailure(call: Call<UserDTO>, t: Throwable) {
-                            user.postValue(null)
-                            Log.d(TAG, "user load error", t)
-                        }
-                    })
+        miCore.getCurrentAccount().filterNotNull().map { ac ->
+            val res = runCatching {
+                ac.getI(miCore.getEncryption()).let{ i ->
+                    miCore.getMisskeyAPI(ac).i(I(i)).execute()
                 }
+            }.getOrNull()
+            res?.body()?.let{
+                ac to it
             }
-        }.launchIn(viewModelScope + Dispatchers.IO)
+        }.filterNotNull().map { pair ->
+            val user = pair.second.toUser(pair.first, true)
+            miCore.getUserRepository().add(user)
+            user
+        }.onEach {
 
-        miCore.getCurrentAccount().filterNotNull().flatMapMerge { ac->
-            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN)
-        }.map {
-            it as? ChannelBody.Main.MeUpdated
+        }
+
+        miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac->
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
+                ac to it
+            }
+        }.map { pair ->
+            (pair.second as? ChannelBody.Main.MeUpdated)?.let{ meUpdated ->
+                pair.first to meUpdated
+            }
         }.filterNotNull().onEach {
-            user.postValue(it.body)
+            val user = it.second.body.toUser(it.first, true)
+            miCore.getUserRepository().add(user)
+            this.user.postValue(user as User.Detail)
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 

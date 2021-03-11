@@ -33,7 +33,7 @@
                 android:layout_gravity="start"
                 android:paddingTop="@dimen/nav_header_vertical_spacing"
                 android:layout_marginTop="20dp"
-                android:onClick="@{()-> accountViewModel.showProfile(accountViewModel.currentAccount)}"
+                android:onClick="@{()-> accountViewModel.showProfile(accountViewModel.currentAccount.value)}"
                 tools:ignore="ContentDescription" />
 
         <ImageButton

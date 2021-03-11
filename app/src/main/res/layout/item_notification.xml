@@ -98,7 +98,7 @@
                         android:layout_height="wrap_content"
                         tools:text="16min"
                         android:singleLine="true"
-                        app:elapsedTime="@{notification.notification.createdAt}"
+                        app:elapsedTime="@{notification.notification.notification.createdAt}"
                         android:layout_gravity="center"/>
             </LinearLayout>
             <FrameLayout
