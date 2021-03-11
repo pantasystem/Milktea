@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
@@ -28,7 +29,12 @@ import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
+@ExperimentalCoroutinesApi
 class UserDetailActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
@@ -75,7 +81,7 @@ class UserDetailActivity : AppCompatActivity() {
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java])
             .initViewModelListener()
 
-        miApplication.getCurrentAccount().observe(this, Observer { ar ->
+        miApplication.getCurrentAccount().filterNotNull().onEach { ar ->
             mAccountRelation = ar
             val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel
@@ -84,8 +90,8 @@ class UserDetailActivity : AppCompatActivity() {
 
 
             viewModel.load()
-            viewModel.user.observe(this, Observer {
-                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, it.id)
+            viewModel.user.observe(this,  {
+                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, it.id.id)
                 //userTimelinePager.adapter = adapter
                 binding.userTimelinePager.adapter = adapter
                 binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
@@ -99,14 +105,14 @@ class UserDetailActivity : AppCompatActivity() {
             //userTimelineTab.setupWithViewPager()
             viewModel.showFollowers.observe(this, Observer {
                 val intent = Intent(this, FollowFollowerActivity::class.java)
-                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it)
+                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it?.id)
                 intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWER_VIEW_MODE)
                 startActivity(intent)
             })
 
-            viewModel.showFollows.observe(this, Observer{
+            viewModel.showFollows.observe(this, {
                 val intent = Intent(this, FollowFollowerActivity::class.java)
-                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it)
+                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it?.id)
                 intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWING_VIEW_MODE)
                 startActivity(intent)
             })
@@ -129,7 +135,7 @@ class UserDetailActivity : AppCompatActivity() {
                 }
             }
 
-        })
+        }.launchIn(lifecycleScope)
 
 
 
@@ -286,7 +292,7 @@ class UserDetailActivity : AppCompatActivity() {
                 Page(mAccountRelation?.accountId?: - 1,
                     title = user.getDisplayUserName(),
                     weight = -1,
-                    pageable = Pageable.UserTimeline(userId = user.id)
+                    pageable = Pageable.UserTimeline(userId = user.id.id)
                 )
             )
 
