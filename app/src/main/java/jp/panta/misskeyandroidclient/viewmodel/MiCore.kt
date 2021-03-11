@@ -13,6 +13,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
+import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
@@ -87,5 +89,9 @@ interface MiCore{
     fun getSettingStore(): SettingStore
 
     fun getGetters(): Getters
+
+    fun getMessageRepository(): MessageRepository
+
+    fun getMessageDataSource(): MessageDataSource
 
 }

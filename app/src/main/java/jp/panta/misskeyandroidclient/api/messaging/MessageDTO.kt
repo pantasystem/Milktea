@@ -7,7 +7,10 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.Serializable
 import java.io.Serializable as JavaSerializable
@@ -18,15 +21,15 @@ data class MessageDTO(
     val id: String,
     @Serializable(with = DateSerializer::class) val createdAt: Date,
     val text: String? = null,
-    val userId: String? = null,
-    val user: UserDTO? = null,
+    val userId: String,
+    val user: UserDTO,
     val recipientId: String? = null,
     val recipient: UserDTO? = null,
     val groupId: String? = null,
     val group: Group? = null,
     val fileId: String? = null,
     val file: FileProperty? = null,
-    val isRead: Boolean? = null,
+    val isRead: Boolean,
     val emojis: List<Emoji>
 ): JavaSerializable{
     fun isGroup(): Boolean{
@@ -52,4 +55,41 @@ data class MessageDTO(
         get() {
             return MFMParser.parse(text, emojis)
         }
+}
+
+fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
+    val list = mutableListOf<User>()
+    val id = Message.Id(account.accountId, id)
+    list.add(user.toUser(account, false))
+    val message = if(groupId == null) {
+        require(recipientId != null)
+        require(recipient != null)
+        list.add(recipient.toUser(account, false))
+        Message.Direct(
+            id,
+            createdAt,
+            text,
+            User.Id(account.accountId, userId),
+            fileId,
+            file,
+            isRead,
+            emojis,
+            recipientId = User.Id(account.accountId, recipientId)
+        )
+    }else{
+        require(group != null)
+        Message.Group(
+            id,
+            createdAt,
+            text,
+            User.Id(account.accountId, userId),
+            fileId,
+            file,
+            isRead,
+            emojis,
+            groupId,
+            group
+        )
+    }
+    return message to list
 }

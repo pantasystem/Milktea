@@ -13,7 +13,7 @@ sealed class Message{
         val messageId: String
     )
 
-    abstract val id: String
+    abstract val id: Id
     abstract val createdAt: Date
     abstract val text: String?
     abstract val userId: User.Id
@@ -22,8 +22,13 @@ sealed class Message{
     abstract val isRead: Boolean
     abstract val emojis: List<Emoji>
 
+    /**
+     * isReadをtrueにして新しいオブジェクトを返す
+     */
+    abstract fun read(): Message
+
     data class Group(
-        override val id: String,
+        override val id: Id,
         override val createdAt: Date,
         override val text: String?,
         override val userId: User.Id,
@@ -33,13 +38,17 @@ sealed class Message{
         override val emojis: List<Emoji>,
         val groupId: String,
         val group: GroupEntity
-    ) : Message()
+    ) : Message() {
+        override fun read(): Message {
+            return this.copy(isRead = true)
+        }
+    }
 
     /**
      * @param recipientId 受信者のUser.Id
      */
     data class Direct(
-        override val id: String,
+        override val id: Id,
         override val createdAt: Date,
         override val text: String?,
         override val userId: User.Id,
@@ -48,7 +57,11 @@ sealed class Message{
         override val isRead: Boolean,
         override val emojis: List<Emoji>,
         val recipientId: User.Id
-    ) : Message()
+    ) : Message() {
+        override fun read(): Message {
+            return this.copy(isRead = true)
+        }
+    }
 }
 
 
@@ -70,4 +83,21 @@ sealed class CreateMessage {
         override val text: String?,
         override val fileId: String?
     ) : CreateMessage()
+}
+
+sealed class MessageRelation {
+
+    abstract val message: Message
+
+    data class Group(
+        override val message: Message.Group,
+        val group: GroupEntity,
+        val user: User
+    ) : MessageRelation()
+
+    data class Direct(
+        override val message: Message.Direct,
+        val user: User,
+        val recipient: User
+    ) : MessageRelation()
 }
