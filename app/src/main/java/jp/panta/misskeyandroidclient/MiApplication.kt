@@ -44,6 +44,10 @@ import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
+import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
+import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
+import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
+import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteRepository
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
@@ -107,6 +111,9 @@ class MiApplication : Application(), MiCore {
     private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
     private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+
+    private lateinit var mMessageDataSource: MessageDataSource
+    private lateinit var mMessageRepository: MessageRepository
 
     private lateinit var mGetters: Getters
 
@@ -196,7 +203,10 @@ class MiApplication : Application(), MiCore {
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
 
-        mGetters = Getters(mNoteRepository, mUserRepository, mNotificationRepository)
+        mMessageDataSource = InMemoryMessageDataSource()
+        mMessageRepository = MessageRepositoryImpl(this)
+
+        mGetters = Getters(mNoteRepository, mUserRepository, mNotificationRepository, mMessageDataSource)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
 
@@ -262,6 +272,14 @@ class MiApplication : Application(), MiCore {
 
     override fun getNotificationRepository(): NotificationRepository {
         return mNotificationRepository
+    }
+
+    override fun getMessageDataSource(): MessageDataSource {
+        return mMessageDataSource
+    }
+
+    override fun getMessageRepository(): MessageRepository {
+        return mMessageRepository
     }
 
     override fun getGetters(): Getters {
