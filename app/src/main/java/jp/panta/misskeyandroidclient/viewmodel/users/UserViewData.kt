@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import jp.panta.misskeyandroidclient.api.notes.toEntities
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
@@ -86,6 +87,12 @@ open class UserViewData(
             u = dto?.toUser(account, true)
             if(u != null){
                 miCore.getUserRepository().add(u)
+            }
+            dto?.pinnedNotes?.map { nDto ->
+                nDto.toEntities(account)
+            }?.forEach {
+                miCore.getUserRepository().addAll(it.third)
+                miCore.getNoteRepository().addAll(it.second)
             }
         }
     }
