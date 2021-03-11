@@ -52,6 +52,26 @@ open class PlaneNoteViewData (
 
     val isRenotedByMe = (note.note.renoteId != null && note.note.text == null && note.note.files.isNullOrEmpty()) && note.user.id.id == account.remoteId
 
+    val statusMessage: String?
+        get(){
+            if(note.reply != null){
+                //reply
+                return "${note.user.getDisplayUserName()}が返信しました"
+            }else if(note.note.renoteId == null && (note.note.text != null || note.note.files != null)){
+                //Note
+                return null
+            }else if(note.note.renoteId != null && note.note.text == null && note.note.files.isNullOrEmpty()){
+                //reNote
+                return "${note.user.getDisplayUserName()}がリノートしました"
+
+            }else if(note.note.renoteId != null && (note.note.text != null || note.note.files != null)){
+                //quote
+                //"${note.user.name}が引用リノートしました"
+                return null
+            }else{
+                return null
+            }
+        }
 
     val userId: User.Id
         get() = toShowNote.user.id
