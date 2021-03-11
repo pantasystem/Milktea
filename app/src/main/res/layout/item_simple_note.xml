@@ -23,7 +23,7 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
 
-            app:transitionDestinationNote="@{note.toShowNote}"
+            app:transitionDestinationNote="@{note.toShowNote.note}"
             app:clickedView="@{elapsedTime}"
             app:mainNameView="@{mainName}"
             app:subNameView="@{subName}"
@@ -74,7 +74,7 @@
                 android:layout_marginStart="8dp"
                 android:singleLine="true"
                 android:ellipsize="end"
-                app:elapsedTime="@{note.toShowNote.createdAt}"
+                app:elapsedTime="@{note.toShowNote.note.createdAt}"
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"
@@ -165,7 +165,7 @@
                     android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                     android:id="@+id/subNote"
                     android:background="@drawable/shape_rounded_square_line"
-                    app:transitionDestinationNote="@{note.subNote}"
+                    app:transitionDestinationNote="@{note.subNote.note}"
                     app:clickedView="@{subNote}"
                     app:subNameView="@{subNoteSubName}"
                     app:mainNameView="@{subNoteMainName}"
