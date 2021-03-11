@@ -10,6 +10,10 @@ import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.plus
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,26 +43,31 @@ class AntennaListViewModel (
 
     val isLoading = MutableLiveData<Boolean>(false)
 
-    val pagedAntennaIds = Transformations.map(miCore.getCurrentAccount()){
-        it.pages.mapNotNull { page ->
-            val pageable = page.pageable()
-            if (pageable is Pageable.Antenna) {
-                pageable.antennaId
-            } else {
-                null
-            }
-        }.toSet()
-    }
+    private val mPagedAntennaIds = MutableLiveData<Set<String>>()
+    val pagedAntennaIds: LiveData<Set<String>> = mPagedAntennaIds
 
     var account: Account? = null
 
     init{
-        antennas.addSource(miCore.getCurrentAccount()){
-            if(account?.accountId != it?.accountId){
+
+        miCore.getCurrentAccount().onEach {
+            if(account?.accountId != it?.accountId) {
                 loadInit()
                 account = it
             }
-        }
+            mPagedAntennaIds.postValue(
+                it?.pages?.mapNotNull { page ->
+                    val pageable = page.pageable()
+                    if (pageable is Pageable.Antenna) {
+                        pageable.antennaId
+                    } else {
+                        null
+                    }
+                }?.toSet()?: emptySet()
+            )
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+
     }
 
     val deleteResultEvent = EventBus<Boolean>()
