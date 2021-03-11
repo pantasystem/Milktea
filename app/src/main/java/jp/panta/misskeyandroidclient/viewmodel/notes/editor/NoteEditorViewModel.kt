@@ -13,12 +13,18 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import java.io.IOException
 import java.lang.NullPointerException
 import java.util.*
@@ -34,26 +40,37 @@ class NoteEditorViewModel(
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
     private val loggerFactory: Logger.Factory,
-    n: NoteDTO? = null,
-    dn: DraftNote? = null
+    n: Note? = null,
+    dn: DraftNote? = null,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel(){
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
-    val currentAccount = miCore.getCurrentAccount()
-
-    val currentUser = Transformations.map(currentAccount){ account ->
-        UserViewData(account.remoteId).apply{
-
-            val i = account.getI(miCore.getEncryption())
-            i.let{
-                setApi(i, miCore.getMisskeyAPI(account))
-            }
-        }
+    private val currentAccount = MutableLiveData<Account>().apply{
+        miCore.getCurrentAccount().onEach {
+            this.postValue(it)
+        }.launchIn(viewModelScope + dispatcher)
     }
 
+    private val mCurrentUser = MutableLiveData<UserViewData>().apply{
+        miCore.getCurrentAccount().filterNotNull().onEach {
+            val userId = User.Id(it.accountId, it.remoteId)
+            this.postValue(
+                UserViewData(
+                    userId,
+                    miCore,
+                    viewModelScope,
+                    dispatcher
+
+                )
+            )
+        }.launchIn(viewModelScope + dispatcher)
+    }
+    val currentUser: LiveData<UserViewData> = mCurrentUser
+
     val draftNote = MutableLiveData<DraftNote>(dn)
-    val note = MutableLiveData<NoteDTO>(n)
+    val note = MutableLiveData<Note>(n)
 
     // FIXME Note.Idを使用するようにすること
     val replyToNoteId = MutableLiveData<String>(replyId)
@@ -152,19 +169,18 @@ class NoteEditorViewModel(
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
-    val address = MutableLiveData<List<UserViewData>>(
+    val address = MutableLiveData(
         n?.visibleUserIds?.map(::setUpUserViewData)
-            ?: dn?.visibleUserIds?.map(::setUpUserViewData)
+            ?: dn?.visibleUserIds?.mapNotNull {
+            miCore.getCurrentAccount().value?.accountId?.let { ac ->
+                User.Id(ac, it)
+            }
+        }?.map(::setUpUserViewData) ?: emptyList()
     )
 
-    private fun setUpUserViewData(userId: String) : UserViewData{
-        return UserViewData(userId).apply{
-            val ci = getCurrentInformation()
-            val i = ci?.getI(miCore.getEncryption())
-            i?.let{
-                setApi(i, miCore.getMisskeyAPI(ci))
-            }
-        }
+
+    private fun setUpUserViewData(userId: User.Id) : UserViewData{
+        return UserViewData(userId, miCore, viewModelScope, dispatcher)
     }
 
     val isSpecified = Transformations.map(visibility){
@@ -319,21 +335,13 @@ class NoteEditorViewModel(
         }
     }
 
-    fun setAddress(added: Array<String>, removed: Array<String>){
+    fun setAddress(added: Array<User.Id>, removed: Array<User.Id>){
         val list = address.value?.let{
             ArrayList(it)
         }?: ArrayList()
 
         list.addAll(
-            added.map{
-                UserViewData(it).apply{
-                    val ci = getCurrentInformation()
-                    val i = ci?.getI(miCore.getEncryption())
-                    i?.let{
-                        setApi(i, miCore.getMisskeyAPI(ci))
-                    }
-                }
-            }
+            added.map(::setUpUserViewData)
         )
 
         list.removeAll { uv ->
@@ -380,7 +388,7 @@ class NoteEditorViewModel(
             text = text.value,
             cw = cw.value,
             visibleUserIds = address.value?.map{
-                it.userId
+                it.userId.id
             },
             draftPoll = poll.value?.toDraftPoll(),
             visibility = visibility.value?.type()?: "public",
@@ -447,7 +455,7 @@ class NoteEditorViewModel(
         return miCore.getCurrentAccount().value
     }
 
-    fun<T> MediatorLiveData<T>.addSourceFromNoteAndDraft(observer: (NoteDTO?, DraftNote?)->Unit) {
+    private fun<T> MediatorLiveData<T>.addSourceFromNoteAndDraft(observer: (Note?, DraftNote?)->Unit) {
         addSource(note) {
             observer(it, draftNote.value)
         }
