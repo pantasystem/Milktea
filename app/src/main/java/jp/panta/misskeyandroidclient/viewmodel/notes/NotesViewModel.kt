@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.api.notes.CreateNote
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -14,7 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -56,17 +55,17 @@ class NotesViewModel(
 
     val shareNoteState = MutableLiveData<State>()
 
-    val targetUser = EventBus<UserDTO>()
+    val targetUser = EventBus<User>()
 
     val targetNote = EventBus<PlaneNoteViewData>()
 
-    val showNoteEvent = EventBus<NoteDTO>()
+    val showNoteEvent = EventBus<Note>()
 
     val targetFile = EventBus<Pair<FileViewData, MediaViewData>>()
 
     val showInputReactionEvent = EventBus<Unit>()
 
-    val openNoteEditor = EventBus<NoteDTO?>()
+    val openNoteEditor = EventBus<Note?>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
@@ -83,7 +82,7 @@ class NotesViewModel(
         loadNoteState(note)
     }
 
-    fun setTargetToUser(user: UserDTO){
+    fun setTargetToUser(user: User){
         targetUser.event = user
     }
 
@@ -94,7 +93,7 @@ class NotesViewModel(
         targetNote.event = note
     }
 
-    fun setShowNote(note: NoteDTO){
+    fun setShowNote(note: Note){
         showNoteEvent.event = note
     }
 
@@ -277,11 +276,11 @@ class NotesViewModel(
         })
     }
 
-    fun removeAndEditNote(note: NoteDTO){
+    fun removeAndEditNote(note: Note){
         getMisskeyAPI()?.delete(
             DeleteNote(
                 i = getAccount()?.getI(encryption)!!,
-                noteId = note.id
+                noteId = note.id.noteId
             )
         )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
