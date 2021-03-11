@@ -3,18 +3,21 @@ package jp.panta.misskeyandroidclient.viewmodel.messaging
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 
 
-abstract class MessageViewData (val message: MessageDTO, account: Account){
-    val messagingId = message.messagingId(account)
-    val id = message.id
+abstract class MessageViewData (val message: MessageRelation, account: Account){
+    val messagingId = message.message.messagingId(account)
+    val id = message.message.id
     abstract val name: String
     abstract val avatarIcon: String
-    val text = message.text
-    val textNode = MFMParser.parse(message.text, message.emojis)
-    val file = if(message.file == null) null else FileViewData(message.file.toFile(account.instanceDomain))
-    val isRead = message.isRead
+    val text = message.message.text
+    val textNode = MFMParser.parse(message.message.text, message.message.emojis)
+    val file = if(message.message.file == null) null else message.message.file?.toFile(account.instanceDomain)?.let{
+        FileViewData(it)
+    }
+    val isRead = message.message.isRead
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -22,10 +25,12 @@ abstract class MessageViewData (val message: MessageDTO, account: Account){
         other as MessageViewData
 
         if (message != other.message) return false
+        if (messagingId != other.messagingId) return false
         if (id != other.id) return false
         if (name != other.name) return false
         if (avatarIcon != other.avatarIcon) return false
         if (text != other.text) return false
+        if (textNode != other.textNode) return false
         if (file != other.file) return false
         if (isRead != other.isRead) return false
 
@@ -34,13 +39,16 @@ abstract class MessageViewData (val message: MessageDTO, account: Account){
 
     override fun hashCode(): Int {
         var result = message.hashCode()
+        result = 31 * result + messagingId.hashCode()
         result = 31 * result + id.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + avatarIcon.hashCode()
         result = 31 * result + (text?.hashCode() ?: 0)
+        result = 31 * result + (textNode?.hashCode() ?: 0)
         result = 31 * result + (file?.hashCode() ?: 0)
-        result = 31 * result + (isRead?.hashCode() ?: 0)
+        result = 31 * result + isRead.hashCode()
         return result
     }
+
 
 }

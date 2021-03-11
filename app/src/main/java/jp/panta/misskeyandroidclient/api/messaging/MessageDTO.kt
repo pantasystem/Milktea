@@ -36,20 +36,7 @@ data class MessageDTO(
         return group != null
     }
 
-    fun opponentUser(account: Account) : UserDTO?{
-        return if(recipient?.id == account.remoteId){
-            user
-        }else{
-            recipient
-        }
-    }
 
-    fun messagingId(account: Account): MessagingId {
-        return MessagingId(
-            this,
-            account
-        )
-    }
 
     val textNode: Root?
         get() {

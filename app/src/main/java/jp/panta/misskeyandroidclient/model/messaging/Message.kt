@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
@@ -61,6 +62,23 @@ sealed class Message{
         override fun read(): Message {
             return this.copy(isRead = true)
         }
+
+        fun partnerUserId(account: Account): User.Id {
+            return if (recipientId == User.Id(account.accountId, account.remoteId)) {
+                userId
+            } else {
+                recipientId
+            }
+        }
+    }
+
+
+
+    fun messagingId(account: Account): MessagingId {
+        return when(this) {
+            is Direct -> MessagingId.Direct(this, account)
+            is Group -> MessagingId.Group(groupId)
+        }
     }
 }
 
@@ -99,5 +117,13 @@ sealed class MessageRelation {
         override val message: Message.Direct,
         val user: User,
         val recipient: User
-    ) : MessageRelation()
+    ) : MessageRelation() {
+        fun opponentUser(account: Account) : User{
+            return if(recipient.id == User.Id(account.accountId, account.remoteId)){
+                user
+            }else{
+                recipient
+            }
+        }
+    }
 }
