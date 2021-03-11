@@ -4,39 +4,68 @@ import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.api.notes.toEntities
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.IndexOutOfBoundsException
 
+@ExperimentalCoroutinesApi
 class UserDetailViewModel(
     val account: Account,
     val misskeyAPI: MisskeyAPI,
     val userId: String?,
     val fqcnUserName: String?,
     val encryption: Encryption,
-    val miCore: MiCore
+    val miCore: MiCore,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel(){
     val tag=  "userDetailViewModel"
 
-    val user = MutableLiveData<UserDTO>()
+    val user = MutableLiveData<User.Detail>()
+    private val userState = MutableStateFlow<User.Detail?>(null).apply {
+        onEach {
+            user.postValue(it)
+        }.launchIn(viewModelScope)
+    }
+
     val isMine = account.remoteId == userId
 
-    val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply{
-        addSource(user){
-            this.value = it.pinnedNotes?.map{note ->
-                PlaneNoteViewData(note, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+    private val pinNotesState = userState.filterNotNull().map {
+        it.pinnedNoteIds?.map { id ->
+            miCore.getNoteRepository().get(id)
+        }?: emptyList()
+    }
+
+    val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
+
+        pinNotesState.map{ notes ->
+            notes.map { note ->
+                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(note), account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
             }
-        }
+        }.onEach {
+            this.postValue(it)
+
+        }.flatMapLatest {
+            it.map {  n ->
+                n.eventFlow
+            }.merge()
+        }.launchIn(viewModelScope)
     }
 
     val isFollowing = MediatorLiveData<Boolean>().apply{
@@ -73,9 +102,9 @@ class UserDetailViewModel(
     }
 
     val isMuted = MediatorLiveData<Boolean>().apply{
-        value = user.value?.isMuted?: false
+        value = user.value?.isMuting?: false
         addSource(user){
-            value = it.isMuted
+            value = it.isMuting
         }
     }
 
@@ -84,41 +113,45 @@ class UserDetailViewModel(
             value = it.url != null
         }
     }
-    val showFollowers = EventBus<UserDTO?>()
-    val showFollows = EventBus<UserDTO?>()
+    val showFollowers = EventBus<User?>()
+    val showFollows = EventBus<User?>()
 
     fun load(){
-        val userNameList = fqcnUserName?.split("@")?.filter{
-            it.isNotBlank()
+        viewModelScope.launch() {
+            val userDTO = fetchUserDTO()
+                ?: return@launch
+            val u = userDTO.toUser(account, true)
+            miCore.getUserRepository().add(u)
+
+            userDTO.pinnedNotes?.map { noteDTO ->
+                noteDTO.toEntities(account)
+            }?.forEach { entities ->
+                miCore.getUserRepository().addAll(entities.third)
+                miCore.getNoteRepository().addAll(entities.second)
+            }
+            userState.value = u as? User.Detail
+
         }
+
+    }
+
+    private fun fetchUserDTO(): UserDTO? {
+        val userNameList = fqcnUserName?.split("@")?.filter{ it.isNotBlank() }
         Log.d(tag, "userNameList:$userNameList, fqcnUserName:$fqcnUserName")
         val userName = userNameList?.firstOrNull()
-        val host = try{
-            userNameList?.get(1)
-        }catch(e: IndexOutOfBoundsException){
-            null
-        }
-        misskeyAPI.showUser(
-            RequestUser(
-                i = account.getI(encryption),
-                userId = userId,
-                userName = userName,
-                host = host
-            )
-        ).enqueue(object : Callback<UserDTO>{
-            override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
-                val user = response.body()
-                if(user != null){
-                    this@UserDetailViewModel.user.postValue(user)
-                }else{
-                    Log.d(tag, "ユーザーの読み込みに失敗しました, userId:$userId, userName: $userName, host: $host")
-                }
-            }
+        val host = runCatching { userNameList?.get(1) }.getOrNull()
 
-            override fun onFailure(call: Call<UserDTO>, t: Throwable) {
-                Log.e(tag, "ユーザーの読み込みに失敗しました", t)
-            }
-        })
+        val req = RequestUser(
+            i = account.getI(encryption),
+            userId = userId,
+            userName = userName,
+            host = host,
+            detail = true
+        )
+        return runCatching {
+            misskeyAPI.showUser(req).execute()?.body()
+        }.getOrNull()
+
     }
 
     fun changeFollow(){
