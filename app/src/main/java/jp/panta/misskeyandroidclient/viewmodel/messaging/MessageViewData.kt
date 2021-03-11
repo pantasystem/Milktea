@@ -2,11 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.messaging
 
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 
 
-abstract class MessageViewData (val message: Message, account: Account){
+abstract class MessageViewData (val message: MessageDTO, account: Account){
     val messagingId = message.messagingId(account)
     val id = message.id
     abstract val name: String

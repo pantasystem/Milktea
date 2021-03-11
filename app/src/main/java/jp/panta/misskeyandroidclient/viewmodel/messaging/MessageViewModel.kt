@@ -6,8 +6,8 @@ import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
 import retrofit2.Callback
@@ -17,7 +17,7 @@ import kotlin.collections.ArrayList
 class MessageViewModel(
     private val account: Account,
     private val misskeyAPI: MisskeyAPI,
-    messageHistory: Message,
+    messageHistory: MessageDTO,
     private val miCore: MiCore,
     private val encryption: Encryption = miCore.getEncryption()
 
@@ -73,8 +73,8 @@ class MessageViewModel(
             return
         }
         isLoading = true
-        misskeyAPI.getMessages(builder.build(null, null, encryption)).enqueue(object : Callback<List<Message>>{
-            override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
+        misskeyAPI.getMessages(builder.build(null, null, encryption)).enqueue(object : Callback<List<MessageDTO>>{
+            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
                 val rawMessages = response.body()?.asReversed()
                 if(rawMessages == null){
                     isLoading = false
@@ -93,7 +93,7 @@ class MessageViewModel(
                 isLoading = false
             }
 
-            override fun onFailure(call: Call<List<Message>>, t: Throwable) {
+            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
                 isLoading = false
             }
         })
@@ -112,8 +112,8 @@ class MessageViewModel(
             return
         }
 
-        misskeyAPI.getMessages(builder.build(untilId = untilId, sinceId = null, encryption = encryption)).enqueue(object : Callback<List<Message>>{
-            override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
+        misskeyAPI.getMessages(builder.build(untilId = untilId, sinceId = null, encryption = encryption)).enqueue(object : Callback<List<MessageDTO>>{
+            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
                 val reversedMessages = response.body()?.asReversed()
                 if(reversedMessages == null){
                     isLoading = false
@@ -134,7 +134,7 @@ class MessageViewModel(
                 isLoading = false
             }
 
-            override fun onFailure(call: Call<List<Message>>, t: Throwable) {
+            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
                 isLoading = false
             }
         })
@@ -152,8 +152,8 @@ class MessageViewModel(
             isLoading = false
             return
         }
-        misskeyAPI.getMessages(builder.build(sinceId = sinceId, untilId = null, encryption = encryption)).enqueue(object : Callback<List<Message>>{
-            override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
+        misskeyAPI.getMessages(builder.build(sinceId = sinceId, untilId = null, encryption = encryption)).enqueue(object : Callback<List<MessageDTO>>{
+            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
                 val rawList = response.body()
                 if(rawList == null){
                     isLoading = false
@@ -175,7 +175,7 @@ class MessageViewModel(
                 messagesLiveData.postValue(State(messages, State.Type.LOAD_NEW))
             }
 
-            override fun onFailure(call: Call<List<Message>>, t: Throwable) {
+            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
 
             }
         })

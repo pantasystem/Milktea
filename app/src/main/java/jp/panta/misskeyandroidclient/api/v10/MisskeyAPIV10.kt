@@ -13,9 +13,9 @@ import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.list.*
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
@@ -67,9 +67,9 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun createFolder(createFolder: CreateFolder): Call<Unit> = misskey.createFolder(createFolder)
 
-    override fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Call<List<Message>> = misskey.getMessageHistory(requestMessageHistory)
+    override fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Call<List<MessageDTO>> = misskey.getMessageHistory(requestMessageHistory)
 
-    override fun getMessages(requestMessage: RequestMessage): Call<List<Message>> = misskey.getMessages(requestMessage)
+    override fun getMessages(requestMessage: RequestMessage): Call<List<MessageDTO>> = misskey.getMessages(requestMessage)
 
     override fun getMeta(requestMeta: RequestMeta): Call<Meta> = misskey.getMeta(requestMeta)
 

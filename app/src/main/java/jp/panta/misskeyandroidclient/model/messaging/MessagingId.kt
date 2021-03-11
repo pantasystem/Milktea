@@ -1,9 +1,10 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.account.Account
 import java.io.Serializable
 
-class MessagingId(val message: Message, val account: Account) : Serializable{
+class MessagingId(val message: MessageDTO, val account: Account) : Serializable{
 
     val isGroup = message.isGroup()
     val msgId = if(isGroup){

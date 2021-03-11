@@ -12,9 +12,9 @@ import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.list.*
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
@@ -181,13 +181,13 @@ interface MisskeyAPI {
 
     //message
     @POST("api/messaging/history")
-    fun getMessageHistory(@Body requestMessageHistory: RequestMessageHistory): Call<List<Message>>
+    fun getMessageHistory(@Body requestMessageHistory: RequestMessageHistory): Call<List<MessageDTO>>
 
     @POST("api/messaging/messages")
-    fun getMessages(@Body requestMessage: RequestMessage): Call<List<Message>>
+    fun getMessages(@Body requestMessage: RequestMessage): Call<List<MessageDTO>>
 
     @POST("api/messaging/messages/create")
-    fun createMessage(@Body messageAction: MessageAction): Call<Message>
+    fun createMessage(@Body messageAction: MessageAction): Call<MessageDTO>
 
     @POST("api/messaging/messages/delete")
     fun deleteMessage(@Body messageAction: MessageAction): Call<Unit>

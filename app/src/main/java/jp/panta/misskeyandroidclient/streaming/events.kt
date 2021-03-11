@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -44,7 +44,7 @@ sealed class ChannelBody : StreamingEvent(){
     sealed class Main : ChannelBody(){
 
         interface HavingMessagingBody {
-            val body: Message
+            val body: MessageDTO
         }
 
         interface HavingNoteBody {
@@ -72,7 +72,7 @@ sealed class ChannelBody : StreamingEvent(){
         @SerialName("unreadMessagingMessage")
         data class UnreadMessagingMessage(
             override val id: String,
-            override val body: Message
+            override val body: MessageDTO
         ) : Main(), HavingMessagingBody
 
         @Serializable
@@ -101,7 +101,7 @@ sealed class ChannelBody : StreamingEvent(){
         @SerialName("messagingMessage")
         data class MessagingMessage(
             override val id: String,
-            override val body: Message
+            override val body: MessageDTO
         ) : Main(), HavingMessagingBody
 
         @Serializable

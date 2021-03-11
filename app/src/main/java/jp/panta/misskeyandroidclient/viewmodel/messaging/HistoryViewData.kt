@@ -1,16 +1,14 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessageStore
 
-class HistoryViewData (account: Account, message: Message, unReadMessageStore: UnReadMessageStore){
+class HistoryViewData (account: Account, message: MessageDTO, unReadMessageStore: UnReadMessageStore){
     val messagingId = message.messagingId(account)
-    val message = MutableLiveData<Message>(message)
+    val message = MutableLiveData<MessageDTO>(message)
     val id = message.id
     val isGroup = message.group != null
     val group = message.group

@@ -9,7 +9,7 @@ import androidx.core.app.NotificationCompat
 import com.google.gson.GsonBuilder
 import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.notification.*
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
@@ -196,7 +196,7 @@ class NotificationService : Service() {
         }
     }
 
-    private fun showMessageNotification(message: Message){
+    private fun showMessageNotification(message: MessageDTO){
 
         val builder = NotificationCompat.Builder(this, MESSAGE_CHANEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)

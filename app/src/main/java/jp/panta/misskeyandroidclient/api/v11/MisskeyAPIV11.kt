@@ -13,9 +13,9 @@ import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.list.*
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
@@ -36,7 +36,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override fun createFavorite(noteRequest: NoteRequest): Call<Unit> = misskeyAPI.createFavorite(noteRequest)
     override fun createFolder(createFolder: CreateFolder): Call<Unit> = misskeyAPI.createFolder(createFolder)
     override fun createList(createList: CreateList): Call<UserList> = misskeyAPI.createList(createList)
-    override fun createMessage(messageAction: MessageAction): Call<Message> = misskeyAPI.createMessage(messageAction)
+    override fun createMessage(messageAction: MessageAction): Call<MessageDTO> = misskeyAPI.createMessage(messageAction)
     override fun createReaction(reaction: CreateReaction): Call<Unit> = misskeyAPI.createReaction(reaction)
     override fun delete(deleteNote: DeleteNote): Call<Unit> = misskeyAPI.delete(deleteNote)
     override fun deleteFavorite(noteRequest: NoteRequest): Call<Unit> = misskeyAPI.deleteFavorite(noteRequest)
@@ -49,8 +49,8 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     open fun following(userRequest: RequestUser): Call<List<FollowFollowerUser>> = apiDiff.following(userRequest)
     override fun getFiles(fileRequest: RequestFile): Call<List<FileProperty>> = misskeyAPI.getFiles(fileRequest)
     override fun getFolders(folderRequest: RequestFolder): Call<List<FolderProperty>> = misskeyAPI.getFolders(folderRequest)
-    override fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Call<List<Message>> = misskeyAPI.getMessageHistory(requestMessageHistory)
-    override fun getMessages(requestMessage: RequestMessage): Call<List<Message>> = misskeyAPI.getMessages(requestMessage)
+    override fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Call<List<MessageDTO>> = misskeyAPI.getMessageHistory(requestMessageHistory)
+    override fun getMessages(requestMessage: RequestMessage): Call<List<MessageDTO>> = misskeyAPI.getMessages(requestMessage)
     override fun getMeta(requestMeta: RequestMeta): Call<Meta> = misskeyAPI.getMeta(requestMeta)
     override fun globalTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskeyAPI.globalTimeline(noteRequest)
     override fun homeTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskeyAPI.homeTimeline(noteRequest)

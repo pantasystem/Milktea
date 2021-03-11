@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.view.messaging.MessageListAdapter
 import kotlinx.android.synthetic.main.fragment_message.*
 import java.lang.IllegalArgumentException
@@ -20,7 +20,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
 
     companion object{
         private const val ARGS_MESSAGE_HISTORY = "MessageFragment.args_message_history"
-        fun newInstance(messageHistory: Message): MessageFragment{
+        fun newInstance(messageHistory: MessageDTO): MessageFragment{
             val bundle = Bundle()
             bundle.putSerializable(ARGS_MESSAGE_HISTORY, messageHistory)
             return MessageFragment().apply{
@@ -35,7 +35,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val messageHistory = arguments?.getSerializable(ARGS_MESSAGE_HISTORY) as Message?
+        val messageHistory = arguments?.getSerializable(ARGS_MESSAGE_HISTORY) as MessageDTO?
 
         if(messageHistory == null){
             Log.e("MessageFragment", "messageHistoryがNullです")

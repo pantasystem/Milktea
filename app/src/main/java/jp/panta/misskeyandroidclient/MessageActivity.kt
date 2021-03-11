@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -86,7 +86,7 @@ class MessageActivity : AppCompatActivity() {
         }
     }
 
-    private fun setTitle(message: Message){
+    private fun setTitle(message: MessageDTO){
         val ac = (applicationContext as MiApplication).getCurrentAccount().value ?: return
         supportActionBar?.title = if(message.isGroup()){
             message.group?.name

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.serialization.Serializable
@@ -14,7 +15,7 @@ data class MessageAction(
     val fileId: String?,
     val messageId: String?
 ): JavaSerializable{
-    class Factory(val account: Account, val message: Message){
+    class Factory(val account: Account, val message: MessageDTO){
         fun actionCreateMessage(text: String?, fileId: String?, encryption: Encryption): MessageAction{
             return MessageAction(
                 account.getI(encryption),
@@ -26,7 +27,7 @@ data class MessageAction(
             )
         }
 
-        fun actionDeleteMessage(message: Message, encryption: Encryption): MessageAction{
+        fun actionDeleteMessage(message: MessageDTO, encryption: Encryption): MessageAction{
             return MessageAction(
                 account.getI(encryption),
                 null,
@@ -37,7 +38,7 @@ data class MessageAction(
             )
         }
 
-        fun actionRead(message: Message, encryption: Encryption): MessageAction{
+        fun actionRead(message: MessageDTO, encryption: Encryption): MessageAction{
             return MessageAction(
                 account.getI(encryption),
                 null,

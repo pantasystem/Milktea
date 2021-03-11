@@ -2,8 +2,8 @@ package jp.panta.misskeyandroidclient.model.messaging
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.account.Account
 
 /**
@@ -12,15 +12,15 @@ import jp.panta.misskeyandroidclient.model.account.Account
 @Deprecated("使いにくいので廃止")
 class UnReadMessageStore(val account: Account) {
 
-    private val mUnreadMessagesMap = HashMap<MessagingId, HashSet<Message>>()
-    private val mUnreadMessagesLiveDataMap = HashMap<MessagingId, MutableLiveData<List<Message>>>()
+    private val mUnreadMessagesMap = HashMap<MessagingId, HashSet<MessageDTO>>()
+    private val mUnreadMessagesLiveDataMap = HashMap<MessagingId, MutableLiveData<List<MessageDTO>>>()
 
     private val mMessageIdMessagingIdMap = HashMap<String, MessagingId>()
 
 
     private val mUnreadMessagesCount = MutableLiveData<Int>()
 
-    fun addUnReadMessage(message: Message){
+    fun addUnReadMessage(message: MessageDTO){
         val messagingId = message.messagingId(account)
         synchronized(mUnreadMessagesMap){
             var unreadMessages = mUnreadMessagesMap[messagingId]
@@ -37,7 +37,7 @@ class UnReadMessageStore(val account: Account) {
         updateLiveData(messagingId)
     }
 
-    private fun updateLiveData(messagingId: MessagingId): MutableLiveData<List<Message>>{
+    private fun updateLiveData(messagingId: MessagingId): MutableLiveData<List<MessageDTO>>{
         synchronized(mUnreadMessagesLiveDataMap){
             var liveData = mUnreadMessagesLiveDataMap[messagingId]
             if( liveData == null ){
@@ -59,7 +59,7 @@ class UnReadMessageStore(val account: Account) {
 
 
 
-    fun getUnreadMessages(messagingId: MessagingId): List<Message>{
+    fun getUnreadMessages(messagingId: MessagingId): List<MessageDTO>{
         synchronized(mUnreadMessagesMap){
             var messages = mUnreadMessagesMap[messagingId]
             if( messages == null ){
@@ -82,7 +82,7 @@ class UnReadMessageStore(val account: Account) {
     }
 
 
-    fun getUnreadMessagesLiveData(messagingId: MessagingId): LiveData<List<Message>>{
+    fun getUnreadMessagesLiveData(messagingId: MessagingId): LiveData<List<MessageDTO>>{
         return updateLiveData(messagingId)
     }
     fun allUnReadMessagesCount(): Int{
@@ -93,7 +93,7 @@ class UnReadMessageStore(val account: Account) {
         }
     }
 
-    fun readMessage(message: Message){
+    fun readMessage(message: MessageDTO){
         val messagingId = message.messagingId(account)
         synchronized(mUnreadMessagesMap){
             mUnreadMessagesMap[messagingId]?.apply{

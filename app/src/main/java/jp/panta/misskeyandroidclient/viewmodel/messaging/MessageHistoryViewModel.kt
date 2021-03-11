@@ -6,7 +6,7 @@ import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -39,7 +39,7 @@ class MessageHistoryViewModel(
             val disposable = miCore.messageStreamFilter.getAccountMessageObservable(account)
                 .subscribe { msg ->
                     val messagingId = msg.messagingId(account)
-                    fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: Message){
+                    fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: MessageDTO){
                         val list = ArrayList<HistoryViewData>(liveData.value?: emptyList())
                         val anyMsg = list.firstOrNull { hvd ->
                             hvd.messagingId == messagingId
@@ -110,8 +110,8 @@ class MessageHistoryViewModel(
     fun loadGroup(){
         isRefreshing.postValue(true)
         val request = RequestMessageHistory(i = account.getI(encryption)!!, group = true, limit = 100)
-        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<Message>>{
-            override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
+        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<MessageDTO>>{
+            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
                 val list = response.body()
                 if(list != null){
                     historyGroupLiveData.postValue(list.map{
@@ -121,7 +121,7 @@ class MessageHistoryViewModel(
                 isRefreshing.postValue(false)
             }
 
-            override fun onFailure(call: Call<List<Message>>, t: Throwable) {
+            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
                 Log.d("MessageHistory", "group historyの取得に失敗しました・・なんで！？:$call")
                 isRefreshing.postValue(false)
             }
@@ -131,8 +131,8 @@ class MessageHistoryViewModel(
     fun loadUser(){
         isRefreshing.postValue(true)
         val request = RequestMessageHistory(i = account.getI(encryption)!!, group = false, limit = 100)
-        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<Message>>{
-            override fun onResponse(call: Call<List<Message>>, response: Response<List<Message>>) {
+        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<MessageDTO>>{
+            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
                 val list = response.body()
                 if(list!= null){
                     historyUserLiveData.postValue(list.map{
@@ -143,7 +143,7 @@ class MessageHistoryViewModel(
 
             }
 
-            override fun onFailure(call: Call<List<Message>>, t: Throwable) {
+            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
                 isRefreshing.postValue(false)
                 Log.d("MessageHistory", "user historyの取得に失敗しました・・セイバーかわいい:$call")
             }

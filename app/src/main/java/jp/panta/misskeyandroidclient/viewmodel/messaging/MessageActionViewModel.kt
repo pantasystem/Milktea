@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.MessageAction
 import retrofit2.Call
 import java.lang.IllegalArgumentException
@@ -19,7 +19,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 class MessageActionViewModel(
     val account: Account,
     val misskeyAPI: MisskeyAPI,
-    private val messageHistory: Message,
+    private val messageHistory: MessageDTO,
     private val encryption: Encryption
 ) : ViewModel(){
 
@@ -27,7 +27,7 @@ class MessageActionViewModel(
     class Factory(
         val account: Account,
         val miApplication: MiApplication,
-        private val messageHistory: Message
+        private val messageHistory: MessageDTO
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == MessageActionViewModel::class.java){
@@ -48,14 +48,14 @@ class MessageActionViewModel(
         val tmpFile = file.value
         text.value = null
         file.value = null
-        misskeyAPI.createMessage(action).enqueue(object : Callback<Message>{
-            override fun onResponse(call: Call<Message>, response: Response<Message>) {
+        misskeyAPI.createMessage(action).enqueue(object : Callback<MessageDTO>{
+            override fun onResponse(call: Call<MessageDTO>, response: Response<MessageDTO>) {
                 if (response.code() != 200) {
                     file.postValue(tmpFile)
                     text.postValue(tmpText)
                 }
             }
-            override fun onFailure(call: Call<Message>, t: Throwable) {
+            override fun onFailure(call: Call<MessageDTO>, t: Throwable) {
                 Log.d("MessageActionViewModel", "失敗しました", t)
                 file.postValue(tmpFile)
                 text.postValue(tmpText)
