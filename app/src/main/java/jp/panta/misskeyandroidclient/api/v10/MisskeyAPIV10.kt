@@ -14,7 +14,7 @@ import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.model.list.*
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.model.messaging.MessageAction
+import jp.panta.misskeyandroidclient.api.messaging.MessageAction
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta

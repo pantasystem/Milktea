@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.model.messaging.MessageAction
+import jp.panta.misskeyandroidclient.api.messaging.MessageAction
 import retrofit2.Call
 import java.lang.IllegalArgumentException
 import retrofit2.Callback
