@@ -4,9 +4,11 @@ import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.entities
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.messaging.MessageNotFoundException
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
+import kotlin.jvm.Throws
 
 class MessageRelationGetter(
     private val messageDataSource: MessageDataSource,
@@ -17,6 +19,17 @@ class MessageRelationGetter(
         val (message, users) = messageDTO.entities(account)
         messageDataSource.add(message)
         userRepository.addAll(users)
+        return get(message)
+    }
+
+    @Throws(MessageNotFoundException::class)
+    suspend fun get(messageId: Message.Id): MessageRelation {
+        val message = messageDataSource.find(messageId)
+            ?: throw MessageNotFoundException(messageId)
+        return get(message)
+    }
+
+    suspend fun get(message: Message): MessageRelation {
         return when(message) {
             is Message.Direct -> {
                 MessageRelation.Direct(
