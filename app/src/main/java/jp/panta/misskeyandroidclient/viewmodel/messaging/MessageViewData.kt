@@ -1,8 +1,11 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import java.lang.IllegalArgumentException
@@ -18,7 +21,16 @@ abstract class MessageViewData (val message: MessageRelation, account: Account){
     val file = if(message.message.file == null) null else message.message.file?.toFile(account.instanceDomain)?.let{
         FileViewData(it)
     }
-    val isRead = message.message.isRead
+    //val isRead = message.message.isRead
+    private val mIsReadLiveData = MutableLiveData<Boolean>(message.message.isRead)
+    private var mIsRead: Boolean = message.message.isRead
+        set(value) {
+            mIsReadLiveData.postValue(value)
+            field = value
+        }
+
+    val isRead: LiveData<Boolean> = mIsReadLiveData
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -49,6 +61,11 @@ abstract class MessageViewData (val message: MessageRelation, account: Account){
         result = 31 * result + (file?.hashCode() ?: 0)
         result = 31 * result + isRead.hashCode()
         return result
+    }
+
+    fun update(message: Message) {
+        require(this.message.message.id == message.id)
+        mIsRead = message.isRead
     }
 
 
