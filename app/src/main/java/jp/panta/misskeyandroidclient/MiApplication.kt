@@ -45,6 +45,7 @@ import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
+import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
@@ -113,6 +114,7 @@ class MiApplication : Application(), MiCore {
     private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
     private lateinit var mMessageDataSource: MessageDataSource
+    private lateinit var mUnreadMessages: UnReadMessages
     private lateinit var mMessageRepository: MessageRepository
 
     private lateinit var mGetters: Getters
@@ -203,7 +205,10 @@ class MiApplication : Application(), MiCore {
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
 
-        mMessageDataSource = InMemoryMessageDataSource()
+        InMemoryMessageDataSource(mAccountRepository).also {
+            mMessageDataSource = it
+            mUnreadMessages = it
+        }
         mMessageRepository = MessageRepositoryImpl(this)
 
         mGetters = Getters(mNoteRepository, mUserRepository, mNotificationRepository, mMessageDataSource)
@@ -280,6 +285,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getMessageRepository(): MessageRepository {
         return mMessageRepository
+    }
+
+    override fun getUnreadMessages(): UnReadMessages {
+        return mUnreadMessages
     }
 
     override fun getGetters(): Getters {
