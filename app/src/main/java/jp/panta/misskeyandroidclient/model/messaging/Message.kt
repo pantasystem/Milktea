@@ -106,16 +106,17 @@ sealed class CreateMessage {
 sealed class MessageRelation {
 
     abstract val message: Message
+    abstract val user: User
 
     data class Group(
         override val message: Message.Group,
         val group: GroupEntity,
-        val user: User
+        override val user: User
     ) : MessageRelation()
 
     data class Direct(
         override val message: Message.Direct,
-        val user: User,
+        override val user: User,
         val recipient: User
     ) : MessageRelation() {
         fun opponentUser(account: Account) : User{
