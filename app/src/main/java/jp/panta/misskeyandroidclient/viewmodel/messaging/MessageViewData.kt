@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
+import java.lang.IllegalArgumentException
 
 
 abstract class MessageViewData (val message: MessageRelation, account: Account){
@@ -51,4 +52,16 @@ abstract class MessageViewData (val message: MessageRelation, account: Account){
     }
 
 
+}
+
+class SelfMessageViewData(message: MessageRelation, account: Account) : MessageViewData(message, account){
+    override val avatarIcon: String = message.user.avatarUrl?: throw IllegalArgumentException("not self message")
+
+    override val name: String = message.user.name?: message.user.userName
+
+}
+
+class OtherUserMessageViewData(message: MessageRelation, account: Account) : MessageViewData(message, account){
+    override val avatarIcon: String = message.user.avatarUrl?: throw IllegalArgumentException("not recipient")
+    override val name: String = message.user.name?: message.user.userName
 }
