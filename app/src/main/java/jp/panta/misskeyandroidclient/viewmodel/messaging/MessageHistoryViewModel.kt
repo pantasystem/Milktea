@@ -7,66 +7,40 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
 
+@Suppress("BlockingMethodInNonBlockingContext")
+@ExperimentalCoroutinesApi
+@FlowPreview
 class MessageHistoryViewModel(
     private val account: Account,
     private val miCore: MiCore,
-    private val encryption: Encryption = miCore.getEncryption()
+    private val encryption: Encryption = miCore.getEncryption(),
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 
-    ) : ViewModel(){
-
-    private val mDisposable = CompositeDisposable()
-
-    val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
-    val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
+) : ViewModel(){
 
 
-    val messageSubscriber = miCore.messageStreamFilter
-    val unreadMessageStore = messageSubscriber.getUnreadMessageStore(account)
+    private val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
+    private val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
 
-    val historyGroupAndUserLiveData = object : MediatorLiveData<List<HistoryViewData>>(){
-        override fun onActive() {
-            super.onActive()
-            val disposable = miCore.messageStreamFilter.getAccountMessageObservable(account)
-                .subscribe { msg ->
-                    val messagingId = msg.messagingId(account)
-                    fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: MessageDTO){
-                        val list = ArrayList<HistoryViewData>(liveData.value?: emptyList())
-                        val anyMsg = list.firstOrNull { hvd ->
-                            hvd.messagingId == messagingId
-                        }
-                        if( anyMsg == null ){
 
-                            list.add(HistoryViewData(account, message, unreadMessageStore))
-                        }else{
-                            anyMsg.message.postValue(message)
-                        }
-                        liveData.postValue(list)
-                    }
-                    if(messagingId.isGroup){
-                        updateLiveData(historyGroupLiveData, msg)
-                    }else{
-                        updateLiveData(historyUserLiveData, msg)
-                    }
 
-                }
-            mDisposable.add(disposable)
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-            mDisposable.clear()
-        }
-    }.apply{
+    @FlowPreview
+    val historyGroupAndUserLiveData = MediatorLiveData<List<HistoryViewData>>().apply{
         addSource(historyUserLiveData){
             val groups = historyGroupLiveData.value?: emptyList()
             val list = ArrayList<HistoryViewData>()
@@ -83,6 +57,19 @@ class MessageHistoryViewModel(
             }
             this.postValue(list)
         }
+    }
+
+    init {
+        miCore.messageStreamFilter.getAccountMessageObservable(account).map {
+            miCore.getGetters().messageRelationGetter.get(it)
+        }.onEach {
+            if(it is MessageRelation.Group) {
+                updateLiveData(historyGroupLiveData, it)
+            }else{
+                updateLiveData(historyUserLiveData, it)
+            }
+        }.launchIn(viewModelScope + coroutineDispatcher)
+
     }
 
     val isRefreshing = MutableLiveData<Boolean>(false)
@@ -107,47 +94,41 @@ class MessageHistoryViewModel(
         }
     }
 
-    fun loadGroup(){
+    private fun loadGroup(){
         isRefreshing.postValue(true)
-        val request = RequestMessageHistory(i = account.getI(encryption)!!, group = true, limit = 100)
-        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<MessageDTO>>{
-            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
-                val list = response.body()
-                if(list != null){
-                    historyGroupLiveData.postValue(list.map{
-                        HistoryViewData(account, it, unreadMessageStore)
-                    })
-                }
-                isRefreshing.postValue(false)
+        viewModelScope.launch(coroutineDispatcher) {
+            val messages = fetchHistory(true)
+            if(messages.isNotEmpty()) {
+                historyGroupLiveData.postValue(messages)
             }
 
-            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
-                Log.d("MessageHistory", "group historyの取得に失敗しました・・なんで！？:$call")
-                isRefreshing.postValue(false)
-            }
-        })
+            isRefreshing.postValue(false)
+
+        }
+
     }
 
-    fun loadUser(){
+    private fun loadUser(){
         isRefreshing.postValue(true)
-        val request = RequestMessageHistory(i = account.getI(encryption)!!, group = false, limit = 100)
-        getMisskeyAPI()?.getMessageHistory(request)?.enqueue(object : Callback<List<MessageDTO>>{
-            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
-                val list = response.body()
-                if(list!= null){
-                    historyUserLiveData.postValue(list.map{
-                        HistoryViewData(account, it, unreadMessageStore)
-                    })
-                }
-                isRefreshing.postValue(false)
-
+        viewModelScope.launch(coroutineDispatcher) {
+            val messages = fetchHistory(false)
+            if(messages.isNotEmpty()) {
+                historyUserLiveData.postValue(messages)
             }
+            isRefreshing.postValue(false)
+        }
+    }
 
-            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
-                isRefreshing.postValue(false)
-                Log.d("MessageHistory", "user historyの取得に失敗しました・・セイバーかわいい:$call")
+    private suspend fun fetchHistory(isGroup: Boolean): List<HistoryViewData>{
+        val request = RequestMessageHistory(i = account.getI(encryption), group = isGroup, limit = 100)
+
+        return runCatching {
+            getMisskeyAPI()?.getMessageHistory(request)?.execute()?.body()?.map {
+                miCore.getGetters().messageRelationGetter.get(account, it)
             }
-        })
+        }.getOrNull()?.map {
+            HistoryViewData(account, it, miCore.getUnreadMessages(), viewModelScope)
+        }?: emptyList()
     }
 
     fun openMessage(messageHistory: HistoryViewData){
@@ -156,5 +137,19 @@ class MessageHistoryViewModel(
 
     private fun getMisskeyAPI(): MisskeyAPI?{
         return miCore.getMisskeyAPI(account)
+    }
+
+    private fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: MessageRelation){
+        val list = ArrayList<HistoryViewData>(liveData.value?: emptyList())
+        val anyMsg = list.firstOrNull { hvd ->
+            hvd.messagingId == message.message.messagingId(account)
+        }
+        if( anyMsg == null ){
+
+            list.add(HistoryViewData(account, message, miCore.getUnreadMessages(), viewModelScope, coroutineDispatcher))
+        }else{
+            anyMsg.message.postValue(message)
+        }
+        liveData.postValue(list)
     }
 }
