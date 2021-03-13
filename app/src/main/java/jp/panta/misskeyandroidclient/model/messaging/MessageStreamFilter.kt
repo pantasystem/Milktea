@@ -5,13 +5,16 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
-
+@FlowPreview
+@ExperimentalCoroutinesApi
 class MessageStreamFilter(val miCore: MiCore){
 
 
-    fun getAllMergedAccountMessages(): Flow<MessageDTO>{
+    fun getAllMergedAccountMessages(): Flow<Message>{
         return miCore.getAccounts().flatMapMerge {
             it.map{ ac ->
                 getAccountMessageObservable(ac)
@@ -19,18 +22,26 @@ class MessageStreamFilter(val miCore: MiCore){
         }
     }
 
-    fun getObservable(messagingId: MessagingId, ac: Account): Flow<MessageDTO>{
+    fun getObservable(messagingId: MessagingId, ac: Account): Flow<Message>{
         return miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map{
             (it as? ChannelBody.Main.HavingMessagingBody)?.body
+        }.filterNotNull().map {
+            miCore.getGetters().messageRelationGetter.get(ac, it)
+        }.map {
+            it.message
         }.filter {
-            it?.messagingId(ac) == messagingId
-        }.filterNotNull()
+            messagingId == it.messagingId(ac)
+        }
     }
 
-    fun getAccountMessageObservable(ac: Account): Flow<MessageDTO>{
+    fun getAccountMessageObservable(ac: Account): Flow<Message>{
         return miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map{
             (it as? ChannelBody.Main.HavingMessagingBody)?.body
-        }.filterNotNull()
+        }.filterNotNull().map {
+            miCore.getGetters().messageRelationGetter.get(ac, it)
+        }.map {
+            it.message
+        }
     }
 
 
