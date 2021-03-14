@@ -22,15 +22,23 @@ class MessageStreamFilter(val miCore: MiCore){
         }
     }
 
-    fun getObservable(messagingId: MessagingId, ac: Account): Flow<Message>{
-        return miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map{
-            (it as? ChannelBody.Main.HavingMessagingBody)?.body
-        }.filterNotNull().map {
-            miCore.getGetters().messageRelationGetter.get(ac, it)
-        }.map {
-            it.message
-        }.filter {
-            messagingId == it.messagingId(ac)
+    fun getObservable(messagingId: MessagingId): Flow<Message>{
+        return flow<Account> {
+            val accountId = when(messagingId) {
+                is MessagingId.Direct -> messagingId.userId.accountId
+                is MessagingId.Group -> messagingId.groupId.accountId
+            }
+            miCore.getAccountRepository().get(accountId)
+        }.flatMapLatest { ac ->
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map{
+                (it as? ChannelBody.Main.HavingMessagingBody)?.body
+            }.filterNotNull().map {
+                miCore.getGetters().messageRelationGetter.get(ac, it)
+            }.map {
+                it.message
+            }.filter {
+                messagingId == it.messagingId(ac)
+            }
         }
     }
 

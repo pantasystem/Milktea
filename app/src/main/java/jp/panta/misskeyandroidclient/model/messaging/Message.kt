@@ -38,7 +38,7 @@ sealed class Message{
         override val file: FileProperty?,
         override val isRead: Boolean,
         override val emojis: List<Emoji>,
-        val groupId: String,
+        val groupId: GroupEntity.Id,
         val group: GroupEntity
     ) : Message() {
         override fun read(): Message {
@@ -98,7 +98,7 @@ sealed class CreateMessage {
 
     data class Group(
         override val accountId: Long,
-        val groupId: String,
+        val groupId: GroupEntity.Id,
         override val text: String?,
         override val fileId: String?
     ) : CreateMessage()

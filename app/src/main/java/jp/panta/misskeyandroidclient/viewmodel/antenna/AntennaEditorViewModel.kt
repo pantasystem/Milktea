@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.group.Group
+import jp.panta.misskeyandroidclient.api.groups.GroupDTO
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
@@ -125,7 +125,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val groupList = MediatorLiveData<List<Group>?>().apply{
+    val groupList = MediatorLiveData<List<GroupDTO>?>().apply{
         addSource(this@AntennaEditorViewModel.source){
             /*if(it == Source.GROUP && this.value.isNullOrEmpty()){
                 miCore.getMisskeyAPI(accountRelation)
@@ -133,7 +133,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val group = MediatorLiveData<Group>().apply{
+    val group = MediatorLiveData<GroupDTO>().apply{
         addSource(groupList){
             this.value = it?.firstOrNull { g ->
                 g.id == this@AntennaEditorViewModel.antenna.value?.userGroupId
