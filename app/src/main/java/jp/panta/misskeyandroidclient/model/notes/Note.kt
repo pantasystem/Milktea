@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
@@ -49,7 +50,7 @@ data class Note(
     data class Id(
         val accountId: Long,
         val noteId: String
-    ) : Serializable
+    ) : EntityId
 
     fun updated(){
         this.instanceUpdatedAt = Date()

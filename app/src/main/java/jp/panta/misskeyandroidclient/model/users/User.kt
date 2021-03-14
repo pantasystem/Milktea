@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.users
 
+import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import java.io.Serializable
@@ -25,7 +26,7 @@ sealed class User{
     data class Id(
         val accountId: Long,
         val id: String,
-    ) : Serializable
+    ) : EntityId
 
     data class Simple(
         override val id: Id,

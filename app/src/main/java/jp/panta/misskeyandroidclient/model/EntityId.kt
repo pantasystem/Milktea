@@ -5,4 +5,4 @@ import java.io.Serializable
 /**
  * Idを表す
  */
-interface Id : Serializable
+interface EntityId : Serializable

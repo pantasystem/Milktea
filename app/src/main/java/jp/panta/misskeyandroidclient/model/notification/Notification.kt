@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.notification
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
@@ -20,7 +21,7 @@ sealed class Notification {
     data class Id(
         val accountId: Long,
         val notificationId: String
-    ) : java.io.Serializable
+    ) : EntityId
 }
 
 
