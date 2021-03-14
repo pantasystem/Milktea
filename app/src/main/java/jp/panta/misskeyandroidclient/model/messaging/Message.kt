@@ -29,6 +29,15 @@ sealed class Message{
      */
     abstract fun read(): Message
 
+    fun messagingId(account: Account): MessagingId {
+        return when(this) {
+            is Direct -> MessagingId.Direct(this, account)
+            is Group -> MessagingId.Group(groupId)
+        }
+    }
+
+
+
     data class Group(
         override val id: Id,
         override val createdAt: Date,
@@ -75,12 +84,7 @@ sealed class Message{
 
 
 
-    fun messagingId(account: Account): MessagingId {
-        return when(this) {
-            is Direct -> MessagingId.Direct(this, account)
-            is Group -> MessagingId.Group(groupId)
-        }
-    }
+
 }
 
 
