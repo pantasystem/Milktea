@@ -132,4 +132,8 @@ sealed class MessageRelation {
             }
         }
     }
+
+    fun isMime(account: Account): Boolean {
+        return message.userId == User.Id(account.accountId, account.remoteId)
+    }
 }

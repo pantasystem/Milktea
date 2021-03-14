@@ -2,24 +2,33 @@ package jp.panta.misskeyandroidclient.viewmodel.messaging
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.model.group.Group
+import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlin.collections.ArrayList
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class MessageViewModel(
-    private val account: Account,
-    private val misskeyAPI: MisskeyAPI,
-    messageHistory: MessageDTO,
     private val miCore: MiCore,
-    private val encryption: Encryption = miCore.getEncryption()
+    private val messagingId: MessagingId,
+    private val encryption: Encryption = miCore.getEncryption(),
 
 ) : ViewModel(){
 
@@ -32,40 +41,30 @@ class MessageViewModel(
         }
     }
 
-    private val mMessageId = messageHistory.messagingId(account)
-
     val messagesLiveData = MutableLiveData<State>()
-    private val builder = RequestMessage.Builder(account, messageHistory).apply{
-        this.limit = 20
-    }
 
     private var isLoading = false
 
+    constructor(groupId: Group.Id, miCore: MiCore) : this(miCore, MessagingId.Group(groupId))
 
-    private val unreadMessageStore = miCore.messageStreamFilter.getUnreadMessageStore(account)
-    //private val mainCapture = miCore.getMainCapture(accountRelation)
-    private val mCompositeDisposable = CompositeDisposable()
+    constructor(userId: User.Id, miCore: MiCore) : this(miCore, MessagingId.Direct(userId))
+
     init{
-        //mainCapture.putListener(messageObserver)
-        val dis = miCore.messageStreamFilter.getObservable(messageHistory.messagingId(account), account).subscribe { message ->
+        miCore.messageStreamFilter.getObservable(messagingId).map {
+            miCore.getGetters().messageRelationGetter.get(it)
+        }.onEach { msg ->
             val messages = messagesLiveData.value?.messages.toArrayList()
-
-
-            if(message.messagingId(account) == mMessageId){
-                val msg = if(message.userId == account.remoteId){
-                    //me
-                    SelfMessageViewData(message, account)
-                }else{
-                    RecipientMessageViewData(message, account)
-                }
-                messages.add(msg)
-
-                messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
-                unreadMessageStore.readMessage(message)
-
+            val a = messagingId.getAccount()
+            val viewData = if(msg.isMime(a)) {
+                SelfMessageViewData(msg, a)
+            }else{
+                OtherUserMessageViewData(msg, a)
             }
-        }
-        mCompositeDisposable.add(dis)
+            messages.add(viewData)
+
+            messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
     }
 
     fun loadInit(){
@@ -73,30 +72,14 @@ class MessageViewModel(
             return
         }
         isLoading = true
-        misskeyAPI.getMessages(builder.build(null, null, encryption)).enqueue(object : Callback<List<MessageDTO>>{
-            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
-                val rawMessages = response.body()?.asReversed()
-                if(rawMessages == null){
-                    isLoading = false
-                    return
-                }
-                unreadMessageStore.readAll(mMessageId)
-                val viewDataList = rawMessages.map{
-                    if(it.user?.id == account.remoteId){
-                        //me
-                        SelfMessageViewData(it, account)
-                    }else{
-                        RecipientMessageViewData(it, account)
-                    }
-                }
-                messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
-                isLoading = false
-            }
-
-            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
-                isLoading = false
-            }
-        })
+        viewModelScope.launch(Dispatchers.IO) {
+            val account = messagingId.getAccount()
+            val viewDataList = runCatching {
+                miCore.getMisskeyAPI(account).getMessages(RequestMessage(i = account.getI(miCore.getEncryption()))).execute()?.body()
+            }.getOrNull()?.toMessageViewData(account)?: emptyList()
+            messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
+            isLoading = false
+        }
 
     }
 
@@ -111,77 +94,36 @@ class MessageViewModel(
             isLoading = false
             return
         }
+        viewModelScope.launch(Dispatchers.IO) {
+            val account = messagingId.getAccount()
+            val viewData = runCatching {
+                miCore.getMisskeyAPI(messagingId.getAccount()).getMessages(RequestMessage(
+                    i = account.getI(miCore.getEncryption()),
+                    untilId = untilId.messageId,
+                    groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
+                    userId = (messagingId as? MessagingId.Direct)?.userId?.id
+                )).execute()?.body()
+            }.getOrNull()?.toMessageViewData(account)?: emptyList()
 
-        misskeyAPI.getMessages(builder.build(untilId = untilId, sinceId = null, encryption = encryption)).enqueue(object : Callback<List<MessageDTO>>{
-            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
-                val reversedMessages = response.body()?.asReversed()
-                if(reversedMessages == null){
-                    isLoading = false
-                    return
-                }
-                val viewData = reversedMessages.map{
-                    if(it.userId == account.remoteId){
-                        SelfMessageViewData(it, account)
-                    }else{
-                        RecipientMessageViewData(it, account)
-                    }
-                }
-
-                val messages = ArrayList<MessageViewData>(exMessages).apply{
-                    addAll(0, viewData)
-                }
-                messagesLiveData.postValue(State(messages, State.Type.LOAD_OLD))
-                isLoading = false
+            val messages = ArrayList<MessageViewData>(exMessages).apply{
+                addAll(0, viewData)
             }
-
-            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
-                isLoading = false
-            }
-        })
-
-    }
-
-    fun loadNew(){
-        if(isLoading){
-            return
-        }
-        isLoading = true
-        val exMessages = messagesLiveData.value?.messages
-        val sinceId = exMessages?.lastOrNull()?.id
-        if(exMessages.isNullOrEmpty() || sinceId == null){
+            messagesLiveData.postValue(State(messages, State.Type.LOAD_OLD))
             isLoading = false
-            return
         }
-        misskeyAPI.getMessages(builder.build(sinceId = sinceId, untilId = null, encryption = encryption)).enqueue(object : Callback<List<MessageDTO>>{
-            override fun onResponse(call: Call<List<MessageDTO>>, response: Response<List<MessageDTO>>) {
-                val rawList = response.body()
-                if(rawList == null){
-                    isLoading = false
-                    return
-                }
-
-                val viewData = rawList.map{
-                    if(it.userId == account.remoteId){
-                        //me
-                        SelfMessageViewData(it, account)
-                    }else{
-                        RecipientMessageViewData(it, account)
-                    }
-                }
-
-                val messages = ArrayList<MessageViewData>(exMessages).apply{
-                    addAll(viewData)
-                }
-                messagesLiveData.postValue(State(messages, State.Type.LOAD_NEW))
-            }
-
-            override fun onFailure(call: Call<List<MessageDTO>>, t: Throwable) {
-
-            }
-        })
     }
 
-
+    private suspend fun List<MessageDTO>.toMessageViewData(account: Account): List<MessageViewData> {
+        return this.map {
+            miCore.getGetters().messageRelationGetter.get(account, it)
+        }.map { msg ->
+            if(msg.isMime(account)) {
+                SelfMessageViewData(msg, account)
+            }else{
+                OtherUserMessageViewData(msg, account)
+            }
+        }
+    }
 
     private fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData>{
         return if(this == null){
@@ -189,5 +131,13 @@ class MessageViewModel(
         }else{
             ArrayList(this)
         }
+    }
+
+    private suspend fun MessagingId.getAccount(): Account {
+        val accountId = when(this) {
+            is MessagingId.Direct -> this.userId.accountId
+            is MessagingId.Group -> this.groupId.accountId
+        }
+        return miCore.getAccountRepository().get(accountId)
     }
 }
