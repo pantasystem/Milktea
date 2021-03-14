@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.Version
@@ -126,6 +127,9 @@ class MiApplication : Application(), MiCore {
         private set
 
     override lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override lateinit var messageStreamFilter: MessageStreamFilter
 
 
@@ -159,7 +163,8 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_5_6)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
-        mAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
+        val roomAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
+        mAccountRepository = MediatorAccountRepository(roomAccountRepository)
 
 
         reactionHistoryDao = database.reactionHistoryDao()
