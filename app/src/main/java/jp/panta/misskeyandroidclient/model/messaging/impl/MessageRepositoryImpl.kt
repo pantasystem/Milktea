@@ -47,7 +47,7 @@ class MessageRepositoryImpl(
             is CreateMessage.Group -> {
                 MessageAction(
                     i,
-                    groupId = createMessage.groupId,
+                    groupId = createMessage.groupId.groupId,
                     text = createMessage.text,
                     fileId = createMessage.fileId,
                     messageId = null,
