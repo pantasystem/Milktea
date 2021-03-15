@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -15,52 +16,57 @@ import java.lang.IllegalArgumentException
 import retrofit2.Callback
 import retrofit2.Response
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.messaging.CreateMessage
+import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class MessageActionViewModel(
-    val account: Account,
-    val misskeyAPI: MisskeyAPI,
-    private val messageHistory: MessageDTO,
-    private val encryption: Encryption
+
+    private val messagingId: MessagingId,
+    private val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val account: Account,
+        val messagingId: MessagingId,
         val miApplication: MiApplication,
-        private val messageHistory: MessageDTO
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == MessageActionViewModel::class.java){
-                return MessageActionViewModel(account, miApplication.getMisskeyAPI(account), messageHistory, miApplication.getEncryption()) as T
+                return MessageActionViewModel(messagingId, miApplication) as T
             }
             throw IllegalArgumentException("use MessageActionViewModel::class.java")
         }
     }
 
+    private val logger = miCore.loggerFactory.create("MessageActionViewModel")
 
     val text = MutableLiveData<String>()
     val file = MutableLiveData<FileProperty>()
 
+    private val mErrors = MutableStateFlow<Throwable?>(null)
+    val errors = mErrors.asStateFlow()
+
     fun send(){
-        val factory = MessageAction.Factory(account, messageHistory)
-        val action = factory.actionCreateMessage(text.value, file.value?.id, encryption)
+
         val tmpText = text.value
         val tmpFile = file.value
-        text.value = null
-        file.value = null
-        misskeyAPI.createMessage(action).enqueue(object : Callback<MessageDTO>{
-            override fun onResponse(call: Call<MessageDTO>, response: Response<MessageDTO>) {
-                if (response.code() != 200) {
-                    file.postValue(tmpFile)
-                    text.postValue(tmpText)
-                }
+        //text.value = null
+        //file.value = null
+        viewModelScope.launch(Dispatchers.IO) {
+            val createMessage = CreateMessage.Factory.create(messagingId, tmpText, tmpFile?.id)
+            runCatching { miCore.getMessageRepository().create(createMessage) }.onFailure {
+                logger.error("メッセージ作成中にエラー発生", e = it)
+                mErrors.value = it
+            }.onSuccess {
+                file.postValue(null)
+                text.postValue("")
             }
-            override fun onFailure(call: Call<MessageDTO>, t: Throwable) {
-                Log.d("MessageActionViewModel", "失敗しました", t)
-                file.postValue(tmpFile)
-                text.postValue(tmpText)
-            }
-        })
+        }
     }
 
 }
