@@ -7,6 +7,18 @@ import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
 
 sealed class MessagingId : Serializable{
 
+    val accountId: Long
+        get() {
+            return when(this) {
+                is Group -> {
+                    groupId.accountId
+                }
+                is Direct -> {
+                    userId.accountId
+                }
+            }
+        }
+
     data class Group(
         val groupId: GroupEntity.Id
     ) : MessagingId()
