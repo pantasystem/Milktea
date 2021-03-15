@@ -106,6 +106,30 @@ sealed class CreateMessage {
         override val text: String?,
         override val fileId: String?
     ) : CreateMessage()
+
+    object Factory {
+
+        fun create(messagingId: MessagingId, text: String?, fileId: String?): CreateMessage{
+            return when(messagingId) {
+                is MessagingId.Direct -> {
+                    Direct(
+                        messagingId.accountId,
+                        messagingId.userId,
+                        text,
+                        fileId
+                    )
+                }
+                is MessagingId.Group -> {
+                    Group(
+                        messagingId.accountId,
+                        messagingId.groupId,
+                        text,
+                        fileId
+                    )
+                }
+            }
+        }
+    }
 }
 
 sealed class MessageRelation {
