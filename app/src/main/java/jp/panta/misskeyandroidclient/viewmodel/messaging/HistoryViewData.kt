@@ -4,15 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
-import jp.panta.misskeyandroidclient.model.messaging.UnReadMessageStore
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 
 class HistoryViewData (account: Account, message: MessageRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope, coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO){
     val messagingId = message.message.messagingId(account)
@@ -54,6 +50,42 @@ class HistoryViewData (account: Account, message: MessageRelation, unReadMessage
                 mUnreadMessages.postValue(it)
             }
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as HistoryViewData
+
+        if (messagingId != other.messagingId) return false
+        if (message != other.message) return false
+        if (isGroup != other.isGroup) return false
+        if (group != other.group) return false
+        if (partner != other.partner) return false
+        if (historyIcon != other.historyIcon) return false
+        if (title != other.title) return false
+        if (mUnreadMessages != other.mUnreadMessages) return false
+        if (unreadMessages != other.unreadMessages) return false
+        if (unreadMessageCount != other.unreadMessageCount) return false
+        if (scope != other.scope) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = messagingId.hashCode()
+        result = 31 * result + message.hashCode()
+        result = 31 * result + isGroup.hashCode()
+        result = 31 * result + (group?.hashCode() ?: 0)
+        result = 31 * result + (partner?.hashCode() ?: 0)
+        result = 31 * result + (historyIcon?.hashCode() ?: 0)
+        result = 31 * result + title.hashCode()
+        result = 31 * result + mUnreadMessages.hashCode()
+        result = 31 * result + unreadMessages.hashCode()
+        result = 31 * result + unreadMessageCount.hashCode()
+        result = 31 * result + scope.hashCode()
+        return result
     }
 
 }

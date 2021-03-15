@@ -8,6 +8,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.MessageActivity
@@ -17,11 +18,18 @@ import jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModelFactory
 import kotlinx.android.synthetic.main.fragment_messaging_history.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
 
     private var mLinearLayoutManager: LinearLayoutManager? = null
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -30,19 +38,23 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
         mLinearLayoutManager = layoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { ar ->
+        miApplication.getCurrentAccount().filterNotNull().onEach { ar ->
 
-            val historyViewModel = ViewModelProvider(this, MessageHistoryViewModelFactory(ar, miApplication))["$ar", MessageHistoryViewModel::class.java]
+            val historyViewModel = ViewModelProvider(
+                this,
+                MessageHistoryViewModelFactory(ar, miApplication)
+            )["$ar", MessageHistoryViewModel::class.java]
 
-            val adapter = HistoryListAdapter(diffUtilItemCallback, historyViewModel, viewLifecycleOwner)
+            val adapter =
+                HistoryListAdapter(diffUtilItemCallback, historyViewModel, viewLifecycleOwner)
             history_list_view.adapter = adapter
 
 
-            historyViewModel.historyGroupAndUserLiveData.observe(viewLifecycleOwner, Observer {
+            historyViewModel.historyGroupAndUserLiveData.observe(viewLifecycleOwner, {
                 adapter.submitList(it)
             })
 
-            historyViewModel.isRefreshing.observe(viewLifecycleOwner, Observer {
+            historyViewModel.isRefreshing.observe(viewLifecycleOwner, {
                 refresh.isRefreshing = it
             })
 
@@ -50,8 +62,8 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
                 historyViewModel.loadGroupAndUser()
             }
 
-            historyViewModel.messageHistorySelected.observe(viewLifecycleOwner, Observer { hvd ->
-                Handler(Looper.getMainLooper()).post{
+            historyViewModel.messageHistorySelected.observe(viewLifecycleOwner, { hvd ->
+                Handler(Looper.getMainLooper()).post {
                     val intent = Intent(activity, MessageActivity::class.java)
                     intent.putExtra(MessageActivity.EXTRA_MESSAGING_ID, hvd.messagingId)
                     startActivity(intent)
@@ -61,7 +73,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
             historyViewModel.loadGroupAndUser()
 
 
-        })
+        }.launchIn(lifecycleScope)
 
     }
 
@@ -75,7 +87,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
         }
 
         override fun areItemsTheSame(oldItem: HistoryViewData, newItem: HistoryViewData): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.messagingId == newItem.messagingId
         }
     }
 
