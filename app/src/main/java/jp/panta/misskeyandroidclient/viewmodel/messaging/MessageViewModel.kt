@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -11,6 +9,7 @@ import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -28,8 +27,6 @@ import kotlin.collections.ArrayList
 class MessageViewModel(
     private val miCore: MiCore,
     private val messagingId: MessagingId,
-    private val encryption: Encryption = miCore.getEncryption(),
-
 ) : ViewModel(){
 
     class State(
@@ -44,6 +41,24 @@ class MessageViewModel(
     val messagesLiveData = MutableLiveData<State>()
 
     private var isLoading = false
+
+
+    val title: LiveData<String> = Transformations.map(messagesLiveData) {
+        it.messages.firstOrNull()?.let { viewData ->
+            when(viewData.message){
+                is MessageRelation.Group -> {
+                    viewData.message.group.name
+                }
+                is MessageRelation.Direct -> {
+                    if(viewData is SelfMessageViewData){
+                        viewData.message.recipient.userName
+                    }else{
+                        viewData.message.user.userName
+                    }
+                }
+            }
+        }
+    }
 
     constructor(groupId: Group.Id, miCore: MiCore) : this(miCore, MessagingId.Group(groupId))
 
