@@ -54,12 +54,15 @@ import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
+import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
+import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
@@ -104,6 +107,9 @@ class MiApplication : Application(), MiCore {
     private lateinit var mNoteDataSource: NoteDataSource
     private lateinit var mUserDataSource: UserDataSource
     private lateinit var mNotificationRepository: NotificationRepository
+
+    private lateinit var mNoteRepository: NoteRepository
+    private lateinit var mUserRepository: UserRepository
 
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
@@ -184,7 +190,11 @@ class MiApplication : Application(), MiCore {
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 
         mNoteDataSource = InMemoryNoteDataSource(loggerFactory)
+        mNoteRepository = NoteRepositoryImpl(this)
+
         mUserDataSource = InMemoryUserDataSource()
+        mUserRepository = UserRepositoryImpl(this)
+
         mNotificationRepository = InMemoryNotificationRepository()
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource)
@@ -458,9 +468,16 @@ class MiApplication : Application(), MiCore {
         return mNoteDataSource
     }
 
+    override fun getNoteRepository(): NoteRepository {
+        return mNoteRepository
+    }
 
-    override fun getUserRepository(): UserDataSource {
+    override fun getUserDataSource(): UserDataSource {
         return mUserDataSource
+    }
+
+    override fun getUserRepository(): UserRepository {
+        return mUserRepository
     }
 
     override fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow {
