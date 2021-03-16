@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import jp.panta.misskeyandroidclient.model.Entity
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -45,7 +46,7 @@ data class Note(
 
     val app: App?,
     var instanceUpdatedAt: Date = Date()
-) {
+) : Entity{
 
     data class Id(
         val accountId: Long,

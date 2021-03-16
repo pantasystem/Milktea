@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.users
 
+import jp.panta.misskeyandroidclient.model.Entity
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -11,7 +12,7 @@ import java.util.*
  * Userはfollowやunfollowなどは担当しない
  * Userはfollowやunfollowに関連しないため
  */
-sealed class User{
+sealed class User : Entity{
 
     abstract val id: Id
     abstract val userName: String
