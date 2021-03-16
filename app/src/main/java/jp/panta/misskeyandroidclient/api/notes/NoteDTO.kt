@@ -66,6 +66,9 @@ data class NoteDTO(
     @SerializedName("_featuredId_")
     @SerialName("_featuredId_")
     val tmpFeaturedId: String? = null,
+    @SerialName("_prId_")
+    @SerializedName("_prId_")
+    val promotionId: String? = null,
 
     val app: App? = null
 ): Serializable

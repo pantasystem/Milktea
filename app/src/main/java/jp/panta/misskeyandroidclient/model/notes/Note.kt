@@ -57,9 +57,32 @@ data class Note(
     }
 }
 
-class NoteRelation(
-    val note: Note,
-    val user: User,
-    val reply: NoteRelation?,
-    val renote: NoteRelation?,
-)
+sealed class NoteRelation {
+    abstract val note: Note
+    abstract val user: User
+    abstract val reply: NoteRelation?
+    abstract val renote: NoteRelation?
+
+    data class Normal(
+        override val note: Note,
+        override val user: User,
+        override val renote: NoteRelation?,
+        override val reply: NoteRelation?
+    ) : NoteRelation()
+
+    data class Featured(
+        override val note: Note,
+        override val user: User,
+        override val renote: NoteRelation?,
+        override val reply: NoteRelation?,
+        val featuredId: String
+    ) : NoteRelation()
+
+    data class Promotion(
+        override val note: Note,
+        override val user: User,
+        override val renote: NoteRelation?,
+        override val reply: NoteRelation?,
+        val promotionId: String
+    ) : NoteRelation()
+}
