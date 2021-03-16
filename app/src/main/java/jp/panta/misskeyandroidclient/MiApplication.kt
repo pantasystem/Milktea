@@ -51,7 +51,7 @@ import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSou
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteRepository
+import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -99,7 +99,7 @@ class MiApplication : Application(), MiCore {
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIUrlMap = HashMap<String, Pair<Version?, MisskeyAPI>>()
 
-    private lateinit var mNoteRepository: NoteRepository
+    private lateinit var mNoteDataSource: NoteDataSource
     private lateinit var mUserDataSource: UserDataSource
     private lateinit var mNotificationRepository: NotificationRepository
 
@@ -181,7 +181,7 @@ class MiApplication : Application(), MiCore {
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 
-        mNoteRepository = InMemoryNoteRepository(loggerFactory)
+        mNoteDataSource = InMemoryNoteDataSource(loggerFactory)
         mUserDataSource = InMemoryUserDataSource()
         mNotificationRepository = InMemoryNotificationRepository()
 
@@ -200,7 +200,7 @@ class MiApplication : Application(), MiCore {
 
         mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
             mAccountRepository,
-            mNoteRepository,
+            mNoteDataSource,
             mNoteCaptureAPIWithAccountProvider,
             loggerFactory,
             applicationScope,
@@ -216,7 +216,7 @@ class MiApplication : Application(), MiCore {
         }
         mMessageRepository = MessageRepositoryImpl(this)
 
-        mGetters = Getters(mNoteRepository, mUserDataSource, mNotificationRepository, mMessageDataSource)
+        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationRepository, mMessageDataSource)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
 
@@ -445,8 +445,8 @@ class MiApplication : Application(), MiCore {
         return this.mSettingStore
     }
 
-    override fun getNoteRepository(): NoteRepository {
-        return mNoteRepository
+    override fun getNoteRepository(): NoteDataSource {
+        return mNoteDataSource
     }
 
 

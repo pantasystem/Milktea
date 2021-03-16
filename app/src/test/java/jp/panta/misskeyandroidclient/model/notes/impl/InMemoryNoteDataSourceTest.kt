@@ -1,25 +1,22 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notes.toNote
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
 import java.util.*
 
-class InMemoryNoteRepositoryTest {
+class InMemoryNoteDataSourceTest {
 
     @Test
     fun testAdd() {
         val loggerFactory = TestLogger.Factory()
-        val noteRepository = InMemoryNoteRepository(loggerFactory)
+        val noteRepository = InMemoryNoteDataSource(loggerFactory)
 
         val account = Account(remoteId = "piyo", instanceDomain = "", encryptedToken = "", userName = "piyoName")
         val dto = NoteDTO(

@@ -12,18 +12,13 @@ import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.plus
 
 open class PlaneNoteViewData (
     val note: NoteRelation,
@@ -230,7 +225,7 @@ open class PlaneNoteViewData (
     }
 
     val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-        if(it is NoteRepository.Event.Updated){
+        if(it is NoteDataSource.Event.Updated){
             update(it.note)
         }
     }

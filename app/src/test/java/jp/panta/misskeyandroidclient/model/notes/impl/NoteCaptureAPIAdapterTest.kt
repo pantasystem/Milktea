@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
 import kotlinx.coroutines.*
@@ -32,7 +32,7 @@ class NoteCaptureAPIAdapterTest {
 
         val coroutineScope = CoroutineScope(Job())
         val accountRepository = TestAccountRepository()
-        val noteRepository = InMemoryNoteRepository(loggerFactory)
+        val noteRepository = InMemoryNoteDataSource(loggerFactory)
 
 
         val noteCaptureAPIAdapter = NoteCaptureAPIAdapter(
@@ -66,7 +66,7 @@ class NoteCaptureAPIAdapterTest {
 
                 for(n in 0 until 10){
                     noteCaptureAPIAdapter.capture(note.id).onEach {
-                        if(it is NoteRepository.Event.Updated){
+                        if(it is NoteDataSource.Event.Updated){
                             assertTrue(it.note.reactionCounts[0].count == 1)
                         }
                     }.launchIn(this)

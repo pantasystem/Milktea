@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient.model.notes
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.users.User
-import kotlinx.coroutines.flow.Flow
 import kotlin.jvm.Throws
 
 /**
@@ -11,10 +10,10 @@ import kotlin.jvm.Throws
  * 要するに抽象化したいだけで意味はない
  * ※またAPIを抽象化するためのものではない
  */
-interface NoteRepository {
+interface NoteDataSource {
 
     interface Factory{
-        fun create(account: Account) : NoteRepository
+        fun create(account: Account) : NoteDataSource
     }
 
     fun interface Listener {

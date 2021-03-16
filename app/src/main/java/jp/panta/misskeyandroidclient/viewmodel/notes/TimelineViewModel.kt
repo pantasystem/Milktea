@@ -370,7 +370,7 @@ class TimelineViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             notes.forEach { note ->
                 note.eventFlow.onEach {
-                    if(it is NoteRepository.Event.Deleted) {
+                    if(it is NoteDataSource.Event.Deleted) {
                         timelineLiveData.postValue(
                             TimelineState(
                                 state = TimelineState.State.REMOVED,

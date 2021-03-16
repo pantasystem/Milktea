@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.*
  */
 class NoteCaptureAPIAdapter(
     private val accountRepository: AccountRepository,
-    private val noteRepository: NoteRepository,
+    private val noteDataSource: NoteDataSource,
     private val noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
     loggerFactory: Logger.Factory,
     cs: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : NoteRepository.Listener {
+) : NoteDataSource.Listener {
 
     private val logger = loggerFactory.create("NoteCaptureAPIAdapter")
 
@@ -27,10 +27,10 @@ class NoteCaptureAPIAdapter(
 
 
     init {
-        noteRepository.addEventListener(this)
+        noteDataSource.addEventListener(this)
     }
 
-    private val noteIdWithListeners = mutableMapOf<Note.Id, MutableSet<(NoteRepository.Event)->Unit>>()
+    private val noteIdWithListeners = mutableMapOf<Note.Id, MutableSet<(NoteDataSource.Event)->Unit>>()
 
     private val noteIdWithJob = mutableMapOf<Note.Id, Job>()
 
@@ -44,7 +44,7 @@ class NoteCaptureAPIAdapter(
         }
     }
 
-    override fun on(e: NoteRepository.Event) {
+    override fun on(e: NoteDataSource.Event) {
 
         synchronized(noteIdWithListeners) {
             noteIdWithListeners[e.noteId]?.forEach { callback ->
@@ -58,10 +58,10 @@ class NoteCaptureAPIAdapter(
     }
 
     @ExperimentalCoroutinesApi
-    fun capture(id: Note.Id) : Flow<NoteRepository.Event> = channelFlow {
+    fun capture(id: Note.Id) : Flow<NoteDataSource.Event> = channelFlow {
         val account = accountRepository.get(id.accountId)
 
-        val repositoryEventListener: (NoteRepository.Event)->Unit = { ev ->
+        val repositoryEventListener: (NoteDataSource.Event)->Unit = { ev ->
             offer(ev)
         }
 
@@ -96,7 +96,7 @@ class NoteCaptureAPIAdapter(
     /**
      * @return Note.Idが初めてListenerに登録されるとtrueが返されます。
      */
-    private fun addRepositoryEventListener(noteId: Note.Id, listener: (NoteRepository.Event)-> Unit): Boolean {
+    private fun addRepositoryEventListener(noteId: Note.Id, listener: (NoteDataSource.Event)-> Unit): Boolean {
         synchronized(noteIdWithListeners) {
             val listeners = noteIdWithListeners[noteId]
             return if(listeners.isNullOrEmpty()) {
@@ -114,10 +114,10 @@ class NoteCaptureAPIAdapter(
     /**
      * @return Note.Idに関連するListenerすべてが解除されるとfalseが返されます。
      */
-    private fun removeRepositoryEventListener(noteId: Note.Id, listener: (NoteRepository.Event)-> Unit): Boolean {
+    private fun removeRepositoryEventListener(noteId: Note.Id, listener: (NoteDataSource.Event)-> Unit): Boolean {
 
         synchronized(noteIdWithListeners) {
-            val listeners: MutableSet<(NoteRepository.Event) -> Unit> =
+            val listeners: MutableSet<(NoteDataSource.Event) -> Unit> =
                 noteIdWithListeners[noteId] ?: return false
 
             if(!listeners.remove(listener)){
@@ -139,10 +139,10 @@ class NoteCaptureAPIAdapter(
     private suspend fun handleRemoteEvent(account: Account, e: NoteUpdated.Body) {
         val noteId = Note.Id(account.accountId, e.id)
         try{
-            val note = noteRepository.get(noteId)
+            val note = noteDataSource.get(noteId)
             when(e) {
                 is NoteUpdated.Body.Deleted -> {
-                    noteRepository.remove(noteId)
+                    noteDataSource.remove(noteId)
                 }
                 is NoteUpdated.Body.Reacted-> {
                     onReacted(note, account, e)
@@ -174,7 +174,7 @@ class NoteCaptureAPIAdapter(
             it.count > 0
         }.toList()
 
-        noteRepository.add(
+        noteDataSource.add(
             note.copy(
                 reactionCounts = newList,
                 myReaction = if(e.body.userId == account.remoteId) null else e.body.reaction
@@ -198,7 +198,7 @@ class NoteCaptureAPIAdapter(
             added.add(ReactionCount(reaction = e.body.reaction, count = 1))
             list = added
         }
-        noteRepository.add(
+        noteDataSource.add(
             note.copy(
                 reactionCounts = list,
                 myReaction = if(e.body.userId == account.remoteId) e.body.reaction else note.myReaction
@@ -221,7 +221,7 @@ class NoteCaptureAPIAdapter(
                 choice
             }
         }
-        noteRepository.add(
+        noteDataSource.add(
             note.copy(
                 poll = poll.copy(choices = updatedChoices)
             )

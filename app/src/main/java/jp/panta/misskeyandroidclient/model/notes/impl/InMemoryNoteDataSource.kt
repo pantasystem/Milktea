@@ -4,14 +4,14 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteNotFoundException
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class InMemoryNoteRepository(
+class InMemoryNoteDataSource(
     loggerFactory: Logger.Factory
-): NoteRepository{
+): NoteDataSource{
 
     val logger = loggerFactory.create("InMemoryNoteRepository")
 
@@ -19,9 +19,9 @@ class InMemoryNoteRepository(
 
     private val mutex = Mutex()
 
-    private val listeners = mutableSetOf<NoteRepository.Listener>()
+    private val listeners = mutableSetOf<NoteDataSource.Listener>()
 
-    override fun addEventListener(listener: NoteRepository.Listener) {
+    override fun addEventListener(listener: NoteDataSource.Listener) {
         listeners.add(listener)
     }
 
@@ -47,10 +47,10 @@ class InMemoryNoteRepository(
             note.updated()
 
             return if(n == null){
-                publish(NoteRepository.Event.Created(note.id, note))
+                publish(NoteDataSource.Event.Created(note.id, note))
                 AddResult.CREATED
             } else {
-                publish(NoteRepository.Event.Updated(note.id, note))
+                publish(NoteDataSource.Event.Updated(note.id, note))
                 AddResult.UPDATED
             }
         }
@@ -73,7 +73,7 @@ class InMemoryNoteRepository(
             if(n == null){
                 return false
             }
-            publish(NoteRepository.Event.Deleted(noteId = noteId))
+            publish(NoteDataSource.Event.Deleted(noteId = noteId))
             return true
         }
     }
@@ -88,7 +88,7 @@ class InMemoryNoteRepository(
         }
     }
 
-    private fun publish(ev: NoteRepository.Event) {
+    private fun publish(ev: NoteDataSource.Event) {
         synchronized(listeners) {
             listeners.forEach { 
                 it.on(ev)

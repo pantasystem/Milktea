@@ -17,7 +17,7 @@ import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -46,7 +46,7 @@ interface MiCore{
 
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?
 
-    fun getNoteRepository(): NoteRepository
+    fun getNoteRepository(): NoteDataSource
 
     fun getUserRepository(): UserDataSource
 
