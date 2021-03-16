@@ -22,10 +22,13 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
     companion object{
         private const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclinet.view.notes.detail.EXTRA_NOTE_ID"
         private const val EXTRA_PAGE = "jp.panta.misskeyandroidclinet.view.notes.detail.EXTRA_PAGE"
-        fun newInstance(noteId: String): NoteDetailFragment{
+        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.view.notes.detail.EXTRA_ACCOUNT_ID"
+
+        fun newInstance(noteId: String, accountId: Long? = null): NoteDetailFragment{
             return NoteDetailFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_NOTE_ID, noteId)
+                    putLong(EXTRA_ACCOUNT_ID, accountId ?: -1)
                 }
             }
         }
@@ -37,12 +40,13 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
             return NoteDetailFragment().apply{
                 arguments = Bundle().apply{
                     putSerializable(EXTRA_PAGE,  page)
+                    putLong(EXTRA_ACCOUNT_ID, page.accountId)
                 }
             }
         }
 
         fun newInstance(noteId: Note.Id): NoteDetailFragment {
-
+            return newInstance(noteId.noteId, noteId.accountId)
         }
     }
 
@@ -51,28 +55,29 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
         val page = (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
             ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
+        val accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1 )?.let{
+            if(it == -1L) null else it
+        }
 
         val miApplication = context?.applicationContext as MiApplication
 
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
 
-        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { ac ->
-            val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(ac, miApplication, page))[NoteDetailViewModel::class.java]
+        val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(page, accountId = accountId, miApplication = miApplication))[NoteDetailViewModel::class.java]
 
-            noteDetailViewModel.loadDetail()
-            val adapter = NoteDetailAdapter(
-                noteDetailViewModel = noteDetailViewModel,
-                notesViewModel = notesViewModel,
-                viewLifecycleOwner = viewLifecycleOwner
-            )
-            noteDetailViewModel.notes.observe(viewLifecycleOwner, Observer {
-                adapter.submitList(it)
-            })
-
-            noteDetailViewModel.loadDetail()
-
-            notes_view.adapter = adapter
-            notes_view.layoutManager = LinearLayoutManager(context)
+        noteDetailViewModel.loadDetail()
+        val adapter = NoteDetailAdapter(
+            noteDetailViewModel = noteDetailViewModel,
+            notesViewModel = notesViewModel,
+            viewLifecycleOwner = viewLifecycleOwner
+        )
+        noteDetailViewModel.notes.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
         })
+
+        noteDetailViewModel.loadDetail()
+
+        notes_view.adapter = adapter
+        notes_view.layoutManager = LinearLayoutManager(context)
     }
 }
