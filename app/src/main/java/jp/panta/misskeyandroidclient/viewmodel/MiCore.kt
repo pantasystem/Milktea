@@ -19,9 +19,11 @@ import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import kotlinx.coroutines.flow.StateFlow
@@ -50,7 +52,11 @@ interface MiCore{
 
     fun getNoteDataSource(): NoteDataSource
 
-    fun getUserRepository(): UserDataSource
+    fun getNoteRepository(): NoteRepository
+
+    fun getUserDataSource(): UserDataSource
+
+    fun getUserRepository(): UserRepository
 
     fun getNotificationRepository(): NotificationRepository
 
