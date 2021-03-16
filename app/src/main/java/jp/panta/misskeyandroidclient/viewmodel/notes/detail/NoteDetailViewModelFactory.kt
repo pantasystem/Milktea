@@ -10,13 +10,13 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class NoteDetailViewModelFactory(
-    val account: Account,
+    val show: Pageable.Show,
     val miApplication: MiApplication,
-    val show: Pageable.Show
+    val accountId: Long? = null
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NoteDetailViewModel::class.java){
-            return NoteDetailViewModel(account, show, miApplication, encryption = miApplication.getEncryption()) as T
+            return NoteDetailViewModel(show, miApplication, accountId = accountId, encryption = miApplication.getEncryption()) as T
         }
         throw  IllegalArgumentException("use NoteDetailViewModel::class.java")
     }
