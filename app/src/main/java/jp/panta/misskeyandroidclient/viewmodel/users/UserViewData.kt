@@ -5,7 +5,7 @@ import jp.panta.misskeyandroidclient.api.notes.toEntities
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
@@ -30,17 +30,17 @@ open class UserViewData(
     init {
         miCore.getUserRepositoryEventToFlow().from(userId).onEach {
             when(it) {
-                is UserRepository.Event.Created -> {
+                is UserDataSource.Event.Created -> {
                     (it.user as? User.Detail)?.let{ detail ->
                         tryPost(detail)
                     }
                 }
-                is UserRepository.Event.Updated -> {
+                is UserDataSource.Event.Updated -> {
                     (it.user as? User.Detail)?.let { detail ->
                         tryPost(detail)
                     }
                 }
-                is UserRepository.Event.Removed -> {
+                is UserDataSource.Event.Removed -> {
                     user.postValue(null)
                 }
             }

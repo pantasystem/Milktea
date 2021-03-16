@@ -6,11 +6,11 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 
 class NoteRelationGetter(
     private val noteRepository: NoteRepository,
-    private val userRepository: UserRepository
+    private val userDataSource: UserDataSource
 ) {
 
     suspend fun get(noteId: Note.Id, deep: Boolean = true, featuredId: String? = null, promotionId: String? = null): NoteRelation? {
@@ -27,13 +27,13 @@ class NoteRelationGetter(
 
     suspend fun get(account: Account, noteDTO: NoteDTO): NoteRelation {
         val entities = noteDTO.toEntities(account)
-        userRepository.addAll(entities.third)
+        userDataSource.addAll(entities.third)
         noteRepository.addAll(entities.second)
         return get(entities.first, featuredId = noteDTO.tmpFeaturedId, promotionId = noteDTO.promotionId)
     }
 
     suspend fun get(note: Note, deep: Boolean = true, featuredId: String? = null, promotionId: String? = null): NoteRelation {
-        val user = userRepository.get(note.userId)
+        val user = userDataSource.get(note.userId)
 
         val renote = if(deep) {
             note.renoteId?.let{

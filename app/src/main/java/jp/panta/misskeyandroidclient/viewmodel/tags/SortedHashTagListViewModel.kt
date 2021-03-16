@@ -1,12 +1,14 @@
 package jp.panta.misskeyandroidclient.viewmodel.tags
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.plus
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -52,15 +54,15 @@ class SortedHashTagListViewModel(
     val isLoading = MutableLiveData<Boolean>()
 
     init{
-        hashTags.addSource(miCore.getCurrentAccount()){
+        miCore.getCurrentAccount().filterNotNull().onEach {
             load()
-        }
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
     fun load(){
         val account = miCore.getCurrentAccount().value
             ?:return
         isLoading.value = true
-        val i = account.getI(miCore.getEncryption())
+        val i = runCatching { account.getI(miCore.getEncryption()) }.getOrNull()
         if(i == null){
             isLoading.value = false
             return

@@ -3,18 +3,14 @@ package jp.panta.misskeyandroidclient.model.users.impl
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
-import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentHashMap
 
-class InMemoryUserRepository : UserRepository{
+class InMemoryUserDataSource : UserDataSource{
 
     private val userMap = ConcurrentHashMap<User.Id, User>()
     private val recordLocks = ConcurrentHashMap<User.Id, Mutex>()
@@ -22,13 +18,13 @@ class InMemoryUserRepository : UserRepository{
 
 
 
-    private val listeners = mutableSetOf<UserRepository.Listener>()
+    private val listeners = mutableSetOf<UserDataSource.Listener>()
 
-    override fun addEventListener(listener: UserRepository.Listener) {
+    override fun addEventListener(listener: UserDataSource.Listener) {
         this.listeners.add(listener)
     }
 
-    override fun removeEventListener(listener: UserRepository.Listener) {
+    override fun removeEventListener(listener: UserDataSource.Listener) {
         this.listeners.remove(listener)
     }
 
@@ -61,13 +57,13 @@ class InMemoryUserRepository : UserRepository{
             }
 
             user.updated()
-            publish(UserRepository.Event.Updated(user.id, user))
+            publish(UserDataSource.Event.Updated(user.id, user))
             return AddResult.UPDATED
 
         }?: tableLock.withLock {
             userMap[user.id] = user
             recordLocks[user.id] = Mutex()
-            publish(UserRepository.Event.Created(user.id, user))
+            publish(UserDataSource.Event.Created(user.id, user))
             return AddResult.CREATED
         }
     }
@@ -90,7 +86,7 @@ class InMemoryUserRepository : UserRepository{
         return tableLock.withLock {
             recordLocks[user.id]?.withLock {
                 userMap.remove(user.id)
-                publish(UserRepository.Event.Removed(user.id))
+                publish(UserDataSource.Event.Removed(user.id))
                 true
             }?: false
         }
@@ -98,7 +94,7 @@ class InMemoryUserRepository : UserRepository{
     }
 
     @ExperimentalCoroutinesApi
-    private fun publish(e: UserRepository.Event) {
+    private fun publish(e: UserDataSource.Event) {
         synchronized(listeners) {
             listeners.forEach { listener ->
                 listener.on(e)

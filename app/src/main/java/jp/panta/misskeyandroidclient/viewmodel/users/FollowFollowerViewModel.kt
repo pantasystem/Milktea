@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
 import jp.panta.misskeyandroidclient.api.v10.RequestFollowFollower
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
@@ -220,10 +221,10 @@ class FollowFollowerViewModel(
     }
 
 
-    val showUserEventBus = EventBus<UserDTO>()
+    val showUserEventBus = EventBus<User.Id>()
 
-    override fun show(user: UserDTO?) {
-        showUserEventBus.event = user
+    override fun show(userId: User.Id) {
+        showUserEventBus.event = userId
     }
 
 

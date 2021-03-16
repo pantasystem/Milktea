@@ -17,7 +17,7 @@ class FavoriteNoteViewData(
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     coroutineScope: CoroutineScope,
     coroutineDispatcher: CoroutineDispatcher
-) : PlaneNoteViewData(noteRelation, account, determineTextLength, noteCaptureAPIAdapter, coroutineScope, coroutineDispatcher){
+) : PlaneNoteViewData(noteRelation, account, determineTextLength, noteCaptureAPIAdapter){
     override fun getRequestId(): String {
         return favorite.id
     }

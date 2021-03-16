@@ -1,29 +1,27 @@
 package jp.panta.misskeyandroidclient.model.users
 
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlin.reflect.KClass
 
 /**
  * UserRepositoryのイベントをFlowに変換する
  */
 class UserRepositoryEventToFlow(
-    val userRepository: UserRepository
-) : UserRepository.Listener{
+    val userDataSource: UserDataSource
+) : UserDataSource.Listener{
 
-    private val userIdWithListener = mutableMapOf<User.Id, MutableSet<(e: UserRepository.Event)->Unit>>()
+    private val userIdWithListener = mutableMapOf<User.Id, MutableSet<(e: UserDataSource.Event)->Unit>>()
 
     init {
-        userRepository.addEventListener(this)
+        userDataSource.addEventListener(this)
     }
 
     @ExperimentalCoroutinesApi
-    fun from(userId: User.Id): Flow<UserRepository.Event> {
+    fun from(userId: User.Id): Flow<UserDataSource.Event> {
         return channelFlow {
-            val callback: (UserRepository.Event)-> Unit = { ev ->
+            val callback: (UserDataSource.Event)-> Unit = { ev ->
                 offer(ev)
             }
 
@@ -34,7 +32,7 @@ class UserRepositoryEventToFlow(
         }
     }
 
-    private fun listen(userId: User.Id, callback: (e: UserRepository.Event)->Unit) {
+    private fun listen(userId: User.Id, callback: (e: UserDataSource.Event)->Unit) {
         synchronized(userIdWithListener) {
             val listeners = userIdWithListener[userId]
                 ?: mutableSetOf()
@@ -44,7 +42,7 @@ class UserRepositoryEventToFlow(
         }
     }
 
-    private fun unListen(userId: User.Id, callback: (e: UserRepository.Event)->Unit) {
+    private fun unListen(userId: User.Id, callback: (e: UserDataSource.Event)->Unit) {
         synchronized(userIdWithListener) {
             val listeners = userIdWithListener[userId]
             listeners?.remove(callback)
@@ -54,7 +52,7 @@ class UserRepositoryEventToFlow(
         }
     }
 
-    override fun on(e: UserRepository.Event) {
+    override fun on(e: UserDataSource.Event) {
         synchronized(userIdWithListener) {
             userIdWithListener[e.userId]?.forEach {
                 it.invoke(e)

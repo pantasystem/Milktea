@@ -8,11 +8,15 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
 import kotlinx.android.synthetic.main.activity_antenna_editor.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
@@ -38,7 +42,7 @@ class AntennaEditorActivity : AppCompatActivity() {
         }
 
         val miCore = applicationContext as MiCore
-        miCore.getCurrentAccount().observe(this, { ac ->
+        miCore.getCurrentAccount().filterNotNull().onEach{ ac ->
             val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(ac, miCore, antenna))[AntennaEditorViewModel::class.java]
             this.mViewModel = viewModel
             viewModel.selectUserEvent.observe(this, {
@@ -60,7 +64,7 @@ class AntennaEditorActivity : AppCompatActivity() {
                     Toast.makeText(this, getString(R.string.failure), Toast.LENGTH_LONG).show()
                 }
             })
-        })
+        }.launchIn(lifecycleScope)
     }
 
     private fun showSearchAndSelectUserActivity(userIds: List<String>){

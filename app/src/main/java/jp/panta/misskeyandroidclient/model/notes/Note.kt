@@ -8,12 +8,6 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.UserRepository
-import jp.panta.misskeyandroidclient.model.users.UserState
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import java.io.Serializable
-import java.lang.Exception
 import java.util.*
 
 data class Note(

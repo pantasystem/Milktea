@@ -7,18 +7,18 @@ import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageNotFoundException
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import kotlin.jvm.Throws
 
 class MessageRelationGetter(
     private val messageDataSource: MessageDataSource,
-    private val userRepository: UserRepository,
+    private val userDataSource: UserDataSource,
 ) {
 
     suspend fun get(account: Account, messageDTO: MessageDTO): MessageRelation {
         val (message, users) = messageDTO.entities(account)
         messageDataSource.add(message)
-        userRepository.addAll(users)
+        userDataSource.addAll(users)
         return get(message)
     }
 
@@ -34,15 +34,15 @@ class MessageRelationGetter(
             is Message.Direct -> {
                 MessageRelation.Direct(
                     message,
-                    userRepository.get(message.userId),
-                    userRepository.get(message.recipientId)
+                    userDataSource.get(message.userId),
+                    userDataSource.get(message.recipientId)
                 )
             }
             is Message.Group -> {
                 MessageRelation.Group(
                     message,
                     message.group,
-                    userRepository.get(message.userId),
+                    userDataSource.get(message.userId),
                 )
             }
         }

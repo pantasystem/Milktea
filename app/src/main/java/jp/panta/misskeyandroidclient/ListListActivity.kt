@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.model.list.UserList
@@ -16,6 +17,9 @@ import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
 import kotlinx.android.synthetic.main.activity_list_list.*
 import kotlinx.android.synthetic.main.content_list_list.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback, UserListEditorDialog.OnSubmittedListener{
 
@@ -56,9 +60,9 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         }else{
             val pullPushUserViewModel = ViewModelProvider(this, UserListPullPushUserViewModel.Factory(miCore))[UserListPullPushUserViewModel::class.java]
 
-            miCore.getCurrentAccount().observe(this, Observer {
+            miCore.getCurrentAccount().filterNotNull().onEach{
                 pullPushUserViewModel.account.value = it
-            })
+            }.launchIn(lifecycleScope)
 
             if(mPullPushUserViewModelEventDisposable?.isDisposed == true){
                 mPullPushUserViewModelEventDisposable = pullPushUserViewModel.pullPushEvent.subscribe {

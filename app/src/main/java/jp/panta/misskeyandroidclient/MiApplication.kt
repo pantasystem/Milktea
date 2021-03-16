@@ -54,10 +54,10 @@ import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteRepository
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationRepository
-import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
-import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserRepository
+import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
@@ -100,7 +100,7 @@ class MiApplication : Application(), MiCore {
     private val mMisskeyAPIUrlMap = HashMap<String, Pair<Version?, MisskeyAPI>>()
 
     private lateinit var mNoteRepository: NoteRepository
-    private lateinit var mUserRepository: UserRepository
+    private lateinit var mUserDataSource: UserDataSource
     private lateinit var mNotificationRepository: NotificationRepository
 
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
@@ -182,10 +182,10 @@ class MiApplication : Application(), MiCore {
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 
         mNoteRepository = InMemoryNoteRepository(loggerFactory)
-        mUserRepository = InMemoryUserRepository()
+        mUserDataSource = InMemoryUserDataSource()
         mNotificationRepository = InMemoryNotificationRepository()
 
-        mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserRepository)
+        mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource)
 
         mSocketWithAccountProvider = SocketWithAccountProviderImpl(
             getEncryption(),
@@ -216,11 +216,11 @@ class MiApplication : Application(), MiCore {
         }
         mMessageRepository = MessageRepositoryImpl(this)
 
-        mGetters = Getters(mNoteRepository, mUserRepository, mNotificationRepository, mMessageDataSource)
+        mGetters = Getters(mNoteRepository, mUserDataSource, mNotificationRepository, mMessageDataSource)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
 
-        val userRepositoryAndMainChanelAPIAdapter = UserRepositoryAndMainChannelAdapter(mUserRepository, mChannelAPIWithAccountProvider)
+        val userRepositoryAndMainChanelAPIAdapter = UserRepositoryAndMainChannelAdapter(mUserDataSource, mChannelAPIWithAccountProvider)
         // NOTE: 何度もchannelの接続と切断が繰り返される可能性があるがAccountに対してそこまでアクションをとる可能性は低い
         mAccountsState.flatMapLatest { list ->
             list.map{ ac ->
@@ -450,8 +450,8 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getUserRepository(): UserRepository {
-        return mUserRepository
+    override fun getUserRepository(): UserDataSource {
+        return mUserDataSource
     }
 
     override fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow {

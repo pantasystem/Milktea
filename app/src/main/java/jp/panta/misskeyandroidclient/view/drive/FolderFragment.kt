@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,9 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
 import kotlinx.android.synthetic.main.fragment_folder.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class FolderFragment : Fragment(R.layout.fragment_folder){
 
@@ -32,13 +36,13 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
 
         val miApplication  = context?.applicationContext as MiApplication
 
-        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer{ ar ->
+        miApplication.getCurrentAccount().filterNotNull().onEach{ ar ->
             val folderViewModelFactory = FolderViewModelFactory(ar, miApplication, null)
             val folderViewModel = ViewModelProvider( requireActivity(), folderViewModelFactory).get(FolderViewModel::class.java)
             mFolderViewModel = folderViewModel
 
             val activity = activity
-                ?:return@Observer
+                ?:return@onEach
             val driveViewModelFactory = DriveViewModelFactory(0)
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {
@@ -69,7 +73,7 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
             }
 
 
-        })
+        }.launchIn(lifecycleScope)
 
         folder_view.addOnScrollListener(mScrollListener)
 

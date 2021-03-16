@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.PageType
@@ -13,6 +14,11 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.plus
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -44,12 +50,15 @@ class PageSettingViewModel(
     val pageOnUpdateEvent = EventBus<Page>()
 
     init{
-        selectedPages.addSource(miCore.getCurrentAccount()){
+
+        miCore.getCurrentAccount().filterNotNull().onEach {
             account = it
-            selectedPages.value = it.pages.sortedBy { p ->
-                p.weight
-            }
-        }
+            selectedPages.postValue(
+                it.pages.sortedBy { p ->
+                    p.weight
+                }
+            )
+        }.launchIn(viewModelScope + Dispatchers.IO)
 
     }
 

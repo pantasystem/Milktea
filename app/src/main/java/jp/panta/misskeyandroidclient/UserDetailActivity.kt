@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,7 @@ import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -37,9 +39,22 @@ import kotlinx.coroutines.flow.onEach
 @ExperimentalCoroutinesApi
 class UserDetailActivity : AppCompatActivity() {
     companion object{
-        const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
-        const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_NAME"
+        private const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
+        private const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_NAME"
+        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
+
+        fun newInstance(context: Context, userName: String? = null, userId: User.Id? = null): Intent {
+            return Intent(context, UserDetailActivity::class.java).apply {
+                userName?.let{
+                    putExtra(EXTRA_USER_NAME, userName)
+                }
+                userId?.let{
+                    putExtra(EXTRA_USER_ID, userId.id)
+                    putExtra(EXTRA_ACCOUNT_ID, userId.accountId)
+                }
+            }
+        }
     }
 
     private var mViewModel: UserDetailViewModel? = null

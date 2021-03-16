@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -17,6 +18,9 @@ import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
@@ -44,7 +48,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         val antenna = arguments?.getSerializable(EXTRA_ANTENNA) as? Antenna?
 
         val miCore: MiCore = view.context.applicationContext as MiApplication
-        miCore.getCurrentAccount().observe(viewLifecycleOwner, {  ar ->
+        miCore.getCurrentAccount().filterNotNull().onEach{  ar ->
             val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(ar, miCore, antenna))[AntennaEditorViewModel::class.java]
             binding.antennaEditorViewModel = viewModel
 
@@ -153,7 +157,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
             viewModel.users.observe( viewLifecycleOwner, {
                 userChipAdapter.submitList(it)
             })
-        })
+        }.launchIn(lifecycleScope)
 
 
 

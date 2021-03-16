@@ -9,7 +9,10 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 
 class DraftNotesViewModel(
     val draftNoteDao: DraftNoteDao,
@@ -34,9 +37,9 @@ class DraftNotesViewModel(
             }
         }
     }.apply{
-        addSource(miCore.getCurrentAccount()){
+        miCore.getCurrentAccount().onEach {
             loadDraftNotes()
-        }
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     val isLoading = MutableLiveData<Boolean>()

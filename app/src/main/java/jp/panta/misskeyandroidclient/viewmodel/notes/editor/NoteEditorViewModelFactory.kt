@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import java.lang.IllegalArgumentException
 
@@ -12,7 +13,7 @@ class NoteEditorViewModelFactory(
     private val miApplication: MiApplication,
     private val replyToNoteId: String? = null,
     private val quoteToNoteId: String? = null,
-    private val note: NoteDTO? = null,
+    private val note: Note? = null,
     private val draftNote: DraftNote? = null
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.model.users
 import jp.panta.misskeyandroidclient.model.AddResult
 import kotlinx.coroutines.flow.Flow
 
-interface UserRepository {
+interface UserDataSource {
 
 
     sealed class Event{
