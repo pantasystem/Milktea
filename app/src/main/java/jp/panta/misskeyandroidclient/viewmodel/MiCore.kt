@@ -13,11 +13,13 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -46,7 +48,7 @@ interface MiCore{
 
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?
 
-    fun getNoteRepository(): NoteDataSource
+    fun getNoteDataSource(): NoteDataSource
 
     fun getUserRepository(): UserDataSource
 
@@ -95,5 +97,10 @@ interface MiCore{
     fun getMessageDataSource(): MessageDataSource
 
     fun getUnreadMessages(): UnReadMessages
+
+
+    fun getDraftNoteDAO(): DraftNoteDao
+
+    fun createFileUploader(account: Account): FileUploader
 
 }

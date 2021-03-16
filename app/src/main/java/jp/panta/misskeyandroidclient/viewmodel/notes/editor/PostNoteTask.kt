@@ -18,7 +18,6 @@ class PostNoteTask(
     //connectionInformation: EncryptedConnectionInformation,
     val encryption: Encryption,
     val createNote: CreateNote,
-    val draftNote: DraftNote?,
     val account: Account,
     loggerFactory: Logger.Factory
     //private val fileUploader: FileUploader
@@ -93,7 +92,7 @@ class PostNoteTask(
         return tmpFiles != null && tmpFiles.size == filesIds?.size
     }
 
-    fun toDraftNote(): DraftNote{
+    fun toDraftNote(draftNote: DraftNote? = null): DraftNote{
         logger.debug("下書きノートが作成された")
         val draftPoll = createNote.poll?.let{
             DraftPoll(it.choices, it.multiple, it.expiresAt)

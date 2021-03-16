@@ -26,7 +26,8 @@ data class CreateNote(
     var files: List<File>? = null,
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
-    val poll: CreatePoll? = null
+    val poll: CreatePoll? = null,
+    val draftNoteId: Long? = null
 
 
 )

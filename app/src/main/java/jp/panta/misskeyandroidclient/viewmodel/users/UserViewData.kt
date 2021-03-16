@@ -87,7 +87,7 @@ open class UserViewData(
                 nDto.toEntities(account)
             }?.forEach {
                 miCore.getUserRepository().addAll(it.third)
-                miCore.getNoteRepository().addAll(it.second)
+                miCore.getNoteDataSource().addAll(it.second)
             }
             u?.let{
                 tryPost(u)

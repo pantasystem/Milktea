@@ -40,6 +40,8 @@ import java.lang.Exception
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.drive.FileUploader
+import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
@@ -435,17 +437,24 @@ class MiApplication : Application(), MiCore {
     }
 
 
+    override fun getDraftNoteDAO(): DraftNoteDao {
+        return draftNoteDao
+    }
 
-
-
-
-
+    override fun createFileUploader(account: Account): FileUploader {
+        return OkHttpDriveFileUploader(
+            context = this,
+            account = account,
+            gson = GsonFactory.create(),
+            encryption = getEncryption()
+        )
+    }
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
     }
 
-    override fun getNoteRepository(): NoteDataSource {
+    override fun getNoteDataSource(): NoteDataSource {
         return mNoteDataSource
     }
 
