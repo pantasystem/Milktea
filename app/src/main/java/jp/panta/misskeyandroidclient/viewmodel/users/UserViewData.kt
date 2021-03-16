@@ -18,7 +18,14 @@ open class UserViewData(
     dispatcher: CoroutineDispatcher = Dispatchers.IO
 ){
 
+
     val user: MutableLiveData<User.Detail?> = MutableLiveData<User.Detail?>()
+
+    private var mUser: User.Detail? = null
+        set(value) {
+            field = value
+            user.postValue(value)
+        }
 
     constructor(
         user: User,
@@ -32,16 +39,16 @@ open class UserViewData(
             when(it) {
                 is UserDataSource.Event.Created -> {
                     (it.user as? User.Detail)?.let{ detail ->
-                        tryPost(detail)
+                        mUser = detail
                     }
                 }
                 is UserDataSource.Event.Updated -> {
                     (it.user as? User.Detail)?.let { detail ->
-                        tryPost(detail)
+                        mUser = detail
                     }
                 }
                 is UserDataSource.Event.Removed -> {
-                    user.postValue(null)
+                    mUser = null
                 }
             }
         }.launchIn(coroutineScope + dispatcher)
@@ -53,51 +60,18 @@ open class UserViewData(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun initLoad() {
-        val account = runCatching {
-            miCore.getAccountRepository().get(userId.accountId)
-        }.getOrNull()
-            ?:return
+
         if(user.value == null){
-            var u : User.Detail? = runCatching {
-                miCore.getUserRepository().get(userId)
+            val u : User.Detail? = runCatching {
+                miCore.getUserRepository().find(userId, true)
             }.getOrNull() as? User.Detail
 
-            if(u != null) {
-                tryPost(u)
-                return
-            }
-
-            val i = runCatching {
-                account.getI(miCore.getEncryption())
-            }.getOrNull()
-            i?: return
-
-            val res = miCore.getMisskeyAPI(account).showUser(RequestUser(
-                i = i,
-                userId = userId.id,
-                detail = true
-            )).execute()
-
-            val dto = res.body()
-            u = dto?.toUser(account, true) as? User.Detail
-            if(u != null){
-                miCore.getUserRepository().add(u)
-            }
-            dto?.pinnedNotes?.map { nDto ->
-                nDto.toEntities(account)
-            }?.forEach {
-                miCore.getUserRepository().addAll(it.third)
-                miCore.getNoteDataSource().addAll(it.second)
-            }
             u?.let{
-                tryPost(u)
+                mUser = it
             }
         }
     }
 
-    private fun tryPost(user: User.Detail) {
-        this.user.postValue(user)
-    }
 
 
 }
