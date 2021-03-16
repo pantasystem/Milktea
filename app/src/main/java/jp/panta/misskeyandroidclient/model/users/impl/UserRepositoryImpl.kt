@@ -34,6 +34,9 @@ class UserRepositoryImpl(
                 detail = true
             )).execute()?.body()?.let{
                 val user = it.toUser(account, true)
+                it.pinnedNotes?.forEach { dto ->
+                    miCore.getGetters().noteRelationGetter.get(account, dto)
+                }
                 miCore.getUserDataSource().add(user)
                 return user
             }
