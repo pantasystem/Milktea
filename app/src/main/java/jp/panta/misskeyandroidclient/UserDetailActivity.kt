@@ -61,7 +61,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     private var mAccountRelation: Account? = null
 
-    private var mUserId: String? = null
+    private var mUserId: User.Id? = null
     private var mIsMainActive: Boolean = true
 
     private var mParentActivity: Activities? = null
@@ -76,7 +76,7 @@ class UserDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mParentActivity = intent.getParentActivity()
 
-        val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
+        val userId: User.Id? = intent.getSerializableExtra(EXTRA_USER_ID) as? User.Id
         mUserId = userId
         val userName = intent.data?.getQueryParameter("userName")
             ?: intent.getStringExtra(EXTRA_USER_NAME)
@@ -98,7 +98,7 @@ class UserDetailActivity : AppCompatActivity() {
 
         miApplication.getCurrentAccount().filterNotNull().onEach { ar ->
             mAccountRelation = ar
-            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
+            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel
             binding.userViewModel = viewModel
 
@@ -198,7 +198,7 @@ class UserDetailActivity : AppCompatActivity() {
         block?.isVisible = !(mViewModel?.isBlocking?.value?: true)
         unblock?.isVisible = mViewModel?.isBlocking?.value?: false
         unmute?.isVisible = mViewModel?.isMuted?.value?: false
-        if(mViewModel?.isMine == true){
+        if(mViewModel?.isMine?.value == true){
             block?.isVisible = false
             mute?.isVisible = false
             unblock?.isVisible = false
@@ -209,7 +209,7 @@ class UserDetailActivity : AppCompatActivity() {
         val page = mAccountRelation?.pages?.firstOrNull {
             val pageable = it.pageable()
             if(pageable is Pageable.UserTimeline){
-                pageable.userId == mUserId
+                pageable.userId == mUserId?.id
             }else{
                 false
             }
@@ -294,7 +294,7 @@ class UserDetailActivity : AppCompatActivity() {
         val page = mAccountRelation?.pages?.firstOrNull {
             val pageable = it.pageable()
             if(pageable is Pageable.UserTimeline){
-                pageable.userId == mUserId && mUserId != null
+                pageable.userId == mUserId?.id && mUserId != null
             }else{
                 false
             }
