@@ -7,12 +7,9 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.api.users.UserDTO
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -26,9 +23,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import java.io.IOException
-import java.lang.NullPointerException
-import java.util.*
-import kotlin.collections.ArrayList
 
 class NoteEditorViewModel(
     //private val accountRelation: AccountRelation,
@@ -195,7 +189,8 @@ class NoteEditorViewModel(
         }
     )
 
-    val noteTask = MutableLiveData<PostNoteTask>()
+    //val noteTask = MutableLiveData<PostNoteTask>()
+    val isPost = EventBus<Boolean>()
 
     val showPollDatePicker = EventBus<Unit>()
     val showPollTimePicker = EventBus<Unit>()
@@ -228,12 +223,13 @@ class NoteEditorViewModel(
                 files = files.value,
                 replyId = replyId,
                 renoteId = renoteId,
-                poll = poll.value?.buildCreatePoll()
+                poll = poll.value?.buildCreatePoll(),
+                draftNoteId = draftNote.value?.draftNoteId
             )
-            val noteTask = PostNoteTask(encryption, createNote, draftNote.value, account, loggerFactory)
+            miCore.createNote(createNote)
 
-            // FIXME Model層に依頼すべきだがServiceを呼び出したいがためにViewへ通知してしまっている
-            this.noteTask.postValue(noteTask)
+
+            this.isPost.event = true
         }
 
     }
@@ -335,7 +331,7 @@ class NoteEditorViewModel(
         }
     }
 
-    fun setAddress(added: Array<User.Id>, removed: Array<User.Id>){
+    fun setAddress(added: List<User.Id>, removed: List<User.Id>){
         val list = address.value?.let{
             ArrayList(it)
         }?: ArrayList()
@@ -353,7 +349,7 @@ class NoteEditorViewModel(
     }
 
 
-    fun addMentionUsers(users: List<UserDTO>, pos: Int): Int{
+    fun addMentionUsers(users: List<User>, pos: Int): Int{
         val mentionBuilder = StringBuilder()
         users.forEachIndexed { index, it ->
             val userName = it.getDisplayUserName()

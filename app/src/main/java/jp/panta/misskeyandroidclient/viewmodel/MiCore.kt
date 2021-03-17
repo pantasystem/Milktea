@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
+import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
@@ -108,5 +109,7 @@ interface MiCore{
     fun getDraftNoteDAO(): DraftNoteDao
 
     fun createFileUploader(account: Account): FileUploader
+
+    fun createNote(createNote: CreateNote)
 
 }

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,8 @@ import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
@@ -41,15 +44,18 @@ import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_note_editor.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
     companion object{
-        const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
-        const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
-        const val EXTRA_NOTE = "jp.panta.misskeyandroidclient.EXTRA_NOTE"
-        const val EXTRA_DRAFT_NOTE = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
+        private const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
+        private const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
+        private const val EXTRA_NOTE = "jp.panta.misskeyandroidclient.EXTRA_NOTE"
+        private const val EXTRA_DRAFT_NOTE = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
+        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
         const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
         const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
@@ -57,6 +63,30 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         const val SELECT_MENTION_TO_USER_REQUEST_CODE = 931
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
+
+        fun newBundle(context: Context, replyTo: Note.Id? = null, quoteTo: Note.Id? = null, note: Note? =null, draftNote: DraftNote? = null): Intent {
+            return Intent(context, NoteEditorActivity::class.java).apply {
+                replyTo?.let{
+                    putExtra(EXTRA_REPLY_TO_NOTE_ID, replyTo.noteId)
+                    putExtra(EXTRA_ACCOUNT_ID, replyTo.accountId)
+                }
+
+                quoteTo?.let {
+                    putExtra(EXTRA_QUOTE_TO_NOTE_ID, quoteTo.noteId)
+                    putExtra(EXTRA_ACCOUNT_ID, quoteTo.accountId)
+                }
+
+                note?.let {
+                    putExtra(EXTRA_NOTE, note)
+                    putExtra(EXTRA_ACCOUNT_ID, note.id.accountId)
+                }
+
+                draftNote?.let {
+                    putExtra(EXTRA_DRAFT_NOTE, it)
+                }
+
+            }
+        }
     }
     private var mViewModel: NoteEditorViewModel? = null
 
@@ -64,6 +94,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
     private lateinit var mConfirmViewModel: ConfirmViewModel
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -103,7 +134,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val replyToNoteId: String? = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)
         val quoteToNoteId: String? = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)
 
-        val note: NoteDTO? = intent.getSerializableExtra(EXTRA_NOTE) as NoteDTO?
+        val note: Note? = intent.getSerializableExtra(EXTRA_NOTE) as? Note
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
@@ -132,8 +163,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             AccountSwitchingDialog().show(supportFragmentManager, "tag")
         })
         accountViewModel.showProfile.observe(this, {
-            val intent = Intent(this, UserDetailActivity::class.java)
-            intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
+            val intent = UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
+
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
 
@@ -184,13 +215,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
         })
 
-        viewModel.noteTask.observe(this, {postNote->
-            Log.d("NoteEditorActivity", "$postNote")
-            val intent = Intent(this, PostNoteService::class.java)
-            intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
-            startService(intent)
-            finish()
-        })
+        viewModel.isPost.observe(this) {
+            if(it) {
+                finish()
+            }
+        }
 
         viewModel.showVisibilitySelectionEvent.observe(this, {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
@@ -346,10 +375,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
     private fun startSearchAndSelectUser(){
         val selectedUserIds = mViewModel?.address?.value?.map{
             it.userId
-        }?.toTypedArray()?: emptyArray()
+        }?: emptyList()
 
-        val intent = Intent(this, SearchAndSelectUserActivity::class.java)
-        intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, selectedUserIds)
+        val intent  = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selectedUserIds)
+
         startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
     }
 
@@ -445,23 +474,26 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
             SELECT_USER_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK && data != null){
-                    val added = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
-                    val removed = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
-                    if(added != null && removed != null){
-                        mViewModel?.setAddress(added, removed)
+                    //val added = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
+                    //val removed = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
+                    val changed = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                    if(changed != null) {
+                        mViewModel?.setAddress(changed.added, changed.removed)
                     }
                 }
             }
             SELECT_MENTION_TO_USER_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK && data != null){
-                    val users = (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USERS) as ArrayList<*>).mapNotNull {
-                        it as? UserDTO
+                    val changed = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+
+                    if(changed != null){
+                        val pos = mBinding.inputMain.selectionEnd
+                        mViewModel?.addMentionUsers(changed.selectedUsers, pos)?.let { newPos ->
+                            mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+                            mBinding.inputMain.setSelection(newPos)
+                        }
                     }
-                    val pos = mBinding.inputMain.selectionEnd
-                    mViewModel?.addMentionUsers(users, pos)?.let{ newPos ->
-                        mBinding.inputMain.setText(mViewModel?.text?.value?: "")
-                        mBinding.inputMain.setSelection(newPos)
-                    }
+
                 }
             }
         }
