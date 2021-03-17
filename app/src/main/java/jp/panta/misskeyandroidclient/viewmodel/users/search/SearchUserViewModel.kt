@@ -1,24 +1,17 @@
 package jp.panta.misskeyandroidclient.viewmodel.users.search
 
-import android.util.Log
 import androidx.lifecycle.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.SearchByUserAndHost
-import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 /**
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
@@ -91,16 +84,20 @@ class SearchUserViewModel(
     }
     fun search(request: RequestUser){
 
-
+        // TODO Service層などに切り出すなどをしてリファクタリングをする
         viewModelScope.launch(Dispatchers.IO) {
+            val account = miCore.getAccountRepository().getCurrentAccount()
             isLoading.postValue(true)
             val resUsers = runCatching {
                 getSearchByUserAndHost()?.search(request)?.execute()?.body()
             }.onFailure {
                 logger.error("request api/users/searchエラー", it)
             }.getOrNull()?.map {
-                val u = it.toUser(miCore.getCurrentAccount().value!!, isDetail = hasDetail?:false).also{ u ->
-                    miCore.getUserRepository().add(u)
+                val u = it.toUser(account, isDetail = hasDetail?:false).also{ u ->
+                    miCore.getUserDataSource().add(u)
+                }
+                it.pinnedNotes?.forEach { dto ->
+                    miCore.getGetters().noteRelationGetter.get(account, dto)
                 }
                 UserViewData(u, miCore, viewModelScope)
             }?: emptyList()
