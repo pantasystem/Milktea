@@ -2,15 +2,11 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")
@@ -123,7 +119,7 @@ class SortedUsersViewModel(
                 .map {
                     it?.map{ dto ->
                         dto.toUser(account).also{ u ->
-                            miCore.getUserRepository().add(u)
+                            miCore.getUserDataSource().add(u)
                         }
                     }?.map{ u->
                         UserViewData(u, miCore, viewModelScope, Dispatchers.IO)
