@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
@@ -654,6 +655,27 @@ class MiApplication : Application(), MiCore {
 
     private fun<T> List<T>.toArrayList(): ArrayList<T>{
         return ArrayList(this)
+    }
+
+    /**
+     * プラットフォームへの依存をなるべく少なくしたかったためApplicationから作成している
+     */
+    override fun createNote(createNote: CreateNote) {
+        applicationScope.launch(Dispatchers.IO) {
+            runCatching {
+                getNoteRepository().create(createNote)
+            }.onSuccess {
+                logger.debug("投稿に成功しました。")
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MiApplication, getString(R.string.success), Toast.LENGTH_LONG).show()
+                }
+            }.onFailure {
+                logger.error("投稿に失敗しました。", e = it)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MiApplication, "error: $it", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
 }
