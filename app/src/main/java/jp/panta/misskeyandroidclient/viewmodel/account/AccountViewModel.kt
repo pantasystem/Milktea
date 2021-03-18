@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.account
 
-import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
@@ -13,10 +11,7 @@ import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import retrofit2.Call
 import java.lang.IllegalArgumentException
-import retrofit2.Callback
-import retrofit2.Response
 
 @Suppress("UNCHECKED_CAST")
 class AccountViewModel(
@@ -70,7 +65,7 @@ class AccountViewModel(
             }
         }.filterNotNull().map { pair ->
             val user = pair.second.toUser(pair.first, true)
-            miCore.getUserRepository().add(user)
+            miCore.getUserDataSource().add(user)
             user
         }.onEach {
 
@@ -86,7 +81,7 @@ class AccountViewModel(
             }
         }.filterNotNull().onEach {
             val user = it.second.body.toUser(it.first, true)
-            miCore.getUserRepository().add(user)
+            miCore.getUserDataSource().add(user)
             this.user.postValue(user as User.Detail)
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
