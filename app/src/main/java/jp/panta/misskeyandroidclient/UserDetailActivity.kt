@@ -119,17 +119,17 @@ class UserDetailActivity : AppCompatActivity() {
             })
             //userTimelineTab.setupWithViewPager()
             viewModel.showFollowers.observe(this, Observer {
-                val intent = Intent(this, FollowFollowerActivity::class.java)
-                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it?.id)
-                intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWER_VIEW_MODE)
-                startActivity(intent)
+                it?.let{
+                    val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
+                    startActivity(intent)
+                }
             })
 
             viewModel.showFollows.observe(this, {
-                val intent = Intent(this, FollowFollowerActivity::class.java)
-                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it?.id)
-                intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWING_VIEW_MODE)
-                startActivity(intent)
+                it?.let{
+                    val intent = FollowFollowerActivity.newIntent(this, it.id, true)
+                    startActivity(intent)
+                }
             })
 
             val updateMenu = Observer<Boolean> {
