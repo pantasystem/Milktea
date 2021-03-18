@@ -24,6 +24,7 @@ import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_user_list_detail.*
 
 class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmittedListener {
@@ -128,11 +129,10 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                 }
             }
             R.id.action_add_user ->{
-                val intent = Intent(this, SearchAndSelectUserActivity::class.java)
                 val selected = mUserListDetailViewModel?.listUsers?.value?.map{
                     it.userId
-                }?.toTypedArray()?: return false
-                intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, selected)
+                }?: return false
+                val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selected)
                 startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
             }
         }
@@ -149,8 +149,9 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         Log.d(TAG, "onActivityResult: reqCode:$requestCode, resultCode:$resultCode")
         if(requestCode == SELECT_USER_REQUEST_CODE){
             if(resultCode == RESULT_OK){
-                val added = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
-                val removed = data?.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
+                val changedDiff = data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                val added = changedDiff?.added
+                val removed = changedDiff?.removed
                 Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
                 added?.forEach{
                     mUserListDetailViewModel?.pushUser(it)
