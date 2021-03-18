@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import java.io.Serializable
 
 
 class SelectedUserViewModel(
@@ -39,8 +40,9 @@ class SelectedUserViewModel(
     data class ChangedDiffResult(
         val selected: List<User.Id>,
         val added: List<User.Id>,
-        val removed: List<User.Id>
-    )
+        val removed: List<User.Id>,
+        val selectedUsers: List<User>
+    ) : Serializable
 
     private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
 
@@ -135,6 +137,10 @@ class SelectedUserViewModel(
             it.userId
         }?: emptyList()
 
+        val selectedUsers = selectedUsers.value?.mapNotNull {
+            it.user.value
+        } ?: emptyList<User>()
+
 
 
         val added = selected.filter{ s ->
@@ -144,6 +150,6 @@ class SelectedUserViewModel(
         val removed = exSelected.filter{ ex ->
             !selected.contains(ex)
         }
-        return ChangedDiffResult(selected.toList(), added, removed)
+        return ChangedDiffResult(selected.toList(), added, removed, selectedUsers)
     }
 }

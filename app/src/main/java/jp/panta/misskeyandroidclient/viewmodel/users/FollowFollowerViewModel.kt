@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
@@ -35,7 +36,10 @@ class FollowFollowerViewModel(
         val userId: User.Id,
         val type: Type,
         val miCore: MiCore,
-    ) {
+    ) : ViewModelProvider.Factory{
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return FollowFollowerViewModel(userId, type, miCore) as T
+        }
 
     }
 
