@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
 import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -111,5 +112,7 @@ interface MiCore{
     fun createFileUploader(account: Account): FileUploader
 
     fun createNote(createNote: CreateNote)
+
+    fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
 }

@@ -9,6 +9,7 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.gettters.Getters
@@ -46,6 +47,8 @@ import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
+import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
@@ -103,7 +106,7 @@ class MiApplication : Application(), MiCore {
     private lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
-    private val mMisskeyAPIUrlMap = HashMap<String, Pair<Version?, MisskeyAPI>>()
+    private val mMisskeyAPIProvider: MisskeyAPIProvider = MisskeyAPIProvider()
 
     private lateinit var mNoteDataSource: NoteDataSource
     private lateinit var mUserDataSource: UserDataSource
@@ -186,7 +189,7 @@ class MiApplication : Application(), MiCore {
 
         urlPreviewDAO = database.urlPreviewDAO()
 
-        metaRepository = RoomMetaRepository(database.metaDAO())
+        metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO()), InMemoryMetaRepository())
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 
@@ -569,32 +572,19 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun setUpMetaMap(accounts: List<Account>){
         try{
+            // NOTE: メモリ等にインスタンスを読み込んでおく
             accounts.forEach { ac ->
                 loadInstanceMetaAndSetupAPI(ac.instanceDomain)
             }
         }catch(e: Exception){
-            logger.debug("meta取得中にエラー発生", e = e)
+            logger.error("meta取得中にエラー発生", e = e)
         }
     }
 
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
-            val meta = synchronized(mMisskeyAPIUrlMap){
-                try{
-                    mMetaInstanceUrlMap[instanceDomain]
-                }catch(e: Exception){
-                    logger.error( "metaマップからの取得に失敗したでち")
-                    null
-                }
-            } ?: try{
-                metaStore.get(instanceDomain)
-            }catch(e: Exception){
-                logger.debug("metaをオンラインから取得するのに失敗したでち")
-                connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
-
-                null
-            }
+            val meta = metaStore.get(instanceDomain)
 
 
             logger.debug("load meta result ${meta?.let{"成功"}?: "失敗"} ")
@@ -604,13 +594,7 @@ class MiApplication : Application(), MiCore {
             synchronized(mMetaInstanceUrlMap){
                 mMetaInstanceUrlMap[instanceDomain] = meta
             }
-            synchronized(mMisskeyAPIUrlMap){
-                val versionAndApi = mMisskeyAPIUrlMap[instanceDomain]
-                if(versionAndApi?.first != meta.getVersion()){
-                    val newApi = MisskeyAPIServiceBuilder.build(instanceDomain, meta.getVersion())
-                    mMisskeyAPIUrlMap[instanceDomain] = Pair(meta.getVersion(), newApi)
-                }
-            }
+
             return meta
 
         }catch(e: Exception){
@@ -627,12 +611,11 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMisskeyAPI(instanceDomain: String): MisskeyAPI {
-        synchronized(mMisskeyAPIUrlMap){
-            val api = mMisskeyAPIUrlMap[instanceDomain]
-                ?: Pair(null, MisskeyAPIServiceBuilder.build(instanceDomain))
-            mMisskeyAPIUrlMap[instanceDomain] = api
-            return api.second
-        }
+        return mMisskeyAPIProvider.get(instanceDomain, mMetaInstanceUrlMap[instanceDomain]?.getVersion())
+    }
+
+    override fun getMisskeyAPIProvider(): MisskeyAPIProvider {
+        return mMisskeyAPIProvider
     }
 
     override fun getEncryption(): Encryption {
