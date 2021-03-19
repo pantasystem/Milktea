@@ -9,15 +9,22 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.api.list.CreateList
 import jp.panta.misskeyandroidclient.api.list.ListId
 import jp.panta.misskeyandroidclient.api.list.UserListDTO
+import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.IllegalStateException
 import kotlin.collections.LinkedHashMap
 
+@ExperimentalCoroutinesApi
 class ListListViewModel(
     val miCore: MiCore
 ) : ViewModel(){
@@ -29,156 +36,153 @@ class ListListViewModel(
         }
     }
 
-    companion object{
-        private const val TAG = "ListListViewModel"
-    }
 
     val encryption = miCore.getEncryption()
-
-    var account: Account? = null
-    val userListList = MediatorLiveData<List<UserListDTO>>().apply{
-        miCore.getCurrentAccount().onEach {
-            account = it
-            loadListList(it)
+    val userListList = MediatorLiveData<List<UserList>>().apply{
+        mUserListListFlow.onEach {
+            postValue(it)
         }.launchIn(viewModelScope)
     }
 
-    val pagedUserList = MediatorLiveData<Set<UserListDTO>>().apply{
-        addSource(userListList){ userLists ->
-            this.value = userLists.filter{ ul ->
-                account?.pages?.any {
-                    (it.pageable() as? Pageable.UserListTimeline)?.listId == ul.id
-                }?:false
-            }.toSet()
+    private val mUserListListFlow = MutableStateFlow<List<UserList>>(emptyList())
+
+    val pagedUserList = MediatorLiveData<Set<UserList>>().apply{
+        miCore.getCurrentAccount().filterNotNull().map { account ->
+            loadListList(account.accountId).filter {  ul ->
+                account.pages.any{ page ->
+                    page.pageParams.listId == ul.id.userListId
+                }
+            }
+        }.onEach {  list ->
+            postValue(list.toSet())
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        miCore.getCurrentAccount().onEach {
+            fetch()
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+    }
+
+    private val mUserListIdMap = LinkedHashMap<UserList.Id, UserList>()
+
+
+    val showUserDetailEvent = EventBus<UserList>()
+
+
+    private fun fetch() {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = miCore.getAccountRepository().getCurrentAccount()
+                loadListList(account.accountId)
+            }.onSuccess {
+                mUserListListFlow.value = it
+            }
+
         }
     }
 
-    private val mUserListIdMap = LinkedHashMap<String, UserListDTO>()
 
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun loadListList(accountId: Long): List<UserList>{
+        val account = miCore.getAccountRepository().get(accountId)
+        val i = account.getI(encryption)
+        val res = miCore.getMisskeyAPI(account).userList(I(i)).execute()
+        res.throwIfHasError()
 
-    val showUserDetailEvent = EventBus<UserListDTO>()
-
-   
-
-    fun loadListList(account: Account? = this.account){
-        val i = account?.getI(encryption)
-            ?: return
-        miCore.getMisskeyAPI(account).userList(I(i)).enqueue(object : Callback<List<UserListDTO>>{
-            override fun onResponse(
-                call: Call<List<UserListDTO>>,
-                response: Response<List<UserListDTO>>
-            ) {
-                val userListMap = response.body()?.map{
-                    it.id to it
-                }?.toMap()?: emptyMap()
-                mUserListIdMap.clear()
-                mUserListIdMap.putAll(userListMap)
-
-                userListList.postValue(mUserListIdMap.values.toList())
-            }
-
-            override fun onFailure(call: Call<List<UserListDTO>>, t: Throwable) {
-                Log.d(TAG, "loadListList error", t)
-            }
-        })
+        val userListMap = res.body()?.map {
+            it.toEntity(account)
+        }?.map{
+            it.id to it
+        }?.toMap()?: emptyMap()
+        mUserListIdMap.clear()
+        mUserListIdMap.putAll(userListMap)
+        return mUserListIdMap.values.toList()
     }
-
-
 
     /**
      * 他Activityで変更を加える場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListUpdated(userList: UserListDTO?){
+    fun onUserListUpdated(userList: UserList?){
         userList?: return
         mUserListIdMap[userList.id] = userList
-        userListList.postValue(mUserListIdMap.values.toList())
+        mUserListListFlow.value = mUserListIdMap.values.toList()
     }
 
     /**
      * 他Activity等でUserListを正常に作成できた場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListCreated(userList: UserListDTO){
+    fun onUserListCreated(userList: UserList){
 
         mUserListIdMap[userList.id] = userList
-        userListList.postValue(mUserListIdMap.values.toList())
+        mUserListListFlow.value = mUserListIdMap.values.toList()
     }
 
 
 
-    fun showUserListDetail(userList: UserListDTO?){
+    fun showUserListDetail(userList: UserList?){
         userList?.let{ ul ->
             showUserDetailEvent.event = ul
         }
     }
 
-    fun toggleTab(userList: UserListDTO?){
+    fun toggleTab(userList: UserList?){
         userList?.let{ ul ->
-            val exPage = account?.pages?.firstOrNull {
-                val pageable = it.pageable()
-                if(pageable is Pageable.UserListTimeline){
-                    pageable.listId == ul.id
-                }else{
-                    false
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    val account = miCore.getAccountRepository().get(userList.id.accountId)
+                    val exPage = account?.pages?.firstOrNull {
+                        val pageable = it.pageable()
+                        if(pageable is Pageable.UserListTimeline){
+                            pageable.listId == ul.id.userListId
+                        }else{
+                            false
+                        }
+                    }
+                    if(exPage == null){
+                        val page = Page(account.accountId, ul.name, pageable =  Pageable.UserListTimeline(ul.id.userListId), weight = 0)
+                        miCore.addPageInCurrentAccount(page)
+                    }
                 }
-            }
-            if(exPage == null && account != null){
-                val page = Page(account!!.accountId, ul.name, pageable =  Pageable.UserListTimeline(ul.id), weight = 0)
-                miCore.addPageInCurrentAccount(page)
-            }else if(exPage != null){
-                miCore.removePageInCurrentAccount(exPage)
             }
         }
     }
 
-    fun delete(userList: UserListDTO?){
-        val account = this.account
-        val misskeyAPI = account?.let{
-            miCore.getMisskeyAPI(it)
-        }
-        if(misskeyAPI == null || userList == null){
-            return
-        }
-        misskeyAPI.deleteList(
-            ListId(
-            i = account.getI(miCore.getEncryption())!!,
-            listId = userList.id
-        )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                userListList.postValue(userListList.value?.let{ ulList ->
-                    ulList.filterNot{
-                        it.id == userList.id
-                    }
-                })
-            }
+    fun delete(userList: UserList?){
+        userList?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = miCore.getAccountRepository().get(userList.id.accountId)
+                val misskeyAPI = miCore.getMisskeyAPI(account)
+                val res = misskeyAPI.deleteList(
+                    ListId(
+                        i = account.getI(miCore.getEncryption()),
+                        listId = userList.id.userListId
+                    )
+                ).execute()
+                res.throwIfHasError()
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
+            }.onSuccess {
+                mUserListIdMap.remove(userList.id)
+                mUserListListFlow.value = mUserListIdMap.values.toList()
 
             }
-        })
+        }
+
     }
 
     fun createUserList(name: String){
-        val api = account?.let{
-            miCore.getMisskeyAPI(it)
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = miCore.getAccountRepository().getCurrentAccount()
+                val res = miCore.getMisskeyAPI(account).createList(CreateList(i = account.getI(miCore.getEncryption()), name)).execute()
+                res.throwIfHasError()
+                res.body()?.toEntity(account)
+                    ?: throw IllegalStateException()
+            }.onSuccess {
+                onUserListCreated(it)
+            }
         }
-        api?.createList(
-            CreateList(
-            account?.getI(miCore.getEncryption())!!,
-            name = name
-        )
-        )?.enqueue(object : Callback<UserListDTO>{
-            override fun onResponse(call: Call<UserListDTO>, response: Response<UserListDTO>) {
-                val ul = response.body()
-                if(ul != null){
 
-                    onUserListCreated(ul)
-                }
-            }
-            override fun onFailure(call: Call<UserListDTO>, t: Throwable) {
-
-            }
-        })
     }
 
 
