@@ -1,12 +1,12 @@
 package jp.panta.misskeyandroidclient
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
 import kotlinx.android.synthetic.main.activity_antenna_list.*
 
@@ -34,8 +34,7 @@ class AntennaListActivity : AppCompatActivity() {
             confirmDeleteAntenna(it)
         })
         mAntennaListViewModel.editAntennaEvent.observe( this, {
-            val intent = Intent(this, AntennaEditorActivity::class.java)
-            intent.putExtra(AntennaEditorActivity.EXTRA_ANTENNA, it)
+            val intent = AntennaEditorActivity.newIntent(this, it.id)
             startActivityForResult(intent, REQUEST_ANTENNA_EDITOR_CODE)
         })
 
@@ -45,7 +44,7 @@ class AntennaListActivity : AppCompatActivity() {
 
     }
 
-    private fun confirmDeleteAntenna(antenna: AntennaDTO){
+    private fun confirmDeleteAntenna(antenna: Antenna){
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.confirm_deletion))
             .setMessage(antenna.name)

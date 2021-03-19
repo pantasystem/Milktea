@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
 
 class PageableTemplate(val account: Account?) {
     fun globalTimeline(title: String): Page{
@@ -52,8 +53,8 @@ class PageableTemplate(val account: Account?) {
     fun antenna(antennaId: String, title: String): Page{
         return Page(account?.accountId?: - 1, title, 0, Pageable.Antenna(antennaId))
     }
-    fun antenna(antenna: AntennaDTO): Page{
-        return Page(account?.accountId?: - 1, antenna.name, 0, Pageable.Antenna(antenna.id))
+    fun antenna(antenna: Antenna): Page{
+        return Page(antenna.id.accountId, antenna.name, 0, Pageable.Antenna(antenna.id.antennaId))
     }
 
 

@@ -9,20 +9,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemAntennaBinding
-import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
 
 class AntennaListAdapter(
     private val antennaListViewModel: AntennaListViewModel,
     val lifecycleOwner: LifecycleOwner
-) : ListAdapter<AntennaDTO, AntennaListAdapter.ViewHolder>(ItemCallback()){
+) : ListAdapter<Antenna, AntennaListAdapter.ViewHolder>(ItemCallback()){
 
-    class ItemCallback : DiffUtil.ItemCallback<AntennaDTO>(){
-        override fun areContentsTheSame(oldItem: AntennaDTO, newItem: AntennaDTO): Boolean {
+    class ItemCallback : DiffUtil.ItemCallback<Antenna>(){
+        override fun areContentsTheSame(oldItem: Antenna, newItem: Antenna): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areItemsTheSame(oldItem: AntennaDTO, newItem: AntennaDTO): Boolean {
+        override fun areItemsTheSame(oldItem: Antenna, newItem: Antenna): Boolean {
             return oldItem == newItem
         }
     }

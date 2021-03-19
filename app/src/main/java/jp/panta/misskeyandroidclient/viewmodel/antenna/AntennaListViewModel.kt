@@ -5,14 +5,15 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,18 +34,23 @@ class AntennaListViewModel (
         const val TAG = "AntennaViewModel"
     }
 
-    val antennas = MediatorLiveData<List<AntennaDTO>>()
+    val antennas = MediatorLiveData<List<Antenna>>()
 
-    val editAntennaEvent = EventBus<AntennaDTO>()
+    val editAntennaEvent = EventBus<Antenna>()
 
-    val confirmDeletionAntennaEvent = EventBus<AntennaDTO>()
+    val confirmDeletionAntennaEvent = EventBus<Antenna>()
 
-    val openAntennasTimelineEvent = EventBus<AntennaDTO>()
+    val openAntennasTimelineEvent = EventBus<Antenna>()
 
     val isLoading = MutableLiveData<Boolean>(false)
+    private var mIsLoading: Boolean = false
+        set(value) {
+            field = value
+            isLoading.postValue(value)
+        }
 
-    private val mPagedAntennaIds = MutableLiveData<Set<String>>()
-    val pagedAntennaIds: LiveData<Set<String>> = mPagedAntennaIds
+    private val mPagedAntennaIds = MutableLiveData<Set<Antenna.Id>>()
+    val pagedAntennaIds: LiveData<Set<Antenna.Id>> = mPagedAntennaIds
 
     var account: Account? = null
 
@@ -59,7 +65,10 @@ class AntennaListViewModel (
                 it?.pages?.mapNotNull { page ->
                     val pageable = page.pageable()
                     if (pageable is Pageable.Antenna) {
-                        pageable.antennaId
+                        account?.accountId?.let { accountId ->
+                            Antenna.Id(accountId, pageable.antennaId)
+
+                        }
                     } else {
                         null
                     }
@@ -73,33 +82,33 @@ class AntennaListViewModel (
     val deleteResultEvent = EventBus<Boolean>()
 
     fun loadInit(){
-        isLoading.value = true
-        val i = miCore.getCurrentAccount().value?.getI(miCore.getEncryption())
-            ?: return
-        getMisskeyAPI()?.getAntennas(
-            AntennaQuery(
-                i = i,
-                limit = null,
-                antennaId = null
-            )
-        )?.enqueue(object : Callback<List<AntennaDTO>>{
-            override fun onResponse(call: Call<List<AntennaDTO>>, response: Response<List<AntennaDTO>>) {
-                antennas.postValue(response.body())
-                isLoading.postValue(false)
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = miCore.getAccountRepository().getCurrentAccount()
+                val res = (miCore.getMisskeyAPI(account) as MisskeyAPIV12).getAntennas(
+                    AntennaQuery(
+                        i = account.getI(miCore.getEncryption()),
+                        limit = null,
+                        antennaId = null
+                    )
+                ).execute().body()
+                    ?: throw IllegalStateException("アンテナの取得に失敗しました")
+                res.map { dto ->
+                    dto.toEntity(account)
+                }
+            }.onSuccess {
+                antennas.postValue(it)
             }
+            mIsLoading = false
+        }
 
-            override fun onFailure(call: Call<List<AntennaDTO>>, t: Throwable) {
-                Log.e(TAG, "アンテナ一覧の取得に失敗しました。", t)
-                isLoading.postValue(false)
-            }
-        })
     }
 
-    fun toggleTab(antenna: AntennaDTO?){
+    fun toggleTab(antenna: Antenna?){
         antenna?: return
         val paged = account?.pages?.firstOrNull {
 
-            it.pageParams.antennaId == antenna.id
+            it.pageParams.antennaId == antenna.id.antennaId
         }
         if(paged == null){
             miCore.addPageInCurrentAccount(PageableTemplate(account!!).antenna(antenna))
@@ -108,25 +117,25 @@ class AntennaListViewModel (
         }
     }
 
-    fun confirmDeletionAntenna(antenna: AntennaDTO?){
+    fun confirmDeletionAntenna(antenna: Antenna?){
         antenna?: return
         confirmDeletionAntennaEvent.event = antenna
     }
 
-    fun editAntenna(antenna: AntennaDTO?){
+    fun editAntenna(antenna: Antenna?){
         antenna?: return
         editAntennaEvent.event = antenna
     }
 
-    fun openAntennasTimeline(antenna: AntennaDTO?){
+    fun openAntennasTimeline(antenna: Antenna?){
         openAntennasTimelineEvent.event = antenna
     }
 
-    fun deleteAntenna(antenna: AntennaDTO){
+    fun deleteAntenna(antenna: Antenna){
         account?.getI(miCore.getEncryption())?.let{ i ->
             getMisskeyAPI()?.deleteAntenna(AntennaQuery(
                 i = i,
-                antennaId = antenna.id,
+                antennaId = antenna.id.antennaId,
                 limit = null
             ))?.enqueue(object : Callback<Unit>{
                 override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
