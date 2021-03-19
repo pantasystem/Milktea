@@ -130,7 +130,7 @@ class ListListViewModel(
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     val account = miCore.getAccountRepository().get(userList.id.accountId)
-                    val exPage = account?.pages?.firstOrNull {
+                    val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
                         if(pageable is Pageable.UserListTimeline){
                             pageable.listId == ul.id.userListId
