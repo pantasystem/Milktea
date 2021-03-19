@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
@@ -56,7 +58,9 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
     }
 
 
-    override fun show(user: UserDTO?) {
-
+    override fun show(userId: User.Id?) {
+        userId?.let {
+            UserDetailActivity.newInstance(requireContext(), userId = userId)
+        }
     }
 }

@@ -69,8 +69,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
     }
 
     override fun onSelect(draftNote: DraftNote?) {
-        val intent = Intent(requireContext(), NoteEditorActivity::class.java)
-        intent.putExtra(NoteEditorActivity.EXTRA_DRAFT_NOTE, draftNote)
+        val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = draftNote)
         requireActivity().startActivityFromFragment(this, intent, 300)
     }
 

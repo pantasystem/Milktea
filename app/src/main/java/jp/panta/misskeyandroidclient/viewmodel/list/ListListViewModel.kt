@@ -11,6 +11,8 @@ import jp.panta.misskeyandroidclient.model.list.ListId
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,10 +37,10 @@ class ListListViewModel(
 
     var account: Account? = null
     val userListList = MediatorLiveData<List<UserList>>().apply{
-        addSource(miCore.getCurrentAccount()){
+        miCore.getCurrentAccount().onEach {
             account = it
             loadListList(it)
-        }
+        }.launchIn(viewModelScope)
     }
 
     val pagedUserList = MediatorLiveData<Set<UserList>>().apply{

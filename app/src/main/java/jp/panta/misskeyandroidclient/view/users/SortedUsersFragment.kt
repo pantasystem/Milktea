@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
@@ -86,14 +87,11 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         })
     }
 
-    override fun show(user: UserDTO?) {
-        user?: return
-
-        val intent = Intent(requireContext(), UserDetailActivity::class.java)
-        intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-
-        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, user.id)
-        startActivity(intent)
+    override fun show(userId: User.Id?) {
+        userId?.let{
+            val intent = UserDetailActivity.newInstance(requireContext(), userId = userId)
+            intent.putActivity(Activities.ACTIVITY_IN_APP)
+            startActivity(intent)
+        }
     }
 }

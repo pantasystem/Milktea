@@ -142,7 +142,7 @@ class NoteDetailAdapter(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<LinkedHashMap<String, Int>> {
+        val observer = Observer<Map<String, Int>> {
             adapter.submitList(it.toList())
         }
         note.reactionCounts.observe(viewLifecycleOwner, observer)

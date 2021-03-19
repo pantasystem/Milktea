@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager.widget.PagerAdapter
 import jp.panta.misskeyandroidclient.KeyStore
@@ -20,6 +21,8 @@ import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import kotlinx.android.synthetic.main.fragment_tab.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 
 class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
@@ -47,7 +50,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
-        miApp.getCurrentAccount().observe(viewLifecycleOwner, Observer { account ->
+        miApp.getCurrentAccount().filterNotNull().flowOn(Dispatchers.IO).onEach { account ->
             val pages = account.pages
 
 
@@ -57,8 +60,8 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             mPagerAdapter?.setList(
                 account,
                 pages.sortedBy {
-                it.weight
-            })
+                    it.weight
+                })
             //mPagerAdapter?.notifyDataSetChanged()
 
 
@@ -73,7 +76,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
                 elevationView.visibility = View.GONE
                 tabLayout.elevation
             }
-        })
+        }.launchIn(lifecycleScope)
 
     }
 

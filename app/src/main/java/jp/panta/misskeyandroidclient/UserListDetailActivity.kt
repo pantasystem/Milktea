@@ -131,7 +131,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             R.id.action_add_user ->{
                 val selected = mUserListDetailViewModel?.listUsers?.value?.map{
                     it.userId
-                }?: return false
+                }?.filterNotNull()?: return false
                 val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selected)
                 startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
             }
