@@ -61,13 +61,13 @@ interface MisskeyAPI {
     fun searchUser(@Body requestUser: RequestUser): Call<List<UserDTO>>
 
     @POST("api/users/lists/list")
-    fun userList(@Body i: I): Call<List<UserList>>
+    fun userList(@Body i: I): Call<List<UserListDTO>>
 
     @POST("api/users/lists/show")
-    fun showList(@Body listId: ListId): Call<UserList>
+    fun showList(@Body listId: ListId): Call<UserListDTO>
 
     @POST("api/users/lists/create")
-    fun createList(@Body createList: CreateList): Call<UserList>
+    fun createList(@Body createList: CreateList): Call<UserListDTO>
 
     @POST("api/lists/delete")
     fun deleteList(@Body listId: ListId): Call<Unit>

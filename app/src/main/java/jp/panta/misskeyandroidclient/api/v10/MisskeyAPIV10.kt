@@ -119,15 +119,15 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override fun userListTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.userListTimeline(noteRequest)
 
-    override fun createList(createList: CreateList): Call<UserList> = misskey.createList(createList)
+    override fun createList(createList: CreateList): Call<UserListDTO> = misskey.createList(createList)
 
     override fun deleteList(listId: ListId): Call<Unit> = misskey.deleteList(listId)
 
-    override fun showList(listId: ListId): Call<UserList> = misskey.showList(listId)
+    override fun showList(listId: ListId): Call<UserListDTO> = misskey.showList(listId)
 
     override fun updateList(createList: UpdateList): Call<Unit> = misskey.updateList(createList)
 
-    override fun userList(i: I): Call<List<UserList>> = misskey.userList(i)
+    override fun userList(i: I): Call<List<UserListDTO>> = misskey.userList(i)
 
     override fun pullUserFromList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pullUserFromList(listUserOperation)
 
