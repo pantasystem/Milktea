@@ -1,15 +1,14 @@
 package jp.panta.misskeyandroidclient.viewmodel.list
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.list.UserList
+import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.model.users.User
 
 data class UserListEvent(
     val type: Type,
-    val account: Account,
-    val userListId: String,
+    val userListId: UserList.Id,
 
     //push user, pull user
-    val userId: String? = null,
+    val userId: User.Id? = null,
 
     //create
     val userList: UserList? = null,

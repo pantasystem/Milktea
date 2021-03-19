@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.api.list.CreateList
 import jp.panta.misskeyandroidclient.api.list.ListId
-import jp.panta.misskeyandroidclient.api.list.UserList
+import jp.panta.misskeyandroidclient.api.list.UserListDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.flow.launchIn
@@ -36,14 +36,14 @@ class ListListViewModel(
     val encryption = miCore.getEncryption()
 
     var account: Account? = null
-    val userListList = MediatorLiveData<List<UserList>>().apply{
+    val userListList = MediatorLiveData<List<UserListDTO>>().apply{
         miCore.getCurrentAccount().onEach {
             account = it
             loadListList(it)
         }.launchIn(viewModelScope)
     }
 
-    val pagedUserList = MediatorLiveData<Set<UserList>>().apply{
+    val pagedUserList = MediatorLiveData<Set<UserListDTO>>().apply{
         addSource(userListList){ userLists ->
             this.value = userLists.filter{ ul ->
                 account?.pages?.any {
@@ -53,20 +53,20 @@ class ListListViewModel(
         }
     }
 
-    private val mUserListIdMap = LinkedHashMap<String, UserList>()
+    private val mUserListIdMap = LinkedHashMap<String, UserListDTO>()
 
 
-    val showUserDetailEvent = EventBus<UserList>()
+    val showUserDetailEvent = EventBus<UserListDTO>()
 
    
 
     fun loadListList(account: Account? = this.account){
         val i = account?.getI(encryption)
             ?: return
-        miCore.getMisskeyAPI(account).userList(I(i)).enqueue(object : Callback<List<UserList>>{
+        miCore.getMisskeyAPI(account).userList(I(i)).enqueue(object : Callback<List<UserListDTO>>{
             override fun onResponse(
-                call: Call<List<UserList>>,
-                response: Response<List<UserList>>
+                call: Call<List<UserListDTO>>,
+                response: Response<List<UserListDTO>>
             ) {
                 val userListMap = response.body()?.map{
                     it.id to it
@@ -77,7 +77,7 @@ class ListListViewModel(
                 userListList.postValue(mUserListIdMap.values.toList())
             }
 
-            override fun onFailure(call: Call<List<UserList>>, t: Throwable) {
+            override fun onFailure(call: Call<List<UserListDTO>>, t: Throwable) {
                 Log.d(TAG, "loadListList error", t)
             }
         })
@@ -88,7 +88,7 @@ class ListListViewModel(
     /**
      * 他Activityで変更を加える場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListUpdated(userList: UserList?){
+    fun onUserListUpdated(userList: UserListDTO?){
         userList?: return
         mUserListIdMap[userList.id] = userList
         userListList.postValue(mUserListIdMap.values.toList())
@@ -97,7 +97,7 @@ class ListListViewModel(
     /**
      * 他Activity等でUserListを正常に作成できた場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListCreated(userList: UserList){
+    fun onUserListCreated(userList: UserListDTO){
 
         mUserListIdMap[userList.id] = userList
         userListList.postValue(mUserListIdMap.values.toList())
@@ -105,13 +105,13 @@ class ListListViewModel(
 
 
 
-    fun showUserListDetail(userList: UserList?){
+    fun showUserListDetail(userList: UserListDTO?){
         userList?.let{ ul ->
             showUserDetailEvent.event = ul
         }
     }
 
-    fun toggleTab(userList: UserList?){
+    fun toggleTab(userList: UserListDTO?){
         userList?.let{ ul ->
             val exPage = account?.pages?.firstOrNull {
                 val pageable = it.pageable()
@@ -130,7 +130,7 @@ class ListListViewModel(
         }
     }
 
-    fun delete(userList: UserList?){
+    fun delete(userList: UserListDTO?){
         val account = this.account
         val misskeyAPI = account?.let{
             miCore.getMisskeyAPI(it)
@@ -167,15 +167,15 @@ class ListListViewModel(
             account?.getI(miCore.getEncryption())!!,
             name = name
         )
-        )?.enqueue(object : Callback<UserList>{
-            override fun onResponse(call: Call<UserList>, response: Response<UserList>) {
+        )?.enqueue(object : Callback<UserListDTO>{
+            override fun onResponse(call: Call<UserListDTO>, response: Response<UserListDTO>) {
                 val ul = response.body()
                 if(ul != null){
 
                     onUserListCreated(ul)
                 }
             }
-            override fun onFailure(call: Call<UserList>, t: Throwable) {
+            override fun onFailure(call: Call<UserListDTO>, t: Throwable) {
 
             }
         })
