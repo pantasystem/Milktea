@@ -6,9 +6,9 @@ import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.list.CreateList
-import jp.panta.misskeyandroidclient.model.list.ListId
-import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.api.list.CreateList
+import jp.panta.misskeyandroidclient.api.list.ListId
+import jp.panta.misskeyandroidclient.api.list.UserList
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.flow.launchIn
@@ -138,10 +138,12 @@ class ListListViewModel(
         if(misskeyAPI == null || userList == null){
             return
         }
-        misskeyAPI.deleteList(ListId(
+        misskeyAPI.deleteList(
+            ListId(
             i = account.getI(miCore.getEncryption())!!,
             listId = userList.id
-        )).enqueue(object : Callback<Unit>{
+        )
+        ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 userListList.postValue(userListList.value?.let{ ulList ->
                     ulList.filterNot{
@@ -160,10 +162,12 @@ class ListListViewModel(
         val api = account?.let{
             miCore.getMisskeyAPI(it)
         }
-        api?.createList(CreateList(
+        api?.createList(
+            CreateList(
             account?.getI(miCore.getEncryption())!!,
             name = name
-        ))?.enqueue(object : Callback<UserList>{
+        )
+        )?.enqueue(object : Callback<UserList>{
             override fun onResponse(call: Call<UserList>, response: Response<UserList>) {
                 val ul = response.body()
                 if(ul != null){

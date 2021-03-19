@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListAddUserBinding
 import jp.panta.misskeyandroidclient.databinding.ItemListBinding
-import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.api.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
 

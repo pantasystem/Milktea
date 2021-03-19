@@ -4,14 +4,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.list.ListUserOperation
-import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.api.list.ListUserOperation
+import jp.panta.misskeyandroidclient.api.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

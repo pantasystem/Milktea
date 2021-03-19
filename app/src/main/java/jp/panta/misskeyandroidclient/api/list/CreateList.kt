@@ -1,10 +1,9 @@
-package jp.panta.misskeyandroidclient.model.list
+package jp.panta.misskeyandroidclient.api.list
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UpdateList(
+data class CreateList(
     val i: String,
-    val listId: String,
     val name: String
 )

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.api
 
+import jp.panta.misskeyandroidclient.api.list.*
 import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
@@ -11,7 +12,6 @@ import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
-import jp.panta.misskeyandroidclient.model.list.*
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.MessageAction
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage

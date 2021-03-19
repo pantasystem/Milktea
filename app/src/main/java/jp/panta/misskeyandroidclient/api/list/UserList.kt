@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.list
+package jp.panta.misskeyandroidclient.api.list
 
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import java.io.Serializable

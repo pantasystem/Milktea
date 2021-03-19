@@ -7,10 +7,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.list.CreateList
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.android.synthetic.main.dialog_user_list_editor.view.*
 
 class UserListEditorDialog : AppCompatDialogFragment(){
