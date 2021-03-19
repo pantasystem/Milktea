@@ -6,7 +6,7 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11Diff
-import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
 import retrofit2.Call
@@ -17,15 +17,15 @@ open class MisskeyAPIV12(misskey: MisskeyAPI, private val misskeyAPIV12Diff: Mis
 
     override fun antennasNotes(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskeyAPIV12Diff.antennasNotes(noteRequest)
 
-    override fun createAntenna(antennaToAdd: AntennaToAdd): Call<Antenna> = misskeyAPIV12Diff.createAntenna(antennaToAdd)
+    override fun createAntenna(antennaToAdd: AntennaToAdd): Call<AntennaDTO> = misskeyAPIV12Diff.createAntenna(antennaToAdd)
 
     override fun deleteAntenna(query: AntennaQuery): Call<Unit> = misskeyAPIV12Diff.deleteAntenna(query)
 
-    override fun getAntennas(query: AntennaQuery): Call<List<Antenna>> = misskeyAPIV12Diff.getAntennas(query)
+    override fun getAntennas(query: AntennaQuery): Call<List<AntennaDTO>> = misskeyAPIV12Diff.getAntennas(query)
 
-    override fun showAntenna(antennaQuery: AntennaQuery): Call<Antenna> = misskeyAPIV12Diff.showAntenna(antennaQuery)
+    override fun showAntenna(antennaQuery: AntennaQuery): Call<AntennaDTO> = misskeyAPIV12Diff.showAntenna(antennaQuery)
 
-    override fun updateAntenna(antennaToAdd: AntennaToAdd): Call<Antenna> = misskeyAPIV12Diff.updateAntenna(antennaToAdd)
+    override fun updateAntenna(antennaToAdd: AntennaToAdd): Call<AntennaDTO> = misskeyAPIV12Diff.updateAntenna(antennaToAdd)
 
 
 
