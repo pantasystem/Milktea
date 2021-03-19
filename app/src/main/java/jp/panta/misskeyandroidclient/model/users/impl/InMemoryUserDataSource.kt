@@ -81,6 +81,18 @@ class InMemoryUserDataSource : UserDataSource{
         }?: throw UserNotFoundException(userId)
     }
 
+    override suspend fun get(accountId: Long, userName: String, host: String?): User {
+        return tableLock.withLock {
+            userMap.filterKeys {
+                it.accountId == accountId
+            }.map {
+                it.value
+            }.firstOrNull {
+                it.userName == userName && (it.host == host || it.host.isNullOrBlank() == host.isNullOrBlank())
+            }?: throw UserNotFoundException(null)
+        }
+    }
+
     @ExperimentalCoroutinesApi
     override suspend fun remove(user: User): Boolean {
         return tableLock.withLock {

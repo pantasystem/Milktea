@@ -36,15 +36,15 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         app:srcCompat="@drawable/ic_person_black_24dp"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription"
+                        app:tint="?attr/colorNoteActionButtonTint" />
                 <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         app:srcCompat="@drawable/ic_check_black_24dp"
                         android:layout_gravity="end|top"
-                        android:tint="?attr/colorAccent"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription"
+                        app:tint="?attr/colorAccent" />
 
             </FrameLayout>
 

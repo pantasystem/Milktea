@@ -4,10 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
 import kotlinx.android.synthetic.main.activity_antenna_list.*
 
@@ -46,7 +45,7 @@ class AntennaListActivity : AppCompatActivity() {
 
     }
 
-    private fun confirmDeleteAntenna(antenna: Antenna){
+    private fun confirmDeleteAntenna(antenna: AntennaDTO){
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.confirm_deletion))
             .setMessage(antenna.name)

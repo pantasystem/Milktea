@@ -5,7 +5,7 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -33,13 +33,13 @@ class AntennaListViewModel (
         const val TAG = "AntennaViewModel"
     }
 
-    val antennas = MediatorLiveData<List<Antenna>>()
+    val antennas = MediatorLiveData<List<AntennaDTO>>()
 
-    val editAntennaEvent = EventBus<Antenna>()
+    val editAntennaEvent = EventBus<AntennaDTO>()
 
-    val confirmDeletionAntennaEvent = EventBus<Antenna>()
+    val confirmDeletionAntennaEvent = EventBus<AntennaDTO>()
 
-    val openAntennasTimelineEvent = EventBus<Antenna>()
+    val openAntennasTimelineEvent = EventBus<AntennaDTO>()
 
     val isLoading = MutableLiveData<Boolean>(false)
 
@@ -82,20 +82,20 @@ class AntennaListViewModel (
                 limit = null,
                 antennaId = null
             )
-        )?.enqueue(object : Callback<List<Antenna>>{
-            override fun onResponse(call: Call<List<Antenna>>, response: Response<List<Antenna>>) {
+        )?.enqueue(object : Callback<List<AntennaDTO>>{
+            override fun onResponse(call: Call<List<AntennaDTO>>, response: Response<List<AntennaDTO>>) {
                 antennas.postValue(response.body())
                 isLoading.postValue(false)
             }
 
-            override fun onFailure(call: Call<List<Antenna>>, t: Throwable) {
+            override fun onFailure(call: Call<List<AntennaDTO>>, t: Throwable) {
                 Log.e(TAG, "アンテナ一覧の取得に失敗しました。", t)
                 isLoading.postValue(false)
             }
         })
     }
 
-    fun toggleTab(antenna: Antenna?){
+    fun toggleTab(antenna: AntennaDTO?){
         antenna?: return
         val paged = account?.pages?.firstOrNull {
 
@@ -108,21 +108,21 @@ class AntennaListViewModel (
         }
     }
 
-    fun confirmDeletionAntenna(antenna: Antenna?){
+    fun confirmDeletionAntenna(antenna: AntennaDTO?){
         antenna?: return
         confirmDeletionAntennaEvent.event = antenna
     }
 
-    fun editAntenna(antenna: Antenna?){
+    fun editAntenna(antenna: AntennaDTO?){
         antenna?: return
         editAntennaEvent.event = antenna
     }
 
-    fun openAntennasTimeline(antenna: Antenna?){
+    fun openAntennasTimeline(antenna: AntennaDTO?){
         openAntennasTimelineEvent.event = antenna
     }
 
-    fun deleteAntenna(antenna: Antenna){
+    fun deleteAntenna(antenna: AntennaDTO){
         account?.getI(miCore.getEncryption())?.let{ i ->
             getMisskeyAPI()?.deleteAntenna(AntennaQuery(
                 i = i,

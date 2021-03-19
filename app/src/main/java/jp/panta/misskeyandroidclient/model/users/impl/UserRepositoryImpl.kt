@@ -45,6 +45,35 @@ class UserRepositoryImpl(
         throw UserNotFoundException(userId)
     }
 
+    override suspend fun findByUserName(accountId: Long, userName: String, host: String?): User {
+        val local = runCatching {
+            miCore.getUserDataSource().get(accountId, userName, host)
+        }.getOrNull()
+
+        if(local != null) {
+            return local
+        }
+        val account = miCore.getAccountRepository().get(accountId)
+        val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
+        misskeyAPI.showUser(
+            RequestUser(
+                i = account.getI(miCore.getEncryption()),
+                userName = userName,
+                host = host
+            )
+        ).execute()?.body()?.let {
+            it.pinnedNotes?.forEach { dto ->
+                miCore.getGetters().noteRelationGetter.get(account, dto)
+            }
+            val user = it.toUser(account, true)
+            miCore.getUserDataSource().add(user)
+            return user
+        }
+
+        throw UserNotFoundException(null, userName = userName, host = host)
+
+    }
+
     override suspend fun mute(userId: User.Id): Boolean {
         return action(userId.getMisskeyAPI()::muteUser, userId) { user ->
             user.copy(isMuting = true)

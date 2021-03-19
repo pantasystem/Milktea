@@ -8,11 +8,13 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
 open class UserViewData(
-    val userId: User.Id,
+    val userId: User.Id?,
+    val userName: String? = null,
+    val host: String? = null,
+    val accountId: Long? = null,
     val miCore: MiCore,
     coroutineScope: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -20,6 +22,7 @@ open class UserViewData(
 
 
     val user: MutableLiveData<User.Detail?> = MutableLiveData<User.Detail?>()
+    private val userFlow = MutableStateFlow<User.Detail?>(null)
 
     private var mUser: User.Detail? = null
         set(value) {
@@ -32,10 +35,28 @@ open class UserViewData(
         miCore: MiCore,
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): this(user.id, miCore, coroutineScope, dispatcher)
+    ): this(user.id, miCore = miCore, coroutineScope = coroutineScope, dispatcher = dispatcher)
+
+    constructor(
+        userName: String,
+        host: String?,
+        accountId: Long,
+        miCore: MiCore,
+        coroutineScope: CoroutineScope,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    ) : this(null, userName, host, accountId, miCore ,coroutineScope, dispatcher)
+
+    constructor(
+        userId: User.Id,
+        miCore: MiCore,
+        coroutineScope: CoroutineScope,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    ) : this(userId, null, null, null, miCore, coroutineScope, dispatcher)
 
     init {
-        miCore.getUserRepositoryEventToFlow().from(userId).onEach {
+        userFlow.filterNotNull().flatMapMerge { user ->
+            miCore.getUserRepositoryEventToFlow().from(user.id)
+        }.onEach {
             when(it) {
                 is UserDataSource.Event.Created -> {
                     (it.user as? User.Detail)?.let{ detail ->
@@ -63,7 +84,13 @@ open class UserViewData(
 
         if(user.value == null){
             val u : User.Detail? = runCatching {
-                miCore.getUserRepository().find(userId, true)
+                if(userId == null) {
+                    require(accountId != null)
+                    require(userName != null)
+                    miCore.getUserRepository().findByUserName(accountId, userName, host)
+                }else{
+                    miCore.getUserRepository().find(userId, true)
+                }
             }.getOrNull() as? User.Detail
 
             u?.let{

@@ -1,44 +1,48 @@
 package jp.panta.misskeyandroidclient.viewmodel.antenna
 
 import android.util.Log
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.groups.GroupDTO
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
+import jp.panta.misskeyandroidclient.model.group.Group
+import jp.panta.misskeyandroidclient.model.list.ListId
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.StringBuilder
 import java.util.regex.Pattern
 
-/**
- * @param antenna 新規作成時はnullになる
- */
+
+@Suppress("BlockingMethodInNonBlockingContext")
 class AntennaEditorViewModel (
-    val account: Account,
+    val antennaId: Antenna.Id?,
     val miCore: MiCore,
-    antenna: Antenna?
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val ac: Account, val miCore: MiCore, val antenna: Antenna?) : ViewModelProvider.Factory{
+    class Factory(val miCore: MiCore, val antennaId: Antenna.Id) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return AntennaEditorViewModel(ac, miCore, antenna) as T
+            return AntennaEditorViewModel(antennaId, miCore) as T
         }
     }
 
-    val antenna = MutableLiveData<Antenna?>(antenna)
+    val antenna = MutableLiveData<Antenna?>()
+
+
+    private val mAntenna = MutableStateFlow<Antenna?>(null)
 
     enum class Source(val remote: String){
         HOME("home"), ALL("all"), USERS("users"), LIST("list"), GROUP("group")
@@ -69,7 +73,26 @@ class AntennaEditorViewModel (
         }
     }
 
-    val users = MediatorLiveData<List<UserViewData>>().apply{
+    val userNames = MutableStateFlow<List<String>>(emptyList()).apply {
+        mAntenna.filterNotNull().onEach {
+            value = it.users
+        }
+    }
+
+    private val mUsers = userNames.map { list ->
+        list.map { userName ->
+            val userNameAndHost = userName.split("@")
+            UserViewData(userNameAndHost.first(), userNameAndHost.lastOrNull(), getAccount().accountId ,miCore, viewModelScope, Dispatchers.IO)
+
+        }
+    }
+
+    val users = MutableStateFlow<List<UserViewData>>(emptyList()).apply {
+        mUsers.onEach { list ->
+            value = list
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
+    /*val users = MediatorLiveData<List<UserViewData>>().apply{
         addSource(this@AntennaEditorViewModel.antenna){
             this.value = it?.users?.filter{ str ->
                 str.isNotBlank()
@@ -84,38 +107,21 @@ class AntennaEditorViewModel (
                 uvd.setApi(i, miCore.getMisskeyAPI(account))
             }
         }
-    }
+    }*/
 
 
 
     val userListList = MediatorLiveData<List<UserList>>().apply{
-        fun loadUserListList(){
-
-            val i = account.getI(miCore.getEncryption())
-                ?: return
-            miCore.getMisskeyAPI(account).userList(I(i)).enqueue(object : Callback<List<UserList>>{
-                override fun onResponse(
-                    call: Call<List<UserList>>,
-                    response: Response<List<UserList>>
-                ) {
-                    this@apply.postValue(response.body())
-                }
-
-                override fun onFailure(call: Call<List<UserList>>, t: Throwable) {
-                    this@apply.postValue(emptyList())
-                    Log.e("AntennaEditorVM", "ユーザーリスト一覧の取得に失敗しました", t)
-                }
-            })
-        }
-        addSource(this@AntennaEditorViewModel.antenna){
-            loadUserListList()
-        }
-        addSource(this@AntennaEditorViewModel.source){
-            if(it == Source.LIST && this.value.isNullOrEmpty()){
-                loadUserListList()
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = getAccount()
+                miCore.getMisskeyAPI(account).userList(I(account.getI(miCore.getEncryption()))).execute()?.body()
+            }.onSuccess {
+                postValue(it)
             }
         }
     }
+
 
     val userList = MediatorLiveData<UserList?>().apply{
         addSource(userListList){ list ->
@@ -125,7 +131,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val groupList = MediatorLiveData<List<GroupDTO>?>().apply{
+    val groupList = MediatorLiveData<List<Group>?>().apply{
         addSource(this@AntennaEditorViewModel.source){
             /*if(it == Source.GROUP && this.value.isNullOrEmpty()){
                 miCore.getMisskeyAPI(accountRelation)
@@ -133,7 +139,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val group = MediatorLiveData<GroupDTO>().apply{
+    val group = MediatorLiveData<Group>().apply{
         addSource(groupList){
             this.value = it?.firstOrNull { g ->
                 g.id == this@AntennaEditorViewModel.antenna.value?.userGroupId
@@ -179,81 +185,70 @@ class AntennaEditorViewModel (
 
     val antennaAddedStateEvent = EventBus<Boolean>()
     
-    fun addRemote(){
+    fun createOrUpdate(){
 
-        val i = account.getI(miCore.getEncryption())
-            ?: return
-        val antenna = this.antenna.value
-        val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
-            ?: return
-        val antennaAPI = if(antenna?.id == null){
-            api::createAntenna
-        }else{
-            api::updateAntenna
-        }
-        val request = AntennaToAdd(
-            i,
-            antenna?.id,
-            name.value?: antenna?.name?: "",
-            source.value?.remote!!,
-            userList.value?.id,
-            null,
-            toListKeywords(keywords.value?: ""),
-            toListKeywords(excludeKeywords.value?: ""),
-            users.value?.map{
-                it.userId
-            }?: emptyList(),
-            caseSensitive.value?: false,
-            withFile.value?: false,
-            withReplies.value?: false,
-            notify.value?: false
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = getAccount()
+                val api = miCore.getMisskeyAPI(account) as MisskeyAPIV12
+                val antenna = mAntenna.value
+                val request = AntennaToAdd(
+                    account.getI(miCore.getEncryption()),
+                    antennaId?.antennaId,
+                    name.value?: antenna?.name?: "",
+                    source.value?.remote!!,
+                    userList.value?.id,
+                    null,
+                    toListKeywords(keywords.value?: ""),
+                    toListKeywords(excludeKeywords.value?: ""),
+                    userNames.value,
+                    caseSensitive.value?: false,
+                    withFile.value?: false,
+                    withReplies.value?: false,
+                    notify.value?: false
 
-        )
-        antennaAPI.invoke(request).enqueue(object : Callback<Antenna>{
-            override fun onResponse(call: Call<Antenna>, response: Response<Antenna>) {
-                if(response.code() in 200 until 300){
-                    this@AntennaEditorViewModel.antenna.postValue(response.body())
-                    antennaAddedStateEvent.event = true
+                )
+                val res = if(antennaId == null) {
+                    api.createAntenna(request).execute()
                 }else{
-                    Log.d("AntennaViewModel", "add antenna error code:${response.code()}, errorMsg:${response.errorBody()?.string()}")
-                    antennaAddedStateEvent.event = false
+                    api.updateAntenna(request).execute()
                 }
-            }
 
-            override fun onFailure(call: Call<Antenna>, t: Throwable) {
-                Log.e("AntennaEditorViewModel", "add antenna error", t)
+                res.body()?.toEntity(account)
+            }.onSuccess {
+                antennaAddedStateEvent.event = it != null
+                mAntenna.value = it
+            }.onFailure {
                 antennaAddedStateEvent.event = false
             }
-        })
+
+
+        }
+
     }
 
     val antennaRemovedEvent = EventBus<Unit>()
 
     fun removeRemote(){
-        val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
-        api?.deleteAntenna(
-            AntennaQuery(
-                i = account.getI(miCore.getEncryption())!!,
-                antennaId = antenna.value?.id,
-                limit = null
-            )
-        )?.enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
+        val antennaId = antennaId ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = getAccount()
+                (miCore.getMisskeyAPI(account) as MisskeyAPIV12).deleteAntenna(
+                    AntennaQuery(antennaId = antennaId.antennaId, i = account.getI(miCore.getEncryption()), limit = null)
+                ).execute()
+            }.onSuccess {
+                if(it.isSuccessful) {
                     antennaRemovedEvent.event = Unit
                 }
             }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.e("AntennaEditorViewModel", "delete error", t)
-            }
-        })
+        }
     }
-    val selectUserEvent = EventBus<List<String>>()
+    val selectUserEvent = EventBus<List<User.Id>>()
     fun selectUser(){
-        selectUserEvent.event = users.value?.map{
-            it.userId
-        }?: emptyList()
+        selectUserEvent.event = users.value.mapNotNull {
+            it.user.value?.id
+        }
     }
 
     
@@ -279,10 +274,18 @@ class AntennaEditorViewModel (
         }
     }
 
-    fun setUserIds(userIds: List<String>){
-        users.value = userIds.map{
-            UserViewData(it)
-        }
+    fun setUserNames(userNames: List<String>){
+        this.userNames.value = userNames
     }
 
+    private var mAccount: Account? = null
+    private suspend fun getAccount(): Account {
+        if(mAccount == null) {
+            mAccount = antennaId?.let{
+                miCore.getAccountRepository().get(it.accountId)
+            }?: miCore.getAccountRepository().getCurrentAccount()
+        }
+        require(mAccount != null)
+        return mAccount!!
+    }
 }

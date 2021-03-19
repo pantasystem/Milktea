@@ -23,6 +23,8 @@ interface UserDataSource {
 
     suspend fun get(userId: User.Id): User
 
+    suspend fun get(accountId: Long, userName: String, host: String?): User
+
     suspend fun add(user: User): AddResult
 
     suspend fun addAll(users: List<User>): List<AddResult>

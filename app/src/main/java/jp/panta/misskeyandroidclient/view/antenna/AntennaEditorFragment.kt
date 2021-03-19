@@ -7,29 +7,32 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
-import jp.panta.misskeyandroidclient.api.v12.antenna.Antenna
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     companion object {
-        const val EXTRA_ANTENNA = "jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment.EXTRA_ANTENNA"
-        fun newInstance(antenna: Antenna?): AntennaEditorFragment{
+        const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment.EXTRA_ANTENNA_ID"
+        fun newInstance(antennaId: Antenna.Id): AntennaEditorFragment{
             return AntennaEditorFragment().apply{
                 arguments = Bundle().apply{
-                    putSerializable(EXTRA_ANTENNA, antenna)
+                    putSerializable(EXTRA_ANTENNA_ID, antennaId)
                 }
             }
         }
@@ -45,122 +48,121 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
 
 
-        val antenna = arguments?.getSerializable(EXTRA_ANTENNA) as? Antenna?
+        val antennaId = arguments?.getSerializable(EXTRA_ANTENNA_ID) as Antenna.Id
 
         val miCore: MiCore = view.context.applicationContext as MiApplication
-        miCore.getCurrentAccount().filterNotNull().onEach{  ar ->
-            val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(ar, miCore, antenna))[AntennaEditorViewModel::class.java]
-            binding.antennaEditorViewModel = viewModel
+        val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(miCore, antennaId))[AntennaEditorViewModel::class.java]
+        binding.antennaEditorViewModel = viewModel
 
 
-            binding.receivingSourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        binding.receivingSourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                resourceStringToSource(receivedSourceStringArray[position])?.let{
+                    viewModel.source.value = it
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+
+        viewModel.source.observe(viewLifecycleOwner, {
+
+            val srcIndex = receivedSourceStringArray.indexOf(sourceToResourceString(it))
+            Log.d("AntennaEditorViewModel", "srcIndex:$srcIndex, type:$it")
+            binding.receivingSourceSpinner.setSelection(srcIndex)
+
+
+        })
+
+
+        viewModel.userListList.observe( viewLifecycleOwner, { list ->
+            val userListListAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, list.map{
+                it.name
+            })
+            binding.userListListSpinner.adapter = userListListAdapter
+
+
+            binding.userListListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
                     view: View?,
                     position: Int,
                     id: Long
                 ) {
-                   resourceStringToSource(receivedSourceStringArray[position])?.let{
-                       viewModel.source.value = it
-                   }
+                    viewModel.userList.value = list[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
 
-            viewModel.source.observe(viewLifecycleOwner, {
+        })
+        viewModel.userList.observe(viewLifecycleOwner, {
+            it?.let{ ul ->
+                val index = viewModel.userListList.value?.indexOfFirst { list ->
+                    ul.id == list.id
+                }?: 0
+                Log.d("AntennaEditorFragment", "選択したIndex:$index, userList:${viewModel.userList.value}")
+                binding.userListListSpinner.setSelection(index)
+            }
 
-                val srcIndex = receivedSourceStringArray.indexOf(sourceToResourceString(it))
-                Log.d("AntennaEditorViewModel", "srcIndex:$srcIndex, type:$it")
-                binding.receivingSourceSpinner.setSelection(srcIndex)
+        })
 
 
-            })
-
-
-            viewModel.userListList.observe( viewLifecycleOwner, { list ->
-                val userListListAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, list.map{
-                    it.name
+        viewModel.groupList.observe( viewLifecycleOwner, {
+            it?.let{ groups ->
+                val groupsAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, groups.map{ group ->
+                    group.name
                 })
-                binding.userListListSpinner.adapter = userListListAdapter
-
-
-                binding.userListListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+                binding.groupListSpinner.adapter = groupsAdapter
+                binding.groupListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
                     override fun onItemSelected(
                         parent: AdapterView<*>?,
                         view: View?,
                         position: Int,
                         id: Long
                     ) {
-                        viewModel.userList.value = list[position]
+                        viewModel.group.value = groups[position]
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-                }
-
-            })
-            viewModel.userList.observe(viewLifecycleOwner, {
-                it?.let{ ul ->
-                    val index = viewModel.userListList.value?.indexOfFirst { list ->
-                        ul.id == list.id
-                    }?: 0
-                    Log.d("AntennaEditorFragment", "選択したIndex:$index, userList:${viewModel.userList.value}")
-                    binding.userListListSpinner.setSelection(index)
-                }
-
-            })
-
-
-            viewModel.groupList.observe( viewLifecycleOwner, {
-                it?.let{ groups ->
-                    val groupsAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, groups.map{ group ->
-                        group.name
-                    })
-                    binding.groupListSpinner.adapter = groupsAdapter
-                    binding.groupListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            viewModel.group.value = groups[position]
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-
-                    }
 
                 }
-            })
 
-            viewModel.group.observe( viewLifecycleOwner, { g ->
-                g?.let{
-                    val index = viewModel.groupList.value?.indexOfFirst { inG ->
-                        g.id == inG.id
-                    }?: 0
-                    binding.groupListSpinner.setSelection(index)
+            }
+        })
+
+        viewModel.group.observe( viewLifecycleOwner, { g ->
+            g?.let{
+                val index = viewModel.groupList.value?.indexOfFirst { inG ->
+                    g.id == inG.id
+                }?: 0
+                binding.groupListSpinner.setSelection(index)
+            }
+
+        })
+
+
+        val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
+        binding.specifiedUserListView.adapter = userChipAdapter
+        val flexBoxLayoutManager = FlexboxLayoutManager(view.context)
+        flexBoxLayoutManager.flexDirection = FlexDirection.ROW
+        flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
+        flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
+        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+        binding.specifiedUserListView.layoutManager = flexBoxLayoutManager
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.users.collect {
+                withContext(Dispatchers.Main) {
+                    userChipAdapter.submitList(it)
                 }
-
-            })
-
-
-            val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
-            binding.specifiedUserListView.adapter = userChipAdapter
-            val flexBoxLayoutManager = FlexboxLayoutManager(view.context)
-            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-            binding.specifiedUserListView.layoutManager = flexBoxLayoutManager
-
-            viewModel.users.observe( viewLifecycleOwner, {
-                userChipAdapter.submitList(it)
-            })
-        }.launchIn(lifecycleScope)
-
-
-
+            }
+        }
 
 
     }

@@ -50,7 +50,7 @@ class SelectedUserViewModel(
 
     val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
         addSource(selectedUsers){
-            value = it.map{ uv ->
+            value = it.mapNotNull{ uv ->
                 uv.userId
             }.toSet()
         }
@@ -150,6 +150,6 @@ class SelectedUserViewModel(
         val removed = exSelected.filter{ ex ->
             !selected.contains(ex)
         }
-        return ChangedDiffResult(selected.toList(), added, removed, selectedUsers)
+        return ChangedDiffResult(selected.filterNotNull().toList(), added.filterNotNull(), removed, selectedUsers)
     }
 }
