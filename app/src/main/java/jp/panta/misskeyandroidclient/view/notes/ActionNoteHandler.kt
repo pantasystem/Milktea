@@ -14,6 +14,8 @@ import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
@@ -33,10 +35,7 @@ class ActionNoteHandler(
     private val settingStore = SettingStore(activity.getSharedPreferences(activity.getPreferenceName(), Context.MODE_PRIVATE))
 
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
-        //Log.d("MainActivity", "reply clicked :$it")
-        val intent = Intent(activity, NoteEditorActivity::class.java)
-        intent.putExtra(NoteEditorActivity.EXTRA_REPLY_TO_NOTE_ID, it.toShowNote.id)
-        activity.startActivity(intent)
+        activity.startActivity(NoteEditorActivity.newBundle(activity, replyTo = it.toShowNote.note.id))
     }
 
     private val reNoteTargetObserver = Observer<PlaneNoteViewData>{
@@ -49,10 +48,10 @@ class ActionNoteHandler(
         Log.d("MainActivity", "share clicked :$it")
         ShareBottomSheetDialog().show(activity.supportFragmentManager, "MainActivity")
     }
-    private val targetUserObserver = Observer<UserDTO>{
+    private val targetUserObserver = Observer<User>{
         Log.d("MainActivity", "user clicked :$it")
-        val intent = Intent(activity, UserDetailActivity::class.java)
-        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.id)
+        val intent = UserDetailActivity.newInstance(activity, userId = it.id)
+
         intent.putActivity(Activities.ACTIVITY_IN_APP)
 
 
@@ -64,8 +63,7 @@ class ActionNoteHandler(
     }
 
     private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData>{
-        val intent = Intent(activity, NoteEditorActivity::class.java)
-        intent.putExtra(NoteEditorActivity.EXTRA_QUOTE_TO_NOTE_ID, it.toShowNote.id)
+        val intent = NoteEditorActivity.newBundle(activity, replyTo = it.toShowNote.note.id)
         activity.startActivity(intent)
     }
 
@@ -82,17 +80,13 @@ class ActionNoteHandler(
     }
 
     private val noteTargetObserver = Observer<PlaneNoteViewData>{
-        val intent = Intent(activity, NoteDetailActivity::class.java)
-        intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.toShowNote.id)
-        intent.putActivity(Activities.ACTIVITY_IN_APP)
-        activity.startActivity(intent)
+        NoteDetailActivity.newIntent(activity, noteId = it.toShowNote.note.id).let{
+            activity.startActivity(it)
+        }
     }
 
-    private val showNoteEventObserver = Observer<NoteDTO>{
-        val intent = Intent(activity, NoteDetailActivity::class.java)
-        intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, it.id)
-        intent.putActivity(Activities.ACTIVITY_IN_APP)
-        activity.startActivity(intent)
+    private val showNoteEventObserver = Observer<Note>{
+        activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = it.id))
     }
     private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{
         Log.d("ActionNoteHandler", "${it.first.file}")
@@ -112,13 +106,8 @@ class ActionNoteHandler(
         dialog.show(activity.supportFragmentManager, "")
     }
 
-    private val openNoteEditor = Observer<NoteDTO?>{ note ->
-        val intent = Intent(activity, NoteEditorActivity::class.java).apply{
-            if(note != null){
-                putExtra(NoteEditorActivity.EXTRA_NOTE, note)
-            }
-        }
-        activity.startActivity(intent)
+    private val openNoteEditor = Observer<Note?>{ note ->
+        activity.startActivity(NoteEditorActivity.newBundle(activity, note = note))
     }
 
     private val confirmDeletionEventObserver = Observer<PlaneNoteViewData>{
@@ -126,7 +115,7 @@ class ActionNoteHandler(
             activity.getString(R.string.confirm_deletion),
             null,
             eventType = "delete_note",
-            args = it.toShowNote
+            args = it.toShowNote.note
         )
     }
 
@@ -135,7 +124,7 @@ class ActionNoteHandler(
             null,
             activity.getString(R.string.confirm_delete_and_edit_note_description),
             eventType = "delete_and_edit_note",
-            args = it.toShowNote
+            args = it.toShowNote.note
         )
     }
 
@@ -154,7 +143,7 @@ class ActionNoteHandler(
                 }
             }
             "delete_and_edit_note" ->{
-                if(it.args is NoteDTO){
+                if(it.args is Note){
                     mNotesViewModel.removeAndEditNote(it.args)
                 }
             }

@@ -46,8 +46,8 @@ class AccountViewModel(
     val switchAccount = EventBus<Int>()
 
 
-    val showFollowers = EventBus<Unit>()
-    val showFollowings = EventBus<Unit>()
+    val showFollowers = EventBus<User.Id>()
+    val showFollowings = EventBus<User.Id>()
 
     val showProfile = EventBus<Account>()
 
@@ -95,12 +95,12 @@ class AccountViewModel(
         switchAccount.event = switchAccount.event?: 0 + 1
     }
 
-    fun showFollowers(){
-        showFollowers.event = Unit
+    fun showFollowers(userId: User.Id){
+        showFollowers.event = userId
     }
 
-    fun showFollowings(){
-        showFollowings.event = Unit
+    fun showFollowings(userId: User.Id){
+        showFollowings.event = userId
     }
 
     fun showProfile(account: Account?){

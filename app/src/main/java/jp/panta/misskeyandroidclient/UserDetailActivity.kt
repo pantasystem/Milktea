@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-@ExperimentalCoroutinesApi
 class UserDetailActivity : AppCompatActivity() {
     companion object{
         private const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
@@ -66,6 +65,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     private var mParentActivity: Activities? = null
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -187,6 +187,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
@@ -227,6 +228,7 @@ class UserDetailActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d("UserDetail", "mParentActivity: $mParentActivity")
 
@@ -287,6 +289,7 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
 
+    @ExperimentalCoroutinesApi
     private fun addPageToTab(){
         val user = mViewModel?.user?.value
         user?: return

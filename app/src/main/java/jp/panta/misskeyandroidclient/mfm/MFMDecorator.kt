@@ -135,8 +135,7 @@ object MFMDecorator {
 
         private fun decorateMention(mention: Mention): Spanned?{
             return textView.get()?.let{ textView ->
-                val intent = Intent(textView.context, UserDetailActivity::class.java)
-                intent.putExtra(UserDetailActivity.EXTRA_USER_NAME, mention.text)
+                val intent = UserDetailActivity.newInstance(textView.context, userName = mention.text)
                 intent.putActivity(Activities.ACTIVITY_IN_APP)
 
 

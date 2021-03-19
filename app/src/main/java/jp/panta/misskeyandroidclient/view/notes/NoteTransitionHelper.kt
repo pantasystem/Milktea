@@ -20,8 +20,7 @@ object NoteTransitionHelper {
         val clicked = clickedView?: this
         clicked.setOnClickListener {
             val context = this.context
-            val intent = Intent(context, NoteDetailActivity::class.java)
-            intent.putExtra(NoteDetailActivity.EXTRA_NOTE_ID, transitionDestinationNote.id.noteId)
+            val intent = NoteDetailActivity.newIntent(context, transitionDestinationNote.id)
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
             if(context is Activity){
