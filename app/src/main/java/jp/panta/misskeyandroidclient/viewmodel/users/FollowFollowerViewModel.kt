@@ -196,7 +196,7 @@ class FollowFollowerViewModel(
 
     val showUserEventBus = EventBus<User.Id>()
 
-    override fun show(userId: User.Id) {
+    override fun show(userId: User.Id?) {
         showUserEventBus.event = userId
     }
 
