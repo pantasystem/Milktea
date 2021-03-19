@@ -383,8 +383,8 @@ class NoteEditorViewModel(
             accountId = currentAccount.value?.accountId!!,
             text = text.value,
             cw = cw.value,
-            visibleUserIds = address.value?.map{
-                it.userId.id
+            visibleUserIds = address.value?.mapNotNull {
+                it.userId?.id ?: it.user.value?.id?.id
             },
             draftPoll = poll.value?.toDraftPoll(),
             visibility = visibility.value?.type()?: "public",
