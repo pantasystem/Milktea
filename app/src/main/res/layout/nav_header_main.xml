@@ -72,7 +72,7 @@
                 tools:text="114"
                 android:text="@{ Integer.toString(accountViewModel.user.followingCount) }"
                 android:layout_marginEnd="3dp"
-                android:onClick="@{()-> accountViewModel.showFollowings() }"
+                android:onClick="@{()-> accountViewModel.showFollowings(accountViewModel.user.id) }"
                 />
 
         <androidx.emoji.widget.EmojiTextView
@@ -84,7 +84,7 @@
                 android:layout_below="@id/subName"
 
                 android:layout_marginEnd="12dp"
-                android:onClick="@{()-> accountViewModel.showFollowings() }"
+                android:onClick="@{()-> accountViewModel.showFollowings(accountViewModel.user.id) }"
                 />
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/follower_count"
@@ -95,7 +95,7 @@
                 tools:text="514"
                 android:layout_marginEnd="3dp"
                 android:text="@{ Integer.toString(accountViewModel.user.followersCount) }"
-                android:onClick="@{()-> accountViewModel.showFollowers() }"
+                android:onClick="@{()-> accountViewModel.showFollowers(accountViewModel.user.id) }"
                 />
         <androidx.emoji.widget.EmojiTextView
                 android:layout_width="wrap_content"
@@ -103,7 +103,7 @@
                 android:layout_toEndOf="@id/follower_count"
                 android:layout_below="@id/subName"
                 android:text="@string/follower"
-                android:onClick="@{()-> accountViewModel.showFollowers() }"
+                android:onClick="@{()-> accountViewModel.showFollowers(accountViewModel.user.id) }"
                 />
 
     </RelativeLayout>

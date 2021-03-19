@@ -19,8 +19,7 @@ object UserTransitionHelper {
         user?: return
         this.setOnClickListener { view ->
             val context = view.context
-            val intent = Intent(context, UserDetailActivity::class.java)
-            intent.putExtra(UserDetailActivity.EXTRA_USER_ID, user.id)
+            val intent = UserDetailActivity.newInstance(context, userId = user.id)
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
 

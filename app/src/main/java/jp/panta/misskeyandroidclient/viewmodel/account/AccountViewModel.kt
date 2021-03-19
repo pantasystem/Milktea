@@ -95,12 +95,16 @@ class AccountViewModel(
         switchAccount.event = switchAccount.event?: 0 + 1
     }
 
-    fun showFollowers(userId: User.Id){
-        showFollowers.event = userId
+    fun showFollowers(userId: User.Id?){
+        userId?.let {
+            showFollowers.event = userId
+        }
     }
 
-    fun showFollowings(userId: User.Id){
-        showFollowings.event = userId
+    fun showFollowings(userId: User.Id?){
+        userId?.let{
+            showFollowings.event = userId
+        }
     }
 
     fun showProfile(account: Account?){

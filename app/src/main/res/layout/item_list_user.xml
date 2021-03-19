@@ -71,7 +71,7 @@
                     tools:ignore="ContentDescription,PrivateResource"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:tint="?attr/colorNoteActionButtonTint"
-                    android:onClick="@{()-> userListDetailViewModel.pullUser(userViewData.userId.id)}"
+                    android:onClick="@{()-> userListDetailViewModel.pullUser(userViewData.userId)}"
                     />
 
 
