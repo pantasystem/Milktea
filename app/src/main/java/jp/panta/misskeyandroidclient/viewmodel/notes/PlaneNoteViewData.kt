@@ -18,7 +18,9 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 
 open class PlaneNoteViewData (
     val note: NoteRelation,
@@ -224,6 +226,7 @@ open class PlaneNoteViewData (
         }?: emptyList()
     }
 
+    @ExperimentalCoroutinesApi
     val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
         if(it is NoteDataSource.Event.Updated){
             update(it.note)
