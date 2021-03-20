@@ -138,8 +138,8 @@ class ActionNoteHandler(
         }
         when(it.eventType){
             "delete_note" ->{
-                if(it.args is NoteDTO){
-                    mNotesViewModel.removeNote(it.args)
+                if(it.args is Note){
+                    mNotesViewModel.removeNote(it.args.id)
                 }
             }
             "delete_and_edit_note" ->{
