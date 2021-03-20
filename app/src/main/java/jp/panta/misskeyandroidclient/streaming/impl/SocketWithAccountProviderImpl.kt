@@ -35,24 +35,15 @@ class SocketWithAccountProviderImpl(
         synchronized(accountIdWithSocket) {
             var socket = accountIdWithSocket[account.accountId]
             if(socket != null){
+                logger.debug("すでにインスタンス化済み")
                 return socket
             }
 
 
             var uri = account.instanceDomain
-            val urlResult = Regex("^(http|https).*").find(uri)?.groups?.firstOrNull()
-            if(urlResult != null) {
-                val protocol = if(urlResult.value == "https") {
-                    "wss"
-                }else{
-                    "ws"
-                }
-                uri = protocol + uri.substring(urlResult.range.last, uri.length)
+            if(uri.startsWith("https")) {
+                uri = "wss" + uri.substring(5, uri.length) + "/streaming"
             }
-            if(!uri.endsWith("/")) {
-                uri = "$uri/"
-            }
-            uri = "${uri}streaming"
             try {
                 val i = account.getI(encryption)
                 uri = "${uri}?i=$i"
@@ -60,13 +51,15 @@ class SocketWithAccountProviderImpl(
             }catch (e: UnauthorizedException) {
                 logger.debug("未認証アカウント:id=${account.accountId}, baseURL=${account.instanceDomain}")
             }
+            logger.debug("url:$uri")
 
             socket = SocketImpl(
                 url = uri,
                 okHttpClient
             )
-            instanceCreatedListener.invoke(account, socket)
             accountIdWithSocket[account.accountId] = socket
+
+            instanceCreatedListener.invoke(account, socket)
 
             return socket
         }
