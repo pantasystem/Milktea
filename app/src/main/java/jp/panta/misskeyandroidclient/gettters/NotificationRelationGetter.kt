@@ -17,7 +17,7 @@ class NotificationRelationGetter(
 
 
     suspend fun get(account: Account, notificationDTO: NotificationDTO): NotificationRelation {
-        val user = notificationDTO.user.toUser(account)
+        val user = notificationDTO.user.toUser(account, false)
         userDataSource.add(user)
         val noteRelation = notificationDTO.note?.let{
             noteRelationGetter.get(account, it)
