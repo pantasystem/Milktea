@@ -90,7 +90,7 @@ class NoteCaptureAPIAdapter(
                 }
             }
         }
-    }
+    }.shareIn(coroutineScope, replay = 1, started = SharingStarted.Lazily)
 
 
     /**
