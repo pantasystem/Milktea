@@ -114,6 +114,8 @@ class TimelineViewModel(
                 )
             )
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+        loadInit()
     }
 
 
