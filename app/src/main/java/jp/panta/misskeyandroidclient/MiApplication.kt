@@ -259,7 +259,7 @@ class MiApplication : Application(), MiCore {
             list.map{ ac ->
                 userRepositoryAndMainChanelAPIAdapter.listen(ac)
             }.merge()
-        }.launchIn(applicationScope)
+        }.launchIn(applicationScope + Dispatchers.IO)
 
         mAccountRepository.addEventListener { ev ->
             applicationScope.launch(Dispatchers.IO) {
