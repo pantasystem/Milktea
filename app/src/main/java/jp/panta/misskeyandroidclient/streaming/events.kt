@@ -10,10 +10,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
 
-@Serializable
-data class EventMessage(
-    val body: StreamingEvent
-)
+
 
 @Serializable
 sealed class StreamingEvent
