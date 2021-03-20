@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder
 import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.notification.*
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
@@ -84,14 +85,18 @@ class NotificationService : Service() {
             }.filterNot {
                 mStopNotificationAccountMap.contains(it.first.accountId)
             }.map {
-                it.second as? ChannelBody.Main.Notification
+                (it.second as? ChannelBody.Main.Notification)?.let{ body ->
+                    it.first to body
+                }
             }.filterNotNull().onEach {
-                showNotification(it.body)
+                val notification = miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
+                showNotification(notification)
             }.launchIn(coroutineScope + Dispatchers.IO)
 
 
             miApplication.messageStreamFilter.getAllMergedAccountMessages().onEach {
-                showMessageNotification(it)
+                val msgRelation = miApplication.getGetters().messageRelationGetter.get(it)
+                showMessageNotification(msgRelation)
             }.launchIn(coroutineScope)
 
         }
@@ -99,7 +104,7 @@ class NotificationService : Service() {
 
     }
 
-    fun showNotification(account: Account, notification: Notification) {
+    fun showNotification(account: Account, notification: NotificationRelation) {
         Handler(Looper.getMainLooper()).post{
             //val miApplication = applicationContext as MiApplication
             synchronized(mStopNotificationAccountMap){
@@ -116,37 +121,37 @@ class NotificationService : Service() {
         }
     }
 
-    private fun showNotification(notification: Notification) {
+    private fun showNotification(notification: NotificationRelation) {
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
         builder.setSmallIcon(R.mipmap.ic_launcher_foreground)
 
-        when(notification) {
+        when(notification.notification) {
             is FollowNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName() + " " +applicationContext.getString(R.string.followed_by))
             }
             is MentionNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.mention_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note.text))
+                builder.setContentText(SafeUnbox.unbox(notification.note?.note?.text))
             }
             is ReplyNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.replied_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note.text))
+                builder.setContentText(SafeUnbox.unbox(notification.note?.note?.text))
             }
             is QuoteNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.quoted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note.text))
+                builder.setContentText(SafeUnbox.unbox(notification.note?.note?.text))
             }
             is PollVoteNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.voted_by))
             }
             is ReactionNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.reacted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.reaction))
+                builder.setContentText(SafeUnbox.unbox(notification.notification.reaction))
             }
             is RenoteNotification -> {
                 // builder.setSmallIcon(R.drawable.ic_re_note)
                 builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.renoted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note.reNote?.text?: ""))
+                builder.setContentText(SafeUnbox.unbox(notification.note?.renote?.note?.text?: ""))
             }
             is ReceiveFollowRequestNotification -> {
                 builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.request_follow))
@@ -161,7 +166,7 @@ class NotificationService : Service() {
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
         val pendingIntent = TaskStackBuilder.create(this)
-            .addNextIntentWithParentStack(makeResultActivityIntent(notification))
+            .addNextIntentWithParentStack(makeResultActivityIntent(notification.notification))
             .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
 
         builder.setContentIntent(pendingIntent)
@@ -175,20 +180,18 @@ class NotificationService : Service() {
     private fun makeResultActivityIntent(notification: Notification): Intent{
         return when(notification){
             is FollowNotification -> {
-                Intent(this, UserDetailActivity::class.java).apply{
-                    putExtra(UserDetailActivity.EXTRA_USER_ID, notification.user.id)
+                UserDetailActivity.newInstance(this, userId = notification.userId).apply{
                     putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }
             is ReceiveFollowRequestNotification -> {
-                Intent(this, UserDetailActivity::class.java).apply{
-                    putExtra(UserDetailActivity.EXTRA_USER_ID, notification.user.id)
+                UserDetailActivity.newInstance(this, userId = notification.userId).apply{
+
                     putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }
             is HasNote -> {
-                Intent(this, NoteDetailActivity::class.java).apply{
-                    putExtra(NoteDetailActivity.EXTRA_NOTE_ID, notification.note.id)
+                NoteDetailActivity.newIntent(this, notification.noteId).apply{
                     putExtra(NoteDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
                 }
             }
@@ -196,12 +199,12 @@ class NotificationService : Service() {
         }
     }
 
-    private fun showMessageNotification(message: MessageDTO){
+    private fun showMessageNotification(message: MessageRelation){
 
         val builder = NotificationCompat.Builder(this, MESSAGE_CHANEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
-            .setContentTitle(message.user?.getDisplayUserName())
-            .setContentText(SafeUnbox.unbox(message.text))
+            .setContentTitle(message.user.getDisplayUserName())
+            .setContentText(SafeUnbox.unbox(message.message.text))
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
         with(makeNotificationManager(MESSAGE_CHANEL_ID)){

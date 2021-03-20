@@ -18,13 +18,16 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
 import kotlinx.android.synthetic.main.fragment_notification.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
 
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
+    @ExperimentalCoroutinesApi
     lateinit var mViewModel: NotificationViewModel
 
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -35,37 +38,36 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
 
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
-        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer { ar ->
-            val factory = NotificationViewModelFactory(ar, miApplication)
-            mViewModel = ViewModelProvider(this, factory).get("$ar",NotificationViewModel::class.java)
+        val factory = NotificationViewModelFactory(miApplication)
+        mViewModel = ViewModelProvider(this, factory).get(NotificationViewModel::class.java)
 
 
 
-            val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, viewLifecycleOwner)
-            notification_list_view.adapter = adapter
-            notification_list_view.layoutManager = mLinearLayoutManager
+        val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, viewLifecycleOwner)
+        notification_list_view.adapter = adapter
+        notification_list_view.layoutManager = mLinearLayoutManager
 
-            mViewModel.loadInit()
+        mViewModel.loadInit()
 
-            mViewModel.notificationsLiveData.observe(viewLifecycleOwner, Observer {
-                adapter.submitList(it)
-            })
-
-            mViewModel.isLoading.observe(viewLifecycleOwner, Observer {
-                notification_swipe_refresh.isRefreshing = it
-            })
-
-            notification_swipe_refresh.setOnRefreshListener {
-                mViewModel.loadInit()
-            }
-
+        mViewModel.notificationsLiveData.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
         })
+
+        mViewModel.isLoading.observe(viewLifecycleOwner, Observer {
+            notification_swipe_refresh.isRefreshing = it
+        })
+
+        notification_swipe_refresh.setOnRefreshListener {
+            mViewModel.loadInit()
+        }
+
 
         notification_list_view.addOnScrollListener(mScrollListener)
 
 
     }
 
+    @ExperimentalCoroutinesApi
     private val mScrollListener = object : RecyclerView.OnScrollListener(){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)

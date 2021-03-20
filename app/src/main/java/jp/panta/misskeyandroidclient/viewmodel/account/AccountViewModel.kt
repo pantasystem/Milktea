@@ -33,9 +33,10 @@ class AccountViewModel(
 
     val accounts = MediatorLiveData<List<AccountViewData>>().apply{
         miCore.getAccounts().onEach { accounts ->
-            value = accounts.map{ ac ->
+            val viewDataList = accounts.map{ ac ->
                 AccountViewData(ac, miCore, viewModelScope, Dispatchers.IO)
             }
+            postValue(viewDataList)
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 

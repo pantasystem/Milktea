@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.setting.page
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.api.list.UserList
+import jp.panta.misskeyandroidclient.api.list.UserListDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 
@@ -21,7 +21,7 @@ class PageableTemplate(val account: Account?) {
 
     fun userListTimeline(listId: String) = Pageable.UserListTimeline(listId = listId)
 
-    fun userListTimeline(userList: UserList): Page{
+    fun userListTimeline(userList: UserListDTO): Page{
         return Page(account?.accountId?: - 1, userList.name, 0,  Pageable.UserListTimeline(userList.id))
     }
     fun mention(title: String): Page{
