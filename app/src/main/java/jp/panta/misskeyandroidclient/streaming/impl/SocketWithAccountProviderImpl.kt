@@ -16,7 +16,7 @@ import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider as ISoc
 class SocketWithAccountProviderImpl(
     val encryption: Encryption,
     val accountRepository: AccountRepository,
-    loggerFactory: Logger.Factory,
+    val loggerFactory: Logger.Factory,
     val instanceCreatedListener: (account: Account, socket: Socket)-> Unit = { _, s -> s.connect() },
     val okHttpClient: OkHttpClient = OkHttpClient()
 ) : ISocketWithAccountProvider{
@@ -55,7 +55,8 @@ class SocketWithAccountProviderImpl(
 
             socket = SocketImpl(
                 url = uri,
-                okHttpClient
+                okHttpClient,
+                loggerFactory,
             )
             accountIdWithSocket[account.accountId] = socket
 

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.streaming.network
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.SocketEventListener
 import jp.panta.misskeyandroidclient.streaming.StreamingEvent
@@ -7,11 +8,14 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.*
+import java.lang.Exception
 
 class SocketImpl(
     val url: String,
-    val okHttpClient: OkHttpClient = OkHttpClient()
+    val okHttpClient: OkHttpClient = OkHttpClient(),
+    loggerFactory: Logger.Factory
 ) : Socket, WebSocketListener() {
+    val logger = loggerFactory.create("SocketImpl")
 
 
     val json = Json {
@@ -22,6 +26,7 @@ class SocketImpl(
     private var mState: Socket.State = Socket.State.NeverConnected
         set(value) {
             field = value
+            logger.debug("SocketImpl状態変化: ${value.javaClass}, $value")
             listeners.forEach {
                 it.onStateChanged(value)
             }
@@ -62,8 +67,10 @@ class SocketImpl(
     }
 
     override fun send(msg: String): Boolean {
+        logger.debug("メッセージ送信: $msg")
         synchronized(this){
             if(state() != Socket.State.Connected){
+                logger.debug("送信をキャンセル")
                 return false
             }
 
@@ -80,6 +87,7 @@ class SocketImpl(
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
+        logger.debug("WebSocketをClose: $code")
 
         synchronized(this){
             mState = Socket.State.Closed(code, reason)
@@ -111,8 +119,12 @@ class SocketImpl(
         super.onMessage(webSocket, text)
         synchronized(listeners) {
             for(listener in listeners) {
-                if(listener.onMessage(json.decodeFromString(text))) {
-                    break
+                try {
+                    if(listener.onMessage(json.decodeFromString(text))){
+                        break
+                    }
+                }catch (e: Exception) {
+                    logger.error("onMessage: error msg: $text", e = e)
                 }
             }
         }
