@@ -4,6 +4,7 @@ import android.util.Log
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -17,6 +18,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class NoteTimelineStore(
     val account: Account,
     //override val timelineRequestBase: NoteRequest.Setting,
@@ -48,7 +50,7 @@ class NoteTimelineStore(
                 is Pageable.Antenna -> {
                     val api = miCore.getMisskeyAPI(account)
                     if(api is MisskeyAPIV12){
-                        (api as MisskeyAPIV12)::antennasNotes
+                        (api)::antennasNotes
                     }else{
                         throw IllegalArgumentException("antennaはV12以上でなければ使用できません")
                     }
@@ -70,6 +72,7 @@ class NoteTimelineStore(
         }else{
             getStore()?.invoke(request)?.execute()
         }
+        res?.throwIfHasError()
         return makeResponse(res?.body(), res)
     }
 
@@ -79,6 +82,7 @@ class NoteTimelineStore(
         val req = requestBuilder.build(NoteRequest.Conditions(sinceId = sinceId))
         val res = getStore()?.invoke(req)?.execute()
         val reversedList = res?.body()?.asReversed()
+        res?.throwIfHasError()
         return makeResponse(reversedList, res)
     }
 
@@ -86,6 +90,8 @@ class NoteTimelineStore(
     override suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val req = requestBuilder.build(NoteRequest.Conditions(untilId = untilId))
         val res = getStore()?.invoke(req)?.execute()
+        res?.throwIfHasError()
+
         return makeResponse(res?.body(), res)
     }
 
@@ -95,20 +101,21 @@ class NoteTimelineStore(
             Log.e("NoteTimelineStore", "異常ステータス受信:${response?.code()}, :${response?.errorBody()?.string()}")
             Log.e("NoteTMStore", "pageable:$pageableTimeline, params: ${pageableTimeline.toParams()}")
         }
-        return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response), list?.map{
-            try{
-                val related = miCore.getGetters().noteRelationGetter.get(account, it)
-                val store = DetermineTextLengthSettingStore(miCore.getSettingStore())
-                if(it.reply == null){
-                    PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter)
-                }else{
-                    HasReplyToNoteViewData(related, account, store, noteCaptureAPIAdapter)
+        return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response),
+            list?.mapNotNull {
+                try {
+                    val related = miCore.getGetters().noteRelationGetter.get(account, it)
+                    val store = DetermineTextLengthSettingStore(miCore.getSettingStore())
+                    if (it.reply == null) {
+                        PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter)
+                    } else {
+                        HasReplyToNoteViewData(related, account, store, noteCaptureAPIAdapter)
+                    }
+                } catch (e: Exception) {
+                    Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)
+                    null
                 }
-            }catch(e: Exception){
-                Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)
-                null
-            }
 
-        }?.filterNotNull())
+            })
     }
 }

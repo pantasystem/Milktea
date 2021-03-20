@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.api.APIError
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
@@ -39,18 +40,11 @@ class TimelineViewModel(
         var substitute: Request? = null
     )
 
-    enum class Errors{
-        AUTHENTICATION,
-        I_AM_AI,
-        SERVER_ERROR,
-        PARAMETER_ERROR,
-        NETWORK,
-        TIMEOUT
-    }
+
 
     val tag = "TimelineViewModel"
-    private val mErrorEvent = MutableSharedFlow<Errors>()
-    val errorEvent: SharedFlow<Errors> = mErrorEvent
+    private val mErrorEvent = MutableSharedFlow<Exception>()
+    val errorEvent: SharedFlow<Exception> = mErrorEvent
 
     private val accountRepository = miCore.getAccountRepository()
 
@@ -63,8 +57,18 @@ class TimelineViewModel(
 
     val isLoading = MutableLiveData<Boolean>()
     val isInitLoading = MutableLiveData<Boolean>()
+    private var mIsLoading: Boolean = false
+        set(value) {
+            field = value
+            mIsInitLoading = value
+            isLoading.postValue(value)
+        }
+    private var mIsInitLoading: Boolean = false
+        set(value) {
+            field = value
+            isInitLoading.postValue(value)
+        }
 
-    private var isLoadingFlag = false
 
     private val logger = miCore.loggerFactory.create("TimelineViewModel")
 
@@ -99,7 +103,7 @@ class TimelineViewModel(
         }.filterNotNull().map{
             miCore.getGetters().noteRelationGetter.get(getAccount(), it.body)
         }.filter {
-           !mNoteIds.contains(it.note.id) && !this.isLoadingFlag
+           !mNoteIds.contains(it.note.id) && !this.mIsLoading
         }.map{
             PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
         }.onEach {
@@ -126,174 +130,118 @@ class TimelineViewModel(
     }
 
     fun loadNew(){
-        Log.d("TimelineLiveData", "loadNew")
-        if( ! isLoadingFlag ){
-            isLoadingFlag = true
-            //val sinceId = observableTimelineList.firstOrNull()?.id
-            val request = timelineLiveData.value.makeSinceIdRequest()
-            if(request?.sinceId == null){
-                isLoadingFlag = false
-                isLoading.postValue(false)
-                return loadInit()
-            }
-            viewModelScope.launch(Dispatchers.IO){
-                try{
-                    val res = syncLoad(request)
-                        ?: return@launch
-                    val list = res.second?.filter(::filterDuplicate)
-                    if(list.isNullOrEmpty()){
-                        return@launch
-                    }else{
-                        list.captureNotes()
-                        loadUrlPreviews(list)
-
-                        val state = timelineLiveData.value
-                        val newState = if(state == null){
-                            //startTimelineCapture()
-
-                            TimelineState(
-                                list,
-                                TimelineState.State.LOAD_NEW
-                            )
-
-                        }else{
-                            /*if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground && list.size < 20){
-                                startTimelineCapture()
-                            }*/
-                            val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
-                                addAll(0, list)
-                            }
-                            TimelineState(
-                                newList,
-                                TimelineState.State.LOAD_NEW
-                            )
-                        }
-
-                        mNoteIds.addAll(list.map(::mapId))
-
-                        timelineLiveData.postValue(newState)
-                    }
-                } catch(e: IOException){
-                    mErrorEvent.tryEmit(Errors.NETWORK)
-                } catch(e: SocketTimeoutException){
-                    mErrorEvent.tryEmit(Errors.TIMEOUT)
-                } catch (e: Exception){
-                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
-                    mErrorEvent.tryEmit(Errors.NETWORK)
-                }finally {
-                    isLoading.postValue(false)
-                    isLoadingFlag = false
-                }
-
-            }
-
+        logger.debug("loadNew")
+        if( mIsInitLoading || mIsLoading ) {
+            return
         }
+        mIsInitLoading = true
+        mIsLoading = true
+        val request = timelineLiveData.value.makeSinceIdRequest()
+        if(request?.sinceId == null){
+            mIsInitLoading = false
+            mIsLoading = false
+            return loadInit()
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                logger.debug("読み込みを開始")
+                val res = syncLoad(request)
+                val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                list.captureNotes()
+                loadUrlPreviews(list)
+
+                val state = timelineLiveData.value
+
+                val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply {
+                    addAll(0, list)
+                }
+                mNoteIds.addAll(list.map(::mapId))
+                TimelineState(
+                    newList,
+                    TimelineState.State.LOAD_NEW
+                )
+            }.onSuccess {
+                timelineLiveData.postValue(it)
+            }.onFailure {
+                handleError(it)
+            }
+            mIsLoading = false
+        }
+
     }
 
     fun loadOld(){
         val request = timelineLiveData.value.makeUntilIdRequest()
         request?.untilId
             ?: return loadInit()
-        if( isLoadingFlag){
+        if( mIsLoading || mIsInitLoading ){
             return
         }
-        isLoadingFlag = true
+        mIsLoading = true
+
         viewModelScope.launch(Dispatchers.IO){
-            try {
+            runCatching {
                 val res = syncLoad(request)
-                    ?: return@launch
-                val list = res.second?.filter(::filterDuplicate)
-                if(list.isNullOrEmpty()){
-                    return@launch
-                }else{
-                    list.captureNotes()
-                    loadUrlPreviews(list)
-                    val state = timelineLiveData.value
-
-                    val newState = if(state == null){
-                        TimelineState(
-                            list,
-                            TimelineState.State.LOAD_OLD
-                        )
-                    }else{
-                        val newList = ArrayList<PlaneNoteViewData>(state.notes).apply{
-                            addAll(list)
-                        }
-                        TimelineState(
-                            newList,
-                            TimelineState.State.LOAD_OLD
-                        )
-                    }
-                    mNoteIds.addAll(list.map(::mapId))
-                    timelineLiveData.postValue(newState)
+                val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                list.captureNotes()
+                loadUrlPreviews(list)
+                mNoteIds.addAll(list.map(::mapId))
+                val state = timelineLiveData.value
+                val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply{
+                    addAll(list)
                 }
-            } catch(e: IOException){
-                mErrorEvent.tryEmit(Errors.NETWORK)
-            } catch(e: SocketTimeoutException){
-                mErrorEvent.tryEmit(Errors.TIMEOUT)
-            } catch (e: Exception){
-                Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
-                mErrorEvent.tryEmit(Errors.NETWORK)
-            }finally {
-                isLoadingFlag = false
-
+                TimelineState(
+                    newList,
+                    TimelineState.State.LOAD_OLD
+                )
+            }.onSuccess {
+                timelineLiveData.postValue(it)
+            }.onFailure {
+                handleError(it)
             }
+            mIsLoading = false
+            mIsInitLoading = false
+
         }
     }
 
     fun loadInit(){
         Log.d("TimelineViewModel", "初期読み込みを開始します")
-        this.isLoading.postValue(true)
-        this.isInitLoading.postValue(true)
 
-        if( ! isLoadingFlag ){
+        if(  mIsInitLoading || mIsLoading ) {
+            return
+        }
+        mIsLoading = true
+        mIsInitLoading = true
 
-            isLoadingFlag = true
+        viewModelScope.launch(Dispatchers.IO){
+            runCatching {
+                val account = getAccount()
+                val response = account.getPagedStore().loadInit()
+                val list = response.second?: emptyList()
+                logger.debug("Networkから受信")
+                val state = TimelineState(
+                    list,
+                    TimelineState.State.INIT
+                )
 
-            viewModelScope.launch(Dispatchers.IO){
-                try{
-                    val account = getAccount()
-                    val response = account.getPagedStore().loadInit()
-                    val list = response.second?: emptyList()
-                    logger.debug("Networkから受信")
-                    val state = TimelineState(
-                        list,
-                        TimelineState.State.INIT
-                    )
+                list.captureNotes()
 
-                    //noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
-                    list.captureNotes()
+                loadUrlPreviews(list)
 
-                    loadUrlPreviews(list)
+                mNoteIds.clear()
+                mNoteIds.addAll(list.map(::mapId))
+                state
+            }.onSuccess { state ->
+                timelineLiveData.postValue(state)
 
-                    mNoteIds.clear()
-                    mNoteIds.addAll(list.map(::mapId))
-
-                    timelineLiveData.postValue(state)
-
-                    /*if(settingStore.isAutoLoadTimeline){
-                        startTimelineCapture()
-                    }*/
-
-                } catch(e: IOException){
-                    mErrorEvent.tryEmit(Errors.NETWORK)
-                    timelineLiveData.postValue(null)
-
-                } catch(e: SocketTimeoutException){
-                    mErrorEvent.tryEmit(Errors.TIMEOUT)
-                    timelineLiveData.postValue(null)
-
-                } catch (e: Exception){
-                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
-                    mErrorEvent.tryEmit(Errors.NETWORK)
-                    timelineLiveData.postValue(null)
-                } finally{
-                    isLoading.postValue(false)
-                    isLoadingFlag = false
-                    isInitLoading.postValue(false)
-                }
-
+            }.onFailure {
+                timelineLiveData.postValue(null)
+                handleError(it)
             }
+            mIsInitLoading = false
+            mIsLoading = false
+
 
         }
     }
@@ -471,4 +419,10 @@ class TimelineViewModel(
         }
     }
 
+    private fun handleError(t: Throwable) {
+        if(t is Exception) {
+            mErrorEvent.tryEmit(t)
+        }
+
+    }
 }
