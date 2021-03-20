@@ -66,6 +66,7 @@ class NoteCaptureAPI(
     private fun unSubscribe(noteId: String, listenId: String) {
         synchronized(noteIdListenMap){
 
+            logger?.debug("unSubscribe noteId: $noteId")
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(listeners.isEmpty()) {
                 return
@@ -89,6 +90,7 @@ class NoteCaptureAPI(
 
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is NoteUpdated) {
+            logger?.debug("noteUpdated: $e")
             synchronized(noteIdListenMap) {
                 if(noteIdListenMap[e.body.id].isNullOrEmpty()) {
                     logger?.warning("listenerは未登録ですが、何か受信したようです。")
@@ -121,6 +123,7 @@ class NoteCaptureAPI(
     }
 
     private fun sendSub(noteId: String) : Boolean{
+        logger?.debug("購読メッセージ送信 noteId: $noteId")
         return socket.send(
             Send.SubscribeNote(Send.SubscribeNote.Body(noteId)).toJson()
         )
