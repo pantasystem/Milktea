@@ -60,7 +60,6 @@ class TimelineViewModel(
     private var mIsLoading: Boolean = false
         set(value) {
             field = value
-            mIsInitLoading = value
             isLoading.postValue(value)
         }
     private var mIsInitLoading: Boolean = false
@@ -130,120 +129,136 @@ class TimelineViewModel(
     }
 
     fun loadNew(){
-        logger.debug("loadNew")
-        if( mIsInitLoading || mIsLoading ) {
-            return
-        }
-        mIsInitLoading = true
-        mIsLoading = true
-        val request = timelineLiveData.value.makeSinceIdRequest()
-        if(request?.sinceId == null){
-            mIsInitLoading = false
-            mIsLoading = false
-            return loadInit()
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                logger.debug("読み込みを開始")
-                val res = syncLoad(request)
-                val list = res?.second?.filter(::filterDuplicate)?: emptyList()
-                list.captureNotes()
-                loadUrlPreviews(list)
-
-                val state = timelineLiveData.value
-
-                val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply {
-                    addAll(0, list)
-                }
-                mNoteIds.addAll(list.map(::mapId))
-                TimelineState(
-                    newList,
-                    TimelineState.State.LOAD_NEW
-                )
-            }.onSuccess {
-                timelineLiveData.postValue(it)
-            }.onFailure {
-                handleError(it)
+        synchronized(timelineLiveData) {
+            logger.debug("loadNew")
+            if( mIsInitLoading || mIsLoading ) {
+                logger.debug("loadNewキャンセル")
+                return
             }
-            mIsLoading = false
+            mIsLoading = true
+            val request = timelineLiveData.value.makeSinceIdRequest()
+            logger.debug("makeSinceIdRequest完了:$request")
+            if(request?.sinceId == null){
+                mIsInitLoading = false
+                mIsLoading = false
+                logger.debug("初期読み込みへ移行")
+                return loadInit()
+            }
+            logger.debug("判定準備完了 active:${viewModelScope.isActive}")
+            viewModelScope.launch(Dispatchers.IO) {
+                logger.debug("launch開始")
+                runCatching {
+                    logger.debug("読み込みを開始")
+                    val res = syncLoad(request)
+                    val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                    list.captureNotes()
+                    loadUrlPreviews(list)
+
+                    val state = timelineLiveData.value
+
+                    val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply {
+                        addAll(0, list)
+                    }
+                    mNoteIds.addAll(list.map(::mapId))
+                    TimelineState(
+                        newList,
+                        TimelineState.State.LOAD_NEW
+                    )
+                }.onSuccess {
+                    timelineLiveData.postValue(it)
+                }.onFailure {
+                    handleError(it)
+                }
+                mIsLoading = false
+                mIsInitLoading = false
+            }
+        }.also {
+            logger.debug("job: active=${it.isActive}, completed=${it.isCompleted}, cancelled=${it.isCancelled}")
         }
+
 
     }
 
     fun loadOld(){
-        val request = timelineLiveData.value.makeUntilIdRequest()
-        request?.untilId
-            ?: return loadInit()
-        if( mIsLoading || mIsInitLoading ){
-            return
-        }
-        mIsLoading = true
-
-        viewModelScope.launch(Dispatchers.IO){
-            runCatching {
-                val res = syncLoad(request)
-                val list = res?.second?.filter(::filterDuplicate)?: emptyList()
-                list.captureNotes()
-                loadUrlPreviews(list)
-                mNoteIds.addAll(list.map(::mapId))
-                val state = timelineLiveData.value
-                val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply{
-                    addAll(list)
-                }
-                TimelineState(
-                    newList,
-                    TimelineState.State.LOAD_OLD
-                )
-            }.onSuccess {
-                timelineLiveData.postValue(it)
-            }.onFailure {
-                handleError(it)
+        synchronized(timelineLiveData) {
+            val request = timelineLiveData.value.makeUntilIdRequest()
+            request?.untilId
+                ?: return loadInit()
+            if( mIsLoading || mIsInitLoading ){
+                return
             }
-            mIsLoading = false
-            mIsInitLoading = false
+            mIsLoading = true
 
+            viewModelScope.launch(Dispatchers.IO){
+                runCatching {
+                    val res = syncLoad(request)
+                    val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                    list.captureNotes()
+                    loadUrlPreviews(list)
+                    mNoteIds.addAll(list.map(::mapId))
+                    val state = timelineLiveData.value
+                    val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply{
+                        addAll(list)
+                    }
+                    TimelineState(
+                        newList,
+                        TimelineState.State.LOAD_OLD
+                    )
+                }.onSuccess {
+                    timelineLiveData.postValue(it)
+                }.onFailure {
+                    handleError(it)
+                }
+                mIsLoading = false
+                mIsInitLoading = false
+
+            }
         }
+
     }
 
     fun loadInit(){
-        Log.d("TimelineViewModel", "初期読み込みを開始します")
+        synchronized(timelineLiveData) {
+            Log.d("TimelineViewModel", "初期読み込みを開始します")
 
-        if(  mIsInitLoading || mIsLoading ) {
-            return
-        }
-        mIsLoading = true
-        mIsInitLoading = true
-
-        viewModelScope.launch(Dispatchers.IO){
-            runCatching {
-                val account = getAccount()
-                val response = account.getPagedStore().loadInit()
-                val list = response.second?: emptyList()
-                logger.debug("Networkから受信")
-                val state = TimelineState(
-                    list,
-                    TimelineState.State.INIT
-                )
-
-                list.captureNotes()
-
-                loadUrlPreviews(list)
-
-                mNoteIds.clear()
-                mNoteIds.addAll(list.map(::mapId))
-                state
-            }.onSuccess { state ->
-                timelineLiveData.postValue(state)
-
-            }.onFailure {
-                timelineLiveData.postValue(null)
-                handleError(it)
+            if(  mIsInitLoading || mIsLoading ) {
+                return
             }
-            mIsInitLoading = false
-            mIsLoading = false
+            mIsLoading = true
+            mIsInitLoading = true
+
+            viewModelScope.launch(Dispatchers.IO){
+                runCatching {
+                    val account = getAccount()
+                    val response = account.getPagedStore().loadInit()
+                    val list = response.second?: emptyList()
+                    logger.debug("Networkから受信")
+                    val state = TimelineState(
+                        list,
+                        TimelineState.State.INIT
+                    )
+
+                    list.captureNotes()
+
+                    loadUrlPreviews(list)
+
+                    mNoteIds.clear()
+                    mNoteIds.addAll(list.map(::mapId))
+                    state
+                }.onSuccess { state ->
+                    timelineLiveData.postValue(state)
+
+                }.onFailure {
+                    timelineLiveData.postValue(null)
+                    handleError(it)
+                }
+                mIsInitLoading = false
+                mIsLoading = false
 
 
+            }
         }
+
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -360,6 +375,7 @@ class TimelineViewModel(
     }
 
     fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): Request?{
+        logger.debug("makeSinceIdRequest")
         return (this?.getSinceIds(substituteSize)?: emptyList()).makeSinceIdRequest()
     }
 
