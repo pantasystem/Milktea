@@ -149,6 +149,7 @@ class MiApplication : Application(), MiCore {
     private val logger = loggerFactory.create("MiApplication")
 
 
+    @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate() {
         super.onCreate()
@@ -240,6 +241,8 @@ class MiApplication : Application(), MiCore {
         mMessageRepository = MessageRepositoryImpl(this)
 
         mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource)
+
+        messageStreamFilter = MessageStreamFilter(this)
 
         mNotificationRepository = NotificationRepositoryImpl(
             mNotificationDataSource,
