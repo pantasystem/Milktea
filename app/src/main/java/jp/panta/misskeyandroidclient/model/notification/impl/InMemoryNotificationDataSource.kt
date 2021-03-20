@@ -3,20 +3,20 @@ package jp.panta.misskeyandroidclient.model.notification.impl
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationNotFoundException
-import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
+import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 
-class InMemoryNotificationRepository : NotificationRepository{
+class InMemoryNotificationDataSource : NotificationDataSource{
 
-    private val listeners = mutableSetOf<NotificationRepository.Listener>()
+    private val listeners = mutableSetOf<NotificationDataSource.Listener>()
     private val notificationIdAndNotification = mutableMapOf<Notification.Id, Notification>()
 
-    override fun addEventListener(listener: NotificationRepository.Listener) {
+    override fun addEventListener(listener: NotificationDataSource.Listener) {
         synchronized(listeners) {
             listeners.add(listener)
         }
     }
 
-    override fun removeEventListener(listener: NotificationRepository.Listener) {
+    override fun removeEventListener(listener: NotificationDataSource.Listener) {
         synchronized(listeners) {
             listeners.remove(listener)
         }
@@ -25,9 +25,9 @@ class InMemoryNotificationRepository : NotificationRepository{
     override suspend fun add(notification: Notification): AddResult {
         return createOrUpdate(notification).also {
             if(it == AddResult.CREATED) {
-                publish(NotificationRepository.Event.Created(notification.id, notification))
+                publish(NotificationDataSource.Event.Created(notification.id, notification))
             }else if(it == AddResult.UPDATED) {
-                publish(NotificationRepository.Event.Updated(notification.id, notification))
+                publish(NotificationDataSource.Event.Updated(notification.id, notification))
             }
         }
     }
@@ -45,7 +45,7 @@ class InMemoryNotificationRepository : NotificationRepository{
     override suspend fun remove(notificationId: Notification.Id): Boolean {
         return delete(notificationId).also {
             if(it){
-                publish(NotificationRepository.Event.Deleted(notificationId))
+                publish(NotificationDataSource.Event.Deleted(notificationId))
             }
         }
     }
@@ -72,7 +72,7 @@ class InMemoryNotificationRepository : NotificationRepository{
         }
     }
 
-    private fun publish(event: NotificationRepository.Event) {
+    private fun publish(event: NotificationDataSource.Event) {
         synchronized(listeners) {
             listeners.forEach {
                 it.on(event)

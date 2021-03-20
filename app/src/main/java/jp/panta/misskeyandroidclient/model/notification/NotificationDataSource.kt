@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.model.notification
 
 import jp.panta.misskeyandroidclient.model.AddResult
 
-interface NotificationRepository {
+interface NotificationDataSource {
 
     sealed class Event {
         abstract val notificationId: Notification.Id

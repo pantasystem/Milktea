@@ -23,7 +23,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
+import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -60,7 +60,7 @@ interface MiCore{
 
     fun getUserRepository(): UserRepository
 
-    fun getNotificationRepository(): NotificationRepository
+    fun getNotificationRepository(): NotificationDataSource
 
     fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow
 

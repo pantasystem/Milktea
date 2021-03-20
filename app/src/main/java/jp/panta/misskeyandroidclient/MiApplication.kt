@@ -10,7 +10,6 @@ import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
@@ -20,7 +19,6 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.instance.Meta
@@ -59,8 +57,8 @@ import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
-import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
-import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationRepository
+import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
@@ -110,7 +108,7 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mNoteDataSource: NoteDataSource
     private lateinit var mUserDataSource: UserDataSource
-    private lateinit var mNotificationRepository: NotificationRepository
+    private lateinit var mNotificationDataSource: NotificationDataSource
 
     private lateinit var mNoteRepository: NoteRepository
     private lateinit var mUserRepository: UserRepository
@@ -199,7 +197,7 @@ class MiApplication : Application(), MiCore {
         mUserDataSource = InMemoryUserDataSource()
         mUserRepository = UserRepositoryImpl(this)
 
-        mNotificationRepository = InMemoryNotificationRepository()
+        mNotificationDataSource = InMemoryNotificationDataSource()
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource)
 
@@ -232,7 +230,7 @@ class MiApplication : Application(), MiCore {
         }
         mMessageRepository = MessageRepositoryImpl(this)
 
-        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationRepository, mMessageDataSource)
+        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource)
 
         notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
 
@@ -296,8 +294,8 @@ class MiApplication : Application(), MiCore {
         return mAccountRepository
     }
 
-    override fun getNotificationRepository(): NotificationRepository {
-        return mNotificationRepository
+    override fun getNotificationRepository(): NotificationDataSource {
+        return mNotificationDataSource
     }
 
     override fun getMessageDataSource(): MessageDataSource {
