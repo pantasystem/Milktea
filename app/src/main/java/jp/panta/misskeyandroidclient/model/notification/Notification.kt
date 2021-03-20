@@ -18,6 +18,8 @@ sealed class Notification {
     abstract val createdAt: Date
     abstract val isRead: Boolean
 
+    abstract fun read(): Notification
+
     data class Id(
         val accountId: Long,
         val notificationId: String
@@ -35,7 +37,11 @@ data class FollowNotification(
     override val createdAt: Date,
     override val userId: User.Id,
     override val isRead: Boolean
-) : Notification()
+) : Notification() {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class FollowRequestAcceptedNotification(
     override val id: Id,
@@ -44,7 +50,11 @@ data class FollowRequestAcceptedNotification(
     override val userId: User.Id,
     override val isRead: Boolean
 
-) : Notification()
+) : Notification() {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class ReceiveFollowRequestNotification(
     override val id: Id,
@@ -53,7 +63,11 @@ data class ReceiveFollowRequestNotification(
     override val userId: User.Id,
     override val isRead: Boolean
 
-) : Notification()
+) : Notification() {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class MentionNotification(
     override val id: Id,
@@ -63,7 +77,11 @@ data class MentionNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote
+) : Notification(), HasNote {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 
 data class ReplyNotification(
@@ -74,7 +92,11 @@ data class ReplyNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote
+) : Notification(), HasNote {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class RenoteNotification(
     override val id: Id,
@@ -84,7 +106,11 @@ data class RenoteNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote
+) : Notification(), HasNote {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class QuoteNotification(
     override val id: Id,
@@ -94,7 +120,11 @@ data class QuoteNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote
+) : Notification(), HasNote {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class ReactionNotification(
     override val id: Id,
@@ -105,7 +135,11 @@ data class ReactionNotification(
     val reaction: String,
     override val isRead: Boolean
 
-) : Notification(), HasNote
+) : Notification(), HasNote {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class PollVoteNotification(
     override val id: Id,
@@ -116,4 +150,8 @@ data class PollVoteNotification(
     val choice: Int,
     override val isRead: Boolean
 
-) : Notification(), HasNote
+) : Notification(), HasNote {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
