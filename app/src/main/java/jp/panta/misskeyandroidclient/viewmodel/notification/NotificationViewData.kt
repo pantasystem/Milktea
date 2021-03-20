@@ -42,7 +42,7 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
     val name = notification.user.name
     val userName = notification.user.userName
 
-    val reaction =  (notification as? ReactionNotification)?.reaction
+    val reaction =  (notification.notification as? ReactionNotification)?.reaction
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
