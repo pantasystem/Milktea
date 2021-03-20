@@ -97,7 +97,7 @@ class NotificationService : Service() {
             miApplication.messageStreamFilter.getAllMergedAccountMessages().onEach {
                 val msgRelation = miApplication.getGetters().messageRelationGetter.get(it)
                 showMessageNotification(msgRelation)
-            }.launchIn(coroutineScope)
+            }.launchIn(coroutineScope + Dispatchers.IO)
 
         }
 
