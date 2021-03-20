@@ -253,8 +253,7 @@ class UserDetailActivity : AppCompatActivity() {
                 addPageToTab()
             }
             R.id.add_list ->{
-                val intent = Intent(this, ListListActivity::class.java)
-                intent.putExtra(ListListActivity.EXTRA_ADD_USER_ID, mUserId)
+                val intent = ListListActivity.newInstance(this, mUserId)
                 startActivity(intent)
             }
             else -> return false

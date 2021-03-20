@@ -373,7 +373,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
     }
 
     private fun startSearchAndSelectUser(){
-        val selectedUserIds = mViewModel?.address?.value?.map{
+        val selectedUserIds = mViewModel?.address?.value?.mapNotNull{
             it.userId
         }?: emptyList()
 

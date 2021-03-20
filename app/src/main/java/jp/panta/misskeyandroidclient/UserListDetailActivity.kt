@@ -209,16 +209,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         finish()
     }
 
-    private fun createdResultFinish(userList: UserListDTO){
-        val data = Intent().apply{
-            putExtra(ListListActivity.EXTRA_USER_LIST_ID, userList.id)
-            putExtra(ListListActivity.EXTRA_USER_LIST_NAME, userList.name)
-            putExtra(ListListActivity.EXTRA_CREATED_AT, userList.createdAt)
-            putExtra(ListListActivity.EXTRA_USER_ID_ARRAY, userList.userIds.toTypedArray())
-        }
-        setResult(RESULT_OK, data)
-        finish()
-    }
+
 
     inner class PagerAdapter(val listId: UserList.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))

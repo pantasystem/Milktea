@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.api.list.UserListDTO
 import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.view.list.ListListAdapter
 import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
@@ -25,14 +27,18 @@ import kotlinx.coroutines.flow.onEach
 class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback, UserListEditorDialog.OnSubmittedListener{
 
     companion object{
-        const val EXTRA_USER_LIST_NAME = "jp.panta.misskeyandroidclient.EXTRA_USER_LIST_NAME"
-        const val EXTRA_USER_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_USER_LIST_ID"
-        const val EXTRA_CREATED_AT = "jp.panta.misskeyandroidclient.EXTRA_CREATED_AT"
-        const val EXTRA_USER_ID_ARRAY = "jp.panta.misskeyandroidclient.EXTRA_USER_ID_ARRAY"
 
-        const val EXTRA_ADD_USER_ID = "jp.panta.misskeyandroidclient.extra.ADD_USER_ID"
+        private const val EXTRA_ADD_USER_ID = "jp.panta.misskeyandroidclient.extra.ADD_USER_ID"
 
         private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
+
+        fun newInstance(context: Context, addUserId: User.Id?): Intent {
+            return Intent(context, ListListActivity::class.java).apply {
+                addUserId?.let {
+                    putExtra(EXTRA_ADD_USER_ID, addUserId)
+                }
+            }
+        }
     }
 
     @ExperimentalCoroutinesApi
@@ -46,7 +52,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         setTheme()
         setContentView(R.layout.activity_list_list)
 
-        val addUserId = intent.getStringExtra(EXTRA_ADD_USER_ID)
+        val addUserId = intent.getSerializableExtra(EXTRA_ADD_USER_ID) as? User.Id
 
         val miCore = application as MiCore
 
@@ -127,6 +133,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         mListListViewModel?.createUserList(name)
     }
 
+    @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode){

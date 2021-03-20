@@ -11,7 +11,7 @@
                 type="jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel" />
         <variable
                 name="addUserId"
-                type="String" />
+                type="jp.panta.misskeyandroidclient.model.users.User.Id" />
     </data>
 
     <androidx.cardview.widget.CardView
