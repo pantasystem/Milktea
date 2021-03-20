@@ -69,8 +69,8 @@ class TimelineViewModel(
     private val logger = miCore.loggerFactory.create("TimelineViewModel")
 
     init {
-        flow<Account> {
-            getAccount()
+        flow {
+            emit(getAccount())
         }.filter {
             pageable is Pageable.GlobalTimeline
                     || pageable is Pageable.HybridTimeline
@@ -431,7 +431,7 @@ class TimelineViewModel(
             mAccountCache
         }
 
-        if(accountId != null && accountId?:0 > 0) {
+        if(accountId != null && accountId > 0) {
             val ac = accountRepository.get(accountId)
             mAccountCache = ac
             return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
