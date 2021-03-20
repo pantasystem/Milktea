@@ -9,22 +9,23 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthImpl
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+@ExperimentalCoroutinesApi
 class NotificationViewModel(
-    private val account: Account,
-    private val misskeyAPI: MisskeyAPI,
     private val miCore: MiCore,
-    private val encryption: Encryption = miCore.getEncryption(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-    //private val noteCapture: NoteCapture
 ) : ViewModel(){
 
+    private val encryption: Encryption = miCore.getEncryption()
 
 
     val isLoading = MutableLiveData<Boolean>()
@@ -47,6 +48,31 @@ class NotificationViewModel(
             field = value
         }
 
+    init {
+        miCore.getCurrentAccount().filterNotNull().onEach {
+            loadInit()
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
+                it as? ChannelBody.Main.Notification
+            }.filterNotNull().map {
+                ac to it
+            }.map {
+                it.first to miCore.getGetters().notificationRelationGetter.get(it.first, it.second.body)
+            }
+        }.map {  accountAndNotificationRelation ->
+            val notificationRelation = accountAndNotificationRelation.second
+            val account = accountAndNotificationRelation.first
+            NotificationViewData(notificationRelation, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+        }.onEach {
+
+            val list = ArrayList(notifications)
+            list.add(0, it)
+            notifications = list
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
+
     fun loadInit(){
         if(isLoadingFlag){
             return
@@ -55,12 +81,15 @@ class NotificationViewModel(
         noteCaptureScope.cancel()
         noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + ioDispatcher)
 
-        val request = NotificationRequest(i = account.getI(encryption), limit = 20)
         viewModelScope.launch(ioDispatcher) {
+            val account = miCore.getAccountRepository().getCurrentAccount()
+            val request = NotificationRequest(i = account.getI(encryption), limit = 20)
+            val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
+
             val notificationDTOList = runCatching {
                 misskeyAPI.notification(request).execute()?.body()
             }.getOrNull()
-            val viewDataList = notificationDTOList?.toNotificationViewData()
+            val viewDataList = notificationDTOList?.toNotificationViewData(account)
                 ?: emptyList()
             viewDataList.forEach {
                 it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
@@ -83,12 +112,15 @@ class NotificationViewModel(
             return
         }
 
-        val request = NotificationRequest(i = account.getI(encryption), limit = 20, untilId = untilId.notificationId)
         viewModelScope.launch(ioDispatcher) {
+            val account = miCore.getAccountRepository().getCurrentAccount()
+            val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
+
+            val request = NotificationRequest(i = account.getI(encryption), limit = 20, untilId = untilId.notificationId)
             val notifications = runCatching {
                 misskeyAPI.notification(request).execute()?.body()
             }.getOrNull()
-            val list = notifications?.toNotificationViewData()
+            val list = notifications?.toNotificationViewData(account)
             if(list.isNullOrEmpty()) {
                 isLoadingFlag = false
                 return@launch
@@ -109,18 +141,18 @@ class NotificationViewModel(
 
     }
 
-    private suspend fun NotificationDTO.toNotificationRelation(): NotificationRelation {
+    private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
         return miCore.getGetters().notificationRelationGetter.get(account, this)
     }
 
-    private suspend fun List<NotificationDTO>.toNotificationRelations(): List<NotificationRelation> {
+    private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
         return this.map {
-            it.toNotificationRelation()
+            it.toNotificationRelation(account)
         }
     }
 
-    private suspend fun List<NotificationDTO>.toNotificationViewData(): List<NotificationViewData> {
-        return this.toNotificationRelations().map {
+    private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
+        return this.toNotificationRelations(account).map {
             NotificationViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
         }
     }
