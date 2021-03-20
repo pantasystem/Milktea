@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.list.UserList
+import jp.panta.misskeyandroidclient.api.list.UserListDTO
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
@@ -107,7 +107,7 @@ class AntennaEditorViewModel (
 
 
 
-    val userListList = MediatorLiveData<List<UserList>>().apply{
+    val userListList = MediatorLiveData<List<UserListDTO>>().apply{
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
@@ -119,7 +119,7 @@ class AntennaEditorViewModel (
     }
 
 
-    val userList = MediatorLiveData<UserList?>().apply{
+    val userList = MediatorLiveData<UserListDTO?>().apply{
         addSource(userListList){ list ->
             this.value = list.firstOrNull {
                 it.id == this@AntennaEditorViewModel.antenna.value?.userListId

@@ -69,7 +69,7 @@ class ListListViewModel(
     val showUserDetailEvent = EventBus<UserList>()
 
 
-    private fun fetch() {
+    fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().getCurrentAccount()

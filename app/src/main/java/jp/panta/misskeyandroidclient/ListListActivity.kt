@@ -8,7 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.disposables.Disposable
-import jp.panta.misskeyandroidclient.api.list.UserList
+import jp.panta.misskeyandroidclient.api.list.UserListDTO
+import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.view.list.ListListAdapter
 import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
@@ -16,6 +17,7 @@ import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
 import kotlinx.android.synthetic.main.activity_list_list.*
 import kotlinx.android.synthetic.main.content_list_list.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -33,10 +35,12 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
     }
 
+    @ExperimentalCoroutinesApi
     private var mListListViewModel: ListListViewModel? = null
 
     private var mPullPushUserViewModelEventDisposable: Disposable? = null
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -65,7 +69,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
             if(mPullPushUserViewModelEventDisposable?.isDisposed == true){
                 mPullPushUserViewModelEventDisposable = pullPushUserViewModel.pullPushEvent.subscribe {
-                    mListListViewModel?.loadListList()
+                    mListListViewModel?.fetch()
                 }
             }
 
@@ -84,7 +88,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         mListListViewModel?.userListList?.observe(this, Observer{ userListList ->
             listAdapter.submitList(userListList)
         })
-        mListListViewModel?.loadListList()
+
 
         setUpObservers()
         addListButton.setOnClickListener {
@@ -95,6 +99,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
 
 
+    @ExperimentalCoroutinesApi
     private fun setUpObservers(){
         mListListViewModel?.showUserDetailEvent?.removeObserver(showUserListDetail)
         mListListViewModel?.showUserDetailEvent?.observe(this, showUserListDetail)
@@ -102,9 +107,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     }
 
     private val showUserListDetail = Observer<UserList>{ ul ->
-        val intent = Intent(this, UserListDetailActivity::class.java)
-        intent.putExtra(UserListDetailActivity.EXTRA_LIST_ID, ul.id)
-        intent.putExtra(UserListDetailActivity.EXTRA_ACCOUNT_ID, mListListViewModel?.account?.accountId?: - 1)
+        val intent = UserListDetailActivity.newIntent(this, ul.id)
         startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
     }
 
@@ -113,16 +116,13 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     override fun onEdit(userList: UserList?) {
         userList?: return
 
-        val intent = Intent(this, UserListDetailActivity::class.java)
-        val account = mListListViewModel?.account
-        if(account != null){
-            intent.putExtra(UserListDetailActivity.EXTRA_LIST_ID, userList.id)
-                .putExtra(UserListDetailActivity.EXTRA_ACCOUNT_ID, account.accountId)
-            intent.action = UserListDetailActivity.ACTION_EDIT_NAME
-            startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
-        }
+        val intent = UserListDetailActivity.newIntent(this, userList.id)
+        intent.action = UserListDetailActivity.ACTION_EDIT_NAME
+        startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
     }
 
+
+    @ExperimentalCoroutinesApi
     override fun onSubmit(name: String) {
         mListListViewModel?.createUserList(name)
     }
