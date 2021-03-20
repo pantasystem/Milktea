@@ -18,31 +18,14 @@ import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
-import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.util.getPreferenceName
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
-import jp.panta.misskeyandroidclient.model.url.*
-import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
-import kotlinx.coroutines.*
-import java.lang.Exception
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashMap
-import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
+import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
@@ -50,26 +33,43 @@ import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
+import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
+import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
+import jp.panta.misskeyandroidclient.model.url.*
+import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
 import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
+import jp.panta.misskeyandroidclient.util.getPreferenceName
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.util.concurrent.ConcurrentHashMap
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -112,6 +112,7 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mNoteRepository: NoteRepository
     private lateinit var mUserRepository: UserRepository
+    private lateinit var mNotificationRepository: NotificationRepository
 
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
@@ -136,7 +137,6 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-    override lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -205,8 +205,17 @@ class MiApplication : Application(), MiCore {
             getEncryption(),
             mAccountRepository,
             loggerFactory,
-            { _, socket ->
-               socket.connect()
+            { account, socket ->
+                socket.connect()
+                getChannelAPI(account).connect(ChannelAPI.Type.MAIN).onEach {
+                    // 各種DataSourceなどの各種変更イベントを通達する
+                    runCatching {
+                        if(it is ChannelBody.Main.Notification) {
+                            getGetters().notificationRelationGetter.get(account, it.body)
+                        }
+                    }
+
+                }.launchIn(applicationScope + Dispatchers.IO)
             }
         )
 
@@ -232,7 +241,14 @@ class MiApplication : Application(), MiCore {
 
         mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource)
 
-        notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
+        mNotificationRepository = NotificationRepositoryImpl(
+            mNotificationDataSource,
+            applicationScope,
+            mSocketWithAccountProvider,
+            mAccountRepository,
+            getGetters().notificationRelationGetter,
+            Dispatchers.IO
+        )
 
         val userRepositoryAndMainChanelAPIAdapter = UserRepositoryAndMainChannelAdapter(mUserDataSource, mChannelAPIWithAccountProvider)
         // NOTE: 何度もchannelの接続と切断が繰り返される可能性があるがAccountに対してそこまでアクションをとる可能性は低い
@@ -294,8 +310,12 @@ class MiApplication : Application(), MiCore {
         return mAccountRepository
     }
 
-    override fun getNotificationRepository(): NotificationDataSource {
+    override fun getNotificationDataSource(): NotificationDataSource {
         return mNotificationDataSource
+    }
+
+    override fun getNotificationRepository(): NotificationRepository {
+        return mNotificationRepository
     }
 
     override fun getMessageDataSource(): MessageDataSource {

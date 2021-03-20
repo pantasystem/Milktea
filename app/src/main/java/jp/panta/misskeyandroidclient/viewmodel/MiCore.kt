@@ -9,7 +9,6 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
@@ -24,6 +23,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -31,11 +31,7 @@ import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import kotlinx.coroutines.flow.StateFlow
 
 interface MiCore{
-    //val accounts: MutableLiveData<List<Account>>
 
-    //val currentAccount: MutableLiveData<Account>
-
-    var notificationSubscribeViewModel: NotificationSubscribeViewModel
 
     var messageStreamFilter: MessageStreamFilter
 
@@ -60,7 +56,9 @@ interface MiCore{
 
     fun getUserRepository(): UserRepository
 
-    fun getNotificationRepository(): NotificationDataSource
+    fun getNotificationDataSource(): NotificationDataSource
+
+    fun getNotificationRepository(): NotificationRepository
 
     fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow
 
