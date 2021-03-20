@@ -15,7 +15,7 @@ object NoteTransitionHelper {
 
     @JvmStatic
     @BindingAdapter("clickedView", "transitionDestinationNote")
-    fun View.transitionNoteDetail(clickedView: View?, transitionDestinationNote: Note){
+    fun View.transitionNoteDetail(clickedView: View?, transitionDestinationNote: Note?){
         transitionDestinationNote?: return
         val clicked = clickedView?: this
         clicked.setOnClickListener {
