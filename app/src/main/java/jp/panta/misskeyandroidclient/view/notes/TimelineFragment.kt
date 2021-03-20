@@ -105,6 +105,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             ViewModelProvider(requireActivity(), factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
 
         }
+        mViewModel?.loadInit()
 
 
 

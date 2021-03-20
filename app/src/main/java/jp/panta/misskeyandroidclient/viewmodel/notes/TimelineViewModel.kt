@@ -21,6 +21,7 @@ import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
+import kotlin.math.log
 
 @ExperimentalCoroutinesApi
 class TimelineViewModel(
@@ -64,6 +65,8 @@ class TimelineViewModel(
     val isInitLoading = MutableLiveData<Boolean>()
 
     private var isLoadingFlag = false
+
+    private val logger = miCore.loggerFactory.create("TimelineViewModel")
 
     init {
         flow<Account> {
@@ -110,7 +113,7 @@ class TimelineViewModel(
                     notes = list
                 )
             )
-        }.launchIn(viewModelScope)
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
 
@@ -250,10 +253,12 @@ class TimelineViewModel(
                     val account = getAccount()
                     val response = account.getPagedStore().loadInit()
                     val list = response.second?: emptyList()
+                    logger.debug("Networkから受信")
                     val state = TimelineState(
                         list,
                         TimelineState.State.INIT
                     )
+
                     //noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
                     list.captureNotes()
 
@@ -426,7 +431,7 @@ class TimelineViewModel(
             mAccountCache
         }
 
-        if(accountId != null) {
+        if(accountId != null && accountId?:0 > 0) {
             val ac = accountRepository.get(accountId)
             mAccountCache = ac
             return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
