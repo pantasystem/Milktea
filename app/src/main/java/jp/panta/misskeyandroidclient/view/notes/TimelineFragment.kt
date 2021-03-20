@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.api.APIError
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.setMenuTint
@@ -28,6 +29,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
 
@@ -98,13 +101,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val pageable = mPage?.pageable() ?: mPageable
             ?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
         val factory = TimelineViewModelFactory(null, mPage?.accountId, pageable,  miApplication)
-        mViewModel = if(mPage == null){
-            ViewModelProvider(this, factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
+        mViewModel =  ViewModelProvider(this, factory).get(TimelineViewModel::class.java)
 
-        }else{
-            ViewModelProvider(requireActivity(), factory).get("timelineFragment:$mPage",TimelineViewModel::class.java)
-
-        }
 
 
 
@@ -181,23 +179,25 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         lifecycleScope.launchWhenResumed {
             mViewModel?.errorEvent?.collect { error ->
                 when(error){
-                    TimelineViewModel.Errors.AUTHENTICATION ->{
+                    is IOException -> {
+                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_LONG).show()
+
+                    }
+                    is SocketTimeoutException -> {
+                        Toast.makeText(requireContext(), R.string.timeout_error, Toast.LENGTH_LONG).show()
+
+                    }
+                    is APIError.AuthenticationException -> {
                         Toast.makeText(requireContext(), R.string.auth_error, Toast.LENGTH_LONG).show()
                     }
-                    TimelineViewModel.Errors.I_AM_AI ->{
+                    is APIError.IAmAIException -> {
                         Toast.makeText(requireContext(), R.string.bot_error, Toast.LENGTH_LONG).show()
                     }
-                    TimelineViewModel.Errors.PARAMETER_ERROR ->{
-                        Toast.makeText(requireContext(), R.string.parameter_error, Toast.LENGTH_LONG).show()
-                    }
-                    TimelineViewModel.Errors.SERVER_ERROR ->{
+                    is APIError.InternalServerException -> {
                         Toast.makeText(requireContext(), R.string.auth_error, Toast.LENGTH_LONG).show()
                     }
-                    TimelineViewModel.Errors.NETWORK ->{
-                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_LONG).show()
-                    }
-                    TimelineViewModel.Errors.TIMEOUT ->{
-                        Toast.makeText(requireContext(), R.string.timeout_error, Toast.LENGTH_LONG).show()
+                    is APIError.ClientException -> {
+                        Toast.makeText(requireContext(), R.string.parameter_error, Toast.LENGTH_LONG).show()
                     }
 
                 }
