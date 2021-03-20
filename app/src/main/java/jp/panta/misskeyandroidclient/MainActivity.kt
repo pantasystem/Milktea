@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.Gravity
-
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,16 +21,20 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.model.notification.Notification
+import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.util.getPreferenceName
@@ -50,12 +53,13 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -64,7 +68,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var mBottomNavigationAdapter: MainBottomNavigationAdapter? = null
 
-    private var mNotificationSubscribeViewModel: NotificationSubscribeViewModel? = null
 
     private var mNotificationService: NotificationService? = null
 
@@ -72,6 +75,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setTheme(R.style.AppThemeDark)
@@ -104,38 +108,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initAccountViewModelListener()
         setHeaderProfile(mainBinding)
 
-        mNotificationSubscribeViewModel = miApplication.notificationSubscribeViewModel
 
 
         mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        miApplication.getCurrentAccount().map{
-            miApplication.messageStreamFilter.getAccountMessageObservable(it)
+        // NOTE: メッセージの既読数をバッジに表示する
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getUnreadMessages().findByAccountId(it.accountId)
         }.map {
+            it.size
+        }.flowOn(Dispatchers.IO).onEach { count ->
+            bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
+                it.isVisible = count > 0
+                it.number = count
+            }
+        }.launchIn(lifecycleScope)
 
-        }
-
-        miApplication.getCurrentAccount().observe(this, Observer { ar ->
-
-            miApplication.messageStreamFilter.getUnreadMessageStore(ar).getUnreadMessageCountLiveData().observe( this, Observer { count ->
-                bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
-                    it.isVisible = count > 0
-                    it.number = count
-                }
-            })
-
-            //mNotificationSubscribeViewModel?.currentNotification?.observe(this, notificationObserver)
-            val isV12 = miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Major.V_12)?: false
+        // NOTE: インスタンスのバージョンを調べ、メニューを制御する
+        miApplication.getCurrentAccount().map {
+            miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Major.V_12)?: false
+        }.flowOn(Dispatchers.IO).onEach { isV12 ->
             Log.d("MainActivity", if(isV12) "v12のようです" else "v12以外のようです")
             navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
+        }.launchIn(lifecycleScope)
 
-        })
-
-        mNotificationSubscribeViewModel?.notifications?.observe(this, notificationObserver)
-
-
-        miApplication.connectionStatus.observe(this, Observer{ status ->
+        miApplication.connectionStatus.observe(this, { status ->
             when(status){
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
                 ConnectionStatus.ACCOUNT_ERROR ->{
@@ -150,31 +148,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
+        // NOTE: 通知の既読数を表示する
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getNotificationRepository().countUnreadNotification(it.accountId)
+        }.flowOn(Dispatchers.IO).onEach { count ->
+            if(count <= 0) {
+                bottom_navigation.getBadge(R.id.navigation_notification)?.clearNumber()
+            }
+            bottom_navigation.getOrCreateBadge(R.id.navigation_notification).apply{
+                isVisible = count > 0
+                number = count
+            }
+        }.launchIn(lifecycleScope)
+
+        // NOTE: 最新の通知をSnackBar等に表示する
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+            miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map { body ->
+                body as? ChannelBody.Main.Notification
+            }.filterNotNull().map {
+                ac to it
+            }
+        }.map {
+            miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
+        }.flowOn(Dispatchers.IO).onEach {
+            showNotification(it)
+        }.launchIn(lifecycleScope)
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState)
 
-    }
-
-    private val notificationObserver = Observer { notifications: List<Notification>? ->
-        Log.d("MainActivity", "通知が更新されました: $notifications")
-
-        if(notifications.isNullOrEmpty()){
-            bottom_navigation.getBadge(R.id.navigation_notification)?.clearNumber()
-        }
-        bottom_navigation.getOrCreateBadge(R.id.navigation_notification).apply{
-            //isVisible = !notifications.isNullOrEmpty()
-            isVisible = !notifications.isNullOrEmpty()
-            notifications?.size?.let{ size ->
-                number = size
-
-            }
-        }
-        notifications?.lastOrNull()?.let{ notify ->
-            Log.d("MainActivity", "通知が来ました:$notify")
-            showNotification(notify)
-
-        }
     }
 
 
@@ -212,6 +214,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    /**
+     * シンプルエディターの表示・非表示を行う
+     */
     private fun setSimpleEditor(){
         val miApplication = applicationContext as MiApplication
         val ft = supportFragmentManager.beginTransaction()
@@ -234,9 +239,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         ft.commit()
     }
 
-    private fun showNotification(notify: Notification){
+    /**
+     * 通知をSnackBarに表示する
+     */
+    private fun showNotification(notify: NotificationRelation){
         val account = (application as MiApplication).getCurrentAccount().value?: return
-        val viewData = NotificationViewData(notify, account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore()))
+        val miCore = application as MiCore
+
+        val viewData = NotificationViewData(notify, account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore()), miCore.getNoteCaptureAdapter())
         //Log.d("MainActivity")
         val name = notify.user.name?: notify.user.userName
         val msg = when(viewData.type){
@@ -249,12 +259,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             NotificationViewData.Type.POLL_VOTE -> name + " ${getString(R.string.voted_by)}"
             NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + " ${getString(R.string.followed_by)}"
             NotificationViewData.Type.FOLLOW_REQUEST_ACCEPTED -> name + " ${getString(R.string.follow_request_accepted)}"
-            else -> "もうわかんねぇなこれ"
         }
         val snackBar = Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG)
-        /*snackBar.setAction(R.string.show){
-            mBottomNavigationAdapter?.setCurrentFragment(R.id.navigation_notification)
-        }*/
+
         snackBar.show()
     }
 
@@ -267,29 +274,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    private val showFollowingsObserver = Observer<Unit>{
+    private val showFollowingsObserver = Observer<User.Id>{
         closeDrawerWhenOpenedDrawer()
-        val intent = Intent(this, FollowFollowerActivity::class.java).apply{
-            putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWING_VIEW_MODE)
-        }
+        val intent = FollowFollowerActivity.newIntent(this, it, true)
         startActivity(intent)
     }
 
-    private val showFollowersObserver = Observer<Unit>{
+    private val showFollowersObserver = Observer<User.Id>{
         closeDrawerWhenOpenedDrawer()
-        val intent = Intent(this, FollowFollowerActivity::class.java).apply {
-            putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWER_VIEW_MODE)
-        }
+        val intent = FollowFollowerActivity.newIntent(this, it, false)
         startActivity(intent)
     }
 
+    @ExperimentalCoroutinesApi
     private val showProfileObserver = Observer<Account>{
         closeDrawerWhenOpenedDrawer()
-        val intent = Intent(this, UserDetailActivity::class.java)
-        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it.remoteId)
+        val intent = UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
         intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }
+    @ExperimentalCoroutinesApi
     private fun initAccountViewModelListener(){
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
@@ -366,9 +370,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         return when (item.itemId) {
             R.id.action_settings -> {
                 startActivity(Intent(this, SettingsActivity::class.java))
