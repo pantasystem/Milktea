@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
@@ -42,10 +43,10 @@ class NoteDetailViewModel(
 
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val rawDetail = miCore.getMisskeyAPI(getAccount()).showNote(makeRequest()).execute().body()
-                    ?:return@launch
+                val account = getAccount()
+                val note = miCore.getNoteRepository().find(Note.Id(account.accountId, show.noteId))
 
-                val noteDetail = miCore.getGetters().noteRelationGetter.get(getAccount(), rawDetail)
+                val noteDetail = miCore.getGetters().noteRelationGetter.get(note)
 
                 val detail = NoteDetailViewData(
                     noteDetail,
