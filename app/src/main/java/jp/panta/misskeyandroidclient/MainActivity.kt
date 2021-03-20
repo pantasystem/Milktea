@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -57,8 +58,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }.launchIn(lifecycleScope)
 
         // NOTE: 最新の通知をSnackBar等に表示する
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+        val currentAccountNotifications = miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
             miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map { body ->
                 body as? ChannelBody.Main.Notification
             }.filterNotNull().map {
@@ -170,9 +170,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }.map {
             miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
-        }.flowOn(Dispatchers.IO).onEach {
-            showNotification(it)
-        }.launchIn(lifecycleScope)
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            currentAccountNotifications.collect { notificationRelation ->
+                withContext(Dispatchers.Main) {
+                    showNotification(notificationRelation)
+                }
+            }
+        }
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState)
@@ -242,6 +247,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     /**
      * 通知をSnackBarに表示する
      */
+    @MainThread
     private fun showNotification(notify: NotificationRelation){
         val account = (application as MiApplication).getCurrentAccount().value?: return
         val miCore = application as MiCore
@@ -338,6 +344,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    @MainThread
     private fun closeDrawerWhenOpenedDrawer(){
         if(drawer_layout.isDrawerOpen(GravityCompat.START)){
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -487,6 +494,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .into(backgroundImage)
     }
 
+    @MainThread
     private fun applyUI(){
         invalidateOptionsMenu()
         setSimpleEditor()
