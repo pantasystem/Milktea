@@ -35,6 +35,21 @@ sealed class Send {
 
     }
 
+    @SerialName("readNotification")
+    @Serializable
+    data class ReadNotification(
+        val body: Body
+    ) : Send() {
+
+        /**
+         * @param id 通知のId
+         */
+        @Serializable
+        data class Body(val id: String)
+    }
+
+
+
     @SerialName("disconnect")
     @Serializable
     data class Disconnect(
