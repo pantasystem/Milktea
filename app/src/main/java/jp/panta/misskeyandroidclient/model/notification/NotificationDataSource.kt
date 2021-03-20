@@ -23,4 +23,6 @@ interface NotificationDataSource {
     suspend fun remove(notificationId: Notification.Id) : Boolean
     suspend fun addAll(notifications: Collection<Notification>): List<AddResult>
 
+    suspend fun countUnreadNotification(accountId: Long): Int
+
 }

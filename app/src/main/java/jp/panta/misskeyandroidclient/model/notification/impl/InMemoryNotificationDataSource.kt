@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notification.impl
 
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.notification.AccountNotificationCount
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationNotFoundException
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
@@ -46,6 +47,32 @@ class InMemoryNotificationDataSource : NotificationDataSource{
         return delete(notificationId).also {
             if(it){
                 publish(NotificationDataSource.Event.Deleted(notificationId))
+            }
+        }
+    }
+
+    override suspend fun countUnreadNotification(accountId: Long): Int {
+        return countUnreadNotificationByAccount(accountId)
+    }
+
+
+
+    private fun countUnreadNotificationByAccount(accountId: Long): Int {
+        synchronized(notificationIdAndNotification) {
+            return notificationIdAndNotification.values.filter {
+                it.id.accountId == accountId
+            }.filterNot {
+                it.isRead
+            }.count()
+        }
+    }
+
+    private fun countUnreadNotification(): List<AccountNotificationCount> {
+        synchronized(notificationIdAndNotification) {
+            return notificationIdAndNotification.values.groupBy {
+                it.id.accountId
+            }.map {
+                AccountNotificationCount(it.key, it.value.count())
             }
         }
     }
