@@ -2,12 +2,8 @@ package jp.panta.misskeyandroidclient
 
 import android.app.Application
 import android.content.Context
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.net.ConnectivityManager
-import android.net.Network
-import android.os.Build
 import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -69,7 +65,6 @@ import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProv
 import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
-import jp.panta.misskeyandroidclient.util.receive
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
@@ -78,9 +73,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
-    companion object{
-        const val TAG = "MiApplication"
-    }
 
     lateinit var reactionHistoryDao: ReactionHistoryDao
 
@@ -122,6 +114,7 @@ class MiApplication : Application(), MiCore {
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+    private lateinit var mSocketConnectionQueue: SocketConnectionQueue
 
     private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
@@ -216,10 +209,7 @@ class MiApplication : Application(), MiCore {
             mAccountRepository,
             loggerFactory,
             { account, socket ->
-                applicationScope.launch(Dispatchers.IO) {
-                    val res = socket.blockingConnect()
-                    logger.debug("接続結果: ${if(res) "success" else "failure"}")
-                }
+                mSocketConnectionQueue.connect(account)
                 getChannelAPI(account).connect(ChannelAPI.Type.MAIN).onEach {
                     // 各種DataSourceなどの各種変更イベントを通達する
                     runCatching {
@@ -229,15 +219,15 @@ class MiApplication : Application(), MiCore {
                     }
 
                 }.launchIn(applicationScope + Dispatchers.IO)
-                socket.addSocketEventListener(object : SocketEventListener {
-                    override fun onMessage(e: StreamingEvent): Boolean = false
-
-                    override fun onStateChanged(e: Socket.State) {
-                        handleSocketStateEvent(account, socket, e)
-                    }
-                })
+                socket.addStateEventListener { e ->
+                    handleSocketStateEvent(account, socket, e)
+                }
+            },
+            { _, _ ->
+                mIsActiveNetwork
             }
         )
+        mSocketConnectionQueue = SocketConnectionQueue(mSocketWithAccountProvider, applicationScope, Dispatchers.IO, loggerFactory)
 
         mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
 
@@ -307,12 +297,13 @@ class MiApplication : Application(), MiCore {
 
         mActiveNetworkState.distinctUntilChanged().onEach {
             logger.debug("接続状態が変化:${if(it) "接続" else "未接続"}")
+            mIsActiveNetwork = it
             if(it) {
                 // NOTE: ネットワークの接続状態が非アクティブからアクティブに変化したのでSocketの再接続処理を行う
                 mSocketWithAccountProvider.all().filterNot { socket ->
                     socket.state() == Socket.State.Connected
                 }.forEach { socket ->
-                    socket.connect()
+                    mSocketConnectionQueue.connect(socket)
                 }
             }
         }.launchIn(applicationScope + Dispatchers.IO)
@@ -619,8 +610,13 @@ class MiApplication : Application(), MiCore {
      * Socketの通信状態をhandleする。
      */
     private fun handleSocketStateEvent(account: Account, socket: Socket, state: Socket.State) {
-        if(state is Socket.State.Failure) {
-            // TODO: Connection Queueのようなものを作って接続試行中にさらにリクエストを送信できないようにする
+        if(state is Socket.State.Failure
+            && mIsActiveNetwork
+            && !(mNoteCaptureAPIWithAccountProvider.get(account).isEmpty()
+                    && mChannelAPIWithAccountProvider.get(account).isEmpty())
+        ) {
+            logger.debug("ネットワークアクティブ、WebSocket未接続なので再接続を試みる")
+            mSocketConnectionQueue.connect(account)
         }
     }
 
