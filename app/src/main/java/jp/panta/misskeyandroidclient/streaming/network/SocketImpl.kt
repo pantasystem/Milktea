@@ -43,6 +43,7 @@ class SocketImpl(
     override fun connect(): Boolean {
         synchronized(this){
             if(mWebSocket != null){
+                logger.debug("接続済みのためキャンセル")
                 return false
             }
             mState = Socket.State.Connecting
@@ -91,6 +92,7 @@ class SocketImpl(
 
         synchronized(this){
             mState = Socket.State.Closed(code, reason)
+            mWebSocket = null
         }
     }
 
@@ -110,6 +112,7 @@ class SocketImpl(
             mState = Socket.State.Failure(
                 t, response
             )
+            mWebSocket = null
         }
     }
 
@@ -132,6 +135,7 @@ class SocketImpl(
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
+        logger.debug("webSocket:url=$url 接続")
         synchronized(this){
             mState = Socket.State.Connected
         }
