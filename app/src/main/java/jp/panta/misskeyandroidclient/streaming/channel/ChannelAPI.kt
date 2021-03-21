@@ -49,6 +49,24 @@ class ChannelAPI(
         }
     }
 
+    /**
+     * 接続しているチャンネル数
+     */
+    fun count(): Int {
+        synchronized(listenersMap) {
+            return listenersMap.filterNot {
+                it.value.isNullOrEmpty()
+            }.count()
+        }
+    }
+
+    /**
+     * 接続しているチャンネル数がゼロであるか
+     */
+    fun isEmpty(): Boolean {
+        return count() == 0
+    }
+
     private fun connect(type: Type, listenId: String, listener: (ChannelBody)->Unit) {
         synchronized(listenersMap) {
             if(listenersMap[type]?.contains(listenId) == true){

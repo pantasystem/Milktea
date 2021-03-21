@@ -50,6 +50,10 @@ class NoteCaptureAPI(
         }
     }
 
+    fun isEmpty(): Boolean {
+        return count() == 0
+    }
+
     /**
      * すでにCapture済みかをチェックします
      */
