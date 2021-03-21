@@ -27,7 +27,7 @@ class SocketImpl(
             field = value
             logger.debug("SocketImpl状態変化: ${value.javaClass}, $value")
             synchronized(stateListeners) {
-                stateListeners.forEach {
+                stateListeners.toList().forEach {
                     it.onStateChanged(value)
                 }
             }
@@ -41,7 +41,7 @@ class SocketImpl(
 
 
     override fun addMessageEventListener(listener: SocketMessageEventListener) {
-        synchronized(messageListeners) {
+        synchronized(this) {
             val empty = messageListeners.isEmpty()
             messageListeners.add(listener)
             if(empty && messageListeners.isNotEmpty()) {
@@ -51,13 +51,13 @@ class SocketImpl(
     }
 
     override fun addStateEventListener(listener: SocketStateEventListener) {
-        synchronized(stateListeners) {
+        synchronized(this) {
             stateListeners.add(listener)
         }
     }
 
     override fun removeMessageEventListener(listener: SocketMessageEventListener) {
-        synchronized(messageListeners) {
+        synchronized(this) {
             messageListeners.remove(listener)
             if(messageListeners.isEmpty()) {
                 disconnect()
@@ -66,7 +66,7 @@ class SocketImpl(
     }
 
     override fun removeStateEventListener(listener: SocketStateEventListener) {
-        synchronized(stateListeners) {
+        synchronized(this) {
             stateListeners.remove(listener)
         }
     }
@@ -95,14 +95,19 @@ class SocketImpl(
                 continuation.resume(false)
             }
             val callback = object : SocketStateEventListener{
+                var isResumed = false
                 override fun onStateChanged(e: Socket.State) {
-                    if(e is Socket.State.Connected){
-                        removeStateEventListener(this)
-                        continuation.resume(true)
-                    }else if(e is Socket.State.Failure || e is Socket.State.Closed) {
-                        removeStateEventListener(this)
-                        continuation.resume(false)
+                    if(!isResumed) {
+                        if(e is Socket.State.Connected){
+                            removeStateEventListener(this)
+                            continuation.resume(true)
+                        }else if(e is Socket.State.Failure || e is Socket.State.Closed) {
+                            removeStateEventListener(this)
+                            continuation.resume(false)
+                        }
+                        isResumed = true
                     }
+
                 }
 
             }
@@ -122,7 +127,7 @@ class SocketImpl(
     }
 
     override fun send(msg: String): Boolean {
-        logger.debug("メッセージ送信: $msg")
+        logger.debug("メッセージ送信: $msg, state${state()}")
         synchronized(this){
             if(state() != Socket.State.Connected){
                 logger.debug("送信をキャンセル state:${state()}")
@@ -161,6 +166,7 @@ class SocketImpl(
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         super.onFailure(webSocket, t, response)
+        logger.error("onFailure, res=$response", e = t)
 
         synchronized(this) {
             mState = Socket.State.Failure(
@@ -175,7 +181,7 @@ class SocketImpl(
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
 
-        synchronized(messageListeners) {
+        synchronized(this) {
             val iterator = messageListeners.iterator()
             while(iterator.hasNext()) {
                 val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.getOrNull()
