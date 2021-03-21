@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
 import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.SocketEventListener
 import jp.panta.misskeyandroidclient.streaming.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -12,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ChannelAPI(
     val socket: Socket,
-) : SocketEventListener {
+) : SocketMessageEventListener, SocketStateEventListener {
 
     enum class Type {
         MAIN, HOME, LOCAL, HYBRID, GLOBAL
@@ -32,7 +31,8 @@ class ChannelAPI(
     private val typeIdMap = ConcurrentHashMap<Type, String>()
 
     init {
-        socket.addSocketEventListener(this)
+        socket.addMessageEventListener(this)
+        socket.addStateEventListener(this)
     }
 
     @ExperimentalCoroutinesApi
