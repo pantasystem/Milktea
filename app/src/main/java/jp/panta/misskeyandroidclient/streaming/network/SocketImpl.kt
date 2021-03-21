@@ -1,20 +1,17 @@
 package jp.panta.misskeyandroidclient.streaming.network
 
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.streaming.Socket
-import jp.panta.misskeyandroidclient.streaming.SocketEventListener
-import jp.panta.misskeyandroidclient.streaming.StreamingEvent
+import jp.panta.misskeyandroidclient.streaming.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.*
-import java.lang.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class SocketImpl(
     val url: String,
     val okHttpClient: OkHttpClient = OkHttpClient(),
+    val onBeforeConnectListener: BeforeConnectListener,
     loggerFactory: Logger.Factory
 ) : Socket, WebSocketListener() {
     val logger = loggerFactory.create("SocketImpl")
@@ -29,28 +26,54 @@ class SocketImpl(
         set(value) {
             field = value
             logger.debug("SocketImpl状態変化: ${value.javaClass}, $value")
-            listeners.forEach {
-                it.onStateChanged(value)
+            synchronized(stateListeners) {
+                stateListeners.forEach {
+                    it.onStateChanged(value)
+                }
             }
+
         }
 
-    private val listeners = mutableSetOf<SocketEventListener>()
+    private val stateListeners = mutableSetOf<SocketStateEventListener>()
 
-    override fun addSocketEventListener(listener: SocketEventListener) {
-        synchronized(listeners) {
-            listeners.add(listener)
+    private val messageListeners = mutableSetOf<SocketMessageEventListener>()
+
+
+
+    override fun addMessageEventListener(listener: SocketMessageEventListener) {
+        synchronized(messageListeners) {
+            val empty = messageListeners.isEmpty()
+            messageListeners.add(listener)
+            if(empty && messageListeners.isNotEmpty()) {
+                connect()
+            }
         }
     }
 
-    override fun removeSocketEventListener(listener: SocketEventListener) {
-        synchronized(listeners) {
-            listeners.remove(listener)
+    override fun addStateEventListener(listener: SocketStateEventListener) {
+        synchronized(stateListeners) {
+            stateListeners.add(listener)
+        }
+    }
+
+    override fun removeMessageEventListener(listener: SocketMessageEventListener) {
+        synchronized(messageListeners) {
+            messageListeners.remove(listener)
+            if(messageListeners.isEmpty()) {
+                disconnect()
+            }
+        }
+    }
+
+    override fun removeStateEventListener(listener: SocketStateEventListener) {
+        synchronized(stateListeners) {
+            stateListeners.remove(listener)
         }
     }
 
     override fun connect(): Boolean {
         synchronized(this){
-            if(mWebSocket != null){
+            if(mWebSocket != null && onBeforeConnectListener.onBeforeConnect(this)){
                 logger.debug("接続済みのためキャンセル")
                 return false
             }
@@ -71,19 +94,19 @@ class SocketImpl(
                 logger.debug("connect -> falseのためキャンセル")
                 continuation.resume(false)
             }
-            val callback = object : SocketEventListener {
-                override fun onMessage(e: StreamingEvent): Boolean = false
+            val callback = object : SocketStateEventListener{
                 override fun onStateChanged(e: Socket.State) {
                     if(e is Socket.State.Connected){
-                        removeSocketEventListener(this)
+                        removeStateEventListener(this)
                         continuation.resume(true)
                     }else if(e is Socket.State.Failure || e is Socket.State.Closed) {
-                        removeSocketEventListener(this)
+                        removeStateEventListener(this)
                         continuation.resume(false)
                     }
                 }
+
             }
-            addSocketEventListener(callback)
+            addStateEventListener(callback)
             return@suspendCoroutine
         }
     }
@@ -151,14 +174,15 @@ class SocketImpl(
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
-        synchronized(listeners) {
-            for(listener in listeners) {
-                try {
-                    if(listener.onMessage(json.decodeFromString(text))){
-                        break
-                    }
-                }catch (e: Exception) {
-                    logger.error("onMessage: error msg: $text", e = e)
+
+        synchronized(messageListeners) {
+            val iterator = messageListeners.iterator()
+            while(iterator.hasNext()) {
+                val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.getOrNull()
+                    ?: continue
+                val listener = iterator.next()
+                if(listener.onMessage(e)){
+                    break
                 }
             }
         }
