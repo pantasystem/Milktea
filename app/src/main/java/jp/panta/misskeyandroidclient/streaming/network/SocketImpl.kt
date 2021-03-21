@@ -102,7 +102,7 @@ class SocketImpl(
         logger.debug("メッセージ送信: $msg")
         synchronized(this){
             if(state() != Socket.State.Connected){
-                logger.debug("送信をキャンセル")
+                logger.debug("送信をキャンセル state:${state()}")
                 return false
             }
 
