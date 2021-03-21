@@ -7,4 +7,6 @@ interface SocketWithAccountProvider {
     fun get(account: Account) : Socket
 
     fun get(accountId: Long) : Socket?
+
+    fun all(): List<Socket>
 }
