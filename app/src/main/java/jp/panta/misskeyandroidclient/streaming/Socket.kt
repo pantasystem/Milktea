@@ -64,7 +64,13 @@ interface Socket {
      */
     fun send(msg: String): Boolean
 
-    fun addSocketEventListener(listener: SocketEventListener)
 
-    fun removeSocketEventListener(listener: SocketEventListener)
+    fun addStateEventListener(listener: SocketStateEventListener)
+
+    fun removeStateEventListener(listener: SocketStateEventListener)
+
+    fun addMessageEventListener(listener: SocketMessageEventListener)
+
+    fun removeMessageEventListener(listener: SocketMessageEventListener)
+
 }
