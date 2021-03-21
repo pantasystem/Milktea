@@ -68,4 +68,10 @@ class SocketWithAccountProviderImpl(
 
 
     }
+
+    override fun all(): List<Socket> {
+        synchronized(accountIdWithSocket) {
+            return accountIdWithSocket.values.toList()
+        }
+    }
 }
