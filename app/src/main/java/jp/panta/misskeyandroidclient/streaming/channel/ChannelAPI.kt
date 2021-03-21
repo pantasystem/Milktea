@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -18,13 +19,13 @@ class ChannelAPI(
     }
 
 
-    private val listenersMap = ConcurrentHashMap<Type, HashMap<String,(ChannelBody)->Unit>>(
+    private val listenersMap = ConcurrentHashMap<Type, HashSet<(ChannelBody)->Unit>>(
         mapOf(
-            Type.MAIN to hashMapOf(),
-            Type.HOME to hashMapOf(),
-            Type.LOCAL to hashMapOf(),
-            Type.HYBRID to hashMapOf(),
-            Type.GLOBAL to hashMapOf()
+            Type.MAIN to hashSetOf(),
+            Type.HOME to hashSetOf(),
+            Type.LOCAL to hashSetOf(),
+            Type.HYBRID to hashSetOf(),
+            Type.GLOBAL to hashSetOf()
         )
     )
 
@@ -38,13 +39,13 @@ class ChannelAPI(
     @ExperimentalCoroutinesApi
     fun connect(type: Type) : Flow<ChannelBody> {
         return channelFlow {
-            val listenId = UUID.randomUUID().toString()
-            connect(type, listenId){
+            val callback: (ChannelBody)-> Unit = {
                 offer(it)
             }
+            connect(type, callback)
 
             awaitClose {
-                disconnect(type, listenId)
+                disconnect(type, callback)
             }
         }
     }
@@ -67,15 +68,16 @@ class ChannelAPI(
         return count() == 0
     }
 
-    private fun connect(type: Type, listenId: String, listener: (ChannelBody)->Unit) {
-        synchronized(listenersMap) {
-            if(listenersMap[type]?.contains(listenId) == true){
+    private fun connect(type: Type, listener: (ChannelBody)->Unit) {
+        synchronized(typeIdMap) {
+            // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
+            if(listenersMap[type]?.contains(listener) == true) {
                 return@synchronized
             }
 
-            listenersMap[type]?.let{ map ->
-                map[listenId] = listener
-            }
+            listenersMap[type]?.add(listener)
+                ?: throw IllegalStateException("listenersがNULLです。")
+
             if(typeIdMap[type] == null){
                 sendConnect(type)
             }
@@ -87,15 +89,15 @@ class ChannelAPI(
 
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
-            synchronized(listenersMap) {
-
-                listenersMap.values.forEach { listeners ->
-                    listeners.filter {
-                        it.key == e.body.id
-                    }.values.forEach { callback ->
+            synchronized(typeIdMap) {
+                typeIdMap.filter {
+                    it.value == e.body.id
+                }.keys.forEach {
+                    listenersMap[it]?.forEach { callback ->
                         callback.invoke(e.body)
-                    }
+                    }?: throw IllegalStateException("未実装なTypeです。")
                 }
+
             }
             return true
         }
@@ -107,6 +109,10 @@ class ChannelAPI(
      * 接続メッセージを現在の状態にかかわらずサーバーに送信する
      */
     private fun sendConnect(type: Type): Boolean {
+        if(typeIdMap.isEmpty()) {
+            socket.addMessageEventListener(this)
+            socket.addStateEventListener(this)
+        }
         val body = when(type){
             Type.GLOBAL -> Send.Connect.Type.GLOBAL_TIMELINE
             Type.HYBRID -> Send.Connect.Type.HYBRID_TIMELINE
@@ -125,13 +131,13 @@ class ChannelAPI(
         return false
     }
 
-    private fun disconnect(type: Type, listenId: String) {
+    private fun disconnect(type: Type, listener: (ChannelBody) -> Unit) {
         synchronized(listenersMap) {
-            if(listenersMap[type]?.contains(listenId) != true){
+            if(listenersMap[type]?.contains(listener) != true){
                 return@synchronized
             }
 
-            listenersMap[type]?.remove(listenId)
+            listenersMap[type]?.remove(listener)
 
             // 誰にも使われていなければサーバーからChannelへの接続を開放する
             trySendDisconnect(type)
@@ -145,13 +151,17 @@ class ChannelAPI(
             if(id != null){
                 socket.send((Send.Disconnect(Send.Disconnect.Body(id)).toJson()))
             }
+            if(typeIdMap.isEmpty()) {
+                socket.removeMessageEventListener(this)
+                socket.removeStateEventListener(this)
+            }
         }
     }
 
 
     override fun onStateChanged(e: Socket.State) {
         if(e is Socket.State.Connected) {
-            synchronized(listenersMap) {
+            synchronized(typeIdMap) {
                 val types = typeIdMap.keys
                 typeIdMap.clear()
                 types.forEach {

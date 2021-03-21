@@ -2,25 +2,23 @@ package jp.panta.misskeyandroidclient.streaming.notes
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.SocketEventListener
 import jp.panta.misskeyandroidclient.streaming.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.HashSet
 
 class NoteCaptureAPI(
     val socket: Socket,
     loggerFactory: Logger.Factory? = null
-) : SocketEventListener {
+) : SocketMessageEventListener, SocketStateEventListener {
 
 
     val logger = loggerFactory?.create("NoteCaptureAPI")
 
-    init {
-        socket.addSocketEventListener(this)
-    }
+
 
     @ExperimentalCoroutinesApi
     fun capture(noteId: String): Flow<NoteUpdated.Body> {
@@ -28,14 +26,16 @@ class NoteCaptureAPI(
         return channelFlow {
             logger?.debug("channelFlow起動")
             val listenId = UUID.randomUUID().toString()
-            capture(noteId, listenId){ noteUpdated ->
+
+            val listener: (NoteUpdated)-> Unit = { noteUpdated ->
                 logger?.debug("受信:$noteUpdated")
                 offer(noteUpdated.body)
             }
+            capture(noteId, listener)
 
             awaitClose {
                 logger?.debug("captureを終了する noteId=$noteId, listenId=$listenId")
-                unSubscribe(noteId, listenId)
+                unSubscribe(noteId, listener)
             }
         }
 
@@ -63,19 +63,23 @@ class NoteCaptureAPI(
         }
     }
 
-    private val noteIdListenMap = ConcurrentHashMap<String, ConcurrentHashMap<String, (NoteUpdated)->Unit>>()
+    private val noteIdListenMap = ConcurrentHashMap<String, HashSet<(NoteUpdated)->Unit>>()
 
-    private fun capture(noteId: String, listenId: String, listener: (NoteUpdated)->Unit) {
+    private fun capture(noteId: String, listener: (NoteUpdated)->Unit) {
         synchronized(noteIdListenMap){
             val listeners = noteIdListenMap.getOrNew(noteId)
+            if(noteIdListenMap.isEmpty()) {
+                socket.addMessageEventListener(this)
+                socket.addStateEventListener(this)
+            }
             if(listeners.isEmpty()){
                 logger?.debug("リモートへCaptureができていなかったので開始する")
                 if(!sendSub(noteId)){
                     return@synchronized
                 }
             }
-            if(!listeners.contains(listenId)) {
-                listeners[listenId] = listener
+            if(!listeners.contains(listener)) {
+                listeners.add(listener)
             }
             noteIdListenMap[noteId] = listeners
 
@@ -83,7 +87,7 @@ class NoteCaptureAPI(
 
     }
 
-    private fun unSubscribe(noteId: String, listenId: String) {
+    private fun unSubscribe(noteId: String, listener: (NoteUpdated) -> Unit) {
         synchronized(noteIdListenMap){
 
             logger?.debug("unSubscribe noteId: $noteId")
@@ -92,18 +96,24 @@ class NoteCaptureAPI(
                 return
             }
 
-            if(listeners.remove(listenId) != null && listeners.isEmpty()) {
+            if(listeners.remove(listener)  && listeners.isEmpty()) {
                 sendUnSub(noteId)
             }
-            noteIdListenMap[noteId] = listeners
+            if(listeners.isEmpty()) {
+                noteIdListenMap.remove(noteId)
+            }
+            if(noteIdListenMap.isEmpty()) {
+                socket.removeMessageEventListener(this)
+                socket.removeStateEventListener(this)
+            }
         }
 
     }
 
 
-    private fun Map<String, ConcurrentHashMap<String, (NoteUpdated)->Unit>>.getOrNew(noteId: String) : ConcurrentHashMap<String, (NoteUpdated)->Unit> {
+    private fun Map<String, HashSet<(NoteUpdated)->Unit>>.getOrNew(noteId: String) : HashSet<(NoteUpdated)->Unit> {
         val listeners = this[noteId]
-        return listeners ?: ConcurrentHashMap<String, (NoteUpdated)->Unit>()
+        return listeners ?: HashSet()
     }
 
 
@@ -115,7 +125,7 @@ class NoteCaptureAPI(
                 if(noteIdListenMap[e.body.id].isNullOrEmpty()) {
                     logger?.warning("listenerは未登録ですが、何か受信したようです。")
                 }else{
-                    noteIdListenMap[e.body.id]?.values?.forEach {
+                    noteIdListenMap[e.body.id]?.forEach {
                         it.invoke(e)
                     }
                 }
