@@ -41,7 +41,23 @@ class NoteCaptureAPI(
 
     }
 
+    /**
+     * subscribeしているノート数を計算します
+     */
+    fun count(): Int {
+        synchronized(noteIdListenMap) {
+            return noteIdListenMap.size
+        }
+    }
 
+    /**
+     * すでにCapture済みかをチェックします
+     */
+    fun isCaptured(noteId: String): Boolean {
+        synchronized(noteIdListenMap) {
+            return noteIdListenMap.containsKey(noteId)
+        }
+    }
 
     private val noteIdListenMap = ConcurrentHashMap<String, ConcurrentHashMap<String, (NoteUpdated)->Unit>>()
 
@@ -107,6 +123,7 @@ class NoteCaptureAPI(
     }
 
     override fun onStateChanged(e: Socket.State) {
+        logger?.debug("onStateChanged $e")
         if(e is Socket.State.Connected) {
             synchronized(noteIdListenMap) {
                 noteIdListenMap.keys.forEach {

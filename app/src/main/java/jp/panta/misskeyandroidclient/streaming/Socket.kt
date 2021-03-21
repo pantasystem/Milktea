@@ -45,6 +45,8 @@ interface Socket {
      */
     fun connect(): Boolean
 
+    suspend fun blockingConnect(): Boolean
+
     /**
      * 切断する
      * @return 状態が変化した場合true 現在の状態から何も変化しない場合はfalseが返されます
@@ -63,4 +65,6 @@ interface Socket {
     fun send(msg: String): Boolean
 
     fun addSocketEventListener(listener: SocketEventListener)
+
+    fun removeSocketEventListener(listener: SocketEventListener)
 }

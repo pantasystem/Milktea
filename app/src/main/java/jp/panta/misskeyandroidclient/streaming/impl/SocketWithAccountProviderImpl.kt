@@ -17,7 +17,7 @@ class SocketWithAccountProviderImpl(
     val encryption: Encryption,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
-    val instanceCreatedListener: (account: Account, socket: Socket)-> Unit = { _, s -> s.connect() },
+    val instanceCreatedListener: (account: Account, socket: Socket)-> Unit,
     val okHttpClient: OkHttpClient = OkHttpClient()
 ) : ISocketWithAccountProvider{
 

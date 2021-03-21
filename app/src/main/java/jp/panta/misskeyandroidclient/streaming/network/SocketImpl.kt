@@ -9,6 +9,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.*
 import java.lang.Exception
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class SocketImpl(
     val url: String,
@@ -40,6 +42,12 @@ class SocketImpl(
         }
     }
 
+    override fun removeSocketEventListener(listener: SocketEventListener) {
+        synchronized(listeners) {
+            listeners.remove(listener)
+        }
+    }
+
     override fun connect(): Boolean {
         synchronized(this){
             if(mWebSocket != null){
@@ -55,6 +63,29 @@ class SocketImpl(
             return mWebSocket != null
         }
 
+    }
+
+    override suspend fun blockingConnect(): Boolean {
+        return suspendCoroutine { continuation ->
+            if(!connect()) {
+                logger.debug("connect -> falseのためキャンセル")
+                continuation.resume(false)
+            }
+            val callback = object : SocketEventListener {
+                override fun onMessage(e: StreamingEvent): Boolean = false
+                override fun onStateChanged(e: Socket.State) {
+                    if(e is Socket.State.Connected){
+                        removeSocketEventListener(this)
+                        continuation.resume(true)
+                    }else if(e is Socket.State.Failure || e is Socket.State.Closed) {
+                        removeSocketEventListener(this)
+                        continuation.resume(false)
+                    }
+                }
+            }
+            addSocketEventListener(callback)
+            return@suspendCoroutine
+        }
     }
 
     override fun disconnect(): Boolean {

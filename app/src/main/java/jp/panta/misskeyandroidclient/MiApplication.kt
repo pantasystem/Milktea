@@ -2,8 +2,12 @@ package jp.panta.misskeyandroidclient
 
 import android.app.Application
 import android.content.Context
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.Network
+import android.os.Build
 import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -59,12 +63,13 @@ import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAda
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
 import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
+import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
 import jp.panta.misskeyandroidclient.util.getPreferenceName
+import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
+import jp.panta.misskeyandroidclient.util.receive
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
@@ -148,6 +153,8 @@ class MiApplication : Application(), MiCore {
     override var loggerFactory: Logger.Factory = AndroidDefaultLogger.Factory
     private val logger = loggerFactory.create("MiApplication")
 
+    private lateinit var mActiveNetworkState: Flow<Boolean>
+    private var mIsActiveNetwork: Boolean = false
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -161,6 +168,8 @@ class MiApplication : Application(), MiCore {
                 .setEmojiSpanIndicatorEnabled(true)
         }
         EmojiCompat.init(config)
+
+        mActiveNetworkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
@@ -207,7 +216,10 @@ class MiApplication : Application(), MiCore {
             mAccountRepository,
             loggerFactory,
             { account, socket ->
-                socket.connect()
+                applicationScope.launch(Dispatchers.IO) {
+                    val res = socket.blockingConnect()
+                    logger.debug("接続結果: ${if(res) "success" else "failure"}")
+                }
                 getChannelAPI(account).connect(ChannelAPI.Type.MAIN).onEach {
                     // 各種DataSourceなどの各種変更イベントを通達する
                     runCatching {
@@ -217,6 +229,13 @@ class MiApplication : Application(), MiCore {
                     }
 
                 }.launchIn(applicationScope + Dispatchers.IO)
+                socket.addSocketEventListener(object : SocketEventListener {
+                    override fun onMessage(e: StreamingEvent): Boolean = false
+
+                    override fun onStateChanged(e: Socket.State) {
+                        handleSocketStateEvent(account, socket, e)
+                    }
+                })
             }
         )
 
@@ -285,6 +304,20 @@ class MiApplication : Application(), MiCore {
             }
         }
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
+
+        mActiveNetworkState.distinctUntilChanged().onEach {
+            logger.debug("接続状態が変化:${if(it) "接続" else "未接続"}")
+            if(it) {
+                // NOTE: ネットワークの接続状態が非アクティブからアクティブに変化したのでSocketの再接続処理を行う
+                mSocketWithAccountProvider.all().filterNot { socket ->
+                    socket.state() == Socket.State.Connected
+                }.forEach { socket ->
+                    socket.connect()
+                }
+            }
+        }.launchIn(applicationScope + Dispatchers.IO)
+
+
     }
 
     override fun getAccounts(): StateFlow<List<Account>> {
@@ -579,6 +612,15 @@ class MiApplication : Application(), MiCore {
             page.also {
                 page.weight = index
             }
+        }
+    }
+
+    /**
+     * Socketの通信状態をhandleする。
+     */
+    private fun handleSocketStateEvent(account: Account, socket: Socket, state: Socket.State) {
+        if(state is Socket.State.Failure) {
+            // TODO: Connection Queueのようなものを作って接続試行中にさらにリクエストを送信できないようにする
         }
     }
 
