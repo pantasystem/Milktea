@@ -11,8 +11,8 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
+import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
@@ -20,7 +20,6 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
 
 open class PlaneNoteViewData (
     val note: NoteRelation,
@@ -208,7 +207,6 @@ open class PlaneNoteViewData (
         require(toShowNote.note.id == note.id) {
             "更新として渡されたNote.Idと現在のIdが一致しません。"
         }
-        emojiMap.clear()
         emojiMap.putAll(note.emojis?.map{
             it.name to it
         }?: emptyList())

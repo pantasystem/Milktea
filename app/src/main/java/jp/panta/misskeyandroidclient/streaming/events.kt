@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -177,7 +178,8 @@ data class NoteUpdated (
             @Serializable
             data class Body(
                 val reaction: String,
-                val userId: String
+                val userId: String,
+                val emoji: Emoji? = null
             )
         }
 

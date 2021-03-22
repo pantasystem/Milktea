@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.notes
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import kotlinx.coroutines.*
@@ -198,10 +199,19 @@ class NoteCaptureAPIAdapter(
             added.add(ReactionCount(reaction = e.body.reaction, count = 1))
             list = added
         }
+        val emojis = e.body.emoji?.let {
+            note.emojis?.let {
+                it.toMutableList().also { eList ->
+                    eList.add(e.body.emoji)
+                }
+            }
+        }?: note.emojis
+
         noteDataSource.add(
             note.copy(
                 reactionCounts = list,
-                myReaction = if(e.body.userId == account.remoteId) e.body.reaction else note.myReaction
+                myReaction = if(e.body.userId == account.remoteId) e.body.reaction else note.myReaction,
+                emojis = emojis
             )
         )
     }
