@@ -8,13 +8,13 @@ import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
  */
 interface Logger {
     val defaultTag: String
-    fun debug(msg: String, tag: String = defaultTag, e: Exception? = null)
+    fun debug(msg: String, tag: String = defaultTag, e: Throwable? = null)
 
     fun error(msg: String, e: Throwable? = null, tag: String = defaultTag)
 
-    fun info(msg: String, tag: String = defaultTag, e: Exception? = null)
+    fun info(msg: String, tag: String = defaultTag, e: Throwable? = null)
 
-    fun warning(msg: String, tag: String = defaultTag, e: Exception? = null)
+    fun warning(msg: String, tag: String = defaultTag, e: Throwable? = null)
 
     interface Factory {
         fun create(tag: String = "MisskeyApp"): Logger

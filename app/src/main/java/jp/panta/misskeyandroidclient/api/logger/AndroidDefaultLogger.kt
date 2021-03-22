@@ -7,7 +7,7 @@ class AndroidDefaultLogger(
     override val defaultTag: String
 ) : Logger{
 
-    override fun debug(msg: String, tag: String, e: Exception?) {
+    override fun debug(msg: String, tag: String, e: Throwable?) {
         Log.d(tag, msg, e)
     }
 
@@ -15,11 +15,11 @@ class AndroidDefaultLogger(
         Log.e(tag, msg, e)
     }
 
-    override fun info(msg: String, tag: String, e: Exception?) {
+    override fun info(msg: String, tag: String, e: Throwable?) {
         Log.i(tag, msg, e)
     }
 
-    override fun warning(msg: String, tag: String, e: Exception?) {
+    override fun warning(msg: String, tag: String, e: Throwable?) {
         Log.w(tag, msg, e)
     }
 
