@@ -18,7 +18,11 @@ class UserRepositoryAndMainChannelAdapter(
 
 
     fun listen(account: Account): Flow<ChannelBody.Main.HavingUserBody> {
-        return channelAPIWithAccountProvider.get(account).connect(ChannelAPI.Type.MAIN).map {
+        return suspend {
+            channelAPIWithAccountProvider.get(account)
+        }.asFlow().flatMapLatest {
+            it.connect(ChannelAPI.Type.MAIN)
+        }.map {
             it as? ChannelBody.Main.HavingUserBody
         }.filterNotNull().onEach {
             userDataSource.add(it.body.toUser(account, true))

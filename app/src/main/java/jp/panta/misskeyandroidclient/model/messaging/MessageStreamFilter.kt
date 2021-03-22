@@ -43,7 +43,11 @@ class MessageStreamFilter(val miCore: MiCore){
     }
 
     fun getAccountMessageObservable(ac: Account): Flow<Message>{
-        return miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map{
+        return suspend {
+            miCore.getChannelAPI(ac)
+        }.asFlow().flatMapLatest {
+            it.connect(ChannelAPI.Type.MAIN)
+        }.map{
             (it as? ChannelBody.Main.HavingMessagingBody)?.body
         }.filterNotNull().map {
             miCore.getGetters().messageRelationGetter.get(ac, it)

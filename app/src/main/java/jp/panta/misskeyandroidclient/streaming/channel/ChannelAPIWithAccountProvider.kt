@@ -13,16 +13,16 @@ class ChannelAPIWithAccountProvider(
 
     private val accountWithChannelAPI = mutableMapOf<Long, ChannelAPI>()
     private val logger = loggerFactory.create("ChannelAPIWithAccountProvider")
+    private val mutex = Mutex()
 
-    fun get(account: Account) : ChannelAPI{
-        synchronized(accountWithChannelAPI) {
+    suspend fun get(account: Account) : ChannelAPI{
+        mutex.withLock {
             logger.debug("ChannelAPIWithAccountProvider get accountId=${account.accountId} hash=${hashCode()}")
             var channelAPI = accountWithChannelAPI[account.accountId]
             if(channelAPI != null){
                 return channelAPI
             }
             channelAPI = ChannelAPI(socketWithAccountProvider.get(account), loggerFactory)
-            accountWithChannelAPI[account.accountId] = channelAPI
             require(accountWithChannelAPI.put(account.accountId, channelAPI) == null)
             return channelAPI
         }

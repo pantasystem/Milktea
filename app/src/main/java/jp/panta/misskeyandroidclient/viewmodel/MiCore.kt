@@ -86,7 +86,7 @@ interface MiCore{
     fun getEncryption(): Encryption
 
 
-    fun getChannelAPI(account: Account): ChannelAPI
+    suspend fun getChannelAPI(account: Account): ChannelAPI
 
     fun getNoteCaptureAdapter() : NoteCaptureAPIAdapter
 

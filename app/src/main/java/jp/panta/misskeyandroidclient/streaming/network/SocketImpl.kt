@@ -191,7 +191,14 @@ class SocketImpl(
             while(iterator.hasNext()) {
 
                 val listener = iterator.next()
-                if(listener.onMessage(e)){
+                val res = runCatching {
+                    listener.onMessage(e)
+                }.onFailure {
+                    logger.error("メッセージリスナー先でエラー発生", e = it)
+                }.getOrElse {
+                    false
+                }
+                if(res){
                     break
                 }
             }

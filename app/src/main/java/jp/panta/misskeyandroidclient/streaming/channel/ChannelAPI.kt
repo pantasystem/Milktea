@@ -112,7 +112,7 @@ class ChannelAPI(
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
             synchronized(typeIdMap) {
-                logger.debug("onMessage id=${e.body.id}, type=${e.body::class.simpleName} typeIdMap=${typeIdMap}, count=${count()}, hash=${this.hashCode()}")
+                //logger.debug("onMessage id=${e.body.id}, type=${e.body::class.simpleName} typeIdMap=${typeIdMap}, count=${count()}, hash=${this.hashCode()}")
                 typeIdMap.filter {
                     it.value == e.body.id
                 }.keys.forEach {

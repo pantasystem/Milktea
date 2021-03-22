@@ -210,7 +210,7 @@ class MiApplication : Application(), MiCore {
             loggerFactory,
             { account, socket ->
                 mSocketConnectionQueue.connect(account)
-                getChannelAPI(account).connect(ChannelAPI.Type.MAIN).onEach {
+                connectChannel(account, ChannelAPI.Type.MAIN).onEach {
                     // 各種DataSourceなどの各種変更イベントを通達する
                     runCatching {
                         if(it is ChannelBody.Main.Notification) {
@@ -220,7 +220,9 @@ class MiApplication : Application(), MiCore {
 
                 }.launchIn(applicationScope + Dispatchers.IO)
                 socket.addStateEventListener { e ->
-                    handleSocketStateEvent(account, socket, e)
+                    applicationScope.launch {
+                        handleSocketStateEvent(account, socket, e)
+                    }
                 }
             },
             { _, _ ->
@@ -533,7 +535,7 @@ class MiApplication : Application(), MiCore {
         return mUserRepositoryEventToFlow
     }
 
-    override fun getChannelAPI(account: Account): ChannelAPI {
+    override suspend fun getChannelAPI(account: Account): ChannelAPI {
         return mChannelAPIWithAccountProvider.get(account)
     }
 
@@ -609,7 +611,7 @@ class MiApplication : Application(), MiCore {
     /**
      * Socketの通信状態をhandleする。
      */
-    private fun handleSocketStateEvent(account: Account, socket: Socket, state: Socket.State) {
+    private suspend fun handleSocketStateEvent(account: Account, socket: Socket, state: Socket.State) {
         if(state is Socket.State.Failure
             && mIsActiveNetwork
             && !(mNoteCaptureAPIWithAccountProvider.get(account).isEmpty()
@@ -717,6 +719,16 @@ class MiApplication : Application(), MiCore {
                     Toast.makeText(this@MiApplication, "error: $it", Toast.LENGTH_LONG).show()
                 }
             }
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    fun MiCore.connectChannel(account: Account, channelType: ChannelAPI.Type): Flow<ChannelBody> {
+        return suspend {
+            getChannelAPI(account)
+        }.asFlow().flatMapLatest {
+            it.connect(channelType)
         }
     }
 

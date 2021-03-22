@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.api.notification
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.notes.toNote
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -64,10 +65,14 @@ data class NotificationDTO(
                 )
             }
             "reaction" -> {
-                require(noteId != null)
-                require(reaction != null)
+
+                require(reaction != null) {
+                    "想定しないデータ=$this"
+                }
+                require(note != null)
+                val n = note.toNote(account)
                 ReactionNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, noteId), reaction, isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), n.id, reaction, isRead
                 )
             }
             "pollVoted" -> {
