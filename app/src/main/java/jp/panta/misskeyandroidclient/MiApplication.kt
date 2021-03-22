@@ -197,7 +197,7 @@ class MiApplication : Application(), MiCore {
         mNoteDataSource = InMemoryNoteDataSource(loggerFactory)
         mNoteRepository = NoteRepositoryImpl(this)
 
-        mUserDataSource = InMemoryUserDataSource()
+        mUserDataSource = InMemoryUserDataSource(loggerFactory)
         mUserRepository = UserRepositoryImpl(this)
 
         mNotificationDataSource = InMemoryNotificationDataSource()

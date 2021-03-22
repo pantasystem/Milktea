@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.users.impl
 
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -13,6 +14,7 @@ import retrofit2.Call
 class UserRepositoryImpl(
     val miCore: MiCore
 ) : UserRepository{
+    private val logger = miCore.loggerFactory.create("UserRepositoryImpl")
 
     override suspend fun find(userId: User.Id, detail: Boolean): User {
         val localResult = runCatching {
@@ -28,11 +30,13 @@ class UserRepositoryImpl(
 
         val account = miCore.getAccount(userId.accountId)
         if(localResult.getOrNull() == null) {
-            miCore.getMisskeyAPI(account).showUser(RequestUser(
+            val res = miCore.getMisskeyAPI(account).showUser(RequestUser(
                 i = account.getI(miCore.getEncryption()),
                 userId = userId.id,
                 detail = true
-            )).execute()?.body()?.let{
+            )).execute()
+            res.throwIfHasError()
+            res?.body()?.let{
                 val user = it.toUser(account, true)
                 it.pinnedNotes?.forEach { dto ->
                     miCore.getGetters().noteRelationGetter.get(account, dto)
@@ -55,13 +59,16 @@ class UserRepositoryImpl(
         }
         val account = miCore.getAccountRepository().get(accountId)
         val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
-        misskeyAPI.showUser(
+        val res = misskeyAPI.showUser(
             RequestUser(
                 i = account.getI(miCore.getEncryption()),
                 userName = userName,
                 host = host
             )
-        ).execute()?.body()?.let {
+        ).execute()
+        res.throwIfHasError()
+
+        res?.body()?.let {
             it.pinnedNotes?.forEach { dto ->
                 miCore.getGetters().noteRelationGetter.get(account, dto)
             }
@@ -100,7 +107,10 @@ class UserRepositoryImpl(
 
     override suspend fun follow(userId: User.Id): Boolean {
         val account = miCore.getAccountRepository().get(userId.accountId)
-        val res = miCore.getMisskeyAPI(account).followUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))).execute()
+        val req = RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))
+        logger.debug("follow req:$req")
+        val res = miCore.getMisskeyAPI(account).followUser(req).execute()
+        res.throwIfHasError()
         if(res.isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(isFollowing = true)
             miCore.getUserDataSource().add(updated)
@@ -111,6 +121,7 @@ class UserRepositoryImpl(
     override suspend fun unfollow(userId: User.Id): Boolean {
         val account = miCore.getAccountRepository().get(userId.accountId)
         val res = miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))).execute()
+        res.throwIfHasError()
         if(res.isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(isFollowing = true)
             miCore.getUserDataSource().add(updated)
@@ -121,6 +132,7 @@ class UserRepositoryImpl(
     private suspend fun action(requestAPI: (RequestUser)-> Call<Unit>, userId: User.Id, reducer: (User.Detail)-> User.Detail): Boolean {
         val account = miCore.getAccountRepository().get(userId.accountId)
         val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))).execute()
+        res.throwIfHasError()
         if(res.isSuccessful) {
 
             val updated = reducer.invoke(find(userId, true) as User.Detail)

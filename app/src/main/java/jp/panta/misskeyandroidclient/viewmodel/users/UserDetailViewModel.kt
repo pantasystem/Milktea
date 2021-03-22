@@ -114,6 +114,16 @@ class UserDetailViewModel(
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
 
+    init {
+        userState.filterNotNull().flatMapLatest {
+            miCore.getUserRepositoryEventToFlow().from(it.id)
+        }.map {
+            miCore.getUserRepository().find(it.userId) as? User.Detail
+        }.filterNotNull().onEach {
+            userState.value = it
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
+
     fun load(){
         viewModelScope.launch(dispatcher) {
             var user = userId?.let { miCore.getUserRepository().find(userId, true) }
@@ -147,6 +157,8 @@ class UserDetailViewModel(
                     miCore.getUserRepository().find(user.id) as User.Detail
                 }.onSuccess {
                     userState.value = it
+                }.onFailure {
+                    logger.error("unmute", e = it)
                 }
             }
 
@@ -169,6 +181,8 @@ class UserDetailViewModel(
                     miCore.getUserRepository().find(it.id, true) as User.Detail
                 }.onSuccess {
                     userState.value = it
+                }.onFailure {
+                    logger.error("unmute", e = it)
                 }
             }
         }
@@ -182,6 +196,8 @@ class UserDetailViewModel(
                     miCore.getUserRepository().find(it.id, true) as User.Detail
                 }.onSuccess {
                     userState.value = it
+                }.onFailure {
+                    logger.error("unmute", e = it)
                 }
             }
         }

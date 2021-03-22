@@ -181,6 +181,7 @@ class SocketImpl(
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
+        logger.debug("onMessage: $text")
 
         synchronized(this) {
             val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->

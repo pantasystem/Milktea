@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.users.impl
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
@@ -10,12 +11,14 @@ import kotlinx.coroutines.sync.withLock
 import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentHashMap
 
-class InMemoryUserDataSource : UserDataSource{
+class InMemoryUserDataSource(
+    loggerFactory: Logger.Factory? = null
+) : UserDataSource{
+    private val logger = loggerFactory?.create("InMemoryUserDataSource")
 
     private val userMap = ConcurrentHashMap<User.Id, User>()
-    private val recordLocks = ConcurrentHashMap<User.Id, Mutex>()
-    private val tableLock = Mutex()
 
+    private val usersLock = Mutex()
 
 
     private val listeners = mutableSetOf<UserDataSource.Listener>()
@@ -30,8 +33,13 @@ class InMemoryUserDataSource : UserDataSource{
 
     @ExperimentalCoroutinesApi
     override suspend fun add(user: User): AddResult {
-        recordLocks[user.id]?.withLock {
-            val u = userMap[user.id]?: throw IllegalStateException("recordLocksにはオブジェクトがあるのにuserMap二は存在しない異常な状態です。")
+        usersLock.withLock {
+            val u = userMap[user.id]
+            if(u == null) {
+                userMap[user.id] = user
+                publish(UserDataSource.Event.Created(user.id, user))
+                return AddResult.CREATED
+            }
             if(u.instanceUpdatedAt > user.instanceUpdatedAt){
                 return AddResult.CANCEL
             }
@@ -59,13 +67,8 @@ class InMemoryUserDataSource : UserDataSource{
             user.updated()
             publish(UserDataSource.Event.Updated(user.id, user))
             return AddResult.UPDATED
-
-        }?: tableLock.withLock {
-            userMap[user.id] = user
-            recordLocks[user.id] = Mutex()
-            publish(UserDataSource.Event.Created(user.id, user))
-            return AddResult.CREATED
         }
+
     }
 
     @ExperimentalCoroutinesApi
@@ -76,13 +79,13 @@ class InMemoryUserDataSource : UserDataSource{
     }
 
     override suspend fun get(userId: User.Id): User {
-        return recordLocks[userId]?.withLock {
+        return usersLock.withLock {
             userMap[userId]
         }?: throw UserNotFoundException(userId)
     }
 
     override suspend fun get(accountId: Long, userName: String, host: String?): User {
-        return tableLock.withLock {
+        return usersLock.withLock {
             userMap.filterKeys {
                 it.accountId == accountId
             }.map {
@@ -95,12 +98,10 @@ class InMemoryUserDataSource : UserDataSource{
 
     @ExperimentalCoroutinesApi
     override suspend fun remove(user: User): Boolean {
-        return tableLock.withLock {
-            recordLocks[user.id]?.withLock {
-                userMap.remove(user.id)
+        return usersLock.withLock {
+            userMap.remove(user.id)?.also {
                 publish(UserDataSource.Event.Removed(user.id))
-                true
-            }?: false
+            } != null
         }
 
     }

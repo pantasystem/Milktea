@@ -12,14 +12,14 @@ data class Error(
     val id: String
 )
 
-sealed class APIError : Exception(){
+sealed class APIError(msg: String) : Exception(msg){
     abstract val error: Error?
-    data class ClientException(override val error: Error?) : APIError()
-    data class AuthenticationException(override val error: Error?) : APIError()
-    data class ForbiddenException(override val error: Error?) : APIError()
-    data class IAmAIException(override val error: Error?) : APIError()
-    data class InternalServerException(override val error: Error?) : APIError()
-    data class SomethingException(override val error: Error?) : APIError()
+    data class ClientException(override val error: Error?) : APIError("error:$error")
+    data class AuthenticationException(override val error: Error?) : APIError("error:$error")
+    data class ForbiddenException(override val error: Error?) : APIError("error:$error")
+    data class IAmAIException(override val error: Error?) : APIError("error:$error")
+    data class InternalServerException(override val error: Error?) : APIError("error:$error")
+    data class SomethingException(override val error: Error?) : APIError("error:$error")
 }
 
 val formatter = Json {
@@ -33,6 +33,7 @@ fun<T> Response<T>.throwIfHasError() {
         }
     }.getOrNull()
     error.let {
+        println("throwIfHasError: code:${this.code()}, errorBody:${this.errorBody()?.string()}")
         when(this.code()) {
             400 -> throw APIError.ClientException(it)
             401 -> throw APIError.AuthenticationException(it)
