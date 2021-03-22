@@ -146,13 +146,13 @@ class NoteCaptureAPIAdapter(
                     noteDataSource.remove(noteId)
                 }
                 is NoteUpdated.Body.Reacted-> {
-                    note.onReacted(account, e)
+                    noteDataSource.add(note.onReacted(account, e))
                 }
                 is NoteUpdated.Body.Unreacted -> {
-                    note.onUnReacted(account, e)
+                    noteDataSource.add(note.onUnReacted(account, e))
                 }
                 is NoteUpdated.Body.PollVoted -> {
-                    note.onPollVoted(account, e)
+                    noteDataSource.add(note.onPollVoted(account, e))
                 }
 
             }

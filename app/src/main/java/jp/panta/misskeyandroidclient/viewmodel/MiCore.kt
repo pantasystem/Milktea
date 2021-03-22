@@ -28,6 +28,7 @@ import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
 import kotlinx.coroutines.flow.StateFlow
 
 interface MiCore{
@@ -89,6 +90,8 @@ interface MiCore{
     suspend fun getChannelAPI(account: Account): ChannelAPI
 
     fun getNoteCaptureAdapter() : NoteCaptureAPIAdapter
+
+    fun getNoteCaptureAPI(account: Account) : NoteCaptureAPI
 
     fun getCurrentInstanceMeta(): Meta?
 

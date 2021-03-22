@@ -1,18 +1,18 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.api.notes.DeleteNote
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.drive.FileUploader
-import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
-import jp.panta.misskeyandroidclient.model.notes.CreateNote
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteNotFoundException
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
+import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
-import java.lang.IllegalStateException
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.selects.select
+import kotlin.coroutines.suspendCoroutine
 
 class NoteRepositoryImpl(
     val miCore: MiCore
@@ -21,8 +21,8 @@ class NoteRepositoryImpl(
     override suspend fun create(createNote: CreateNote): Note {
         val task = PostNoteTask(miCore.getEncryption(), createNote, createNote.author, miCore.loggerFactory)
         val result = runCatching {task.execute(
-                miCore.createFileUploader(createNote.author)
-            )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
+            miCore.createFileUploader(createNote.author)
+        )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.runCatching {
             getOrThrow().let {
                 miCore.getMisskeyAPI(createNote.author).create(it).execute().body()?.createdNote
@@ -71,33 +71,64 @@ class NoteRepositoryImpl(
         return note
     }
 
+    @ExperimentalCoroutinesApi
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun reaction(createReaction: CreateReaction): Boolean {
         val account = miCore.getAccount(createReaction.noteId.accountId)
-        val note = find(createReaction.noteId)
+        var note = find(createReaction.noteId)
         if(note.myReaction != null) {
-            miCore.getMisskeyAPI(account).deleteReaction(DeleteNote(
-                noteId = note.id.noteId,
-                i = account.getI(miCore.getEncryption())
-            )).execute()
+            if(!unreaction(createReaction.noteId)) {
+                return false
+            }
         }
 
-        return miCore.getMisskeyAPI(account).createReaction(
-            jp.panta.misskeyandroidclient.api.notes.CreateReaction(
-                i = account.getI(miCore.getEncryption()),
-                noteId = note.id.noteId,
-                reaction = createReaction.reaction
-            )
-        ).execute().isSuccessful
+        note = miCore.getNoteDataSource().get(createReaction.noteId)
+
+        return runCatching {
+            if(postReaction(createReaction) && !miCore.getNoteCaptureAPI(account).isCaptured(createReaction.noteId.noteId)) {
+                miCore.getNoteDataSource().add(note.onIReacted(createReaction.reaction))
+                return@runCatching true
+            }
+            false
+        }.getOrThrow()
+
+
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun unreaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
         val account = miCore.getAccountRepository().get(noteId.accountId)
-        return miCore.getMisskeyAPI(account).deleteReaction(DeleteNote(
+        return postUnReaction(noteId)
+                && (miCore.getNoteCaptureAPI(account).isCaptured(noteId.noteId)
+                || (note.myReaction != null
+                && miCore.getNoteDataSource().add(note.onIUnReacted()) != AddResult.CANCEL))
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun postReaction(createReaction: CreateReaction): Boolean {
+        val account = miCore.getAccount(createReaction.noteId.accountId)
+        val res = miCore.getMisskeyAPI(account).createReaction(
+            jp.panta.misskeyandroidclient.api.notes.CreateReaction(
+                i = account.getI(miCore.getEncryption()),
+                noteId = createReaction.noteId.noteId,
+                reaction = createReaction.reaction
+            )
+        ).execute()
+        res.throwIfHasError()
+        return res.isSuccessful
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun postUnReaction(noteId: Note.Id): Boolean {
+        val note = find(noteId)
+        val account  = miCore.getAccount(noteId.accountId)
+        val res = miCore.getMisskeyAPI(account).deleteReaction(DeleteNote(
             noteId = note.id.noteId,
             i = account.getI(miCore.getEncryption())
-        )).execute().isSuccessful
+        )).execute()
+        res.throwIfHasError()
+        return res.isSuccessful
+
     }
 }

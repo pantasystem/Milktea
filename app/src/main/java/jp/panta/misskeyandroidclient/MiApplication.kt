@@ -63,6 +63,7 @@ import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
+import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -683,6 +684,9 @@ class MiApplication : Application(), MiCore {
         return mEncryption
     }
 
+    override fun getNoteCaptureAPI(account: Account): NoteCaptureAPI {
+        return mNoteCaptureAPIWithAccountProvider.get(account)
+    }
 
 
 

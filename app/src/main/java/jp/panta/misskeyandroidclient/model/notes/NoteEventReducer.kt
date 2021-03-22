@@ -72,3 +72,45 @@ fun Note.onPollVoted(account: Account, e: NoteUpdated.Body.PollVoted): Note {
         poll = poll.copy(choices = updatedChoices)
     )
 }
+
+fun Note.onIReacted(reaction: String) : Note{
+    var hasItem = false
+    var list = this.reactionCounts.map { count ->
+        if(count.reaction == reaction) {
+            hasItem = true
+            count.copy(count = count.count + 1)
+        }else{
+            count
+        }
+    }
+    if(!hasItem) {
+        val added = list.toMutableList()
+        added.add(ReactionCount(reaction = reaction, count = 1))
+        list = added
+    }
+
+    return this.copy(
+        reactionCounts = list,
+        myReaction = reaction,
+        emojis = emojis
+    )
+}
+
+fun Note.onIUnReacted() : Note {
+    val list = this.reactionCounts.toMutableList()
+    val newList = list.asSequence().map {
+        if(it.reaction == myReaction) {
+            it.copy(count = it.count - 1)
+        }else{
+            it
+        }
+    }.filter {
+        it.count > 0
+    }.toList()
+
+    return this.copy(
+        reactionCounts = newList,
+        myReaction = null
+
+    )
+}
