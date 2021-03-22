@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
-import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.notes.toEntities
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
@@ -18,9 +18,6 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingS
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @ExperimentalCoroutinesApi
 class UserDetailViewModel(
@@ -30,11 +27,11 @@ class UserDetailViewModel(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val encryption: Encryption = miCore.getEncryption()
 ) : ViewModel(){
-    val tag=  "userDetailViewModel"
+    private val logger = miCore.loggerFactory.create("UserDetailViewModel")
 
     val user = MutableLiveData<User.Detail>()
     private val userState = MutableStateFlow<User.Detail?>(null).apply {
-        onEach {
+        filterNotNull().onEach {
             user.postValue(it)
         }.launchIn(viewModelScope)
     }
@@ -119,39 +116,21 @@ class UserDetailViewModel(
 
     fun load(){
         viewModelScope.launch(dispatcher) {
-            val userDTO = fetchUserDTO()
-                ?: return@launch
-            val u = userDTO.toUser(getAccount(), true)
-            miCore.getUserDataSource().add(u)
-
-            userDTO.pinnedNotes?.map { noteDTO ->
-                noteDTO.toEntities(getAccount())
-            }?.forEach { entities ->
-                miCore.getUserDataSource().addAll(entities.third)
-                miCore.getNoteDataSource().addAll(entities.second)
+            var user = userId?.let { miCore.getUserRepository().find(userId, true) }
+            if(user == null){
+                user = fqdnUserName?.let {
+                    val account = getAccount()
+                    val userNameAndHost = fqdnUserName.split("@").filter{ it.isNotBlank() }
+                    val userName = userNameAndHost[1]
+                    val host = userNameAndHost.lastOrNull()
+                    miCore.getUserRepository().findByUserName(account.accountId, userName, host)
+                }
             }
-            userState.value = u as? User.Detail
+
+
+            userState.value = user as? User.Detail
 
         }
-
-    }
-
-    private suspend fun fetchUserDTO(): UserDTO? {
-        val userNameList = fqdnUserName?.split("@")?.filter{ it.isNotBlank() }
-        Log.d(tag, "userNameList:$userNameList, fqcnUserName:$fqdnUserName")
-        val userName = userNameList?.firstOrNull()
-        val host = runCatching { userNameList?.get(1) }.getOrNull()
-        val account = getAccount()
-        val req = RequestUser(
-            i = getAccount().getI(encryption),
-            userId = userId?.id,
-            userName = userName,
-            host = host,
-            detail = true
-        )
-        return runCatching {
-            miCore.getMisskeyAPI(account).showUser(req).execute()?.body()
-        }.getOrNull()
 
     }
 
@@ -232,12 +211,6 @@ class UserDetailViewModel(
                 }
             }
         }
-    }
-
-
-
-    private suspend fun createUserIdOnlyRequest(): RequestUser {
-        return RequestUser(i = getAccount().getI(encryption), userId = userId?.id)
     }
 
 
