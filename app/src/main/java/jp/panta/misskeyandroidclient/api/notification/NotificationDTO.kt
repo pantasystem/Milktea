@@ -46,22 +46,22 @@ data class NotificationDTO(
             }
             "mention" -> {
                 MentionNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, noteId?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
                 )
             }
             "reply" -> {
                 ReplyNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, noteId?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
                 )
             }
             "renote" -> {
                 RenoteNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, noteId?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
                 )
             }
             "quote" -> {
                 QuoteNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, noteId?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
                 )
             }
             "reaction" -> {
