@@ -4,8 +4,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 
-private fun Note.onUnReacted(note: Note, account: Account, e: NoteUpdated.Body.Unreacted): Note {
-    val list = note.reactionCounts.toMutableList()
+fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
+    val list = this.reactionCounts.toMutableList()
     val newList = list.asSequence().map {
         if(it.reaction == e.body.reaction) {
             it.copy(count = it.count - 1)
@@ -16,16 +16,16 @@ private fun Note.onUnReacted(note: Note, account: Account, e: NoteUpdated.Body.U
         it.count > 0
     }.toList()
 
-    return note.copy(
+    return this.copy(
         reactionCounts = newList,
         myReaction = if(e.body.userId == account.remoteId) null else e.body.reaction
 
     )
 }
 
-private fun Note.onReacted(note: Note, account: Account, e: NoteUpdated.Body.Reacted): Note {
+fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
     var hasItem = false
-    var list = note.reactionCounts.map { count ->
+    var list = this.reactionCounts.map { count ->
         if(count.reaction == e.body.reaction) {
             hasItem = true
             count.copy(count = count.count + 1)
@@ -39,22 +39,22 @@ private fun Note.onReacted(note: Note, account: Account, e: NoteUpdated.Body.Rea
         list = added
     }
     val emojis = e.body.emoji?.let {
-        note.emojis?.let {
+        this.emojis?.let {
             it.toMutableList().also { eList ->
                 eList.add(e.body.emoji)
             }
         }
-    }?: note.emojis
+    }?: this.emojis
 
-    return note.copy(
+    return this.copy(
         reactionCounts = list,
-        myReaction = if(e.body.userId == account.remoteId) e.body.reaction else note.myReaction,
+        myReaction = if(e.body.userId == account.remoteId) e.body.reaction else this.myReaction,
         emojis = emojis
     )
 }
 
-private fun Note.onPollVoted(note: Note, account: Account, e: NoteUpdated.Body.PollVoted): Note {
-    val poll = note.poll
+fun Note.onPollVoted(account: Account, e: NoteUpdated.Body.PollVoted): Note {
+    val poll = this.poll
     requireNotNull(poll){
         "pollがNULLです"
     }
@@ -68,7 +68,7 @@ private fun Note.onPollVoted(note: Note, account: Account, e: NoteUpdated.Body.P
             choice
         }
     }
-    return note.copy(
+    return this.copy(
         poll = poll.copy(choices = updatedChoices)
     )
 }
