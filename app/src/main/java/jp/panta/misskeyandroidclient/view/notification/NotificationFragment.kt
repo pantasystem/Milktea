@@ -49,11 +49,12 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
         mViewModel.loadInit()
 
-        mViewModel.notificationsLiveData.observe(viewLifecycleOwner, Observer {
+        mViewModel.notificationsLiveData.observe(viewLifecycleOwner, {
+            Log.d("NotificationFragment", "新たなデータ: $it")
             adapter.submitList(it)
         })
 
-        mViewModel.isLoading.observe(viewLifecycleOwner, Observer {
+        mViewModel.isLoading.observe(viewLifecycleOwner, {
             notification_swipe_refresh.isRefreshing = it
         })
 

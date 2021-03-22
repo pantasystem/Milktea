@@ -47,6 +47,7 @@ class NotificationViewModel(
             notificationsLiveData.postValue(value)
             field = value
         }
+    private val logger = miCore.loggerFactory.create("NotificationViewModel")
 
     init {
         miCore.getCurrentAccount().filterNotNull().onEach {
@@ -71,6 +72,8 @@ class NotificationViewModel(
             list.add(0, it)
             notifications = list
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+        loadInit()
     }
 
     fun loadInit(){
@@ -86,15 +89,20 @@ class NotificationViewModel(
             val request = NotificationRequest(i = account.getI(encryption), limit = 20)
             val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
 
-            val notificationDTOList = runCatching {
-                misskeyAPI.notification(request).execute()?.body()
-            }.getOrNull()
-            val viewDataList = notificationDTOList?.toNotificationViewData(account)
-                ?: emptyList()
-            viewDataList.forEach {
-                it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
+            runCatching {
+                val notificationDTOList = misskeyAPI.notification(request).execute()?.body()
+                val viewDataList = notificationDTOList?.toNotificationViewData(account)
+                    ?: emptyList()
+                viewDataList.forEach {
+                    it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
+                }
+                viewDataList
+            }.onSuccess {
+                notifications = it
+            }.onFailure {
+                logger.error("読み込みエラー", e = it)
             }
-            notifications = viewDataList
+
             isLoadingFlag = false
         }
 

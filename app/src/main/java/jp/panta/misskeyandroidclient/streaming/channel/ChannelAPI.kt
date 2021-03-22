@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,12 +13,14 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ChannelAPI(
     val socket: Socket,
+    loggerFactory: Logger.Factory,
 ) : SocketMessageEventListener, SocketStateEventListener {
 
     enum class Type {
         MAIN, HOME, LOCAL, HYBRID, GLOBAL
     }
 
+    private val logger = loggerFactory.create("ChannelAPI")
 
     private val listenersMap = ConcurrentHashMap<Type, HashSet<(ChannelBody)->Unit>>(
         mapOf(
@@ -29,7 +32,7 @@ class ChannelAPI(
         )
     )
 
-    private val typeIdMap = ConcurrentHashMap<Type, String>()
+    private val typeIdMap = HashMap<Type, String>()
 
     init {
         socket.addMessageEventListener(this)
@@ -54,10 +57,8 @@ class ChannelAPI(
      * 接続しているチャンネル数
      */
     fun count(): Int {
-        synchronized(listenersMap) {
-            return listenersMap.filterNot {
-                it.value.isNullOrEmpty()
-            }.count()
+        synchronized(typeIdMap) {
+            return typeIdMap.count()
         }
     }
 
@@ -70,26 +71,48 @@ class ChannelAPI(
 
     private fun connect(type: Type, listener: (ChannelBody)->Unit) {
         synchronized(typeIdMap) {
-            // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
-            if(listenersMap[type]?.contains(listener) == true) {
-                return@synchronized
-            }
+            synchronized(listenersMap) {
+                // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
+                if(listenersMap[type]?.contains(listener) == true) {
+                    logger.debug("リッスン済み")
+                    return
+                }
 
-            listenersMap[type]?.add(listener)
-                ?: throw IllegalStateException("listenersがNULLです。")
+                listenersMap[type]?.add(listener)
+                    ?: throw IllegalStateException("listenersがNULLです。")
 
-            if(typeIdMap[type] == null){
-                sendConnect(type)
+                if(typeIdMap[type] == null){
+                    logger.debug("接続処理を開始")
+                    sendConnect(type)
+                    logger.debug("after sendConnect:${typeIdMap}")
+                }
             }
 
         }
     }
 
+    private fun disconnect(type: Type, listener: (ChannelBody) -> Unit) {
+        synchronized(listenersMap) {
+            synchronized(listenersMap) {
+                if(listenersMap[type]?.contains(listener) != true){
+                    return
+                }
+
+                listenersMap[type]?.remove(listener)
+
+                // 誰にも使われていなければサーバーからChannelへの接続を開放する
+                trySendDisconnect(type)
+            }
+
+
+        }
+    }
 
 
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
             synchronized(typeIdMap) {
+                logger.debug("onMessage id=${e.body.id}, type=${e.body::class.simpleName} typeIdMap=${typeIdMap}, count=${count()}, hash=${this.hashCode()}")
                 typeIdMap.filter {
                     it.value == e.body.id
                 }.keys.forEach {
@@ -122,28 +145,12 @@ class ChannelAPI(
         }
 
         val id = UUID.randomUUID().toString()
-        if(
-            socket.send(Send.Connect(Send.Connect.Body(channel = body, id = id)).toJson())
-        ){
-            typeIdMap[type] = id
-            return true
-        }
-        return false
-    }
-
-    private fun disconnect(type: Type, listener: (ChannelBody) -> Unit) {
-        synchronized(listenersMap) {
-            if(listenersMap[type]?.contains(listener) != true){
-                return@synchronized
-            }
-
-            listenersMap[type]?.remove(listener)
-
-            // 誰にも使われていなければサーバーからChannelへの接続を開放する
-            trySendDisconnect(type)
-
+        typeIdMap[type] = id
+        return socket.send(Send.Connect(Send.Connect.Body(channel = body, id = id)).toJson()).also {
+            logger.debug("channel=$body API登録完了 result=$it, typeIdMap=${typeIdMap}, hash=${this.hashCode()}")
         }
     }
+
 
     private fun trySendDisconnect(type: Type) {
         if(listenersMap[type].isNullOrEmpty()){
@@ -155,18 +162,21 @@ class ChannelAPI(
                 socket.removeMessageEventListener(this)
                 socket.removeStateEventListener(this)
             }
+            logger.debug("channel 購読解除, type=$type, id=$id")
         }
     }
 
 
     override fun onStateChanged(e: Socket.State) {
         if(e is Socket.State.Connected) {
+
             synchronized(typeIdMap) {
                 val types = typeIdMap.keys
-                typeIdMap.clear()
-                types.forEach {
+                val sendCount = types.toList().count {
+                    logger.debug("接続処理: $it")
                     sendConnect(it)
                 }
+                logger.debug("types: $typeIdMap, 送信済み数:$sendCount, count:${count()}")
             }
         }
     }

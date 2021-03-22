@@ -66,6 +66,13 @@ sealed class ChannelBody : StreamingEvent(){
         ) : Main()
 
         @Serializable
+        @SerialName("unreadNotification")
+        data class UnreadNotification(
+            override val id: String,
+            val body: NotificationDTO
+        ) : Main()
+
+        @Serializable
         @SerialName("unreadMessagingMessage")
         data class UnreadMessagingMessage(
             override val id: String,

@@ -102,7 +102,7 @@ open class PlaneNoteViewData (
     val textNode = MFMParser.parse(toShowNote.note.text, toShowNote.note.emojis)
     val urls = textNode?.getUrls()
 
-    val emojis = toShowNote.note.emojis
+    var emojis = toShowNote.note.emojis?: emptyList()
 
     val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojis?.map{
         it.name to it
@@ -212,6 +212,7 @@ open class PlaneNoteViewData (
         emojiMap.putAll(note.emojis?.map{
             it.name to it
         }?: emptyList())
+        emojis = emojiMap.values.toList()
         renoteCount.postValue(note.renoteCount)
 
         myReaction.postValue(note.myReaction)
