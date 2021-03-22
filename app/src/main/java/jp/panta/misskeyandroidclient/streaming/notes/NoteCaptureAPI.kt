@@ -31,9 +31,9 @@ class NoteCaptureAPI(
                 logger?.debug("受信:$noteUpdated")
                 offer(noteUpdated.body)
             }
-            logger?.debug("before capture")
+            //logger?.debug("before capture")
             capture(noteId, listener)
-            logger?.debug("after capture")
+            //logger?.debug("after capture")
 
             awaitClose {
                 logger?.debug("captureを終了する noteId=$noteId, listenId=$listenId")
