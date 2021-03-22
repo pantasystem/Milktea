@@ -26,7 +26,7 @@ class SocketImpl(
         set(value) {
             field = value
             logger.debug("SocketImpl状態変化: ${value.javaClass}, $value")
-            synchronized(stateListeners) {
+            synchronized(this) {
                 stateListeners.toList().forEach {
                     it.onStateChanged(value)
                 }
@@ -90,12 +90,13 @@ class SocketImpl(
 
     override suspend fun blockingConnect(): Boolean {
         return suspendCoroutine { continuation ->
+            var isResumed = false
             if(!connect()) {
                 logger.debug("connect -> falseのためキャンセル")
                 continuation.resume(false)
+                isResumed = true
             }
             val callback = object : SocketStateEventListener{
-                var isResumed = false
                 override fun onStateChanged(e: Socket.State) {
                     if(!isResumed) {
                         if(e is Socket.State.Connected){
@@ -184,8 +185,9 @@ class SocketImpl(
         synchronized(this) {
             val iterator = messageListeners.iterator()
             while(iterator.hasNext()) {
-                val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.getOrNull()
-                    ?: continue
+                val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
+                    logger.warning("デコードエラー", e = t)
+                }.getOrNull() ?: continue
                 val listener = iterator.next()
                 if(listener.onMessage(e)){
                     break
