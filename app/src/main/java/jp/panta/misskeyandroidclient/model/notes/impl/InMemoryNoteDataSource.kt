@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteNotFoundException
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.users.User
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -18,11 +19,14 @@ class InMemoryNoteDataSource(
     private val notes = HashMap<Note.Id, Note>()
 
     private val mutex = Mutex()
+    private val listenersLock = Mutex()
 
     private val listeners = mutableSetOf<NoteDataSource.Listener>()
 
-    override fun addEventListener(listener: NoteDataSource.Listener) {
-        listeners.add(listener)
+    override fun addEventListener(listener: NoteDataSource.Listener): Unit = runBlocking {
+        listenersLock.withLock {
+            listeners.add(listener)
+        }
     }
 
 
@@ -88,9 +92,9 @@ class InMemoryNoteDataSource(
         }
     }
 
-    private fun publish(ev: NoteDataSource.Event) {
-        synchronized(listeners) {
-            listeners.forEach { 
+    private fun publish(ev: NoteDataSource.Event) = runBlocking<Unit> {
+        listenersLock.withLock {
+            listeners.forEach {
                 it.on(ev)
             }
         }
