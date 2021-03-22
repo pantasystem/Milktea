@@ -205,12 +205,12 @@ class MiApplication : Application(), MiCore {
         return accountRepository.get(accountId)
     }
 
-    override fun getUrlPreviewStore(account: Account): UrlPreviewStore? {
+    override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
         return getUrlPreviewStore(account, false)
     }
 
 
-    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore?{
+    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->
             val url = mSettingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
 
@@ -561,7 +561,7 @@ class MiApplication : Application(), MiCore {
             var noteCapture = mNoteCaptureAccountMap[account.accountId]
 
             if(noteCapture == null){
-                noteCapture = NoteCapture(account, getNoteEventStore(account))
+                noteCapture = NoteCapture(account, getNoteEventStore(account), getMeta(account)?.getVersion())
                 setupObserver(account, noteCapture)
                 mNoteCaptureAccountMap[account.accountId] = noteCapture
             }
@@ -621,6 +621,12 @@ class MiApplication : Application(), MiCore {
 
     private fun<T> List<T>.toArrayList(): ArrayList<T>{
         return ArrayList(this)
+    }
+
+    private fun getMeta(account: Account): Meta? {
+        synchronized(mMetaInstanceUrlMap) {
+            return mMetaInstanceUrlMap[account.instanceDomain]
+        }
     }
 
 }

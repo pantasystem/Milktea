@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.streming.AbsObserver
@@ -22,12 +23,14 @@ import kotlin.collections.HashSet
  * リモートの更新イベントをイベントデータとして返す
  *
  */
-class NoteCapture(override val account: Account, private val noteEventStore: NoteEventStore) : AbsObserver(){
+class NoteCapture(override val account: Account, private val noteEventStore: NoteEventStore, val version: Version?) : AbsObserver(){
+
     data class CaptureRequest(override val type: String = "sn", val body: CaptureRequestBody): StreamingAction
     data class CaptureRequestBody(private val id: String)
 
     data class NoteUpdated(override val type: String, val body: Body<NoteUpdatedBody>): StreamingAction
     data class NoteUpdatedBody(val reaction: String?, val userId: String?, val choice: Int?, val deletedAt: String?, val emoji: Emoji?)
+
 
     /**
      * ノートをまとめてキャプチャーするためのクライアント
@@ -80,6 +83,10 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
         }
 
 
+    }
+
+    companion object {
+        const val V_12_75_0 = "12.75.0"
     }
 
     private val mGson = GsonFactory.create()
@@ -193,7 +200,19 @@ class NoteCapture(override val account: Account, private val noteEventStore: Not
     }
 
     private fun createCaptureRequest(noteId: String): CaptureRequest {
-        return CaptureRequest(body = CaptureRequestBody(noteId))
+        val v = version
+        val type = when {
+            v == null -> {
+                "sn"
+            }
+            v >= Version(V_12_75_0) -> {
+                "sr"
+            }
+            else -> {
+                "sn"
+            }
+        }
+        return CaptureRequest(body = CaptureRequestBody(noteId), type = type)
     }
 
     private fun createUnCaptureRequest(noteId: String): CaptureRequest {
