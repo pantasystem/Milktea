@@ -183,11 +183,13 @@ class SocketImpl(
         super.onMessage(webSocket, text)
 
         synchronized(this) {
+            val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
+                logger.warning("デコードエラー", e = t)
+            }.getOrNull()?: return@synchronized
+
             val iterator = messageListeners.iterator()
             while(iterator.hasNext()) {
-                val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
-                    logger.warning("デコードエラー", e = t)
-                }.getOrNull() ?: continue
+
                 val listener = iterator.next()
                 if(listener.onMessage(e)){
                     break
