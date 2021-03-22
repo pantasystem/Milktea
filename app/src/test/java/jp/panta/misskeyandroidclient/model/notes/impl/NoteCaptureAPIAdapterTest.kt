@@ -37,7 +37,7 @@ class NoteCaptureAPIAdapterTest {
 
         val noteCaptureAPIAdapter = NoteCaptureAPIAdapter(
             accountRepository = accountRepository,
-            noteRepository = noteRepository,
+            noteDataSource = noteRepository,
             noteCaptureAPIWithAccountProvider = noteCaptureAPIWithAccountProvider,
             loggerFactory,
             coroutineScope

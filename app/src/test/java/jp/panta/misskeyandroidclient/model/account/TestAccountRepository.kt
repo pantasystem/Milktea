@@ -18,6 +18,14 @@ class TestAccountRepository : AccountRepository {
         return ac
     }
 
+    override fun addEventListener(listener: AccountRepository.Listener) {
+
+    }
+
+    override fun removeEventListener(listener: AccountRepository.Listener) {
+
+    }
+
     override suspend fun delete(account: Account) {
         accounts.remove(account.accountId)
     }

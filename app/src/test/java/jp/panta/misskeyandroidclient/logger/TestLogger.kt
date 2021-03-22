@@ -6,7 +6,7 @@ class TestLogger(
     override val defaultTag: String
 ) : Logger{
 
-    override fun debug(msg: String, tag: String, e: Exception?) {
+    override fun debug(msg: String, tag: String, e: Throwable?) {
         println("debug:$tag:$msg, error:$e")
     }
 
@@ -14,11 +14,11 @@ class TestLogger(
         println("error:$tag:$msg, error:$e")
     }
 
-    override fun info(msg: String, tag: String, e: Exception?) {
+    override fun info(msg: String, tag: String, e: Throwable?) {
         println("info:$tag:$msg, error:$e")
     }
 
-    override fun warning(msg: String, tag: String, e: Exception?) {
+    override fun warning(msg: String, tag: String, e: Throwable?) {
         println("warning:$tag:$msg, error:$e")
 
     }

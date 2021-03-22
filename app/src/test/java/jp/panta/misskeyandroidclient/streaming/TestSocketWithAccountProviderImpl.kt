@@ -11,4 +11,8 @@ class TestSocketWithAccountProviderImpl : SocketWithAccountProvider{
     override fun get(accountId: Long): Socket {
         return TestSocketImpl()
     }
+
+    override fun all(): List<Socket> {
+        return listOf(TestSocketImpl())
+    }
 }
