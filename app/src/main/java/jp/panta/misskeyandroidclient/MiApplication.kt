@@ -241,7 +241,7 @@ class MiApplication : Application(), MiCore {
         )
 
 
-        mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider)
+        mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
 
         InMemoryMessageDataSource(mAccountRepository).also {
             mMessageDataSource = it
