@@ -43,15 +43,18 @@ class UserDetailActivity : AppCompatActivity() {
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
 
-        fun newInstance(context: Context, userName: String? = null, userId: User.Id? = null): Intent {
+        fun newInstance(context: Context, userId: User.Id): Intent {
             return Intent(context, UserDetailActivity::class.java).apply {
-                userName?.let{
-                    putExtra(EXTRA_USER_NAME, userName)
-                }
-                userId?.let{
-                    putExtra(EXTRA_USER_ID, userId.id)
-                    putExtra(EXTRA_ACCOUNT_ID, userId.accountId)
-                }
+
+                putExtra(EXTRA_USER_ID, userId.id)
+                putExtra(EXTRA_ACCOUNT_ID, userId.accountId)
+            }
+        }
+
+        fun newInstance(context: Context, userName: String): Intent {
+            return Intent(context, UserDetailActivity::class.java).apply {
+                putExtra(EXTRA_USER_NAME, userName)
+
             }
         }
     }
@@ -76,8 +79,15 @@ class UserDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mParentActivity = intent.getParentActivity()
 
-        val userId: User.Id? = intent.getSerializableExtra(EXTRA_USER_ID) as? User.Id
+        val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
+        val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
+        val userId: User.Id? = if(!(remoteUserId == null || accountId == -1L)) {
+            User.Id(accountId, remoteUserId)
+        }else{
+            null
+        }
         mUserId = userId
+
         val userName = intent.data?.getQueryParameter("userName")
             ?: intent.getStringExtra(EXTRA_USER_NAME)
             ?: intent.data?.path?.let{ path ->
@@ -105,12 +115,15 @@ class UserDetailActivity : AppCompatActivity() {
 
 
             viewModel.load()
-            viewModel.user.observe(this,  {
-                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, it.id.id)
-                //userTimelinePager.adapter = adapter
-                binding.userTimelinePager.adapter = adapter
-                binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
-                supportActionBar?.title = it.getDisplayUserName()
+            viewModel.user.observe(this,  { detail ->
+                if(detail != null){
+                    val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, detail.id.id)
+                    //userTimelinePager.adapter = adapter
+                    binding.userTimelinePager.adapter = adapter
+                    binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
+                    supportActionBar?.title = detail.getDisplayUserName()
+                }
+
             })
 
 
