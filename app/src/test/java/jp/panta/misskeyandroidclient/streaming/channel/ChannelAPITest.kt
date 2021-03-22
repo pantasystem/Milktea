@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.streaming.channel
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.network.SocketImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -12,6 +13,8 @@ import org.junit.Assert
 import org.junit.Test
 
 import org.junit.Assert.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ChannelAPITest {
 
@@ -37,5 +40,49 @@ class ChannelAPITest {
         }.join()
 
 
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testDisconnect() {
+        val wssURL = "wss://misskey.io/streaming"
+        val logger = TestLogger.Factory()
+        val okHttpClient = OkHttpClient()
+        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val channelAPI = ChannelAPI(socket, logger)
+        runBlocking {
+
+            val job1 = launch {
+                channelAPI.connect(ChannelAPI.Type.MAIN).collect ()
+            }
+
+            val job2 = launch {
+                channelAPI.connect(ChannelAPI.Type.GLOBAL).collect ()
+            }
+
+            val job3 = launch {
+                channelAPI.connect(ChannelAPI.Type.GLOBAL).collect ()
+            }
+
+            val closedRes: Socket.State = suspendCoroutine<Socket.State> { continuation ->
+                var flag = true
+                socket.addStateEventListener { ev ->
+                    if(flag) {
+                        if(ev is Socket.State.Connected) {
+                            assertEquals(2, channelAPI.count())
+                            job1.cancel()
+                            job2.cancel()
+                            job3.cancel()
+                        }
+                        if(ev is Socket.State.Closed) {
+                            flag = false
+
+                            continuation.resume(ev)
+                        }
+                    }
+                }
+            }
+            assertTrue(closedRes is Socket.State.Closed)
+        }
     }
 }
