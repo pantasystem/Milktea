@@ -59,9 +59,21 @@ sealed class Send {
         data class Body(val id: String)
     }
 
-    @SerialName("sn")
+    @SerialName("subNote")
     @Serializable
     data class SubscribeNote(
+        val body: Body
+    ) : Send() {
+
+        @Serializable
+        data class Body(
+            @SerialName("id") val noteId: String
+        )
+    }
+
+    @SerialName("sr")
+    @Serializable
+    data class SubscribeAndReadNote(
         val body: Body
     ) : Send() {
 
