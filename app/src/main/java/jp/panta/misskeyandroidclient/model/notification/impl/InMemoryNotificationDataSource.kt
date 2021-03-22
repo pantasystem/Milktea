@@ -5,20 +5,26 @@ import jp.panta.misskeyandroidclient.model.notification.AccountNotificationCount
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationNotFoundException
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class InMemoryNotificationDataSource : NotificationDataSource{
 
     private val listeners = mutableSetOf<NotificationDataSource.Listener>()
     private val notificationIdAndNotification = mutableMapOf<Notification.Id, Notification>()
 
-    override fun addEventListener(listener: NotificationDataSource.Listener) {
-        synchronized(listeners) {
+    private val notificationsMapLock = Mutex()
+    private val listenersLock = Mutex()
+
+    override fun addEventListener(listener: NotificationDataSource.Listener) = runBlocking <Unit>{
+        listenersLock.withLock {
             listeners.add(listener)
         }
     }
 
-    override fun removeEventListener(listener: NotificationDataSource.Listener) {
-        synchronized(listeners) {
+    override fun removeEventListener(listener: NotificationDataSource.Listener) = runBlocking<Unit>{
+        listenersLock.withLock {
             listeners.remove(listener)
         }
     }
@@ -57,8 +63,8 @@ class InMemoryNotificationDataSource : NotificationDataSource{
 
 
 
-    private fun countUnreadNotificationByAccount(accountId: Long): Int {
-        synchronized(notificationIdAndNotification) {
+    private suspend fun countUnreadNotificationByAccount(accountId: Long): Int {
+        notificationsMapLock.withLock {
             return notificationIdAndNotification.values.filter {
                 it.id.accountId == accountId
             }.filterNot {
@@ -67,8 +73,8 @@ class InMemoryNotificationDataSource : NotificationDataSource{
         }
     }
 
-    private fun countUnreadNotification(): List<AccountNotificationCount> {
-        synchronized(notificationIdAndNotification) {
+    private suspend fun countUnreadNotification(): List<AccountNotificationCount> {
+        notificationsMapLock.withLock {
             return notificationIdAndNotification.values.groupBy {
                 it.id.accountId
             }.map {
@@ -77,30 +83,30 @@ class InMemoryNotificationDataSource : NotificationDataSource{
         }
     }
 
-    private fun find(id: Notification.Id): Notification? {
-        synchronized(notificationIdAndNotification) {
+    private suspend fun find(id: Notification.Id): Notification? {
+        notificationsMapLock.withLock {
             return notificationIdAndNotification[id]
         }
     }
 
-    private fun createOrUpdate(notification: Notification): AddResult{
-        synchronized(notificationIdAndNotification) {
+    private suspend fun createOrUpdate(notification: Notification): AddResult{
+        notificationsMapLock.withLock {
             val exNotification = notificationIdAndNotification[notification.id]
             notificationIdAndNotification[notification.id] = notification
             return if(exNotification == null) AddResult.CREATED else AddResult.UPDATED
         }
     }
 
-    private fun delete(notificationId: Notification.Id): Boolean {
-        synchronized(notificationIdAndNotification) {
+    private suspend fun delete(notificationId: Notification.Id): Boolean {
+        notificationsMapLock.withLock {
             val ex = notificationIdAndNotification[notificationId]
             notificationIdAndNotification.remove(notificationId)
             return ex != null
         }
     }
 
-    private fun publish(event: NotificationDataSource.Event) {
-        synchronized(listeners) {
+    private fun publish(event: NotificationDataSource.Event) = runBlocking{
+        listenersLock.withLock {
             listeners.forEach {
                 it.on(event)
             }
