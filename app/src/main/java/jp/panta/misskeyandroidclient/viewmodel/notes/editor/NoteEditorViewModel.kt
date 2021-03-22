@@ -142,9 +142,9 @@ class NoteEditorViewModel(
     // FIXME リモートのVisibilityを参照するようにする
     val visibility = MediatorLiveData<Visibility>().apply {
         addSourceFromNoteAndDraft { noteDTO, draftNote ->
-            val type = noteDTO?.visibility?: draftNote?.visibility
             val local = noteDTO?.localOnly ?: draftNote?.localOnly
-            value = if(type == null) Visibility.Public(false) else Visibility(type, local?: false)
+            val type = noteDTO?.visibility?: Visibility(draftNote?.visibility?: "public", local?: false)
+            value = type
         }
     }
 

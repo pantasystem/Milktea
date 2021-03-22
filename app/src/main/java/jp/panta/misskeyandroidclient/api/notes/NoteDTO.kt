@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
@@ -74,6 +75,9 @@ data class NoteDTO(
 ): Serializable
 
 fun NoteDTO.toNote(account: Account): Note{
+    val visibility = Visibility(this.visibility?: "public", isLocalOnly = localOnly?: false, visibleUserIds = visibleUserIds?.map { id ->
+        User.Id(account.accountId, id)
+    }?: emptyList())
     return Note(
         id = Note.Id(account.accountId, this.id),
         createdAt = this.createdAt,
@@ -83,7 +87,7 @@ fun NoteDTO.toNote(account: Account): Note{
         replyId = this.replyId?.let{ Note.Id(account.accountId, this.replyId) },
         renoteId = this.renoteId?.let{ Note.Id(account.accountId, this.renoteId) },
         viaMobile = this.viaMobile,
-        visibility = this.visibility,
+        visibility = visibility,
         localOnly = this.localOnly,
         emojis = this.emojis,
         app = this.app,

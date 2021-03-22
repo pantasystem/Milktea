@@ -22,7 +22,7 @@ data class Note(
     val renoteId: Id?,
 
     val viaMobile: Boolean?,
-    val visibility: String?,
+    val visibility: Visibility,
     val localOnly: Boolean?,
 
     val visibleUserIds: List<User.Id>?,
