@@ -27,9 +27,9 @@ class SocketImpl(
             field = value
             logger.debug("SocketImpl状態変化: ${value.javaClass}, $value")
             synchronized(this) {
-                stateListeners.toList().forEach {
-                    it.onStateChanged(value)
-                }
+                stateListeners.toList()
+            }.forEach {
+                it.onStateChanged(value)
             }
 
         }

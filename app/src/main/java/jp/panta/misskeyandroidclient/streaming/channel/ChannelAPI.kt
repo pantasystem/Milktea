@@ -36,7 +36,7 @@ class ChannelAPI(
 
     init {
         socket.addMessageEventListener(this)
-        socket.addStateEventListener(this)
+        //socket.addStateEventListener(this)
     }
 
     @ExperimentalCoroutinesApi
@@ -112,7 +112,6 @@ class ChannelAPI(
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
             synchronized(typeIdMap) {
-                //logger.debug("onMessage id=${e.body.id}, type=${e.body::class.simpleName} typeIdMap=${typeIdMap}, count=${count()}, hash=${this.hashCode()}")
                 typeIdMap.filter {
                     it.value == e.body.id
                 }.keys.forEach {
@@ -134,7 +133,6 @@ class ChannelAPI(
     private fun sendConnect(type: Type): Boolean {
         if(typeIdMap.isEmpty()) {
             socket.addMessageEventListener(this)
-            socket.addStateEventListener(this)
         }
         val body = when(type){
             Type.GLOBAL -> Send.Connect.Type.GLOBAL_TIMELINE
@@ -160,7 +158,6 @@ class ChannelAPI(
             }
             if(typeIdMap.isEmpty()) {
                 socket.removeMessageEventListener(this)
-                socket.removeStateEventListener(this)
             }
             logger.debug("channel 購読解除, type=$type, id=$id")
         }
