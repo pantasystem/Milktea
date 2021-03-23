@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.model.group
 
+import jp.panta.misskeyandroidclient.model.Entity
+import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.users.User
 import java.util.*
 
@@ -9,6 +11,6 @@ data class Group(
     val name: String,
     val ownerId: User.Id,
     val userIds: List<User.Id>
-) {
-    data class Id(val accountId: Long, val groupId: String)
+) : Entity {
+    data class Id(val accountId: Long, val groupId: String) : EntityId
 }
