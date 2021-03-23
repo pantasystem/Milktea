@@ -81,6 +81,9 @@ class ChannelAPI(
                 listenersMap[type]?.add(listener)
                     ?: throw IllegalStateException("listenersがNULLです。")
 
+                if(typeIdMap.isEmpty()) {
+                    socket.addMessageEventListener(this)
+                }
                 if(typeIdMap[type] == null){
                     logger.debug("接続処理を開始")
                     sendConnect(type)
@@ -102,6 +105,9 @@ class ChannelAPI(
 
                 // 誰にも使われていなければサーバーからChannelへの接続を開放する
                 trySendDisconnect(type)
+                if(typeIdMap.isEmpty()) {
+                    socket.removeMessageEventListener(this)
+                }
             }
 
 
@@ -131,9 +137,6 @@ class ChannelAPI(
      * 接続メッセージを現在の状態にかかわらずサーバーに送信する
      */
     private fun sendConnect(type: Type): Boolean {
-        if(typeIdMap.isEmpty()) {
-            socket.addMessageEventListener(this)
-        }
         val body = when(type){
             Type.GLOBAL -> Send.Connect.Type.GLOBAL_TIMELINE
             Type.HYBRID -> Send.Connect.Type.HYBRID_TIMELINE
@@ -156,9 +159,7 @@ class ChannelAPI(
             if(id != null){
                 socket.send((Send.Disconnect(Send.Disconnect.Body(id)).toJson()))
             }
-            if(typeIdMap.isEmpty()) {
-                socket.removeMessageEventListener(this)
-            }
+
             logger.debug("channel 購読解除, type=$type, id=$id")
         }
     }
