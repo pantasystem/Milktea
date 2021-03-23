@@ -35,8 +35,8 @@ class ChannelAPI(
     private val typeIdMap = HashMap<Type, String>()
 
     init {
-        socket.addMessageEventListener(this)
-        //socket.addStateEventListener(this)
+        //socket.addMessageEventListener(this)
+        socket.addStateEventListener(this)
     }
 
     @ExperimentalCoroutinesApi
@@ -166,7 +166,7 @@ class ChannelAPI(
 
     override fun onStateChanged(e: Socket.State) {
         if(e is Socket.State.Connected) {
-
+            logger.debug("onStateChanged")
             synchronized(typeIdMap) {
                 val types = typeIdMap.keys
                 val sendCount = types.toList().count {
@@ -176,6 +176,8 @@ class ChannelAPI(
                 logger.debug("types: $typeIdMap, 送信済み数:$sendCount, count:${count()}")
             }
         }
+        logger.debug("after onStateChanged")
+
     }
 
 }

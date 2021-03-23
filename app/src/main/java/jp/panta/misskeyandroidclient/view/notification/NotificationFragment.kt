@@ -47,7 +47,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         notification_list_view.adapter = adapter
         notification_list_view.layoutManager = mLinearLayoutManager
 
-        mViewModel.loadInit()
+        //mViewModel.loadInit()
 
         mViewModel.notificationsLiveData.observe(viewLifecycleOwner, {
             Log.d("NotificationFragment", "新たなデータ: $it")

@@ -50,9 +50,9 @@ class NotificationViewModel(
     private val logger = miCore.loggerFactory.create("NotificationViewModel")
 
     init {
-        miCore.getCurrentAccount().filterNotNull().onEach {
+        miCore.getCurrentAccount().filterNotNull().flowOn(Dispatchers.IO).onEach {
             loadInit()
-        }.launchIn(viewModelScope + Dispatchers.IO)
+        }.launchIn(viewModelScope)
 
         miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
             miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
@@ -73,24 +73,30 @@ class NotificationViewModel(
             notifications = list
         }.launchIn(viewModelScope + Dispatchers.IO)
 
-        loadInit()
+        //loadInit()
     }
 
     fun loadInit(){
         if(isLoadingFlag){
+            logger.debug("cancel loadInit")
             return
         }
+        logger.debug("loadInit")
+
         isLoadingFlag = true
-        noteCaptureScope.cancel()
+        //noteCaptureScope.cancel()
         noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + ioDispatcher)
 
-        viewModelScope.launch(ioDispatcher) {
+        logger.debug("before launch:${viewModelScope.isActive}")
+        viewModelScope.launch(Dispatchers.IO) {
+            logger.debug("in launch")
             val account = miCore.getAccountRepository().getCurrentAccount()
             val request = NotificationRequest(i = account.getI(encryption), limit = 20)
             val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
 
             runCatching {
                 val notificationDTOList = misskeyAPI.notification(request).execute()?.body()
+                logger.debug("res: $notificationDTOList")
                 val viewDataList = notificationDTOList?.toNotificationViewData(account)
                     ?: emptyList()
                 viewDataList.forEach {
@@ -108,6 +114,7 @@ class NotificationViewModel(
 
     }
     fun loadOld(){
+        logger.debug("loadOld")
         if(isLoadingFlag){
             return
         }
@@ -117,7 +124,7 @@ class NotificationViewModel(
         val untilId = exNotificationList.lastOrNull()?.id
         if(exNotificationList.isNullOrEmpty() || untilId == null){
             isLoadingFlag = false
-            return
+            return loadInit()
         }
 
         viewModelScope.launch(ioDispatcher) {
