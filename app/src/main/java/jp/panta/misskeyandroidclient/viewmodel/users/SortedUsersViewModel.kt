@@ -4,11 +4,9 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")
@@ -101,7 +99,7 @@ class SortedUsersViewModel(
     }.apply{
         miCore.getCurrentAccount().onEach {
             loadUsers()
-        }
+        }.launchIn(viewModelScope + Dispatchers.Main)
     }
 
     val isRefreshing = MutableLiveData<Boolean>()
@@ -127,11 +125,11 @@ class SortedUsersViewModel(
                         }
                     }?.map{ u->
                         UserViewData(u, miCore, viewModelScope, Dispatchers.IO)
-                    }?.let{ viewDataList ->
-                        users.postValue(viewDataList)
-                    }
+                    }?: emptyList()
                 }.onFailure { t ->
                     logger.error("ユーザーを取得しようとしたところエラーが発生しました", t)
+                }.onSuccess {
+                    users.postValue(it)
                 }
             isRefreshing.postValue(false)
         }
