@@ -68,6 +68,7 @@ class NotificationViewModel(
             NotificationViewData(notificationRelation, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
         }.onEach {
 
+            it.noteViewData?.eventFlow?.launchIn(viewModelScope + Dispatchers.IO)
             val list = ArrayList(notifications)
             list.add(0, it)
             notifications = list

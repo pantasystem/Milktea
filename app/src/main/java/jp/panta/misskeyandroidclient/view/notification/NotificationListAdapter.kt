@@ -44,8 +44,9 @@ class NotificationListAdapter(
         //holder.binding.simpleNote.reactionView.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
         //holder.binding.simpleNote.reactionView.adapter = adapter
         setReactionCounter(note, holder.binding.simpleNote.reactionView)
-        holder.binding.executePendingBindings()
         holder.binding.lifecycleOwner = lifecycleOwner
+        holder.binding.executePendingBindings()
+
 
     }
 
