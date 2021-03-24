@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.account.Account
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.lang.ClassCastException
 
 
@@ -11,6 +12,7 @@ import java.lang.ClassCastException
 class NotificationViewModelFactory(
     private val miApplication: MiApplication
     ) : ViewModelProvider.Factory{
+    @ExperimentalCoroutinesApi
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == NotificationViewModel::class.java){
             //val noteCapture = miApplication.noteCapture

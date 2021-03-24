@@ -161,7 +161,6 @@ class NotesViewModel(
      * 既に含まれているmyReactionと一致しない場合は一度解除し再送する
      */
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String){
-        val myReaction = planeNoteViewData.myReaction.value
 
 
         viewModelScope.launch(Dispatchers.IO){

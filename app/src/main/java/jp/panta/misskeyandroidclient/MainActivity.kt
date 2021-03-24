@@ -64,6 +64,7 @@ import kotlinx.coroutines.flow.*
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     lateinit var mNotesViewModel: NotesViewModel
+    @ExperimentalCoroutinesApi
     private lateinit var mAccountViewModel: AccountViewModel
 
     private var mBottomNavigationAdapter: MainBottomNavigationAdapter? = null
@@ -75,6 +76,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
+    @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -312,6 +314,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportActionBar?.title = title
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun setHeaderProfile(activityMainBinding: ActivityMainBinding){
 
         DataBindingUtil.bind<NavHeaderMainBinding>(activityMainBinding.navView.getHeaderView(0))

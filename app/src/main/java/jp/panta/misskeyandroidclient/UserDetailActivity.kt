@@ -59,6 +59,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     private var mViewModel: UserDetailViewModel? = null
 
     private var mAccountRelation: Account? = null
@@ -127,11 +128,11 @@ class UserDetailActivity : AppCompatActivity() {
             })
 
 
-            viewModel.userName.observe(this, Observer{
+            viewModel.userName.observe(this, {
                 supportActionBar?.title = it
             })
             //userTimelineTab.setupWithViewPager()
-            viewModel.showFollowers.observe(this, Observer {
+            viewModel.showFollowers.observe(this, {
                 it?.let{
                     val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
                     startActivity(intent)
@@ -186,7 +187,7 @@ class UserDetailActivity : AppCompatActivity() {
             return titles.size
         }
 
-        override fun getPageTitle(position: Int): CharSequence? {
+        override fun getPageTitle(position: Int): CharSequence {
             return titles[position]
         }
 

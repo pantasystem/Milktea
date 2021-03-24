@@ -45,12 +45,14 @@ class NotificationService : Service() {
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 
-    override fun onBind(intent: Intent): IBinder? {
+    override fun onBind(intent: Intent): IBinder {
         return mBinder
     }
 
     private val mDisposable = CompositeDisposable()
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startObserve()
         Log.d(TAG, "serviceを開始した")

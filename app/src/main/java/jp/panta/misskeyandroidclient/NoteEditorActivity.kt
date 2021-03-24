@@ -47,6 +47,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelF
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_note_editor.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
@@ -94,6 +95,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
     private lateinit var mConfirmViewModel: ConfirmViewModel
 
+    @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -372,6 +374,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         }
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun startSearchAndSelectUser(){
         val selectedUserIds = mViewModel?.address?.value?.mapNotNull{
             it.userId
@@ -425,6 +429,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         finishOrConfirmSaveAsDraftOrDelete()
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

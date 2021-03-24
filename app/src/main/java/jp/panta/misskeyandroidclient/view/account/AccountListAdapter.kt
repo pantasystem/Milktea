@@ -11,8 +11,12 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemAccountBinding
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
-class AccountListAdapter(diff: DiffUtil.ItemCallback<AccountViewData>, val accountViewModel: AccountViewModel, val lifecycleOwner: LifecycleOwner) : ListAdapter<AccountViewData, AccountListAdapter.AccountViewHolder>(diff){
+@FlowPreview
+@ExperimentalCoroutinesApi
+class AccountListAdapter constructor(diff: DiffUtil.ItemCallback<AccountViewData>, val accountViewModel: AccountViewModel, val lifecycleOwner: LifecycleOwner) : ListAdapter<AccountViewData, AccountListAdapter.AccountViewHolder>(diff){
     class AccountViewHolder(val binding: ItemAccountBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int) {

@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
 import kotlinx.android.synthetic.main.fragment_follow_follwer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
@@ -36,6 +37,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
     private var mViewModel: FollowFollowerViewModel? = null
     private lateinit var mLinearLayoutManager: LinearLayoutManager
 
+    @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,6 +88,8 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private val mScrollListener = object : RecyclerView.OnScrollListener(){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)

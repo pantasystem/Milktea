@@ -13,13 +13,16 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentLinkedDeque
-
+@FlowPreview
+@ExperimentalCoroutinesApi
 class UserListDetailViewModel(
     val listId: UserList.Id,
     val miCore: MiCore
@@ -37,6 +40,7 @@ class UserListDetailViewModel(
 
 
 
+
     private val mUserMap = LinkedHashMap<User.Id, UserViewData>()
 
     //private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
@@ -48,6 +52,7 @@ class UserListDetailViewModel(
     private val mListUsers = MutableLiveData<List<UserViewData>>()
 
     val userList: LiveData<UserList> = mUserList
+
 
     val listUsers: LiveData<List<UserViewData>> = mListUsers
 

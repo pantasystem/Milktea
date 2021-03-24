@@ -5,11 +5,15 @@ import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SortedUsersViewModel(
     val miCore: MiCore,
     type: Type?,

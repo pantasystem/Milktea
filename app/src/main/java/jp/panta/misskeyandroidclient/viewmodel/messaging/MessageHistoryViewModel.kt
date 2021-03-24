@@ -126,7 +126,7 @@ class MessageHistoryViewModel(
         val request = RequestMessageHistory(i = account.getI(encryption), group = isGroup, limit = 100)
 
         return runCatching {
-            val res = getMisskeyAPI()?.getMessageHistory(request)?.execute()
+            val res = getMisskeyAPI().getMessageHistory(request).execute()
             res?.throwIfHasError()
                 res?.body()?.map {
                 miCore.getGetters().messageRelationGetter.get(account, it)

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient.util.platform
 
 import android.content.Context

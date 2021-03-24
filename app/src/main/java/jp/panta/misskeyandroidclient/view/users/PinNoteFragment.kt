@@ -13,9 +13,11 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import kotlinx.android.synthetic.main.fragment_pin_note.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
 
+    @ExperimentalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -38,7 +40,7 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
         }, viewLifecycleOwner, notesViewModel)
         pin_notes_view.adapter = adapter
         pin_notes_view.layoutManager = LinearLayoutManager(this.context)
-        userViewModel.pinNotes.observe(viewLifecycleOwner, Observer{
+        userViewModel.pinNotes.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
     }

@@ -13,6 +13,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import kotlinx.android.synthetic.main.fragment_search_user.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDetails{
 
@@ -31,6 +33,8 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
         }
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 

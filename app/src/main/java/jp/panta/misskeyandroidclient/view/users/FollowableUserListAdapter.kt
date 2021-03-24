@@ -12,7 +12,11 @@ import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class FollowableUserListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val showUserDetails: ShowUserDetails,
@@ -20,6 +24,8 @@ class FollowableUserListAdapter(
 ) : ListAdapter<UserViewData, FollowableUserListAdapter.ViewHolder>(
     DiffUtilItemCallback()
 ){
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     class DiffUtilItemCallback : DiffUtil.ItemCallback<UserViewData>(){
         override fun areContentsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
             return oldItem.user.value == newItem.user.value

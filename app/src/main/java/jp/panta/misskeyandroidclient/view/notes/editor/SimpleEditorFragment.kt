@@ -21,7 +21,6 @@ import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -34,9 +33,10 @@ import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_note_editor.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 interface SimpleEditor{
 
@@ -64,6 +64,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
     override val isShowEditorMenu: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -262,6 +264,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         }
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun startSearchAndSelectUser(){
         val selectedUserIds = mViewModel?.address?.value?.mapNotNull {
             it.userId?: it.user.value?.id
@@ -307,7 +311,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
     }
 
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

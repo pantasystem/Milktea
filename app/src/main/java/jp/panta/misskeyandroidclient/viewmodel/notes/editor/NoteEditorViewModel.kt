@@ -15,13 +15,10 @@ import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import java.io.IOException
 
 class NoteEditorViewModel(
@@ -33,7 +30,7 @@ class NoteEditorViewModel(
     replyId: String? = null,
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
-    private val loggerFactory: Logger.Factory,
+    loggerFactory: Logger.Factory,
     n: Note? = null,
     dn: DraftNote? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -46,7 +43,8 @@ class NoteEditorViewModel(
             this.postValue(it)
         }.launchIn(viewModelScope + dispatcher)
     }
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private val mCurrentUser = MutableLiveData<UserViewData>().apply{
         miCore.getCurrentAccount().filterNotNull().onEach {
             val userId = User.Id(it.accountId, it.remoteId)
@@ -61,6 +59,8 @@ class NoteEditorViewModel(
             )
         }.launchIn(viewModelScope + dispatcher)
     }
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     val currentUser: LiveData<UserViewData> = mCurrentUser
 
     val draftNote = MutableLiveData<DraftNote>(dn)
@@ -163,6 +163,8 @@ class NoteEditorViewModel(
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     val address = MutableLiveData(
         n?.visibleUserIds?.map(::setUpUserViewData)
             ?: dn?.visibleUserIds?.mapNotNull {
@@ -173,6 +175,8 @@ class NoteEditorViewModel(
     )
 
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun setUpUserViewData(userId: User.Id) : UserViewData{
         return UserViewData(userId, miCore, viewModelScope, dispatcher)
     }
@@ -331,6 +335,9 @@ class NoteEditorViewModel(
         }
     }
 
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     fun setAddress(added: List<User.Id>, removed: List<User.Id>){
         val list = address.value?.let{
             ArrayList(it)
@@ -377,7 +384,8 @@ class NoteEditorViewModel(
         return pos + emoji.length
     }
 
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     fun toDraftNote(): DraftNote{
         return DraftNote(
             accountId = currentAccount.value?.accountId!!,
@@ -438,7 +446,8 @@ class NoteEditorViewModel(
     private fun getInstanceBaseUrl(): String?{
         return currentAccount.value?.instanceDomain
     }
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     fun clear(){
         text.value = ""
         cw.value = ""

@@ -37,7 +37,7 @@ class FolderViewModel(
         isLoading = true
 
         isRefreshing.postValue(true)
-        misskeyAPI.getFolders(RequestFolder(i = account.getI(encryption)!!, folderId = currentFolder.value, limit = 20)).enqueue(object : Callback<List<FolderProperty>>{
+        misskeyAPI.getFolders(RequestFolder(i = account.getI(encryption), folderId = currentFolder.value, limit = 20)).enqueue(object : Callback<List<FolderProperty>>{
             override fun onResponse(
                 call: Call<List<FolderProperty>>,
                 response: Response<List<FolderProperty>>
@@ -78,7 +78,7 @@ class FolderViewModel(
             return
         }
 
-        val request = RequestFolder(i = account.getI(encryption)!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
+        val request = RequestFolder(i = account.getI(encryption), folderId = currentFolder.value, limit = 20, untilId = untilId)
         misskeyAPI.getFolders(request).enqueue(object : Callback<List<FolderProperty>>{
             override fun onResponse(
                 call: Call<List<FolderProperty>>,
@@ -111,7 +111,7 @@ class FolderViewModel(
     fun createFolder(folderName: String){
         if(folderName.isNotBlank()){
             misskeyAPI.createFolder(CreateFolder(
-                i = account.getI(encryption)!!,
+                i = account.getI(encryption),
                 name = folderName,
                 parentId = currentFolder.value
             )).enqueue(object : Callback<Unit>{

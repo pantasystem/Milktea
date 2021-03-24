@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -17,6 +19,8 @@ import java.util.concurrent.TimeUnit
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
  * SelectedUserViewModelに分離する予定
  */
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SearchUserViewModel(
     val miCore: MiCore,
     val hasDetail: Boolean?
