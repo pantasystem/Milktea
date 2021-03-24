@@ -130,14 +130,12 @@ class SocketImpl(
 
     override fun send(msg: String): Boolean {
         logger.debug("メッセージ送信: $msg, state${state()}")
-        synchronized(this){
-            if(state() != Socket.State.Connected){
-                logger.debug("送信をキャンセル state:${state()}")
-                return false
-            }
-
-            return mWebSocket?.send(msg)?: false
+        if(state() != Socket.State.Connected){
+            logger.debug("送信をキャンセル state:${state()}")
+            return false
         }
+
+        return mWebSocket?.send(msg)?: false
     }
 
     override fun state(): Socket.State {
