@@ -4,98 +4,56 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.reactivex.disposables.Disposable
+import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.notes.Event
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteEvent
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.streming.NoteCapture
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
-import jp.panta.misskeyandroidclient.model.streming.note.NoteRegister
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.viewmodel.notes.TimelineState
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class NoteDetailViewModel(
-    val account: Account,
     val show: Pageable.Show,
     val miCore: MiCore,
+    val accountId: Long? = null,
     val encryption: Encryption = miCore.getEncryption()
 ) : ViewModel(){
 
-    private val request = NoteRequest(
+    /*private val request = NoteRequest(
         i = account.getI(encryption),
         noteId = show.noteId
-    )
+    )*/
 
-    private val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(account)
-    //private val streamingAdapter = StreamingAdapter(connectionInformation, encryption)
+    //private val misskeyAPI: MisskeyAPI = miCore.getMisskeyAPI(account)
 
+    val notes = MutableLiveData<List<PlaneNoteViewData>>()
 
-    private val noteCapture = miCore.getNoteCapture(account)
-    private val client = jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture.Client()
-    private val noteEventStore = miCore.getNoteEventStore(account)
-
-
-    val notes = object : MutableLiveData<List<PlaneNoteViewData>>(){
-        override fun onActive() {
-            super.onActive()
-
-            startStreaming()
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-
-            stopStreaming()
-        }
-    }
-
-    //private val mNoteDetailId = UUID.randomUUID().toString()
-
-    private var mNoteCaptureDisposable: Disposable? = null
-
-    private fun startStreaming(){
-
-        //noteCapture.attach(noteRegister)
-        noteCapture.attachClient(client)
-        if(mNoteCaptureDisposable == null){
-            mNoteCaptureDisposable = noteEventStore.getEventStream(Date()).subscribe {
-                noteEventObserver(it)
-            }
-        }
-
-    }
-
-    private fun stopStreaming(){
-        //noteCapture.detach(noteRegister)
-        noteCapture.detachClient(client)
-        mNoteCaptureDisposable?.dispose()
-        mNoteCaptureDisposable = null
-    }
 
 
     fun loadDetail(){
 
         viewModelScope.launch(Dispatchers.IO){
             try{
-                val rawDetail = misskeyAPI.showNote(request).execute().body()
-                    ?:return@launch
-                val detail = NoteDetailViewData(rawDetail, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+                val account = getAccount()
+                val note = miCore.getNoteRepository().find(Note.Id(account.accountId, show.noteId))
+
+                val noteDetail = miCore.getGetters().noteRelationGetter.get(note)
+
+                val detail = NoteDetailViewData(
+                    noteDetail,
+                    getAccount(),
+                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                    miCore.getNoteCaptureAdapter()
+                )
                 loadUrlPreview(detail)
                 var list: List<PlaneNoteViewData> = listOf(detail)
                 notes.postValue(list)
@@ -105,6 +63,7 @@ class NoteDetailViewModel(
                     list = ArrayList<PlaneNoteViewData>(conversation).apply{
                         addAll(list)
                     }
+                    list.captureAll()
                     notes.postValue(list)
                 }
                 val children = loadChildren()
@@ -112,18 +71,9 @@ class NoteDetailViewModel(
                     list = ArrayList<PlaneNoteViewData>(list).apply{
                         addAll(children)
                     }
+                    list.captureAll()
                     notes.postValue(list)
                 }
-                //noteCapture.subscribeAll(noteRegister.registerId, list)
-
-                val noteIds = HashSet<String>()
-
-                for(note in list){
-
-                    noteIds.add(note.id)
-                    noteIds.add(note.toShowNote.id)
-                }
-                client.captureAll(noteIds.toList())
 
             }catch (e: Exception){
 
@@ -146,7 +96,8 @@ class NoteDetailViewModel(
         }
     }
 
-    private fun getChildrenToIterate(
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun getChildrenToIterate(
         noteConversationViewData: NoteConversationViewData,
         conversation: ArrayList<PlaneNoteViewData>
     ): NoteConversationViewData{
@@ -159,8 +110,13 @@ class NoteDetailViewModel(
             noteConversationViewData
         }else{
             conversation.add(next)
-            val children = misskeyAPI.children(NoteRequest(account.getI(encryption), limit = 100,noteId =  next.toShowNote.id)).execute().body()?.map{
-                PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+            val children = miCore.getMisskeyAPI(getAccount()).children(NoteRequest(getAccount().getI(encryption), limit = 100,noteId =  next.toShowNote.note.id.noteId)).execute().body()?.map{
+                PlaneNoteViewData(
+                    miCore.getGetters().noteRelationGetter.get(getAccount(), it),
+                    getAccount(),
+                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                    miCore.getNoteCaptureAdapter()
+                ).apply{
                     loadUrlPreview(this)
                 }
             }
@@ -169,81 +125,89 @@ class NoteDetailViewModel(
         }
     }
 
-
-    private fun loadConversation(): List<PlaneNoteViewData>?{
-        return misskeyAPI.conversation(request).execute().body()?.map{
-            PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun loadConversation(): List<PlaneNoteViewData>?{
+        return miCore.getMisskeyAPI(getAccount()).conversation(makeRequest()).execute().body()?.map{
+            miCore.getGetters().noteRelationGetter.get(getAccount(), it)
+        }?.map{
+            PlaneNoteViewData(
+                it,
+                getAccount(),
+                DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                miCore.getNoteCaptureAdapter()
+            ).apply{
                 loadUrlPreview(this)
             }
         }
     }
 
-    private fun loadChildren(): List<NoteConversationViewData>?{
+    private suspend fun loadChildren(): List<NoteConversationViewData>?{
         return loadChildren(id = show.noteId)?.filter{
             it.reNote?.id != show.noteId
         }?.map{
-            val planeNoteViewData = PlaneNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
-            val childInChild = loadChildren(planeNoteViewData.toShowNote.id)?.map{n ->
-                PlaneNoteViewData(n, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+            miCore.getGetters().noteRelationGetter.get(getAccount(), it)
+        }?.map{
+            val planeNoteViewData = PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            val childInChild = loadChildren(planeNoteViewData.toShowNote.note.id.noteId)?.map{n ->
+                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(getAccount(), n), getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter()).apply{
                     loadUrlPreview(this)
                 }
             }
-            NoteConversationViewData(it, childInChild, account, DetermineTextLengthSettingStore(miCore.getSettingStore())).apply{
+            NoteConversationViewData(
+                it,
+                childInChild,
+                getAccount(),
+                DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                miCore.getNoteCaptureAdapter()
+            ).apply{
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }
         }
 
     }
 
-    private fun loadChildren(id: String): List<Note>?{
-        return misskeyAPI.children(NoteRequest(i = account.getI(encryption), limit = 100, noteId = id)).execute().body()
+    private suspend fun loadChildren(id: String): List<NoteDTO>?{
+        return miCore.getMisskeyAPI(getAccount()).children(NoteRequest(i = getAccount().getI(encryption), limit = 100, noteId = id)).execute().body()
     }
 
-    private fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData){
+    private suspend fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData){
         UrlPreviewLoadTask(
-            miCore.getUrlPreviewStore(account),
+            miCore.getUrlPreviewStore(getAccount()),
             planeNoteViewData.urls,
             viewModelScope
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
-    private fun noteEventObserver(noteEvent: NoteEvent){
-        Log.d("TM-VM", "#noteEventObserver $noteEvent")
-        val timelineNotes = notes.value
-            ?: return
-
-        val updatedNotes = when(noteEvent.event){
-
-            is Event.Deleted ->{
-                timelineNotes.filterNot{ note ->
-                    note.id == noteEvent.noteId || note.toShowNote.id == noteEvent.noteId
-                }
-            }
-            else -> timelineNotes.map{
-                val note: PlaneNoteViewData = it
-                if(note.toShowNote.id == noteEvent.noteId){
-                    when(noteEvent.event){
-                        is Event.Reacted ->{
-                            it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
-                        }
-                        is Event.UnReacted ->{
-                            it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
-                        }
-                        is Event.Voted ->{
-                            it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
-                        }
-                        /*is Event.Added ->{
-                            note.update(noteEvent.event.note)
-                        }*/
-                    }
-                }
-
-                note
-            }
+    private fun<T: PlaneNoteViewData> T.capture():  T{
+        val self = this
+        viewModelScope.launch(Dispatchers.IO) {
+            self.eventFlow.collect()
         }
-        if(noteEvent.event is Event.Deleted){
-            notes.postValue(updatedNotes)
+        return this
+    }
+
+    private fun<T: PlaneNoteViewData> List<T>.captureAll() {
+        this.forEach {
+            it.capture()
         }
     }
 
+    private var mAc: Account? = null
+    private suspend fun getAccount(): Account {
+        if(mAc != null) {
+            return mAc!!
+        }
+
+        if(accountId != null) {
+            mAc = miCore.getAccountRepository().get(accountId)
+            return mAc!!
+        }
+
+        mAc = miCore.getAccountRepository().getCurrentAccount()
+        return mAc!!
+    }
+
+    private suspend fun makeRequest(): NoteRequest {
+        return show.toParams().toNoteRequest(i = getAccount().getI(miCore.getEncryption()))
+    }
 }

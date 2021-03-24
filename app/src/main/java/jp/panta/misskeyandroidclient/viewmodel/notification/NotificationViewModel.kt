@@ -1,211 +1,177 @@
 package jp.panta.misskeyandroidclient.viewmodel.notification
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.reactivex.disposables.Disposable
+import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
+import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.notes.Event
-import jp.panta.misskeyandroidclient.model.notes.NoteEvent
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthImpl
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.collections.ArrayList
-import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
+@ExperimentalCoroutinesApi
 class NotificationViewModel(
-    private val account: Account,
-    private val misskeyAPI: MisskeyAPI,
     private val miCore: MiCore,
-    private val encryption: Encryption = miCore.getEncryption()
-    //private val noteCapture: NoteCapture
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel(){
 
+    private val encryption: Encryption = miCore.getEncryption()
 
 
-    private var isLoadingFlag = false
     val isLoading = MutableLiveData<Boolean>()
+    private var isLoadingFlag = false
+        set(value) {
+            isLoading.postValue(value)
+            field = value
+        }
     //loadNewはない
 
+    private var noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + ioDispatcher)
 
     // private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
-    private val noteCapture = miCore.getNoteCapture(account)
 
-    private val noteCaptureClient = NoteCapture.Client()
 
-    var mEventStoreStreamDisposable: Disposable? = null
+    val notificationsLiveData = MutableLiveData<List<NotificationViewData>>()
+    private var notifications: List<NotificationViewData> = emptyList()
+        set(value) {
+            notificationsLiveData.postValue(value)
+            field = value
+        }
+    private val logger = miCore.loggerFactory.create("NotificationViewModel")
 
-    val notificationsLiveData = object : MutableLiveData<List<NotificationViewData>>(){
-        override fun onActive() {
-            super.onActive()
-            noteCapture.attachClient(noteCaptureClient)
-            if(mEventStoreStreamDisposable == null){
-                mEventStoreStreamDisposable = miCore.getNoteEventStore(account).getEventStream().subscribe {
-                    noteEventObserver(it)
-                }
+    init {
+        miCore.getCurrentAccount().filterNotNull().flowOn(Dispatchers.IO).onEach {
+            loadInit()
+        }.launchIn(viewModelScope)
+
+        miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
+                it as? ChannelBody.Main.Notification
+            }.filterNotNull().map {
+                ac to it
+            }.map {
+                it.first to miCore.getGetters().notificationRelationGetter.get(it.first, it.second.body)
             }
+        }.map {  accountAndNotificationRelation ->
+            val notificationRelation = accountAndNotificationRelation.second
+            val account = accountAndNotificationRelation.first
+            NotificationViewData(notificationRelation, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+        }.onEach {
 
+            it.noteViewData?.eventFlow?.launchIn(viewModelScope + Dispatchers.IO)
+            val list = ArrayList(notifications)
+            list.add(0, it)
+            notifications = list
+        }.launchIn(viewModelScope + Dispatchers.IO)
 
-        }
-        override fun onInactive() {
-            super.onInactive()
-            //noteCapture.detach(noteRegister)
-            noteCapture.detachClient(noteCaptureClient)
-            mEventStoreStreamDisposable?.dispose()
-        }
-
+        //loadInit()
     }
 
     fun loadInit(){
         if(isLoadingFlag){
+            logger.debug("cancel loadInit")
             return
         }
+        logger.debug("loadInit")
+
         isLoadingFlag = true
-        val request = NotificationRequest(i = account.getI(encryption)!!, limit = 20)
-        misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
-            override fun onResponse(
-                call: Call<List<Notification>?>,
-                response: Response<List<Notification>?>
-            ) {
-                val list = try{
-                    response.body()?.mapNotNull{
-                        try{
-                            NotificationViewData((it), account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+        //noteCaptureScope.cancel()
+        noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + ioDispatcher)
 
-                        }catch(e: Exception){
-                            Log.e("NotificationViewModel", "error:${it}", e)
-                            null
-                        }
-                    }
-                }catch(e: Exception){
-                    Log.e("NotificationViewModel", "error:${response.body()}", e)
-                    null
+        logger.debug("before launch:${viewModelScope.isActive}")
+        viewModelScope.launch(Dispatchers.IO) {
+            logger.debug("in launch")
+            val account = miCore.getAccountRepository().getCurrentAccount()
+            val request = NotificationRequest(i = account.getI(encryption), limit = 20)
+            val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
+
+            runCatching {
+                val notificationDTOList = misskeyAPI.notification(request).execute()?.body()
+                logger.debug("res: $notificationDTOList")
+                val viewDataList = notificationDTOList?.toNotificationViewData(account)
+                    ?: emptyList()
+                viewDataList.forEach {
+                    it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
                 }
-                notificationsLiveData.postValue(
-                    list
-                )
-                if(list != null){
-                    noteCaptureClient.unCaptureAll()
-                    noteCapture.attachClient(noteCaptureClient)
-                    noteCaptureClient.captureAll(
-                        list.pickNoteIds()
-                    )
-
-                }
-
-                isLoadingFlag = false
-                isLoading.postValue(false)
-                miCore.notificationSubscribeViewModel.readAllNotifications(account)
+                viewDataList
+            }.onSuccess {
+                notifications = it
+            }.onFailure {
+                logger.error("読み込みエラー", e = it)
             }
-            override fun onFailure(call: Call<List<Notification>?>, t: Throwable) {
-                isLoadingFlag = false
-                isLoading.postValue(false)
-            }
-        })
+
+            isLoadingFlag = false
+        }
+
     }
     fun loadOld(){
+        logger.debug("loadOld")
         if(isLoadingFlag){
             return
         }
         isLoadingFlag = true
 
-        val exNotificationList = notificationsLiveData.value
-        val untilId = exNotificationList?.lastOrNull()?.id
-        if(exNotificationList == null || untilId == null){
+        val exNotificationList = notifications
+        val untilId = exNotificationList.lastOrNull()?.id
+        if(exNotificationList.isNullOrEmpty() || untilId == null){
             isLoadingFlag = false
-            return
+            return loadInit()
         }
 
-        val request = NotificationRequest(i = account.getI(encryption)!!, limit = 20, untilId = untilId)
-        misskeyAPI.notification(request).enqueue(object : Callback<List<Notification>?>{
-            override fun onResponse(
-                call: Call<List<Notification>?>,
-                response: Response<List<Notification>?>
-            ) {
-                val rawList = response.body()
-                if(rawList == null){
-                    isLoadingFlag = false
-                    return
-                }
+        viewModelScope.launch(ioDispatcher) {
+            val account = miCore.getAccountRepository().getCurrentAccount()
+            val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
 
-                val list = rawList.map{
-                    NotificationViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
-                }
-
-                val notificationViewDataList = ArrayList<NotificationViewData>(exNotificationList).apply{
-                    addAll(
-                        list
-                    )
-                }
-
-                noteCaptureClient.captureAll(list.pickNoteIds())
-
-
-                notificationsLiveData.postValue(notificationViewDataList)
+            val request = NotificationRequest(i = account.getI(encryption), limit = 20, untilId = untilId.notificationId)
+            val notifications = runCatching {
+                misskeyAPI.notification(request).execute()?.body()
+            }.getOrNull()
+            val list = notifications?.toNotificationViewData(account)
+            if(list.isNullOrEmpty()) {
                 isLoadingFlag = false
+                return@launch
+            }
+            list.forEach {
+                it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
             }
 
-            override fun onFailure(call: Call<List<Notification>?>, t: Throwable) {
-                isLoadingFlag = false
+            val notificationViewDataList = ArrayList<NotificationViewData>(exNotificationList).also {
+                it.addAll(
+                    list
+                )
             }
-        })
+            this@NotificationViewModel.notifications = notificationViewDataList
+            isLoadingFlag = false
+        }
+
+
     }
 
-
-    private fun List<NotificationViewData>.pickNoteIds(): List<String>{
-        val hashSet = HashSet<String>()
-        for(notify in this){
-            if(notify.noteViewData != null){
-                hashSet.add(notify.noteViewData.id)
-                hashSet.add(notify.noteViewData.toShowNote.id)
-            }
-        }
-        return hashSet.toList()
+    private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
+        return miCore.getGetters().notificationRelationGetter.get(account, this)
     }
-    private fun noteEventObserver(noteEvent: NoteEvent){
-        Log.d("TM-VM", "#noteEventObserver $noteEvent")
-        val timelineNotes = notificationsLiveData.value
-            ?: return
 
-
-        val updatedNotification = when(noteEvent.event){
-
-            is Event.Deleted ->{
-                timelineNotes.filterNot{ notification ->
-                    notification.noteViewData?.id == noteEvent.noteId || notification.noteViewData?.toShowNote?.id == noteEvent.noteId
-                }
-            }
-            else -> timelineNotes.map{
-                val note: PlaneNoteViewData? = it.noteViewData
-                if(note?.toShowNote?.id == noteEvent.noteId){
-                    when(noteEvent.event){
-                        is Event.Reacted ->{
-                            note.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account.remoteId)
-                        }
-                        is Event.UnReacted ->{
-                            note.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account.remoteId)
-                        }
-                        is Event.Voted ->{
-                            note.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account.remoteId)
-                        }
-
-                    }
-                }
-
-                it
-            }
-        }
-        if(noteEvent.event is Event.Deleted){
-            notificationsLiveData.postValue(updatedNotification)
+    private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
+        return this.map {
+            it.toNotificationRelation(account)
         }
     }
+
+    private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
+        return this.toNotificationRelations(account).map {
+            NotificationViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+        }
+    }
+
 
 }

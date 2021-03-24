@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,9 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import kotlinx.android.synthetic.main.fragment_file.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class FileFragment : Fragment(R.layout.fragment_file){
 
@@ -60,8 +64,8 @@ class FileFragment : Fragment(R.layout.fragment_file){
         files_view.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.getCurrentAccount().observe(viewLifecycleOwner, Observer {
-            val activity = activity?: return@Observer
+        miApplication.getCurrentAccount().filterNotNull().onEach{
+            val activity = activity?: return@onEach
 
             val driveViewModelFactory = DriveViewModelFactory(maxSize)
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
@@ -93,7 +97,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
             refresh.setOnRefreshListener {
                 viewModel.loadInit()
             }
-        })
+        }.launchIn(lifecycleScope)
         files_view.addOnScrollListener(mScrollListener)
     }
 

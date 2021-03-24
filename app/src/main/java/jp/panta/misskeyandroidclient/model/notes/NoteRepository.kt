@@ -1,30 +1,16 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import io.reactivex.Observable
-import jp.panta.misskeyandroidclient.model.account.Account
-import java.util.*
+import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
 
 interface NoteRepository {
 
-    interface Factory{
-        fun create(account: Account) : NoteRepository
-    }
+    suspend fun delete(noteId: Note.Id): Boolean
 
-    data class Event(val note: Note, val type: Type, val createdAt: Date = Date()){
+    suspend fun create(createNote: CreateNote): Note
 
-        enum class Type{
-            CREATED, UPDATED, DELETED
-        }
-    }
+    suspend fun find(noteId: Note.Id): Note
 
-    val account: Account
+    suspend fun reaction(createReaction: CreateReaction): Boolean
 
-    suspend fun add(note: Note) : Note
-
-    suspend fun get(noteId: String) : Note?
-
-    suspend fun remove(note: Note)
-
-    fun getEventStream(date: Date): Observable<Event>
-
+    suspend fun unreaction(noteId: Note.Id): Boolean
 }

@@ -1,23 +1,35 @@
 package jp.panta.misskeyandroidclient
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
+import androidx.lifecycle.lifecycleScope
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_antenna_editor.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
-        const val EXTRA_ANTENNA = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA"
+        const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA_ID"
         private const val REQUEST_SEARCH_AND_SELECT_USER = 110
+
+        fun newIntent(context: Context, antennaId: Antenna.Id) : Intent{
+            return Intent(context, AntennaEditorActivity::class.java).apply {
+                putExtra(EXTRA_ANTENNA_ID, antennaId)
+            }
+        }
     }
 
     private var mViewModel: AntennaEditorViewModel? = null
@@ -29,43 +41,40 @@ class AntennaEditorActivity : AppCompatActivity() {
         setSupportActionBar(antennaEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val antenna = intent.getSerializableExtra(EXTRA_ANTENNA) as? Antenna?
+        val antennaId=  intent.getSerializableExtra(EXTRA_ANTENNA_ID) as Antenna.Id
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()
-            ft.replace(R.id.antennaEditorBase, AntennaEditorFragment.newInstance(antenna))
+            ft.replace(R.id.antennaEditorBase, AntennaEditorFragment.newInstance(antennaId))
             ft.commit()
         }
 
         val miCore = applicationContext as MiCore
-        miCore.getCurrentAccount().observe(this, Observer { ac ->
-            val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(ac, miCore, antenna))[AntennaEditorViewModel::class.java]
-            this.mViewModel = viewModel
-            viewModel.selectUserEvent.observe(this, Observer {
-                showSearchAndSelectUserActivity(it)
-            })
-            viewModel.name.observe(this, Observer {
-                supportActionBar?.title = it
-            })
-            viewModel.antennaRemovedEvent.observe(this, Observer {
-                Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
-                setResult(RESULT_OK)
-                finish()
-            })
+        val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(miCore, antennaId))[AntennaEditorViewModel::class.java]
+        this.mViewModel = viewModel
+        viewModel.selectUserEvent.observe(this, {
+            showSearchAndSelectUserActivity(it)
+        })
+        viewModel.name.observe(this, {
+            supportActionBar?.title = it
+        })
+        viewModel.antennaRemovedEvent.observe(this, {
+            Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
+            setResult(RESULT_OK)
+            finish()
+        })
 
-            viewModel.antennaAddedStateEvent.observe(this, Observer {
-                if(it){
-                    Toast.makeText(this, getString(R.string.success), Toast.LENGTH_LONG).show()
-                }else{
-                    Toast.makeText(this, getString(R.string.failure), Toast.LENGTH_LONG).show()
-                }
-            })
+        viewModel.antennaAddedStateEvent.observe(this, {
+            if(it){
+                Toast.makeText(this, getString(R.string.success), Toast.LENGTH_LONG).show()
+            }else{
+                Toast.makeText(this, getString(R.string.failure), Toast.LENGTH_LONG).show()
+            }
         })
     }
 
-    private fun showSearchAndSelectUserActivity(userIds: List<String>){
-        val intent = Intent(this, SearchAndSelectUserActivity::class.java)
-        intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, userIds.toTypedArray())
+    private fun showSearchAndSelectUserActivity(userIds: List<User.Id>){
+        val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = userIds)
         startActivityForResult(intent, REQUEST_SEARCH_AND_SELECT_USER)
     }
 
@@ -90,9 +99,11 @@ class AntennaEditorActivity : AppCompatActivity() {
         when(requestCode){
             REQUEST_SEARCH_AND_SELECT_USER ->{
                 if(resultCode == Activity.RESULT_OK && data != null){
-                    data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS)?.toList()?.let{
-                        mViewModel?.setUserIds(it)
-
+                    (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult)?.let {
+                        val userNames = it.selectedUsers.map { user ->
+                            user.getDisplayUserName()
+                        }
+                        mViewModel?.setUserNames(userNames)
                     }
                 }
             }

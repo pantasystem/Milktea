@@ -6,7 +6,6 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Relation
 import jp.panta.misskeyandroidclient.model.Page
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
 
 @Entity
 class AccountRelation{
@@ -25,8 +24,8 @@ class AccountRelation{
     @Ignore
     fun getCurrentConnectionInformation(): EncryptedConnectionInformation?{
         return try{
-            connectionInformationList.maxBy {
-                it.updatedAt.time
+            connectionInformationList.maxByOrNull { e ->
+                e.updatedAt.time
             }
         }catch(e: UninitializedPropertyAccessException){
             Log.d("AccountRelation", "error", e)

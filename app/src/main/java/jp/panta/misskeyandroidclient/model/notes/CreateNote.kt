@@ -1,33 +1,30 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
-import java.lang.IllegalArgumentException
 
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+
+/**
+ * @param noExtractEmojis 本文からカスタム絵文字を展開しないか否か
+ * @param noExtractMentions 本文からメンションを展開しないか否か
+ * @param noExtractHashtags 本文からハッシュタグを展開しないか否か
+ */
 data class CreateNote(
-    val i: String,
-    val visibility: String = "public",
-    val visibleUserIds: List<String>? = null,
+    val author: Account,
+    val visibility: Visibility,
     val text: String?,
     val cw: String? = null,
     val viaMobile: Boolean? = null,
-    val localOnly: Boolean? = null,
     val noExtractMentions: Boolean? = null,
     val noExtractHashtags: Boolean? = null,
     val noExtractEmojis: Boolean? = null,
-    var fileIds: List<String>? = null,
-    val replyId: String? = null,
-    val renoteId: String? = null,
-    val poll: CreatePoll? = null
+    var files: List<File>? = null,
+    val replyId: Note.Id? = null,
+    val renoteId: Note.Id? = null,
+    val poll: CreatePoll? = null,
+    val draftNoteId: Long? = null
 
 
-){
-    data class Response(val createdNote: Note)
+)
 
-    enum class Visibility(val isLocalOnlyPossible: Boolean){
-        PUBLIC(true),
-        HOME(true),
-        FOLLOWERS(true),
-        SPECIFIED(false)
-
-    }
-}

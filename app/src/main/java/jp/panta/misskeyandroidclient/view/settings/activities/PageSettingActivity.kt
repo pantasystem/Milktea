@@ -23,6 +23,7 @@ import jp.panta.misskeyandroidclient.view.settings.page.PagesAdapter
 import jp.panta.misskeyandroidclient.view.settings.page.SelectPageToAddDialog
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
+import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 
 class PageSettingActivity : AppCompatActivity() {
 
@@ -72,8 +73,7 @@ class PageSettingActivity : AppCompatActivity() {
             when(pt){
                 PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(Intent(this, SearchActivity::class.java))
                 PageType.USER -> {
-                    val intent = Intent(this, SearchAndSelectUserActivity::class.java)
-                    intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTABLE_MAXIMUM_SIZE, 1)
+                    val intent = SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_RESULT_CODE)
                 }
                 PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
@@ -124,9 +124,11 @@ class PageSettingActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE){
             if(resultCode == RESULT_OK && data != null){
-                val userId = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS)
-                    ?.firstOrNull()?: return
-                mPageSettingViewModel.addUserPageById(userId)
+                val changeDiff = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as SelectedUserViewModel.ChangedDiffResult
+                val userId = changeDiff.selectedUsers.firstOrNull()?.id?.id
+                userId?.let {
+                    mPageSettingViewModel.addUserPageById(userId)
+                }
             }
         }
     }

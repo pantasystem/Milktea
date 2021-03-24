@@ -1,19 +1,17 @@
 package jp.panta.misskeyandroidclient.viewmodel.account
 
-import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Call
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.lang.IllegalArgumentException
-import retrofit2.Callback
-import retrofit2.Response
 
 @Suppress("UNCHECKED_CAST")
 class AccountViewModel(
@@ -34,57 +32,59 @@ class AccountViewModel(
     }
 
     val accounts = MediatorLiveData<List<AccountViewData>>().apply{
-        addSource(miCore.getAccounts()){ arList ->
-            value = arList.map{ ac ->
-                val avd = AccountViewData(ac)
-                ac.getI(miCore.getEncryption())?.let{ i ->
-                    miCore.getMisskeyAPI(ac).i(
-                        I(i)
-                    ).enqueue(avd.accept)
-                }
-                avd
+        miCore.getAccounts().onEach { accounts ->
+            val viewDataList = accounts.map{ ac ->
+                AccountViewData(ac, miCore, viewModelScope, Dispatchers.IO)
             }
-        }
+            postValue(viewDataList)
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     val currentAccount = miCore.getCurrentAccount()
 
-    private var mBeforeAccount: Account? = null
-    val user = MediatorLiveData<User>()
+    val user = MediatorLiveData<User.Detail>()
 
     val switchAccount = EventBus<Int>()
 
 
-    val showFollowers = EventBus<Unit>()
-    val showFollowings = EventBus<Unit>()
+    val showFollowers = EventBus<User.Id>()
+    val showFollowings = EventBus<User.Id>()
 
     val showProfile = EventBus<Account>()
 
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init{
-        user.addSource(miCore.getCurrentAccount()){
-            val nullableI = it?.getI(miCore.getEncryption())
-            nullableI?.let { i ->
-                miCore.getMisskeyAPI(it).i(I(i)).enqueue(object : Callback<User>{
-                    override fun onResponse(call: Call<User>, response: Response<User>) {
-                        response.body()?.let{ u ->
-                            user.postValue(u)
-                        }
-                    }
+        miCore.getCurrentAccount().filterNotNull().map { ac ->
+            val res = runCatching {
+                ac.getI(miCore.getEncryption()).let{ i ->
+                    miCore.getMisskeyAPI(ac).i(I(i)).execute()
+                }
+            }.getOrNull()
+            res?.body()?.let{
+                ac to it
+            }
+        }.filterNotNull().map { pair ->
+            val user = pair.second.toUser(pair.first, true)
+            miCore.getUserDataSource().add(user)
+            user
+        }.onEach {
 
-                    override fun onFailure(call: Call<User>, t: Throwable) {
-                        user.postValue(null)
-                        Log.d(TAG, "user load error", t)
-                    }
-                })
-            }
-            mBeforeAccount?.let{ before ->
-                miCore.getMainCapture(before).removeListener(mainCaptureListener)
-            }
-            miCore.getMainCapture(it).putListener(mainCaptureListener)
-            mBeforeAccount = it
         }
+
+        miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac->
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
+                ac to it
+            }
+        }.map { pair ->
+            (pair.second as? ChannelBody.Main.MeUpdated)?.let{ meUpdated ->
+                pair.first to meUpdated
+            }
+        }.filterNotNull().onEach {
+            val user = it.second.body.toUser(it.first, true)
+            miCore.getUserDataSource().add(user)
+            this.user.postValue(user as User.Detail)
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     fun setSwitchTargetConnectionInstance(account: Account){
@@ -96,12 +96,16 @@ class AccountViewModel(
         switchAccount.event = switchAccount.event?: 0 + 1
     }
 
-    fun showFollowers(){
-        showFollowers.event = Unit
+    fun showFollowers(userId: User.Id?){
+        userId?.let {
+            showFollowers.event = userId
+        }
     }
 
-    fun showFollowings(){
-        showFollowings.event = Unit
+    fun showFollowings(userId: User.Id?){
+        userId?.let{
+            showFollowings.event = userId
+        }
     }
 
     fun showProfile(account: Account?){
@@ -116,17 +120,5 @@ class AccountViewModel(
         }
     }
 
-    private val mainCaptureListener = object : MainCapture.AbsListener(){
-        override fun meUpdated(user: User) {
-            if(user.id == miCore.getCurrentAccount().value?.remoteId){
-                this@AccountViewModel.user.postValue(user)
-            }
-            accounts.value?.forEach {
-                if(it.userId == user.id){
-                    it.user.postValue(user)
-                }
-            }
-        }
-    }
 
 }

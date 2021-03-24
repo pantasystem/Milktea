@@ -4,14 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.Activities
 
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -71,7 +71,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         val toggleFollowViewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miCore))[ToggleFollowViewModel::class.java]
 
 
-        exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner, Observer {
+        exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner, {
             exploreUsersSwipeRefresh.isRefreshing = it?: false
         })
 
@@ -82,19 +82,16 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
         exploreUsersView.adapter = adapter
         exploreUsersView.layoutManager = LinearLayoutManager(view.context)
-        exploreUsersViewModel.users.observe( viewLifecycleOwner, Observer {
+        exploreUsersViewModel.users.observe( viewLifecycleOwner, {
             adapter.submitList(it)
         })
     }
 
-    override fun show(user: User?) {
-        user?: return
-
-        val intent = Intent(requireContext(), UserDetailActivity::class.java)
-        intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-
-        intent.putExtra(UserDetailActivity.EXTRA_USER_ID, user.id)
-        startActivity(intent)
+    override fun show(userId: User.Id?) {
+        userId?.let{
+            val intent = UserDetailActivity.newInstance(requireContext(), userId = userId)
+            intent.putActivity(Activities.ACTIVITY_IN_APP)
+            startActivity(intent)
+        }
     }
 }

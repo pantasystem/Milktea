@@ -1,5 +1,8 @@
 package jp.panta.misskeyandroidclient.model.drive
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class RequestFile (
     val i: String,
     val limit: Int? = null,

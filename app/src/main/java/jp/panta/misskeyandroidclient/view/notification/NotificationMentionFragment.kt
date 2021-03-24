@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.account.page.Page
@@ -14,6 +15,9 @@ import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.android.synthetic.main.fragment_notification_mention.*
 import kotlinx.android.synthetic.main.fragment_notification_mention.view.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class NotificationMentionFragment : Fragment(R.layout.fragment_notification_mention){
 
@@ -31,9 +35,9 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
         notificationTab.setupWithViewPager(notificationPager)
 
         val miCore = requireContext().applicationContext as MiApplication
-        miCore.getCurrentAccount().observe( viewLifecycleOwner, Observer {
+        miCore.getCurrentAccount().filterNotNull().onEach {
             notificationPagerAdapter.notifyDataSetChanged()
-        })
+        }.launchIn(lifecycleScope)
 
     }
 

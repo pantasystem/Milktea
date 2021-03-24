@@ -1,8 +1,7 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import jp.panta.misskeyandroidclient.model.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.api.users.RequestUser
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

@@ -69,7 +69,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
                 dismiss()
                 return@setOnClickListener
             }
-            clipboardManager.setPrimaryClip(ClipData.newPlainText("", note.toShowNote.text))
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("", note.toShowNote.note.text))
             dismiss()
         }
 

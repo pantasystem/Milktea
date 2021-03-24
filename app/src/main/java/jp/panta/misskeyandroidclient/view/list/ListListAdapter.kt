@@ -11,11 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListAddUserBinding
 import jp.panta.misskeyandroidclient.databinding.ItemListBinding
+
 import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class ListListAdapter(
+class ListListAdapter @ExperimentalCoroutinesApi constructor(
     private val listListViewModel: ListListViewModel,
     val lifecycleOwner: LifecycleOwner,
     var onTryToEditCallback: OnTryToEditCallback? = null
@@ -61,14 +64,15 @@ class ListListAdapter(
         fun onEdit(userList: UserList?)
     }
 
-    private var addUserId: String? = null
+    private var addUserId: User.Id? = null
     private var pullPushUserViewModel: UserListPullPushUserViewModel? = null
 
+    @ExperimentalCoroutinesApi
     constructor(
         listListViewModel: ListListViewModel,
         lifecycleOwner: LifecycleOwner,
         onTryToEditCallback: OnTryToEditCallback?,
-        addUserId: String,
+        addUserId: User.Id,
         pullPushUserViewModel: UserListPullPushUserViewModel)
     :this(listListViewModel, lifecycleOwner, onTryToEditCallback){
         this.addUserId = addUserId

@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBinding
+import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
 import java.util.*
@@ -34,10 +35,10 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
         )
 
         var nowSelectedVisibility = when(viewModel.visibility.value){
-            PostNoteTask.Visibility.PUBLIC -> 0
-            PostNoteTask.Visibility.HOME -> 1
-            PostNoteTask.Visibility.FOLLOWERS -> 2
-            PostNoteTask.Visibility.SPECIFIED -> 3
+            is Visibility.Public -> 0
+            is Visibility.Home -> 1
+            is Visibility.Followers -> 2
+            is Visibility.Specified -> 3
             else -> 0
         }
         if(nowSelectedVisibility !in visibilities.indices){
@@ -53,14 +54,16 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
             .setSingleChoiceItems(
                 visibilities, nowSelectedVisibility
             ) { _, which ->
-
-                when(visibilities[which]){
-                    getString(R.string.visibility_public) -> viewModel.setVisibility(PostNoteTask.Visibility.PUBLIC)
-                    getString(R.string.visibility_home) -> viewModel.setVisibility(PostNoteTask.Visibility.HOME)
-                    getString(R.string.visibility_follower) -> viewModel.setVisibility(PostNoteTask.Visibility.FOLLOWERS)
-                    getString(R.string.visibility_specified) -> viewModel.setVisibility(PostNoteTask.Visibility.SPECIFIED)
-                    else -> viewModel.setVisibility(PostNoteTask.Visibility.PUBLIC)
-                }
+                val type =
+                    when(visibilities[which]){
+                        getString(R.string.visibility_public) -> "public"
+                        getString(R.string.visibility_home) -> "home"
+                        getString(R.string.visibility_follower) -> "local"
+                        getString(R.string.visibility_specified) -> "specified"
+                        else -> "public"
+                    }
+                val localOnly = viewModel.isLocalOnly.value?:false
+                viewModel.setVisibility(Visibility(type, localOnly))
 
             }
             .setView(view)

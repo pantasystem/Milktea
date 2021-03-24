@@ -1,50 +1,83 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.Entity
+import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.auth.custom.App
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
-import java.io.Serializable
 import java.util.*
-import kotlin.collections.LinkedHashMap
 
 data class Note(
-    val id: String,
-    //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date,
+    val id: Id,
     val createdAt: Date,
     val text: String?,
     val cw: String?,
-    val userId: String?,
+    val userId: User.Id,
 
-    val replyId: String?,
+    val replyId: Id?,
 
-    @SerializedName("renoteId")
-    val reNoteId: String?,
+    val renoteId: Id?,
 
     val viaMobile: Boolean?,
-    val visibility: String?,
+    val visibility: Visibility,
     val localOnly: Boolean?,
 
-    @SerializedName("visibleUserIds")
-    val visibleUserIds: List<String>?,
+    val visibleUserIds: List<User.Id>?,
 
     val url: String?,
     val uri: String?,
-    @SerializedName("renoteCount") val reNoteCount: Int,
-    @SerializedName("reactions") val reactionCounts: LinkedHashMap<String, Int>?,
-    @SerializedName("emojis") val emojis: List<Emoji>?,
-    @SerializedName("repliesCount") val replyCount: Int,
-    @SerializedName("user") val user: User,
-    @SerializedName("files") val files: List<FileProperty>?,
-    //@JsonProperty("fileIds") val mediaIds: List<String?>?,    //v10, v11の互換性が取れない
+    val renoteCount: Int,
+    val reactionCounts: List<ReactionCount>,
+    val emojis: List<Emoji>?,
+    val repliesCount: Int,
+    val files: List<FileProperty>?,
     val poll: Poll?,
-    @SerializedName("renote") val reNote: Note?,
-    val reply: Note?,
-    @SerializedName("myReaction") val myReaction: String?,
+    val myReaction: String?,
 
-    @SerializedName("_featuredId_") val tmpFeaturedId: String?,
 
-    val app: App
-): Serializable
+    val app: App?,
+    var instanceUpdatedAt: Date = Date()
+) : Entity{
+
+    data class Id(
+        val accountId: Long,
+        val noteId: String
+    ) : EntityId
+
+    fun updated(){
+        this.instanceUpdatedAt = Date()
+    }
+}
+
+sealed class NoteRelation {
+    abstract val note: Note
+    abstract val user: User
+    abstract val reply: NoteRelation?
+    abstract val renote: NoteRelation?
+
+    data class Normal(
+        override val note: Note,
+        override val user: User,
+        override val renote: NoteRelation?,
+        override val reply: NoteRelation?
+    ) : NoteRelation()
+
+    data class Featured(
+        override val note: Note,
+        override val user: User,
+        override val renote: NoteRelation?,
+        override val reply: NoteRelation?,
+        val featuredId: String
+    ) : NoteRelation()
+
+    data class Promotion(
+        override val note: Note,
+        override val user: User,
+        override val renote: NoteRelation?,
+        override val reply: NoteRelation?,
+        val promotionId: String
+    ) : NoteRelation()
+}

@@ -4,72 +4,76 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.Build
-import android.provider.CalendarContract
-import android.provider.FontRequest
-import android.util.Log
+import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.emoji.text.FontRequestEmojiCompatConfig
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
+import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
-import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionUserSettingDao
-import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.streming.Observer
-import jp.panta.misskeyandroidclient.model.streming.StreamingAdapter
-import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
-import jp.panta.misskeyandroidclient.util.getPreferenceName
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.model.messaging.MessageSubscriber
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
-import jp.panta.misskeyandroidclient.model.url.*
-import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationSubscribeViewModel
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
-import kotlinx.coroutines.*
-import java.lang.Exception
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashMap
-import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.drive.FileUploader
+import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
+import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
+import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
-import jp.panta.misskeyandroidclient.model.notes.NoteEventStore
-import jp.panta.misskeyandroidclient.model.notes.NoteEventStoreFactory
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
+import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
+import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
+import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
+import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
+import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
+import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
+import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
+import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
+import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
+import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
+import jp.panta.misskeyandroidclient.model.url.*
+import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
+import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
+import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
+import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
+import jp.panta.misskeyandroidclient.streaming.*
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
+import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
+import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
+import jp.panta.misskeyandroidclient.util.getPreferenceName
+import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import java.util.concurrent.ConcurrentHashMap
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
-    companion object{
-        const val CURRENT_USER_ID = "jp.panta.misskeyandroidclient.MiApplication.CurrentUserId"
-        const val TAG = "MiApplication"
-    }
-
-    /*var connectionInstanceDao: ConnectionInstanceDao? = null
-        private set*/
-
-
-
 
     lateinit var reactionHistoryDao: ReactionHistoryDao
 
@@ -81,57 +85,73 @@ class MiApplication : Application(), MiCore {
 
     lateinit var urlPreviewDAO: UrlPreviewDAO
 
-    lateinit var accountRepository: AccountRepository
+    lateinit var mAccountRepository: AccountRepository
 
     lateinit var metaRepository: MetaRepository
 
     lateinit var metaStore: MetaStore
 
-    val noteEventStoreFactory: NoteEventStoreFactory = NoteEventStoreFactory()
-
-
-    //private var nowInstanceMeta: Meta? = null
-
     private lateinit var sharedPreferences: SharedPreferences
 
-
-    /*var misskeyAPIService: MisskeyAPI? = null
-        private set*/
-
-    //private var misskeyAPIServiceDomainMap: Map<String, MisskeyAPI>? = null
-
-    // private var mConnectionInstance: ConnectionInstance? = null
-
-    private val mAccounts = MutableLiveData<List<Account>>()
-    private val mCurrentAccount = MutableLiveData<Account>()
+    private val mAccountsState = MutableStateFlow(emptyList<Account>())
+    private val mCurrentAccountState = MutableStateFlow<Account?>(null)
 
 
-    //var isSuccessCurrentAccount = MutableLiveData<Boolean>()
     var connectionStatus = MutableLiveData<ConnectionStatus>()
 
     private lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
-    private val mMisskeyAPIUrlMap = HashMap<String, Pair<Version?, MisskeyAPI>>()
+    private val mMisskeyAPIProvider: MisskeyAPIProvider = MisskeyAPIProvider()
 
-    private val mStreamingAccountMap = HashMap<Long, StreamingAdapter>()
-    private val mMainCaptureAccountMap = HashMap<Long, MainCapture>()
-    private val mMainCaptureFactory: MainCapture.Factory = MainCapture.Factory(GsonFactory.create(), ::setupObserver)
+    private lateinit var mNoteDataSource: NoteDataSource
+    private lateinit var mUserDataSource: UserDataSource
+    private lateinit var mNotificationDataSource: NotificationDataSource
 
-    private val mNoteCaptureAccountMap = HashMap<Long, NoteCapture>()
-    private val mTimelineCaptureAccountMap = HashMap<Long, TimelineCapture>()
+    private lateinit var mNoteRepository: NoteRepository
+    private lateinit var mUserRepository: UserRepository
+    private lateinit var mNotificationRepository: NotificationRepository
+
+    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
+
+    private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+    private lateinit var mSocketConnectionQueue: SocketConnectionQueue
+
+    private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
+
+
+    private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
+
+    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+
+    private lateinit var mMessageDataSource: MessageDataSource
+    private lateinit var mUnreadMessages: UnReadMessages
+    private lateinit var mMessageRepository: MessageRepository
+
+    private lateinit var mGetters: Getters
+
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-    override lateinit var notificationSubscribeViewModel: NotificationSubscribeViewModel
-    override lateinit var messageSubscriber: MessageSubscriber
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    override lateinit var messageStreamFilter: MessageStreamFilter
+
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
+    override var loggerFactory: Logger.Factory = AndroidDefaultLogger.Factory
+    private val logger = loggerFactory.create("MiApplication")
 
+    private lateinit var mActiveNetworkState: Flow<Boolean>
+    private var mIsActiveNetwork: Boolean = false
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreate() {
         super.onCreate()
 
@@ -142,6 +162,8 @@ class MiApplication : Application(), MiCore {
                 .setEmojiSpanIndicatorEnabled(true)
         }
         EmojiCompat.init(config)
+
+        mActiveNetworkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
@@ -155,8 +177,8 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_5_6)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
-        accountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
-
+        val roomAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
+        mAccountRepository = MediatorAccountRepository(roomAccountRepository)
 
 
         reactionHistoryDao = database.reactionHistoryDao()
@@ -169,46 +191,178 @@ class MiApplication : Application(), MiCore {
 
         urlPreviewDAO = database.urlPreviewDAO()
 
-        metaRepository = RoomMetaRepository(database.metaDAO())
+        metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO()), InMemoryMetaRepository())
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 
-        notificationSubscribeViewModel = NotificationSubscribeViewModel(this)
-        messageSubscriber =
-            MessageSubscriber(
-                this
-            )
+        mNoteDataSource = InMemoryNoteDataSource(loggerFactory)
+        mNoteRepository = NoteRepositoryImpl(this)
 
+        mUserDataSource = InMemoryUserDataSource(loggerFactory)
+        mUserRepository = UserRepositoryImpl(this)
+
+        mNotificationDataSource = InMemoryNotificationDataSource()
+
+        mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource)
+
+        mSocketWithAccountProvider = SocketWithAccountProviderImpl(
+            getEncryption(),
+            mAccountRepository,
+            loggerFactory,
+            { account, socket ->
+                mSocketConnectionQueue.connect(account)
+                connectChannel(account, ChannelAPI.Type.MAIN).onEach {
+                    // 各種DataSourceなどの各種変更イベントを通達する
+                    runCatching {
+                        if(it is ChannelBody.Main.Notification) {
+                            getGetters().notificationRelationGetter.get(account, it.body)
+                        }
+                    }
+
+                }.launchIn(applicationScope + Dispatchers.IO)
+                socket.addStateEventListener { e ->
+                    applicationScope.launch {
+                        handleSocketStateEvent(account, socket, e)
+                    }
+                }
+            },
+            { _, _ ->
+                mIsActiveNetwork
+            }
+        )
+        mSocketConnectionQueue = SocketConnectionQueue(mSocketWithAccountProvider, applicationScope, Dispatchers.IO, loggerFactory)
+
+        mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
+
+        mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
+            mAccountRepository,
+            mNoteDataSource,
+            mNoteCaptureAPIWithAccountProvider,
+            loggerFactory,
+            applicationScope,
+            Dispatchers.IO
+        )
+
+
+        mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
+
+        InMemoryMessageDataSource(mAccountRepository).also {
+            mMessageDataSource = it
+            mUnreadMessages = it
+        }
+        mMessageRepository = MessageRepositoryImpl(this)
+
+        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource)
+
+        messageStreamFilter = MessageStreamFilter(this)
+
+        mNotificationRepository = NotificationRepositoryImpl(
+            mNotificationDataSource,
+            applicationScope,
+            mSocketWithAccountProvider,
+            mAccountRepository,
+            getGetters().notificationRelationGetter,
+            Dispatchers.IO
+        )
+
+        val userRepositoryAndMainChanelAPIAdapter = UserRepositoryAndMainChannelAdapter(mUserDataSource, mChannelAPIWithAccountProvider)
+        // NOTE: 何度もchannelの接続と切断が繰り返される可能性があるがAccountに対してそこまでアクションをとる可能性は低い
+        mAccountsState.flatMapLatest { list ->
+            list.map{ ac ->
+                userRepositoryAndMainChanelAPIAdapter.listen(ac)
+            }.merge()
+        }.launchIn(applicationScope + Dispatchers.IO)
+
+        mAccountRepository.addEventListener { ev ->
+            applicationScope.launch(Dispatchers.IO) {
+                try{
+                    if(ev is AccountRepository.Event.Deleted) {
+                        mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
+                    }
+                    loadAndInitializeAccounts()
+                }catch(e: Exception) {
+                    logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
+                }
+            }
+        }
 
         applicationScope.launch(Dispatchers.IO){
             try{
                 //val connectionInstances = connectionInstanceDao!!.findAll()
-                AccountMigration(database.accountDao(), accountRepository, sharedPreferences).executeMigrate()
+                AccountMigration(database.accountDao(), mAccountRepository, sharedPreferences).executeMigrate()
                 loadAndInitializeAccounts()
             }catch(e: Exception){
-                Log.e(TAG, "load account error", e)
+                logger.error("load account error", e = e)
                 //isSuccessCurrentAccount.postValue(false)
             }
         }
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
+
+        mActiveNetworkState.distinctUntilChanged().onEach {
+            logger.debug("接続状態が変化:${if(it) "接続" else "未接続"}")
+            mIsActiveNetwork = it
+            if(it) {
+                // NOTE: ネットワークの接続状態が非アクティブからアクティブに変化したのでSocketの再接続処理を行う
+                mSocketWithAccountProvider.all().filterNot { socket ->
+                    socket.state() == Socket.State.Connected
+                }.forEach { socket ->
+                    mSocketConnectionQueue.connect(socket)
+                }
+            }
+        }.launchIn(applicationScope + Dispatchers.IO)
+
+
     }
 
-    override fun getAccounts(): LiveData<List<Account>> {
-        return mAccounts
+    override fun getAccounts(): StateFlow<List<Account>> {
+        return mAccountsState
     }
 
-    override fun getCurrentAccount(): LiveData<Account> {
-        return mCurrentAccount
+    override fun getCurrentAccount(): StateFlow<Account?> {
+        return mCurrentAccountState
     }
 
     override suspend fun getAccount(accountId: Long): Account {
-        return accountRepository.get(accountId)
+        return mAccountRepository.get(accountId)
     }
 
     override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
         return getUrlPreviewStore(account, false)
     }
 
+
+
+    override fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter {
+        return mNoteCaptureAPIAdapter
+    }
+
+    override fun getAccountRepository(): AccountRepository {
+        return mAccountRepository
+    }
+
+    override fun getNotificationDataSource(): NotificationDataSource {
+        return mNotificationDataSource
+    }
+
+    override fun getNotificationRepository(): NotificationRepository {
+        return mNotificationRepository
+    }
+
+    override fun getMessageDataSource(): MessageDataSource {
+        return mMessageDataSource
+    }
+
+    override fun getMessageRepository(): MessageRepository {
+        return mMessageRepository
+    }
+
+    override fun getUnreadMessages(): UnReadMessages {
+        return mUnreadMessages
+    }
+
+    override fun getGetters(): Getters {
+        return mGetters
+    }
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->
@@ -220,7 +374,7 @@ class MiApplication : Application(), MiCore {
                     urlPreviewDAO
                     ,mSettingStore.urlPreviewSetting.getSourceType(),
                     mSettingStore.urlPreviewSetting.getSummalyUrl(),
-                    mCurrentAccount.value
+                    mCurrentAccountState.value
                 ).create()
             }
             mUrlPreviewStoreInstanceBaseUrlMap[url] = store
@@ -231,10 +385,10 @@ class MiApplication : Application(), MiCore {
     override fun setCurrentAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                accountRepository.setCurrentAccount(account)
+                mAccountRepository.setCurrentAccount(account)
                 loadAndInitializeAccounts()
             }catch(e: Exception){
-                Log.e(TAG, "switchAccount error", e)
+                logger.error("switchAccount error", e)
             }
         }
     }
@@ -243,14 +397,9 @@ class MiApplication : Application(), MiCore {
     override fun logoutAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                accountRepository.delete(account)
+                mAccountRepository.delete(account)
             }catch(e: Exception){
 
-            }
-            try{
-                closeAccountResource(account)
-            }catch(e: Exception){
-                Log.e(TAG, "disconnect error", e)
             }
 
             try{
@@ -263,28 +412,11 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    private fun closeAccountResource(account: Account){
-        synchronized(mStreamingAccountMap){
-            mStreamingAccountMap.remove(account.accountId)?.disconnect()
-        }
-
-        synchronized(mMainCaptureAccountMap){
-            mStreamingAccountMap.remove(account.accountId)
-        }
-
-        synchronized(mTimelineCaptureAccountMap){
-            mStreamingAccountMap.remove(account.accountId)
-        }
-
-        synchronized(mNoteCaptureAccountMap){
-            mNoteCaptureAccountMap.remove(account.accountId)
-        }
-    }
 
     override fun addAccount(account: Account) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                accountRepository.add(account, true)
+                mAccountRepository.add(account, true)
 
                 loadAndInitializeAccounts()
             }catch(e: Exception){
@@ -301,10 +433,9 @@ class MiApplication : Application(), MiCore {
             val pages = account.pages.toArrayList()
             pages.add(page)
             try{
-                val updated= accountRepository.add(account.copy(pages = pages), true)
-                mCurrentAccount.postValue(updated)
+                mAccountRepository.add(account.copy(pages = pages), true)
             }catch(e: Exception){
-                Log.e(TAG, "アカウント更新処理中にエラー発生", e)
+                logger.error("アカウント更新処理中にエラー発生", e)
             }
             loadAndInitializeAccounts()
         }
@@ -320,10 +451,10 @@ class MiApplication : Application(), MiCore {
                 }?.pageId
             }
             try{
-                accountRepository.add(account.copy(pages = removed), true)
+                mAccountRepository.add(account.copy(pages = removed), true)
                 loadAndInitializeAccounts()
             }catch(e: AccountNotFoundException){
-
+                logger.error("ページを削除しようとしたところエラーが発生した", e)
             }
         }
     }
@@ -333,11 +464,11 @@ class MiApplication : Application(), MiCore {
     override fun removePageInCurrentAccount(page: Page) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                val current = accountRepository.getCurrentAccount()
+                val current = mAccountRepository.getCurrentAccount()
                 val removed = current.copy(pages = current.pages.filterNot{
                     it == page || it.pageId == page.pageId
                 })
-                accountRepository.add(removed, true)
+                mAccountRepository.add(removed, true)
                 loadAndInitializeAccounts()
             }catch(e: AccountNotFoundException){
                 connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
@@ -348,8 +479,8 @@ class MiApplication : Application(), MiCore {
     override fun replaceAllPagesInCurrentAccount(pages: List<Page>) {
         applicationScope.launch(Dispatchers.IO){
             try{
-                val updated = accountRepository.getCurrentAccount().copy(pages = pages)
-                accountRepository.add(updated, true)
+                val updated = mAccountRepository.getCurrentAccount().copy(pages = pages)
+                mAccountRepository.add(updated, true)
                 loadAndInitializeAccounts()
             }catch(e: AccountNotFoundException){
                 connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
@@ -359,34 +490,54 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun getCurrentAccountErrorSafe(): Account?{
         return try{
-            accountRepository.getCurrentAccount()
+            mAccountRepository.getCurrentAccount()
         }catch(e: AccountNotFoundException){
-            Log.e(TAG, "アカウントローディング中に失敗しました", e)
+            logger.error("アカウントローディング中に失敗しました", e)
             connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
             return null
         }
     }
 
 
-
-
-
-    override fun setupObserver(account: Account, observer: Observer) {
-        synchronized(mStreamingAccountMap) {
-            val streaming = getStreamingAdapter(account)
-            synchronized(streaming.observerMap) {
-                if (streaming.observerMap[observer.id] == null) {
-                    streaming.putObserver(observer)
-                }
-            }
-        }
+    override fun getDraftNoteDAO(): DraftNoteDao {
+        return draftNoteDao
     }
 
-
-
+    override fun createFileUploader(account: Account): FileUploader {
+        return OkHttpDriveFileUploader(
+            context = this,
+            account = account,
+            gson = GsonFactory.create(),
+            encryption = getEncryption()
+        )
+    }
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
+    }
+
+    override fun getNoteDataSource(): NoteDataSource {
+        return mNoteDataSource
+    }
+
+    override fun getNoteRepository(): NoteRepository {
+        return mNoteRepository
+    }
+
+    override fun getUserDataSource(): UserDataSource {
+        return mUserDataSource
+    }
+
+    override fun getUserRepository(): UserRepository {
+        return mUserRepository
+    }
+
+    override fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow {
+        return mUserRepositoryEventToFlow
+    }
+
+    override suspend fun getChannelAPI(account: Account): ChannelAPI {
+        return mChannelAPIWithAccountProvider.get(account)
     }
 
 
@@ -394,16 +545,16 @@ class MiApplication : Application(), MiCore {
         try{
             val current: Account
             val tmpAccounts = try{
-                current = accountRepository.getCurrentAccount()
+                current = mAccountRepository.getCurrentAccount()
 
-                accountRepository.findAll()
+                mAccountRepository.findAll()
             }catch(e: AccountNotFoundException){
                 connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
                 return
             }
 
 
-            Log.d(this.javaClass.simpleName, "load account result : $current")
+            logger.debug(this.javaClass.simpleName, "load account result : $current")
 
 
             val meta = loadInstanceMetaAndSetupAPI(current.instanceDomain)
@@ -412,30 +563,30 @@ class MiApplication : Application(), MiCore {
                 connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
             }
 
-            Log.d(TAG, "accountId:${current.accountId}, account:$current")
+            logger.debug("accountId:${current.accountId}, account:$current")
             if(current.pages.isEmpty()){
                 saveDefaultPages(current, meta)
                 return loadAndInitializeAccounts()
             }
 
-            mCurrentAccount.postValue(current)
-            mAccounts.postValue(tmpAccounts)
+            mCurrentAccountState.value = current
+            mAccountsState.value = tmpAccounts
             connectionStatus.postValue(ConnectionStatus.SUCCESS)
 
             setUpMetaMap(tmpAccounts)
 
         }catch(e: Exception){
             //isSuccessCurrentAccount.postValue(false)
-            Log.e(TAG, "初期読み込みに失敗しまちた", e)
+            logger.error( "初期読み込みに失敗しまちた", e)
         }
     }
 
     private suspend fun saveDefaultPages(account: Account, meta: Meta?){
         try{
             val pages = makeDefaultPages(account, meta)
-            accountRepository.add(account.copy(pages = pages), true)
+            mAccountRepository.add(account.copy(pages = pages), true)
         }catch(e: Exception){
-            Log.e(TAG, "default pages create error", e)
+            logger.error("default pages create error", e)
         }
     }
 
@@ -458,10 +609,24 @@ class MiApplication : Application(), MiCore {
         }
     }
 
+    /**
+     * Socketの通信状態をhandleする。
+     */
+    private suspend fun handleSocketStateEvent(account: Account, socket: Socket, state: Socket.State) {
+        if(state is Socket.State.Failure
+            && mIsActiveNetwork
+            && !(mNoteCaptureAPIWithAccountProvider.get(account).isEmpty()
+                    && mChannelAPIWithAccountProvider.get(account).isEmpty())
+        ) {
+            logger.debug("ネットワークアクティブ、WebSocket未接続なので再接続を試みる")
+            mSocketConnectionQueue.connect(account)
+        }
+    }
+
 
     override fun getCurrentInstanceMeta(): Meta?{
         return synchronized(mMetaInstanceUrlMap){
-            mCurrentAccount.value?.instanceDomain?.let{ url ->
+            mCurrentAccountState.value?.instanceDomain?.let{ url ->
                 mMetaInstanceUrlMap[url]
             }
         }
@@ -469,52 +634,33 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun setUpMetaMap(accounts: List<Account>){
         try{
+            // NOTE: メモリ等にインスタンスを読み込んでおく
             accounts.forEach { ac ->
                 loadInstanceMetaAndSetupAPI(ac.instanceDomain)
             }
         }catch(e: Exception){
-            Log.e(TAG, "meta取得中にエラー発生", e)
+            logger.error("meta取得中にエラー発生", e = e)
         }
     }
 
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
-            val meta = synchronized(mMisskeyAPIUrlMap){
-                try{
-                    mMetaInstanceUrlMap[instanceDomain]
-                }catch(e: Exception){
-                    Log.d(TAG, "metaマップからの取得に失敗したでち")
-                    null
-                }
-            } ?: try{
-                metaStore.get(instanceDomain)
-            }catch(e: Exception){
-                Log.d(TAG, "metaをオンラインから取得するのに失敗したでち")
-                connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
-
-                null
-            }
+            val meta = metaStore.get(instanceDomain)
 
 
-            Log.d(TAG, "load meta result ${meta?.let{"成功"}?: "失敗"} ")
+            logger.debug("load meta result ${meta?.let{"成功"}?: "失敗"} ")
 
             meta?: return null
 
             synchronized(mMetaInstanceUrlMap){
                 mMetaInstanceUrlMap[instanceDomain] = meta
             }
-            synchronized(mMisskeyAPIUrlMap){
-                val versionAndApi = mMisskeyAPIUrlMap[instanceDomain]
-                if(versionAndApi?.first != meta.getVersion()){
-                    val newApi = MisskeyAPIServiceBuilder.build(instanceDomain, meta.getVersion())
-                    mMisskeyAPIUrlMap[instanceDomain] = Pair(meta.getVersion(), newApi)
-                }
-            }
+
             return meta
 
         }catch(e: Exception){
-            Log.e(TAG, "metaの読み込み一連処理に失敗したでち", e)
+            logger.error("metaの読み込み一連処理に失敗したでち", e)
             connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
             return null
         }
@@ -527,92 +673,28 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMisskeyAPI(instanceDomain: String): MisskeyAPI {
-        synchronized(mMisskeyAPIUrlMap){
-            val api = mMisskeyAPIUrlMap[instanceDomain]
-                ?: Pair(null, MisskeyAPIServiceBuilder.build(instanceDomain))
-            mMisskeyAPIUrlMap[instanceDomain] = api
-            return api.second
-        }
+        return mMisskeyAPIProvider.get(instanceDomain, mMetaInstanceUrlMap[instanceDomain]?.getVersion())
+    }
+
+    override fun getMisskeyAPIProvider(): MisskeyAPIProvider {
+        return mMisskeyAPIProvider
     }
 
     override fun getEncryption(): Encryption {
         return mEncryption
     }
 
-
-
-    override fun getNoteEventStore(account: Account): NoteEventStore {
-        return noteEventStoreFactory.create(account)
-    }
-
-    override fun getMainCapture(account: Account): MainCapture{
-        Log.d(TAG, "getMainCapture")
-
-        val mainCapture = mMainCaptureFactory.create(account)
-        validateObserverAccount(mainCapture, account)
-        return mainCapture
+    override fun getNoteCaptureAPI(account: Account): NoteCaptureAPI {
+        return mNoteCaptureAPIWithAccountProvider.get(account)
     }
 
 
-
-    override fun getNoteCapture(account: Account): NoteCapture {
-
-        synchronized(mNoteCaptureAccountMap){
-            var noteCapture = mNoteCaptureAccountMap[account.accountId]
-
-            if(noteCapture == null){
-                noteCapture = NoteCapture(account, getNoteEventStore(account), getMeta(account)?.getVersion())
-                setupObserver(account, noteCapture)
-                mNoteCaptureAccountMap[account.accountId] = noteCapture
-            }
-            validateObserverAccount(noteCapture, account)
-
-            return noteCapture
-        }
-
-    }
-
-
-    private fun getStreamingAdapter(account: Account): StreamingAdapter {
-
-        synchronized(mStreamingAccountMap){
-            var streaming = mStreamingAccountMap[account.accountId]
-            if(streaming == null){
-                streaming = StreamingAdapter(account, getEncryption())
-            }
-            mStreamingAccountMap[account.accountId] = streaming
-            return streaming
-        }
-    }
-
-    override fun getTimelineCapture(account: Account): TimelineCapture {
-        synchronized(mTimelineCaptureAccountMap){
-            var timelineCapture = mTimelineCaptureAccountMap[account.accountId]
-
-            if(timelineCapture == null){
-                timelineCapture = TimelineCapture(account, getSettingStore())
-                setupObserver(account, timelineCapture)
-                mTimelineCaptureAccountMap[account.accountId] = timelineCapture
-            }
-            validateObserverAccount(timelineCapture, account)
-            return timelineCapture
-        }
-
-    }
-
-    private fun validateObserverAccount(observer: Observer, account: Account){
-        if(observer.account == account){
-            Log.d("MiApplication", "Observerのアカウント一致正常です！！")
-        }else{
-            Log.e("MiApplication" ,"Observerのアカウントが一致しません！！エラー")
-        }
-    }
 
     private val sharedPreferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when(key){
                 UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
-                    mAccounts.value?.forEach {
+                    mAccountsState.value.forEach {
                         getUrlPreviewStore(it, true)
                     }
                 }
@@ -623,9 +705,34 @@ class MiApplication : Application(), MiCore {
         return ArrayList(this)
     }
 
-    private fun getMeta(account: Account): Meta? {
-        synchronized(mMetaInstanceUrlMap) {
-            return mMetaInstanceUrlMap[account.instanceDomain]
+    /**
+     * プラットフォームへの依存をなるべく少なくしたかったためApplicationから作成している
+     */
+    override fun createNote(createNote: CreateNote) {
+        applicationScope.launch(Dispatchers.IO) {
+            runCatching {
+                getNoteRepository().create(createNote)
+            }.onSuccess {
+                logger.debug("投稿に成功しました。")
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MiApplication, getString(R.string.success), Toast.LENGTH_LONG).show()
+                }
+            }.onFailure {
+                logger.error("投稿に失敗しました。", e = it)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MiApplication, "error: $it", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    fun MiCore.connectChannel(account: Account, channelType: ChannelAPI.Type): Flow<ChannelBody> {
+        return suspend {
+            getChannelAPI(account)
+        }.asFlow().flatMapLatest {
+            it.connect(channelType)
         }
     }
 

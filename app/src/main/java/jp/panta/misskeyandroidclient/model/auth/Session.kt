@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.auth
 
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import kotlinx.serialization.Serializable
 
-data class Session(val token: String, val url: String)
+@Serializable data class Session(val token: String, val url: String)

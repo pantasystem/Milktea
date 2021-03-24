@@ -1,5 +1,8 @@
 package jp.panta.misskeyandroidclient.model.api
 
+import jp.panta.misskeyandroidclient.api.list.*
+import jp.panta.misskeyandroidclient.api.notes.*
+import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CreateApp
@@ -9,19 +12,16 @@ import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
-import jp.panta.misskeyandroidclient.model.list.*
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessageAction
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.messaging.MessageAction
+import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
-import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.NotificationRequest
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -48,26 +48,26 @@ interface MisskeyAPI {
 
 
     @POST("api/i")
-    fun i(@Body i: I): Call<User>
+    fun i(@Body i: I): Call<UserDTO>
 
     //users
     @POST("api/users")
-    fun getUsers(@Body requestUser: RequestUser): Call<List<User>>
+    fun getUsers(@Body requestUser: RequestUser): Call<List<UserDTO>>
 
     @POST("api/users/show")
-    fun showUser(@Body requestUser: RequestUser): Call<User>
+    fun showUser(@Body requestUser: RequestUser): Call<UserDTO>
 
     @POST("api/users/search")
-    fun searchUser(@Body requestUser: RequestUser): Call<List<User>>
+    fun searchUser(@Body requestUser: RequestUser): Call<List<UserDTO>>
 
     @POST("api/users/lists/list")
-    fun userList(@Body i: I): Call<List<UserList>>
+    fun userList(@Body i: I): Call<List<UserListDTO>>
 
     @POST("api/users/lists/show")
-    fun showList(@Body listId: ListId): Call<UserList>
+    fun showList(@Body listId: ListId): Call<UserListDTO>
 
     @POST("api/users/lists/create")
-    fun createList(@Body createList: CreateList): Call<UserList>
+    fun createList(@Body createList: CreateList): Call<UserListDTO>
 
     @POST("api/lists/delete")
     fun deleteList(@Body listId: ListId): Call<Unit>
@@ -82,10 +82,10 @@ interface MisskeyAPI {
     fun pullUserFromList(@Body listUserOperation: ListUserOperation): Call<Unit>
 
     @POST("api/following/delete")
-    fun unFollowUser(@Body requestUser: RequestUser): Call<User>
+    fun unFollowUser(@Body requestUser: RequestUser): Call<UserDTO>
 
     @POST("api/following/create")
-    fun followUser(@Body requestUser: RequestUser): Call<User>
+    fun followUser(@Body requestUser: RequestUser): Call<UserDTO>
 
     //account
     @POST("api/i/favorites")
@@ -98,7 +98,7 @@ interface MisskeyAPI {
     fun deleteFavorite(@Body noteRequest: NoteRequest): Call<Unit>
 
     @POST("api/i/notifications")
-    fun notification(@Body notificationRequest: NotificationRequest): Call<List<Notification>?>
+    fun notification(@Body notificationRequest: NotificationRequest): Call<List<NotificationDTO>?>
 
     @POST("api/notes/create")
     fun create(@Body createNote: CreateNote): Call<CreateNote.Response>
@@ -115,51 +115,51 @@ interface MisskeyAPI {
     fun unrenote(@Body deleteNote: DeleteNote): Call<Unit>
 
     @POST("api/notes/search")
-    fun searchNote(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun searchNote(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/state")
     fun noteState(@Body noteRequest: NoteRequest): Call<State>
 
     @POST("api/notes/show")
-    fun showNote(@Body requestNote: NoteRequest): Call<Note>
+    fun showNote(@Body requestNote: NoteRequest): Call<NoteDTO>
 
     @POST("api/notes/children")
-    fun children(@Body noteRequest: NoteRequest): Call<List<Note>>
+    fun children(@Body noteRequest: NoteRequest): Call<List<NoteDTO>>
 
     @POST("api/notes/conversation")
-    fun conversation(@Body noteRequest: NoteRequest): Call<List<Note>>
+    fun conversation(@Body noteRequest: NoteRequest): Call<List<NoteDTO>>
 
     @POST("api/notes/featured")
-    fun featured(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun featured(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     //timeline
     @POST("api/notes/timeline")
-    fun homeTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun homeTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
 
     @POST("api/notes/hybrid-timeline")
-    fun hybridTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun hybridTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/local-timeline")
-    fun localTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun localTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/global-timeline")
-    fun globalTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun globalTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/polls/vote")
     fun vote(@Body vote: Vote) : Call<Unit>
 
     @POST("api/notes/search-by-tag")
-    fun searchByTag(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun searchByTag(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/user-list-timeline")
-    fun userListTimeline(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun userListTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
     //user
     @POST("api/users/notes")
-    fun userNotes(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun userNotes(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
     @POST("api/notes/mentions")
-    fun mentions(@Body noteRequest: NoteRequest): Call<List<Note>?>
+    fun mentions(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
 
 
 
@@ -181,13 +181,13 @@ interface MisskeyAPI {
 
     //message
     @POST("api/messaging/history")
-    fun getMessageHistory(@Body requestMessageHistory: RequestMessageHistory): Call<List<Message>>
+    fun getMessageHistory(@Body requestMessageHistory: RequestMessageHistory): Call<List<MessageDTO>>
 
     @POST("api/messaging/messages")
-    fun getMessages(@Body requestMessage: RequestMessage): Call<List<Message>>
+    fun getMessages(@Body requestMessage: RequestMessage): Call<List<MessageDTO>>
 
     @POST("api/messaging/messages/create")
-    fun createMessage(@Body messageAction: MessageAction): Call<Message>
+    fun createMessage(@Body messageAction: MessageAction): Call<MessageDTO>
 
     @POST("api/messaging/messages/delete")
     fun deleteMessage(@Body messageAction: MessageAction): Call<Unit>

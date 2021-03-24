@@ -1,51 +1,74 @@
 package jp.panta.misskeyandroidclient.model.users
 
-import com.google.gson.annotations.SerializedName
+import jp.panta.misskeyandroidclient.model.Entity
+import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import java.io.Serializable
+import java.lang.Exception
+import java.util.*
 
-data class User(
-    @SerializedName("id") val id:String,
-    @SerializedName("username") val userName: String,
-    @SerializedName("name") val name: String?,
-    @SerializedName("host") val host: String?,
-    @SerializedName("description") val description: String?,
-    //@SerializedName("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date?,
-    @SerializedName("followersCount") val followersCount: Int?,
-    @SerializedName("followingCount") val followingCount: Int?,
-    @SerializedName("hostLower") val hostLower: String?,
-    @SerializedName("notesCount") val notesCount: Int?,
-    //@JsonProperty("clientSettings") val clientSettings: ClientSetting?,
-    @SerializedName("email") val email: String?,
-    @SerializedName("isBot") val isBot: Boolean,
-    @SerializedName("isCat") val isCat: Boolean,
-    //@SerializedName("lastUsedAt") val lastUsedAt: String?,
-    @SerializedName("line") val line: String?,
-    @SerializedName("links") val links: String?,
-    //@SerializedName("profile") val profile: Any?,
-    //@SerializedName("settings") val settings: Any?,
-    @SerializedName("pinnedNoteIds") val pinnedNoteIds: List<String>?,
-    @SerializedName("pinnedNotes") val pinnedNotes: List<Note>?,
-    //("twitter") val twitter: Any?,
-    val twoFactorEnabled: Boolean?,
-    @SerializedName("isAdmin") val isAdmin: Boolean?,
-    @SerializedName("avatarUrl") val avatarUrl: String?,
-    @SerializedName("bannerUrl") val bannerUrl: String?,
-    //@SerializedName("avatarColor") val avatarColor: Any?,
-    @SerializedName("emojis") val emojis: List<Emoji>?,
+/**
+ * Userはfollowやunfollowなどは担当しない
+ * Userはfollowやunfollowに関連しないため
+ */
+sealed class User : Entity{
 
-    @SerializedName("isFollowing") val isFollowing: Boolean?,
-    @SerializedName("isFollowed") val isFollowed: Boolean?,
+    abstract val id: Id
+    abstract val userName: String
+    abstract val name: String?
+    abstract val avatarUrl: String?
+    abstract val emojis: List<Emoji>
+    abstract val isCat: Boolean?
+    abstract val isBot: Boolean?
+    abstract val host: String?
+    abstract var instanceUpdatedAt: Date
 
+    data class Id(
+        val accountId: Long,
+        val id: String,
+    ) : EntityId
 
-    @SerializedName("isBlocking") val isBlocking: Boolean?,
-    @SerializedName("isMuted") val isMuted: Boolean?,
-    val url: String?
+    data class Simple(
+        override val id: Id,
+        override val userName: String,
+        override val name: String?,
+        override val avatarUrl: String?,
+        override val emojis: List<Emoji>,
+        override val isCat: Boolean?,
+        override val isBot: Boolean?,
+        override val host: String?,
+        override var instanceUpdatedAt: Date = Date()
+    ) : User()
 
-    //JsonProperty("isVerified") val isVerified: Boolean,
-    //@JsonProperty("isLocked") val isLocked: Boolean
-): Serializable{
+    data class Detail(
+        override val id: Id,
+        override val userName: String,
+        override val name: String?,
+        override val avatarUrl: String?,
+        override val emojis: List<Emoji>,
+        override val isCat: Boolean?,
+        override val isBot: Boolean?,
+        override val host: String?,
+        val description: String?,
+        val followersCount: Int?,
+        val followingCount: Int?,
+        val hostLower: String?,
+        val notesCount: Int?,
+        val pinnedNoteIds: List<Note.Id>?,
+        val bannerUrl: String?,
+        val url: String?,
+        val isFollowing: Boolean,
+        val isFollower: Boolean,
+        val isBlocking: Boolean,
+        val isMuting: Boolean,
+        override var instanceUpdatedAt: Date = Date()
+    ) : User()
+
+    fun updated(){
+        instanceUpdatedAt = Date()
+    }
+
     fun getDisplayUserName(): String{
         return "@" + this.userName + if(this.host == null){
             ""
@@ -61,4 +84,12 @@ data class User(
     fun getShortDisplayName(): String{
         return "@" + this.userName
     }
+}
+
+sealed class UserState {
+    data class Removed(val id: User.Id) : UserState()
+    data class Success(val note: User) : UserState()
+    data class Error(val exception: Exception) : UserState()
+    object None : UserState()
+    object Loading : UserState()
 }

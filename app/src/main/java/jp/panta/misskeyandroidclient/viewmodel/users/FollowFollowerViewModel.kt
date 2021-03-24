@@ -1,57 +1,46 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
+import jp.panta.misskeyandroidclient.api.v10.RequestFollowFollower
+import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
+import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.streming.MainCapture
-import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.v10.MisskeyAPIV10
-import jp.panta.misskeyandroidclient.model.v10.RequestFollowFollower
-import jp.panta.misskeyandroidclient.model.v11.MisskeyAPIV11
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import kotlin.collections.ArrayList
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.atomic.AtomicBoolean
 
 class FollowFollowerViewModel(
-    val account: Account,
-    val misskeyAPI: MisskeyAPI,
-    val user: User?,
+    val userId: User.Id,
     val type: Type,
-    val miCore: MiCore,
-    private val encryption: Encryption = miCore.getEncryption()
+    private val miCore: MiCore,
 ) : ViewModel(), ShowUserDetails{
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val account: Account,
-        val miApplication: MiApplication,
-        val user: User?,
+        val userId: User.Id,
         val type: Type,
-        val encryption: Encryption
+        val miCore: MiCore,
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            val misskeyAPI = miApplication.getMisskeyAPI(account)
-            if(modelClass == FollowFollowerViewModel::class.java){
-                return FollowFollowerViewModel(
-                    account,
-                    misskeyAPI,
-                    user,
-                    type,
-                    miApplication
-                ) as T
-            }
-            throw IllegalArgumentException("use FollowFollowerViewModel::class.java")
+            return FollowFollowerViewModel(userId, type, miCore) as T
         }
+
     }
 
     enum class Type{
@@ -59,198 +48,182 @@ class FollowFollowerViewModel(
         FOLLOWER
     }
 
-    val tag = "FollowFollowerViewModel"
+    interface Paginator {
+        suspend fun next(): List<User.Detail>
+        suspend fun init()
+    }
 
-    val userId = user?.id?: account.remoteId
+    @Suppress("BlockingMethodInNonBlockingContext")
+    class DefaultPaginator(
+        val account: Account,
+        val misskeyAPI: MisskeyAPIV11,
+        val userId: User.Id,
+        val type: Type,
+        val encryption: Encryption,
+        val noteRelationGetter: NoteRelationGetter,
+        val userDataSource: UserDataSource
+
+    ) : Paginator{
+
+        private val lock = Mutex()
+        private val api = if(type == Type.FOLLOWER) misskeyAPI::followers else misskeyAPI::following
+        private var nextId: String? = null
+
+        override suspend fun next(): List<User.Detail> {
+            lock.withLock {
+                val res = api.invoke(RequestUser(
+                    account.getI(encryption),
+                    userId = userId.id,
+                    untilId = nextId
+                )).execute().body()
+                    ?: return emptyList()
+                nextId = res.last().id
+                return res.mapNotNull {
+                    it.followee ?: it.follower
+                }.map { userDTO ->
+                    userDTO.pinnedNotes?.forEach { noteDTO ->
+                        noteRelationGetter.get(account, noteDTO)
+                    }
+                    (userDTO.toUser(account, true) as User.Detail).also {
+                        userDataSource.add(it)
+                    }
+                }
+            }
+        }
+        override suspend fun init() {
+            lock.withLock {
+                nextId = null
+            }
+        }
+    }
+
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    class V10Paginator(
+        val account: Account,
+        val misskeyAPIV10: MisskeyAPIV10,
+        val userId: User.Id,
+        val type: Type,
+        val encryption: Encryption,
+        val noteRelationGetter: NoteRelationGetter,
+        val userDataSource: UserDataSource
+    ) : Paginator{
+        private val lock = Mutex()
+        private var nextId: String? = null
+        private val api = if(type == Type.FOLLOWER) misskeyAPIV10::followers else misskeyAPIV10::following
+
+        override suspend fun next(): List<User.Detail> {
+            lock.withLock {
+                val res = api.invoke(
+                    RequestFollowFollower(
+                        i = account.getI(encryption),
+                        cursor = nextId,
+                        userId = userId.id
+                    )
+                ).execute().body() ?: return emptyList()
+                nextId = res.next
+                return res.users.map { userDTO ->
+                    userDTO.pinnedNotes?.forEach {
+                        noteRelationGetter.get(account, it)
+                    }
+                    (userDTO.toUser(account, true) as User.Detail).also {
+                        userDataSource.add(it)
+                    }
+                }
+            }
+        }
+        override suspend fun init() {
+            lock.withLock {
+                nextId = null
+            }
+        }
+    }
 
 
 
-    private val followFollowerUpdateListener = Listener()
-    private val mainCapture = miCore.getMainCapture(account)
+
+    val logger = miCore.loggerFactory.create("FollowFollowerViewModel")
+
+    val accountRepository = miCore.getAccountRepository()
+    val userRepository = miCore.getUserRepository()
+    private val misskeyAPIProvider = miCore.getMisskeyAPIProvider()
+    private val encryption = miCore.getEncryption()
+    private val noteRelationGetter = miCore.getGetters().noteRelationGetter
+    private val userDataSource: UserDataSource = miCore.getUserDataSource()
 
     val isInitializing = MutableLiveData<Boolean>(false)
 
 
-    val users = object : MutableLiveData<List<UserViewData>>(){
-        override fun onActive() {
-            mainCapture.putListener(followFollowerUpdateListener)
+    val users = MutableLiveData<List<UserViewData>>()
+    private var mUsers: List<UserViewData> = emptyList()
+        set(value) {
+            field = value
+            users.postValue(value)
         }
 
-        override fun onInactive() {
-            mainCapture.removeListener(followFollowerUpdateListener)
-        }
-    }
     private var mIsLoading: Boolean = false
 
-    private data class Result(val nextId: String?, val users: List<User>)
-    private abstract inner class Loader{
-        private var result: Result? = null
-        abstract fun onLoadInit(): Result?
-        abstract fun onLoadNext(nextId: String?): Result?
-        fun loadInit(){
-            if(mIsLoading){
-                return
-            }
-            result = null
-            users.value = emptyList()
-            loadNext()
+
+
+    fun loadInit() = viewModelScope.launch(Dispatchers.IO) {
+        isInitializing.postValue(true)
+        getPaginator().init()
+        mUsers = emptyList()
+        loadOld().join()
+        isInitializing.postValue(false)
+
+    }
+
+
+
+    fun loadOld() = viewModelScope.launch (Dispatchers.IO){
+        if(mIsLoading) return@launch
+        mIsLoading = true
+        runCatching {
+            val list = getPaginator().next().map {
+                UserViewData(it, miCore, viewModelScope, Dispatchers.IO)
+            }.toMutableList()
+            list.addAll(0, mUsers)
+            mUsers = list
+        }.onFailure {
+
         }
+        mIsLoading = false
 
-        fun loadNext(){
-            if(mIsLoading){
-                return
+        isInitializing.postValue(false)
+    }
+
+
+    val showUserEventBus = EventBus<User.Id>()
+
+    override fun show(userId: User.Id?) {
+        showUserEventBus.event = userId
+    }
+
+
+    private var mAccount: Account? = null
+    private val accountLock = Mutex()
+    private var mPaginator: Paginator? = null
+    private suspend fun getPaginator(): Paginator {
+        accountLock.withLock {
+            if(mPaginator != null){
+                mPaginator
             }
-            if(result != null && result?.nextId == null){
-                return
+
+            if(mAccount == null) {
+                mAccount = accountRepository.get(userId.accountId)
             }
-            mIsLoading = true
-            viewModelScope.launch(Dispatchers.IO){
-
-                val tmpCursorId = result?.nextId
-                val beforeResult = result
-
-
-                try{
-                    if(beforeResult != null && beforeResult.nextId == null){
-                        return@launch
-                    }
-
-                    val result = if(tmpCursorId == null){
-                        onLoadInit()
-                    }else{
-                        onLoadNext(tmpCursorId)
-                    }
-
-                    result?: return@launch
-                    this@Loader.result = result
-                    val viewDataList = result.users.map{
-                        UserViewData(it)
-                    }
-                    val arrayList = ArrayList(users.value?: emptyList())
-                    arrayList.addAll(viewDataList)
-                    users.postValue(arrayList)
-
-                }catch(e: Exception){
-                    Log.e(tag, "読み込み中にエラー発生", e)
-                }finally {
-                    mIsLoading = false
-                    if(tmpCursorId == null){
-                        isInitializing.postValue(false)
-                    }
+            mPaginator = mAccount?.let { account ->
+                val api = misskeyAPIProvider.get(account.instanceDomain)
+                if(api is MisskeyAPIV10){
+                    V10Paginator(account, api, userId, type, encryption, noteRelationGetter, userDataSource)
+                }else{
+                    DefaultPaginator(account, api as MisskeyAPIV11, userId, type, encryption, noteRelationGetter, userDataSource)
                 }
             }
-
+            require(mPaginator != null)
+            return mPaginator!!
         }
     }
-
-    private inner class V10Loader(misskeyAPIV10: MisskeyAPIV10) : Loader(){
-        val store = if(type == Type.FOLLOWING){
-            misskeyAPIV10::following
-        }else{
-            misskeyAPIV10::followers
-        }
-        override fun onLoadInit(): Result? {
-            return onLoadNext(null)
-        }
-
-        override fun onLoadNext(nextId: String?): Result? {
-            val res = store.invoke(
-                RequestFollowFollower(
-                    i = account.getI(miCore.getEncryption()),
-                    userId = userId,
-                    cursor = nextId
-                )
-            ).execute()
-            val body = res.body()?: return null
-            Log.d(tag, "受信したデータ:$body")
-            if(body.users.isNullOrEmpty()){
-                Log.e(tag, "受信に失敗した: ${res.code()}, ${res.errorBody()}")
-            }
-            return Result(body.next, body.users)
-        }
-
-    }
-
-    private inner class V11Loader(misskeyAPIV11: MisskeyAPIV11) : Loader(){
-
-        val store = if(type == Type.FOLLOWING){
-            misskeyAPIV11::following
-        }else{
-            misskeyAPIV11::followers
-        }
-        override fun onLoadInit(): Result? {
-            return onLoadNext(null)
-        }
-
-        override fun onLoadNext(nextId: String?): Result? {
-            val res = store.invoke(
-                RequestUser(
-                    i = account.getI(miCore.getEncryption()),
-                    userId = userId,
-                    untilId = nextId
-                )
-            ).execute()
-            val body = res.body()
-            if(body == null){
-                Log.d(tag, "取得に失敗しました:code:${res.code()} ,${res.errorBody()?.string()}")
-                return null
-            }
-            val next = body.lastOrNull()?.id!!
-            val users = body.mapNotNull {
-                it.followee ?: it.follower
-            }
-
-            return Result(next, users)
-        }
-    }
-
-    private val loader = when(misskeyAPI){
-        is MisskeyAPIV11 ->{
-            V11Loader(misskeyAPI)
-        }
-        is MisskeyAPIV10 ->{
-            V10Loader(misskeyAPI)
-        }
-        else -> {
-            Log.e(tag, "想定外のバージョンで実行されたかAPIの初期化に失敗している")
-            null
-        }
-    }
-    fun loadInit(){
-        loader?.loadInit()
-    }
-
-
-
-    fun loadOld(){
-        loader?.loadNext()
-    }
-
-    private inner class Listener : MainCapture.AbsListener(){
-        override fun follow(user: User) {
-
-            users.value?.forEach { uvd ->
-                if(uvd.userId == user.id){
-                    uvd.user.postValue(user)
-                }
-            }
-        }
-
-        override fun unFollowed(user: User) {
-            users.value?.forEach { uvd ->
-                if(uvd.userId == user.id){
-                    uvd.user.postValue(user)
-                }
-            }
-        }
-    }
-
-
-    val showUserEventBus = EventBus<User>()
-
-    override fun show(user: User?) {
-        showUserEventBus.event = user
-    }
-
 
 }

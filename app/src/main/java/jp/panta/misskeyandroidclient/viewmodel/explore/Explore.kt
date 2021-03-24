@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.explore
 
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import java.io.Serializable

@@ -10,16 +10,17 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.messaging.Message
+import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageFragment
+import jp.panta.misskeyandroidclient.view.messaging.MessageFragment
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import jp.panta.misskeyandroidclient.view.TitleSettable
 import kotlinx.android.synthetic.main.activity_message.*
 
-class MessageActivity : AppCompatActivity() {
+class MessageActivity : AppCompatActivity(), TitleSettable {
 
     companion object{
         const val EXTRA_MESSAGING_ID = "jp.panta.misskeyandroidclient.MessageActivity.EXTRA_MESSAGING_ID"
@@ -57,13 +58,12 @@ class MessageActivity : AppCompatActivity() {
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()
-            val fragment = MessageFragment.newInstance(messagingId.message)
+            val fragment = MessageFragment.newInstance(messagingId)
             ft.add(R.id.content_main, fragment)
             ft.commit()
         }
-        setTitle(messagingId.message)
 
-        val factory = MessageActionViewModel.Factory(account, application as MiApplication, messagingId.message)
+        val factory = MessageActionViewModel.Factory(messagingId, application as MiApplication)
         val messageActionViewModel = ViewModelProvider(this, factory)[MessageActionViewModel::class.java]
         mViewModel = messageActionViewModel
         binding.actionViewModel = messageActionViewModel
@@ -86,13 +86,8 @@ class MessageActivity : AppCompatActivity() {
         }
     }
 
-    private fun setTitle(message: Message){
-        val ac = (applicationContext as MiApplication).getCurrentAccount().value ?: return
-        supportActionBar?.title = if(message.isGroup()){
-            message.group?.name
-        }else{
-            message.opponentUser(ac)?.getDisplayUserName()
-        }
+    override fun setTitle(text: String) {
+        supportActionBar?.title = text
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

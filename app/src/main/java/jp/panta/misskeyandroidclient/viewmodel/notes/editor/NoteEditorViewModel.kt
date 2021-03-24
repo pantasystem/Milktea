@@ -1,14 +1,13 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
-import android.util.Log
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.users.User
@@ -16,12 +15,14 @@ import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import java.io.IOException
-import java.lang.NullPointerException
-import java.util.*
-import kotlin.collections.ArrayList
 
 class NoteEditorViewModel(
     //private val accountRelation: AccountRelation,
@@ -29,29 +30,65 @@ class NoteEditorViewModel(
     private val miCore: MiCore,
     private val draftNoteDao: DraftNoteDao,
     //meta: Meta,
-    private val replyToNoteId: String? = null,
+    replyId: String? = null,
     private val quoteToNoteId: String? = null,
     private val encryption: Encryption = miCore.getEncryption(),
-    val note: Note? = null,
-    val draftNote: DraftNote? = null
+    private val loggerFactory: Logger.Factory,
+    n: Note? = null,
+    dn: DraftNote? = null,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel(){
 
+    private val logger = loggerFactory.create("NoteEditorViewModel")
 
-    val currentAccount = miCore.getCurrentAccount()
+    private val currentAccount = MutableLiveData<Account>().apply{
+        miCore.getCurrentAccount().onEach {
+            this.postValue(it)
+        }.launchIn(viewModelScope + dispatcher)
+    }
 
-    val currentUser = Transformations.map(currentAccount){ account ->
-        UserViewData(account.remoteId).apply{
+    private val mCurrentUser = MutableLiveData<UserViewData>().apply{
+        miCore.getCurrentAccount().filterNotNull().onEach {
+            val userId = User.Id(it.accountId, it.remoteId)
+            this.postValue(
+                UserViewData(
+                    userId,
+                    miCore,
+                    viewModelScope,
+                    dispatcher
 
-            val i = account.getI(miCore.getEncryption())
-            i?.let{
-                setApi(i, miCore.getMisskeyAPI(account))
-            }
+                )
+            )
+        }.launchIn(viewModelScope + dispatcher)
+    }
+    val currentUser: LiveData<UserViewData> = mCurrentUser
+
+    val draftNote = MutableLiveData<DraftNote>(dn)
+    val note = MutableLiveData<Note>(n)
+
+    // FIXME Note.Idを使用するようにすること
+    val replyToNoteId = MutableLiveData<String>(replyId)
+
+    // FIXME Note.Idを使用するようにすること
+    val renoteId = MutableLiveData<String>(quoteToNoteId)
+
+    val cw = MediatorLiveData<String>().apply {
+        addSourceFromNoteAndDraft { noteDTO, draftNote ->
+            value = noteDTO?.cw ?: draftNote?.cw
         }
     }
 
-    val hasCw = MutableLiveData<Boolean>(!note?.cw.isNullOrBlank()|| !draftNote?.cw.isNullOrBlank())
-    val cw = MutableLiveData<String>(note?.cw?: draftNote?.cw)
-    val text = MutableLiveData<String>(note?.text?: draftNote?.text)
+
+    val hasCw = MediatorLiveData<Boolean>().apply {
+        addSource(cw){
+            value = !it.isNullOrBlank()
+        }
+    }
+    val text = MediatorLiveData<String>().apply {
+        addSourceFromNoteAndDraft { noteDTO, draftNote ->
+            value = noteDTO?.text ?: draftNote?.text
+        }
+    }
     var maxTextLength = Transformations.map(currentAccount){
         miCore.getCurrentInstanceMeta()?.maxNoteTextLength?: 1500
     }
@@ -72,16 +109,16 @@ class NoteEditorViewModel(
 
     val files = MediatorLiveData<List<File>>().apply{
         this.postValue(
-            note?.files?.map{
+            n?.files?.map{
                 it.toFile(getInstanceBaseUrl()?: "")
-            }?:draftNote?.files?: emptyList<File>()
+            }?:dn?.files?: emptyList<File>()
         )
     }
 
     val totalImageCount = MediatorLiveData<Int>().apply{
 
         this.addSource(files){
-            Log.d("NoteEditorViewModel", "list$it, sizeは: ${it.size}")
+            logger.debug( "list$it, sizeは: ${it.size}")
             this.value = it.size
         }
     }
@@ -102,56 +139,58 @@ class NoteEditorViewModel(
         }
     }
 
-    private val mVisibilityEnums = PostNoteTask.Visibility.values()
-    private val mExVisibility = mVisibilityEnums.firstOrNull {
-        it.visibility == note?.visibility?.toLowerCase(Locale.US)
-                || it.visibility == draftNote?.visibility?.toLowerCase(Locale.US)
+    // FIXME リモートのVisibilityを参照するようにする
+    val visibility = MediatorLiveData<Visibility>().apply {
+        addSourceFromNoteAndDraft { noteDTO, draftNote ->
+            val local = noteDTO?.localOnly ?: draftNote?.localOnly
+            val type = noteDTO?.visibility?: Visibility(draftNote?.visibility?: "public", local?: false)
+            value = type
+        }
     }
-    val visibility = MutableLiveData<PostNoteTask.Visibility>(mExVisibility?: PostNoteTask.Visibility.PUBLIC)
 
     val isLocalOnly = MediatorLiveData<Boolean>().apply{
         addSource(visibility){
-            value = it.canLocalOnly && value == true
+            value = it.isLocalOnly()
         }
     }
 
     val isLocalOnlyEnabled = MediatorLiveData<Boolean>().apply{
         addSource(visibility){
-            value = it?.canLocalOnly == true
+            value = it is CanLocalOnly
         }
     }
 
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
-    val address = MutableLiveData<List<UserViewData>>(
-        note?.visibleUserIds?.map(::setUpUserViewData)
-            ?: draftNote?.visibleUserIds?.map(::setUpUserViewData)
+    val address = MutableLiveData(
+        n?.visibleUserIds?.map(::setUpUserViewData)
+            ?: dn?.visibleUserIds?.mapNotNull {
+            miCore.getCurrentAccount().value?.accountId?.let { ac ->
+                User.Id(ac, it)
+            }
+        }?.map(::setUpUserViewData) ?: emptyList()
     )
 
-    private fun setUpUserViewData(userId: String) : UserViewData{
-        return UserViewData(userId).apply{
-            val ci = getCurrentInformation()
-            val i = ci?.getI(miCore.getEncryption())
-            i?.let{
-                setApi(i, miCore.getMisskeyAPI(ci))
-            }
-        }
+
+    private fun setUpUserViewData(userId: User.Id) : UserViewData{
+        return UserViewData(userId, miCore, viewModelScope, dispatcher)
     }
 
     val isSpecified = Transformations.map(visibility){
-        it == PostNoteTask.Visibility.SPECIFIED
+        it is Visibility.Specified
     }
 
     val poll = MutableLiveData<PollEditor?>(
-        note?.poll?.let{
+        n?.poll?.let{
             PollEditor(it)
-        }?: draftNote?.draftPoll?.let{
+        }?: dn?.draftPoll?.let{
             PollEditor(it)
         }
     )
 
-    val noteTask = MutableLiveData<PostNoteTask>()
+    //val noteTask = MutableLiveData<PostNoteTask>()
+    val isPost = EventBus<Boolean>()
 
     val showPollDatePicker = EventBus<Unit>()
     val showPollTimePicker = EventBus<Unit>()
@@ -167,18 +206,30 @@ class NoteEditorViewModel(
 
     fun post(){
         currentAccount.value?.let{ account ->
-            val noteTask = PostNoteTask(encryption, draftNote, account)
-            noteTask.cw = if(cw.value.isNullOrBlank()) null else cw.value
-            noteTask.files = files.value
-            noteTask.text =text.value
-            noteTask.poll = poll.value?.buildCreatePoll()
-            noteTask.renoteId = quoteToNoteId
-            noteTask.replyId = replyToNoteId
-            noteTask.setVisibility(visibility.value, address.value?.map{
-                it.userId
-            })
-            noteTask.localOnly = this.isLocalOnly.value?: false
-            this.noteTask.postValue(noteTask)
+
+            // FIXME 本来はreplyToNoteIdの時点でNote.Idを使うべきだが現状は厳しい
+            val rtn = replyToNoteId.value
+            val replyId = if(rtn == null) null else Note.Id(noteId = rtn, accountId = account.accountId)
+
+            val rnn = renoteId.value
+            val renoteId = if(rnn == null) null else Note.Id(noteId = rnn, accountId = account.accountId)
+            // FIXME viaMobileを設定できるようにする
+            val createNote = CreateNote(
+                author = account,
+                visibility = visibility.value?: Visibility.Public(false),
+                text = text.value,
+                cw = cw.value,
+                viaMobile = false,
+                files = files.value,
+                replyId = replyId,
+                renoteId = renoteId,
+                poll = poll.value?.buildCreatePoll(),
+                draftNoteId = draftNote.value?.draftNoteId
+            )
+            miCore.createNote(createNote)
+
+
+            this.isPost.event = true
         }
 
     }
@@ -260,11 +311,16 @@ class NoteEditorViewModel(
         showVisibilitySelectionEvent.event = Unit
     }
 
-    fun setVisibility(visibility: PostNoteTask.Visibility){
+    fun setVisibility(visibility: Visibility){
         this.visibility.value = visibility
         this.visibilitySelectedEvent.event = Unit
     }
 
+    fun toggleLocalOnly() {
+        if(this.isLocalOnlyEnabled.value == true){
+            this.isLocalOnly.value = !(this.isLocalOnly.value?: false)
+        }
+    }
 
 
     private fun List<File>?.toArrayList(): ArrayList<File>{
@@ -275,21 +331,13 @@ class NoteEditorViewModel(
         }
     }
 
-    fun setAddress(added: Array<String>, removed: Array<String>){
+    fun setAddress(added: List<User.Id>, removed: List<User.Id>){
         val list = address.value?.let{
             ArrayList(it)
         }?: ArrayList()
 
         list.addAll(
-            added.map{
-                UserViewData(it).apply{
-                    val ci = getCurrentInformation()
-                    val i = ci?.getI(miCore.getEncryption())
-                    i?.let{
-                        setApi(i, miCore.getMisskeyAPI(ci))
-                    }
-                }
-            }
+            added.map(::setUpUserViewData)
         )
 
         list.removeAll { uv ->
@@ -306,7 +354,7 @@ class NoteEditorViewModel(
         users.forEachIndexed { index, it ->
             val userName = it.getDisplayUserName()
             if(index < users.size - 1){
-                mentionBuilder.appendln(userName)
+                mentionBuilder.appendLine(userName)
             }else{
                 mentionBuilder.append(userName)
             }
@@ -325,7 +373,7 @@ class NoteEditorViewModel(
         val builder = StringBuilder(text.value?: "")
         builder.insert(pos, emoji)
         text.value = builder.toString()
-        Log.d("NoteEditorViewModel", "position:${pos + emoji.length - 1}")
+        logger.debug( "position:${pos + emoji.length - 1}")
         return pos + emoji.length
     }
 
@@ -335,17 +383,17 @@ class NoteEditorViewModel(
             accountId = currentAccount.value?.accountId!!,
             text = text.value,
             cw = cw.value,
-            visibleUserIds = address.value?.map{
-                it.userId
+            visibleUserIds = address.value?.mapNotNull {
+                it.userId?.id ?: it.user.value?.id?.id
             },
             draftPoll = poll.value?.toDraftPoll(),
-            visibility = visibility.value?.visibility?: "public",
-            localOnly = visibility.value?.canLocalOnly,
+            visibility = visibility.value?.type()?: "public",
+            localOnly = visibility.value?.isLocalOnly(),
             renoteId = quoteToNoteId,
-            replyId = replyToNoteId,
+            replyId = replyToNoteId.value,
             files = files.value
         ).apply{
-            this.draftNoteId = draftNote?.draftNoteId
+            this.draftNoteId = draftNote.value?.draftNoteId
         }
     }
     fun saveDraft(){
@@ -359,15 +407,15 @@ class NoteEditorViewModel(
                 try{
                     isSaveNoteAsDraft.event = draftNoteDao.fullInsert(dfNote)
                 }catch(e: Exception){
-                    Log.e("NoteEditorVM", "下書き書き込み中にエラー発生：失敗してしまった", e)
+                    logger.error( "下書き書き込み中にエラー発生：失敗してしまった", e)
                 }
             }catch(e: IOException){
 
             }catch(e: NullPointerException){
-                Log.e("NoteEditorVM", "下書き保存に失敗した", e)
+                logger.error( "下書き保存に失敗した", e)
 
             }catch (e: Throwable){
-                Log.e("NoteEditorVM", "下書き保存に失敗した", e)
+                logger.error( "下書き保存に失敗した", e)
 
             }
 
@@ -402,5 +450,16 @@ class NoteEditorViewModel(
     private fun getCurrentInformation(): Account?{
         return miCore.getCurrentAccount().value
     }
+
+    private fun<T> MediatorLiveData<T>.addSourceFromNoteAndDraft(observer: (Note?, DraftNote?)->Unit) {
+        addSource(note) {
+            observer(it, draftNote.value)
+        }
+
+        addSource(draftNote) {
+            observer(note.value, it)
+        }
+    }
+
 
 }

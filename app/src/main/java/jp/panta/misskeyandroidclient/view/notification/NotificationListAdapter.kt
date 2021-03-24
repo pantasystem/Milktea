@@ -44,8 +44,9 @@ class NotificationListAdapter(
         //holder.binding.simpleNote.reactionView.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
         //holder.binding.simpleNote.reactionView.adapter = adapter
         setReactionCounter(note, holder.binding.simpleNote.reactionView)
-        holder.binding.executePendingBindings()
         holder.binding.lifecycleOwner = lifecycleOwner
+        holder.binding.executePendingBindings()
+
 
     }
 
@@ -62,7 +63,7 @@ class NotificationListAdapter(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<LinkedHashMap<String, Int>> {
+        val observer = Observer<Map<String, Int>> {
             adapter.submitList(it.toList())
         }
         note.reactionCounts.observe(lifecycleOwner, observer)

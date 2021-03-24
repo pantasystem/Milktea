@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -20,13 +22,23 @@ import kotlinx.android.synthetic.main.activity_note_detail.*
 
 class NoteDetailActivity : AppCompatActivity() {
     companion object{
-        const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_NOTE_ID"
+        private const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_NOTE_ID"
+        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
 
         private const val TAG = "NoteDetailActivity"
 
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
+
+        fun newIntent(context: Context, noteId: Note.Id): Intent {
+            return Intent(context, NoteDetailActivity::class.java).apply {
+                putExtra(EXTRA_NOTE_ID, noteId.noteId)
+                putExtra(EXTRA_ACCOUNT_ID, noteId.accountId)
+            }
+        }
     }
     private var mNoteId: String? = null
+    private var mAccountId: Long? = null
+
     private var mIsMainActive: Boolean = true
 
     private var mParentActivity: Activities? = null
@@ -46,6 +58,9 @@ class NoteDetailActivity : AppCompatActivity() {
             ?: intent.data?.path?.replace("/notes/", "")
         Log.d(TAG, "受け取ったnoteId: $noteId")
         mNoteId = noteId
+        mAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let{
+            if(it == -1L) null else it
+        }
 
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
@@ -53,7 +68,7 @@ class NoteDetailActivity : AppCompatActivity() {
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!))
+        ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!, accountId = mAccountId))
         ft.commit()
 
 

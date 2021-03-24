@@ -2,16 +2,14 @@ package jp.panta.misskeyandroidclient.viewmodel.list
 
 import android.util.Log
 import androidx.lifecycle.*
-import io.reactivex.Observer
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.ReplaySubject
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
-import jp.panta.misskeyandroidclient.model.list.ListId
-import jp.panta.misskeyandroidclient.model.list.ListUserOperation
-import jp.panta.misskeyandroidclient.model.list.UpdateList
+import jp.panta.misskeyandroidclient.api.list.ListId
+import jp.panta.misskeyandroidclient.api.list.ListUserOperation
+import jp.panta.misskeyandroidclient.api.list.UpdateList
+import jp.panta.misskeyandroidclient.api.list.UserListDTO
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.Dispatchers
@@ -19,18 +17,18 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentLinkedDeque
 
 class UserListDetailViewModel(
-    val accountId: Long,
-    val listId: String,
+    val listId: UserList.Id,
     val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val accountId: Long, val listId: String, private val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(val listId: UserList.Id, private val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return UserListDetailViewModel(accountId, listId, miCore) as T
+            return UserListDetailViewModel(listId, miCore) as T
         }
     }
 
@@ -39,13 +37,12 @@ class UserListDetailViewModel(
 
 
 
-    private val mUserMap = LinkedHashMap<String, UserViewData>()
+    private val mUserMap = LinkedHashMap<User.Id, UserViewData>()
 
     //private val mPublisher = UserListEventStore(misskeyAPI, account).getEventStream()
     val updateEvents = ConcurrentLinkedDeque<UserListEvent>()
 
 
-    private val mAccount = MutableLiveData<Account>()
     private val mUserList = MutableLiveData<UserList>()
 
     private val mListUsers = MutableLiveData<List<UserViewData>>()
@@ -54,180 +51,149 @@ class UserListDetailViewModel(
 
     val listUsers: LiveData<List<UserViewData>> = mListUsers
 
+    private val logger = miCore.loggerFactory.create("UserListDetailViewModel")
+
     init{
 
-        viewModelScope.launch(Dispatchers.IO){
-            try{
-                mAccount.postValue(miCore.getAccount(accountId))
-            }catch(e: AccountNotFoundException){
-                Log.e(tag, "指定されたaccountId:${accountId}のアカウントを発見することができませんでした。", e)
-            }
-        }
 
-        mAccount.observeForever {
-            load()
-        }
+        load()
 
         mUserList.observeForever { ul ->
-            mAccount.value?.let{ ac ->
-                loadUsers(ac, ul.userIds)
-            }
+            loadUsers(ul.userIds)
+
         }
     }
 
     fun load(){
-        val account = mAccount.value
-        if(account == null){
-            Log.i(tag, "#load アカウントがまだ読み込めていません。")
-            return
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = getAccount()
+                val res = miCore.getMisskeyAPI(account).showList(
+                    ListId(
+                        i = account.getI(miCore.getEncryption()),
+                        listId = listId.userListId
+                    )
+                ).execute()
+                res.throwIfHasError()
+                res.body()?.toEntity(account)
+            }.onSuccess {
+                mUserList.postValue(it)
+            }.onFailure {
+                logger.error("load list error", e = it)
+            }
+
         }
 
-        miCore.getMisskeyAPI(account).showList(
-            ListId(
-                i = account.getI(miCore.getEncryption())!!,
-                listId = listId
-            )
-        ).enqueue(object : Callback<UserList>{
-            override fun onResponse(call: Call<UserList>, response: Response<UserList>) {
-                val ul = response.body()?: return
-                mUserList.postValue(ul)
-                //loadUsers(account, ul.userIds)
-            }
-
-            override fun onFailure(call: Call<UserList>, t: Throwable) {
-                Log.e(tag, "load user list error, listId:$listId", t)
-            }
-        })
     }
 
     fun updateName(name: String){
-        Log.d(tag, "更新しようとしています:$name")
-        val account = mAccount.value
-        if(account == null){
-            Log.i(tag, "#load アカウントがまだ読み込めていません。")
-            return
-        }
-
-        miCore.getMisskeyAPI(account).updateList(
-            UpdateList(
-                i = account.getI(miCore.getEncryption())!!,
-                listId = listId,
-                name = name
-            )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
-                    updateEvents.add(
-                        UserListEvent(userListId = listId, account = account, type = UserListEvent.Type.UPDATED_NAME)
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = getAccount()
+                val res = miCore.getMisskeyAPI(account).updateList(
+                    UpdateList(
+                        i = account.getI(miCore.getEncryption()),
+                        listId = listId.userListId,
+                        name = name
                     )
-                    load()
-                }else{
-                    Log.d(tag, "更新に失敗しました:$response")
-                }
-            }
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.e(tag, "更新に失敗した:$call", t)
-            }
-        })
-    }
+                ).execute()
+                res.throwIfHasError()
 
-    fun pushUser(userId: String){
-        val account = mAccount.value
-        if(account == null){
-            Log.i(tag, "#load アカウントがまだ読み込めていません。")
-            return
+            }.onSuccess {
+                updateEvents.add(
+                    UserListEvent(userListId = listId, type = UserListEvent.Type.UPDATED_NAME)
+                )
+                load()
+            }.onFailure { t ->
+                logger.error("名前の更新に失敗した", e = t)
+            }
         }
 
-        miCore.getMisskeyAPI(account).pushUserToList(
-            ListUserOperation(
-                i = account.getI(miCore.getEncryption())!!,
-                listId = listId,
-                userId = userId
-            )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
-                    onPushedUser(account, userId)
-                }
-            }
+    }
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.d(tag, "push user error", t)
+    fun pushUser(userId: User.Id){
+
+        viewModelScope.launch(Dispatchers.IO){
+            runCatching {
+                val account = getAccount()
+                val res = miCore.getMisskeyAPI(account).pushUserToList(
+                    ListUserOperation(
+                        i = account.getI(miCore.getEncryption()),
+                        listId = listId.userListId,
+                        userId = userId.id
+                    )
+                ).execute()
+                res.throwIfHasError()
+
+            }.onSuccess {
+                onPushedUser(userId)
+
             }
-        })
+        }
+
     }
 
 
-    fun pullUser(userId: String){
-        val account = mAccount.value
-        if(account == null){
-            Log.i(tag, "#load アカウントがまだ読み込めていません。")
-            return
-        }
+    fun pullUser(userId: User.Id){
 
-        miCore.getMisskeyAPI(account).pullUserFromList(
-            ListUserOperation(
-                i = account.getI(miCore.getEncryption())!!,
-                listId = listId,
-                userId = userId
-            )
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
-                    onPulledUser(account, userId)
-                }else{
-                    Log.d(tag, "pull user failure: $response")
-                }
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val account = miCore.getAccountRepository().getCurrentAccount()
+                val result = miCore.getMisskeyAPI(account).pullUserFromList(
+                    ListUserOperation(
+                        i = account.getI(miCore.getEncryption()),
+                        listId = listId.userListId,
+                        userId = userId.id
+                    )
+                ).execute()
+                result.throwIfHasError()
+                if(result.isSuccessful) userId else null
+            }.onFailure { t ->
                 Log.d(tag, "pull user error", t)
+            }.onSuccess {
+                onPulledUser(userId)
             }
-        })
+        }
+
+
     }
-    private fun loadUsers(account: Account, userIds: List<String>){
+    private fun loadUsers(userIds: List<User.Id>){
 
         Log.d(tag, "load users $userIds")
         mUserMap.clear()
 
         val listUserViewDataList = userIds.map{ userId ->
-            UserViewData(userId).apply{
-                miCore.getMisskeyAPI(account).showUser(
-                    RequestUser(
-                    i = account.getI(miCore.getEncryption())!!,
-                    userId = userId
-                )).enqueue(this.accept)
-            }
+            UserViewData(userId, miCore, viewModelScope)
         }
 
-        mUserMap.putAll(
-            listUserViewDataList.map{
-                it.userId to it
+        val list = listUserViewDataList.mapNotNull {
+            (it.userId ?: it.user.value?.id)?.let { id ->
+                id to it
             }
+        }.toMap()
+        mUserMap.putAll(
+            list
         )
         mListUsers.postValue(mUserMap.values.toList())
     }
 
-    private fun onPushedUser(account: Account, userId: String){
-        val newUser = UserViewData(userId)
+    private fun onPushedUser(userId: User.Id){
+        val newUser = UserViewData(userId, miCore, viewModelScope, Dispatchers.IO)
         mUserMap[userId] = newUser
-        loadAndPutUser(account, newUser)
         adaptUsers()
 
         updateEvents.add(UserListEvent(
-            account = account,
             userListId = listId,
             userId = userId,
             type = UserListEvent.Type.PUSH_USER
         ))
     }
 
-    private fun onPulledUser(account: Account, userId: String){
+    private fun onPulledUser(userId: User.Id){
         mUserMap.remove(userId)
         adaptUsers()
 
         updateEvents.add(UserListEvent(
-            account = account,
             userListId = listId,
             userId = userId,
             type = UserListEvent.Type.PULL_USER
@@ -235,16 +201,14 @@ class UserListDetailViewModel(
     }
 
 
-    private fun loadAndPutUser(account: Account, user: UserViewData){
-        miCore.getMisskeyAPI(account).showUser(
-            RequestUser(
-                i = account.getI(miCore.getEncryption()),
-                userId = user.userId
-            )).enqueue(user.accept)
-    }
+
 
     private fun adaptUsers(){
         mListUsers.postValue(mUserMap.values.toList())
+    }
+
+    private suspend fun getAccount(): Account {
+        return miCore.getAccountRepository().get(listId.accountId)
     }
 
 }

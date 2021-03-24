@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -31,6 +32,9 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
 import kotlinx.android.synthetic.main.activity_drive.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class DriveActivity : AppCompatActivity() {
     companion object{
@@ -77,7 +81,7 @@ class DriveActivity : AppCompatActivity() {
         }
 
         val miApplication = applicationContext as MiApplication
-        miApplication.getCurrentAccount().observe(this, Observer {
+        miApplication.getCurrentAccount().filterNotNull().onEach {
             val driveViewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
             mDriveViewModel = driveViewModel
             mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
@@ -109,7 +113,7 @@ class DriveActivity : AppCompatActivity() {
             driveViewModel.openFileEvent.observe(this, Observer {
                 // TODO ファイルの詳細を開く
             })
-        })
+        }.launchIn(lifecycleScope)
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()

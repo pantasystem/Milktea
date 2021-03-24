@@ -49,8 +49,8 @@
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
                         tools:srcCompat="@drawable/ic_follow"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription"
+                        app:tint="?attr/colorNoteActionButtonTint" />
 
                 <ImageView
                         android:id="@+id/reactionImage"
@@ -98,7 +98,7 @@
                         android:layout_height="wrap_content"
                         tools:text="16min"
                         android:singleLine="true"
-                        app:elapsedTime="@{notification.notification.createdAt}"
+                        app:elapsedTime="@{notification.notification.notification.createdAt}"
                         android:layout_gravity="center"/>
             </LinearLayout>
             <FrameLayout

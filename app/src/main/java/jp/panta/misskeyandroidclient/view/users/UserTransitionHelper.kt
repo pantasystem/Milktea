@@ -7,6 +7,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.UserDetailActivity
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 
@@ -18,8 +19,7 @@ object UserTransitionHelper {
         user?: return
         this.setOnClickListener { view ->
             val context = view.context
-            val intent = Intent(context, UserDetailActivity::class.java)
-            intent.putExtra(UserDetailActivity.EXTRA_USER_ID, user.id)
+            val intent = UserDetailActivity.newInstance(context, userId = user.id)
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
 

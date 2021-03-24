@@ -1,14 +1,11 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.page
 
-import android.content.Context
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.PageType
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.v12.antenna.Antenna
-import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
+import jp.panta.misskeyandroidclient.api.list.UserListDTO
+import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.antenna.Antenna
 
 class PageableTemplate(val account: Account?) {
     fun globalTimeline(title: String): Page{
@@ -24,7 +21,7 @@ class PageableTemplate(val account: Account?) {
 
     fun userListTimeline(listId: String) = Pageable.UserListTimeline(listId = listId)
 
-    fun userListTimeline(userList: UserList): Page{
+    fun userListTimeline(userList: UserListDTO): Page{
         return Page(account?.accountId?: - 1, userList.name, 0,  Pageable.UserListTimeline(userList.id))
     }
     fun mention(title: String): Page{
@@ -45,7 +42,7 @@ class PageableTemplate(val account: Account?) {
     fun user(userId: String, title: String): Page{
         return Page(account?.accountId?: - 1, title, 0, Pageable.UserTimeline(userId))
     }
-    fun user(user: User, isUserNameDefault: Boolean): Page{
+    fun user(user: UserDTO, isUserNameDefault: Boolean): Page{
         val title = if(isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
         return Page(account?.accountId?: - 1, title, 0, Pageable.UserTimeline(userId = user.id))
     }
@@ -56,7 +53,7 @@ class PageableTemplate(val account: Account?) {
         return Page(account?.accountId?: - 1, title, 0, Pageable.Antenna(antennaId))
     }
     fun antenna(antenna: Antenna): Page{
-        return Page(account?.accountId?: - 1, antenna.name, 0, Pageable.Antenna(antenna.id))
+        return Page(antenna.id.accountId, antenna.name, 0, Pageable.Antenna(antenna.id.antennaId))
     }
 
 

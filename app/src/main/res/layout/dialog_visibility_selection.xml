@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         >
     <data>
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
-        <import type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask.Visibility"/>
+        <import type="jp.panta.misskeyandroidclient.model.notes.Visibility"/>
         <variable
                 name="noteEditorViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
@@ -15,10 +16,11 @@
             android:text="@string/local_only"
             android:layout_marginTop="8dp"
             android:enabled="@{ SafeUnbox.unbox(noteEditorViewModel.isLocalOnlyEnabled) }"
-            android:checked="@={ SafeUnbox.unbox(noteEditorViewModel.isLocalOnly) }"
+            android:checked="@{ SafeUnbox.unbox(noteEditorViewModel.isLocalOnly) }"
+            android:onClick="@{()-> noteEditorViewModel.toggleLocalOnly()}"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:textColor="@android:color/white"
-            />
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 </layout>

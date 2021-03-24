@@ -183,7 +183,7 @@
                     android:text="@string/save"
                     android:layout_marginEnd="16dp"
                     app:icon="@drawable/ic_save_black_24dp"
-                    android:onClick="@{ ()-> antennaEditorViewModel.addRemote() }"/>
+                    android:onClick="@{ ()-> antennaEditorViewModel.createOrUpdate() }"/>
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -51,7 +51,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
                     tools:text="message"
-                    android:text='@{historyViewData.message.text ?? ""}'
+                    android:text='@{historyViewData.message.message.text ?? ""}'
                     android:layout_toStartOf="@id/unread_message_badge"
                     />
             <ImageView
@@ -80,7 +80,7 @@
                     android:id="@+id/updated_at"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    app:elapsedTime="@{historyViewData.message.createdAt}"
+                    app:elapsedTime="@{historyViewData.message.message.createdAt}"
                     tools:text="13m"
                     android:layout_below="@id/history_message"
                     android:layout_toEndOf="@id/message_image"

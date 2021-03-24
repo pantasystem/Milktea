@@ -1,0 +1,8 @@
+package jp.panta.misskeyandroidclient.model.notes.reaction
+
+import java.io.Serializable
+
+data class ReactionCount(
+    val reaction: String,
+    val count: Int
+) : Serializable

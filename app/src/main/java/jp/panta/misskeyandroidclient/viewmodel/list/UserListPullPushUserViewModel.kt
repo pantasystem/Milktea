@@ -4,14 +4,13 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.list.ListUserOperation
+import jp.panta.misskeyandroidclient.api.list.ListUserOperation
 import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,8 +23,8 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
 
     data class Event(
         val type: Type,
-        val userId: String,
-        val listId: String
+        val userId: User.Id,
+        val listId: UserList.Id
     )
 
     @Suppress("UNCHECKED_CAST")
@@ -41,7 +40,7 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
     val pullPushEvent: Observable<Event> = subject
 
 
-    fun toggle(userList: UserList, userId: String){
+    fun toggle(userList: UserList, userId: User.Id){
         val account = miCore.getCurrentAccount().value
         if(account == null){
             Log.w(this.javaClass.simpleName, "Accountを見つけることができなかった処理を中断する")
@@ -65,7 +64,7 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
         }
 
         api.invoke(
-            ListUserOperation(i = account.getI(miCore.getEncryption())!!, listId = userList.id, userId = userId)
+            ListUserOperation(i = account.getI(miCore.getEncryption()), listId = userList.id.userListId, userId = userId.id)
         ).enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if(response.code() in 200 until 300){

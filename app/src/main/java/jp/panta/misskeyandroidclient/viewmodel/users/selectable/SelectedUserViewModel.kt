@@ -1,22 +1,21 @@
 package jp.panta.misskeyandroidclient.viewmodel.users.selectable
 
-import android.util.Log
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.users.RequestUser
+import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
-import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
+import java.io.Serializable
 
 
 class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,
-    val exSelectedUserIds: List<String> = emptyList(),
+    val exSelectedUserIds: List<User.Id> = emptyList(),
     val exSelectedUsers: List<User> = emptyList()
 ) : ViewModel(){
 
@@ -24,7 +23,7 @@ class SelectedUserViewModel(
     class Factory(
         val miCore: MiCore,
         val selectableSize: Int,
-        val selectedUserIds: List<String>?,
+        val selectedUserIds: List<User.Id>?,
         val selectedUsers: List<User>?
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -39,23 +38,19 @@ class SelectedUserViewModel(
 
 
     data class ChangedDiffResult(
-        val selected: List<String>,
-        val added: List<String>,
-        val removed: List<String>
-    )
+        val selected: List<User.Id>,
+        val added: List<User.Id>,
+        val removed: List<User.Id>,
+        val selectedUsers: List<User>
+    ) : Serializable
 
-    private val mSelectedUserIdUserMap: HashMap<String, UserViewData>
+    private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
 
-    val selectedUsers = UsersLiveData().apply{
-        addSource(miCore.getCurrentAccount()){
-            it?.let{ ar ->
-                setMainCapture(miCore.getMainCapture(ar))
-            }
-        }
-    }
-    val selectedUserIds = MediatorLiveData<Set<String>>().apply{
+    val selectedUsers = MediatorLiveData<List<UserViewData>>()
+
+    val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
         addSource(selectedUsers){
-            value = it.map{ uv ->
+            value = it.mapNotNull{ uv ->
                 uv.userId
             }.toSet()
         }
@@ -69,27 +64,20 @@ class SelectedUserViewModel(
 
 
     init{
-        val usersMap = HashMap<String, UserViewData>()
-
-        val misskeyAPI = miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!)
+        val usersMap = HashMap<User.Id, UserViewData>()
 
         val srcUser = exSelectedUsers.map{
-            it.id to UserViewData(it)
+            it.id to UserViewData(it, miCore, viewModelScope)
         }
 
         usersMap.putAll(srcUser)
 
         val srcUserId = exSelectedUserIds.mapNotNull{
-            val call = misskeyAPI.showUser(RequestUser(
-                i = miCore.getCurrentAccount().value?.getI(miCore.getEncryption()),
-                userId = it
-            ))
+
             if(usersMap.containsKey(it)){
                 null
             }else{
-                it to UserViewData(it).apply{
-                    call.enqueue(accept)
-                }
+                it to UserViewData(it, miCore, viewModelScope)
             }
 
         }
@@ -103,7 +91,7 @@ class SelectedUserViewModel(
     fun selectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
-            mSelectedUserIdUserMap[user.id] = UserViewData(user)
+            mSelectedUserIdUserMap[user.id] = UserViewData(user, miCore, viewModelScope)
             selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
@@ -140,7 +128,7 @@ class SelectedUserViewModel(
         val selectedBeforeUsers = exSelectedUsers.map{
             it.id
         }.toSet()
-        val exSelected = HashSet<String>().apply{
+        val exSelected = HashSet<User.Id>().apply{
             addAll(selectedBeforeIds)
             addAll(selectedBeforeUsers)
         }
@@ -148,6 +136,10 @@ class SelectedUserViewModel(
         val selected = selectedUsers.value?.map{
             it.userId
         }?: emptyList()
+
+        val selectedUsers = selectedUsers.value?.mapNotNull {
+            it.user.value
+        } ?: emptyList<User>()
 
 
 
@@ -158,6 +150,6 @@ class SelectedUserViewModel(
         val removed = exSelected.filter{ ex ->
             !selected.contains(ex)
         }
-        return ChangedDiffResult(selected.toList(), added, removed)
+        return ChangedDiffResult(selected.filterNotNull().toList(), added.filterNotNull(), removed, selectedUsers)
     }
 }

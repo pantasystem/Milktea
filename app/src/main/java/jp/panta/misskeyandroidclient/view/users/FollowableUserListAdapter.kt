@@ -33,7 +33,9 @@ class FollowableUserListAdapter(
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.userViewData = getItem(position)
+        getItem(position).user.observe(viewLifecycleOwner) {
+            holder.binding.user = it
+        }
         holder.binding.lifecycleOwner = viewLifecycleOwner
         holder.binding.showUserDetails = showUserDetails
         holder.binding.toggleFollowViewModel = toggleFollowViewModel

@@ -1,44 +1,70 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
-import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.api.notes.toEntities
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.users.RequestUser
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.lang.IndexOutOfBoundsException
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
+@ExperimentalCoroutinesApi
 class UserDetailViewModel(
-    val account: Account,
-    val misskeyAPI: MisskeyAPI,
-    val userId: String?,
-    val fqcnUserName: String?,
-    val encryption: Encryption,
-    val miCore: MiCore
+    val userId: User.Id?,
+    val fqdnUserName: String?,
+    val miCore: MiCore,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val encryption: Encryption = miCore.getEncryption()
 ) : ViewModel(){
-    val tag=  "userDetailViewModel"
+    private val logger = miCore.loggerFactory.create("UserDetailViewModel")
 
-    val user = MutableLiveData<User>()
-    val isMine = account.remoteId == userId
-
-    val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply{
-        addSource(user){
-            this.value = it.pinnedNotes?.map{note ->
-                PlaneNoteViewData(note, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
-            }
-        }
+    val user = MutableLiveData<User.Detail>()
+    private val userState = MutableStateFlow<User.Detail?>(null).apply {
+        filterNotNull().onEach {
+            user.postValue(it)
+        }.launchIn(viewModelScope)
     }
+
+
+    private val pinNotesState = userState.filterNotNull().map {
+        it.pinnedNoteIds?.map { id ->
+            miCore.getNoteDataSource().get(id)
+        }?: emptyList()
+    }
+
+    val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
+
+        pinNotesState.map{ notes ->
+            notes.map { note ->
+                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(note), getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            }
+        }.onEach {
+            this.postValue(it)
+
+        }.flatMapLatest {
+            it.map {  n ->
+                n.eventFlow
+            }.merge()
+        }.launchIn(viewModelScope + dispatcher)
+    }
+
+    val isMine = MutableLiveData<Boolean>()
+    private val isMeState = userState.filterNotNull().map {
+        miCore.getAccountRepository().get(it.id.accountId).remoteId == it.id.id
+    }.onEach {
+        isMine.postValue(it)
+    }.launchIn(viewModelScope + Dispatchers.IO)
 
     val isFollowing = MediatorLiveData<Boolean>().apply{
         addSource(user){
@@ -74,9 +100,9 @@ class UserDetailViewModel(
     }
 
     val isMuted = MediatorLiveData<Boolean>().apply{
-        value = user.value?.isMuted?: false
+        value = user.value?.isMuting?: false
         addSource(user){
-            value = it.isMuted
+            value = it.isMuting
         }
     }
 
@@ -88,66 +114,54 @@ class UserDetailViewModel(
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
 
+    init {
+        userState.filterNotNull().flatMapLatest {
+            miCore.getUserRepositoryEventToFlow().from(it.id)
+        }.map {
+            miCore.getUserRepository().find(it.userId) as? User.Detail
+        }.filterNotNull().onEach {
+            userState.value = it
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
+
     fun load(){
-        val userNameList = fqcnUserName?.split("@")?.filter{
-            it.isNotBlank()
-        }
-        Log.d(tag, "userNameList:$userNameList, fqcnUserName:$fqcnUserName")
-        val userName = userNameList?.firstOrNull()
-        val host = try{
-            userNameList?.get(1)
-        }catch(e: IndexOutOfBoundsException){
-            null
-        }
-        misskeyAPI.showUser(
-            RequestUser(
-                i = account.getI(encryption)!!,
-                userId = userId,
-                userName = userName,
-                host = host
-            )
-        ).enqueue(object : Callback<User>{
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                val user = response.body()
-                if(user != null){
-                    this@UserDetailViewModel.user.postValue(user)
-                }else{
-                    Log.d(tag, "ユーザーの読み込みに失敗しました, userId:$userId, userName: $userName, host: $host")
+        viewModelScope.launch(dispatcher) {
+            var user = userId?.let { miCore.getUserRepository().find(userId, true) }
+            if(user == null){
+                user = fqdnUserName?.let {
+                    val account = getAccount()
+                    val userNameAndHost = fqdnUserName.split("@").filter{ it.isNotBlank() }
+                    val userName = userNameAndHost[1]
+                    val host = userNameAndHost.lastOrNull()
+                    miCore.getUserRepository().findByUserName(account.accountId, userName, host)
                 }
             }
 
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                Log.e(tag, "ユーザーの読み込みに失敗しました", t)
-            }
-        })
+
+            userState.value = user as? User.Detail
+
+        }
+
     }
 
     fun changeFollow(){
-        val isFollowing = isFollowing.value?: false
-        if(isFollowing){
-            misskeyAPI.unFollowUser(RequestUser(account.getI(encryption)!!, userId = userId)).enqueue(
-                object : Callback<User>{
-                    override fun onResponse(call: Call<User>, response: Response<User>) {
-                        if(response.code() == 200){
-                            this@UserDetailViewModel.isFollowing.postValue(false)
-                        }
+        viewModelScope.launch(Dispatchers.IO) {
+            userState.value?.let{
+                runCatching {
+                    val user = miCore.getUserRepository().find(it.id) as User.Detail
+                    if(user.isFollowing) {
+                        miCore.getUserRepository().unfollow(user.id)
+                    }else{
+                        miCore.getUserRepository().follow(user.id)
                     }
+                    miCore.getUserRepository().find(user.id) as User.Detail
+                }.onSuccess {
+                    userState.value = it
+                }.onFailure {
+                    logger.error("unmute", e = it)
+                }
+            }
 
-                    override fun onFailure(call: Call<User>, t: Throwable) {
-                    }
-                }
-            )
-        }else{
-            misskeyAPI.followUser(RequestUser(account.getI(encryption)!!, userId = userId)).enqueue(object : Callback<User>{
-                override fun onResponse(call: Call<User>, response: Response<User>) {
-                    if(response.code() == 200){
-                        this@UserDetailViewModel.isFollowing.postValue(true)
-                    }
-                }
-
-                override fun onFailure(call: Call<User>, t: Throwable) {
-                }
-            })
         }
     }
 
@@ -160,38 +174,74 @@ class UserDetailViewModel(
     }
 
     fun mute(){
-       sendUserIdAndStateChange(misskeyAPI::muteUser, isMuted, true, 204)
+        viewModelScope.launch(Dispatchers.IO) {
+            userState.value?.let{
+                runCatching {
+                    miCore.getUserRepository().mute(it.id)
+                    miCore.getUserRepository().find(it.id, true) as User.Detail
+                }.onSuccess {
+                    userState.value = it
+                }.onFailure {
+                    logger.error("unmute", e = it)
+                }
+            }
+        }
     }
 
     fun unmute(){
-        sendUserIdAndStateChange(misskeyAPI::unmuteUser, isMuted, false, 204)
+        viewModelScope.launch(Dispatchers.IO) {
+            userState.value?.let{
+                runCatching {
+                    miCore.getUserRepository().unmute(it.id)
+                    miCore.getUserRepository().find(it.id, true) as User.Detail
+                }.onSuccess {
+                    userState.value = it
+                }.onFailure {
+                    logger.error("unmute", e = it)
+                }
+            }
+        }
     }
 
     fun block(){
-        sendUserIdAndStateChange(misskeyAPI::blockUser, isBlocking, true, 200)
+        viewModelScope.launch(Dispatchers.IO) {
+            userState.value?.let{
+                runCatching {
+                    miCore.getUserRepository().block(it.id)
+                    (miCore.getUserRepository().find(it.id, true) as User.Detail)
+                }.onSuccess {
+                    userState.value = it
+                }
+            }
+        }
     }
 
     fun unblock(){
-        sendUserIdAndStateChange(misskeyAPI::unblockUser, isBlocking, false, 200)
-    }
-
-    private fun sendUserIdAndStateChange(apiFunction: (RequestUser)->Call<Unit>, liveData: MediatorLiveData<Boolean>, valueOnSuccess: Boolean, codeOnSuccess: Int){
-        apiFunction(createUserIdOnlyRequest()).enqueue(object :Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() == codeOnSuccess){
-                    liveData.postValue(valueOnSuccess)
-                }else{
-                    Log.d(tag, "失敗しました, code:${response.code()}")
+        viewModelScope.launch(Dispatchers.IO) {
+            userState.value?.let{
+                runCatching {
+                    miCore.getUserRepository().unblock(it.id)
+                    (miCore.getUserRepository().find(it.id, true) as User.Detail)
+                }.onSuccess {
+                    userState.value = it
                 }
             }
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-            }
-        })
+        }
     }
 
-    private fun createUserIdOnlyRequest(): RequestUser{
-        return RequestUser(i = account.getI(encryption)!!, userId = userId)
-    }
 
+    var mAc: Account? = null
+    private suspend fun getAccount(): Account {
+        if(mAc != null) {
+            return mAc!!
+        }
+        if(userId != null) {
+            mAc = miCore.getAccountRepository().get(userId.accountId)
+            return mAc!!
+        }
+
+        mAc = miCore.getAccountRepository().getCurrentAccount()
+        return mAc!!
+    }
 
 }

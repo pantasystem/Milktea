@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
+import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+
 data class TimelineState(
     val notes: List<PlaneNoteViewData>,
     val state: State
@@ -30,7 +32,7 @@ data class TimelineState(
         var index = 0
         val list = ArrayList<String>()
         while(index < notes.size && list.size < size){
-            if(notes[index].note.tmpFeaturedId.isNullOrBlank()){
+            if(notes[index].note is NoteRelation.Normal){
                 list.add(notes[index].getRequestId())
             }
             index ++
@@ -47,7 +49,7 @@ data class TimelineState(
         var counter = 0
         val list = ArrayList<String>()
         while(notes.size - counter - 1>= 0 && list.size < size){
-            if(notes[notes.size - 1 - counter].note.tmpFeaturedId.isNullOrBlank()){
+            if(notes[notes.size - 1 - counter].note is NoteRelation.Normal){
                 list.add(notes[notes.size - 1 - counter].getRequestId())
             }
             counter ++

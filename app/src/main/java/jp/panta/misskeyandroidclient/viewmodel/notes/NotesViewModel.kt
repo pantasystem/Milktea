@@ -4,16 +4,15 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.notes.State
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -24,10 +23,10 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
 
 class NotesViewModel(
     val miCore: MiCore,
@@ -101,24 +100,24 @@ class NotesViewModel(
     }
 
     fun postRenote(){
-        val renoteId = reNoteTarget.event?.toShowNote?.id
-        if(renoteId != null){
-            val request = CreateNote(i = getAccount()?.getI(encryption)!!, text = null, renoteId = renoteId)
-            getMisskeyAPI()?.create(request)?.enqueue(object : Callback<CreateNote.Response>{
-                override fun onResponse(
-                    call: Call<CreateNote.Response>,
-                    response: Response<CreateNote.Response>
-                ) {
+        val renoteId = reNoteTarget.event?.toShowNote?.note?.id
+            ?:return
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val author = miCore.getAccountRepository().get(renoteId.accountId)
+                miCore.getNoteRepository().create(CreateNote(renoteId = renoteId, text = null, visibility = Visibility.Public(true), author = author))
+            }.onSuccess {
+                withContext(Dispatchers.Main) {
                     statusMessage.event = "renoteしました"
-
                 }
-                override fun onFailure(call: Call<CreateNote.Response>, t: Throwable) {
+            }.onFailure {
+                withContext(Dispatchers.Main) {
                     errorStatusMessage.event = "renote失敗しました"
-
                 }
+            }
 
-            })
         }
+
     }
 
     fun putQuoteRenoteTarget(){
@@ -164,29 +163,23 @@ class NotesViewModel(
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String){
         val myReaction = planeNoteViewData.myReaction.value
 
+
         viewModelScope.launch(Dispatchers.IO){
             //リアクション解除処理をする
             submittedNotesOnReaction.event = planeNoteViewData
             Log.d("NotesViewModel", "postReaction(n, n)")
-            try{
-                if(myReaction != null){
-                    syncDeleteReaction(planeNoteViewData)
-                }
-                if(reaction == myReaction){
-                    return@launch
-                }
-                val res = getMisskeyAPI()?.createReaction(CreateReaction(
-                    i = getAccount()?.getI(encryption)!!,
-                    reaction = reaction,
-                    noteId = planeNoteViewData.toShowNote.id
-                ))?.execute()
-                if(res?.code() in 200 until 300){
+            runCatching {
+                val result = miCore.getNoteRepository().reaction(
+                    CreateReaction(
+                        noteId = planeNoteViewData.toShowNote.note.id,
+                        reaction = reaction
+                    )
+                )
+                if(result) {
                     syncAddReactionHistory(reaction)
                 }
-                Log.d("NotesViewModel", "結果: $res")
-            }catch(e: Exception){
-                Log.e("NotesViewModel", "postReaction error", e)
             }
+
 
         }
     }
@@ -195,12 +188,9 @@ class NotesViewModel(
      * 同期リアクション削除
      * 既にリアクションが含まれている場合のみ実行される
      */
-    private fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
+    private suspend fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
         planeNoteViewData.myReaction.value?: return
-        getMisskeyAPI()?.deleteReaction(DeleteNote(
-            i = getAccount()?.getI(encryption)!!,
-            noteId = planeNoteViewData.toShowNote.id
-        ))?.execute()
+        miCore.getNoteRepository().unreaction(planeNoteViewData.toShowNote.note.id)
     }
 
     private fun syncAddReactionHistory(reaction: String){
@@ -218,7 +208,7 @@ class NotesViewModel(
         getMisskeyAPI()?.createFavorite(
             NoteRequest(
                 i = getAccount()?.getI(encryption)!!,
-                noteId = note.toShowNote.id
+                noteId = note.toShowNote.note.id.noteId
             )
         )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -239,7 +229,7 @@ class NotesViewModel(
         getMisskeyAPI()?.deleteFavorite(
             NoteRequest(
                 i = getAccount()?.getI(encryption)!!,
-                noteId = note.toShowNote.id
+                noteId = note.toShowNote.note.id.noteId
             )
         )?.enqueue(object : Callback<Unit>{
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
@@ -255,70 +245,61 @@ class NotesViewModel(
     }
 
 
-    fun removeNote(note: Note){
-        getMisskeyAPI()?.delete(
-            DeleteNote(
-                i = getAccount()?.getI(encryption)!!,
-                noteId = note.id
-            )
-        )?.enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                Log.d(TAG, "削除に成功しました")
-                if(response.code() == 204){
+    fun removeNote(noteId: Note.Id){
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                miCore.getNoteRepository().delete(noteId)
+            }.onSuccess {
+                withContext(Dispatchers.Main) {
                     statusMessage.event = "削除に成功しました"
                 }
             }
+        }
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.d(TAG, "削除に失敗しました")
-            }
-        })
     }
 
     fun removeAndEditNote(note: Note){
-        getMisskeyAPI()?.delete(
-            DeleteNote(
-                i = getAccount()?.getI(encryption)!!,
-                noteId = note.id
-            )
-        )?.enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                miCore.getNoteRepository().delete(note.id)
+            }.onSuccess {
+                if(it) {
                     openNoteEditor.event = note
                 }
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
+            }.onFailure { t ->
                 Log.e(TAG, "削除に失敗しました", t)
+
             }
-        })
+        }
+
     }
 
     fun unRenote(planeNoteViewData: PlaneNoteViewData){
         if(planeNoteViewData.isRenotedByMe){
-            getMisskeyAPI()?.delete(
-                DeleteNote(i = getAccount()?.getI(miCore.getEncryption())!!, noteId = planeNoteViewData.note.id)
-            )?.enqueue(object : Callback<Unit>{
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if(response.code() in 200 until 300){
-                        statusMessage.event = "削除に成功しました"
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    miCore.getNoteRepository().delete(planeNoteViewData.note.note.id)
+                }.onSuccess {
+                    if(it) {
+                        withContext(Dispatchers.IO) {
+                            statusMessage.event = "削除に成功しました"
+                        }
                     }
+                }.onFailure { t ->
+                    Log.d(TAG, "unrenote失敗", t)
                 }
+            }
 
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    Log.d(TAG, "unrenote失敗")
-                }
-            })
         }
 
     }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
-        getMisskeyAPI()?.noteState(NoteRequest(i = getAccount()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.id))
+        getMisskeyAPI()?.noteState(NoteRequest(i = getAccount()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.note.id.noteId))
             ?.enqueue(object : Callback<State>{
                 override fun onResponse(call: Call<State>, response: Response<State>) {
-                    val nowNoteId = shareTarget.event?.toShowNote?.id
-                    if(nowNoteId == planeNoteViewData.toShowNote.id){
+                    val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
+                    if(nowNoteId == planeNoteViewData.toShowNote.note.id.noteId){
                         val state = response.body()?: return
                         Log.d(TAG, "state: $state")
                         shareNoteState.postValue(state)

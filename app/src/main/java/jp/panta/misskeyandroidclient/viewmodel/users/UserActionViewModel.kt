@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import java.lang.IllegalArgumentException
 
@@ -18,9 +18,9 @@ class UserActionViewModel : ViewModel(){
         }
     }
 
-    val targetUser = EventBus<User>()
+    val targetUser = EventBus<UserDTO>()
 
-    fun setTargetToUser(user: User){
+    fun setTargetToUser(user: UserDTO){
         targetUser.event = user
     }
 

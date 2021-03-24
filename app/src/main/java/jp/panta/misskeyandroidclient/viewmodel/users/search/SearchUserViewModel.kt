@@ -1,20 +1,16 @@
 package jp.panta.misskeyandroidclient.viewmodel.users.search
 
-import android.util.Log
 import androidx.lifecycle.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
-import jp.panta.misskeyandroidclient.model.users.RequestUser
-import jp.panta.misskeyandroidclient.model.users.SearchByUserAndHost
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.api.users.SearchByUserAndHost
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import jp.panta.misskeyandroidclient.viewmodel.users.UsersLiveData
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 /**
@@ -25,6 +21,8 @@ class SearchUserViewModel(
     val miCore: MiCore,
     val hasDetail: Boolean?
 ) : ViewModel(){
+
+    private val logger = miCore.loggerFactory.create("SearchUserViewModel")
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val miCore: MiCore, val hasDetail: Boolean?) : ViewModelProvider.Factory{
@@ -41,7 +39,7 @@ class SearchUserViewModel(
 
     val isLoading = MutableLiveData<Boolean>()
 
-    private val users = object : UsersLiveData(){
+    private val users = object : MediatorLiveData<List<UserViewData>>(){
         override fun onActive() {
             super.onActive()
 
@@ -60,9 +58,7 @@ class SearchUserViewModel(
         addSource(host){
             search()
         }
-        addSource(miCore.getCurrentAccount()){
-            setMainCapture(miCore.getMainCapture(it))
-        }
+
     }
 
     private var mSearchByUserAndHost: SearchByUserAndHost? = null
@@ -88,25 +84,27 @@ class SearchUserViewModel(
     }
     fun search(request: RequestUser){
 
+        // TODO Service層などに切り出すなどをしてリファクタリングをする
+        viewModelScope.launch(Dispatchers.IO) {
+            val account = miCore.getAccountRepository().getCurrentAccount()
+            isLoading.postValue(true)
+            val resUsers = runCatching {
+                getSearchByUserAndHost()?.search(request)?.execute()?.body()
+            }.onFailure {
+                logger.error("request api/users/searchエラー", it)
+            }.getOrNull()?.map {
+                val u = it.toUser(account, isDetail = hasDetail?:false).also{ u ->
+                    miCore.getUserDataSource().add(u)
+                }
+                it.pinnedNotes?.forEach { dto ->
+                    miCore.getGetters().noteRelationGetter.get(account, dto)
+                }
+                UserViewData(u, miCore, viewModelScope)
+            }?: emptyList()
+            users.postValue(resUsers)
+            isLoading.postValue(false)
+        }
 
-        isLoading.postValue(true)
-        getSearchByUserAndHost()?.search(request)?.enqueue(object : Callback<List<User>> {
-            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                users.postValue(
-                    response.body()?.map{
-                        UserViewData(it)
-                    }
-                )
-                isLoading.postValue(false)
-
-
-            }
-
-            override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                Log.e("SearchUserViewModel", "search and select user error", t)
-                isLoading.postValue(false)
-            }
-        })
     }
 
     private fun getSearchByUserAndHost(): SearchByUserAndHost?{

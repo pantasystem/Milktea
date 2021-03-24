@@ -3,40 +3,53 @@ package jp.panta.misskeyandroidclient.viewmodel.messaging
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.UnReadMessageStore
+import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
+import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 
-class HistoryViewData (account: Account, message: Message, unReadMessageStore: UnReadMessageStore){
-    val messagingId = message.messagingId(account)
-    val message = MutableLiveData<Message>(message)
-    val id = message.id
-    val isGroup = message.group != null
-    val group = message.group
-    val partner = if(message.recipient?.id == account.remoteId){
-        message.user
-    }else{
-        message.recipient
+class HistoryViewData (account: Account, message: MessageRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope, coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO){
+    val messagingId = message.message.messagingId(account)
+    val message = MutableLiveData<MessageRelation>(message)
+    //val id = message.message.id
+    val isGroup = message is MessageRelation.Group
+    val group = (message as? MessageRelation.Group)?.group
+    val partner = (message as? MessageRelation.Direct)?.let {
+        if(message.recipient.id.id == account.remoteId){
+            message.user
+        }else{
+            message.recipient
+        }
     }
 
     val historyIcon = if(isGroup) {
-        message.user?.avatarUrl
+        message.user.avatarUrl
     }else{
         partner?.avatarUrl
     }
 
 
     val title = if(isGroup){
-        "${message.group?.name}"
+        "${group?.name}"
     }else{
         val host = partner?.host
         "@${partner?.userName}" + if(host != null) "@$host" else ""
     }
+    private val mUnreadMessages = MutableLiveData<List<Message>>()
+    val unreadMessages: LiveData<List<Message>> = mUnreadMessages
+    val unreadMessageCount = Transformations.map(mUnreadMessages){
+        it?.size?: 0
+    }
 
-    val unreadMessages = unReadMessageStore.getUnreadMessagesLiveData(messagingId)
-    val unreadMessageCount = Transformations.map(unreadMessages){
-        it.size
+    private val scope = coroutineScope + coroutineDispatcher
+    init {
+        scope.launch {
+            unReadMessages.findByMessagingId(messagingId).collect {
+                mUnreadMessages.postValue(it)
+            }
+        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -47,12 +60,15 @@ class HistoryViewData (account: Account, message: Message, unReadMessageStore: U
 
         if (messagingId != other.messagingId) return false
         if (message != other.message) return false
-        if (id != other.id) return false
         if (isGroup != other.isGroup) return false
         if (group != other.group) return false
         if (partner != other.partner) return false
         if (historyIcon != other.historyIcon) return false
         if (title != other.title) return false
+        if (mUnreadMessages != other.mUnreadMessages) return false
+        if (unreadMessages != other.unreadMessages) return false
+        if (unreadMessageCount != other.unreadMessageCount) return false
+        if (scope != other.scope) return false
 
         return true
     }
@@ -60,18 +76,16 @@ class HistoryViewData (account: Account, message: Message, unReadMessageStore: U
     override fun hashCode(): Int {
         var result = messagingId.hashCode()
         result = 31 * result + message.hashCode()
-        result = 31 * result + id.hashCode()
         result = 31 * result + isGroup.hashCode()
         result = 31 * result + (group?.hashCode() ?: 0)
         result = 31 * result + (partner?.hashCode() ?: 0)
         result = 31 * result + (historyIcon?.hashCode() ?: 0)
         result = 31 * result + title.hashCode()
+        result = 31 * result + mUnreadMessages.hashCode()
+        result = 31 * result + unreadMessages.hashCode()
+        result = 31 * result + unreadMessageCount.hashCode()
+        result = 31 * result + scope.hashCode()
         return result
     }
-
-    override fun toString(): String {
-        return "HistoryViewData(messagingId=$messagingId, message=$message, id='$id', isGroup=$isGroup, group=$group, partner=$partner, historyIcon=$historyIcon, title='$title')"
-    }
-
 
 }

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.auth
 
-import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.api.users.UserDTO
+import kotlinx.serialization.Serializable
 
-data class AccessToken(val accessToken: String, val user: User)
+@Serializable data class AccessToken(val accessToken: String, val user: UserDTO)
 

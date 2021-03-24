@@ -1,11 +1,16 @@
 package jp.panta.misskeyandroidclient.model.group
 
-import java.io.Serializable
+import jp.panta.misskeyandroidclient.model.Entity
+import jp.panta.misskeyandroidclient.model.EntityId
+import jp.panta.misskeyandroidclient.model.users.User
+import java.util.*
 
 data class Group(
-    val id: String,
-    val createdAt: String,
+    val id: Id,
+    val createdAt: Date,
     val name: String,
-    val ownerId: String?,
-    val userIds: List<String>?
-): Serializable
+    val ownerId: User.Id,
+    val userIds: List<User.Id>
+) : Entity {
+    data class Id(val accountId: Long, val groupId: String) : EntityId
+}

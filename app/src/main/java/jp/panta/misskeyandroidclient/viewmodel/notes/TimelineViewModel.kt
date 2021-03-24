@@ -2,440 +2,263 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.lifecycle.*
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import jp.panta.misskeyandroidclient.api.APIError
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.streming.TimelineCapture
-import jp.panta.misskeyandroidclient.model.streming.note.v2.NoteCapture
+import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePagingStore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.*
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.notes.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
+import kotlin.math.log
 
-class TimelineViewModel : ViewModel{
+@ExperimentalCoroutinesApi
+class TimelineViewModel(
+    val account: Account?,
+    val accountId: Long? = account?.accountId,
+    val pageable: Pageable,
+    val miCore: MiCore,
+    val settingStore: SettingStore,
+    val include: NoteRequest.Include
+) : ViewModel(){
+
     data class Request(
         val sinceId: String? = null,
         val untilId: String? = null,
         var substitute: Request? = null
-    ){
-        companion object{
-            @JvmStatic
-            fun makeUntilIdRequest(timelineState: TimelineState?, substituteSize: Int = 2): Request?{
-                val ids = timelineState?.getUntilIds(substituteSize)
-                return makeUntilIdRequest(ids?: emptyList())
-            }
+    )
 
-            @JvmStatic
-            private fun makeUntilIdRequest(ids: List<String>, index: Int = 0): Request?{
-                if(ids.size <= index){
-                    return null
-                }
-                val now = Request(
-                    untilId = ids[index]
-                )
-                now.substitute = makeUntilIdRequest(ids,index + 1)
-                return now
-            }
 
-            @JvmStatic
-            fun makeSinceIdRequest(timelineState: TimelineState?, substituteSize: Int = 2): Request?{
-                return makeSinceIdRequest(
-                    timelineState?.getSinceIds(substituteSize)?: emptyList()
-                )
-            }
-
-            @JvmStatic
-            private fun makeSinceIdRequest(ids: List<String>, index: Int = 0): Request?{
-                if(ids.size <= index){
-                    return null
-                }
-                val now = Request(
-                    sinceId = ids[index]
-                )
-                now.substitute = makeUntilIdRequest(ids,index + 1)
-                return now
-            }
-        }
-
-    }
-
-    enum class Errors{
-        AUTHENTICATION,
-        I_AM_AI,
-        SERVER_ERROR,
-        PARAMETER_ERROR,
-        NETWORK,
-        TIMEOUT
-    }
 
     val tag = "TimelineViewModel"
-    val errorState = MutableLiveData<Errors>()
+    private val mErrorEvent = MutableSharedFlow<Exception>()
+    val errorEvent: SharedFlow<Exception> = mErrorEvent
 
-
-    private var noteCapture: NoteCapture? = null
-    private var noteCaptureClient: NoteCapture.Client? = null
-
-    private var timelineCapture: TimelineCapture? = null
-    //private var noteRepository: NoteRepository? = null
-    private var noteEventStore: NoteEventStore? = null
-
+    private val accountRepository = miCore.getAccountRepository()
 
     val position = MutableLiveData<Int>()
 
-    private var notePagingStore: NotePagedStore? = null
+    private var mNoteIds = HashSet<Note.Id>()
 
-    private var isInitialized: Boolean = false
-
-    private val usingAccount = MediatorLiveData<Account>()
-
-
-    /**
-     * このViewModelに紐づけられたAccountです。
-     * 特にアカウントが紐づけられていない場合はNullになります。
-     */
-    private var reservedAccount: Account? = null
-
-    var misskeyAPI: MisskeyAPI? = null
-        private set
-
-    val miCore: MiCore
-
-    val settingStore: SettingStore
-
-    val include: NoteRequest.Include
-
-    val pageable: Pageable
-
-    private val mCompositeDisposable = CompositeDisposable()
-
-    private var stoppedAt: Date = Date()
-    private var mNoteEventDisposable: Disposable? = null
-
-    constructor(page: Page, miCore: MiCore, include: NoteRequest.Include)
-            : this(page.pageable(),miCore, include) {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try{
-                val account = try{
-                    miCore.getAccount(page.accountId)
-                }catch(e: AccountNotFoundException){
-                    miCore.getCurrentAccount().value
-                }?: return@launch
-
-                this@TimelineViewModel.reservedAccount = account
-                applyAccount(account, page.pageable())
-
-                isInitialized = true
-            }catch(e: AccountNotFoundException){
-
-            }
-        }
-    }
-    constructor(pageable: Pageable, miCore: MiCore, account: Account?, include: NoteRequest.Include)
-            : this(pageable, miCore, include){
-        usingAccount.postValue(account)
-        this.reservedAccount = account
-    }
-
-    constructor(pageable: Pageable, miCore: MiCore, include: NoteRequest.Include) : super(){
-        this.miCore = miCore
-        this.settingStore = miCore.getSettingStore()
-        this.include = include
-        this.pageable = pageable
-        usingAccount.addSource(miCore.getCurrentAccount()){ current ->
-            if(reservedAccount == null || reservedAccount?.accountId == current.accountId){
-                Log.d("TimelineVM", "アカウント初期化: $current,")
-                usingAccount.postValue(current)
-                applyAccount(current, pageable)
-            }
-        }
-
-    }
-
-    /**
-     * アカウントを変数やデータストアやイベントストリームなどに適応し
-     * 状態を初期化します
-     */
-    private fun applyAccount(account: Account, pageable: Pageable){
-        Log.d("TimelineVM", "pageable:$pageable, param:${pageable.toParams()}")
-
-        if(mBeforeAccount != null){
-            noteCaptureClient?.let{
-                noteCapture?.detachClient(it)
-            }
-        }
-        timelineCapture = if(settingStore.isAutoLoadTimeline){
-            miCore.getTimelineCapture(account)
-        }else{
-            null
-        }
-
-        noteCapture = miCore.getNoteCapture(account)
-        noteCaptureClient = NoteCapture.Client()
-        //noteCapture?.addNoteDeletedListener(mNoteDeletedListener)
-        noteEventStore = miCore.getNoteEventStore(account)
-        notePagingStore = when(pageable){
-            is Pageable.Favorite -> FavoriteNotePagingStore(account, pageable, miCore)
-            else -> NoteTimelineStore(
-                account,
-                pageable,
-                include,
-                miCore
-            )
-        }
-
-        misskeyAPI = miCore.getMisskeyAPI(account)
-        loadInit()
-
-
-
-        noteEventStore?.getEventStream()
-        //this.account = account
-
-    }
-
-    private var mNoteIds = HashSet<String>()
-
-    private var isActive: Boolean = false
-    private var mBeforeAccount: Account? = null
-    private val timelineLiveData = object : MediatorLiveData<TimelineState>(){
-        override fun onActive() {
-            super.onActive()
-
-            active(this.value?.notes)
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-
-            inactive()
-        }
-
-    }.apply{
-        addSource(usingAccount){ using ->
-            if(isActive){
-                startNoteCapture()
-            }
-            if( using != mBeforeAccount || value?.notes.isNullOrEmpty()){
-                loadInit()
-            }
-            mBeforeAccount = using
-        }
-    }
-
-    private fun active(notes: List<PlaneNoteViewData>?){
-        isActive = true
-
-        if(!settingStore.isUpdateTimelineInBackground){
-            startNoteCapture()
-        }
-        if(isInitialized && notes.isNullOrEmpty()){
-            loadInit()
-        }
-    }
-
-    private fun inactive(){
-        isActive = false
-
-        if(settingStore.isAutoLoadTimeline){
-            stopTimelineCapture()
-        }
-    }
-
-    private var mObserver: TimelineCapture.TimelineObserver? = null
-
+    private val timelineLiveData = MediatorLiveData<TimelineState>()
 
 
     val isLoading = MutableLiveData<Boolean>()
     val isInitLoading = MutableLiveData<Boolean>()
+    private var mIsLoading: Boolean = false
+        set(value) {
+            field = value
+            isLoading.postValue(value)
+        }
+    private var mIsInitLoading: Boolean = false
+        set(value) {
+            field = value
+            isInitLoading.postValue(value)
+        }
 
-    private var isLoadingFlag = false
+
+    private val logger = miCore.loggerFactory.create("TimelineViewModel")
+
+    init {
+        flow {
+            emit(getAccount())
+        }.filter {
+            pageable is Pageable.GlobalTimeline
+                    || pageable is Pageable.HybridTimeline
+                    || pageable is Pageable.LocalTimeline
+                    || pageable is Pageable.HomeTimeline
+        }.flatMapLatest { account ->
+            when(pageable) {
+                is Pageable.GlobalTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.GLOBAL)
+                }
+                is Pageable.HybridTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.HYBRID)
+
+                }
+                is Pageable.LocalTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.LOCAL)
+
+                }
+                is Pageable.HomeTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.HOME)
+                }
+                else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
+            }
+        }.map {
+          it as? ChannelBody.ReceiveNote
+        }.filterNotNull().map{
+            miCore.getGetters().noteRelationGetter.get(getAccount(), it.body)
+        }.filter {
+           !mNoteIds.contains(it.note.id) && !this.mIsLoading
+        }.map{
+            PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+        }.onEach {
+            this.mNoteIds.add(it.id)
+            listOf(it).captureNotes()
+            val list = ArrayList<PlaneNoteViewData>(this.timelineLiveData.value?.notes?: emptyList<PlaneNoteViewData>())
+            list.add(0, it)
+            this.timelineLiveData.postValue(
+                TimelineState(
+                    state = TimelineState.State.RECEIVED_NEW,
+                    notes = list
+                )
+            )
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        loadInit()
+    }
 
 
 
-    fun getTimelineLiveData() : LiveData<TimelineState>{
+
+    fun getTimelineLiveData() : LiveData<TimelineState?>{
         return timelineLiveData
     }
 
     fun loadNew(){
-        Log.d("TimelineLiveData", "loadNew")
-        if( ! isLoadingFlag ){
-            isLoadingFlag = true
-            //val sinceId = observableTimelineList.firstOrNull()?.id
-            val request = Request.makeSinceIdRequest(timelineLiveData.value)
+        synchronized(timelineLiveData) {
+            logger.debug("loadNew")
+            if( mIsInitLoading || mIsLoading ) {
+                logger.debug("loadNewキャンセル")
+                return
+            }
+            mIsLoading = true
+            val request = timelineLiveData.value.makeSinceIdRequest()
+            logger.debug("makeSinceIdRequest完了:$request")
             if(request?.sinceId == null){
-                isLoadingFlag = false
-                isLoading.postValue(false)
+                mIsInitLoading = false
+                mIsLoading = false
+                logger.debug("初期読み込みへ移行")
                 return loadInit()
             }
-            viewModelScope.launch(Dispatchers.IO){
-                try{
+            logger.debug("判定準備完了 active:${viewModelScope.isActive}")
+            viewModelScope.launch(Dispatchers.IO) {
+                logger.debug("launch開始")
+                runCatching {
+                    logger.debug("読み込みを開始")
                     val res = syncLoad(request)
-                        ?: return@launch
-                    val list = res.second?.filter(::filterDuplicate)
-                    if(list.isNullOrEmpty()){
-                        return@launch
-                    }else{
-                        captureNotes(list)
-                        loadUrlPreviews(list)
+                    val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                    list.captureNotes()
+                    loadUrlPreviews(list)
 
-                        val state = timelineLiveData.value
-                        val newState = if(state == null){
-                            startTimelineCapture()
+                    val state = timelineLiveData.value
 
-                            TimelineState(
-                                list,
-                                TimelineState.State.LOAD_NEW
-                            )
-
-                        }else{
-                            if(settingStore.isAutoLoadTimeline && !settingStore.isUpdateTimelineInBackground && list.size < 20){
-                                startTimelineCapture()
-                            }
-                            val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
-                                addAll(0, list)
-                            }
-                            TimelineState(
-                                newList,
-                                TimelineState.State.LOAD_NEW
-                            )
-                        }
-
-                        mNoteIds.addAll(list.map(::mapId))
-
-                        timelineLiveData.postValue(newState)
+                    val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply {
+                        addAll(0, list)
                     }
-                } catch(e: IOException){
-                    errorState.postValue(Errors.NETWORK)
-                } catch(e: SocketTimeoutException){
-                    errorState.postValue(Errors.TIMEOUT)
-                } catch (e: Exception){
-                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
-                    errorState.postValue(Errors.NETWORK)
-                }finally {
-                    isLoading.postValue(false)
-                    isLoadingFlag = false
+                    mNoteIds.addAll(list.map(::mapId))
+                    TimelineState(
+                        newList,
+                        TimelineState.State.LOAD_NEW
+                    )
+                }.onSuccess {
+                    timelineLiveData.postValue(it)
+                }.onFailure {
+                    handleError(it)
                 }
-
+                mIsLoading = false
+                mIsInitLoading = false
             }
-
+        }.also {
+            logger.debug("job: active=${it.isActive}, completed=${it.isCompleted}, cancelled=${it.isCancelled}")
         }
+
+
     }
 
     fun loadOld(){
-        val request = Request.makeUntilIdRequest(timelineLiveData.value)
-        request?.untilId
-            ?: return loadInit()
-        if( isLoadingFlag){
-            return
-        }
-        isLoadingFlag = true
-        viewModelScope.launch(Dispatchers.IO){
-            try {
-                val res = syncLoad(request)
-                    ?: return@launch
-                val list = res.second?.filter(::filterDuplicate)
-                if(list.isNullOrEmpty()){
-                    return@launch
-                }else{
-                    captureNotes(list)
-                    loadUrlPreviews(list)
-                    val state = timelineLiveData.value
+        synchronized(timelineLiveData) {
+            val request = timelineLiveData.value.makeUntilIdRequest()
+            request?.untilId
+                ?: return loadInit()
+            if( mIsLoading || mIsInitLoading ){
+                return
+            }
+            mIsLoading = true
 
-                    val newState = if(state == null){
-                        TimelineState(
-                            list,
-                            TimelineState.State.LOAD_OLD
-                        )
-                    }else{
-                        val newList = ArrayList<PlaneNoteViewData>(state.notes).apply{
-                            addAll(list)
-                        }
-                        TimelineState(
-                            newList,
-                            TimelineState.State.LOAD_OLD
-                        )
-                    }
+            viewModelScope.launch(Dispatchers.IO){
+                runCatching {
+                    val res = syncLoad(request)
+                    val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                    list.captureNotes()
+                    loadUrlPreviews(list)
                     mNoteIds.addAll(list.map(::mapId))
-                    timelineLiveData.postValue(newState)
+                    val state = timelineLiveData.value
+                    val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply{
+                        addAll(list)
+                    }
+                    TimelineState(
+                        newList,
+                        TimelineState.State.LOAD_OLD
+                    )
+                }.onSuccess {
+                    timelineLiveData.postValue(it)
+                }.onFailure {
+                    handleError(it)
                 }
-            }catch (e: IOException){
-                errorState.postValue(Errors.NETWORK)
-            }catch(e: SocketTimeoutException){
-                errorState.postValue(Errors.TIMEOUT)
-            }catch(e: Exception){
-                errorState.postValue(Errors.NETWORK)
-                Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
-            }finally {
-                isLoadingFlag = false
+                mIsLoading = false
+                mIsInitLoading = false
 
             }
         }
+
     }
 
     fun loadInit(){
-        Log.d("TimelineViewModel", "初期読み込みを開始します")
-        this.isLoading.postValue(true)
-        this.isInitLoading.postValue(true)
+        synchronized(timelineLiveData) {
+            Log.d("TimelineViewModel", "初期読み込みを開始します")
 
-        if( ! isLoadingFlag ){
-
-            isLoadingFlag = true
+            if(  mIsInitLoading || mIsLoading ) {
+                return
+            }
+            mIsLoading = true
+            mIsInitLoading = true
 
             viewModelScope.launch(Dispatchers.IO){
-                try{
-                    val response = notePagingStore?.loadInit()!!
+                runCatching {
+                    val account = getAccount()
+                    val response = account.getPagedStore().loadInit()
                     val list = response.second?: emptyList()
+                    logger.debug("Networkから受信")
                     val state = TimelineState(
                         list,
                         TimelineState.State.INIT
                     )
-                    //noteCapture?.subscribeAll(noteCaptureRegister.registerId, list)
-                    captureNotes(list)
+
+                    list.captureNotes()
 
                     loadUrlPreviews(list)
 
                     mNoteIds.clear()
                     mNoteIds.addAll(list.map(::mapId))
-
+                    state
+                }.onSuccess { state ->
                     timelineLiveData.postValue(state)
 
-                    if(settingStore.isAutoLoadTimeline){
-                        startTimelineCapture()
-                    }
-
-                } catch(e: IOException){
-                    Log.d("TimelineLiveData", "タイムライン取得中にIOエラー発生", e)
-                    errorState.postValue(Errors.NETWORK)
+                }.onFailure {
                     timelineLiveData.postValue(null)
-                } catch(e: SocketTimeoutException){
-                    errorState.postValue(Errors.TIMEOUT)
-                    timelineLiveData.postValue(null)
-                } catch (e: Exception){
-                    Log.d("TimelineLiveData", "タイムライン取得中にエラー発生", e)
-                    errorState.postValue(Errors.NETWORK)
-                    timelineLiveData.postValue(null)
-
-                } finally{
-                    isLoading.postValue(false)
-                    isLoadingFlag = false
-                    isInitLoading.postValue(false)
+                    handleError(it)
                 }
+                mIsInitLoading = false
+                mIsLoading = false
+
 
             }
-
         }
+
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -443,19 +266,19 @@ class TimelineViewModel : ViewModel{
         if(request == null && isRetry){
             return null
         }
-
+        val account = getAccount()
         val res = when {
             request?.untilId != null -> {
-                notePagingStore?.loadOld(untilId = request.untilId)
+                account.getPagedStore().loadOld(untilId = request.untilId)
             }
             request?.sinceId != null -> {
-                notePagingStore?.loadNew(sinceId = request.sinceId)
+                account.getPagedStore().loadNew(sinceId = request.sinceId)
             }
             else -> {
-                notePagingStore?.loadInit()
+                account.getPagedStore().loadInit()
             }
         }
-        val notes = res?.second
+        val notes = res.second
 
         if(notes?.isNotEmpty() == true){
             return res
@@ -464,12 +287,12 @@ class TimelineViewModel : ViewModel{
         val targetNoteId = request?.untilId?: request?.sinceId ?: return null
 
         val targetNote = try{
-            misskeyAPI?.showNote(
+            account.getMisskeyAPI().showNote(
                 NoteRequest(
-                    i = reservedAccount?.getI(miCore.getEncryption()),
+                    i = account.getI(miCore.getEncryption()),
                     noteId = targetNoteId
                 )
-            )?.execute()
+            ).execute()
         }catch(e: Throwable){
             null
         }
@@ -482,152 +305,14 @@ class TimelineViewModel : ViewModel{
 
     }
 
-    fun start(){
 
-        if(settingStore.isUpdateTimelineInBackground){
-            startNoteCapture()
-        }
-    }
-
-
-
-    private fun startTimelineCapture(){
-        if(timelineCapture != null){
-            //observer?.updateId()
-            val observer = TimelineCapture.TimelineObserver.create(pageable, this.timelineObserver)
-            if(observer != null && mObserver == null){
-                Log.d(tag, "タイムラインキャプチャーを開始しようとしている")
-                timelineCapture?.addChannelObserver(observer)
-                mObserver = observer
-            }
-        }
-    }
-
-    private fun stopTimelineCapture(){
-        if(timelineCapture != null){
-            val observer = mObserver
-            if(observer != null){
-                Log.d("TimelineViewModel" , "タイムラインキャプチャー停止中")
-                timelineCapture?.removeChannelObserver(observer)
-                mObserver = null
-            }
-
-        }
-    }
-
-    private fun startNoteCapture(){
-
-        //noteCapture?.attach(noteCaptureRegister)
-        noteCaptureClient?.let{
-            noteCapture?.attachClient(it)
-        }
-
-        if(mNoteEventDisposable == null){
-            mNoteEventDisposable = noteEventStore?.getEventStream(stoppedAt)?.subscribe {
-                noteEventObserver(it)
-            }
-        }
-
-
-    }
-
-
-
-
-    private val timelineObserver = object : TimelineCapture.Observer{
-        override fun onReceived(note: PlaneNoteViewData) {
-            if(isLoadingFlag){
-                return
-            }
-            if(mNoteIds.contains(note.id)){
-                Log.i("TM-VM", "重複を確認したためキャンセルする")
-                return
-            }
-            captureNotes(listOf(note))
-            loadUrlPreviews(listOf(note))
-            val notes = timelineLiveData.value?.notes
-            val list = if(notes == null){
-                arrayListOf(note)
-            }else{
-                ArrayList<PlaneNoteViewData>(notes).apply{
-                    add(0, note)
-                }
-            }
-            mNoteIds.add(note.id)
-            if(list.size > mNoteIds.size){
-                Log.d("TM-VM", "重複が発生しています ${mNoteIds.size}: ${list.size}")
-            }
-            timelineLiveData.postValue(
-                TimelineState(
-                    list,
-                    TimelineState.State.RECEIVED_NEW
-                )
-            )
-        }
-    }
-
-    private fun captureNotes(notes: List<PlaneNoteViewData>){
-        val captureNoteIds = HashSet<String>()
-        for(note in notes){
-            captureNoteIds.add(note.id)
-            captureNoteIds.add(note.toShowNote.id)
-        }
-        val successCount = noteCaptureClient?.captureAll(captureNoteIds.toList())
-        if(successCount != captureNoteIds.size){
-            Log.d("TM-VM", "Captureへの登録に失敗したようです。試みた件数:${captureNoteIds.size}, 成功した件数:$successCount")
-        }
-    }
-
-    private fun noteEventObserver(noteEvent: NoteEvent){
-        Log.d("TM-VM", "#noteEventObserver $noteEvent")
-        val timelineNotes = timelineLiveData.value?.notes
-            ?: return
-
-        val account = usingAccount.value
-        val updatedNotes = when(noteEvent.event){
-
-            is Event.Deleted ->{
-                timelineNotes.filterNot{ note ->
-                    note.id == noteEvent.noteId || note.toShowNote.id == noteEvent.noteId
-                }
-            }
-            else -> timelineNotes.map{
-                val note: PlaneNoteViewData = it
-                if(note.toShowNote.id == noteEvent.noteId){
-                    when(noteEvent.event){
-                        is Event.Reacted ->{
-                            it.addReaction(noteEvent.event.reaction, noteEvent.event.emoji, noteEvent.event.userId == account?.remoteId)
-                        }
-                        is Event.UnReacted ->{
-                            it.takeReaction(noteEvent.event.reaction, noteEvent.event.userId == account?.remoteId)
-                        }
-                        is Event.Voted ->{
-                            it.poll?.update(noteEvent.event.choice, noteEvent.event.userId == account?.remoteId)
-                        }
-                        /*is Event.Added ->{
-                            //note.update(noteEvent.event.note)
-                        }*/
-                    }
-                }
-
-                note
-            }
-        }
-        if(noteEvent.event is Event.Deleted){
-            timelineLiveData.postValue(TimelineState(state = TimelineState.State.REMOVED, notes = updatedNotes))
-        }
-    }
-
-
-    private fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
-        val store = reservedAccount?.let { ac ->
-            miCore.getUrlPreviewStore(ac)
-        }?: return
+    private suspend fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
+        val account  = getAccount()
 
         list.forEach{ note ->
             note.textNode?.getUrls()?.let{ urls ->
                 UrlPreviewLoadTask(
-                    store,
+                    miCore.getUrlPreviewStore(account),
                     urls,
                     viewModelScope
                 ).load(note.urlPreviewLoadTaskCallback)
@@ -638,7 +323,7 @@ class TimelineViewModel : ViewModel{
 
 
 
-    private fun mapId(planeNoteViewData: PlaneNoteViewData): String{
+    private fun mapId(planeNoteViewData: PlaneNoteViewData): Note.Id{
         return planeNoteViewData.id
     }
 
@@ -647,25 +332,113 @@ class TimelineViewModel : ViewModel{
         return ! mNoteIds.contains(planeNoteViewData.id)
     }
 
-    override fun onCleared() {
-        super.onCleared()
 
-        // リソース解放を行う
-        stopNoteCapture()
-    }
 
-    private fun stopNoteCapture(){
-        Log.d("TimelineViewModel", "キャプチャーを停止する")
-        noteCaptureClient?.let{
-            noteCapture?.detachClient(it)
+    private fun List<PlaneNoteViewData>.captureNotes() {
+        val scope = viewModelScope + Dispatchers.IO
+        val notes = this
+        viewModelScope.launch(Dispatchers.IO) {
+            notes.forEach { note ->
+                note.eventFlow.onEach {
+                    if(it is NoteDataSource.Event.Deleted) {
+                        timelineLiveData.postValue(
+                            TimelineState(
+                                state = TimelineState.State.REMOVED,
+                                notes =timelineLiveData.value?.notes?.filterNot { pnvd ->
+                                    pnvd.id == it.noteId
+                                } ?: emptyList()
+                            )
+                        )
+                    }
+                }.launchIn(scope)
+            }
         }
-        stoppedAt = Date()
-        mNoteEventDisposable?.dispose()
-        mNoteEventDisposable = null
     }
 
 
 
+    private fun TimelineState?.makeUntilIdRequest(substituteSize: Int = 2): Request? {
+        val ids = this?.getUntilIds(substituteSize)?: emptyList()
+        return ids.makeUntilIdRequest()
+    }
+
+    private fun List<String>.makeUntilIdRequest(index: Int = 0): Request? {
+        if(this.size <= index) {
+            return null
+        }
+
+        val now = Request(
+            untilId = this[index]
+        )
+        now.substitute = this.makeUntilIdRequest(index + 1)
+        return now
+    }
+
+    fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): Request?{
+        logger.debug("makeSinceIdRequest")
+        return (this?.getSinceIds(substituteSize)?: emptyList()).makeSinceIdRequest()
+    }
+
+    private fun List<String>.makeSinceIdRequest(index: Int = 0): Request?{
+        if(this.size <= index){
+            return null
+        }
+        val now = Request(
+            sinceId = this[index]
+        )
+        now.substitute = makeUntilIdRequest(index + 1)
+        return now
+    }
+
+    //
+    private var mAccountCache: Account? = account
+    private suspend fun getAccount(): Account {
+        if(mAccountCache != null) {
+            mAccountCache
+        }
+
+        if(accountId != null && accountId > 0) {
+            val ac = accountRepository.get(accountId)
+            mAccountCache = ac
+            return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
+        }
+
+        mAccountCache = accountRepository.getCurrentAccount()
+        return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
+    }
 
 
+
+    private fun Account.getMisskeyAPI(): MisskeyAPI {
+        return miCore.getMisskeyAPI(this)
+    }
+
+    private fun Account.getPagedStore(): NotePagedStore {
+        return when(pageable){
+            is Pageable.Favorite -> FavoriteNotePagingStore(
+                this,
+                pageable,
+                miCore,
+                miCore.getNoteCaptureAdapter(),
+                viewModelScope,
+                Dispatchers.IO
+            )
+            else -> NoteTimelineStore(
+                this,
+                pageable,
+                include,
+                miCore,
+                miCore.getNoteCaptureAdapter(),
+                viewModelScope,
+                Dispatchers.IO
+            )
+        }
+    }
+
+    private fun handleError(t: Throwable) {
+        if(t is Exception) {
+            mErrorEvent.tryEmit(t)
+        }
+
+    }
 }

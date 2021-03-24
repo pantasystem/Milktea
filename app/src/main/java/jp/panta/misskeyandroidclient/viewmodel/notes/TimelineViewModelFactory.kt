@@ -7,21 +7,22 @@ import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.account.Account
 
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Suppress("UNCHECKED_CAST")
 class TimelineViewModelFactory(
-    private val page: Page?,
     private val account: Account?,
+    private val accountId: Long? = account?.accountId,
     private val pageable: Pageable,
     private val miApplication: MiApplication
 ) : ViewModelProvider.Factory{
 
+    @ExperimentalCoroutinesApi
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == TimelineViewModel::class.java){
 
@@ -34,12 +35,8 @@ class TimelineViewModelFactory(
                 includeRenotedMyNotes = includeRenotedMyNotes,
                 includeMyRenotes = includeMyRenotes
             )
+            return TimelineViewModel(account, accountId, pageable, miApplication, miApplication.getSettingStore(), include) as T
 
-            return if(page == null){
-                TimelineViewModel(pageable, miApplication, account, include)
-            }else{
-                TimelineViewModel(page, miApplication, include)
-            } as T
 
         }
 

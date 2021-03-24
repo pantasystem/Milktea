@@ -1,23 +1,27 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.favorite
 
-import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
-import jp.panta.misskeyandroidclient.model.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotePagedStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import retrofit2.Response
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class FavoriteNotePagingStore(
     val account: Account,
     override val pageableTimeline: Pageable.Favorite,
-    private val miCore: MiCore
+    private val miCore: MiCore,
+    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    private val coroutineScope: CoroutineScope,
+    private val coroutineDispatcher: CoroutineDispatcher
 ) : NotePagedStore{
 
     val favorites = miCore.getMisskeyAPI(account)::favorites
@@ -45,10 +49,12 @@ class FavoriteNotePagingStore(
         return makeResponse(res, false)
     }
 
-    private fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
+    private suspend fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
-            FavoriteNoteViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()))
+            FavoriteNoteViewData(it ,
+                miCore.getGetters().noteRelationGetter.get(account, it.note),
+                account, DetermineTextLengthSettingStore(miCore.getSettingStore()), noteCaptureAPIAdapter, coroutineScope, coroutineDispatcher)
         }
         return Pair(BodyLessResponse(res), list)
     }

@@ -6,14 +6,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
@@ -23,6 +21,7 @@ import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -31,11 +30,12 @@ import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
-import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_note_editor.*
 
 interface SimpleEditor{
@@ -87,14 +87,12 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
-        accountViewModel.switchAccount.observe(this, Observer {
+        accountViewModel.switchAccount.observe(this,  {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         })
-        accountViewModel.showProfile.observe(this, Observer {
-            val intent = Intent(requireContext(), UserDetailActivity::class.java)
-            intent.putExtra(UserDetailActivity.EXTRA_USER_ID, it)
+        accountViewModel.showProfile.observe(this,  {
+            val intent = UserDetailActivity.newInstance(requireContext(), userId = User.Id(it.accountId, it.remoteId))
             intent.putActivity(Activities.ACTIVITY_IN_APP)
-
 
             startActivity(intent)
         })
@@ -129,10 +127,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
         binding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        viewModel.files.observe(viewLifecycleOwner, Observer{list ->
+        viewModel.files.observe(viewLifecycleOwner, {list ->
             simpleImagePreviewAdapter.submitList(list)
         })
-        viewModel.poll.observe(viewLifecycleOwner, Observer { poll ->
+        viewModel.poll.observe(viewLifecycleOwner,  { poll ->
             if(poll == null){
                 removePollFragment()
             }else{
@@ -140,29 +138,26 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             }
         })
 
-        viewModel.noteTask.observe(viewLifecycleOwner, Observer{postNote->
-            Log.d("NoteEditorActivity", "$postNote")
-            val intent = Intent(requireContext(), PostNoteService::class.java)
-            intent.putExtra(PostNoteService.EXTRA_NOTE_TASK, postNote)
-            requireActivity().startService(intent)
-            viewModel.clear()
-        })
 
-        viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner, Observer {
+        viewModel.isPost.observe(viewLifecycleOwner) {
+            viewModel.clear()
+        }
+
+        viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner,  {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(childFragmentManager, "NoteEditor")
         })
 
-        viewModel.address.observe(viewLifecycleOwner, Observer{
+        viewModel.address.observe(viewLifecycleOwner, {
             userChipAdapter.submitList(it)
         })
 
-        viewModel.showPollTimePicker.observe(this, Observer{
+        viewModel.showPollTimePicker.observe(this, {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
         })
 
-        viewModel.showPollDatePicker.observe(this, Observer {
+        viewModel.showPollDatePicker.observe(this,  {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
         })
 
@@ -194,8 +189,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         }
 
         val emojiSelectionViewModel = ViewModelProvider(requireActivity())[EmojiSelectionViewModel::class.java]
-        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, Observer(::onSelect))
-        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, Observer(::onSelect))
+        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, (::onSelect))
+        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, (::onSelect))
 
     }
 
@@ -268,12 +263,11 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
     }
 
     private fun startSearchAndSelectUser(){
-        val selectedUserIds = mViewModel?.address?.value?.map{
-            it.userId
-        }?.toTypedArray()?: emptyArray()
+        val selectedUserIds = mViewModel?.address?.value?.mapNotNull {
+            it.userId?: it.user.value?.id
+        } ?: emptyList()
 
-        val intent = Intent(requireContext(), SearchAndSelectUserActivity::class.java)
-        intent.putExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_IDS, selectedUserIds)
+        val intent = SearchAndSelectUserActivity.newIntent(requireContext(), selectedUserIds = selectedUserIds)
         startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
     }
 
@@ -306,8 +300,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
     override fun goToNormalEditor() {
         mViewModel?.toDraftNote()?.let{
-            val intent = Intent(requireContext(), NoteEditorActivity::class.java)
-            intent.putExtra(NoteEditorActivity.EXTRA_DRAFT_NOTE, it)
+            val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = it)
             startActivity(intent)
             mViewModel?.clear()
         }
@@ -364,8 +357,9 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             }
             SELECT_USER_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK && data != null){
-                    val added = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
-                    val removed = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
+                    val changedDiff = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                    val added = changedDiff?.added
+                    val removed = changedDiff?.removed
                     if(added != null && removed != null){
                         mViewModel?.setAddress(added, removed)
                     }
@@ -373,10 +367,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             }
             SELECT_MENTION_TO_USER_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK && data != null){
-                    val users = (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USERS) as ArrayList<*>).mapNotNull {
-                        it as? User
-                    }
+                    val changedDiff = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                    val users = changedDiff?.selectedUsers?: emptyList()
                     val pos = mBinding.inputMainText.selectionEnd
+
                     mViewModel?.addMentionUsers(users, pos)?.let{ newPos ->
                         mBinding.inputMainText.setText(mViewModel?.text?.value?: "")
                         mBinding.inputMainText.setSelection(newPos)

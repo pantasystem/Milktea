@@ -9,6 +9,7 @@ import android.widget.AdapterView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
@@ -23,6 +24,9 @@ import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.setting.reaction.ReactionPickerSettingViewModel
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.lang.IllegalArgumentException
 
 class ReactionSettingActivity : AppCompatActivity() {
@@ -52,7 +56,7 @@ class ReactionSettingActivity : AppCompatActivity() {
         val touchHelper = ItemTouchHelper(ItemTouchCallback())
         touchHelper.attachToRecyclerView(binding.reactionSettingListView)
         binding.reactionSettingListView.addItemDecoration(touchHelper)
-        miApplication.getCurrentAccount().observe(this, Observer {
+        miApplication.getCurrentAccount().filterNotNull().onEach {
             mEmojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
             mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
             binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel!!
@@ -72,7 +76,7 @@ class ReactionSettingActivity : AppCompatActivity() {
             binding.reactionPickerType.setSelection(mReactionPickerSettingViewModel?.reactionPickerType?.ordinal?: 0)
 
 
-        })
+        }.launchIn(lifecycleScope)
 
         val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map(::formatReaction)?: emptyList()
         val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter( emojis, this)

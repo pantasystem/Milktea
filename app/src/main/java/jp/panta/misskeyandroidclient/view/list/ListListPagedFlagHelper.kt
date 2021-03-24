@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.ImageButton
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.api.list.UserListDTO
 import jp.panta.misskeyandroidclient.model.list.UserList
 
 

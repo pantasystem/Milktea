@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
@@ -28,23 +30,45 @@ import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.users.User
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class UserDetailActivity : AppCompatActivity() {
     companion object{
-        const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
-        const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_NAME"
+        private const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_ID"
+        private const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.UserDetailActivity.EXTRA_USER_NAME"
+        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
+
+        fun newInstance(context: Context, userId: User.Id): Intent {
+            return Intent(context, UserDetailActivity::class.java).apply {
+
+                putExtra(EXTRA_USER_ID, userId.id)
+                putExtra(EXTRA_ACCOUNT_ID, userId.accountId)
+            }
+        }
+
+        fun newInstance(context: Context, userName: String): Intent {
+            return Intent(context, UserDetailActivity::class.java).apply {
+                putExtra(EXTRA_USER_NAME, userName)
+
+            }
+        }
     }
 
     private var mViewModel: UserDetailViewModel? = null
 
     private var mAccountRelation: Account? = null
 
-    private var mUserId: String? = null
+    private var mUserId: User.Id? = null
     private var mIsMainActive: Boolean = true
 
     private var mParentActivity: Activities? = null
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -55,8 +79,15 @@ class UserDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mParentActivity = intent.getParentActivity()
 
-        val userId: String? = intent.getStringExtra(EXTRA_USER_ID)
+        val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
+        val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
+        val userId: User.Id? = if(!(remoteUserId == null || accountId == -1L)) {
+            User.Id(accountId, remoteUserId)
+        }else{
+            null
+        }
         mUserId = userId
+
         val userName = intent.data?.getQueryParameter("userName")
             ?: intent.getStringExtra(EXTRA_USER_NAME)
             ?: intent.data?.path?.let{ path ->
@@ -75,21 +106,24 @@ class UserDetailActivity : AppCompatActivity() {
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java])
             .initViewModelListener()
 
-        miApplication.getCurrentAccount().observe(this, Observer { ar ->
+        miApplication.getCurrentAccount().filterNotNull().onEach { ar ->
             mAccountRelation = ar
-            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(ar, miApplication, userId, userName))[UserDetailViewModel::class.java]
+            val viewModel = ViewModelProvider(this, UserDetailViewModelFactory(miApplication, userId, userName))[UserDetailViewModel::class.java]
             mViewModel = viewModel
             binding.userViewModel = viewModel
 
 
 
             viewModel.load()
-            viewModel.user.observe(this, Observer {
-                val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, it.id)
-                //userTimelinePager.adapter = adapter
-                binding.userTimelinePager.adapter = adapter
-                binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
-                supportActionBar?.title = it.getDisplayUserName()
+            viewModel.user.observe(this,  { detail ->
+                if(detail != null){
+                    val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, detail.id.id)
+                    //userTimelinePager.adapter = adapter
+                    binding.userTimelinePager.adapter = adapter
+                    binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
+                    supportActionBar?.title = detail.getDisplayUserName()
+                }
+
             })
 
 
@@ -98,17 +132,17 @@ class UserDetailActivity : AppCompatActivity() {
             })
             //userTimelineTab.setupWithViewPager()
             viewModel.showFollowers.observe(this, Observer {
-                val intent = Intent(this, FollowFollowerActivity::class.java)
-                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it)
-                intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWER_VIEW_MODE)
-                startActivity(intent)
+                it?.let{
+                    val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
+                    startActivity(intent)
+                }
             })
 
-            viewModel.showFollows.observe(this, Observer{
-                val intent = Intent(this, FollowFollowerActivity::class.java)
-                intent.putExtra(FollowFollowerActivity.EXTRA_USER, it)
-                intent.putExtra(FollowFollowerActivity.EXTRA_VIEW_CURRENT, FollowFollowerActivity.FOLLOWING_VIEW_MODE)
-                startActivity(intent)
+            viewModel.showFollows.observe(this, {
+                it?.let{
+                    val intent = FollowFollowerActivity.newIntent(this, it.id, true)
+                    startActivity(intent)
+                }
             })
 
             val updateMenu = Observer<Boolean> {
@@ -129,7 +163,7 @@ class UserDetailActivity : AppCompatActivity() {
                 }
             }
 
-        })
+        }.launchIn(lifecycleScope)
 
 
 
@@ -166,6 +200,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
@@ -177,7 +212,7 @@ class UserDetailActivity : AppCompatActivity() {
         block?.isVisible = !(mViewModel?.isBlocking?.value?: true)
         unblock?.isVisible = mViewModel?.isBlocking?.value?: false
         unmute?.isVisible = mViewModel?.isMuted?.value?: false
-        if(mViewModel?.isMine == true){
+        if(mViewModel?.isMine?.value == true){
             block?.isVisible = false
             mute?.isVisible = false
             unblock?.isVisible = false
@@ -188,7 +223,7 @@ class UserDetailActivity : AppCompatActivity() {
         val page = mAccountRelation?.pages?.firstOrNull {
             val pageable = it.pageable()
             if(pageable is Pageable.UserTimeline){
-                pageable.userId == mUserId
+                pageable.userId == mUserId?.id
             }else{
                 false
             }
@@ -206,6 +241,7 @@ class UserDetailActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d("UserDetail", "mParentActivity: $mParentActivity")
 
@@ -230,8 +266,7 @@ class UserDetailActivity : AppCompatActivity() {
                 addPageToTab()
             }
             R.id.add_list ->{
-                val intent = Intent(this, ListListActivity::class.java)
-                intent.putExtra(ListListActivity.EXTRA_ADD_USER_ID, mUserId)
+                val intent = ListListActivity.newInstance(this, mUserId)
                 startActivity(intent)
             }
             else -> return false
@@ -266,6 +301,7 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
 
+    @ExperimentalCoroutinesApi
     private fun addPageToTab(){
         val user = mViewModel?.user?.value
         user?: return
@@ -273,7 +309,7 @@ class UserDetailActivity : AppCompatActivity() {
         val page = mAccountRelation?.pages?.firstOrNull {
             val pageable = it.pageable()
             if(pageable is Pageable.UserTimeline){
-                pageable.userId == mUserId && mUserId != null
+                pageable.userId == mUserId?.id && mUserId != null
             }else{
                 false
             }
@@ -286,7 +322,7 @@ class UserDetailActivity : AppCompatActivity() {
                 Page(mAccountRelation?.accountId?: - 1,
                     title = user.getDisplayUserName(),
                     weight = -1,
-                    pageable = Pageable.UserTimeline(userId = user.id)
+                    pageable = Pageable.UserTimeline(userId = user.id.id)
                 )
             )
 

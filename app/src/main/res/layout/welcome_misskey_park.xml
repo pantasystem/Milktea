@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="user"
-                type="jp.panta.misskeyandroidclient.model.users.User" />
+                type="jp.panta.misskeyandroidclient.api.users.UserDTO" />
         <import type="android.view.View"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
