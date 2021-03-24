@@ -56,8 +56,10 @@ dependencies {
     //noinspection GradleCompatible
     implementation "androidx.appcompat:appcompat:1.2.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    // NOTE: リアクションピッカーなどでリフレクションを行っているのでバージョンを変更しないこと
     implementation 'com.google.android.material:material:1.3.0-alpha03'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation 'androidx.preference:preference-ktx:1.1.1'
     // Required for local unit tests (JUnit 4 framework)
@@ -79,8 +81,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0"
 
 
-    def coroutines_version = '1.4.0'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    def coroutines_version = '1.4.3'
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
