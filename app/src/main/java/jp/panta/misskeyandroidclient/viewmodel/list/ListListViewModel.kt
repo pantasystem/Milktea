@@ -36,15 +36,17 @@ class ListListViewModel(
         }
     }
 
+    private val mUserListListFlow = MutableStateFlow<List<UserList>>(emptyList())
 
     val encryption = miCore.getEncryption()
     val userListList = MediatorLiveData<List<UserList>>().apply{
-        mUserListListFlow.onEach {
-            postValue(it)
-        }.launchIn(viewModelScope)
+        viewModelScope.launch(Dispatchers.IO) {
+            mUserListListFlow.collect {
+                postValue(it)
+            }
+        }
     }
 
-    private val mUserListListFlow = MutableStateFlow<List<UserList>>(emptyList())
 
     val pagedUserList = MediatorLiveData<Set<UserList>>().apply{
         miCore.getCurrentAccount().filterNotNull().map { account ->
@@ -57,7 +59,7 @@ class ListListViewModel(
             postValue(list.toSet())
         }.launchIn(viewModelScope + Dispatchers.IO)
 
-        miCore.getCurrentAccount().onEach {
+        miCore.getCurrentAccount().filterNotNull().onEach {
             fetch()
         }.launchIn(viewModelScope + Dispatchers.IO)
 
@@ -68,6 +70,8 @@ class ListListViewModel(
 
     val showUserDetailEvent = EventBus<UserList>()
 
+    private val logger = miCore.loggerFactory.create("ListListViewModel")
+
 
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -76,6 +80,8 @@ class ListListViewModel(
                 loadListList(account.accountId)
             }.onSuccess {
                 mUserListListFlow.value = it
+            }.onFailure {
+                logger.error("fetch error", e = it)
             }
 
         }
@@ -115,6 +121,8 @@ class ListListViewModel(
 
         mUserListIdMap[userList.id] = userList
         mUserListListFlow.value = mUserListIdMap.values.toList()
+
+
     }
 
 
