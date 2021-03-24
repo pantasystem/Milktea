@@ -2,14 +2,13 @@ package jp.panta.misskeyandroidclient.streaming.channel
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.Socket
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import java.lang.IllegalStateException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class ChannelAPI(
     val socket: Socket,
@@ -22,17 +21,16 @@ class ChannelAPI(
 
     private val logger = loggerFactory.create("ChannelAPI")
 
-    private val listenersMap = ConcurrentHashMap<Type, HashSet<(ChannelBody)->Unit>>(
-        mapOf(
-            Type.MAIN to hashSetOf(),
-            Type.HOME to hashSetOf(),
-            Type.LOCAL to hashSetOf(),
-            Type.HYBRID to hashSetOf(),
-            Type.GLOBAL to hashSetOf()
-        )
+    private var listenersMap = mapOf<Type, Set<(ChannelBody)->Unit>>(
+        Type.MAIN to hashSetOf(),
+        Type.HOME to hashSetOf(),
+        Type.LOCAL to hashSetOf(),
+        Type.HYBRID to hashSetOf(),
+        Type.GLOBAL to hashSetOf()
     )
 
-    private val typeIdMap = HashMap<Type, String>()
+    private var typeIdMap = mapOf<Type, String>()
+    private val mutex = Mutex()
 
     init {
         //socket.addMessageEventListener(this)
@@ -49,6 +47,7 @@ class ChannelAPI(
 
             awaitClose {
                 disconnect(type, callback)
+
             }
         }
     }
@@ -56,11 +55,7 @@ class ChannelAPI(
     /**
      * 接続しているチャンネル数
      */
-    fun count(): Int {
-        synchronized(typeIdMap) {
-            return typeIdMap.count()
-        }
-    }
+    fun count(): Int = typeIdMap.count()
 
     /**
      * 接続しているチャンネル数がゼロであるか
@@ -69,64 +64,65 @@ class ChannelAPI(
         return count() == 0
     }
 
-    private fun connect(type: Type, listener: (ChannelBody)->Unit) {
-        synchronized(typeIdMap) {
-            synchronized(listenersMap) {
-                // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
-                if(listenersMap[type]?.contains(listener) == true) {
-                    logger.debug("リッスン済み")
-                    return
-                }
-
-                listenersMap[type]?.add(listener)
-                    ?: throw IllegalStateException("listenersがNULLです。")
-
-                if(typeIdMap.isEmpty()) {
-                    socket.addMessageEventListener(this)
-                }
-                if(typeIdMap[type] == null){
-                    logger.debug("接続処理を開始")
-                    sendConnect(type)
-                    logger.debug("after sendConnect:${typeIdMap}")
-                }
+    private fun connect(type: Type, listener: (ChannelBody)->Unit): Unit = runBlocking{
+        // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
+        mutex.withLock {
+            if(listenersMap[type]?.contains(listener) == true) {
+                logger.debug("リッスン済み")
+                return@runBlocking
             }
 
+            val sets = listenersMap[type]?.toMutableSet()?.also {
+                it.add(listener)
+            } ?: throw IllegalStateException("listenersがNULLです。")
+            listenersMap = listenersMap.toMutableMap().also {
+                it[type] = sets
+            }
+
+            if(typeIdMap.isEmpty()) {
+                socket.addMessageEventListener(this@ChannelAPI)
+            }
+            if(typeIdMap[type] == null){
+                logger.debug("接続処理を開始")
+                sendConnect(type)
+                logger.debug("after sendConnect:${typeIdMap}")
+            }
         }
+
     }
 
-    private fun disconnect(type: Type, listener: (ChannelBody) -> Unit) {
-        synchronized(listenersMap) {
-            synchronized(listenersMap) {
-                if(listenersMap[type]?.contains(listener) != true){
-                    return
-                }
+    private fun disconnect(type: Type, listener: (ChannelBody) -> Unit) = runBlocking{
+        mutex.withLock {
+            if(listenersMap[type]?.contains(listener) != true){
+                return@runBlocking
+            }
 
-                listenersMap[type]?.remove(listener)
-
-                // 誰にも使われていなければサーバーからChannelへの接続を開放する
-                trySendDisconnect(type)
-                if(typeIdMap.isEmpty()) {
-                    socket.removeMessageEventListener(this)
+            listenersMap = listenersMap.toMutableMap().also {
+                it[type] = (it[type]?.toMutableSet()?: emptySet()).toMutableSet().also { set ->
+                    set.remove(listener)
                 }
             }
 
-
+            // 誰にも使われていなければサーバーからChannelへの接続を開放する
+            trySendDisconnect(type)
+            if(typeIdMap.isEmpty()) {
+                socket.removeMessageEventListener(this@ChannelAPI)
+            }
         }
+
     }
 
 
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
-            synchronized(typeIdMap) {
-                typeIdMap.filter {
-                    it.value == e.body.id
-                }.keys.forEach {
-                    listenersMap[it]?.forEach { callback ->
-                        callback.invoke(e.body)
-                    }?: throw IllegalStateException("未実装なTypeです。")
-                }
-
+            typeIdMap.filter {
+                it.value == e.body.id
+            }.keys.forEach {
+                listenersMap[it]?.forEach { callback ->
+                    callback.invoke(e.body)
+                }?: throw IllegalStateException("未実装なTypeです。")
             }
+
             return true
         }
 
@@ -137,6 +133,7 @@ class ChannelAPI(
      * 接続メッセージを現在の状態にかかわらずサーバーに送信する
      */
     private fun sendConnect(type: Type): Boolean {
+        logger.debug("sendConnect($type)")
         val body = when(type){
             Type.GLOBAL -> Send.Connect.Type.GLOBAL_TIMELINE
             Type.HYBRID -> Send.Connect.Type.HYBRID_TIMELINE
@@ -146,7 +143,9 @@ class ChannelAPI(
         }
 
         val id = UUID.randomUUID().toString()
-        typeIdMap[type] = id
+        typeIdMap = typeIdMap.toMutableMap().also {
+            it[type] = id
+        }
         return socket.send(Send.Connect(Send.Connect.Body(channel = body, id = id)).toJson()).also {
             logger.debug("channel=$body API登録完了 result=$it, typeIdMap=${typeIdMap}, hash=${this.hashCode()}")
         }
@@ -155,7 +154,9 @@ class ChannelAPI(
 
     private fun trySendDisconnect(type: Type) {
         if(listenersMap[type].isNullOrEmpty()){
-            val id = typeIdMap.remove(type)
+            val map = typeIdMap.toMutableMap()
+            val id = map.remove(type)
+            typeIdMap = map
             if(id != null){
                 socket.send((Send.Disconnect(Send.Disconnect.Body(id)).toJson()))
             }
@@ -167,17 +168,13 @@ class ChannelAPI(
 
     override fun onStateChanged(e: Socket.State) {
         if(e is Socket.State.Connected) {
-            logger.debug("onStateChanged")
-            synchronized(typeIdMap) {
-                val types = typeIdMap.keys
-                val sendCount = types.toList().count {
-                    logger.debug("接続処理: $it")
-                    sendConnect(it)
-                }
-                logger.debug("types: $typeIdMap, 送信済み数:$sendCount, count:${count()}")
+            val types = typeIdMap.keys
+            val sendCount = types.toList().count {
+                //logger.debug("接続処理: $it")
+                sendConnect(it)
             }
+            logger.debug("types: $typeIdMap, 送信済み数:$sendCount")
         }
-        logger.debug("after onStateChanged")
 
     }
 
