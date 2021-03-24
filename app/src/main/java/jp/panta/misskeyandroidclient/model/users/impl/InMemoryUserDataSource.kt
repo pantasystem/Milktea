@@ -40,6 +40,8 @@ class InMemoryUserDataSource(
         return createOrUpdate(user).also {
             if(it == AddResult.CREATED) {
                 publish(UserDataSource.Event.Created(user.id, user))
+            }else if(it == AddResult.UPDATED) {
+                publish(UserDataSource.Event.Updated(user.id, user))
             }
         }
 
