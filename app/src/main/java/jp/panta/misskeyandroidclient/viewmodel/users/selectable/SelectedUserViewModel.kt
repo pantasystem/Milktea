@@ -9,9 +9,12 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import java.io.Serializable
 
-
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,

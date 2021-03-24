@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.util.eventbus
 
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.arch.core.internal.SafeIterableMap
 import androidx.lifecycle.Lifecycle
@@ -9,7 +10,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 
 class EventBus <T>(val limitMilliTime: Long = 500){
-    private val mHandler = Handler()
 
     private var isLimiting: Boolean = false
 

@@ -9,13 +9,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 import kotlinx.android.synthetic.main.fragment_list_user_list.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
     companion object{
 
     }
 
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -23,7 +26,7 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
         listUserList.layoutManager = LinearLayoutManager(requireContext())
         val adapter = ListUserListAdapter(viewModel, viewLifecycleOwner)
         listUserList.adapter = adapter
-        viewModel.listUsers.observe(viewLifecycleOwner, Observer{ list ->
+        viewModel.listUsers.observe(viewLifecycleOwner, { list ->
             adapter.submitList(list)
         })
     }

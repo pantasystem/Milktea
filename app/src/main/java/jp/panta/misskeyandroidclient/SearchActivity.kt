@@ -13,6 +13,8 @@ import jp.panta.misskeyandroidclient.view.users.ClickableUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import kotlinx.android.synthetic.main.activity_search.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class SearchActivity : AppCompatActivity() {
 
@@ -24,8 +26,12 @@ class SearchActivity : AppCompatActivity() {
 
     private var mSearchWord: String? = null
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private lateinit var mSearchUserViewModel: SearchUserViewModel
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -42,11 +48,13 @@ class SearchActivity : AppCompatActivity() {
         val usersAdapter = ClickableUserListAdapter(this)
         searchedUsers.adapter = usersAdapter
         searchedUsers.layoutManager = LinearLayoutManager(this)
-        mSearchUserViewModel.getUsers().observe(this, Observer {
+        mSearchUserViewModel.getUsers().observe(this, {
             usersAdapter.submitList(it)
         })
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
         menuInflater.inflate(R.menu.menu_search, menu)
@@ -63,6 +71,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private val queryTextListener = object : SearchView.OnQueryTextListener{
         override fun onQueryTextChange(newText: String?): Boolean {
             mSearchUserViewModel.userName.value = newText?: ""

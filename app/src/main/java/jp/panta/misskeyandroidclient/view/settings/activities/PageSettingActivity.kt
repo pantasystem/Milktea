@@ -24,6 +24,8 @@ import jp.panta.misskeyandroidclient.view.settings.page.SelectPageToAddDialog
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class PageSettingActivity : AppCompatActivity() {
 
@@ -52,7 +54,7 @@ class PageSettingActivity : AppCompatActivity() {
         binding.pagesView.adapter = pagesAdapter
         binding.pagesView.layoutManager = LinearLayoutManager(this)
 
-        mPageSettingViewModel.selectedPages.observe(this, Observer {
+        mPageSettingViewModel.selectedPages.observe(this, {
             Log.d("PageSettingActivity", "選択済みページが更新された")
             pagesAdapter.submitList(it)
         })
@@ -61,15 +63,15 @@ class PageSettingActivity : AppCompatActivity() {
             SelectPageToAddDialog().show(supportFragmentManager, "Activity")
         }
 
-        mPageSettingViewModel.pageOnActionEvent.observe(this, Observer {
+        mPageSettingViewModel.pageOnActionEvent.observe(this, {
             PageSettingActionDialog().show(supportFragmentManager, "PSA")
         })
 
-        mPageSettingViewModel.pageOnUpdateEvent.observe(this, Observer {
+        mPageSettingViewModel.pageOnUpdateEvent.observe(this, {
             EditTabNameDialog().show(supportFragmentManager, "ETD")
         })
 
-        mPageSettingViewModel.pageAddedEvent.observe(this, Observer{ pt ->
+        mPageSettingViewModel.pageAddedEvent.observe(this, { pt ->
             when(pt){
                 PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(Intent(this, SearchActivity::class.java))
                 PageType.USER -> {
@@ -119,7 +121,8 @@ class PageSettingActivity : AppCompatActivity() {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
     }
 
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE){

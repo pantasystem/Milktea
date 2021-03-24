@@ -61,11 +61,10 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         supportActionBar?.title = text
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             android.R.id.home -> finish()
         }
-        item?: return false
         return super.onOptionsItemSelected(item)
     }
 

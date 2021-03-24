@@ -10,10 +10,13 @@ import jp.panta.misskeyandroidclient.viewmodel.explore.Explore
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.android.synthetic.main.fragment_explore.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class ExploreFragment : Fragment(R.layout.fragment_explore){
 
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

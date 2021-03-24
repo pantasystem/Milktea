@@ -11,18 +11,25 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSelectableSimpleUserBinding
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class SelectableUsersAdapter(
     val selectedUserViewModel: SelectedUserViewModel,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<UserViewData, SelectableUsersAdapter.VH>(ItemCallback()){
 
     class VH(val binding: ItemSelectableSimpleUserBinding) : RecyclerView.ViewHolder(binding.root)
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     class ItemCallback : DiffUtil.ItemCallback<UserViewData>(){
         override fun areContentsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
             return oldItem.user.value == newItem.user.value
         }
 
+        @ExperimentalCoroutinesApi
         override fun areItemsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
             return oldItem.userId == newItem.userId
         }

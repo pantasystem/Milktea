@@ -29,11 +29,15 @@ import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.StateFlow
 
 interface MiCore{
 
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     var messageStreamFilter: MessageStreamFilter
 
     val loggerFactory: Logger.Factory

@@ -10,7 +10,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemClickableSimpleUserBinding
 import jp.panta.misskeyandroidclient.view.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class ClickableUserListAdapter(val lifecycleOwner: LifecycleOwner) : ListAdapter<UserViewData, ClickableUserListAdapter.VH>(SelectableUsersAdapter.ItemCallback()){
     class VH(val binding: ItemClickableSimpleUserBinding) : RecyclerView.ViewHolder(binding.root)
 

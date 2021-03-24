@@ -19,6 +19,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.android.synthetic.main.fragment_explore_users.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails{
 
@@ -30,6 +32,8 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         const val EXTRA_STATE = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_STATE"
 
         @JvmStatic
+        @FlowPreview
+        @ExperimentalCoroutinesApi
         fun newInstance(type: SortedUsersViewModel.Type): SortedUsersFragment {
             return SortedUsersFragment()
                 .apply{
@@ -56,6 +60,8 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         }
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

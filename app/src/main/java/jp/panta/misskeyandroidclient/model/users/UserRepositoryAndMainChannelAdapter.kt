@@ -5,6 +5,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
 
@@ -17,6 +19,8 @@ class UserRepositoryAndMainChannelAdapter(
 ) {
 
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     fun listen(account: Account): Flow<ChannelBody.Main.HavingUserBody> {
         return suspend {
             channelAPIWithAccountProvider.get(account)

@@ -54,7 +54,7 @@ class FileViewData(
     override fun hashCode(): Int {
         var result = file.hashCode()
         result = 31 * result + id.hashCode()
-        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + name.hashCode()
         result = 31 * result + (type?.hashCode() ?: 0)
         result = 31 * result + (md5?.hashCode() ?: 0)
         result = 31 * result + (size ?: 0)

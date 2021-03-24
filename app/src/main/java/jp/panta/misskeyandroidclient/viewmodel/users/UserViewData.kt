@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 open class UserViewData(
     val userId: User.Id?,
     val userName: String? = null,

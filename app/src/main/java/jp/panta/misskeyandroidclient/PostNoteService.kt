@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient
 
 import android.app.IntentService
@@ -11,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@Suppress("DEPRECATION")
 @Deprecated("MiApplicationへ移植したため非推奨")
 class PostNoteService : IntentService("PostNoteService") {
 

@@ -7,6 +7,8 @@ import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.view.users.SortedUsersFragment
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.android.synthetic.main.activity_sorted_uses.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class SortedUsersActivity : AppCompatActivity() {
 
@@ -20,6 +22,9 @@ class SortedUsersActivity : AppCompatActivity() {
         const val EXTRA_TITLE = "jp.panta.misskeyandroidclient.EXTRA_TITLE"
 
     }
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

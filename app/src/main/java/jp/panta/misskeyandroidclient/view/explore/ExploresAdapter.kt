@@ -12,6 +12,8 @@ import jp.panta.misskeyandroidclient.SortedHashTagsActivity
 import jp.panta.misskeyandroidclient.SortedUsersActivity
 import jp.panta.misskeyandroidclient.databinding.ItemExploreBinding
 import jp.panta.misskeyandroidclient.viewmodel.explore.Explore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class ExploresAdapter : ListAdapter<Explore, ExploresAdapter.VH>(ItemCB){
     class VH(val binding: ItemExploreBinding) : RecyclerView.ViewHolder(binding.root)
@@ -25,6 +27,8 @@ class ExploresAdapter : ListAdapter<Explore, ExploresAdapter.VH>(ItemCB){
         }
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onBindViewHolder(holder: VH, position: Int) {
         val explore = getItem(position)
         holder.binding.explore = explore

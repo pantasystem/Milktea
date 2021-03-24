@@ -47,7 +47,7 @@ class FileViewModel(
         }
         isLoading = true
         isRefreshing.postValue(true)
-        val request = RequestFile(i = account.getI(encryption)!!, folderId = currentFolder.value, limit = 20)
+        val request = RequestFile(i = account.getI(encryption), folderId = currentFolder.value, limit = 20)
         misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
             override fun onResponse(
                 call: Call<List<FileProperty>>,
@@ -100,7 +100,7 @@ class FileViewModel(
             isLoading = false
             return
         }
-        val request = RequestFile(i = account.getI(encryption)!!, folderId = currentFolder.value, limit = 20, untilId = untilId)
+        val request = RequestFile(i = account.getI(encryption), folderId = currentFolder.value, limit = 20, untilId = untilId)
         misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
             override fun onResponse(
                 call: Call<List<FileProperty>>,

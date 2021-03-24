@@ -33,7 +33,7 @@ class OkHttpDriveFileUploader(
 
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("i", account.getI(encryption)!!)
+                .addFormDataPart("i", account.getI(encryption))
                 .addFormDataPart("force", isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart("file", file.name, createRequestBody(Uri.parse(file.path)))

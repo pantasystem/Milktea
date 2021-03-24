@@ -11,13 +11,20 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListUserBinding
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class ListUserListAdapter(
     private val userListDetailViewModel: UserListDetailViewModel,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<UserViewData, ListUserListAdapter.VH>(ItemCallback()){
     class VH(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)
+    @FlowPreview
     class ItemCallback : DiffUtil.ItemCallback<UserViewData>(){
+        @FlowPreview
+        @ExperimentalCoroutinesApi
         override fun areContentsTheSame(
             oldItem: UserViewData,
             newItem: UserViewData
@@ -26,6 +33,8 @@ class ListUserListAdapter(
                     && oldItem.user.value == newItem.user.value
         }
 
+        @FlowPreview
+        @ExperimentalCoroutinesApi
         override fun areItemsTheSame(
             oldItem: UserViewData,
             newItem: UserViewData

@@ -17,6 +17,8 @@ import jp.panta.misskeyandroidclient.view.users.selectable.SelectableUsersAdapte
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import java.io.Serializable
 
 class SearchAndSelectUserActivity : AppCompatActivity() {
@@ -37,8 +39,12 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
     private var mSelectedUserIds: List<User.Id>? = null
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private var mSelectedUserViewModel: SelectedUserViewModel? = null
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -90,18 +96,22 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         mSelectedUserViewModel = selectedUserViewModel
 
     }
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> setResultFinish()
         }
         return super.onOptionsItemSelected(item)
     }
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onBackPressed() {
         setResultFinish()
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun setResultFinish(){
         val selectedDiff = mSelectedUserViewModel?.getSelectedUserIdsChangedDiff()
 

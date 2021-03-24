@@ -17,11 +17,9 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.atomic.AtomicBoolean
@@ -154,7 +152,11 @@ class FollowFollowerViewModel(
     val isInitializing = MutableLiveData<Boolean>(false)
 
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     val users = MutableLiveData<List<UserViewData>>()
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private var mUsers: List<UserViewData> = emptyList()
         set(value) {
             field = value
@@ -165,6 +167,8 @@ class FollowFollowerViewModel(
 
 
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     fun loadInit() = viewModelScope.launch(Dispatchers.IO) {
         isInitializing.postValue(true)
         getPaginator().init()
@@ -176,6 +180,8 @@ class FollowFollowerViewModel(
 
 
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     fun loadOld() = viewModelScope.launch (Dispatchers.IO){
         if(mIsLoading) return@launch
         mIsLoading = true

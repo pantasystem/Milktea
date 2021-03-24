@@ -222,7 +222,7 @@ class MiApplication : Application(), MiCore {
                 }.launchIn(applicationScope + Dispatchers.IO)
                 socket.addStateEventListener { e ->
                     applicationScope.launch {
-                        handleSocketStateEvent(account, socket, e)
+                        handleSocketStateEvent(account, e)
                     }
                 }
             },
@@ -612,7 +612,7 @@ class MiApplication : Application(), MiCore {
     /**
      * Socketの通信状態をhandleする。
      */
-    private suspend fun handleSocketStateEvent(account: Account, socket: Socket, state: Socket.State) {
+    private suspend fun handleSocketStateEvent(account: Account,  state: Socket.State) {
         if(state is Socket.State.Failure
             && mIsActiveNetwork
             && !(mNoteCaptureAPIWithAccountProvider.get(account).isEmpty()

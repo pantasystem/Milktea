@@ -28,6 +28,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.android.synthetic.main.activity_user_list_detail.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmittedListener {
 
@@ -52,11 +54,16 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     private var account: Account? = null
     private var mListId: UserList.Id? = null
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private var mUserListDetailViewModel: UserListDetailViewModel? = null
 
     private var mIsNameUpdated: Boolean = false
     private var mUserListName: String = ""
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -77,7 +84,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        userListDetailViewModel.userList.observe(this, Observer<UserList>{ ul ->
+        userListDetailViewModel.userList.observe(this, { ul ->
             supportActionBar?.title = ul.name
             mUserListName = ul.name
 
@@ -90,7 +97,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             }
         })
 
-        userListDetailViewModel.userList.observe(this, Observer {
+        userListDetailViewModel.userList.observe(this, {
             invalidateOptionsMenu()
         })
 
@@ -98,6 +105,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onSubmit(name: String) {
         mUserListDetailViewModel?.updateName(name)
     }
@@ -119,6 +128,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         return super.onCreateOptionsMenu(menu)
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_add_to_tab ->{
@@ -142,11 +153,14 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }
         return super.onOptionsItemSelected(item)
     }
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onBackPressed() {
         updatedResultFinish()
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -193,6 +207,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun updatedResultFinish(){
         val updatedEvent = mUserListDetailViewModel?.updateEvents?.toList()?: emptyList()
 

@@ -15,6 +15,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingS
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
@@ -38,7 +40,8 @@ class NoteDetailViewModel(
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
 
 
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     fun loadDetail(){
 
         viewModelScope.launch(Dispatchers.IO){
@@ -178,6 +181,7 @@ class NoteDetailViewModel(
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
+    @ExperimentalCoroutinesApi
     private fun<T: PlaneNoteViewData> T.capture():  T{
         val self = this
         viewModelScope.launch(Dispatchers.IO) {
@@ -186,6 +190,7 @@ class NoteDetailViewModel(
         return this
     }
 
+    @ExperimentalCoroutinesApi
     private fun<T: PlaneNoteViewData> List<T>.captureAll() {
         this.forEach {
             it.capture()

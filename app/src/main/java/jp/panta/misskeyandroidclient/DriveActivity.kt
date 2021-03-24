@@ -100,17 +100,17 @@ class DriveActivity : AppCompatActivity() {
             }
             val adapter = DirListAdapter(diffUtilItemCallback, driveViewModel)
             dirListView.adapter = adapter
-            driveViewModel.hierarchyDirectory.observe(this, Observer { dir ->
+            driveViewModel.hierarchyDirectory.observe(this, { dir ->
                 Log.d("DriveActivity", "更新がありました: $dir")
                 adapter.submitList(dir)
             })
 
-            driveViewModel.selectedFilesMapLiveData?.observe(this, Observer{ selected ->
+            driveViewModel.selectedFilesMapLiveData?.observe(this, { selected ->
                 supportActionBar?.title = "${getString(R.string.selected)} ${selected.size}/${maxSize}"
                 mMenuOpen?.isEnabled = selected.isNotEmpty() && selected.size <= maxSize
             })
 
-            driveViewModel.openFileEvent.observe(this, Observer {
+            driveViewModel.openFileEvent.observe(this, {
                 // TODO ファイルの詳細を開く
             })
         }.launchIn(lifecycleScope)
@@ -142,8 +142,8 @@ class DriveActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             android.R.id.home -> finish()
             R.id.action_open ->{
                 val ids = mDriveViewModel?.getSelectedFileIds()
@@ -160,7 +160,6 @@ class DriveActivity : AppCompatActivity() {
                 }
             }
         }
-        item?: return false
         return super.onOptionsItemSelected(item)
     }
 

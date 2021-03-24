@@ -17,22 +17,19 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import kotlinx.android.synthetic.main.dialog_switch_account.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class AccountSwitchingDialog : BottomSheetDialogFragment(){
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.dialog_switch_account,null)
         dialog.setContentView(view)
 
-        val miApplication = context?.applicationContext as MiApplication
-        //miApplication.connectionInstanceDao?.findAll()
-        val accounts = miApplication.getAccounts().value
-        if(accounts == null){
-            Log.w("AccountSwitchDialog", "アカウント達の取得に失敗しました")
-            Toast.makeText(this.context, "アカウントの取得に失敗しました", Toast.LENGTH_LONG).show()
-            return dialog
-        }
+
         val activity = activity
         if(activity == null){
             dismiss()
@@ -57,18 +54,19 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         val accountViewModel = ViewModelProvider(activity)[AccountViewModel::class.java]
 
         val adapter = AccountListAdapter(diff, accountViewModel, activity)
-        accountViewModel.accounts.observe(this, Observer {
+        accountViewModel.accounts.observe(this, {
             adapter.submitList(it)
         })
         view.accounts_view.adapter = adapter
-        accountViewModel.switchTargetConnectionInstanceEvent.observe(activity, Observer {
+        accountViewModel.switchTargetConnectionInstanceEvent.observe(activity, {
             dismiss()
         })
         return dialog
     }
 
 
-
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private val diff = object : DiffUtil.ItemCallback<AccountViewData>(){
         override fun areContentsTheSame(
             oldItem: AccountViewData,
