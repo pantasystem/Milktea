@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
@@ -54,9 +55,9 @@ class SortedHashTagListViewModel(
     val isLoading = MutableLiveData<Boolean>()
 
     init{
-        miCore.getCurrentAccount().filterNotNull().onEach {
+        miCore.getCurrentAccount().filterNotNull().flowOn(Dispatchers.IO).onEach {
             load()
-        }.launchIn(viewModelScope + Dispatchers.IO)
+        }.launchIn(viewModelScope)
     }
     fun load(){
         val account = miCore.getCurrentAccount().value
