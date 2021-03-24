@@ -13,6 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.lang.IllegalArgumentException
 
+@ExperimentalCoroutinesApi
 @Suppress("UNCHECKED_CAST")
 class AccountViewModel(
     val miCore: MiCore
@@ -56,21 +57,12 @@ class AccountViewModel(
 
     init{
         miCore.getCurrentAccount().filterNotNull().map { ac ->
-            val res = runCatching {
-                ac.getI(miCore.getEncryption()).let{ i ->
-                    miCore.getMisskeyAPI(ac).i(I(i)).execute()
-                }
-            }.getOrNull()
-            res?.body()?.let{
-                ac to it
-            }
-        }.filterNotNull().map { pair ->
-            val user = pair.second.toUser(pair.first, true)
-            miCore.getUserDataSource().add(user)
+            miCore.getUserRepository().find(User.Id(ac.accountId, ac.remoteId), true) as? User.Detail
+        }.filterNotNull().map { user ->
             user
         }.onEach {
-
-        }
+            user.postValue(it)
+        }.launchIn(viewModelScope + Dispatchers.IO)
 
         miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac->
             miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
