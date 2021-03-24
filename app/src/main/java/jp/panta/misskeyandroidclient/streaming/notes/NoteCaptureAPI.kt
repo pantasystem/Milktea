@@ -74,13 +74,9 @@ class NoteCaptureAPI(
 
     private fun capture(noteId: String, listener: (NoteUpdated)->Unit) = runBlocking{
         lock.withLock {
-            logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()})")
-            logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()}) in synchronized")
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(noteIdListenMap.isEmpty()) {
-                logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()}) before addMessageEventListener addStateEventListener")
                 socket.addMessageEventListener(this@NoteCaptureAPI)
-                logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()}) after addMessageEventListener addStateEventListener")
             }
             if(listeners.isEmpty()){
                 logger?.debug("リモートへCaptureができていなかったので開始する")
