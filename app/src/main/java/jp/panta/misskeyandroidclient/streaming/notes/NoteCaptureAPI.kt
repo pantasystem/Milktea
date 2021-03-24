@@ -2,21 +2,21 @@ package jp.panta.misskeyandroidclient.streaming.notes
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.Socket
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashSet
 
 class NoteCaptureAPI(
     val socket: Socket,
-    loggerFactory: Logger.Factory? = null
+    loggerFactory: Logger.Factory? = null,
 ) : SocketMessageEventListener, SocketStateEventListener {
 
 
     val logger = loggerFactory?.create("NoteCaptureAPI")
+
 
 
 
@@ -33,11 +33,14 @@ class NoteCaptureAPI(
             }
             //logger?.debug("before capture")
             capture(noteId, listener)
+
             //logger?.debug("after capture")
 
             awaitClose {
                 logger?.debug("captureを終了する noteId=$noteId, listenId=$listenId")
                 unSubscribe(noteId, listener)
+
+
             }
         }
 
@@ -46,11 +49,8 @@ class NoteCaptureAPI(
     /**
      * subscribeしているノート数を計算します
      */
-    fun count(): Int {
-        synchronized(noteIdListenMap) {
-            return noteIdListenMap.size
-        }
-    }
+    fun count(): Int = noteIdListenMap.size
+
 
     fun isEmpty(): Boolean {
         return count() == 0
@@ -60,62 +60,73 @@ class NoteCaptureAPI(
      * すでにCapture済みかをチェックします
      */
     fun isCaptured(noteId: String): Boolean {
-        synchronized(noteIdListenMap) {
-            return noteIdListenMap.containsKey(noteId)
-        }
+        return noteIdListenMap.containsKey(noteId)
+
+
     }
 
-    private val noteIdListenMap = ConcurrentHashMap<String, HashSet<(NoteUpdated)->Unit>>()
+    private var noteIdListenMap = mapOf<String, Set<(NoteUpdated)->Unit>>()
+    private val lock = Mutex()
 
-    private fun capture(noteId: String, listener: (NoteUpdated)->Unit) {
-        synchronized(noteIdListenMap){
+    init {
+        socket.addStateEventListener(this)
+    }
+
+    private fun capture(noteId: String, listener: (NoteUpdated)->Unit) = runBlocking{
+        lock.withLock {
+            logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()})")
+            logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()}) in synchronized")
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(noteIdListenMap.isEmpty()) {
-                socket.addMessageEventListener(this)
-                socket.addStateEventListener(this)
+                logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()}) before addMessageEventListener addStateEventListener")
+                socket.addMessageEventListener(this@NoteCaptureAPI)
+                logger?.debug("capture(noteId:$noteId, listener:${listener.hashCode()}) after addMessageEventListener addStateEventListener")
             }
             if(listeners.isEmpty()){
                 logger?.debug("リモートへCaptureができていなかったので開始する")
                 if(!sendSub(noteId)){
-                    return@synchronized
+                    return@runBlocking
                 }
             }
             if(!listeners.contains(listener)) {
                 listeners.add(listener)
             }
-            noteIdListenMap[noteId] = listeners
-
+            noteIdListenMap = noteIdListenMap.toMutableMap().also {
+                it[noteId] = listeners
+            }
         }
+
 
     }
 
-    private fun unSubscribe(noteId: String, listener: (NoteUpdated) -> Unit) {
-        synchronized(noteIdListenMap){
-
+    private fun unSubscribe(noteId: String, listener: (NoteUpdated) -> Unit) = runBlocking{
+        lock.withLock {
             logger?.debug("unSubscribe noteId: $noteId")
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(listeners.isEmpty()) {
-                return
+                return@runBlocking
             }
 
             if(listeners.remove(listener)  && listeners.isEmpty()) {
                 sendUnSub(noteId)
             }
             if(listeners.isEmpty()) {
-                noteIdListenMap.remove(noteId)
+                noteIdListenMap = noteIdListenMap.toMutableMap().also {
+                    it.remove(noteId)
+                }
             }
             if(noteIdListenMap.isEmpty()) {
-                socket.removeMessageEventListener(this)
-                socket.removeStateEventListener(this)
+                socket.removeMessageEventListener(this@NoteCaptureAPI)
             }
         }
+
 
     }
 
 
-    private fun Map<String, HashSet<(NoteUpdated)->Unit>>.getOrNew(noteId: String) : HashSet<(NoteUpdated)->Unit> {
+    private fun Map<String, Set<(NoteUpdated)->Unit>>.getOrNew(noteId: String) : MutableSet<(NoteUpdated)->Unit> {
         val listeners = this[noteId]
-        return listeners ?: HashSet()
+        return listeners?.toMutableSet()?: mutableSetOf()
     }
 
 
@@ -123,15 +134,14 @@ class NoteCaptureAPI(
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is NoteUpdated) {
             logger?.debug("noteUpdated: $e")
-            synchronized(noteIdListenMap) {
-                if(noteIdListenMap[e.body.id].isNullOrEmpty()) {
-                    logger?.warning("listenerは未登録ですが、何か受信したようです。")
-                }else{
-                    noteIdListenMap[e.body.id]?.forEach {
-                        it.invoke(e)
-                    }
-                }
-
+            val listeners = if(noteIdListenMap[e.body.id].isNullOrEmpty()) {
+                logger?.warning("listenerは未登録ですが、何か受信したようです。")
+                null
+            }else{
+                noteIdListenMap[e.body.id]
+            }
+            listeners?.forEach {
+                it.invoke(e)
             }
             return true
         }
@@ -141,17 +151,15 @@ class NoteCaptureAPI(
     override fun onStateChanged(e: Socket.State) {
         logger?.debug("onStateChanged $e")
         if(e is Socket.State.Connected) {
-            synchronized(noteIdListenMap) {
-                noteIdListenMap.keys.forEach {
-                    sendSub(it)
-                }
+            noteIdListenMap.keys.forEach {
+                sendSub(it)
             }
         }else if(e is Socket.State.Closing) {
-            synchronized(noteIdListenMap) {
-                noteIdListenMap.keys.forEach {
-                    sendUnSub(it)
-                }
+
+            noteIdListenMap.keys.forEach {
+                sendUnSub(it)
             }
+
         }
     }
 

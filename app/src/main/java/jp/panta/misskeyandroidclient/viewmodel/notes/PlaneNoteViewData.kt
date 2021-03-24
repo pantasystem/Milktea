@@ -85,7 +85,7 @@ open class PlaneNoteViewData (
     val avatarUrl = toShowNote.user.avatarUrl
 
     val cw = toShowNote.note.cw
-    val cwNode = MFMParser.parse(toShowNote.note.text, toShowNote.note.emojis)
+    val cwNode = MFMParser.parse(toShowNote.note.cw, toShowNote.note.emojis)
 
     //true　折り畳み
     val text = toShowNote.note.text.apply{

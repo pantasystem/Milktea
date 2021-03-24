@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
@@ -36,6 +37,8 @@ class MessageHistoryViewModel(
 
     private val historyUserLiveData = MutableLiveData<List<HistoryViewData>>()
     private val historyGroupLiveData = MutableLiveData<List<HistoryViewData>>()
+
+    private val logger = miCore.loggerFactory.create("MessageHistoryViewModel")
 
 
 
@@ -123,9 +126,13 @@ class MessageHistoryViewModel(
         val request = RequestMessageHistory(i = account.getI(encryption), group = isGroup, limit = 100)
 
         return runCatching {
-            getMisskeyAPI()?.getMessageHistory(request)?.execute()?.body()?.map {
+            val res = getMisskeyAPI()?.getMessageHistory(request)?.execute()
+            res?.throwIfHasError()
+                res?.body()?.map {
                 miCore.getGetters().messageRelationGetter.get(account, it)
             }
+        }.onFailure {
+            logger.error("fetchMessagingHistory error", e = it)
         }.getOrNull()?.map {
             HistoryViewData(account, it, miCore.getUnreadMessages(), viewModelScope)
         }?: emptyList()
@@ -135,7 +142,7 @@ class MessageHistoryViewModel(
         messageHistorySelected.event = messageHistory
     }
 
-    private fun getMisskeyAPI(): MisskeyAPI?{
+    private fun getMisskeyAPI(): MisskeyAPI{
         return miCore.getMisskeyAPI(account)
     }
 

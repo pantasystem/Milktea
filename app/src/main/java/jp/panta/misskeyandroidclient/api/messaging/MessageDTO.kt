@@ -31,7 +31,7 @@ data class MessageDTO(
     val fileId: String? = null,
     val file: FileProperty? = null,
     val isRead: Boolean,
-    val emojis: List<Emoji>
+    val emojis: List<Emoji>?
 ): JavaSerializable{
     fun isGroup(): Boolean{
         return group != null
@@ -61,7 +61,7 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             fileId,
             file,
             isRead,
-            emojis,
+            emojis?: emptyList(),
             recipientId = User.Id(account.accountId, recipientId)
         )
     }else{
@@ -74,7 +74,7 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             fileId,
             file,
             isRead,
-            emojis,
+            emojis?: emptyList(),
             GroupEntity.Id(account.accountId, groupId),
             group.toGroup(account.accountId)
         )

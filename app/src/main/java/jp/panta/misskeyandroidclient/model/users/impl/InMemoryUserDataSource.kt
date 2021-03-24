@@ -21,52 +21,28 @@ class InMemoryUserDataSource(
     private val usersLock = Mutex()
 
 
-    private val listeners = mutableSetOf<UserDataSource.Listener>()
+    private var listeners = setOf<UserDataSource.Listener>()
 
     override fun addEventListener(listener: UserDataSource.Listener) {
-        this.listeners.add(listener)
+        this.listeners = listeners.toMutableSet().apply {
+            add(listener)
+        }
     }
 
     override fun removeEventListener(listener: UserDataSource.Listener) {
-        this.listeners.remove(listener)
+        this.listeners = listeners.toMutableSet().apply {
+            remove(listener)
+        }
     }
 
     @ExperimentalCoroutinesApi
     override suspend fun add(user: User): AddResult {
-        usersLock.withLock {
-            val u = userMap[user.id]
-            if(u == null) {
-                userMap[user.id] = user
+        return createOrUpdate(user).also {
+            if(it == AddResult.CREATED) {
                 publish(UserDataSource.Event.Created(user.id, user))
-                return AddResult.CREATED
+            }else if(it == AddResult.UPDATED) {
+                publish(UserDataSource.Event.Updated(user.id, user))
             }
-            if(u.instanceUpdatedAt > user.instanceUpdatedAt){
-                return AddResult.CANCEL
-            }
-            when {
-                user is User.Detail -> {
-                    userMap[user.id] = user
-                }
-                u is User.Detail -> {
-                    // RepositoryのUserがDetailで与えられたUserがSimpleの時Simpleと一致する部分のみ更新する
-                    userMap[user.id] = u.copy(
-                        name = user.name,
-                        userName = user.userName,
-                        avatarUrl = user.avatarUrl,
-                        emojis = user.emojis,
-                        isCat = user.isCat,
-                        isBot = user.isBot,
-                        host = user.host
-                    )
-                }
-                else -> {
-                    userMap[user.id] = user
-                }
-            }
-
-            user.updated()
-            publish(UserDataSource.Event.Updated(user.id, user))
-            return AddResult.UPDATED
         }
 
     }
@@ -99,20 +75,55 @@ class InMemoryUserDataSource(
     @ExperimentalCoroutinesApi
     override suspend fun remove(user: User): Boolean {
         return usersLock.withLock {
-            userMap.remove(user.id)?.also {
-                publish(UserDataSource.Event.Removed(user.id))
-            } != null
-        }
+            userMap.remove(user.id)
+        }?.also{
+            publish(UserDataSource.Event.Removed(user.id))
+        } != null
+
 
     }
 
+    private suspend fun createOrUpdate(user: User): AddResult {
+        usersLock.withLock {
+            val u = userMap[user.id]
+            if(u == null) {
+                userMap[user.id] = user
+                return AddResult.CREATED
+            }
+            if(u.instanceUpdatedAt > user.instanceUpdatedAt){
+                return AddResult.CANCEL
+            }
+            when {
+                user is User.Detail -> {
+                    userMap[user.id] = user
+                }
+                u is User.Detail -> {
+                    // RepositoryのUserがDetailで与えられたUserがSimpleの時Simpleと一致する部分のみ更新する
+                    userMap[user.id] = u.copy(
+                        name = user.name,
+                        userName = user.userName,
+                        avatarUrl = user.avatarUrl,
+                        emojis = user.emojis,
+                        isCat = user.isCat,
+                        isBot = user.isBot,
+                        host = user.host
+                    )
+                }
+                else -> {
+                    userMap[user.id] = user
+                }
+            }
+
+            user.updated()
+            return AddResult.UPDATED
+        }
+    }
+
+
     @ExperimentalCoroutinesApi
     private fun publish(e: UserDataSource.Event) {
-        synchronized(listeners) {
-            listeners.forEach { listener ->
-                listener.on(e)
-            }
+        listeners.forEach { listener ->
+            listener.on(e)
         }
-
     }
 }

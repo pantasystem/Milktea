@@ -55,8 +55,10 @@ class InMemoryMessageDataSource(
 
     override fun findByMessagingId(messagingId: MessagingId): Flow<List<Message>> {
         return messagesState.map {
-            it.filter { msg ->
-                val ac = accountRepository.get(msg.id.accountId)
+            val ac = accountRepository.get(messagingId.accountId)
+            it.filterNot { msg ->
+                msg.isRead || msg.userId.id == ac.remoteId
+            }.filter { msg ->
                 messagingId == msg.messagingId(ac)
             }
         }
@@ -64,14 +66,22 @@ class InMemoryMessageDataSource(
 
     override fun findByAccountId(accountId: Long): Flow<List<Message>> {
         return messagesState.map {
-            it.filter { msg ->
+            val ac = accountRepository.get(accountId)
+            it.filterNot { msg ->
+                msg.isRead || msg.userId.id == ac.remoteId
+            }.filter { msg ->
                 msg.id.accountId == accountId
             }
         }
     }
 
     override fun findAll(): Flow<List<Message>> {
-        return messagesState
+        return messagesState.map {
+            it.filterNot { msg ->
+                val ac = accountRepository.get(msg.id.accountId)
+                msg.isRead || msg.userId.id == ac.remoteId
+            }
+        }
     }
 
     private fun createOrUpdate(message: Message): AddResult {

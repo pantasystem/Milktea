@@ -67,7 +67,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
         messages_view.adapter = adapter
 
         var messageState: MessageViewModel.State? = null
-        messageViewModel.messagesLiveData.observe(viewLifecycleOwner, Observer {
+        messageViewModel.messagesLiveData.observe(viewLifecycleOwner, {
             messageState = it
 
             adapter.submitList(it.messages)
@@ -101,7 +101,9 @@ class MessageFragment : Fragment(R.layout.fragment_message){
         messages_view.addOnScrollListener(scrollListener)
 
         messageViewModel.title.observe(viewLifecycleOwner) { title ->
-            runCatching{ requireActivity() as? TitleSettable }.getOrNull()?.setTitle(title)
+            if(title != null) {
+                runCatching{ requireActivity() as? TitleSettable }.getOrNull()?.setTitle(title)
+            }
         }
 
 
