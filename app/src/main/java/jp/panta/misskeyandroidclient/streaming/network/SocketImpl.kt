@@ -17,7 +17,7 @@ class SocketImpl(
     val logger = loggerFactory.create("SocketImpl")
 
 
-    val json = Json {
+    private val json = Json {
         ignoreUnknownKeys = true
     }
 
@@ -26,48 +26,49 @@ class SocketImpl(
         set(value) {
             field = value
             logger.debug("SocketImpl状態変化: ${value.javaClass}, $value")
-            synchronized(this) {
-                stateListeners.toList()
-            }.forEach {
+            stateListeners.forEach {
                 it.onStateChanged(value)
             }
 
         }
 
-    private val stateListeners = mutableSetOf<SocketStateEventListener>()
+    private var stateListeners = setOf<SocketStateEventListener>()
 
-    private val messageListeners = mutableSetOf<SocketMessageEventListener>()
+    private var messageListeners = setOf<SocketMessageEventListener>()
 
 
 
     override fun addMessageEventListener(listener: SocketMessageEventListener) {
-        synchronized(this) {
-            val empty = messageListeners.isEmpty()
-            messageListeners.add(listener)
-            if(empty && messageListeners.isNotEmpty()) {
-                connect()
-            }
+
+        val empty = messageListeners.isEmpty()
+        messageListeners = messageListeners.toMutableSet().also {
+            it.add(listener)
         }
+        if(empty && messageListeners.isNotEmpty()) {
+            connect()
+        }
+
     }
 
     override fun addStateEventListener(listener: SocketStateEventListener) {
-        synchronized(this) {
-            stateListeners.add(listener)
+        stateListeners = stateListeners.toMutableSet().also {
+            it.add(listener)
         }
+
     }
 
     override fun removeMessageEventListener(listener: SocketMessageEventListener) {
-        synchronized(this) {
-            messageListeners.remove(listener)
-            if(messageListeners.isEmpty()) {
-                disconnect()
-            }
+        messageListeners = messageListeners.toMutableSet().also {
+            it.remove(listener)
+        }
+        if(messageListeners.isEmpty()) {
+            disconnect()
         }
     }
 
     override fun removeStateEventListener(listener: SocketStateEventListener) {
-        synchronized(this) {
-            stateListeners.remove(listener)
+        stateListeners = stateListeners.toMutableSet().also {
+            it.remove(listener)
         }
     }
 
@@ -140,9 +141,7 @@ class SocketImpl(
     }
 
     override fun state(): Socket.State {
-        synchronized(this){
-            return this.mState
-        }
+        return this.mState
 
     }
 
@@ -181,35 +180,31 @@ class SocketImpl(
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
+        val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
+            logger.warning("デコードエラー", e = t)
+        }.getOrNull()?: return
 
-        synchronized(this) {
-            val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
-                logger.warning("デコードエラー", e = t)
-            }.getOrNull()?: return@synchronized
+        val iterator = messageListeners.iterator()
+        while(iterator.hasNext()) {
 
-            val iterator = messageListeners.iterator()
-            while(iterator.hasNext()) {
-
-                val listener = iterator.next()
-                val res = runCatching {
-                    listener.onMessage(e)
-                }.onFailure {
-                    logger.error("メッセージリスナー先でエラー発生", e = it)
-                }.getOrElse {
-                    false
-                }
-                if(res){
-                    return@synchronized
-                }
+            val listener = iterator.next()
+            val res = runCatching {
+                listener.onMessage(e)
+            }.onFailure {
+                logger.error("メッセージリスナー先でエラー発生", e = it)
+            }.getOrElse {
+                false
             }
-            logger.debug("受諾されんかったメッセージ: $text")
-
+            if(res){
+                return
+            }
         }
+        logger.debug("受諾されんかったメッセージ: $text")
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
-        logger.debug("webSocket:url=$url 接続")
+        logger.debug("onOpen webSocket:url=$url 接続")
         synchronized(this){
             mState = Socket.State.Connected
         }
