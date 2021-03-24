@@ -1,11 +1,12 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.users.User
+import java.io.Serializable
 import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.jvm.Throws
 
-sealed class Visibility {
+sealed class Visibility : Serializable{
     data class Public(
         override val isLocalOnly: Boolean
     ) : CanLocalOnly, Visibility()
