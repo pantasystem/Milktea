@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.api.notes.toEntities
 import jp.panta.misskeyandroidclient.api.users.RequestUser
@@ -93,6 +94,8 @@ open class UserViewData(
                 }else{
                     miCore.getUserRepository().find(userId, true)
                 }
+            }.onFailure {
+                Log.d("UserViewData", "取得エラー", it)
             }.getOrNull() as? User.Detail
 
             u?.let{
