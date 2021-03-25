@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.list.UserListDTO
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
@@ -14,14 +15,13 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import java.lang.StringBuilder
 import java.util.regex.Pattern
 
 
+@FlowPreview
 @Suppress("BlockingMethodInNonBlockingContext")
 class AntennaEditorViewModel (
     val antennaId: Antenna.Id?,
@@ -35,10 +35,28 @@ class AntennaEditorViewModel (
         }
     }
 
-    val antenna = MutableLiveData<Antenna?>()
+    private val logger = miCore.loggerFactory.create("AntennaEditorViewModel")
 
 
-    private val mAntenna = MutableStateFlow<Antenna?>(null)
+
+    private val mAntenna = MutableStateFlow<Antenna?>(null).apply {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                fetch()
+            }.onFailure {
+                logger.debug("アンテナ取得エラー", e = it)
+            }.onSuccess {
+                logger.debug("取得成功:$it")
+                value = it
+            }
+        }
+    }
+
+    val antenna = MutableLiveData<Antenna?>().apply {
+        mAntenna.filterNotNull().onEach {
+            postValue(it)
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
 
     enum class Source(val remote: String){
         HOME("home"), ALL("all"), USERS("users"), LIST("list"), GROUP("group")
@@ -75,14 +93,16 @@ class AntennaEditorViewModel (
         }
     }
 
+    @ExperimentalCoroutinesApi
     private val mUsers = userNames.map { list ->
         list.map { userName ->
-            val userNameAndHost = userName.split("@")
+            val userNameAndHost = userName.split("@", "").filterNot { it == "" }
             UserViewData(userNameAndHost.first(), userNameAndHost.lastOrNull(), getAccount().accountId ,miCore, viewModelScope, Dispatchers.IO)
 
         }
     }
 
+    @ExperimentalCoroutinesApi
     val users = MutableStateFlow<List<UserViewData>>(emptyList()).apply {
         mUsers.onEach { list ->
             value = list
@@ -241,6 +261,7 @@ class AntennaEditorViewModel (
         }
     }
     val selectUserEvent = EventBus<List<User.Id>>()
+    @ExperimentalCoroutinesApi
     fun selectUser(){
         selectUserEvent.event = users.value.mapNotNull {
             it.user.value?.id
@@ -272,6 +293,18 @@ class AntennaEditorViewModel (
 
     fun setUserNames(userNames: List<String>){
         this.userNames.value = userNames
+    }
+
+    private suspend fun fetch(): Antenna? {
+        return antennaId?.let{ antennaId ->
+            val account = miCore.getAccount(antennaId.accountId)
+            val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
+                ?: return null
+            val res = api.showAntenna(AntennaQuery(i = account.getI(miCore.getEncryption()), antennaId = antennaId.antennaId, limit = null)).execute()
+            res.throwIfHasError()
+            res.body()?.toEntity(account)
+
+        }
     }
 
     private var mAccount: Account? = null
