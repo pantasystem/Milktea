@@ -19,18 +19,17 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     companion object {
         const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment.EXTRA_ANTENNA_ID"
-        fun newInstance(antennaId: Antenna.Id): AntennaEditorFragment{
+        fun newInstance(antennaId: Antenna.Id?): AntennaEditorFragment{
             return AntennaEditorFragment().apply{
                 arguments = Bundle().apply{
-                    putSerializable(EXTRA_ANTENNA_ID, antennaId)
+                    antennaId?.let {
+                        putSerializable(EXTRA_ANTENNA_ID, antennaId)
+                    }
                 }
             }
         }
@@ -48,7 +47,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
 
 
-        val antennaId = arguments?.getSerializable(EXTRA_ANTENNA_ID) as Antenna.Id
+        val antennaId = arguments?.getSerializable(EXTRA_ANTENNA_ID) as? Antenna.Id
 
         val miCore: MiCore = view.context.applicationContext as MiApplication
         val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(miCore, antennaId))[AntennaEditorViewModel::class.java]
@@ -167,6 +166,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     }
 
+    @FlowPreview
     fun sourceToResourceString(src: AntennaEditorViewModel.Source): String{
 
         return when(src){
@@ -178,6 +178,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         }
     }
 
+    @FlowPreview
     fun resourceStringToSource(str: String): AntennaEditorViewModel.Source?{
         return when(str){
             getString(R.string.all_notes) -> AntennaEditorViewModel.Source.ALL
