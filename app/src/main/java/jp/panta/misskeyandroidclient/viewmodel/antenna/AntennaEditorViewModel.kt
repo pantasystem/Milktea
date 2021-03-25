@@ -95,9 +95,9 @@ class AntennaEditorViewModel (
 
     @ExperimentalCoroutinesApi
     private val mUsers = userNames.map { list ->
-        list.map { userName ->
-            val userNameAndHost = userName.split("@", "").filterNot { it == "" }
-            UserViewData(userNameAndHost.first(), userNameAndHost.lastOrNull(), getAccount().accountId ,miCore, viewModelScope, Dispatchers.IO)
+        list.map { userName: String ->
+            val userNameAndHost = userName.split("@").filterNot { it == "" }
+            UserViewData(userNameAndHost[0], userNameAndHost.getOrNull(1), getAccount().accountId ,miCore, viewModelScope, Dispatchers.IO)
 
         }
     }
