@@ -145,6 +145,11 @@ class AntennaEditorViewModel (
                 it.id == this@AntennaEditorViewModel.antenna.value?.userListId
             }?: list.firstOrNull()
         }
+        addSource(antenna) { antenna ->
+            this.value = this@AntennaEditorViewModel.userListList.value?.firstOrNull {
+                it.id == antenna?.userListId
+            }
+        }
     }
 
     val groupList = MediatorLiveData<List<Group>?>().apply{
@@ -232,10 +237,15 @@ class AntennaEditorViewModel (
 
                 res.body()?.toEntity(account)
             }.onSuccess {
-                antennaAddedStateEvent.event = it != null
-                mAntenna.value = it
+                withContext(Dispatchers.Main) {
+                    antennaAddedStateEvent.event = it != null
+                    mAntenna.value = it
+                }
+
             }.onFailure {
-                antennaAddedStateEvent.event = false
+                withContext(Dispatchers.Main) {
+                    antennaAddedStateEvent.event = false
+                }
             }
 
 
