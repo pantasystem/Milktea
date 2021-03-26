@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
@@ -59,7 +60,8 @@ class FollowFollowerViewModel(
         val type: Type,
         val encryption: Encryption,
         val noteRelationGetter: NoteRelationGetter,
-        val userDataSource: UserDataSource
+        val userDataSource: UserDataSource,
+        private val logger: Logger?
 
     ) : Paginator{
 
@@ -69,6 +71,7 @@ class FollowFollowerViewModel(
 
         override suspend fun next(): List<User.Detail> {
             lock.withLock {
+                logger?.debug("next: $nextId")
                 val res = api.invoke(RequestUser(
                     account.getI(encryption),
                     userId = userId.id,
@@ -76,6 +79,7 @@ class FollowFollowerViewModel(
                 )).execute().body()
                     ?: return emptyList()
                 nextId = res.last().id
+                require(nextId != null)
                 return res.mapNotNull {
                     it.followee ?: it.follower
                 }.map { userDTO ->
@@ -152,6 +156,7 @@ class FollowFollowerViewModel(
     val isInitializing = MutableLiveData<Boolean>(false)
 
 
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     val users = MutableLiveData<List<UserViewData>>()
@@ -183,16 +188,18 @@ class FollowFollowerViewModel(
     @FlowPreview
     @ExperimentalCoroutinesApi
     fun loadOld() = viewModelScope.launch (Dispatchers.IO){
+        logger.debug("loadOld")
         if(mIsLoading) return@launch
         mIsLoading = true
         runCatching {
             val list = getPaginator().next().map {
                 UserViewData(it, miCore, viewModelScope, Dispatchers.IO)
-            }.toMutableList()
-            list.addAll(0, mUsers)
-            mUsers = list
+            }
+            mUsers = mUsers.toMutableList().also {
+                it.addAll(list)
+            }
         }.onFailure {
-
+            logger.error("load error", e = it)
         }
         mIsLoading = false
 
@@ -210,26 +217,27 @@ class FollowFollowerViewModel(
     private var mAccount: Account? = null
     private val accountLock = Mutex()
     private var mPaginator: Paginator? = null
-    private suspend fun getPaginator(): Paginator {
-        accountLock.withLock {
-            if(mPaginator != null){
-                mPaginator
-            }
 
-            if(mAccount == null) {
-                mAccount = accountRepository.get(userId.accountId)
-            }
-            mPaginator = mAccount?.let { account ->
-                val api = misskeyAPIProvider.get(account.instanceDomain)
-                if(api is MisskeyAPIV10){
-                    V10Paginator(account, api, userId, type, encryption, noteRelationGetter, userDataSource)
-                }else{
-                    DefaultPaginator(account, api as MisskeyAPIV11, userId, type, encryption, noteRelationGetter, userDataSource)
-                }
-            }
-            require(mPaginator != null)
-            return mPaginator!!
+    private suspend fun getPaginator(): Paginator {
+        if(mPaginator != null){
+            return mPaginator
+                ?: throw IllegalStateException("paginator is null")
         }
+        logger.debug("paginator 生成")
+
+        if(mAccount == null) {
+            mAccount = accountRepository.get(userId.accountId)
+        }
+        mPaginator = mAccount?.let { account ->
+            val api = misskeyAPIProvider.get(account.instanceDomain)
+            if(api is MisskeyAPIV10){
+                V10Paginator(account, api, userId, type, encryption, noteRelationGetter, userDataSource)
+            }else{
+                DefaultPaginator(account, api as MisskeyAPIV11, userId, type, encryption, noteRelationGetter, userDataSource, miCore.loggerFactory.create("DefaultPaginator"))
+            }
+        }
+        require(mPaginator != null)
+        return mPaginator!!
     }
 
 }
