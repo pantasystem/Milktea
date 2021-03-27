@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.gettters
 
+import jp.panta.misskeyandroidclient.api.groups.toGroup
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.entities
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageNotFoundException
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
@@ -13,12 +15,16 @@ import kotlin.jvm.Throws
 class MessageRelationGetter(
     private val messageDataSource: MessageDataSource,
     private val userDataSource: UserDataSource,
+    private val groupDataSource: GroupDataSource
 ) {
 
     suspend fun get(account: Account, messageDTO: MessageDTO): MessageRelation {
         val (message, users) = messageDTO.entities(account)
         messageDataSource.add(message)
         userDataSource.addAll(users)
+        messageDTO.group?.let{
+            groupDataSource.add(it.toGroup(account.accountId))
+        }
         return get(message)
     }
 

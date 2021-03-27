@@ -23,6 +23,8 @@ class UserRepositoryImpl(
                     it as? User.Detail
                 }else it
             }
+        }.onFailure {
+            logger.debug("ローカルにユーザーは存在しませんでした。:$userId")
         }
         localResult.getOrNull()?.let{
             return it

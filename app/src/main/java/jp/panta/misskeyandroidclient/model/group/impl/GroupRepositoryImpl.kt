@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.group.impl
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.groups.*
 import jp.panta.misskeyandroidclient.api.throwIfHasError
@@ -15,7 +16,8 @@ class GroupRepositoryImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val accountRepository: AccountRepository,
     private val groupDataSource: GroupDataSource,
-    private val encryption: Encryption
+    private val encryption: Encryption,
+    private val logger: Logger?
 ) : GroupRepository{
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -34,6 +36,8 @@ class GroupRepositoryImpl(
     override suspend fun find(groupId: Group.Id): Group {
         var group = runCatching {
             groupDataSource.find(groupId)
+        }.onFailure {
+            logger?.debug("ローカルには存在しません。:${groupId}")
         }.getOrNull()
 
         if(group != null) {

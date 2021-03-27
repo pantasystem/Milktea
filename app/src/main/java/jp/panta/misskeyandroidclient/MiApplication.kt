@@ -164,10 +164,6 @@ class MiApplication : Application(), MiCore {
 
         val config = BundledEmojiCompatConfig(this)
             .setReplaceAll(true)
-        if(BuildConfig.DEBUG){
-            config.setEmojiSpanIndicatorColor(Color.GREEN)
-                .setEmojiSpanIndicatorEnabled(true)
-        }
         EmojiCompat.init(config)
 
         mActiveNetworkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
@@ -260,7 +256,8 @@ class MiApplication : Application(), MiCore {
             misskeyAPIProvider = mMisskeyAPIProvider,
             accountRepository = mAccountRepository,
             groupDataSource = mGroupDataSource,
-            encryption = mEncryption
+            encryption = mEncryption,
+            loggerFactory.create("GroupRepositoryImpl")
         )
 
         InMemoryMessageDataSource(mAccountRepository).also {
@@ -269,7 +266,7 @@ class MiApplication : Application(), MiCore {
         }
         mMessageRepository = MessageRepositoryImpl(this)
 
-        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource)
+        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource)
 
         messageStreamFilter = MessageStreamFilter(this)
 

@@ -51,8 +51,6 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
     list.add(user.toUser(account, false))
     val message = if(groupId == null) {
         require(recipientId != null)
-        require(recipient != null)
-        list.add(recipient.toUser(account, false))
         Message.Direct(
             id,
             createdAt,
@@ -65,7 +63,6 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             recipientId = User.Id(account.accountId, recipientId)
         )
     }else{
-        require(group != null)
         Message.Group(
             id,
             createdAt,
@@ -76,7 +73,6 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             isRead,
             emojis?: emptyList(),
             GroupEntity.Id(account.accountId, groupId),
-            group.toGroup(account.accountId)
         )
     }
     return message to list

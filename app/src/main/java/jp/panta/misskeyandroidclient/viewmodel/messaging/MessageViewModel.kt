@@ -44,22 +44,25 @@ class MessageViewModel(
     private var isLoading = false
 
 
-    val title: LiveData<String> = Transformations.map(messagesLiveData) {
-        it.messages.firstOrNull()?.let { viewData ->
-            when(viewData.message){
-                is MessageRelation.Group -> {
-                    viewData.message.group.name
-                }
-                is MessageRelation.Direct -> {
-                    if(viewData is SelfMessageViewData){
-                        viewData.message.recipient.userName
-                    }else{
-                        viewData.message.user.userName
+    private val mTitle = MutableLiveData<String>().apply {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                when(messagingId) {
+                    is MessagingId.Direct -> {
+                        miCore.getUserRepository().find(messagingId.userId).getDisplayUserName()
+                    }
+                    is MessagingId.Group -> {
+                        miCore.getGroupRepository().find(messagingId.groupId).name
                     }
                 }
+            }.onSuccess {
+                postValue(it)
+            }.onFailure {
+                logger.debug("タイトル取得の失敗", e = it)
             }
         }
     }
+    val title: LiveData<String> = mTitle
 
     private val logger = miCore.loggerFactory.create("MessageViewModel")
 
