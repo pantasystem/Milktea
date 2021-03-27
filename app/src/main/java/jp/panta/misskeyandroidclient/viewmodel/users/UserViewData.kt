@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.api.notes.toEntities
 import jp.panta.misskeyandroidclient.api.users.RequestUser
@@ -25,6 +26,8 @@ open class UserViewData(
 
     val user: MutableLiveData<User.Detail?> = MutableLiveData<User.Detail?>()
     private val userFlow = MutableStateFlow<User.Detail?>(null)
+
+    private val logger = miCore.loggerFactory.create("UserViewData")
 
     private var mUser: User.Detail? = null
         set(value) {
@@ -85,15 +88,19 @@ open class UserViewData(
     private suspend fun initLoad() {
 
         if(user.value == null){
+            logger.debug("User読み込み開始")
             val u : User.Detail? = runCatching {
-                if(userId == null) {
+                val u = if(userId == null) {
                     require(accountId != null)
                     require(userName != null)
                     miCore.getUserRepository().findByUserName(accountId, userName, host)
                 }else{
                     miCore.getUserRepository().find(userId, true)
                 }
-            }.getOrNull() as? User.Detail
+                u as User.Detail
+            }.onFailure {
+                logger.debug("取得エラー", e = it)
+            }.getOrNull()
 
             u?.let{
                 mUser = it

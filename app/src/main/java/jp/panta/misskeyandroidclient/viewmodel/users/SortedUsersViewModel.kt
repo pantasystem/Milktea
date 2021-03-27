@@ -120,7 +120,7 @@ class SortedUsersViewModel(
             runCatching { miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).execute().body() }
                 .map {
                     it?.map{ dto ->
-                        dto.toUser(account).also{ u ->
+                        dto.toUser(account, true).also{ u ->
                             miCore.getUserDataSource().add(u)
                         }
                     }?.map{ u->

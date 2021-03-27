@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.list.UserListDTO
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
@@ -14,14 +15,13 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import java.lang.StringBuilder
 import java.util.regex.Pattern
 
 
+@FlowPreview
 @Suppress("BlockingMethodInNonBlockingContext")
 class AntennaEditorViewModel (
     val antennaId: Antenna.Id?,
@@ -29,16 +29,34 @@ class AntennaEditorViewModel (
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore, val antennaId: Antenna.Id) : ViewModelProvider.Factory{
+    class Factory(val miCore: MiCore, val antennaId: Antenna.Id?) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return AntennaEditorViewModel(antennaId, miCore) as T
         }
     }
 
-    val antenna = MutableLiveData<Antenna?>()
+    private val logger = miCore.loggerFactory.create("AntennaEditorViewModel")
 
 
-    private val mAntenna = MutableStateFlow<Antenna?>(null)
+
+    private val mAntenna = MutableStateFlow<Antenna?>(null).apply {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                fetch()
+            }.onFailure {
+                logger.debug("アンテナ取得エラー", e = it)
+            }.onSuccess {
+                logger.debug("取得成功:$it")
+                value = it
+            }
+        }
+    }
+
+    val antenna = MutableLiveData<Antenna?>().apply {
+        mAntenna.filterNotNull().onEach {
+            postValue(it)
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
 
     enum class Source(val remote: String){
         HOME("home"), ALL("all"), USERS("users"), LIST("list"), GROUP("group")
@@ -69,20 +87,22 @@ class AntennaEditorViewModel (
         }
     }
 
-    val userNames = MutableStateFlow<List<String>>(emptyList()).apply {
+    private val userNames = MutableStateFlow<List<String>>(emptyList()).apply {
         mAntenna.filterNotNull().onEach {
             value = it.users
-        }
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
+    @ExperimentalCoroutinesApi
     private val mUsers = userNames.map { list ->
-        list.map { userName ->
-            val userNameAndHost = userName.split("@")
-            UserViewData(userNameAndHost.first(), userNameAndHost.lastOrNull(), getAccount().accountId ,miCore, viewModelScope, Dispatchers.IO)
+        list.map { userName: String ->
+            val userNameAndHost = userName.split("@").filterNot { it == "" }
+            UserViewData(userNameAndHost[0], userNameAndHost.getOrNull(1), getAccount().accountId ,miCore, viewModelScope, Dispatchers.IO)
 
         }
     }
 
+    @ExperimentalCoroutinesApi
     val users = MutableStateFlow<List<UserViewData>>(emptyList()).apply {
         mUsers.onEach { list ->
             value = list
@@ -124,6 +144,11 @@ class AntennaEditorViewModel (
             this.value = list.firstOrNull {
                 it.id == this@AntennaEditorViewModel.antenna.value?.userListId
             }?: list.firstOrNull()
+        }
+        addSource(antenna) { antenna ->
+            this.value = this@AntennaEditorViewModel.userListList.value?.firstOrNull {
+                it.id == antenna?.userListId
+            }
         }
     }
 
@@ -201,7 +226,7 @@ class AntennaEditorViewModel (
                     caseSensitive.value?: false,
                     withFile.value?: false,
                     withReplies.value?: false,
-                    notify.value?: false
+                    notify.value?: false,
 
                 )
                 val res = if(antennaId == null) {
@@ -212,10 +237,15 @@ class AntennaEditorViewModel (
 
                 res.body()?.toEntity(account)
             }.onSuccess {
-                antennaAddedStateEvent.event = it != null
-                mAntenna.value = it
+                withContext(Dispatchers.Main) {
+                    antennaAddedStateEvent.event = it != null
+                    mAntenna.value = it
+                }
+
             }.onFailure {
-                antennaAddedStateEvent.event = false
+                withContext(Dispatchers.Main) {
+                    antennaAddedStateEvent.event = false
+                }
             }
 
 
@@ -241,6 +271,7 @@ class AntennaEditorViewModel (
         }
     }
     val selectUserEvent = EventBus<List<User.Id>>()
+    @ExperimentalCoroutinesApi
     fun selectUser(){
         selectUserEvent.event = users.value.mapNotNull {
             it.user.value?.id
@@ -271,7 +302,20 @@ class AntennaEditorViewModel (
     }
 
     fun setUserNames(userNames: List<String>){
+        logger.debug("setUserNames: $userNames")
         this.userNames.value = userNames
+    }
+
+    private suspend fun fetch(): Antenna? {
+        return antennaId?.let{ antennaId ->
+            val account = miCore.getAccount(antennaId.accountId)
+            val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
+                ?: return null
+            val res = api.showAntenna(AntennaQuery(i = account.getI(miCore.getEncryption()), antennaId = antennaId.antennaId, limit = null)).execute()
+            res.throwIfHasError()
+            res.body()?.toEntity(account)
+
+        }
     }
 
     private var mAccount: Account? = null

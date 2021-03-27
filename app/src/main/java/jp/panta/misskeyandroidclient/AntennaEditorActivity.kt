@@ -3,12 +3,11 @@ package jp.panta.misskeyandroidclient
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment
@@ -18,24 +17,23 @@ import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserView
 import kotlinx.android.synthetic.main.activity_antenna_editor.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA_ID"
         private const val REQUEST_SEARCH_AND_SELECT_USER = 110
 
-        fun newIntent(context: Context, antennaId: Antenna.Id) : Intent{
+        fun newIntent(context: Context, antennaId: Antenna.Id?) : Intent{
             return Intent(context, AntennaEditorActivity::class.java).apply {
                 putExtra(EXTRA_ANTENNA_ID, antennaId)
             }
         }
     }
 
+    @FlowPreview
     private var mViewModel: AntennaEditorViewModel? = null
 
+    @FlowPreview
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -43,7 +41,7 @@ class AntennaEditorActivity : AppCompatActivity() {
         setSupportActionBar(antennaEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val antennaId=  intent.getSerializableExtra(EXTRA_ANTENNA_ID) as Antenna.Id
+        val antennaId = intent.getSerializableExtra(EXTRA_ANTENNA_ID) as? Antenna.Id
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()
