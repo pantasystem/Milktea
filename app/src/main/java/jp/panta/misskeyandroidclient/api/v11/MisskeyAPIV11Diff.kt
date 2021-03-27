@@ -17,19 +17,19 @@ interface MisskeyAPIV11Diff {
     fun following(@Body userRequest: RequestUser) : Call<List<FollowFollowerUser>>
 
     @POST("api/users/groups/create")
-    fun createGroup(@Body body: CreateGroup) : Call<GroupDTO>
+    fun createGroup(@Body body: CreateGroupDTO) : Call<GroupDTO>
 
     @POST("api/users/groups/delete")
-    fun deleteGroup(@Body body: DeleteGroup) : Call<Unit>
+    fun deleteGroup(@Body body: DeleteGroupDTO) : Call<Unit>
 
     @POST("api/users/invitations/accept")
-    fun acceptInvitation(@Body body: AcceptInvitation) : Call<Unit>
+    fun acceptInvitation(@Body body: AcceptInvitationDTO) : Call<Unit>
 
     @POST("api/users/invitations/reject")
-    fun rejectInvitation(@Body body: RejectInvitation) : Call<Unit>
+    fun rejectInvitation(@Body body: RejectInvitationDTO) : Call<Unit>
 
     @POST("api/users/groups/invite")
-    fun invite(@Body body: InviteUser) : Call<Unit>
+    fun invite(@Body body: InviteUserDTO) : Call<Unit>
 
     @POST("api/users/groups/joined")
     fun joinedGroups(@Body body: I) : Call<List<GroupDTO>>
@@ -38,14 +38,14 @@ interface MisskeyAPIV11Diff {
     fun ownedGroups(@Body body: I) : Call<List<GroupDTO>>
 
     @POST("api/users/groups/owned")
-    fun pullUser(@Body body: RemoveUser) : Call<Unit>
+    fun pullUser(@Body body: RemoveUserDTO) : Call<Unit>
 
     @POST("api/users/groups/show")
-    fun showGroup(@Body body: ShowGroup) : Call<Unit>
+    fun showGroup(@Body body: ShowGroupDTO) : Call<GroupDTO>
 
     @POST("api/users/groups/transfer")
-    fun transferGroup(@Body body: TransferGroup) : Call<GroupDTO>
+    fun transferGroup(@Body body: TransferGroupDTO) : Call<GroupDTO>
 
     @POST("api/users/groups/update")
-    fun updateGroup(@Body body: UpdateGroup) : Call<GroupDTO>
+    fun updateGroup(@Body body: UpdateGroupDTO) : Call<GroupDTO>
 }

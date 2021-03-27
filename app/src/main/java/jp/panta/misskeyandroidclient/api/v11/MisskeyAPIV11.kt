@@ -26,8 +26,6 @@ import jp.panta.misskeyandroidclient.api.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
 
 open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI{
 
@@ -89,16 +87,16 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override fun getHashTagList(requestHashTagList: RequestHashTagList): Call<List<HashTag>> = misskeyAPI.getHashTagList(requestHashTagList)
     override fun getUsers(requestUser: RequestUser): Call<List<UserDTO>> = misskeyAPI.getUsers(requestUser)
     
-    open fun createGroup( body: CreateGroup) : Call<GroupDTO> = apiDiff.createGroup(body)
-    open fun deleteGroup( body: DeleteGroup) : Call<Unit> = apiDiff.deleteGroup(body)
-    open fun acceptInvitation( body: AcceptInvitation) : Call<Unit> = apiDiff.acceptInvitation(body)
-    open fun rejectInvitation( body: RejectInvitation) : Call<Unit> = apiDiff.rejectInvitation(body)
-    open fun invite( body: InviteUser) : Call<Unit> = apiDiff.invite(body)
+    open fun createGroup( body: CreateGroupDTO) : Call<GroupDTO> = apiDiff.createGroup(body)
+    open fun deleteGroup( body: DeleteGroupDTO) : Call<Unit> = apiDiff.deleteGroup(body)
+    open fun acceptInvitation( body: AcceptInvitationDTO) : Call<Unit> = apiDiff.acceptInvitation(body)
+    open fun rejectInvitation( body: RejectInvitationDTO) : Call<Unit> = apiDiff.rejectInvitation(body)
+    open fun invite( body: InviteUserDTO) : Call<Unit> = apiDiff.invite(body)
     open fun joinedGroups( body: I) : Call<List<GroupDTO>> = apiDiff.joinedGroups(body)
     open fun ownedGroups( body: I) : Call<List<GroupDTO>> = apiDiff.ownedGroups(body)
-    open fun pullUser( body: RemoveUser) : Call<Unit> = apiDiff.pullUser(body)
-    open fun showGroup( body: ShowGroup) : Call<Unit> = apiDiff.showGroup(body)
-    open fun transferGroup( body: TransferGroup) : Call<GroupDTO> = apiDiff.transferGroup(body)
-    open fun updateGroup( body: UpdateGroup) : Call<GroupDTO> = apiDiff.updateGroup(body)
+    open fun pullUser( body: RemoveUserDTO) : Call<Unit> = apiDiff.pullUser(body)
+    open fun showGroup( body: ShowGroupDTO) : Call<GroupDTO> = apiDiff.showGroup(body)
+    open fun transferGroup( body: TransferGroupDTO) : Call<GroupDTO> = apiDiff.transferGroup(body)
+    open fun updateGroup( body: UpdateGroupDTO) : Call<GroupDTO> = apiDiff.updateGroup(body)
 
 }

@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.model.AddResult
 
 interface GroupDataSource {
 
-    suspend fun find(groupId: Group.Id)
+    suspend fun find(groupId: Group.Id): Group
 
     suspend fun add(group: Group) : AddResult
 

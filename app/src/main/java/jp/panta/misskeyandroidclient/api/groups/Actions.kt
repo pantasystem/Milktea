@@ -1,47 +1,48 @@
 package jp.panta.misskeyandroidclient.api.groups
 
-data class DeleteGroup(
+data class DeleteGroupDTO(
     val i: String,
     val groupId: String
 )
 
-data class CreateGroup(
+data class CreateGroupDTO(
     val i: String,
     val name: String
 )
 
-data class AcceptInvitation(
+data class AcceptInvitationDTO(
     val i: String,
     val invitationId: String
 )
 
-data class RejectInvitation(
+data class RejectInvitationDTO(
     val i: String,
     val invitationId: String
 )
 
-data class InviteUser(
+data class InviteUserDTO(
     val i: String,
     val userId: String
 )
 
-data class RemoveUser(
+data class RemoveUserDTO(
     val i: String,
-    val userId: String
+    val userId: String,
+    val groupId: String
 )
 
-data class ShowGroup(
+data class ShowGroupDTO(
     val i: String,
     val groupId: String
 )
 
-data class TransferGroup(
+data class TransferGroupDTO(
     val i: String,
     val groupId: String,
     val userId: String
 )
 
-data class UpdateGroup(
+data class UpdateGroupDTO(
     val i: String,
     val groupId: String,
     val name: String
