@@ -212,13 +212,7 @@ class MiApplication : Application(), MiCore {
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource)
 
-        mGroupDataSource = InMemoryGroupDataSource()
-        mGroupRepository = GroupRepositoryImpl(
-            misskeyAPIProvider = mMisskeyAPIProvider,
-            accountRepository = mAccountRepository,
-            groupDataSource = mGroupDataSource,
-            encryption = mEncryption
-        )
+
 
         mSocketWithAccountProvider = SocketWithAccountProviderImpl(
             getEncryption(),
@@ -260,6 +254,14 @@ class MiApplication : Application(), MiCore {
 
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
+
+        mGroupDataSource = InMemoryGroupDataSource()
+        mGroupRepository = GroupRepositoryImpl(
+            misskeyAPIProvider = mMisskeyAPIProvider,
+            accountRepository = mAccountRepository,
+            groupDataSource = mGroupDataSource,
+            encryption = mEncryption
+        )
 
         InMemoryMessageDataSource(mAccountRepository).also {
             mMessageDataSource = it
