@@ -35,13 +35,11 @@ class MessageRelationGetter(
                 MessageRelation.Direct(
                     message,
                     userDataSource.get(message.userId),
-                    userDataSource.get(message.recipientId)
                 )
             }
             is Message.Group -> {
                 MessageRelation.Group(
                     message,
-                    message.group,
                     userDataSource.get(message.userId),
                 )
             }
