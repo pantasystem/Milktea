@@ -49,9 +49,9 @@ class UserRepositoryImpl(
         throw UserNotFoundException(userId)
     }
 
-    override suspend fun findByUserName(accountId: Long, userName: String, host: String?): User {
+    override suspend fun findByUserName(accountId: Long, userName: String, host: String?, detail: Boolean): User {
         val local = runCatching {
-            miCore.getUserDataSource().get(accountId, userName, host)
+            miCore.getUserDataSource().get(accountId, userName, host) as User.Detail
         }.getOrNull()
 
         if(local != null) {
