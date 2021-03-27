@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
@@ -60,6 +61,8 @@ class MessageViewModel(
         }
     }
 
+    private val logger = miCore.loggerFactory.create("MessageViewModel")
+
     constructor(groupId: Group.Id, miCore: MiCore) : this(miCore, MessagingId.Group(groupId))
 
     constructor(userId: User.Id, miCore: MiCore) : this(miCore, MessagingId.Direct(userId))
@@ -84,13 +87,22 @@ class MessageViewModel(
 
     fun loadInit(){
         if(isLoading){
+            logger.debug("load cancel")
             return
         }
         isLoading = true
         viewModelScope.launch(Dispatchers.IO) {
             val account = messagingId.getAccount()
             val viewDataList = runCatching {
-                miCore.getMisskeyAPI(account).getMessages(RequestMessage(i = account.getI(miCore.getEncryption()))).execute()?.body()
+                miCore.getMisskeyAPI(account).getMessages(
+                    RequestMessage(
+                        i = account.getI(miCore.getEncryption()),
+                        groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
+                        userId = (messagingId as? MessagingId.Direct)?.userId?.id
+                    ),
+                ).execute()?.throwIfHasError()?.body()
+            }.onFailure {
+                logger.debug("メッセージの読み込みに失敗しました。", e = it)
             }.getOrNull()?.toMessageViewData(account)?: emptyList()
             messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
             isLoading = false
