@@ -27,6 +27,8 @@ open class UserViewData(
     val user: MutableLiveData<User.Detail?> = MutableLiveData<User.Detail?>()
     private val userFlow = MutableStateFlow<User.Detail?>(null)
 
+    private val logger = miCore.loggerFactory.create("UserViewData")
+
     private var mUser: User.Detail? = null
         set(value) {
             field = value
@@ -86,17 +88,19 @@ open class UserViewData(
     private suspend fun initLoad() {
 
         if(user.value == null){
+            logger.debug("User読み込み開始")
             val u : User.Detail? = runCatching {
-                if(userId == null) {
+                val u = if(userId == null) {
                     require(accountId != null)
                     require(userName != null)
                     miCore.getUserRepository().findByUserName(accountId, userName, host)
                 }else{
                     miCore.getUserRepository().find(userId, true)
                 }
+                u as User.Detail
             }.onFailure {
-                Log.d("UserViewData", "取得エラー", it)
-            }.getOrNull() as? User.Detail
+                logger.debug("取得エラー", e = it)
+            }.getOrNull()
 
             u?.let{
                 mUser = it
