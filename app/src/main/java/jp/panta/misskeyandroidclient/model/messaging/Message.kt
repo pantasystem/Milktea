@@ -4,8 +4,10 @@ import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserRepository
 import java.util.*
 
 
@@ -48,7 +50,6 @@ sealed class Message{
         override val isRead: Boolean,
         override val emojis: List<Emoji>,
         val groupId: GroupEntity.Id,
-        val group: GroupEntity
     ) : Message() {
         override fun read(): Message {
             return this.copy(isRead = true)
@@ -172,4 +173,18 @@ sealed class MessageHistoryRelation : MessageRelation(){
         override val user: User,
         val recipient: User
     ) : MessageHistoryRelation()
+}
+
+suspend fun MessageRelation.toHistory(groupRepository: GroupRepository, userRepository: UserRepository): MessageHistoryRelation {
+    return when(val msg = message) {
+        is Message.Direct -> {
+            val recipient = userRepository.find(msg.recipientId)
+            MessageHistoryRelation.Direct(this.message, this.user, recipient)
+        }
+        is Message.Group -> {
+            val group = groupRepository.find(msg.groupId)
+            MessageHistoryRelation.Group(this.message, this.user, group)
+        }
+    }
+
 }
