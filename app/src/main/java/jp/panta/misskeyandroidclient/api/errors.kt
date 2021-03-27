@@ -26,7 +26,7 @@ val formatter = Json {
 
 }
 
-fun<T> Response<T>.throwIfHasError() {
+fun<T> Response<T>.throwIfHasError(): Response<T> {
     val error = runCatching {
         this.errorBody()?.string()?.let {
             formatter.decodeFromString<Error>(it)
@@ -44,5 +44,6 @@ fun<T> Response<T>.throwIfHasError() {
 
         }
     }
+    return this
 
 }

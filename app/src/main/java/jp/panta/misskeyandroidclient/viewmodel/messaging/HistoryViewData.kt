@@ -5,18 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
+import jp.panta.misskeyandroidclient.model.messaging.MessageHistoryRelation
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
-class HistoryViewData (account: Account, message: MessageRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope, coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO){
+class HistoryViewData (account: Account, message: MessageHistoryRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope, coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO){
     val messagingId = message.message.messagingId(account)
-    val message = MutableLiveData<MessageRelation>(message)
+    val message = MutableLiveData<MessageHistoryRelation>(message)
     //val id = message.message.id
-    val isGroup = message is MessageRelation.Group
-    val group = (message as? MessageRelation.Group)?.group
-    val partner = (message as? MessageRelation.Direct)?.let {
+    val isGroup = message is MessageHistoryRelation.Group
+    val group = (message as? MessageHistoryRelation.Group)?.group
+    val partner = (message as? MessageHistoryRelation.Direct)?.let {
         if(message.recipient.id.id == account.remoteId){
             message.user
         }else{

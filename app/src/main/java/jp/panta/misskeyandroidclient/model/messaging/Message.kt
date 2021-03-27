@@ -4,8 +4,10 @@ import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserRepository
 import java.util.*
 
 
@@ -48,7 +50,6 @@ sealed class Message{
         override val isRead: Boolean,
         override val emojis: List<Emoji>,
         val groupId: GroupEntity.Id,
-        val group: GroupEntity
     ) : Message() {
         override fun read(): Message {
             return this.copy(isRead = true)
@@ -139,20 +140,18 @@ sealed class MessageRelation {
 
     data class Group(
         override val message: Message.Group,
-        val group: GroupEntity,
         override val user: User
     ) : MessageRelation()
 
     data class Direct(
         override val message: Message.Direct,
         override val user: User,
-        val recipient: User
     ) : MessageRelation() {
-        fun opponentUser(account: Account) : User{
-            return if(recipient.id == User.Id(account.accountId, account.remoteId)){
-                user
+        fun opponentUser(account: Account) : User.Id{
+            return if(message.recipientId == User.Id(account.accountId, account.remoteId)){
+                message.userId
             }else{
-                recipient
+                message.recipientId
             }
         }
     }
@@ -160,4 +159,32 @@ sealed class MessageRelation {
     fun isMime(account: Account): Boolean {
         return message.userId == User.Id(account.accountId, account.remoteId)
     }
+}
+
+sealed class MessageHistoryRelation : MessageRelation(){
+    data class Group(
+        override val message: Message,
+        override val user: User,
+        val group: GroupEntity
+    ) : MessageHistoryRelation()
+
+    data class Direct(
+        override val message: Message,
+        override val user: User,
+        val recipient: User
+    ) : MessageHistoryRelation()
+}
+
+suspend fun MessageRelation.toHistory(groupRepository: GroupRepository, userRepository: UserRepository): MessageHistoryRelation {
+    return when(val msg = message) {
+        is Message.Direct -> {
+            val recipient = userRepository.find(msg.recipientId)
+            MessageHistoryRelation.Direct(this.message, this.user, recipient)
+        }
+        is Message.Group -> {
+            val group = groupRepository.find(msg.groupId)
+            MessageHistoryRelation.Group(this.message, this.user, group)
+        }
+    }
+
 }

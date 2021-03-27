@@ -3,14 +3,14 @@ package jp.panta.misskeyandroidclient.viewmodel.messaging
 import android.util.Log
 import androidx.lifecycle.*
 import io.reactivex.disposables.CompositeDisposable
+import jp.panta.misskeyandroidclient.api.groups.toGroup
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
+import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.messaging.*
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -65,8 +65,10 @@ class MessageHistoryViewModel(
     init {
         miCore.messageStreamFilter.getAccountMessageObservable(account).map {
             miCore.getGetters().messageRelationGetter.get(it)
+        }.map {
+            it.toHistory(miCore.getGroupRepository(), miCore.getUserRepository())
         }.onEach {
-            if(it is MessageRelation.Group) {
+            if(it is MessageHistoryRelation.Group) {
                 updateLiveData(historyGroupLiveData, it)
             }else{
                 updateLiveData(historyUserLiveData, it)
@@ -128,12 +130,20 @@ class MessageHistoryViewModel(
         return runCatching {
             val res = getMisskeyAPI().getMessageHistory(request).execute()
             res?.throwIfHasError()
-                res?.body()?.map {
+            res?.body()?.map {
+                it.group?.let {  groupDTO ->
+                    miCore.getGroupDataSource().add(groupDTO.toGroup(account.accountId))
+                }
+                it.recipient?.let { userDTO ->
+                    miCore.getUserDataSource().add(userDTO.toUser(account))
+                }
                 miCore.getGetters().messageRelationGetter.get(account, it)
             }
         }.onFailure {
             logger.error("fetchMessagingHistory error", e = it)
         }.getOrNull()?.map {
+            it.toHistory(miCore.getGroupRepository(), miCore.getUserRepository())
+        }?.map {
             HistoryViewData(account, it, miCore.getUnreadMessages(), viewModelScope)
         }?: emptyList()
     }
@@ -146,7 +156,7 @@ class MessageHistoryViewModel(
         return miCore.getMisskeyAPI(account)
     }
 
-    private fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: MessageRelation){
+    private fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: MessageHistoryRelation){
         val list = ArrayList<HistoryViewData>(liveData.value?: emptyList())
         val anyMsg = list.firstOrNull { hvd ->
             hvd.messagingId == message.message.messagingId(account)

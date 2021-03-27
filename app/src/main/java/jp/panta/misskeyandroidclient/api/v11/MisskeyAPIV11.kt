@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.api.v11
 
+import jp.panta.misskeyandroidclient.api.groups.*
 import jp.panta.misskeyandroidclient.api.list.*
 import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
@@ -85,5 +86,17 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override fun unrenote(deleteNote: DeleteNote): Call<Unit> = misskeyAPI.unrenote(deleteNote)
     override fun getHashTagList(requestHashTagList: RequestHashTagList): Call<List<HashTag>> = misskeyAPI.getHashTagList(requestHashTagList)
     override fun getUsers(requestUser: RequestUser): Call<List<UserDTO>> = misskeyAPI.getUsers(requestUser)
+    
+    open fun createGroup( body: CreateGroupDTO) : Call<GroupDTO> = apiDiff.createGroup(body)
+    open fun deleteGroup( body: DeleteGroupDTO) : Call<Unit> = apiDiff.deleteGroup(body)
+    open fun acceptInvitation( body: AcceptInvitationDTO) : Call<Unit> = apiDiff.acceptInvitation(body)
+    open fun rejectInvitation( body: RejectInvitationDTO) : Call<Unit> = apiDiff.rejectInvitation(body)
+    open fun invite( body: InviteUserDTO) : Call<Unit> = apiDiff.invite(body)
+    open fun joinedGroups( body: I) : Call<List<GroupDTO>> = apiDiff.joinedGroups(body)
+    open fun ownedGroups( body: I) : Call<List<GroupDTO>> = apiDiff.ownedGroups(body)
+    open fun pullUser( body: RemoveUserDTO) : Call<Unit> = apiDiff.pullUser(body)
+    open fun showGroup( body: ShowGroupDTO) : Call<GroupDTO> = apiDiff.showGroup(body)
+    open fun transferGroup( body: TransferGroupDTO) : Call<GroupDTO> = apiDiff.transferGroup(body)
+    open fun updateGroup( body: UpdateGroupDTO) : Call<GroupDTO> = apiDiff.updateGroup(body)
 
 }

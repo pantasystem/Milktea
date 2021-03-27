@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
@@ -43,22 +44,27 @@ class MessageViewModel(
     private var isLoading = false
 
 
-    val title: LiveData<String> = Transformations.map(messagesLiveData) {
-        it.messages.firstOrNull()?.let { viewData ->
-            when(viewData.message){
-                is MessageRelation.Group -> {
-                    viewData.message.group.name
-                }
-                is MessageRelation.Direct -> {
-                    if(viewData is SelfMessageViewData){
-                        viewData.message.recipient.userName
-                    }else{
-                        viewData.message.user.userName
+    private val mTitle = MutableLiveData<String>().apply {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                when(messagingId) {
+                    is MessagingId.Direct -> {
+                        miCore.getUserRepository().find(messagingId.userId).getDisplayUserName()
+                    }
+                    is MessagingId.Group -> {
+                        miCore.getGroupRepository().find(messagingId.groupId).name
                     }
                 }
+            }.onSuccess {
+                postValue(it)
+            }.onFailure {
+                logger.debug("タイトル取得の失敗", e = it)
             }
         }
     }
+    val title: LiveData<String> = mTitle
+
+    private val logger = miCore.loggerFactory.create("MessageViewModel")
 
     constructor(groupId: Group.Id, miCore: MiCore) : this(miCore, MessagingId.Group(groupId))
 
@@ -84,13 +90,22 @@ class MessageViewModel(
 
     fun loadInit(){
         if(isLoading){
+            logger.debug("load cancel")
             return
         }
         isLoading = true
         viewModelScope.launch(Dispatchers.IO) {
             val account = messagingId.getAccount()
             val viewDataList = runCatching {
-                miCore.getMisskeyAPI(account).getMessages(RequestMessage(i = account.getI(miCore.getEncryption()))).execute()?.body()
+                miCore.getMisskeyAPI(account).getMessages(
+                    RequestMessage(
+                        i = account.getI(miCore.getEncryption()),
+                        groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
+                        userId = (messagingId as? MessagingId.Direct)?.userId?.id
+                    ),
+                ).execute()?.throwIfHasError()?.body()
+            }.onFailure {
+                logger.debug("メッセージの読み込みに失敗しました。", e = it)
             }.getOrNull()?.toMessageViewData(account)?: emptyList()
             messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
             isLoading = false

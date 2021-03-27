@@ -24,6 +24,10 @@ import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.model.group.GroupDataSource
+import jp.panta.misskeyandroidclient.model.group.GroupRepository
+import jp.panta.misskeyandroidclient.model.group.impl.GroupRepositoryImpl
+import jp.panta.misskeyandroidclient.model.group.impl.InMemoryGroupDataSource
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
@@ -128,6 +132,9 @@ class MiApplication : Application(), MiCore {
     private lateinit var mUnreadMessages: UnReadMessages
     private lateinit var mMessageRepository: MessageRepository
 
+    private lateinit var mGroupDataSource: GroupDataSource
+    private lateinit var mGroupRepository: GroupRepository
+
     private lateinit var mGetters: Getters
 
 
@@ -157,10 +164,6 @@ class MiApplication : Application(), MiCore {
 
         val config = BundledEmojiCompatConfig(this)
             .setReplaceAll(true)
-        if(BuildConfig.DEBUG){
-            config.setEmojiSpanIndicatorColor(Color.GREEN)
-                .setEmojiSpanIndicatorEnabled(true)
-        }
         EmojiCompat.init(config)
 
         mActiveNetworkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
@@ -205,6 +208,8 @@ class MiApplication : Application(), MiCore {
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource)
 
+
+
         mSocketWithAccountProvider = SocketWithAccountProviderImpl(
             getEncryption(),
             mAccountRepository,
@@ -246,13 +251,22 @@ class MiApplication : Application(), MiCore {
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
 
+        mGroupDataSource = InMemoryGroupDataSource()
+        mGroupRepository = GroupRepositoryImpl(
+            misskeyAPIProvider = mMisskeyAPIProvider,
+            accountRepository = mAccountRepository,
+            groupDataSource = mGroupDataSource,
+            encryption = mEncryption,
+            loggerFactory.create("GroupRepositoryImpl")
+        )
+
         InMemoryMessageDataSource(mAccountRepository).also {
             mMessageDataSource = it
             mUnreadMessages = it
         }
         mMessageRepository = MessageRepositoryImpl(this)
 
-        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource)
+        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource)
 
         messageStreamFilter = MessageStreamFilter(this)
 
@@ -354,6 +368,14 @@ class MiApplication : Application(), MiCore {
 
     override fun getMessageRepository(): MessageRepository {
         return mMessageRepository
+    }
+
+    override fun getGroupDataSource(): GroupDataSource {
+        return mGroupDataSource
+    }
+
+    override fun getGroupRepository(): GroupRepository {
+        return mGroupRepository
     }
 
     override fun getUnreadMessages(): UnReadMessages {
