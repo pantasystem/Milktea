@@ -87,10 +87,10 @@ class AntennaEditorViewModel (
         }
     }
 
-    val userNames = MutableStateFlow<List<String>>(emptyList()).apply {
+    private val userNames = MutableStateFlow<List<String>>(emptyList()).apply {
         mAntenna.filterNotNull().onEach {
             value = it.users
-        }
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     @ExperimentalCoroutinesApi
@@ -226,7 +226,7 @@ class AntennaEditorViewModel (
                     caseSensitive.value?: false,
                     withFile.value?: false,
                     withReplies.value?: false,
-                    notify.value?: false
+                    notify.value?: false,
 
                 )
                 val res = if(antennaId == null) {
@@ -302,6 +302,7 @@ class AntennaEditorViewModel (
     }
 
     fun setUserNames(userNames: List<String>){
+        logger.debug("setUserNames: $userNames")
         this.userNames.value = userNames
     }
 
