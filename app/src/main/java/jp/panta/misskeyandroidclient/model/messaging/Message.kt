@@ -161,3 +161,17 @@ sealed class MessageRelation {
         return message.userId == User.Id(account.accountId, account.remoteId)
     }
 }
+
+sealed class MessageHistoryRelation : MessageRelation(){
+    data class Group(
+        override val message: Message,
+        override val user: User,
+        val group: GroupEntity
+    ) : MessageHistoryRelation()
+
+    data class Direct(
+        override val message: Message,
+        override val user: User,
+        val recipient: User
+    ) : MessageHistoryRelation()
+}
