@@ -18,6 +18,8 @@ interface MessageDataSource {
     suspend fun delete(messageId: Message.Id): Boolean
 
     suspend fun find(messageId: Message.Id): Message?
+
+    suspend fun readAllMessages(accountId: Long)
 }
 
 class InMemoryMessageDataSource(
@@ -80,6 +82,27 @@ class InMemoryMessageDataSource(
             it.filterNot { msg ->
                 val ac = accountRepository.get(msg.id.accountId)
                 msg.isRead || msg.userId.id == ac.remoteId
+            }
+        }
+    }
+
+    override suspend fun readAllMessages(accountId: Long) {
+        readAllMessagesByAccountId(accountId)
+        updateState()
+    }
+
+    private fun readAllMessagesByAccountId(accountId: Long) {
+        synchronized(messageIdAndMessage) {
+            messageIdAndMessage.keys.filter {
+                it.accountId == accountId
+            }.mapNotNull {
+                messageIdAndMessage[it]
+            }.filterNot {
+                it.isRead
+            }.map {
+                it.read()
+            }.forEach {
+                messageIdAndMessage[it.id] = it
             }
         }
     }
