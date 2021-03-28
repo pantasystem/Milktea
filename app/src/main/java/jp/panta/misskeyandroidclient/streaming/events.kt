@@ -81,6 +81,12 @@ sealed class ChannelBody : StreamingEvent(){
         ) : Main(), HavingMessagingBody
 
         @Serializable
+        @SerialName("readAllMessagingMessage")
+        data class ReadAllMessagingMessages(
+            override val id: String
+        ) : Main()
+
+        @Serializable
         @SerialName("mention")
         data class Mention(
             override val id: String,
