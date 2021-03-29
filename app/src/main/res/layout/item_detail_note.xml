@@ -37,7 +37,14 @@
                 android:paddingBottom="5dp"
                 app:mainNameView="@{mainName}"
                 app:subNameView="@{subName}"
-                app:user="@{note.toShowNote.user}">
+                app:user="@{note.toShowNote.user}"
+
+                app:foldingNote="@{note}"
+                app:foldingButton="@{contentFoldingButton}"
+                app:cw="@{cw}"
+                app:foldingContent="@{contentMain}"
+                app:isFolding="@{note.contentFolding}"
+                >
 
             <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/statusView"
@@ -97,7 +104,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/avatarIcon"
-                    android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                     app:textNode="@{note.cwNode}"
                     tools:text="cwcwcwwcwcw" />
 
