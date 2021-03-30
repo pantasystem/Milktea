@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.SerialName
@@ -157,6 +158,19 @@ sealed class ChannelBody : StreamingEvent(){
         @Serializable
         @SerialName("fileDeleted")
         data class FileDeleted(
+            override val id: String
+        ) : Main()
+
+        @Serializable
+        @SerialName("readAntenna")
+        data class ReadAntenna(
+            override val id: String,
+            val body: AntennaDTO
+        ) : Main()
+
+        @Serializable
+        @SerialName("readAllAntennas")
+        data class ReadAllAntennas(
             override val id: String
         ) : Main()
 
