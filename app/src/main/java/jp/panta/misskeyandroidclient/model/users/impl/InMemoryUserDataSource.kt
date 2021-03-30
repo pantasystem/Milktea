@@ -43,6 +43,7 @@ class InMemoryUserDataSource(
             }else if(it == AddResult.UPDATED) {
                 publish(UserDataSource.Event.Updated(user.id, user))
             }
+            logger?.debug("add result:$it")
         }
 
     }

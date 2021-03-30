@@ -1,15 +1,16 @@
 package jp.panta.misskeyandroidclient.model.streaming
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 
-class MediatorMainEventDispatcher {
+class MediatorMainEventDispatcher(val logger: Logger) {
 
     class Factory(private val miCore: MiCore) {
 
         fun create(): MediatorMainEventDispatcher {
-            return MediatorMainEventDispatcher()
+            return MediatorMainEventDispatcher(miCore.loggerFactory.create("MediatorMainEventDispatcher"))
                 .attach(StreamingMainMessageEventDispatcher(miCore.getMessageDataSource(), miCore.getGetters().messageRelationGetter))
                 .attach(StreamingMainNotificationEventDispatcher(miCore.getGetters().notificationRelationGetter))
                 .attach(StreamingMainUserEventDispatcher(miCore.getUserDataSource()))
@@ -45,7 +46,7 @@ class MediatorMainEventDispatcher {
                 false
             }
             if(result) {
-                break
+                return
             }
         }
     }

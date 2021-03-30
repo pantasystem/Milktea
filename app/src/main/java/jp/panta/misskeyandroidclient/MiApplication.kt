@@ -55,6 +55,7 @@ import jp.panta.misskeyandroidclient.model.notification.impl.NotificationReposit
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
+import jp.panta.misskeyandroidclient.model.streaming.MediatorMainEventDispatcher
 import jp.panta.misskeyandroidclient.model.url.*
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -144,6 +145,7 @@ class MiApplication : Application(), MiCore {
         private set
 
 
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     override lateinit var messageStreamFilter: MessageStreamFilter
@@ -206,7 +208,7 @@ class MiApplication : Application(), MiCore {
 
         mNotificationDataSource = InMemoryNotificationDataSource()
 
-        mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource)
+        mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 
 
 
@@ -278,6 +280,19 @@ class MiApplication : Application(), MiCore {
             getGetters().notificationRelationGetter,
             Dispatchers.IO
         )
+
+        val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
+        getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+            getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map { body ->
+                ac to body
+            }
+        }.mapNotNull {
+            (it.second as? ChannelBody.Main)?.let{ main ->
+                it.first to main
+            }
+        }.onEach {
+            mainEventDispatcher.dispatch(it.first, it.second)
+        }.launchIn(applicationScope + Dispatchers.IO)
 
         val userRepositoryAndMainChanelAPIAdapter = UserRepositoryAndMainChannelAdapter(mUserDataSource, mChannelAPIWithAccountProvider)
         // NOTE: 何度もchannelの接続と切断が繰り返される可能性があるがAccountに対してそこまでアクションをとる可能性は低い
