@@ -1,9 +1,11 @@
 package jp.panta.misskeyandroidclient.view.notes
 
+import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
@@ -25,11 +27,23 @@ object StatusMessageHelper {
             note.reply != null ->{
                 "$name " + context.getString(R.string.replied_by)
             }
-            note.note.renoteId != null && note.note.text == null && note.note.files.isNullOrEmpty() ->{
+            note.note.isRenote() && !note.note.hasContent() ->{
                 "$name " + context.getString(R.string.renoted_by)
             }
+            note is NoteRelation.Featured -> {
+                context.getString(R.string.featured)
+            }
+            note is NoteRelation.Promotion -> {
+                context.getString(R.string.promotion)
+            }
+
             else -> null
-        }?: return
+        }
+        if(message == null) {
+            this.visibility = View.GONE
+            return
+        }
+        this.visibility = View.VISIBLE
         if(isUserNameDefault){
             this.text = message
         }else{

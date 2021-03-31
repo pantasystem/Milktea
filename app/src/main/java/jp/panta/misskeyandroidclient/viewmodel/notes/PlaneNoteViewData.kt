@@ -37,7 +37,7 @@ open class PlaneNoteViewData (
 
     val toShowNote: NoteRelation
         get() {
-            return if(note.note.renoteId != null && note.note.text == null && note.note.files.isNullOrEmpty()){
+            return if(note.note.isRenote() && !note.note.hasContent()){
                 note.renote?: note
             }else{
                 note
@@ -158,7 +158,9 @@ open class PlaneNoteViewData (
 
     val myReaction = MutableLiveData<String>(toShowNote.note.myReaction)
 
-    val poll = if(toShowNote.note.poll == null) null else PollViewData(toShowNote.note.poll!!, toShowNote.note.id.noteId)
+    val poll = toShowNote.note.poll?.let {
+        PollViewData(it, toShowNote.note.id.noteId)
+    }
 
     //reNote先
     val subNote: NoteRelation? = toShowNote.renote
@@ -217,6 +219,9 @@ open class PlaneNoteViewData (
         reactionCounts.postValue(note.reactionCounts.map{
             it.reaction to it.count
         }.toMap())
+        note.poll?.let {
+            poll?.update(it)
+        }
     }
 
     private fun getNotMediaFiles() : List<File>{
