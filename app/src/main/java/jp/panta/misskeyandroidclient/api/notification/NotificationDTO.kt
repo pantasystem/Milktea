@@ -82,7 +82,7 @@ data class NotificationDTO(
                     id, Note.Id(account.accountId, noteId), createdAt, User.Id(account.accountId, this.userId), choice, isRead
                 )
             }
-            else -> throw IllegalStateException("対応していないタイプの通知です。")
+            else -> throw IllegalStateException("対応していないタイプの通知です。:$this")
         }
     }
 }
