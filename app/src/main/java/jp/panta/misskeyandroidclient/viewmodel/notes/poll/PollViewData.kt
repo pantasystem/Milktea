@@ -53,5 +53,16 @@ class PollViewData(private val poll: Poll, val noteId: String){
         }
     }
 
+    fun update(poll: Poll) {
+        runCatching {
+            for(i in poll.choices.indices) {
+                choices[i].voteCount.postValue(poll.choices[i].votes)
+                choices[i].isVoted.postValue(poll.choices[i].isVoted)
+            }
+        }.onFailure {
+            Log.e("PollViewData", "更新処理に失敗した", it)
+        }
+    }
+
 
 }

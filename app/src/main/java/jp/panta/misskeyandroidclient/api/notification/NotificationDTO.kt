@@ -75,14 +75,14 @@ data class NotificationDTO(
                     id, createdAt, User.Id(account.accountId, this.userId), n.id, reaction, isRead
                 )
             }
-            "pollVoted" -> {
-                require(noteId != null)
+            "pollVote" -> {
+                require(noteId != null || note != null)
                 require(choice != null)
                 PollVoteNotification(
-                    id, Note.Id(account.accountId, noteId), createdAt, User.Id(account.accountId, this.userId), choice, isRead
+                    id, Note.Id(account.accountId, noteId?: note?.id!!), createdAt, User.Id(account.accountId, this.userId), choice, isRead
                 )
             }
-            else -> throw IllegalStateException("対応していないタイプの通知です。")
+            else -> throw IllegalStateException("対応していないタイプの通知です。:$this")
         }
     }
 }
