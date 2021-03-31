@@ -50,6 +50,27 @@ data class Note(
     fun updated(){
         this.instanceUpdatedAt = Date()
     }
+
+    /**
+     * 引用リノートであるか
+     */
+    fun isQuote(): Boolean {
+        return isRenote() && hasContent()
+    }
+
+    /**
+     * リノートであるか
+     */
+    fun isRenote(): Boolean {
+        return renoteId != null
+    }
+
+    /**
+     * ファイル、投票、テキストなどのコンテンツを持っているか
+     */
+    fun hasContent(): Boolean {
+        return !(text == null && files.isNullOrEmpty() && poll == null)
+    }
 }
 
 sealed class NoteRelation {
