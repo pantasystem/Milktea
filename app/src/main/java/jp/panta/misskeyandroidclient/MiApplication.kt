@@ -94,7 +94,7 @@ class MiApplication : Application(), MiCore {
 
     lateinit var metaRepository: MetaRepository
 
-    lateinit var metaStore: MetaStore
+    private lateinit var metaStore: MetaStore
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -575,6 +575,10 @@ class MiApplication : Application(), MiCore {
 
     override suspend fun getChannelAPI(account: Account): ChannelAPI {
         return mChannelAPIWithAccountProvider.get(account)
+    }
+
+    override fun getMetaStore(): MetaStore {
+        return metaStore
     }
 
 

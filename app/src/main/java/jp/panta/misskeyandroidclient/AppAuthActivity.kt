@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityAppAuthBinding
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel
 
 class AppAuthActivity : AppCompatActivity() {
@@ -20,7 +21,8 @@ class AppAuthActivity : AppCompatActivity() {
         val binding = DataBindingUtil.setContentView<ActivityAppAuthBinding>(this, R.layout.activity_app_auth)
         setSupportActionBar(binding.appAuthToolbar)
 
-        val appAuthViewModel = ViewModelProvider(this, AppAuthViewModel.Factory(CustomAuthStore.newInstance(this)))[AppAuthViewModel::class.java]
+        val miCore = application as MiCore
+        val appAuthViewModel = ViewModelProvider(this, AppAuthViewModel.Factory(CustomAuthStore.newInstance(this), miCore))[AppAuthViewModel::class.java]
         appAuthViewModel.appName.value = getString(R.string.app_name)
         binding.lifecycleOwner = this
         binding.appAuthViewModel = appAuthViewModel
