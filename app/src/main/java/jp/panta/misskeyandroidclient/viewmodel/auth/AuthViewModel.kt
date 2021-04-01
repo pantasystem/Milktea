@@ -73,7 +73,8 @@ class AuthViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().add(
-                    a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption(), a.app.secret)
+                    a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption(), a.app.secret),
+                    false
                 )
                 val user = a.accessToken.user.toUser(account, true) as User.Detail
                 miCore.getUserDataSource().add(user)
