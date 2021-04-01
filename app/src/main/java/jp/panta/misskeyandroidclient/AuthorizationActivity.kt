@@ -6,6 +6,9 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.model.auth.Authorization
+import jp.panta.misskeyandroidclient.model.auth.custom.App
+import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
+import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
 import jp.panta.misskeyandroidclient.view.auth.AuthFragment
 import jp.panta.misskeyandroidclient.view.auth.AuthResultFragment
 import jp.panta.misskeyandroidclient.view.auth.Waiting4userAuthorizationFragment
@@ -20,9 +23,23 @@ class AuthorizationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization)
 
+        val callbackToken = intent?.data?.getQueryParameter("token")
+
         val miCore = application as MiCore
         val authViewModel = ViewModelProvider(this, AuthViewModel.Factory(miCore))[AuthViewModel::class.java]
-
+        val authStore = CustomAuthStore.newInstance(this)
+        if(callbackToken?.isNotBlank() == true) {
+            authStore.getCustomAuthBridge()?.let {
+                val a = Authorization.Waiting4UserAuthorization(
+                    instanceBaseURL = it.instanceDomain,
+                    session = it.session,
+                    appSecret = it.secret,
+                    viaName = it.viaName
+                )
+                authViewModel.setState(a)
+                authViewModel.getAccessToken()
+            }
+        }
         lifecycleScope.launchWhenCreated {
             authViewModel.authorization.collect {
                 if(it is Authorization.Finish) {

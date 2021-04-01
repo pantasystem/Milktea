@@ -43,17 +43,16 @@ class AuthViewModel(
     fun getAccessToken() {
         val a = authorization.value as? Authorization.Waiting4UserAuthorization
             ?: throw IllegalStateException("現在の状態: ${authorization.value}でアクセストークンを取得することはできません。")
-        requireNotNull( a.app.secret)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
 
-                MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(UserKey(appSecret = a.app.secret, a.session.token))
+                MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
                     .execute().throwIfHasError().body()
                     ?: throw IllegalStateException("response bodyがありません。")
             }.onSuccess {
                 val authenticated = Authorization.Approved(
                     a.instanceBaseURL,
-                    a.app,
+                    appSecret = a.appSecret,
                     it
                 )
                 setState(authenticated)
@@ -69,11 +68,11 @@ class AuthViewModel(
     fun confirmApprove() {
         val a = authorization.value as? Authorization.Approved
             ?: throw IllegalStateException("confirmApproveは状態がApprovedの時以外呼び出すことはできません。")
-        requireNotNull(a.app.secret)
+        requireNotNull(a.appSecret)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().add(
-                    a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption(), a.app.secret),
+                    a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption(), a.appSecret),
                     false
                 )
                 val user = a.accessToken.user.toUser(account, true) as User.Detail

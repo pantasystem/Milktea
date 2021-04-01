@@ -15,13 +15,14 @@ sealed class Authorization {
 
     data class Waiting4UserAuthorization(
         val instanceBaseURL: String,
-        val app: App,
+        val viaName: String?,
+        val appSecret: String,
         val session: Session
     ) : Authorization()
 
     data class Approved(
         val instanceBaseURL: String,
-        val app: App,
+        val appSecret: String,
         val accessToken: AccessToken
     ) : Authorization()
 
