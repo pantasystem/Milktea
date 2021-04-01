@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }.launchIn(lifecycleScope)
 
         // NOTE: 最新の通知をSnackBar等に表示する
-        val currentAccountNotifications = miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
             miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map { body ->
                 body as? ChannelBody.Main.Notification
             }.filterNotNull().map {
@@ -172,14 +172,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }.map {
             miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-            currentAccountNotifications.collect { notificationRelation ->
-                withContext(Dispatchers.Main) {
-                    showNotification(notificationRelation)
-                }
-            }
-        }
+        }.flowOn(Dispatchers.IO).onEach { notificationRelation ->
+            showNotification(notificationRelation)
+        }.launchIn(lifecycleScope + Dispatchers.Main)
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState)

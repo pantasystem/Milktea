@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.users
 
+import android.service.autofill.UserData
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.api.notes.toEntities
@@ -32,6 +33,7 @@ open class UserViewData(
     private var mUser: User.Detail? = null
         set(value) {
             field = value
+            userFlow.value = value
             user.postValue(value)
         }
 
@@ -61,27 +63,19 @@ open class UserViewData(
     init {
         userFlow.filterNotNull().flatMapMerge { user ->
             miCore.getUserRepositoryEventToFlow().from(user.id)
+        }.mapNotNull {
+            (it as? UserDataSource.Event.Created)?.user
+                ?: (it as? UserDataSource.Event.Updated)?.user
+        }.mapNotNull {
+            it as? User.Detail
         }.onEach {
-            when(it) {
-                is UserDataSource.Event.Created -> {
-                    (it.user as? User.Detail)?.let{ detail ->
-                        mUser = detail
-                    }
-                }
-                is UserDataSource.Event.Updated -> {
-                    (it.user as? User.Detail)?.let { detail ->
-                        mUser = detail
-                    }
-                }
-                is UserDataSource.Event.Removed -> {
-                    mUser = null
-                }
-            }
+            mUser = it
         }.launchIn(coroutineScope + dispatcher)
 
         coroutineScope.launch(dispatcher) {
             initLoad()
         }
+
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")

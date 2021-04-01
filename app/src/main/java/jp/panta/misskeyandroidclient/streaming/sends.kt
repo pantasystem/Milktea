@@ -30,7 +30,7 @@ sealed class Send {
         }
 
         @Serializable
-        data class Body (val id: String, val channel: Type)
+        data class Body (val id: String, val channel: Type, val pong: Boolean = false)
 
 
     }

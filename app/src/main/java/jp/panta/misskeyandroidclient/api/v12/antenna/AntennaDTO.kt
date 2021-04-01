@@ -14,8 +14,8 @@ data class AntennaDTO(
     val id: String,
     val name: String,
     val src: String,
-    val userListId: String?,
-    val userGroupId: String?,
+    val userListId: String? = null,
+    val userGroupId: String? = null,
     val keywords: List<List<String>>,
     val excludeKeywords: List<List<String>>,
     val users: List<String>,
@@ -23,7 +23,7 @@ data class AntennaDTO(
     val withFile: Boolean,
     val withReplies: Boolean,
     val notify: Boolean,
-    val hasUnreadNote: Boolean
+    val hasUnreadNote: Boolean? = null
 ) : JSerializable {
 
     fun toEntity(account: Account): Antenna {
@@ -42,7 +42,7 @@ data class AntennaDTO(
             withFile,
             withReplies,
             notify,
-            hasUnreadNote
+            hasUnreadNote?: false
         )
 
     }
