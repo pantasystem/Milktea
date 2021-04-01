@@ -321,4 +321,8 @@
     <string name="start_downloading_placeholder">%sのダウンロードを開始します。</string>
     <string name="add_to_list">リストに追加する</string>
     <string name="promotion">プロモーション</string>
+    <string name="waiting_4_approval">認可されるのを待っています。</string>
+    <string name="i_have_approved">私は認可をしました</string>
+    <string name="waiting_4_u_to_approve">あなたが認可するのを待っています</string>
+
 </resources>

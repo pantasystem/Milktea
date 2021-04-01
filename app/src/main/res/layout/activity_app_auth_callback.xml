@@ -14,12 +14,6 @@
 
             tools:context=".AppAuthCallbackActivity">
 
-        <include
-                layout="@layout/welcome_misskey_park"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:user="@{user}" />
 
         <Button
                 android:id="@+id/continueAuth"

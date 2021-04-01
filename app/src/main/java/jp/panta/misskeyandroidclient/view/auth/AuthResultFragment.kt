@@ -6,8 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAuthResultBinding
+import jp.panta.misskeyandroidclient.model.auth.Authorization
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
+import kotlinx.coroutines.flow.collect
 
 class AuthResultFragment : Fragment(){
 
@@ -24,6 +30,20 @@ class AuthResultFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val miCore = context?.applicationContext as MiCore
+        val viewModel = ViewModelProvider(requireActivity(), AuthViewModel.Factory(miCore))[AuthViewModel::class.java]
+        lifecycleScope.launchWhenCreated {
+            viewModel.authorization.collect {
+                if(it is Authorization.Approved) {
+                    binding.user = it.accessToken.user
+                }
+            }
+
+        }
+
+        binding.continueAuth.setOnClickListener {
+            viewModel.confirmApprove()
+        }
 
     }
 

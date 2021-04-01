@@ -99,8 +99,9 @@ class AppAuthViewModel(
                 )
                 Authorization.Waiting4UserAuthorization(
                     instanceBase,
-                    app,
-                    session
+                    appSecret = app.secret,
+                    session = session,
+                    viaName = app.name
                 )
             }.onSuccess { w4a ->
                 this@AppAuthViewModel.waiting4UserAuthorization.postValue(w4a)

@@ -57,6 +57,7 @@ class AuthViewModel(
                 )
                 setState(authenticated)
             }.onFailure {
+                setState(Authorization.BeforeAuthentication)
                 error.emit(it)
             }
         }
