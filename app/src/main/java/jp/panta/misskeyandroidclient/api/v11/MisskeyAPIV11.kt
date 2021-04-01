@@ -7,8 +7,8 @@ import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
-import jp.panta.misskeyandroidclient.model.auth.custom.CreateApp
-import jp.panta.misskeyandroidclient.model.auth.custom.ShowApp
+import jp.panta.misskeyandroidclient.api.app.CreateApp
+import jp.panta.misskeyandroidclient.api.app.ShowApp
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite

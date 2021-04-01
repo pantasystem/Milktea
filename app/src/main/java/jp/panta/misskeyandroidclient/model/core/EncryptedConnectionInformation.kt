@@ -6,7 +6,7 @@ import androidx.room.ForeignKey.CASCADE
 import androidx.room.ForeignKey.NO_ACTION
 import androidx.room.Ignore
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.auth.AccessToken
+import jp.panta.misskeyandroidclient.api.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
 import jp.panta.misskeyandroidclient.api.users.UserDTO

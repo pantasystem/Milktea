@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.auth
 
 import android.content.SharedPreferences
+import jp.panta.misskeyandroidclient.api.auth.Session
 import java.util.*
 
 private const val AUTH_STORAGE_SESSION_URL = "jp.panta.misskeyandroidclient.model.auth.AuthStorage.sessionUrl"

@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.model.auth.custom
 
 import android.content.Context
 import android.content.SharedPreferences
-import jp.panta.misskeyandroidclient.model.auth.Session
+import jp.panta.misskeyandroidclient.api.auth.Session
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import java.util.*
 
