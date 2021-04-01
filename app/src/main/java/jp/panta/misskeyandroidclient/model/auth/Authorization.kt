@@ -8,19 +8,19 @@ import jp.panta.misskeyandroidclient.model.auth.custom.App
 /**
  * 認証の状態
  */
-sealed class Authentication {
-    object BeforeAuthentication : Authentication()
+sealed class Authorization {
+    object BeforeAuthentication : Authorization()
 
-    data class Waiting4UserAuthentication(
+    data class Waiting4UserAuthorization(
         val instanceBaseURL: String,
         val app: App,
         val session: Session
-    ) : Authentication()
+    ) : Authorization()
 
-    data class Authenticated(
+    data class Approved(
         val instanceBaseURL: String,
         val app: App,
         val userKey: AccessToken
-    )
+    ) : Authorization()
 
 }
