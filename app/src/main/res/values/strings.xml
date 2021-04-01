@@ -318,4 +318,8 @@
     <string name="start_downloading_placeholder">Start downloading %s</string>
     <string name="add_to_list">Add to list</string>
     <string name="promotion">Promotion</string>
+    <string name="waiting_4_approval">Waiting for approval</string>
+    <string name="i_have_approved">I have approved</string>
+    <string name="waiting_4_u_to_approve">Waiting for you to approve</string>
+
 </resources>

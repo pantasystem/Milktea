@@ -268,7 +268,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
                 ConnectionStatus.ACCOUNT_ERROR ->{
                     finish()
-                    startActivity(Intent(this, AppAuthActivity::class.java))
+                    startActivity(Intent(this, AuthorizationActivity::class.java))
                 }
                 ConnectionStatus.NETWORK_ERROR ->{
                     Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()

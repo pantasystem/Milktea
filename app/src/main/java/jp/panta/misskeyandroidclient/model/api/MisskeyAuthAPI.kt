@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import jp.panta.misskeyandroidclient.model.auth.AccessToken
-import jp.panta.misskeyandroidclient.model.auth.AppSecret
-import jp.panta.misskeyandroidclient.model.auth.Session
-import jp.panta.misskeyandroidclient.model.auth.UserKey
+import jp.panta.misskeyandroidclient.api.auth.AccessToken
+import jp.panta.misskeyandroidclient.api.auth.AppSecret
+import jp.panta.misskeyandroidclient.api.auth.Session
+import jp.panta.misskeyandroidclient.api.auth.UserKey
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

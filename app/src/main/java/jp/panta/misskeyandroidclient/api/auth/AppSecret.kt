@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.auth
+package jp.panta.misskeyandroidclient.api.auth
 
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import kotlinx.serialization.Serializable

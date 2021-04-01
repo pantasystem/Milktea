@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when(status){
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
                 ConnectionStatus.ACCOUNT_ERROR ->{
-                    startActivity(Intent(this, AppAuthActivity::class.java))
+                    startActivity(Intent(this, AuthorizationActivity::class.java))
 
                     finish()
                 }
