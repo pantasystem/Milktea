@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel.auth
+package jp.panta.misskeyandroidclient.view.auth
 
 import android.os.Bundle
 import android.view.LayoutInflater
