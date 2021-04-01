@@ -45,6 +45,9 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
             val instanceDomain = it.getString(INSTANCE_DOMAIN, null)?: return null
             val enabledDate = Date(it.getLong(ENABLED_DATE_END, 0))
             val viaName: String? = it.getString(VIA_NAME, null)
+            if(enabledDate < Date()) {
+                return null
+            }
             CustomAuthBridge(
                 secret = secret,
                 session = Session(url = sessionUrl, token = sessionToken),
