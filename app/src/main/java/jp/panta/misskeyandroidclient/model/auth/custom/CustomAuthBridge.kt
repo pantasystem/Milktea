@@ -10,3 +10,14 @@ data class CustomAuthBridge(
     val enabledDateEnd: Date,
     val viaName: String?
 )
+
+fun App.createAuth(instanceDomain: String, session: Session, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): CustomAuthBridge {
+    requireNotNull(secret)
+    return CustomAuthBridge(
+        secret = secret,
+        instanceDomain = instanceDomain,
+        session = session,
+        enabledDateEnd = timeLimit,
+        viaName = name
+    )
+}
