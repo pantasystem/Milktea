@@ -3,20 +3,17 @@ package jp.panta.misskeyandroidclient.view.account
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Toast
-import androidx.lifecycle.Observer
+import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import jp.panta.misskeyandroidclient.AppAuthActivity
-import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.AuthorizationActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
-import kotlinx.android.synthetic.main.dialog_switch_account.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -30,18 +27,21 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         dialog.setContentView(view)
 
 
+
+
         val activity = activity
         if(activity == null){
             dismiss()
             return dialog
         }
 
-        view.add_account.setOnClickListener {
-            startActivity(Intent(activity, AppAuthActivity::class.java))
+        view.findViewById<Button>(R.id.add_account).setOnClickListener {
+            startActivity(Intent(activity, AuthorizationActivity::class.java))
             dismiss()
         }
+        val accountsView = view.findViewById<RecyclerView>(R.id.accounts_view)
 
-        view.accounts_view.layoutManager = LinearLayoutManager(view.context)
+        accountsView.layoutManager = LinearLayoutManager(view.context)
 
 
         /*val viewDataList = accounts.map{ ar ->
@@ -57,7 +57,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment(){
         accountViewModel.accounts.observe(this, {
             adapter.submitList(it)
         })
-        view.accounts_view.adapter = adapter
+        accountsView.adapter = adapter
         accountViewModel.switchTargetConnectionInstanceEvent.observe(activity, {
             dismiss()
         })

@@ -72,7 +72,7 @@ class AppAuthCallbackActivity : AppCompatActivity() {
     }
 
     private fun onFailure(){
-        startActivity(Intent(this, AppAuthActivity::class.java))
+        startActivity(Intent(this, AuthorizationActivity::class.java))
         finish()
     }
 }

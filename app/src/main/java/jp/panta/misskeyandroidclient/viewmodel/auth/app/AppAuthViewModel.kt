@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.api.auth.AppSecret
 import jp.panta.misskeyandroidclient.api.auth.Session
+import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.*
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -46,7 +47,7 @@ class AppAuthViewModel(
     }
 
     val app = MutableLiveData<App?>()
-    val session = MutableLiveData<Session?>()
+    val waiting4UserAuthorization = MutableLiveData<Authorization.Waiting4UserAuthorization?>()
 
     val generatingToken = MutableLiveData<Boolean>(false)
 
@@ -96,9 +97,13 @@ class AppAuthViewModel(
                 customAuthStore.setCustomAuthBridge(
                     app.createAuth(instanceBase, session)
                 )
-                session
-            }.onSuccess { session ->
-                this@AppAuthViewModel.session.postValue(session)
+                Authorization.Waiting4UserAuthorization(
+                    instanceBase,
+                    app,
+                    session
+                )
+            }.onSuccess { w4a ->
+                this@AppAuthViewModel.waiting4UserAuthorization.postValue(w4a)
 
             }.onFailure {
                 Log.e("AppAuthViewModel", "認証開始処理失敗", it)
