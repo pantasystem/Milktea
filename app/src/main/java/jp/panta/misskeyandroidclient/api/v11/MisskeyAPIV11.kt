@@ -22,6 +22,8 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.reaction.ReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
@@ -98,5 +100,6 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     open fun showGroup( body: ShowGroupDTO) : Call<GroupDTO> = apiDiff.showGroup(body)
     open fun transferGroup( body: TransferGroupDTO) : Call<GroupDTO> = apiDiff.transferGroup(body)
     open fun updateGroup( body: UpdateGroupDTO) : Call<GroupDTO> = apiDiff.updateGroup(body)
+    override fun reactions(body: RequestReactionHistoryDTO): Call<List<ReactionHistoryDTO>> = misskeyAPI.reactions(body)
 
 }
