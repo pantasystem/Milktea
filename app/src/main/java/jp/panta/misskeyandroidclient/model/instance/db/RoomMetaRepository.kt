@@ -23,7 +23,9 @@ class RoomMetaRepository(
                 metaDAO.insertAll(emojiDTOList)
             }
             meta.emojis?.map { emoji ->
-                emoji.aliases?.map { alias ->
+                emoji.aliases?.filter {
+                    it.isNotBlank()
+                }?.map { alias ->
                     EmojiAlias(
                         alias,
                         emoji.name,
