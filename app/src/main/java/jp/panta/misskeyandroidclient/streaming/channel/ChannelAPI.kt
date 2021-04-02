@@ -44,7 +44,7 @@ class ChannelAPI(
                 if(!offer(it)){
                     logger.debug("スルーされたメッセージ: $it")
                 }
-                logger.debug("ChannelAPI message:${if(it.toString().length > 50) it.toString().subSequence(0, 50) else it.toString()}")
+                //logger.debug("ChannelAPI message:${if(it.toString().length > 50) it.toString().subSequence(0, 50) else it.toString()}")
             }
             connect(type, callback)
 
@@ -119,7 +119,7 @@ class ChannelAPI(
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
             val st = e.toString()
-            logger.debug("ChannelEvent: ${if(st.length > 100) st.substring(0,100) else st}..., callbacks main:${listenersMap[Type.MAIN]?.size}, global: ${listenersMap[Type.GLOBAL]?.size}, hybrid: ${listenersMap[Type.GLOBAL]?.size}, home:${listenersMap[Type.HOME]?.size}, type=${typeIdMap.filter { it.value == e.body.id }}")
+            //logger.debug("ChannelEvent: ${if(st.length > 100) st.substring(0,100) else st}..., callbacks main:${listenersMap[Type.MAIN]?.size}, global: ${listenersMap[Type.GLOBAL]?.size}, hybrid: ${listenersMap[Type.GLOBAL]?.size}, home:${listenersMap[Type.HOME]?.size}, type=${typeIdMap.filter { it.value == e.body.id }}")
 
             typeIdMap.filter {
                 it.value == e.body.id
