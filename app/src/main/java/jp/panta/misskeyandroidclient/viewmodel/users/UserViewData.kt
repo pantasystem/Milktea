@@ -70,6 +70,8 @@ open class UserViewData(
             it as? User.Detail
         }.onEach {
             mUser = it
+        }.catch { e ->
+            logger.debug("ユーザー状態キャプチャー中にエラー発生", e = e)
         }.launchIn(coroutineScope + dispatcher)
 
         coroutineScope.launch(dispatcher) {

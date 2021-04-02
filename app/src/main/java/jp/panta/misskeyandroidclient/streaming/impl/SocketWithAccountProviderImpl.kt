@@ -65,7 +65,11 @@ class SocketWithAccountProviderImpl(
             )
             accountIdWithSocket[account.accountId] = socket
 
-            instanceCreatedListener.invoke(account, socket)
+            runCatching {
+                instanceCreatedListener.invoke(account, socket)
+            }.onFailure {
+                logger.error("instanceCreatedListener.invoke error", e = it)
+            }
 
             return socket
         }
