@@ -2,13 +2,10 @@ package jp.panta.misskeyandroidclient.streaming
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 
 class SocketConnectionQueue(
     private val socketWithAccountProvider: SocketWithAccountProvider,
@@ -19,13 +16,26 @@ class SocketConnectionQueue(
     private val logger = loggerFactory.create("SocketConnectionQueue")
     private val scope = coroutineScope + dispatcher
     private val connectQueueMap = mutableMapOf<Socket, MutableSharedFlow<Unit>>()
+    private var penaltyPoint = mapOf<Socket, Int>()
 
-    fun connect(account: Account) {
+    suspend fun connect(account: Account, force: Boolean = true) {
         val socket = socketWithAccountProvider.get(account)
-        connect(socket)
+        connect(socket, force)
     }
 
-    fun connect(socket: Socket) {
+    /**
+     * @param force trueの場合はリミットを無視して接続します
+     */
+    suspend fun connect(socket: Socket, force: Boolean = true) {
+        if(force) {
+            if(socket.state() != Socket.State.Connected) {
+                socket.blockingConnect()
+                penaltyPoint = penaltyPoint.toMutableMap().also {
+                    it[socket] = 0
+                }
+            }
+            return
+        }
         val queue: MutableSharedFlow<Unit>
         = synchronized(connectQueueMap) {
             var queue = connectQueueMap[socket]
@@ -34,11 +44,23 @@ class SocketConnectionQueue(
             }
             queue = MutableSharedFlow(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
             connectQueueMap[socket] = queue
-            queue.onEach {
+            queue.filter {
+                socket.state() != Socket.State.Connected
+            }.onEach {
                 logger.debug("接続を試みた")
-                socket.blockingConnect().also {
+                if(!socket.blockingConnect().also {
                     logger.debug("接続要求可否 : ${if(it) "ok" else "failure"}")
+                }){
+                    val point = penaltyPoint[socket]?: 0
+                    if(point > 0){
+                        delay(point * 100L)
+                    }
+                    penaltyPoint = penaltyPoint.toMutableMap().also {
+                        it[socket] = point + 1
+                    }
                 }
+
+
             }.launchIn(scope)
             queue
         }
