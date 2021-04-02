@@ -27,9 +27,7 @@ class ReactionInputDialog : AppCompatDialogFragment(){
         lp?.gravity = Gravity.BOTTOM
 
         val miApplication = view.context.applicationContext as MiApplication
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
-            ":${it.name}:"
-        }?: return dialog
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?: return dialog
         val activity = activity?: return dialog
         val notesViewModel = ViewModelProvider(activity)[NotesViewModel::class.java]
         val adapter =

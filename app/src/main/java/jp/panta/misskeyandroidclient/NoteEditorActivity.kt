@@ -173,9 +173,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             startActivity(intent)
         })
 
-        miApplication.getCurrentInstanceMeta()?.emojis?.map{
-            ":${it.name}:"
-        }?.let{ emojis ->
+        miApplication.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
             binding.inputMain.setAdapter(
                 CustomEmojiCompleteAdapter(
                     emojis,

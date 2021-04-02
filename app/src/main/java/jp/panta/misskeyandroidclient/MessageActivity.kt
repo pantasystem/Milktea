@@ -73,9 +73,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
         }
 
         val miCore = application as MiCore
-        miCore.getCurrentInstanceMeta()?.emojis?.map{
-            ":${it.name}:"
-        }?.let{ emojis ->
+        miCore.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
             binding.inputMessage.setTokenizer(CustomEmojiTokenizer())
             binding.inputMessage.setAdapter(
                 CustomEmojiCompleteAdapter(

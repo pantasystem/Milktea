@@ -34,7 +34,7 @@ data class EmojiDTO(
         id = emoji.id
     )
 
-    fun toEmoji(): Emoji{
+    fun toEmoji(aliases: List<String>): Emoji{
         return Emoji(
             name = this.name,
             id = this.id,
@@ -42,7 +42,21 @@ data class EmojiDTO(
             url = this.url,
             type = this.type,
             category = this.category,
-            host = this.host
+            host = this.host,
+            aliases = aliases
         )
     }
 }
+
+@Entity(
+    tableName = "emoji_alias_table",
+    primaryKeys = ["alias", "name", "instanceDomain"],
+    foreignKeys = [
+        ForeignKey(parentColumns = ["name", "instanceDomain"], childColumns = ["name", "instanceDomain"], entity = EmojiDTO::class, onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE),
+    ]
+)
+data class EmojiAlias(
+    val alias: String,
+    val name: String,
+    val instanceDomain: String,
+)

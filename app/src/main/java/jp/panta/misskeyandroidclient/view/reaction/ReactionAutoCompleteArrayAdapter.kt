@@ -10,9 +10,10 @@ import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionPreviewBinding
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 
 class ReactionAutoCompleteArrayAdapter(
-    private val reactions: List<String>,
+    private val reactions: List<Emoji>,
     private val context: Context
 ) : BaseAdapter(), Filterable{
 
@@ -51,9 +52,14 @@ class ReactionAutoCompleteArrayAdapter(
         override fun performFiltering(constraint: CharSequence?): FilterResults {
             suggestions = listOf()
 
-            if(constraint != null){
+            val text = constraint?.toString()
+            if(text != null){
                 suggestions = reactions.filter{
-                    it.contains(constraint)
+                    it.name.startsWith(text.replace(":", "")) || it.aliases?.any { alias ->
+                        alias.startsWith(text.replace(":", ""))
+                    }?: false
+                }.map {
+                    ":${it.name}:"
                 }
             }
 

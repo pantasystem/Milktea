@@ -63,13 +63,13 @@ class ReactionSettingActivity : AppCompatActivity() {
             val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel!!)
             binding.reactionSettingListView.adapter = reactionsAdapter
 
-            mReactionPickerSettingViewModel?.reactionSettingsList?.observe(this, Observer { list ->
+            mReactionPickerSettingViewModel?.reactionSettingsList?.observe(this, { list ->
                 reactionsAdapter.submitList(list.map{ rus ->
                     rus.reaction
                 })
             })
 
-            mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this, Observer { rus ->
+            mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this, { rus ->
                 showConfirmDeleteReactionDialog(rus.reaction)
             })
 
@@ -78,11 +78,12 @@ class ReactionSettingActivity : AppCompatActivity() {
 
         }.launchIn(lifecycleScope)
 
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map(::formatReaction)?: emptyList()
-        val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter( emojis, this)
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
+        val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(emojis, this)
         binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
         binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
-            mReactionPickerSettingViewModel?.addReaction(reactionAutoCompleteArrayAdapter.suggestions[position])
+            val emoji = reactionAutoCompleteArrayAdapter.suggestions[position]
+            mReactionPickerSettingViewModel?.addReaction(emoji)
             binding.reactionSettingField.setText("")
         }
         binding.reactionSettingField.setOnEditorActionListener { textView, _, keyEvent ->
@@ -148,9 +149,7 @@ class ReactionSettingActivity : AppCompatActivity() {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
 
     }
-    private fun formatReaction(customEmoji: Emoji): String{
-        return ":${customEmoji.name}:"
-    }
+
 
     private fun showConfirmDeleteReactionDialog(reaction: String){
         MaterialAlertDialogBuilder(this)
