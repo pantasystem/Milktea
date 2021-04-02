@@ -50,7 +50,7 @@
         <item name="checkboxStyle">@style/Widget.AppCompat.CompoundButton.CheckBox</item>
         <item name="radioButtonStyle">@style/Widget.AppCompat.CompoundButton.RadioButton</item>
 
-
+        <item name="snackbarTextViewStyle">@style/NotificationSnackBarTextView</item>
 
     </style>
 
@@ -152,5 +152,9 @@
     </style>
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColorPrimary">?attr/colorAccent</item>
+    </style>
+
+    <style name="NotificationSnackBarTextView" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/colorTextColorPrimary</item>
     </style>
 </resources>
