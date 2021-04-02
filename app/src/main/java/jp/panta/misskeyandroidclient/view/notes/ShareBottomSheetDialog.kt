@@ -52,7 +52,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
 
         dataBinding.shareNote.setOnClickListener{
             val baseUrl = viewModel.getAccount()?.instanceDomain
-            val url = "$baseUrl/notes/${note?.id}"
+            val url = "$baseUrl/notes/${note?.id?.noteId}"
             val intent = Intent().apply{
                 action = ACTION_SEND
                 type = "text/plain"
@@ -79,7 +79,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
                 return@setOnClickListener
             }
             val baseUrl = viewModel.getAccount()?.instanceDomain
-            clipboardManager.setPrimaryClip(ClipData.newPlainText("", "$baseUrl/notes/${note.id}"))
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("", "$baseUrl/notes/${note.id.noteId}"))
             dismiss()
 
         }
