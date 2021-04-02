@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemConversationBinding
 import jp.panta.misskeyandroidclient.databinding.ItemDetailNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.view.notes.TimelineListAdapter
 import jp.panta.misskeyandroidclient.view.notes.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
@@ -31,7 +32,7 @@ class NoteDetailAdapter(
     private val notesViewModel: NotesViewModel,
     private val noteDetailViewModel: NoteDetailViewModel,
     private val viewLifecycleOwner: LifecycleOwner,
-    private val diffUtil: DiffUtil.ItemCallback<PlaneNoteViewData> = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
+    diffUtil: DiffUtil.ItemCallback<PlaneNoteViewData> = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
         override fun areContentsTheSame(
             oldItem: PlaneNoteViewData,
             newItem: PlaneNoteViewData
@@ -120,7 +121,7 @@ class NoteDetailAdapter(
                 val adapter = NoteChildConversationAdapter(notesViewModel, viewLifecycleOwner)
                 holder.binding.conversationView.adapter = adapter
                 holder.binding.conversationView.layoutManager = LinearLayoutManager(holder.itemView.context)
-                note.conversation.observe(viewLifecycleOwner, Observer {
+                note.conversation.observe(viewLifecycleOwner, {
                     adapter.submitList(it)
                 })
                 if(note.poll != null){
@@ -142,7 +143,7 @@ class NoteDetailAdapter(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<Map<String, Int>> {
+        val observer = Observer<List<ReactionCount>> {
             adapter.submitList(it.toList())
         }
         note.reactionCounts.observe(viewLifecycleOwner, observer)

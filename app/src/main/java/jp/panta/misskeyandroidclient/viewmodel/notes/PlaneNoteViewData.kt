@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
@@ -144,14 +145,12 @@ open class PlaneNoteViewData (
         get() = if(toShowNote.note.renoteCount > 0) toShowNote.note.renoteCount.toString() else null
     val renoteCount = MutableLiveData<Int>(toShowNote.note.renoteCount)
 
-    val reactionCounts = MutableLiveData<Map<String, Int>>(toShowNote.note.reactionCounts.map{
-        it.reaction to it.count
-    }.toMap())
+    val reactionCounts = MutableLiveData<List<ReactionCount>>(toShowNote.note.reactionCounts)
 
     val reactionCount = Transformations.map(reactionCounts){
         var sum = 0
-        it?.forEach{ map ->
-            sum += map.value
+        it?.forEach{ count ->
+            sum += count.count
         }
         return@map sum
     }
@@ -216,9 +215,7 @@ open class PlaneNoteViewData (
         renoteCount.postValue(note.renoteCount)
 
         myReaction.postValue(note.myReaction)
-        reactionCounts.postValue(note.reactionCounts.map{
-            it.reaction to it.count
-        }.toMap())
+        reactionCounts.postValue(note.reactionCounts)
         note.poll?.let {
             poll?.update(it)
         }

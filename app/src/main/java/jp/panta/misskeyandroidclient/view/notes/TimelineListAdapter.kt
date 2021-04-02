@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemHasReplyToNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.view.notes.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData
@@ -30,7 +31,7 @@ class TimelineListAdapter(
 ) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolderBase>(diffUtilCallBack){
 
     abstract class NoteViewHolderBase(view: View) : RecyclerView.ViewHolder(view){
-        var reactionCountsObserver: Observer<Map<String, Int>>? = null
+        var reactionCountsObserver: Observer<List<ReactionCount>>? = null
         abstract var reactionCountAdapter: ReactionCountAdapter?
         private var mNoteIdAndPollListAdapter: Pair<Note.Id, PollListAdapter>? = null
 
@@ -157,7 +158,7 @@ class TimelineListAdapter(
 
         reactionCountAdapter.submitList(reactionList)
 
-        val observer = Observer<Map<String, Int>> {
+        val observer = Observer<List<ReactionCount>> {
             reactionCountAdapter.submitList(it?.toList())
         }
         holder.reactionCountsObserver = observer
