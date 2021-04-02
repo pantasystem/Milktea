@@ -45,6 +45,7 @@ x
         <item name="radioButtonStyle">@style/Widget.AppCompat.CompoundButton.RadioButton</item>
 
 
+        <item name="snackbarTextViewStyle">@style/NotificationSnackBarTextView</item>
 
 
     </style>
