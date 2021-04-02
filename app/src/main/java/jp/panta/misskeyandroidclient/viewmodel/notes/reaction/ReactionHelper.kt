@@ -16,9 +16,7 @@ object ReactionHelper {
     @BindingAdapter("reactionNote", "reactionBackground")
     fun LinearLayout.setBackground(note: PlaneNoteViewData, reaction: ReactionCount){
 
-        val r = reaction.reaction.replace(":", "")
-        val host = r.split("@").getOrNull(1)
-        if(host != null && host != ".") {
+        if(!reaction.isLocal()) {
             this.background = ColorDrawable(Color.argb(0,0,0,0))
             return
         }
