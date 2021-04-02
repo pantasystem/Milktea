@@ -60,7 +60,6 @@ import jp.panta.misskeyandroidclient.model.url.*
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
-import jp.panta.misskeyandroidclient.model.users.UserRepositoryAndMainChannelAdapter
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
 import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
@@ -285,14 +284,8 @@ class MiApplication : Application(), MiCore {
             }
         }.onEach {
             mainEventDispatcher.dispatch(it.first, it.second)
-        }.launchIn(applicationScope + Dispatchers.IO)
-
-        val userRepositoryAndMainChanelAPIAdapter = UserRepositoryAndMainChannelAdapter(mUserDataSource, mChannelAPIWithAccountProvider)
-        // NOTE: 何度もchannelの接続と切断が繰り返される可能性があるがAccountに対してそこまでアクションをとる可能性は低い
-        mAccountsState.flatMapLatest { list ->
-            list.map{ ac ->
-                userRepositoryAndMainChanelAPIAdapter.listen(ac)
-            }.merge()
+        }.catch { e ->
+            logger.error("Dispatchi時にエラー発生", e = e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
         mAccountRepository.addEventListener { ev ->
@@ -653,7 +646,11 @@ class MiApplication : Application(), MiCore {
                     && mChannelAPIWithAccountProvider.get(account).isEmpty())
         ) {
             logger.debug("ネットワークアクティブ、WebSocket未接続なので再接続を試みる")
-            mSocketConnectionQueue.connect(account, false)
+            runCatching {
+                mSocketConnectionQueue.connect(account, false)
+            }.onFailure {
+                logger.error("接続試行中にエラー発生", e = it)
+            }
         }
     }
 

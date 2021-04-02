@@ -51,22 +51,12 @@ object ReactionViewHelper {
             if(emoji != null){
                 //Log.d("ReactionViewHelper", "カスタム絵文字を発見した: ${emoji}")
                 if(emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true|| emoji.uri?.contains("svg") == true){
-                    /*GlideApp.with(this.context)
-                        .`as`(PictureDrawable::class.java)
-                        .listener(SvgSoftwareLayerSetter())
-                        .load(emoji.url?: emoji.uri)
-                        .centerCrop()
-                        .transition(withCrossFade())
-                        .into(reactionImageView)*/
+
                     GlideApp.with(context)
                         .`as`(Bitmap::class.java)
-                        //.listener(SvgSoftwareLayerSetter())
-                        //.transition(withCrossFade())
                         .load(emoji.url?: emoji.url)
                         .into(reactionImageView)
 
-
-                    //Log.d("ReactionViewHolder", "svgを読み込みました")
                 }else{
                     Glide.with(reactionImageView.context)
                         .load(emoji.url?: emoji.uri)

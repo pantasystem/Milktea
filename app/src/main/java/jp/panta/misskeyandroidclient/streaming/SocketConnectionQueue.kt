@@ -61,6 +61,8 @@ class SocketConnectionQueue(
                 }
 
 
+            }.catch { e ->
+                logger.error("connect試行中にエラー発生", e = e)
             }.launchIn(scope)
             queue
         }

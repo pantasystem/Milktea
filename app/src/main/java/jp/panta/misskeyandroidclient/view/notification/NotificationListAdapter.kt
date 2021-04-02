@@ -14,6 +14,7 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNotificationBinding
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
@@ -63,7 +64,7 @@ class NotificationListAdapter(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<Map<String, Int>> {
+        val observer = Observer<List<ReactionCount>> {
             adapter.submitList(it.toList())
         }
         note.reactionCounts.observe(lifecycleOwner, observer)

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.*
 /**
  * ChannelAPIのMainのイベントをUserRepositoryへ適応するAdapter
  */
+@Deprecated("Dispatcher系のクラスに移行することにした")
 class UserRepositoryAndMainChannelAdapter(
     private val userDataSource: UserDataSource,
     private val channelAPIWithAccountProvider: ChannelAPIWithAccountProvider,

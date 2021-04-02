@@ -8,27 +8,28 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionBinding
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
-class ReactionCountAdapter(val note: PlaneNoteViewData, private val notesViewModel: NotesViewModel) : ListAdapter<Pair<String, Int>, ReactionCountAdapter.ReactionHolder>(
+class ReactionCountAdapter(val note: PlaneNoteViewData, private val notesViewModel: NotesViewModel) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
     reactionDiffUtilItemCallback){
     class ReactionHolder(val binding: ItemReactionBinding): RecyclerView.ViewHolder(binding.root)
 
     companion object{
-        private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<Pair<String, Int>>(){
+        private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<ReactionCount>(){
             override fun areContentsTheSame(
-                oldItem: Pair<String, Int>,
-                newItem: Pair<String, Int>
+                oldItem: ReactionCount,
+                newItem: ReactionCount
             ): Boolean {
                 return oldItem == newItem
             }
 
             override fun areItemsTheSame(
-                oldItem: Pair<String, Int>,
-                newItem: Pair<String, Int>
+                oldItem: ReactionCount,
+                newItem: ReactionCount
             ): Boolean {
-                return oldItem.first == newItem.first
+                return oldItem.reaction == newItem.reaction
             }
         }
     }

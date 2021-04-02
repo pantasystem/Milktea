@@ -76,6 +76,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
+    private var logger: Logger? = null
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,6 +107,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         val miApplication = application as MiApplication
+        logger = miApplication.loggerFactory.create("MainActivity")
 
         mAccountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         initAccountViewModelListener()
@@ -125,6 +128,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 it.isVisible = count > 0
                 it.number = count
             }
+        }.catch { e ->
+            logger?.error("メッセージ既読数取得エラー", e = e)
         }.launchIn(lifecycleScope)
 
         // NOTE: インスタンスのバージョンを調べ、メニューを制御する
@@ -161,6 +166,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 isVisible = count > 0
                 number = count
             }
+        }.catch { e ->
+            logger?.error("通知既読数取得エラー", e = e)
         }.launchIn(lifecycleScope)
 
         // NOTE: 最新の通知をSnackBar等に表示する
@@ -174,6 +181,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
         }.flowOn(Dispatchers.IO).onEach { notificationRelation ->
             showNotification(notificationRelation)
+        }.catch { e ->
+            logger?.error("通知取得エラー", e = e)
         }.launchIn(lifecycleScope + Dispatchers.Main)
 
         startService(Intent(this, NotificationService::class.java))

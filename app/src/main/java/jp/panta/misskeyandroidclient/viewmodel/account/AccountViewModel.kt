@@ -32,12 +32,17 @@ class AccountViewModel(
         const val TAG = "AccountViewModel"
     }
 
+    private val logger = miCore.loggerFactory.create("AccountViewModel")
+
+    @FlowPreview
     val accounts = MediatorLiveData<List<AccountViewData>>().apply{
         miCore.getAccounts().onEach { accounts ->
             val viewDataList = accounts.map{ ac ->
                 AccountViewData(ac, miCore, viewModelScope, Dispatchers.IO)
             }
             postValue(viewDataList)
+        }.catch { e ->
+            logger.debug("アカウントロードエラー", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
@@ -62,6 +67,8 @@ class AccountViewModel(
             user
         }.onEach {
             user.postValue(it)
+        }.catch { e ->
+            logger.error("現在のアカウントの取得に失敗した", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
         miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac->
@@ -76,6 +83,8 @@ class AccountViewModel(
             val user = it.second.body.toUser(it.first, true)
             miCore.getUserDataSource().add(user)
             this.user.postValue(user as User.Detail)
+        }.catch { e ->
+            logger.error("MeUpdated取得エラー", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
@@ -105,6 +114,7 @@ class AccountViewModel(
         showProfile.event = account
     }
 
+    @FlowPreview
     fun signOut(accountViewData: AccountViewData){
         viewModelScope.launch(Dispatchers.IO){
             miCore.logoutAccount(accountViewData.account)
