@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
@@ -114,15 +115,7 @@ class UserDetailViewModel(
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
 
-    init {
-        userState.filterNotNull().flatMapLatest {
-            miCore.getUserRepositoryEventToFlow().from(it.id)
-        }.map {
-            miCore.getUserRepository().find(it.userId) as? User.Detail
-        }.filterNotNull().onEach {
-            userState.value = it
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
+
 
     fun load(){
         viewModelScope.launch(dispatcher) {
@@ -139,6 +132,15 @@ class UserDetailViewModel(
 
 
             userState.value = user as? User.Detail
+            user?.let {
+                miCore.getUserRepositoryEventToFlow().from(user.id).mapNotNull{
+                    (it as? UserDataSource.Event.Updated)?.user?: (it as? UserDataSource.Event.Created)?.user
+                }.mapNotNull {
+                    it as? User.Detail
+                }.onEach {
+                    userState.value = it
+                }.launchIn(viewModelScope + Dispatchers.IO)
+            }
 
         }
 
