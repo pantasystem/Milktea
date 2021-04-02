@@ -59,7 +59,7 @@ fun Visibility(type: String, isLocalOnly: Boolean, visibleUserIds: List<User.Id>
         "home" -> Visibility.Home(isLocalOnly)
         "followers" -> Visibility.Followers(isLocalOnly)
         "specified" -> Visibility.Specified(visibleUserIds?: emptyList())
-        else -> throw IllegalArgumentException("public, home, followers, specified以外許可されていません。")
+        else -> throw IllegalArgumentException("public, home, followers, specified以外許可されていません。与えられたデータ:$type")
     }
     /*require((isLocalOnly && visibility is CanLocalOnly) || !isLocalOnly) {
         "$type では localOnlyは指定できません。"
