@@ -217,16 +217,8 @@ class MiApplication : Application(), MiCore {
             mAccountRepository,
             loggerFactory,
             { account, socket ->
-                mSocketConnectionQueue.connect(account)
-                connectChannel(account, ChannelAPI.Type.MAIN).onEach {
-                    // 各種DataSourceなどの各種変更イベントを通達する
-                    runCatching {
-                        if(it is ChannelBody.Main.Notification) {
-                            getGetters().notificationRelationGetter.get(account, it.body)
-                        }
-                    }
+                socket.connect()
 
-                }.launchIn(applicationScope + Dispatchers.IO)
                 socket.addStateEventListener { e ->
                     applicationScope.launch {
                         handleSocketStateEvent(account, e)
@@ -660,7 +652,7 @@ class MiApplication : Application(), MiCore {
                     && mChannelAPIWithAccountProvider.get(account).isEmpty())
         ) {
             logger.debug("ネットワークアクティブ、WebSocket未接続なので再接続を試みる")
-            mSocketConnectionQueue.connect(account)
+            mSocketConnectionQueue.connect(account, false)
         }
     }
 
