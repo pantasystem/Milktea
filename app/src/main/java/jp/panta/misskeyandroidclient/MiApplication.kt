@@ -180,6 +180,7 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
             .addMigrations(MIGRATION_5_6)
+            .addMigrations(MIGRATION_6_7)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         val roomAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
@@ -196,7 +197,7 @@ class MiApplication : Application(), MiCore {
 
         urlPreviewDAO = database.urlPreviewDAO()
 
-        metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO()), InMemoryMetaRepository())
+        metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
 

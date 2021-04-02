@@ -99,9 +99,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             startActivity(intent)
         })
 
-        miApplication.getCurrentInstanceMeta()?.emojis?.map{
-            ":${it.name}:"
-        }?.let{ emojis ->
+        miApplication.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
             binding.inputMainText.setAdapter(
                 CustomEmojiCompleteAdapter(
                     emojis,
@@ -302,6 +300,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         isShowEditorMenu.value = true
     }
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override fun goToNormalEditor() {
         mViewModel?.toDraftNote()?.let{
             val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = it)

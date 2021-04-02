@@ -44,7 +44,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
         val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
         mNoteViewModel = notesViewModel
 
-        notesViewModel.submittedNotesOnReaction.observe(activity, Observer {
+        notesViewModel.submittedNotesOnReaction.observe(activity, {
             Log.d("ReactionSelectionDialog", "終了が呼び出された")
             dismiss()
         })
@@ -61,7 +61,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         }*/
         val category = miApplication.getCurrentInstanceMeta()?.emojis?.filter {
-            !it.category.isNullOrBlank()
+            it.category != null
         }?.groupBy {
             it.category?: ""
         }?.keys?: emptySet()
@@ -91,7 +91,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
             return 3 + categoryList.size
         }
 
-        override fun getPageTitle(position: Int): CharSequence? {
+        override fun getPageTitle(position: Int): CharSequence {
             return when(position){
                 0 ->{
                     getString(R.string.user)

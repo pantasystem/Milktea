@@ -41,7 +41,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             )
         view.reactionsView.adapter = adapter
 
-        notesViewModel.submittedNotesOnReaction.observe(requireActivity(), Observer{
+        notesViewModel.submittedNotesOnReaction.observe(requireActivity(), {
             dismiss()
         })
         
@@ -67,9 +67,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         }
         
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
-            ":${it.name}:"
-        }?: emptyList()
+        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
         
         val autoCompleteAdapter =
             ReactionAutoCompleteArrayAdapter(
