@@ -15,8 +15,21 @@ class MetaRelation {
     @Relation(parentColumn = "uri", entityColumn = "instanceDomain")
     lateinit var emojis: List<EmojiDTO>
 
+    @Relation(parentColumn = "uri", entityColumn = "instanceDomain")
+    lateinit var aliases: List<EmojiAlias>
+
     @Ignore
     fun toMeta(): Meta{
+        val mapEmojis = aliases.groupBy {
+            it.name to it.instanceDomain
+        }
+        val e = emojis.map { emoji ->
+            val alias = mapEmojis[emoji.name to emoji.instanceDomain]?.map { a ->
+                a.alias
+            }?: emptyList()
+            emoji.toEmoji(alias)
+
+        }
         return Meta(
             bannerUrl = this.meta.bannerUrl,
             cacheRemoteFiles = this.meta.cacheRemoteFiles,
@@ -46,9 +59,7 @@ class MetaRelation {
             swPublicKey = this.meta.swPublicKey,
             toSUrl = this.meta.toSUrl,
             version = this.meta.version,
-            emojis = this.emojis.map{
-                it.toEmoji()
-            },
+            emojis = e,
             uri = this.meta.uri
         )
     }

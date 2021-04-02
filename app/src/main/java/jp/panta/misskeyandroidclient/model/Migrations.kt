@@ -113,3 +113,9 @@ val MIGRATION_5_6 = object : Migration(5, 6){
         database.execSQL("CREATE INDEX IF NOT EXISTS 'index_emoji_table_name' ON 'emoji_table' ('name')")
     }
 }
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'emoji_alias_table' ('alias' TEXT NOT NULL, 'name' TEXT NOT NULL, 'instanceDomain' TEXT NOT NULL, PRIMARY KEY('alias', 'name', 'instanceDomain'), FOREIGN KEY('name', 'instanceDomain') REFERENCES 'emoji_table'('name', 'instanceDomain') ON UPDATE CASCADE ON DELETE CASCADE )")
+    }
+}

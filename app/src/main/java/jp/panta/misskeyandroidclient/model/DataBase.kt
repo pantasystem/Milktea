@@ -16,9 +16,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
 import jp.panta.misskeyandroidclient.model.account.page.TimelinePageTypeConverter
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
-import jp.panta.misskeyandroidclient.model.instance.db.EmojiDTO
-import jp.panta.misskeyandroidclient.model.instance.db.MetaDAO
-import jp.panta.misskeyandroidclient.model.instance.db.MetaDTO
+import jp.panta.misskeyandroidclient.model.instance.db.*
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSetting
@@ -40,10 +38,11 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUse
         Account::class,
         Page::class,
         MetaDTO::class,
-        EmojiDTO::class
+        EmojiDTO::class,
+        EmojiAlias::class
 
     ],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class)
@@ -62,5 +61,6 @@ abstract class DataBase : RoomDatabase(){
     abstract fun pageDAO(): PageDAO
 
     abstract fun metaDAO(): MetaDAO
+    abstract fun emojiAliasDAO(): EmojiAliasDAO
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
 }
