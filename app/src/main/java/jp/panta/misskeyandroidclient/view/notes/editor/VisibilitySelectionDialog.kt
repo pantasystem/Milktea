@@ -58,7 +58,7 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
                     when(visibilities[which]){
                         getString(R.string.visibility_public) -> "public"
                         getString(R.string.visibility_home) -> "home"
-                        getString(R.string.visibility_follower) -> "local"
+                        getString(R.string.visibility_follower) -> "followers"
                         getString(R.string.visibility_specified) -> "specified"
                         else -> "public"
                     }

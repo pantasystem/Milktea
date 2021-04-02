@@ -133,8 +133,17 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         //binding.viewModel
         binding.lifecycleOwner = this
 
-        val replyToNoteId: String? = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)
-        val quoteToNoteId: String? = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)
+        val accountId: Long? = if(intent.getLongExtra(EXTRA_ACCOUNT_ID, - 1) == - 1L) null else intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
+        val replyToNoteId = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)?.let{
+            requireNotNull(accountId)
+            Note.Id(accountId, it)
+        }
+        val quoteToNoteId = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)?.let{
+            requireNotNull(accountId)
+            Note.Id(accountId, it)
+        }
+
+
 
         val note: Note? = intent.getSerializableExtra(EXTRA_NOTE) as? Note
 
