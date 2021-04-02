@@ -162,7 +162,9 @@ class NotesViewModel(
      */
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String){
 
-
+        if(reaction.contains("@") && reaction.replace(":", "").split("@").getOrNull(1) != ".") {
+            return
+        }
         viewModelScope.launch(Dispatchers.IO){
             //リアクション解除処理をする
             submittedNotesOnReaction.event = planeNoteViewData
