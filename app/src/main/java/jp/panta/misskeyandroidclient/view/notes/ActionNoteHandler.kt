@@ -63,7 +63,7 @@ class ActionNoteHandler(
     }
 
     private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData>{
-        val intent = NoteEditorActivity.newBundle(activity, replyTo = it.toShowNote.note.id)
+        val intent = NoteEditorActivity.newBundle(activity, quoteTo = it.toShowNote.note.id)
         activity.startActivity(intent)
     }
 
