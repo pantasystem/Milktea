@@ -11,9 +11,10 @@ import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionPreviewBinding
+import jp.panta.misskeyandroidclient.model.emoji.Emoji
 
 class CustomEmojiCompleteAdapter(
-    private val emojis: List<String>,
+    private val emojis: List<Emoji>,
     private val context: Context
 ) : BaseAdapter(), Filterable {
 
@@ -65,12 +66,16 @@ class CustomEmojiCompleteAdapter(
 
             suggestions = listOf()
 
-            if(constraint != null){
+            val text = constraint?.toString()
+            if(text != null){
                 suggestions = emojis.filter{
-                    it.contains(constraint)
+                    it.name.startsWith(text.replace(":", "")) || it.aliases?.any { alias ->
+                        alias.startsWith(text.replace(":", ""))
+                    }?: false
+                }.map {
+                    ":${it.name}:"
                 }
             }
-            Log.d("EmojiAutoComplete", "constraint:$constraint, suggestions:$suggestions")
 
             val results = FilterResults()
             results.values = suggestions
