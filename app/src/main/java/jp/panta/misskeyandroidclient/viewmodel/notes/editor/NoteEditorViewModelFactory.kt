@@ -11,8 +11,8 @@ import java.lang.IllegalArgumentException
 @Suppress("UNCHECKED_CAST")
 class NoteEditorViewModelFactory(
     private val miApplication: MiApplication,
-    private val replyToNoteId: String? = null,
-    private val quoteToNoteId: String? = null,
+    private val replyToNoteId: Note.Id? = null,
+    private val quoteToNoteId: Note.Id? = null,
     private val note: Note? = null,
     private val draftNote: DraftNote? = null
 ) : ViewModelProvider.Factory{

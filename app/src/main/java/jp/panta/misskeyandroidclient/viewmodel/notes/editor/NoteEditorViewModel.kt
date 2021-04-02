@@ -16,19 +16,14 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import java.io.IOException
 
 class NoteEditorViewModel(
-    //private val accountRelation: AccountRelation,
-    //private val misskeyAPI: MisskeyAPI,
     private val miCore: MiCore,
     private val draftNoteDao: DraftNoteDao,
-    //meta: Meta,
-    replyId: String? = null,
-    private val quoteToNoteId: String? = null,
+    replyId: Note.Id? = null,
+    private val quoteToNoteId: Note.Id? = null,
     private val encryption: Encryption = miCore.getEncryption(),
     loggerFactory: Logger.Factory,
     n: Note? = null,
@@ -67,10 +62,24 @@ class NoteEditorViewModel(
     val note = MutableLiveData<Note>(n)
 
     // FIXME Note.Idを使用するようにすること
-    val replyToNoteId = MutableLiveData<String>(replyId)
+    //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
+    private val mReply = MutableStateFlow<Note?>(null)
+    val reply: StateFlow<Note?> = mReply
+    val replyToNoteId = MutableStateFlow(replyId).also { replyId ->
+        replyId.map { id ->
+            id?.let{
+                miCore.getNoteRepository().find(it)
+            }
+        }.onEach {
+            mReply.value = it
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
+
+
 
     // FIXME Note.Idを使用するようにすること
-    val renoteId = MutableLiveData<String>(quoteToNoteId)
+    //val renoteId = MutableLiveData<Note.Id>(quoteToNoteId)
+    val renoteId = MutableStateFlow(replyId)
 
     val cw = MediatorLiveData<String>().apply {
         addSourceFromNoteAndDraft { noteDTO, draftNote ->
@@ -146,6 +155,9 @@ class NoteEditorViewModel(
             val type = noteDTO?.visibility?: Visibility(draftNote?.visibility?: "public", local?: false)
             value = type
         }
+        reply.filterNotNull().onEach {
+            postValue(it.visibility)
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     val isLocalOnly = MediatorLiveData<Boolean>().apply{
@@ -212,11 +224,9 @@ class NoteEditorViewModel(
         currentAccount.value?.let{ account ->
 
             // FIXME 本来はreplyToNoteIdの時点でNote.Idを使うべきだが現状は厳しい
-            val rtn = replyToNoteId.value
-            val replyId = if(rtn == null) null else Note.Id(noteId = rtn, accountId = account.accountId)
+            val replyId = replyToNoteId.value
 
-            val rnn = renoteId.value
-            val renoteId = if(rnn == null) null else Note.Id(noteId = rnn, accountId = account.accountId)
+            val renoteId = renoteId.value
             // FIXME viaMobileを設定できるようにする
             val createNote = CreateNote(
                 author = account,
@@ -397,13 +407,15 @@ class NoteEditorViewModel(
             draftPoll = poll.value?.toDraftPoll(),
             visibility = visibility.value?.type()?: "public",
             localOnly = visibility.value?.isLocalOnly(),
-            renoteId = quoteToNoteId,
-            replyId = replyToNoteId.value,
+            renoteId = quoteToNoteId?.noteId,
+            replyId = replyToNoteId.value?.noteId,
             files = files.value
         ).apply{
             this.draftNoteId = draftNote.value?.draftNoteId
         }
     }
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     fun saveDraft(){
         if(!canSaveDraft()){
             return
@@ -430,6 +442,8 @@ class NoteEditorViewModel(
         }
     }
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     fun canSaveDraft(): Boolean{
         return !(cw.value.isNullOrBlank()
                 && text.value.isNullOrBlank()
