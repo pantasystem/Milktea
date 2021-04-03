@@ -22,12 +22,14 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
 
-open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI{
+open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI by misskeyAPI{
 
     override fun blockUser(requestUser: RequestUser): Call<Unit> = misskeyAPI.blockUser(requestUser)
     override fun children(noteRequest: NoteRequest): Call<List<NoteDTO>> = misskeyAPI.children(noteRequest)
@@ -98,5 +100,6 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     open fun showGroup( body: ShowGroupDTO) : Call<GroupDTO> = apiDiff.showGroup(body)
     open fun transferGroup( body: TransferGroupDTO) : Call<GroupDTO> = apiDiff.transferGroup(body)
     open fun updateGroup( body: UpdateGroupDTO) : Call<GroupDTO> = apiDiff.updateGroup(body)
+    override fun reactions(body: RequestReactionHistoryDTO): Call<List<ReactionHistoryDTO>> = misskeyAPI.reactions(body)
 
 }

@@ -21,6 +21,8 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
@@ -138,4 +140,6 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
     override fun getHashTagList(requestHashTagList: RequestHashTagList): Call<List<HashTag>> = misskey.getHashTagList(requestHashTagList)
 
     override fun getUsers(requestUser: RequestUser): Call<List<UserDTO>> = misskey.getUsers(requestUser)
+
+    override fun reactions(body: RequestReactionHistoryDTO): Call<List<ReactionHistoryDTO>> = misskey.reactions(body)
 }

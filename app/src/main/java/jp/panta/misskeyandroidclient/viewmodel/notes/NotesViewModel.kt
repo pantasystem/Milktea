@@ -11,9 +11,10 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
@@ -69,6 +70,8 @@ class NotesViewModel(
 
     val openNoteEditor = EventBus<Note?>()
 
+    val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
+
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
         Log.d("NotesViewModel", "登録しました: $note")
@@ -97,6 +100,12 @@ class NotesViewModel(
 
     fun setShowNote(note: Note){
         showNoteEvent.event = note
+    }
+
+    fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
+        noteId?.let {
+            showReactionHistoryEvent.event = ReactionHistoryRequest(noteId, type)
+        }
     }
 
     fun postRenote(){

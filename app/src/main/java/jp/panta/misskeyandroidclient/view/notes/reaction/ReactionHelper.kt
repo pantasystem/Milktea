@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel.notes.reaction
+package jp.panta.misskeyandroidclient.view.notes.reaction
 
 import android.annotation.SuppressLint
 import android.graphics.Color

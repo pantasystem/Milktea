@@ -20,6 +20,8 @@ import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
@@ -105,6 +107,9 @@ interface MisskeyAPI {
 
     @POST("api/notes/delete")
     fun delete(@Body deleteNote: DeleteNote): Call<Unit>
+
+    @POST("api/notes/reactions")
+    fun reactions(@Body body: RequestReactionHistoryDTO): Call<List<ReactionHistoryDTO>>
 
     @POST("api/notes/reactions/create")
     fun createReaction(@Body reaction: CreateReaction): Call<Unit>

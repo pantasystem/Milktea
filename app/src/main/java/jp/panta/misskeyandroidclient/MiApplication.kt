@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -52,6 +51,10 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
@@ -137,6 +140,8 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mGetters: Getters
 
+    private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
+    private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
@@ -272,6 +277,9 @@ class MiApplication : Application(), MiCore {
             getGetters().notificationRelationGetter,
             Dispatchers.IO
         )
+
+        mReactionHistoryDataSource = InMemoryReactionHistoryDataSource()
+        mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
 
         val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
         getCurrentAccount().filterNotNull().flatMapLatest { ac ->
@@ -719,7 +727,13 @@ class MiApplication : Application(), MiCore {
         return mNoteCaptureAPIWithAccountProvider.get(account)
     }
 
+    override fun getReactionHistoryDataSource(): ReactionHistoryDataSource {
+        return mReactionHistoryDataSource
+    }
 
+    override fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory {
+        return mReactionHistoryPaginatorFactory
+    }
 
     private val sharedPreferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
