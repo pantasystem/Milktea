@@ -7,6 +7,7 @@ import java.util.*
 
 data class ReactionHistory (
     val id: Id,
+    val noteId: String,
     val createdAt: Date,
     val user: User,
     val type: String
@@ -14,7 +15,6 @@ data class ReactionHistory (
 
     data class Id(
         val reactionId: String,
-        val noteId: String,
         val accountId: Long
     ) : EntityId
 }
