@@ -27,6 +27,8 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
+import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -128,5 +130,9 @@ interface MiCore{
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
     fun getMetaStore(): MetaStore
+
+    fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory
+
+    fun getReactionHistoryDataSource(): ReactionHistoryDataSource
 
 }

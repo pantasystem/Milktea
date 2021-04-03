@@ -52,6 +52,10 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
+import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.reaction.impl.InMemoryReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
@@ -137,6 +141,8 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mGetters: Getters
 
+    private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
+    private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
@@ -272,6 +278,9 @@ class MiApplication : Application(), MiCore {
             getGetters().notificationRelationGetter,
             Dispatchers.IO
         )
+
+        mReactionHistoryDataSource = InMemoryReactionHistoryDataSource()
+        mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
 
         val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
         getCurrentAccount().filterNotNull().flatMapLatest { ac ->
@@ -719,7 +728,13 @@ class MiApplication : Application(), MiCore {
         return mNoteCaptureAPIWithAccountProvider.get(account)
     }
 
+    override fun getReactionHistoryDataSource(): ReactionHistoryDataSource {
+        return mReactionHistoryDataSource
+    }
 
+    override fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory {
+        return mReactionHistoryPaginatorFactory
+    }
 
     private val sharedPreferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
