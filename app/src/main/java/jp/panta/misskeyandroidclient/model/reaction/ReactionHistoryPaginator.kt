@@ -13,12 +13,7 @@ interface ReactionHistoryPaginator {
     val reactionHistoryRequest: ReactionHistoryRequest
 
     /**
-     * 未来のリアクション履歴を取得します。
+     * 次のリアクションの履歴を取得します
      */
-    suspend fun loadFuture()
-
-    /**
-     * 過去のリアクション履歴を取得します。
-     */
-    suspend fun loadPast()
+    suspend fun next(): Boolean
 }

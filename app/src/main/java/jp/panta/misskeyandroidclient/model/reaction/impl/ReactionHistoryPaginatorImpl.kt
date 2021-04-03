@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.reaction.ReactionHistory
 import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryPaginator
@@ -43,80 +44,43 @@ class ReactionHistoryPaginatorImpl(
         }
     }
 
+    val limit: Int = 20
+
     val lock = Mutex()
 
-    private var sinceId: ReactionHistory.Id? = null
-    private var untilId: ReactionHistory.Id? = null
+    private var offset: Int = 0
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun loadFuture() {
+    override suspend fun next(): Boolean {
         lock.withLock {
-            val account: Account = accountRepository.get(reactionHistoryRequest.noteId.accountId)
+            val account = accountRepository.get(reactionHistoryRequest.noteId.accountId)
             val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-            val body = misskeyAPI.reactions(
+            val res = misskeyAPI.reactions(
                 RequestReactionHistoryDTO(
-                    sinceId= sinceId?.reactionId,
                     i = account.getI(encryption),
-                    type = reactionHistoryRequest.type,
-                    noteId = reactionHistoryRequest.noteId.noteId
+                    offset = offset,
+                    limit = limit,
+                    noteId = reactionHistoryRequest.noteId.noteId,
+                    type = reactionHistoryRequest.type
                 )
-            ).execute().throwIfHasError().body()?: emptyList()
-            val histories = body.map {
-                val user = it.user.toUser(account, false)
+            ).execute()?.throwIfHasError()?.body()?: emptyList()
+
+            if(res.isNotEmpty()) {
+                offset += res.size
+            }
+            val reactionHistories = res.map {
+                val user = it.user.toUser(account)
                 userDataSource.add(user)
                 ReactionHistory(
-                    ReactionHistory.Id(it.id, reactionHistoryRequest.noteId.accountId),
+                    ReactionHistory.Id(it.id, account.accountId),
                     reactionHistoryRequest.noteId,
                     it.createdAt,
                     user,
                     it.type
                 )
             }
-            reactionHistoryDataSource.addAll(histories)
-
-            histories.lastOrNull()?.let {
-                untilId = it.id
-            }
-
-            if(sinceId == null) {
-                sinceId = histories.firstOrNull()?.id
-            }
-        }
-    }
-
-    @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun loadPast() {
-        lock.withLock {
-            val account: Account = accountRepository.get(reactionHistoryRequest.noteId.accountId)
-            val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-            val body = misskeyAPI.reactions(
-                RequestReactionHistoryDTO(
-                    untilId = untilId?.reactionId,
-                    i = account.getI(encryption),
-                    type = reactionHistoryRequest.type,
-                    noteId = reactionHistoryRequest.noteId.noteId
-                )
-            ).execute().throwIfHasError().body()?: emptyList()
-            val histories = body.map {
-                val user = it.user.toUser(account, false)
-                userDataSource.add(user)
-                ReactionHistory(
-                    ReactionHistory.Id(it.id, reactionHistoryRequest.noteId.accountId),
-                    reactionHistoryRequest.noteId,
-                    it.createdAt,
-                    user,
-                    it.type
-                )
-            }
-            reactionHistoryDataSource.addAll(histories)
-
-            histories.lastOrNull()?.let {
-                untilId = it.id
-            }
-
-            if(sinceId == null) {
-                sinceId = histories.firstOrNull()?.id
-            }
+            reactionHistoryDataSource.addAll(reactionHistories)
+            return reactionHistories.isNotEmpty()
         }
     }
 }

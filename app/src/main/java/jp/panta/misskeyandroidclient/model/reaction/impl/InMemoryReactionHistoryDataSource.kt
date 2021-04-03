@@ -12,11 +12,11 @@ import kotlinx.coroutines.sync.withLock
 class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
 
     private val lock = Mutex()
-    private val stateFlow = MutableStateFlow(emptyList<ReactionHistory>())
+    private val stateFlow = MutableStateFlow(emptySet<ReactionHistory>())
 
     override suspend fun add(reactionHistory: ReactionHistory) {
         lock.withLock {
-            stateFlow.value = stateFlow.value.toMutableList().also {
+            stateFlow.value = stateFlow.value.toMutableSet().also {
                 it.add(reactionHistory)
             }
         }
@@ -24,7 +24,7 @@ class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
 
     override suspend fun addAll(reactionHistories: List<ReactionHistory>) {
         lock.withLock {
-            stateFlow.value = stateFlow.value.toMutableList().also {
+            stateFlow.value = stateFlow.value.toMutableSet().also {
                 it.addAll(reactionHistories)
             }
         }
@@ -53,6 +53,8 @@ class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
     }
 
     override fun findAll(): Flow<List<ReactionHistory>> {
-        return stateFlow
+        return stateFlow.map {
+            it.toList()
+        }
     }
 }
