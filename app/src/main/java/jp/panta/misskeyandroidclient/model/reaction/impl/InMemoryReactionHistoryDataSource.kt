@@ -33,7 +33,7 @@ class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
     override fun filterByNoteId(noteId: Note.Id): Flow<List<ReactionHistory>> {
         return stateFlow.map {
             it.filter { history ->
-                history.id.accountId == noteId.accountId && noteId.noteId == history.noteId
+                history.id.accountId == noteId.accountId && noteId== history.noteId
             }.sortedBy { history ->
                 history.id.reactionId
             }
@@ -43,7 +43,7 @@ class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
     override fun filterByNoteIdAndType(noteId: Note.Id, type: String): Flow<List<ReactionHistory>> {
         return stateFlow.map {
             it.filter { history ->
-                history.noteId == noteId.noteId
+                history.noteId == noteId
                         && history.id.accountId == noteId.accountId
                         && history.type == type
             }.sortedBy { history ->
