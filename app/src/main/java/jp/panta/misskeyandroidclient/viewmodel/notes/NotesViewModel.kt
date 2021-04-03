@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox

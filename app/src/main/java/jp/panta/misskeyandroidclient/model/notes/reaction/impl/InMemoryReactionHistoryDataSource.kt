@@ -1,8 +1,8 @@
-package jp.panta.misskeyandroidclient.model.reaction.impl
+package jp.panta.misskeyandroidclient.model.notes.reaction.impl
 
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistory
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

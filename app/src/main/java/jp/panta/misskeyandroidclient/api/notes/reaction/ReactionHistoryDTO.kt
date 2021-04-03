@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.api.reaction
+package jp.panta.misskeyandroidclient.api.notes.reaction
 
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import java.util.*

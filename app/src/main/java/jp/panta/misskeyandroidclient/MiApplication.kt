@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -52,10 +51,10 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.reaction.impl.InMemoryReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.reaction.impl.ReactionHistoryPaginatorImpl
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting

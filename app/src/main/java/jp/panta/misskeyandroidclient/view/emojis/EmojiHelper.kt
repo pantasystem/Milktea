@@ -1,14 +1,13 @@
 package jp.panta.misskeyandroidclient.view.emojis
 
 import android.graphics.Bitmap
-import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.reaction.ReactionSelection
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 

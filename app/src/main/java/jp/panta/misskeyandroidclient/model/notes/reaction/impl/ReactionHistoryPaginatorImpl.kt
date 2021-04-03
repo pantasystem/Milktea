@@ -1,17 +1,15 @@
-package jp.panta.misskeyandroidclient.model.reaction.impl
+package jp.panta.misskeyandroidclient.model.notes.reaction.impl
 
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistory
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryRequest
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

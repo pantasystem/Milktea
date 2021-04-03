@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.reaction
+package jp.panta.misskeyandroidclient.model.notes.reaction
 
 import jp.panta.misskeyandroidclient.model.notes.Note
 

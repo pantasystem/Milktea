@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.api.reaction
+package jp.panta.misskeyandroidclient.api.notes.reaction
 
 data class RequestReactionHistoryDTO (
     val i: String,
