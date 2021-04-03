@@ -50,4 +50,12 @@ class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
             it.values.toList()
         }
     }
+
+    override suspend fun clear(noteId: Note.Id) {
+        lock.withLock {
+            stateFlow.value = stateFlow.value.filterNot {
+                it.value.noteId == noteId
+            }
+        }
+    }
 }

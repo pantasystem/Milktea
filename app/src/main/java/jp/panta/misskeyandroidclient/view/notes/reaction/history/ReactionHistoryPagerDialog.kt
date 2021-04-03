@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
@@ -12,7 +13,13 @@ import jp.panta.misskeyandroidclient.databinding.DialogReactionHistoryPagerBindi
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.notes.reaction.ReactionHistoryPagerViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -37,6 +44,8 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
     }
 
     lateinit var binding: DialogReactionHistoryPagerBinding
+    lateinit var noteId: Note.Id
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +55,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
         binding = DataBindingUtil.inflate(inflater, R.layout.dialog_reaction_history_pager, container, false)
         return binding.root
     }
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -56,33 +66,47 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
         val showCurrentReaction = requireArguments().getString(EXTRA_SHOW_REACTION_TYPE)
 
         val noteId = Note.Id(aId, nId)
+        this.noteId = noteId
 
         val miCore = requireContext().applicationContext as MiCore
-        val noteRepository = miCore.getNoteRepository()
         binding.reactionHistoryTab.setupWithViewPager(binding.reactionHistoryPager)
-        lifecycleScope.launch(Dispatchers.IO) {
-            runCatching {
-                noteRepository.find(noteId).reactionCounts.map {
-                    ReactionHistoryRequest(noteId, it.reaction)
-                }
+        val pagerViewModel = ViewModelProvider(this, ReactionHistoryPagerViewModel.Factory(noteId, miCore))[ReactionHistoryPagerViewModel::class.java]
 
-            }.onSuccess { list ->
+        lifecycleScope.launchWhenCreated {
+            pagerViewModel.types.collect { list ->
+                val types = list.toMutableList().also {
+                    it.add(0, ReactionHistoryRequest(noteId, null))
+                }
                 val index = showCurrentReaction.let { type ->
-                    list.indexOfFirst {
+
+                    types.indexOfFirst {
                         it.type == type
                     }
                 }
                 withContext(Dispatchers.Main) {
-                    showPager(noteId, list)
+                    showPager(noteId, types)
                     binding.reactionHistoryPager.currentItem = index
                 }
             }
         }
+
 
     }
 
     private fun showPager(noteId: Note.Id, types: List<ReactionHistoryRequest>) {
         val adapter = ReactionHistoryPagerAdapter(childFragmentManager, types, noteId)
         binding.reactionHistoryPager.adapter = adapter
+    }
+
+    override fun onPause() {
+        super.onPause()
+        dismissAllowingStateLoss()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        val miCore = requireContext().applicationContext as MiCore
+        requireActivity().lifecycleScope.launch(Dispatchers.IO) {
+            miCore.getReactionHistoryDataSource().clear(noteId)
+        }
     }
 }

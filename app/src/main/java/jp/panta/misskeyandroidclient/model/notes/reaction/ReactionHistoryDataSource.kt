@@ -15,4 +15,6 @@ interface ReactionHistoryDataSource {
     suspend fun add(reactionHistory: ReactionHistory)
 
     suspend fun addAll(reactionHistories: List<ReactionHistory>)
+
+    suspend fun clear(noteId: Note.Id)
 }
