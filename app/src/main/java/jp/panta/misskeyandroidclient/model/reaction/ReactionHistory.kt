@@ -14,6 +14,7 @@ data class ReactionHistory (
 
     data class Id(
         val reactionId: String,
+        val noteId: String,
         val accountId: Long
     ) : EntityId
 }
