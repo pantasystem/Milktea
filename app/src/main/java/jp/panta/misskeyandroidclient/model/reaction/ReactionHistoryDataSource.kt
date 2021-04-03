@@ -1,0 +1,14 @@
+package jp.panta.misskeyandroidclient.model.reaction
+
+import jp.panta.misskeyandroidclient.model.notes.Note
+import kotlinx.coroutines.flow.Flow
+
+
+interface ReactionHistoryDataSource {
+
+    fun findAll(): Flow<List<ReactionHistory>>
+
+    fun filterByNoteId(noteId: Note.Id): Flow<List<ReactionHistory>>
+
+    fun filterByNoteIdAndType(noteId: Note.Id, type: String): Flow<List<ReactionHistory>>
+}
