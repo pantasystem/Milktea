@@ -41,7 +41,7 @@ class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
                         && (type == null || type == history.type)
             }.sortedBy { history ->
                 history.id.reactionId
-            }
+            }.asReversed()
         }
     }
 

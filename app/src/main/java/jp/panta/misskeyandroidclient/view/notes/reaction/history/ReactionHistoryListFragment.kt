@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.view.notes.reaction.history
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,12 +9,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionHistoryListBinding
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.view.users.SimpleUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.reaction.ReactionHistoryViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ReactionHistoryListFragment : Fragment() {
 
@@ -36,6 +39,8 @@ class ReactionHistoryListFragment : Fragment() {
     }
 
     lateinit var binding: FragmentReactionHistoryListBinding
+    lateinit var mLinearLayoutManager: LinearLayoutManager
+    lateinit var mViewModel: ReactionHistoryViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,6 +62,7 @@ class ReactionHistoryListFragment : Fragment() {
         val noteId = Note.Id(aId, nId)
         val miCore = context?.applicationContext as MiCore
         val viewModel = ViewModelProvider(this, ReactionHistoryViewModel.Factory(noteId, type, miCore))[ReactionHistoryViewModel::class.java]
+        mViewModel = viewModel
         viewModel.isLoading.observe(viewLifecycleOwner) {
             if(it == true && viewModel.histories.value.isNullOrEmpty()) {
                 // 初期読み込み
@@ -69,7 +75,9 @@ class ReactionHistoryListFragment : Fragment() {
         }
         val simpleUserListAdapter = SimpleUserListAdapter(requireActivity())
         binding.historiesView.adapter = simpleUserListAdapter
-        binding.historiesView.layoutManager = LinearLayoutManager(requireContext())
+        mLinearLayoutManager = LinearLayoutManager(requireContext())
+        binding.historiesView.layoutManager = mLinearLayoutManager
+        binding.historiesView.addOnScrollListener(mScrollListener)
         viewModel.histories.observe(viewLifecycleOwner) {
             it?.let {
                 it.map { rh ->
@@ -80,5 +88,22 @@ class ReactionHistoryListFragment : Fragment() {
             }
         }
         viewModel.next()
+    }
+
+    private val mScrollListener = object : RecyclerView.OnScrollListener(){
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+
+            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
+            val itemCount = mLinearLayoutManager.itemCount
+
+
+            if(endVisibleItemPosition == (itemCount - 1)){
+                Log.d("", "後ろ")
+                mViewModel.next()
+
+            }
+
+        }
     }
 }
