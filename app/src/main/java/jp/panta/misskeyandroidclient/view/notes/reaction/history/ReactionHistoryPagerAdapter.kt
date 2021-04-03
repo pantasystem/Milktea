@@ -4,10 +4,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 
 class ReactionHistoryPagerAdapter(
     fragmentManager: FragmentManager,
-    val types: List<ViewType>,
+    val types: List<ReactionHistoryRequest>,
     val noteId: Note.Id
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
@@ -18,21 +19,12 @@ class ReactionHistoryPagerAdapter(
     }
 
     override fun getItem(position: Int): Fragment {
-        return when(val type = types[position]) {
-            is ViewType.All -> ReactionHistoryListFragment.newInstance(noteId)
-            is ViewType.Type -> ReactionHistoryListFragment.newInstance(noteId, type.type)
-        }
+        val req = types[position]
+        return ReactionHistoryListFragment.newInstance(req.noteId, req.type)
     }
 
     override fun getPageTitle(position: Int): CharSequence {
-        return when(val type = types[position]){
-            is ViewType.All -> "All"
-            is ViewType.Type -> type.type
-        }
+        return types[position].type?: "All"
     }
 }
 
-sealed class ViewType {
-    object All : ViewType()
-    data class Type(val type: String) : ViewType()
-}

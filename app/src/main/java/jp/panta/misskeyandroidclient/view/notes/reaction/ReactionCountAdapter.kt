@@ -39,6 +39,10 @@ class ReactionCountAdapter(val note: PlaneNoteViewData, private val notesViewMod
         holder.binding.reaction = item//Pair(java.lang.String(item.first), Integer.valueOf(item.second))
         holder.binding.note = note
         holder.binding.notesViewModel = notesViewModel
+        holder.binding.root.setOnLongClickListener {
+            notesViewModel.setShowReactionHistoryDialog(note.toShowNote.note.id, item.reaction)
+            false
+        }
         holder.binding.executePendingBindings()
         //holder.binding.lifecycleOwner = lifecycleOwner
     }
