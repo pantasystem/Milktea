@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionHistoryListBinding
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.view.users.SimpleUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.reaction.ReactionHistoryViewModel
 
@@ -65,9 +67,18 @@ class ReactionHistoryListFragment : Fragment() {
                 binding.historiesView.visibility = View.VISIBLE
             }
         }
-
+        val simpleUserListAdapter = SimpleUserListAdapter(requireActivity())
+        binding.historiesView.adapter = simpleUserListAdapter
+        binding.historiesView.layoutManager = LinearLayoutManager(requireContext())
         viewModel.histories.observe(viewLifecycleOwner) {
-
+            it?.let {
+                it.map { rh ->
+                    rh.user
+                }.let { users ->
+                    simpleUserListAdapter.submitList(users)
+                }
+            }
         }
+        viewModel.next()
     }
 }

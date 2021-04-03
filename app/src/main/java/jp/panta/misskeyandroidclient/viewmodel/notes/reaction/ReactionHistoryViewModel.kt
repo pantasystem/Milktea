@@ -46,7 +46,7 @@ class ReactionHistoryViewModel(
     val histories = MutableLiveData<List<ReactionHistory>>(emptyList())
 
     init {
-        reactionHistoryDataSource.filterByNoteId(paginator.reactionHistoryRequest.noteId).onEach {
+        reactionHistoryDataSource.filter(paginator.reactionHistoryRequest.noteId, paginator.reactionHistoryRequest.type).onEach {
             histories.postValue(it)
         }.catch { e ->
 

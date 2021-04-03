@@ -12,40 +12,33 @@ import kotlinx.coroutines.sync.withLock
 class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
 
     private val lock = Mutex()
-    private val stateFlow = MutableStateFlow(emptySet<ReactionHistory>())
+    private val stateFlow = MutableStateFlow(mapOf<ReactionHistory.Id, ReactionHistory>())
 
     override suspend fun add(reactionHistory: ReactionHistory) {
         lock.withLock {
-            stateFlow.value = stateFlow.value.toMutableSet().also {
-                it.add(reactionHistory)
+            stateFlow.value = stateFlow.value.toMutableMap().also {
+                it[reactionHistory.id] = reactionHistory
             }
         }
     }
 
     override suspend fun addAll(reactionHistories: List<ReactionHistory>) {
         lock.withLock {
-            stateFlow.value = stateFlow.value.toMutableSet().also {
-                it.addAll(reactionHistories)
+            stateFlow.value = stateFlow.value.toMutableMap().also {
+                it.putAll(reactionHistories.map { r ->
+                    r.id to r
+                })
             }
         }
     }
 
-    override fun filterByNoteId(noteId: Note.Id): Flow<List<ReactionHistory>> {
-        return stateFlow.map {
-            it.filter { history ->
-                history.id.accountId == noteId.accountId && noteId== history.noteId
-            }.sortedBy { history ->
-                history.id.reactionId
-            }
-        }
-    }
 
-    override fun filterByNoteIdAndType(noteId: Note.Id, type: String): Flow<List<ReactionHistory>> {
+    override fun filter(noteId: Note.Id, type: String?): Flow<List<ReactionHistory>> {
         return stateFlow.map {
-            it.filter { history ->
+            it.values.filter { history ->
                 history.noteId == noteId
                         && history.id.accountId == noteId.accountId
-                        && history.type == type
+                        && (type == null || type == history.type)
             }.sortedBy { history ->
                 history.id.reactionId
             }
@@ -54,7 +47,7 @@ class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
 
     override fun findAll(): Flow<List<ReactionHistory>> {
         return stateFlow.map {
-            it.toList()
+            it.values.toList()
         }
     }
 }

@@ -69,6 +69,8 @@ class NotesViewModel(
 
     val openNoteEditor = EventBus<Note?>()
 
+    val showReactionHistoryEvent = EventBus<Note.Id?>()
+
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
         Log.d("NotesViewModel", "登録しました: $note")
@@ -97,6 +99,12 @@ class NotesViewModel(
 
     fun setShowNote(note: Note){
         showNoteEvent.event = note
+    }
+
+    fun setShowReactionHistoryDialog(noteId: Note.Id?) {
+        noteId?.let {
+            showReactionHistoryEvent.event = it
+        }
     }
 
     fun postRenote(){

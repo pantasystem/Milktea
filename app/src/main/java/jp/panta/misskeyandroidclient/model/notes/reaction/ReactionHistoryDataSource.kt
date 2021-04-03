@@ -8,9 +8,9 @@ interface ReactionHistoryDataSource {
 
     fun findAll(): Flow<List<ReactionHistory>>
 
-    fun filterByNoteId(noteId: Note.Id): Flow<List<ReactionHistory>>
+    fun filter(noteId: Note.Id, type: String? = null): Flow<List<ReactionHistory>>
 
-    fun filterByNoteIdAndType(noteId: Note.Id, type: String): Flow<List<ReactionHistory>>
+
 
     suspend fun add(reactionHistory: ReactionHistory)
 

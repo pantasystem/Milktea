@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
+import jp.panta.misskeyandroidclient.view.notes.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.picker.ReactionPickerDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -150,6 +151,12 @@ class ActionNoteHandler(
         }
     }
 
+    private val showReactionHistoryDialogObserver: (Note.Id?)->Unit = { noteId: Note.Id? ->
+        noteId?.let {
+            ReactionHistoryPagerDialog.newInstance(noteId).show(activity.supportFragmentManager, "")
+        }
+    }
+
 
 
     fun initViewModelListener(){
@@ -200,5 +207,8 @@ class ActionNoteHandler(
 
         confirmViewModel.confirmedEvent.removeObserver(confirmedEventObserver)
         confirmViewModel.confirmedEvent.observe(activity, confirmedEventObserver)
+
+        mNotesViewModel.showReactionHistoryEvent.removeObserver(showReactionHistoryDialogObserver)
+        mNotesViewModel.showReactionHistoryEvent.observe(activity, showReactionHistoryDialogObserver)
     }
 }
