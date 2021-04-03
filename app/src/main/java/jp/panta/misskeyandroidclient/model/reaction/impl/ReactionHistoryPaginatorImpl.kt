@@ -24,6 +24,24 @@ class ReactionHistoryPaginatorImpl(
     private val userDataSource: UserDataSource
 ) : ReactionHistoryPaginator {
 
+    class Factory(
+        private val reactionHistoryDataSource: ReactionHistoryDataSource,
+        private val misskeyAPIProvider: MisskeyAPIProvider,
+        private val accountRepository: AccountRepository,
+        private val encryption: Encryption,
+        private val userDataSource: UserDataSource
+    ) : ReactionHistoryPaginator.Factory {
+        override fun create(reactionHistoryRequest: ReactionHistoryRequest) : ReactionHistoryPaginator {
+            return ReactionHistoryPaginatorImpl(
+                reactionHistoryRequest,
+                reactionHistoryDataSource,
+                misskeyAPIProvider,
+                accountRepository,
+                encryption,
+                userDataSource
+            )
+        }
+    }
 
     val lock = Mutex()
 

@@ -5,6 +5,11 @@ package jp.panta.misskeyandroidclient.model.reaction
  * 読み込んだデータはReactionHistoryDataSourceへ注入する
  */
 interface ReactionHistoryPaginator {
+
+    interface Factory {
+        fun create(reactionHistoryRequest: ReactionHistoryRequest): ReactionHistoryPaginator
+    }
+
     val reactionHistoryRequest: ReactionHistoryRequest
 
     /**
