@@ -413,14 +413,12 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun setCurrentAccount(account: Account) {
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                mAccountRepository.setCurrentAccount(account)
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
-                logger.error("switchAccount error", e)
-            }
+    override suspend fun setCurrentAccount(account: Account) {
+        try{
+            mAccountRepository.setCurrentAccount(account)
+            loadAndInitializeAccounts()
+        }catch(e: Exception){
+            logger.error("switchAccount error", e)
         }
     }
 
@@ -444,15 +442,13 @@ class MiApplication : Application(), MiCore {
 
 
 
-    override fun addAccount(account: Account) {
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                mAccountRepository.add(account, true)
+    override suspend fun addAccount(account: Account) {
+        try{
+            mAccountRepository.add(account, true)
 
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
+            loadAndInitializeAccounts()
+        }catch(e: Exception){
 
-            }
         }
     }
 

@@ -38,7 +38,6 @@
         <activity android:name=".AntennaEditorActivity" />
         <activity android:name=".AntennaListActivity" />
         <activity android:name=".view.settings.activities.PageSettingActivity" />
-        <activity android:name=".AppAuthCallbackActivity"/>
 
         <activity android:name=".MessagingListActivity" />
         <activity android:name=".NotificationsActivity" />

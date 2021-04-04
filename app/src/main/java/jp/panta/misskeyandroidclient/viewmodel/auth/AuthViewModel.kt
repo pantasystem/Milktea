@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,9 +79,11 @@ class AuthViewModel(
                 )
                 val user = a.accessToken.user.toUser(account, true) as User.Detail
                 miCore.getUserDataSource().add(user)
+                miCore.getAccountRepository().add(account)
+                miCore.setCurrentAccount(account)
+
                 account to user
             }.onSuccess {
-                miCore.addAccount(it.first)
                 setState(Authorization.Finish(it.first, it.second))
             }.onFailure {
                 error.emit(it)

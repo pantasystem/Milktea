@@ -90,7 +90,9 @@ class AccountViewModel(
 
     fun setSwitchTargetConnectionInstance(account: Account){
         switchTargetConnectionInstanceEvent.event = Unit
-        miCore.setCurrentAccount(account)
+        viewModelScope.launch(Dispatchers.IO) {
+            miCore.setCurrentAccount(account)
+        }
     }
 
     fun showSwitchDialog(){

@@ -77,11 +77,11 @@ interface MiCore{
     fun getGroupRepository(): GroupRepository
 
 
-    fun setCurrentAccount(account: Account)
+    suspend fun setCurrentAccount(account: Account)
 
     fun logoutAccount(account: Account)
 
-    fun addAccount(account: Account)
+    suspend fun addAccount(account: Account)
 
     fun addPageInCurrentAccount(page: Page)
 
