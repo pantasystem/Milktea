@@ -1,3 +1,3 @@
 package jp.panta.misskeyandroidclient.model
 
-data class I(val i: String)
+data class I(val i: String?)

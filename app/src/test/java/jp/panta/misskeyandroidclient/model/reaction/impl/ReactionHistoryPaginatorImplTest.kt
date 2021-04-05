@@ -1,16 +1,15 @@
 package jp.panta.misskeyandroidclient.model.reaction.impl
 
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.reaction.ReactionHistoryDTO
-import jp.panta.misskeyandroidclient.api.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistory
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.reaction.ReactionHistoryRequest
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
+import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
 import jp.panta.misskeyandroidclient.util.EncryptionStub
 import kotlinx.coroutines.flow.Flow
@@ -30,21 +29,12 @@ class ReactionHistoryPaginatorImplTest {
 
     class DataSource(
         var addAllListener: (list: List<ReactionHistory>)-> Unit = {}
-    ) :  ReactionHistoryDataSource {
+    ) : ReactionHistoryDataSource {
         override fun findAll(): Flow<List<ReactionHistory>> {
             TODO("Not yet implemented")
         }
 
-        override fun filterByNoteId(noteId: Note.Id): Flow<List<ReactionHistory>> {
-            TODO("Not yet implemented")
-        }
 
-        override fun filterByNoteIdAndType(
-            noteId: Note.Id,
-            type: String,
-        ): Flow<List<ReactionHistory>> {
-            TODO("Not yet implemented")
-        }
 
         override suspend fun add(reactionHistory: ReactionHistory) {
             TODO("Not yet implemented")
@@ -52,6 +42,14 @@ class ReactionHistoryPaginatorImplTest {
 
         override suspend fun addAll(reactionHistories: List<ReactionHistory>) {
             addAllListener.invoke(reactionHistories)
+        }
+
+        override suspend fun clear(noteId: Note.Id) {
+            TODO("Not yet implemented")
+        }
+
+        override fun filter(noteId: Note.Id, type: String?): Flow<List<ReactionHistory>> {
+            TODO("Not yet implemented")
         }
 
     }

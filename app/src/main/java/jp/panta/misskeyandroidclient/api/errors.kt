@@ -7,10 +7,18 @@ import retrofit2.Response
 
 @Serializable
 data class Error(
-    val code: String,
-    val message: String,
-    val id: String
-)
+    val error: Body
+) {
+    @Serializable
+    data class Body(
+        val code: String,
+        val message: String,
+        val id: String,
+        val kind: String? = null
+    )
+}
+
+
 
 sealed class APIError(msg: String) : Exception(msg){
     abstract val error: Error?
@@ -33,7 +41,7 @@ fun<T> Response<T>.throwIfHasError(): Response<T> {
         }
     }.getOrNull()
     error.let {
-        println("throwIfHasError: code:${this.code()}, errorBody:${this.errorBody()?.string()}")
+        println("throwIfHasError: code:${this.code()}, errorBody:${error}")
         when(this.code()) {
             400 -> throw APIError.ClientException(it)
             401 -> throw APIError.AuthenticationException(it)
