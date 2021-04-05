@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
@@ -24,7 +23,6 @@ class NoteEditorViewModel(
     private val draftNoteDao: DraftNoteDao,
     replyId: Note.Id? = null,
     private val quoteToNoteId: Note.Id? = null,
-    private val encryption: Encryption = miCore.getEncryption(),
     loggerFactory: Logger.Factory,
     n: Note? = null,
     dn: DraftNote? = null,
@@ -61,7 +59,6 @@ class NoteEditorViewModel(
     val draftNote = MutableLiveData<DraftNote>(dn)
     val note = MutableLiveData<Note>(n)
 
-    // FIXME Note.Idを使用するようにすること
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
     private val mReply = MutableStateFlow<Note?>(null)
     val reply: StateFlow<Note?> = mReply
@@ -77,9 +74,8 @@ class NoteEditorViewModel(
 
 
 
-    // FIXME Note.Idを使用するようにすること
     //val renoteId = MutableLiveData<Note.Id>(quoteToNoteId)
-    val renoteId = MutableStateFlow(replyId)
+    val renoteId = MutableStateFlow(quoteToNoteId)
 
     val cw = MediatorLiveData<String>().apply {
         addSourceFromNoteAndDraft { noteDTO, draftNote ->

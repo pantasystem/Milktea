@@ -4,12 +4,12 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
@@ -25,10 +25,8 @@ import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -138,7 +136,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             requireNotNull(accountId)
             Note.Id(accountId, it)
         }
-        val quoteToNoteId = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)?.let{
+        val quoteToNoteId = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)?.let{
             requireNotNull(accountId)
             Note.Id(accountId, it)
         }
@@ -398,6 +396,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         startActivityForResult(intent, SELECT_MENTION_TO_USER_REQUEST_CODE)
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun finishOrConfirmSaveAsDraftOrDelete(){
         if(mViewModel?.canSaveDraft() == true){
             mConfirmViewModel.confirmEvent.event = ConfirmCommand(
@@ -431,6 +431,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         }
     }
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override fun onBackPressed() {
 
         finishOrConfirmSaveAsDraftOrDelete()
