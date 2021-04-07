@@ -69,8 +69,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     app:srcCompat="@drawable/ic_chevron_right_black_24dp"
-                    android:tint="?attr/colorNoteActionButtonTint"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
             <androidx.emoji.widget.EmojiTextView
                     android:layout_width="wrap_content"
