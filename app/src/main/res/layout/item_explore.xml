@@ -29,8 +29,7 @@
                     tools:text="グローバルタイムライン"
                     android:layout_gravity="center_vertical"
                     app:drawableTintCompat="@{null}"
-                    android:drawableEnd="@drawable/ic_keyboard_arrow_right_black_24dp"
-                    />
+                    app:drawableEndCompat="@drawable/ic_keyboard_arrow_right_black_24dp" />
 
 
         </LinearLayout>

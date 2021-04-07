@@ -55,6 +55,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSou
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
+import jp.panta.misskeyandroidclient.model.notification.impl.MediatorNotificationDataSource
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
@@ -185,6 +186,7 @@ class MiApplication : Application(), MiCore {
             .addMigrations(MIGRATION_4_5)
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
+            .addMigrations(MIGRATION_7_8)
             .build()
         //connectionInstanceDao = database.connectionInstanceDao()
         val roomAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
@@ -211,7 +213,7 @@ class MiApplication : Application(), MiCore {
         mUserDataSource = InMemoryUserDataSource(loggerFactory)
         mUserRepository = UserRepositoryImpl(this)
 
-        mNotificationDataSource = InMemoryNotificationDataSource()
+        mNotificationDataSource = MediatorNotificationDataSource(InMemoryNotificationDataSource(), database.unreadNotificationDAO())
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 

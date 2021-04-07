@@ -24,7 +24,6 @@ class NotificationRepositoryImpl(
     val accountRepository: AccountRepository,
     val notificationRelationGetter: NotificationRelationGetter,
     val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    val unreadNotificationDAO: UnreadNotificationDAO
 ) : NotificationRepository{
 
     private val unreadNotificationCountStateMap = mutableMapOf<Long, MutableStateFlow<Int>>()
@@ -47,7 +46,6 @@ class NotificationRepositoryImpl(
             val account = accountRepository.get(notificationId.accountId)
             socketProvider.get(account).send(Send.ReadNotification(Send.ReadNotification.Body(notificationId.notificationId)).toJson())
             notificationDataSource.add(notificationDataSource.get(notificationId).read())
-            unreadNotificationDAO.delete(UnreadNotification(accountId = notificationId.accountId, notificationId = notificationId.notificationId))
         }
     }
 

@@ -9,8 +9,8 @@ abstract class UnreadNotificationDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(unreadNotification: UnreadNotification)
 
-    @Delete
-    abstract suspend fun delete(unreadNotification: UnreadNotification)
+    @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId AND notificationId = :notificationId")
+    abstract suspend fun delete(accountId: Long, notificationId: String)
 
     @Query("SELECT un.accountId AS accountId, COUNT(un.notificationId) AS count FROM unread_notifications_table AS un GROUP BY un.accountId")
     abstract suspend fun countByAccount(): List<AccountNotificationCount>
@@ -19,5 +19,5 @@ abstract class UnreadNotificationDAO {
     abstract suspend fun countByAccountId(accountId: Long): Int
 
     @Query("SELECT * FROM unread_notifications_table WHERE accountId = :accountId")
-    abstract suspend fun findByAccountId(accountId: Long): List<AccountNotificationCount>
+    abstract suspend fun findByAccountId(accountId: Long): List<UnreadNotification>
 }

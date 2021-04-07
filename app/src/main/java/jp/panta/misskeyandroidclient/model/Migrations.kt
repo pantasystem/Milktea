@@ -119,3 +119,9 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         database.execSQL("CREATE TABLE IF NOT EXISTS 'emoji_alias_table' ('alias' TEXT NOT NULL, 'name' TEXT NOT NULL, 'instanceDomain' TEXT NOT NULL, PRIMARY KEY('alias', 'name', 'instanceDomain'), FOREIGN KEY('name', 'instanceDomain') REFERENCES 'emoji_table'('name', 'instanceDomain') ON UPDATE CASCADE ON DELETE CASCADE )")
     }
 }
+
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'unread_notifications_table' ('accountId' INTEGER NOT NULL, 'notificationId' TEXT NOT NULL, PRIMARY KEY('accountId', 'notificationId'), FOREIGN KEY('accountId') REFERENCES 'account_table'('accountId') ON UPDATE CASCADE ON DELETE CASCADE )")
+    }
+}

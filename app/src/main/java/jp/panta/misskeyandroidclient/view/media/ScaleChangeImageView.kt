@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.view.media
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Matrix
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import android.widget.ImageView
 
-class ScaleChangeImageView : ImageView{
+class ScaleChangeImageView : androidx.appcompat.widget.AppCompatImageView {
     companion object{
         private const val SCALE_MAX = 4.0F
         private const val SCALE_MIN = 0.5F
@@ -33,6 +33,7 @@ class ScaleChangeImageView : ImageView{
         this.scaleGestureDetector = ScaleGestureDetector(context, scaleGestureListener)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         imageMatrix = mMatrix
         scaleGestureDetector.onTouchEvent(event)
