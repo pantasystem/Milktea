@@ -25,7 +25,7 @@ class RoomMetaRepositoryTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(context, DataBase::class.java).build()
 
-        metaRepository = RoomMetaRepository(database.metaDAO())
+        metaRepository = RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database)
 
         sampleMeta =  Meta(
             bannerUrl = "https://hogehoge.io/hogehoge.jpg",

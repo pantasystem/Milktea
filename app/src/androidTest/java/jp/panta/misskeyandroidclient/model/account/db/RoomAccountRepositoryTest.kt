@@ -27,7 +27,7 @@ class RoomAccountRepositoryTest{
     fun setupRepository(){
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(context, DataBase::class.java).build()
-        roomAccountRepository = RoomAccountRepository(database.accountDAO(), database.pageDAO(), context.getSharedPreferences("test", Context.MODE_PRIVATE))
+        roomAccountRepository = RoomAccountRepository(database, context.getSharedPreferences("test", Context.MODE_PRIVATE), database.accountDAO(), database.pageDAO())
         accountDAO = database.accountDAO()
     }
 
