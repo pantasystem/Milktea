@@ -8,12 +8,9 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotification
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.streaming.*
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -24,16 +21,22 @@ class NotificationRepositoryImpl(
     val accountRepository: AccountRepository,
     val notificationRelationGetter: NotificationRelationGetter,
     val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    val unreadNotificationDAO: UnreadNotificationDAO
 ) : NotificationRepository{
 
     private val unreadNotificationCountStateMap = mutableMapOf<Long, MutableStateFlow<Int>>()
     private val lock = Mutex()
 
     init {
+        coroutineScope.launch(dispatcher) {
+            unreadNotificationDAO.countByAccount().forEach {
+                getFlow(it.accountId).value = it.count
+            }
+        }
         notificationDataSource.addEventListener {
             coroutineScope.launch(dispatcher) {
                 lock.withLock {
-                    unreadNotificationCountStateMap.clear()
+                    //unreadNotificationCountStateMap.clear()
 
                     getFlow(it.notificationId.accountId).value = notificationDataSource.countUnreadNotification(it.notificationId.accountId)
                 }

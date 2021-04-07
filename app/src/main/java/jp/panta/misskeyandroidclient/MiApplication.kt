@@ -277,7 +277,8 @@ class MiApplication : Application(), MiCore {
             mSocketWithAccountProvider,
             mAccountRepository,
             getGetters().notificationRelationGetter,
-            Dispatchers.IO
+            Dispatchers.IO,
+            database.unreadNotificationDAO()
         )
 
         mReactionHistoryDataSource = InMemoryReactionHistoryDataSource()
