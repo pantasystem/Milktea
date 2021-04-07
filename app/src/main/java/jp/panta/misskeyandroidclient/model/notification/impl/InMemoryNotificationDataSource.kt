@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notification.impl
 
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notification.AccountNotificationCount
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationNotFoundException
@@ -61,6 +62,15 @@ class InMemoryNotificationDataSource : NotificationDataSource{
         return countUnreadNotificationByAccount(accountId)
     }
 
+    override suspend fun readAllNotification(accountId: Long) {
+        findAllByAccountId(accountId).filter {
+            !it.isRead
+        }.map{
+            it.read()
+        }.forEach {
+            add(it)
+        }
+    }
 
 
     private suspend fun countUnreadNotificationByAccount(accountId: Long): Int {
@@ -102,6 +112,14 @@ class InMemoryNotificationDataSource : NotificationDataSource{
             val ex = notificationIdAndNotification[notificationId]
             notificationIdAndNotification.remove(notificationId)
             return ex != null
+        }
+    }
+
+    private suspend fun findAllByAccountId(accountId: Long): List<Notification> {
+        return notificationsMapLock.withLock {
+            notificationIdAndNotification.values.filter {
+                it.id.accountId == accountId
+            }
         }
     }
 

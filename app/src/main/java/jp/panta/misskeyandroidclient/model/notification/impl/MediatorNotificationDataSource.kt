@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notification.impl
 
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotification
@@ -44,5 +45,9 @@ class MediatorNotificationDataSource(
 
     override fun removeEventListener(listener: NotificationDataSource.Listener) {
         inMemoryNotificationDataSource.removeEventListener(listener)
+    }
+
+    override suspend fun readAllNotification(accountId: Long) {
+        unreadNotificationDAO.deleteByAccountId(accountId)
     }
 }

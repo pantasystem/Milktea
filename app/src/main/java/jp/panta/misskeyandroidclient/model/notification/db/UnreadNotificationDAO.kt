@@ -12,6 +12,9 @@ abstract class UnreadNotificationDAO {
     @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId AND notificationId = :notificationId")
     abstract suspend fun delete(accountId: Long, notificationId: String)
 
+    @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId")
+    abstract suspend fun deleteByAccountId(accountId: Long)
+
     @Query("SELECT un.accountId AS accountId, COUNT(un.notificationId) AS count FROM unread_notifications_table AS un GROUP BY un.accountId")
     abstract suspend fun countByAccount(): List<AccountNotificationCount>
 
