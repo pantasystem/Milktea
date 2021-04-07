@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager.widget.PagerAdapter
+import com.google.android.material.tabs.TabLayout
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -75,6 +76,11 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
                 tabLayout.visibility = View.VISIBLE
                 elevationView.visibility = View.GONE
                 tabLayout.elevation
+                if(pages.size > 5) {
+                    tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+                }else{
+                    tabLayout.tabMode = TabLayout.MODE_FIXED
+                }
             }
         }.launchIn(lifecycleScope)
 
