@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notification
 
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.account.Account
 
 interface NotificationDataSource {
 
@@ -24,5 +25,6 @@ interface NotificationDataSource {
     suspend fun addAll(notifications: Collection<Notification>): List<AddResult>
 
     suspend fun countUnreadNotification(accountId: Long): Int
+    suspend fun readAllNotification(accountId: Long)
 
 }

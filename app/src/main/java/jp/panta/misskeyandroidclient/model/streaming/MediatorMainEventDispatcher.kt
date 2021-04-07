@@ -12,7 +12,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
         fun create(): MediatorMainEventDispatcher {
             return MediatorMainEventDispatcher(miCore.loggerFactory.create("MediatorMainEventDispatcher"))
                 .attach(StreamingMainMessageEventDispatcher(miCore.getMessageDataSource(), miCore.getGetters().messageRelationGetter))
-                .attach(StreamingMainNotificationEventDispatcher(miCore.getGetters().notificationRelationGetter))
+                .attach(StreamingMainNotificationEventDispatcher(miCore.getGetters().notificationRelationGetter, miCore.getNotificationDataSource()))
                 .attach(StreamingMainUserEventDispatcher(miCore.getUserDataSource()))
         }
     }

@@ -21,6 +21,8 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistor
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSetting
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotification
+import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 
 @Database(
     entities = [
@@ -39,10 +41,10 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUse
         Page::class,
         MetaDTO::class,
         EmojiDTO::class,
-        EmojiAlias::class
-
+        EmojiAlias::class,
+        UnreadNotification::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = true
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class)
@@ -63,4 +65,6 @@ abstract class DataBase : RoomDatabase(){
     abstract fun metaDAO(): MetaDAO
     abstract fun emojiAliasDAO(): EmojiAliasDAO
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
+
+    abstract fun unreadNotificationDAO(): UnreadNotificationDAO
 }

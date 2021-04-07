@@ -33,9 +33,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 app:srcCompat="@drawable/ic_clear_black_24dp"
-                android:tint="?attr/colorNoteActionButtonTint"
                 tools:ignore="ContentDescription,PrivateResource"
                 android:onClick="@{()-> pollViewModel.removeChoice(choice) }"
-                />
+                app:tint="?attr/colorNoteActionButtonTint" />
     </LinearLayout>
 </layout>
