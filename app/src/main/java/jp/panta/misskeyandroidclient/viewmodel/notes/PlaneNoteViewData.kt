@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.onEach
 
 open class PlaneNoteViewData (
@@ -233,6 +234,8 @@ open class PlaneNoteViewData (
             update(it.note)
         }
     }
+
+    var job: Job? = null
 
     init {
 

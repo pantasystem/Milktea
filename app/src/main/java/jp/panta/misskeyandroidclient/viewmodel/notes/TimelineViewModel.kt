@@ -43,11 +43,13 @@ class TimelineViewModel(
 
     private val accountRepository = miCore.getAccountRepository()
 
-    val position = MutableLiveData<Int>()
+    var position: Int = 0
 
     private var mNoteIds = HashSet<Note.Id>()
 
     private val timelineState = MutableStateFlow<TimelineState>(TimelineState.Init(emptyList()))
+
+    private val removeSize = 50
 
 
     val isLoading = MutableLiveData<Boolean>()
@@ -100,14 +102,25 @@ class TimelineViewModel(
            !mNoteIds.contains(it.note.id) && !this.mIsLoading
         }.map{
             PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
-        }.onEach {
-            this.mNoteIds.add(it.id)
-            listOf(it).captureNotes()
-            val list = ArrayList<PlaneNoteViewData>(this.timelineState.value.notes)
-            list.add(0, it)
+        }.onEach { note ->
+            this.mNoteIds.add(note.id)
+            listOf(note).captureNotes()
+            val list = ArrayList<PlaneNoteViewData>(this.timelineState.value.notes).also {
+                it.add(0, note)
+            }
+            if(timelineState.value.notes.size > removeSize && position == 0 && timelineState.subscriptionCount.value > 0) {
+                val removed = list.subList(removeSize, list.size - 1)
+
+                mNoteIds.removeAll(removed.map { it.id })
+                removed.forEach {
+                    it.job?.cancel()
+                }
+                removed.clear()
+            }
             this.timelineState.value = TimelineState.ReceivedNew(
                 notes = list
             )
+
         }.launchIn(viewModelScope + Dispatchers.IO)
 
         loadInit()
@@ -330,7 +343,7 @@ class TimelineViewModel(
         val notes = this
         viewModelScope.launch(Dispatchers.IO) {
             notes.forEach { note ->
-                note.eventFlow.onEach {
+                note.job = note.eventFlow.onEach {
                     if(it is NoteDataSource.Event.Deleted) {
                         timelineState.value =
                             TimelineState.Deleted(

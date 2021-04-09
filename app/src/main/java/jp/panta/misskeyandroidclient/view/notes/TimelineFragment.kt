@@ -215,7 +215,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         })
 
-        mViewModel?.position?.value?.let{
+        mViewModel?.position?.let{
             try{
                 mLinearLayoutManager.scrollToPosition(it)
             }catch(e: Exception){
@@ -332,7 +332,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val itemCount = mLinearLayoutManager.itemCount
 
             mFirstVisibleItemPosition = firstVisibleItemPosition
-            mViewModel?.position?.value = firstVisibleItemPosition
+            mViewModel?.position = firstVisibleItemPosition
 
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")
