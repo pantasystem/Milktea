@@ -15,8 +15,19 @@ class SocketConnectionQueue(
 ) {
     private val logger = loggerFactory.create("SocketConnectionQueue")
     private val scope = coroutineScope + dispatcher
-    private val connectQueueMap = mutableMapOf<Socket, MutableSharedFlow<Unit>>()
-    private var penaltyPoint = mapOf<Socket, Int>()
+    //private val connectQueueMap = mutableMapOf<Socket, MutableSharedFlow<Unit>>()
+    private val connectQueue = MutableSharedFlow<Socket>(extraBufferCapacity = 1000)
+
+    init {
+        connectQueue.filterNot { socket ->
+            socket.state() == Socket.State.Connected
+        }.onEach { socket ->
+            socket.blockingConnect()
+            delay(500)
+        }.catch { e ->
+            logger.error("接続エラー", e = e)
+        }.launchIn(scope)
+    }
 
     suspend fun connect(account: Account, force: Boolean = true) {
         val socket = socketWithAccountProvider.get(account)
@@ -30,42 +41,11 @@ class SocketConnectionQueue(
         if(force) {
             if(socket.state() != Socket.State.Connected) {
                 socket.blockingConnect()
-                penaltyPoint = penaltyPoint.toMutableMap().also {
-                    it[socket] = 0
-                }
+
             }
             return
         }
-        val queue: MutableSharedFlow<Unit>
-        = synchronized(connectQueueMap) {
-            var queue = connectQueueMap[socket]
-            if(queue != null){
-                return@synchronized queue
-            }
-            queue = MutableSharedFlow(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-            connectQueueMap[socket] = queue
-            queue.filter {
-                socket.state() != Socket.State.Connected
-            }.onEach {
-                logger.debug("接続を試みた")
-                if(!socket.blockingConnect().also {
-                    logger.debug("接続要求可否 : ${if(it) "ok" else "failure"}")
-                }){
-                    val point = penaltyPoint[socket]?: 0
-                    if(point > 0){
-                        delay(point * 100L)
-                    }
-                    penaltyPoint = penaltyPoint.toMutableMap().also {
-                        it[socket] = point + 1
-                    }
-                }
+        connectQueue.tryEmit(socket)
 
-
-            }.catch { e ->
-                logger.error("connect試行中にエラー発生", e = e)
-            }.launchIn(scope)
-            queue
-        }
-        logger.debug(if(queue.tryEmit(Unit)) "QueueへのPushを失敗" else "queueへのPush成功")
     }
 }

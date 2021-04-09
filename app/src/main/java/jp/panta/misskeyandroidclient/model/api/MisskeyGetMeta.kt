@@ -8,6 +8,7 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okio.Timeout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,7 +25,7 @@ object MisskeyGetMeta {
         return MetaCall(request, call)
     }
 
-    private class MetaCall(private val request: Request, private val call: okhttp3.Call) : retrofit2.Call<Meta>{
+    private class MetaCall(private val request: Request, private val call: okhttp3.Call) : Call<Meta>{
 
 
         override fun request(): Request {
@@ -71,6 +72,10 @@ object MisskeyGetMeta {
 
         override fun clone(): Call<Meta> {
             return MetaCall(request, call)
+        }
+
+        override fun timeout(): Timeout {
+            return call.timeout()
         }
     }
 }
