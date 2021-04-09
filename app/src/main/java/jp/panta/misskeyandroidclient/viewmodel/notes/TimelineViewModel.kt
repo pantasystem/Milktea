@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import android.util.Log
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.api.APIError
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
@@ -17,12 +16,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.favorite.FavoriteNotePaging
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.io.IOException
-import java.net.SocketTimeoutException
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
-import kotlin.math.log
 
 @ExperimentalCoroutinesApi
 class TimelineViewModel(
@@ -52,7 +47,7 @@ class TimelineViewModel(
 
     private var mNoteIds = HashSet<Note.Id>()
 
-    private val timelineLiveData = MediatorLiveData<TimelineState>()
+    private val timelineState = MutableStateFlow<TimelineState>(TimelineState.Init(emptyList()))
 
 
     val isLoading = MutableLiveData<Boolean>()
@@ -108,13 +103,10 @@ class TimelineViewModel(
         }.onEach {
             this.mNoteIds.add(it.id)
             listOf(it).captureNotes()
-            val list = ArrayList<PlaneNoteViewData>(this.timelineLiveData.value?.notes?: emptyList<PlaneNoteViewData>())
+            val list = ArrayList<PlaneNoteViewData>(this.timelineState.value.notes)
             list.add(0, it)
-            this.timelineLiveData.postValue(
-                TimelineState(
-                    state = TimelineState.State.RECEIVED_NEW,
-                    notes = list
-                )
+            this.timelineState.value = TimelineState.ReceivedNew(
+                notes = list
             )
         }.launchIn(viewModelScope + Dispatchers.IO)
 
@@ -124,19 +116,19 @@ class TimelineViewModel(
 
 
 
-    fun getTimelineLiveData() : LiveData<TimelineState?>{
-        return timelineLiveData
+    fun getTimelineState() : StateFlow<TimelineState>{
+        return timelineState
     }
 
     fun loadNew(){
-        synchronized(timelineLiveData) {
+        synchronized(timelineState) {
             logger.debug("loadNew")
             if( mIsInitLoading || mIsLoading ) {
                 logger.debug("loadNewキャンセル")
                 return
             }
             mIsLoading = true
-            val request = timelineLiveData.value.makeSinceIdRequest()
+            val request = timelineState.value.makeSinceIdRequest()
             logger.debug("makeSinceIdRequest完了:$request")
             if(request?.sinceId == null){
                 mIsInitLoading = false
@@ -154,18 +146,17 @@ class TimelineViewModel(
                     list.captureNotes()
                     loadUrlPreviews(list)
 
-                    val state = timelineLiveData.value
+                    val state = timelineState.value
 
-                    val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply {
+                    val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
                         addAll(0, list)
                     }
                     mNoteIds.addAll(list.map(::mapId))
-                    TimelineState(
+                    TimelineState.LoadNew(
                         newList,
-                        TimelineState.State.LOAD_NEW
                     )
                 }.onSuccess {
-                    timelineLiveData.postValue(it)
+                    timelineState.value = it
                 }.onFailure {
                     handleError(it)
                 }
@@ -180,8 +171,8 @@ class TimelineViewModel(
     }
 
     fun loadOld(){
-        synchronized(timelineLiveData) {
-            val request = timelineLiveData.value.makeUntilIdRequest()
+        synchronized(timelineState) {
+            val request = timelineState.value.makeUntilIdRequest()
             request?.untilId
                 ?: return loadInit()
             if( mIsLoading || mIsInitLoading ){
@@ -196,16 +187,15 @@ class TimelineViewModel(
                     list.captureNotes()
                     loadUrlPreviews(list)
                     mNoteIds.addAll(list.map(::mapId))
-                    val state = timelineLiveData.value
-                    val newList = ArrayList<PlaneNoteViewData>(state?.notes?: emptyList()).apply{
+                    val state = timelineState.value
+                    val newList = ArrayList<PlaneNoteViewData>(state.notes).apply{
                         addAll(list)
                     }
-                    TimelineState(
+                    TimelineState.LoadOld(
                         newList,
-                        TimelineState.State.LOAD_OLD
                     )
                 }.onSuccess {
-                    timelineLiveData.postValue(it)
+                    timelineState.value = it
                 }.onFailure {
                     handleError(it)
                 }
@@ -218,7 +208,7 @@ class TimelineViewModel(
     }
 
     fun loadInit(){
-        synchronized(timelineLiveData) {
+        synchronized(timelineState) {
             Log.d("TimelineViewModel", "初期読み込みを開始します")
 
             if(  mIsInitLoading || mIsLoading ) {
@@ -233,9 +223,8 @@ class TimelineViewModel(
                     val response = account.getPagedStore().loadInit()
                     val list = response.second?: emptyList()
                     logger.debug("Networkから受信")
-                    val state = TimelineState(
+                    val state = TimelineState.Init(
                         list,
-                        TimelineState.State.INIT
                     )
 
                     list.captureNotes()
@@ -246,10 +235,10 @@ class TimelineViewModel(
                     mNoteIds.addAll(list.map(::mapId))
                     state
                 }.onSuccess { state ->
-                    timelineLiveData.postValue(state)
+                    timelineState.value = state
 
                 }.onFailure {
-                    timelineLiveData.postValue(null)
+                    timelineState.value = TimelineState.Init(emptyList())
                     handleError(it)
                 }
                 mIsInitLoading = false
@@ -260,6 +249,8 @@ class TimelineViewModel(
         }
 
     }
+
+
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun syncLoad(request: Request?, isRetry: Boolean = false): Pair<BodyLessResponse, List<PlaneNoteViewData>?>?{
@@ -341,14 +332,13 @@ class TimelineViewModel(
             notes.forEach { note ->
                 note.eventFlow.onEach {
                     if(it is NoteDataSource.Event.Deleted) {
-                        timelineLiveData.postValue(
-                            TimelineState(
-                                state = TimelineState.State.REMOVED,
-                                notes =timelineLiveData.value?.notes?.filterNot { pnvd ->
+                        timelineState.value =
+                            TimelineState.Deleted(
+                                timelineState.value.notes.filterNot { pnvd ->
                                     pnvd.id == it.noteId
-                                } ?: emptyList()
+                                }
                             )
-                        )
+
                     }
                 }.launchIn(scope)
             }

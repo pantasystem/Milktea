@@ -2,18 +2,14 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 
-data class TimelineState(
-    val notes: List<PlaneNoteViewData>,
-    val state: State
-){
-    enum class State{
-        INIT,
-        LOAD_NEW,
-        LOAD_OLD,
-        RECEIVED_NEW,
-        UPDATED,
-        REMOVED
-    }
+sealed class TimelineState{
+    abstract val notes: List<PlaneNoteViewData>
+    data class Init(override val notes: List<PlaneNoteViewData>) : TimelineState()
+    data class LoadNew(override val notes: List<PlaneNoteViewData>) : TimelineState()
+    data class LoadOld(override val notes: List<PlaneNoteViewData>) : TimelineState()
+    data class ReceivedNew(override val notes: List<PlaneNoteViewData>) : TimelineState()
+    data class Deleted(override val notes: List<PlaneNoteViewData>) : TimelineState()
+
 
     fun getSinceId(): String?{
         return notes.firstOrNull()?.getRequestId()
