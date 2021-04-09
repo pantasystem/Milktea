@@ -124,8 +124,8 @@ class UserDetailViewModel(
                 user = fqdnUserName?.let {
                     val account = getAccount()
                     val userNameAndHost = fqdnUserName.split("@").filter{ it.isNotBlank() }
-                    val userName = userNameAndHost[1]
-                    val host = userNameAndHost.lastOrNull()
+                    val userName = userNameAndHost[0]
+                    val host = userNameAndHost.getOrNull(1)
                     miCore.getUserRepository().findByUserName(account.accountId, userName, host)
                 }
             }
