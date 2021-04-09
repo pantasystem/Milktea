@@ -164,6 +164,14 @@ class TimelineViewModel(
                     val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
                         addAll(0, list)
                     }
+
+                    // 先頭で購読されていてノート数が一定数以上なら後端のノートをリスト上から削除する
+                    if(position == 0 && newList.size > removeSize  && timelineState.subscriptionCount.value > 0) {
+                        val removed = newList.subList(removeSize, newList.size - 1)
+                        removed.forEach { it.job?.cancel() }
+                        mNoteIds.removeAll(removed.map(::mapId))
+                        removed.clear()
+                    }
                     mNoteIds.addAll(list.map(::mapId))
                     TimelineState.LoadNew(
                         newList,
