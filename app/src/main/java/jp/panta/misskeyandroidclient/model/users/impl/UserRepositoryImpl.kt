@@ -38,7 +38,7 @@ class UserRepositoryImpl(
                 detail = true
             )).execute()
             res.throwIfHasError()
-            res?.body()?.let{
+            res.body()?.let{
                 val user = it.toUser(account, true)
                 it.pinnedNotes?.forEach { dto ->
                     miCore.getGetters().noteRelationGetter.get(account, dto)
@@ -70,7 +70,7 @@ class UserRepositoryImpl(
         ).execute()
         res.throwIfHasError()
 
-        res?.body()?.let {
+        res.body()?.let {
             it.pinnedNotes?.forEach { dto ->
                 miCore.getGetters().noteRelationGetter.get(account, dto)
             }
@@ -125,7 +125,7 @@ class UserRepositoryImpl(
         val res = miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))).execute()
         res.throwIfHasError()
         if(res.isSuccessful) {
-            val updated = (find(userId, true) as User.Detail).copy(isFollowing = true)
+            val updated = (find(userId, true) as User.Detail).copy(isFollowing = false)
             miCore.getUserDataSource().add(updated)
         }
         return res.isSuccessful

@@ -47,7 +47,9 @@ android {
 
 
 ext {
-    retrofit = '2.3.0'
+    retrofit = '2.8.0'
+    room_version = "2.2.6"
+    coroutines_version = '1.4.3'
 }
 
 dependencies {
@@ -73,7 +75,6 @@ dependencies {
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    def room_version = "2.2.6"
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -89,13 +90,12 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
 
 
-    def coroutines_version = '1.4.3'
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0'
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"

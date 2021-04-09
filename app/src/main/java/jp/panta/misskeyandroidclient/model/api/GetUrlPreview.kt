@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okio.Timeout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -108,6 +109,10 @@ object GetUrlPreview {
 
         override fun clone(): Call<UrlPreview> {
             return PreviewUrlCall(request, call.clone())
+        }
+
+        override fun timeout(): Timeout {
+            return call.timeout()
         }
     }
 }
