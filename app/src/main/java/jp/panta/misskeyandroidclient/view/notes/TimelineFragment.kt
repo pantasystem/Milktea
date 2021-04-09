@@ -144,24 +144,23 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
         list_view.adapter = adapter
 
-        var  timelineState: TimelineState.State? = null
-        mViewModel?.getTimelineLiveData()?.observe(viewLifecycleOwner){ tm ->
-            if( tm != null){
-
+        var  timelineState: TimelineState? = null
+        lifecycleScope.launchWhenResumed {
+            mViewModel?.getTimelineState()?.collect { tm ->
                 adapter.submitList(tm.notes)
-                timelineState = tm.state
-            }
-            if(tm?.notes.isNullOrEmpty()){
-                timelineEmptyView.visibility = View.VISIBLE
-                refresh.visibility = View.GONE
-            }else{
-                timelineEmptyView.visibility = View.GONE
-                refresh.visibility = View.VISIBLE
-            }
-            timelineProgressBar.visibility = View.GONE
+                timelineState = tm
 
-
+                if(tm.notes.isNullOrEmpty()){
+                    timelineEmptyView.visibility = View.VISIBLE
+                    refresh.visibility = View.GONE
+                }else{
+                    timelineEmptyView.visibility = View.GONE
+                    refresh.visibility = View.VISIBLE
+                }
+                timelineProgressBar.visibility = View.GONE
+            }
         }
+
 
         mViewModel?.isInitLoading?.observe( viewLifecycleOwner){
             if(it){
@@ -209,13 +208,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
 
-                if(timelineState == TimelineState.State.RECEIVED_NEW && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
+                if(timelineState is TimelineState.ReceivedNew && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1){
                     mLinearLayoutManager.scrollToPosition(0)
                 }
+
             }
         })
 
-        mViewModel?.position?.value?.let{
+        mViewModel?.position?.let{
             try{
                 mLinearLayoutManager.scrollToPosition(it)
             }catch(e: Exception){
@@ -239,9 +239,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         mFirstVisibleItemPosition?.let{ firstVisibleItemPosition ->
 
 
-            val firstVisibleNote = if(firstVisibleItemPosition > 0 && firstVisibleItemPosition <= mViewModel?.getTimelineLiveData()?.value?.notes?.size?: 0){
+            val firstVisibleNote = if(firstVisibleItemPosition > 0 && firstVisibleItemPosition <= mViewModel?.getTimelineState()?.value?.notes?.size?: 0){
                 try{
-                    mViewModel?.getTimelineLiveData()?.value?.notes?.get(firstVisibleItemPosition)
+                    mViewModel?.getTimelineState()?.value?.notes?.get(firstVisibleItemPosition)
                 }catch(t: Throwable){
                     Log.e("TimelineFragment", "先端に表示されているノートを取得しようとしたら失敗した", t)
                     null
@@ -267,7 +267,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             isLoadInit = true
 
         }
-        if(mViewModel?.getTimelineLiveData()?.value?.notes?.isNotEmpty() == true){
+        if(mViewModel?.getTimelineState()?.value?.notes?.isNotEmpty() == true){
             mViewModel?.loadNew()
         }
 
@@ -332,7 +332,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val itemCount = mLinearLayoutManager.itemCount
 
             mFirstVisibleItemPosition = firstVisibleItemPosition
-            mViewModel?.position?.value = firstVisibleItemPosition
+            mViewModel?.position = firstVisibleItemPosition
 
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")
