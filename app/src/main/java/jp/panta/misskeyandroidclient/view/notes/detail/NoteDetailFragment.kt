@@ -16,6 +16,8 @@ import kotlinx.android.synthetic.main.fragment_note_detail.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
@@ -50,6 +52,8 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
         }
     }
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -71,11 +75,10 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
             notesViewModel = notesViewModel,
             viewLifecycleOwner = viewLifecycleOwner
         )
-        noteDetailViewModel.notes.observe(viewLifecycleOwner, Observer {
+        noteDetailViewModel.notes.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
-        noteDetailViewModel.loadDetail()
 
         notes_view.adapter = adapter
         notes_view.layoutManager = LinearLayoutManager(context)

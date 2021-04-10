@@ -267,7 +267,7 @@ class MiApplication : Application(), MiCore {
         }
         mMessageRepository = MessageRepositoryImpl(this)
 
-        mGetters = Getters(mNoteDataSource, mUserDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource)
+        mGetters = Getters(mNoteDataSource, mNoteRepository,mUserDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource, loggerFactory)
 
         messageStreamFilter = MessageStreamFilter(this)
 
