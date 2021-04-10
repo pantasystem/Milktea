@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.gettters
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
@@ -12,8 +13,9 @@ class Getters(
     notificationDataSource: NotificationDataSource,
     messageDataSource: MessageDataSource,
     groupDataSource: GroupDataSource,
+    loggerFactory: Logger.Factory
 ) {
-    val noteRelationGetter = NoteRelationGetter(noteDataSource, userDataSource)
+    val noteRelationGetter = NoteRelationGetter(noteDataSource, userDataSource, loggerFactory.create("NoteRelationGetter"))
 
     val notificationRelationGetter = NotificationRelationGetter(userDataSource, notificationDataSource, noteRelationGetter)
 

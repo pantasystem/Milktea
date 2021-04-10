@@ -19,6 +19,9 @@ class NoteRepositoryImpl(
 ) : NoteRepository {
 
     private val logger = miCore.loggerFactory.create("NoteRepositoryImpl")
+    private val noteDataSourceAdder: NoteDataSourceAdder by lazy {
+        NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    }
 
     override suspend fun create(createNote: CreateNote): Note {
         val task = PostNoteTask(miCore.getEncryption(), createNote, createNote.author, miCore.loggerFactory)
@@ -40,7 +43,7 @@ class NoteRepositoryImpl(
         createNote.draftNoteId?.let{
             miCore.getDraftNoteDAO().deleteDraftNote(createNote.author.accountId, draftNoteId = it)
         }
-        return miCore.getGetters().noteRelationGetter.get(createNote.author, noteDTO).note
+        return noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
 
     }
 
@@ -68,7 +71,7 @@ class NoteRepositoryImpl(
             i = account.getI(miCore.getEncryption()),
             noteId = noteId.noteId
         )).execute().body()?.let{
-            miCore.getGetters().noteRelationGetter.get(account, it).note
+            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
         note?: throw NoteNotFoundException(noteId)
         return note
@@ -83,9 +86,9 @@ class NoteRepositoryImpl(
             if(!unreaction(createReaction.noteId)) {
                 return false
             }
+            note = miCore.getNoteDataSource().get(createReaction.noteId)
         }
 
-        note = miCore.getNoteDataSource().get(createReaction.noteId)
 
         return runCatching {
             if(postReaction(createReaction) && !miCore.getNoteCaptureAPI(account).isCaptured(createReaction.noteId.noteId)) {

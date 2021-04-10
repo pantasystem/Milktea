@@ -4,6 +4,7 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
@@ -15,6 +16,7 @@ class UserRepositoryImpl(
     val miCore: MiCore
 ) : UserRepository{
     private val logger = miCore.loggerFactory.create("UserRepositoryImpl")
+    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
 
     override suspend fun find(userId: User.Id, detail: Boolean): User {
         val localResult = runCatching {
@@ -41,7 +43,7 @@ class UserRepositoryImpl(
             res.body()?.let{
                 val user = it.toUser(account, true)
                 it.pinnedNotes?.forEach { dto ->
-                    miCore.getGetters().noteRelationGetter.get(account, dto)
+                    noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
                 }
                 miCore.getUserDataSource().add(user)
                 return user
@@ -72,7 +74,7 @@ class UserRepositoryImpl(
 
         res.body()?.let {
             it.pinnedNotes?.forEach { dto ->
-                miCore.getGetters().noteRelationGetter.get(account, dto)
+                noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
             }
             val user = it.toUser(account, true)
             miCore.getUserDataSource().add(user)
