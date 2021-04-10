@@ -18,6 +18,8 @@ class NoteRepositoryImpl(
     val miCore: MiCore
 ) : NoteRepository {
 
+    private val logger = miCore.loggerFactory.create("NoteRepositoryImpl")
+
     override suspend fun create(createNote: CreateNote): Note {
         val task = PostNoteTask(miCore.getEncryption(), createNote, createNote.author, miCore.loggerFactory)
         val result = runCatching {task.execute(
@@ -52,6 +54,7 @@ class NoteRepositoryImpl(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun find(noteId: Note.Id): Note {
+        logger.debug("call find noteId:$noteId")
         val account = miCore.getAccount(noteId.accountId)
 
         var note = runCatching {
@@ -64,7 +67,7 @@ class NoteRepositoryImpl(
         note = miCore.getMisskeyAPI(account).showNote(NoteRequest(
             i = account.getI(miCore.getEncryption()),
             noteId = noteId.noteId
-        )).execute()?.body()?.let{
+        )).execute().body()?.let{
             miCore.getGetters().noteRelationGetter.get(account, it).note
         }
         note?: throw NoteNotFoundException(noteId)
