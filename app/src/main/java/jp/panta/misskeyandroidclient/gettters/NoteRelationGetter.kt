@@ -7,17 +7,19 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
+import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 
 class NoteRelationGetter(
     private val noteDataSource: NoteDataSource,
+    private val noteRepository: NoteRepository,
     private val userDataSource: UserDataSource,
     private val logger: Logger
 ) {
 
     suspend fun get(noteId: Note.Id, deep: Boolean = true, featuredId: String? = null, promotionId: String? = null): NoteRelation? {
         return runCatching {
-            noteDataSource.get(noteId)
+            noteRepository.find(noteId)
         }.onFailure {
             logger.error("ノートの取得に失敗しました", e = it)
         }.getOrNull()?.let{

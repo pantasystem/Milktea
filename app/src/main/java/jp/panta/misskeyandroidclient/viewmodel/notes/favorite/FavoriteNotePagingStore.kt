@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
@@ -27,6 +28,8 @@ class FavoriteNotePagingStore(
     val favorites = miCore.getMisskeyAPI(account)::favorites
 
     //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
+
+    private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
 
     private val builder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()))
 
@@ -53,7 +56,9 @@ class FavoriteNotePagingStore(
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
             FavoriteNoteViewData(it ,
-                miCore.getGetters().noteRelationGetter.get(account, it.note),
+                adder.addNoteDtoToDataSource(account, it.note).let { note ->
+                    miCore.getGetters().noteRelationGetter.get(note)
+                },
                 account, DetermineTextLengthSettingStore(miCore.getSettingStore()), noteCaptureAPIAdapter, coroutineScope, coroutineDispatcher)
         }
         return Pair(BodyLessResponse(res), list)

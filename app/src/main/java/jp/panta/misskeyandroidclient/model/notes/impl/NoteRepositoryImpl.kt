@@ -57,7 +57,6 @@ class NoteRepositoryImpl(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun find(noteId: Note.Id): Note {
-        logger.debug("call find noteId:$noteId")
         val account = miCore.getAccount(noteId.accountId)
 
         var note = runCatching {
@@ -67,6 +66,7 @@ class NoteRepositoryImpl(
             return note
         }
 
+        logger.debug("request notes/show=$noteId")
         note = miCore.getMisskeyAPI(account).showNote(NoteRequest(
             i = account.getI(miCore.getEncryption()),
             noteId = noteId.noteId

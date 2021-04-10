@@ -15,6 +15,7 @@ import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 
@@ -31,6 +32,7 @@ class NoteTimelineStore(
 ) : NotePagedStore{
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
+    private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
 
 
     private fun getStore(): ((NoteRequest)-> Call<List<NoteDTO>?>)? {
@@ -104,7 +106,9 @@ class NoteTimelineStore(
         return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response),
             list?.mapNotNull {
                 try {
-                    val related = miCore.getGetters().noteRelationGetter.get(account, it)
+                    val related = adder.addNoteDtoToDataSource(account, it).let { note ->
+                        miCore.getGetters().noteRelationGetter.get(note)
+                    }
                     val store = DetermineTextLengthSettingStore(miCore.getSettingStore())
                     if (it.reply == null) {
                         PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter)

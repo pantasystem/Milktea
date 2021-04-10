@@ -51,6 +51,8 @@ class TimelineViewModel(
 
     private val removeSize = 50
 
+    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+
 
     val isLoading = MutableLiveData<Boolean>()
     val isInitLoading = MutableLiveData<Boolean>()
@@ -97,7 +99,9 @@ class TimelineViewModel(
         }.map {
           it as? ChannelBody.ReceiveNote
         }.filterNotNull().map{
-            miCore.getGetters().noteRelationGetter.get(getAccount(), it.body)
+            noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it.body)
+        }.map {
+            miCore.getGetters().noteRelationGetter.get(it)
         }.filter {
            !mNoteIds.contains(it.note.id) && !this.mIsLoading
         }.map{
