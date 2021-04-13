@@ -103,7 +103,7 @@ class MessageViewModel(
                         groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
                         userId = (messagingId as? MessagingId.Direct)?.userId?.id
                     ),
-                ).execute()?.throwIfHasError()?.body()
+                ).execute().throwIfHasError().body()?.asReversed()
             }.onFailure {
                 logger.debug("メッセージの読み込みに失敗しました。", e = it)
             }.getOrNull()?.toMessageViewData(account)?: emptyList()
@@ -132,7 +132,7 @@ class MessageViewModel(
                     untilId = untilId.messageId,
                     groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
                     userId = (messagingId as? MessagingId.Direct)?.userId?.id
-                )).execute()?.body()
+                )).execute().body()?.asReversed()
             }.getOrNull()?.toMessageViewData(account)?: emptyList()
 
             val messages = ArrayList<MessageViewData>(exMessages).apply{
