@@ -178,7 +178,7 @@ sealed class MessageHistoryRelation : MessageRelation(){
 suspend fun MessageRelation.toHistory(groupRepository: GroupRepository, userRepository: UserRepository): MessageHistoryRelation {
     return when(val msg = message) {
         is Message.Direct -> {
-            val recipient = userRepository.find(msg.recipientId)
+            val recipient = userRepository.find(msg.recipientId, false)
             MessageHistoryRelation.Direct(this.message, this.user, recipient)
         }
         is Message.Group -> {
