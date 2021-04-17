@@ -1,27 +1,25 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
 import android.util.Log
-import androidx.lifecycle.*
-import io.reactivex.disposables.CompositeDisposable
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.groups.toGroup
+import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.users.toUser
-import jp.panta.misskeyandroidclient.model.messaging.*
+import jp.panta.misskeyandroidclient.model.messaging.MessageHistoryRelation
+import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
+import jp.panta.misskeyandroidclient.model.messaging.toHistory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.lang.Exception
 
 @Suppress("BlockingMethodInNonBlockingContext")
 @ExperimentalCoroutinesApi
@@ -129,8 +127,8 @@ class MessageHistoryViewModel(
 
         return runCatching {
             val res = getMisskeyAPI().getMessageHistory(request).execute()
-            res?.throwIfHasError()
-            res?.body()?.map {
+            res.throwIfHasError()
+            res.body()?.map {
                 it.group?.let {  groupDTO ->
                     miCore.getGroupDataSource().add(groupDTO.toGroup(account.accountId))
                 }

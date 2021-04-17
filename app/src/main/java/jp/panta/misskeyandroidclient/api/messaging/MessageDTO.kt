@@ -31,7 +31,7 @@ data class MessageDTO(
     val fileId: String? = null,
     val file: FileProperty? = null,
     val isRead: Boolean,
-    val emojis: List<Emoji>?
+    val emojis: List<Emoji>? = null
 ): JavaSerializable{
     fun isGroup(): Boolean{
         return group != null

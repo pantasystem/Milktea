@@ -28,10 +28,10 @@ class MessageStreamFilter(val miCore: MiCore){
                 is MessagingId.Direct -> messagingId.userId.accountId
                 is MessagingId.Group -> messagingId.groupId.accountId
             }
-            miCore.getAccountRepository().get(accountId)
+            emit(miCore.getAccountRepository().get(accountId))
         }.flatMapLatest { ac ->
             miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map{
-                (it as? ChannelBody.Main.HavingMessagingBody)?.body
+                (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {
                 miCore.getGetters().messageRelationGetter.get(ac, it)
             }.map {
@@ -48,7 +48,7 @@ class MessageStreamFilter(val miCore: MiCore){
         }.asFlow().flatMapLatest {
             it.connect(ChannelAPI.Type.MAIN)
         }.map{
-            (it as? ChannelBody.Main.HavingMessagingBody)?.body
+            (it as? ChannelBody.Main.MessagingMessage)?.body
         }.filterNotNull().map {
             miCore.getGetters().messageRelationGetter.get(ac, it)
         }.map {
