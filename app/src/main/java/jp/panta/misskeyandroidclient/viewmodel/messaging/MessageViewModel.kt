@@ -81,6 +81,7 @@ class MessageViewModel(
             }else{
                 OtherUserMessageViewData(msg, a)
             }
+            logger.debug("onMessage: $msg")
             messages.add(viewData)
 
             messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
