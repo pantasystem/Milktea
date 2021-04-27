@@ -96,7 +96,7 @@ class InMemoryNoteDataSource(
     private suspend fun createOrUpdate(note: Note): AddResult {
         mutex.withLock{
             val n = this.notes[note.id]
-            if(n != null && n.instanceUpdatedAt != note.instanceUpdatedAt){
+            if(n != null && n.instanceUpdatedAt > note.instanceUpdatedAt){
                 return AddResult.CANCEL
             }
             this.notes[note.id] = note

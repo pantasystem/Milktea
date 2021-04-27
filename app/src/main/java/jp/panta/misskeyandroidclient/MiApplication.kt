@@ -238,7 +238,7 @@ class MiApplication : Application(), MiCore {
         )
         mSocketConnectionQueue = SocketConnectionQueue(mSocketWithAccountProvider, applicationScope, Dispatchers.IO, loggerFactory)
 
-        mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
+        mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(mSocketWithAccountProvider, loggerFactory)
 
         mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
             mAccountRepository,

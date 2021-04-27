@@ -9,10 +9,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.*
 
-class NoteCaptureAPI(
+interface NoteCaptureAPI {
+    fun capture(noteId: String): Flow<NoteUpdated.Body>
+    fun count(): Int
+    fun isEmpty(): Boolean
+    fun isCaptured(noteId: String): Boolean
+}
+
+class NoteCaptureAPIImpl(
     val socket: Socket,
     loggerFactory: Logger.Factory? = null,
-) : SocketMessageEventListener, SocketStateEventListener {
+) : SocketMessageEventListener, SocketStateEventListener, NoteCaptureAPI {
 
 
     val logger = loggerFactory?.create("NoteCaptureAPI")
@@ -21,7 +28,7 @@ class NoteCaptureAPI(
 
 
     @ExperimentalCoroutinesApi
-    fun capture(noteId: String): Flow<NoteUpdated.Body> {
+    override fun capture(noteId: String): Flow<NoteUpdated.Body> {
 
         return channelFlow {
             logger?.debug("channelFlow起動")
@@ -49,17 +56,17 @@ class NoteCaptureAPI(
     /**
      * subscribeしているノート数を計算します
      */
-    fun count(): Int = noteIdListenMap.size
+    override fun count(): Int = noteIdListenMap.size
 
 
-    fun isEmpty(): Boolean {
+    override fun isEmpty(): Boolean {
         return count() == 0
     }
 
     /**
      * すでにCapture済みかをチェックします
      */
-    fun isCaptured(noteId: String): Boolean {
+    override fun isCaptured(noteId: String): Boolean {
         return noteIdListenMap.containsKey(noteId)
 
 
@@ -76,7 +83,7 @@ class NoteCaptureAPI(
         lock.withLock {
             val listeners = noteIdListenMap.getOrNew(noteId)
             if(noteIdListenMap.isEmpty()) {
-                socket.addMessageEventListener(this@NoteCaptureAPI)
+                socket.addMessageEventListener(this@NoteCaptureAPIImpl)
             }
             if(listeners.isEmpty()){
                 logger?.debug("リモートへCaptureができていなかったので開始する")
@@ -112,7 +119,7 @@ class NoteCaptureAPI(
                 }
             }
             if(noteIdListenMap.isEmpty()) {
-                socket.removeMessageEventListener(this@NoteCaptureAPI)
+                socket.removeMessageEventListener(this@NoteCaptureAPIImpl)
             }
         }
 
