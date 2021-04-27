@@ -9,18 +9,21 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+interface NoteCaptureAPIWithAccountProvider {
+    fun get(account: Account): NoteCaptureAPI
+}
 /**
  * NoteCaptureAPIのインスタンスをAccountに基づきいい感じに取得や生成をできるようにする。
  */
-class NoteCaptureAPIWithAccountProvider(
+class NoteCaptureAPIWithAccountProviderImpl(
     private val socketWithAccountProvider: SocketWithAccountProvider,
     private val loggerFactory: Logger.Factory? = null
-) {
+) : NoteCaptureAPIWithAccountProvider{
 
     private val accountIdWithNoteCaptureAPI = mutableMapOf<Long, NoteCaptureAPI>()
     private val lock = Mutex()
 
-    fun get(account: Account) : NoteCaptureAPI = runBlocking{
+    override fun get(account: Account) : NoteCaptureAPI = runBlocking{
         lock.withLock {
             var channelAPI = accountIdWithNoteCaptureAPI[account.accountId]
             if(channelAPI != null) {
