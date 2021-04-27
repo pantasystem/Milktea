@@ -1,43 +1,61 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notes.toNote
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
+import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProvider
+import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProviderImpl
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
+import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
+import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPIImpl
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 class NoteCaptureAPIAdapterTest {
 
+    lateinit var loggerFactory: Logger.Factory
+    lateinit var accountRepository: AccountRepository
+    lateinit var noteDataSource: NoteDataSource
+
+    @Before
+    fun setUp() {
+        loggerFactory = TestLogger.Factory()
+        accountRepository = TestAccountRepository()
+        noteDataSource = InMemoryNoteDataSource(loggerFactory)
+    }
+
     @ExperimentalCoroutinesApi
     @Test
     fun testCapture() {
-        val loggerFactory = TestLogger.Factory()
-        val noteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProvider(
+        val noteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(
             TestSocketWithAccountProviderImpl(),
             loggerFactory
         )
 
 
         val coroutineScope = CoroutineScope(Job())
-        val accountRepository = TestAccountRepository()
-        val noteRepository = InMemoryNoteDataSource(loggerFactory)
 
 
         val noteCaptureAPIAdapter = NoteCaptureAPIAdapter(
             accountRepository = accountRepository,
-            noteDataSource = noteRepository,
+            noteDataSource = noteDataSource,
             noteCaptureAPIWithAccountProvider = noteCaptureAPIWithAccountProvider,
             loggerFactory,
             coroutineScope
@@ -46,7 +64,7 @@ class NoteCaptureAPIAdapterTest {
         runBlocking {
 
             val account = accountRepository.getCurrentAccount()
-            val noteCapture = noteCaptureAPIWithAccountProvider.get(account)
+            val noteCapture = noteCaptureAPIWithAccountProvider.get(account) as NoteCaptureAPIImpl
 
             val dto = NoteDTO(
                 "note-1",
@@ -57,11 +75,11 @@ class NoteCaptureAPIAdapterTest {
                 user = UserDTO("hoge", "hogeName")
             )
             val note = dto.toNote(account)
-            noteRepository.add(
+            noteDataSource.add(
                 note
             )
 
-            var sendCount = AtomicInteger()
+            val sendCount = AtomicInteger()
             val job = launch {
 
                 for(n in 0 until 10){
@@ -95,7 +113,7 @@ class NoteCaptureAPIAdapterTest {
                 }.launchIn(this + Dispatchers.IO)
             }
 
-            val job4 = launch {
+            launch {
                 noteCaptureAPIAdapter.capture(note.id).onEach {
                     println("job4: on ev: $it")
                 }.launchIn(this + Dispatchers.IO)
