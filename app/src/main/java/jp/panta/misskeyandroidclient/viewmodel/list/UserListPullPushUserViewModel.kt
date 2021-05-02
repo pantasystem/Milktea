@@ -4,13 +4,17 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.list.ListUserOperation
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -63,23 +67,19 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
             Type.PUSH
         }
 
-        api.invoke(
-            ListUserOperation(i = account.getI(miCore.getEncryption()), listId = userList.id.userListId, userId = userId.id)
-        ).enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if(response.code() in 200 until 300){
-
-                    subject.onNext(
-                        Event(type = type, userId = userId, listId = userList.id)
-                    )
-                }else{
-                    Log.d(this.javaClass.simpleName, "ユーザーを${type}するのに失敗した")
-                }
-            }
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                api.invoke(ListUserOperation(i = account.getI(miCore.getEncryption()), listId = userList.id.userListId, userId = userId.id))
+                    .throwIfHasError()
+            }.onSuccess {
+                subject.onNext(
+                    Event(type = type, userId = userId, listId = userList.id)
+                )
+            }.onFailure {
                 Log.d(this.javaClass.simpleName, "ユーザーを${type}するのに失敗した")
             }
-        })
+        }
+
     }
 
 }
