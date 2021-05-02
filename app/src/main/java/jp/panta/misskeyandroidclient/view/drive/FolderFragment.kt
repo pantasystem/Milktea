@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.view.drive
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -45,32 +46,36 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
                 ?:return@onEach
             val driveViewModelFactory = DriveViewModelFactory(0)
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
-            driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {
+            driveViewModel.currentDirectory.observe(viewLifecycleOwner, {
                 folderViewModel.currentFolder.postValue(it.id)
             })
 
             val adapter = FolderListAdapter(diffUtilItemCallback, driveViewModel, folderViewModel)
             folder_view.adapter = adapter
 
-            driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {
+            driveViewModel.currentDirectory.observe(viewLifecycleOwner, {
                 folderViewModel.currentFolder.postValue(it.id)
             })
 
-            folderViewModel.isRefreshing.observe(viewLifecycleOwner, Observer{
+            folderViewModel.isRefreshing.observe(viewLifecycleOwner, {
                 refresh.isRefreshing = it
             })
 
-            folderViewModel.currentFolder.observe(viewLifecycleOwner, Observer {
+            folderViewModel.currentFolder.observe(viewLifecycleOwner, {
                 folderViewModel.loadInit()
             })
 
-            folderViewModel.foldersLiveData.observe(viewLifecycleOwner, Observer{
+            folderViewModel.foldersLiveData.observe(viewLifecycleOwner, {
                 adapter.submitList(it)
             })
 
             refresh.setOnRefreshListener {
                 folderViewModel.loadInit()
             }
+
+            folderViewModel.error.filterNotNull().onEach {
+                Toast.makeText(requireContext(), "$it", Toast.LENGTH_SHORT).show()
+            }.launchIn(lifecycleScope)
 
 
         }.launchIn(lifecycleScope)
