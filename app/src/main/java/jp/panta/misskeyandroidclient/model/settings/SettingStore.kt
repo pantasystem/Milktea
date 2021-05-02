@@ -97,7 +97,17 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             return sharedPreferences.getInt(KeyStore.AutoTextFoldingCount.RETURNS.name, KeyStore.AutoTextFoldingCount.RETURNS.default)
         }
 
-    var isVisibleLocalOnly: Boolean
+    var isLearnVisibility: Boolean
+        set(value) {
+            sharedPreferences.edit {
+                putBoolean("IS_LEARN_VISIBILITY", value)
+            }
+        }
+        get() {
+            return sharedPreferences.getBoolean("IS_LEAR_VISIBILITY", true)
+        }
+
+    private var isVisibleLocalOnly: Boolean
         set(value) {
             sharedPreferences.edit {
                 putBoolean("IS_VISIBLE_LOCAL_ONLY", value)
@@ -108,7 +118,7 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         }
 
     fun setNoteVisibility(createNote: CreateNote) {
-        if(!(createNote.renoteId == null && createNote.replyId == null)) {
+        if(!(createNote.renoteId == null && createNote.replyId == null && !isLearnVisibility)) {
             return
         }
         isVisibleLocalOnly = (createNote.visibility as CanLocalOnly).isLocalOnly

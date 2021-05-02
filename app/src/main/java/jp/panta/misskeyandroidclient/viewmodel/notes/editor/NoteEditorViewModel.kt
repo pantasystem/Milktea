@@ -154,6 +154,13 @@ class NoteEditorViewModel(
         reply.filterNotNull().onEach {
             postValue(it.visibility)
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+
+        if(replyId == null || renoteId.value == null) {
+            currentAccount.value?.let {
+                this.value = miCore.getSettingStore().getNoteVisibility(it.accountId)
+            }
+        }
     }
 
     val isLocalOnly = MediatorLiveData<Boolean>().apply{
