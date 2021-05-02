@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.api.notes.State
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -214,44 +215,47 @@ class NotesViewModel(
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event){
         note?: return
-
-        getMisskeyAPI()?.createFavorite(
-            NoteRequest(
-                i = getAccount()?.getI(encryption)!!,
-                noteId = note.toShowNote.note.id.noteId
-            )
-        )?.enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                getMisskeyAPI()?.createFavorite(
+                    NoteRequest(
+                        i = getAccount()?.getI(encryption)!!,
+                        noteId = note.toShowNote.note.id.noteId
+                    )
+                )
+            }.onSuccess {
+                requireNotNull(it)
                 Log.d(TAG, "お気に入りに追加しました")
                 statusMessage.event = "お気に入りに追加しました"
-            }
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
+            }.onFailure { t ->
                 Log.e(TAG, "お気に入りに追加失敗しました", t)
                 statusMessage.event = "お気に入りにへの追加に失敗しました"
             }
-        })
-
+        }
     }
 
     fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event){
         note?: return
-
-        getMisskeyAPI()?.deleteFavorite(
-            NoteRequest(
-                i = getAccount()?.getI(encryption)!!,
-                noteId = note.toShowNote.note.id.noteId
-            )
-        )?.enqueue(object : Callback<Unit>{
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val res = getMisskeyAPI()?.deleteFavorite(
+                    NoteRequest(
+                        i = getAccount()?.getI(encryption)!!,
+                        noteId = note.toShowNote.note.id.noteId
+                    )
+                )
+                requireNotNull(res)
+                res
+            }.onSuccess {
                 Log.d(TAG, "お気に入りから削除しました")
                 statusMessage.event = "お気に入りから削除しました"
-            }
-
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                Log.e(TAG, "お気に入りの削除に追加失敗しました", t)
+            }.onFailure {
+                Log.e(TAG, "お気に入りの削除に追加失敗しました", it)
                 statusMessage.event = "お気に入りの削除に失敗しました"
             }
-        })
+        }
+
+
     }
 
 
@@ -305,47 +309,42 @@ class NotesViewModel(
     }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
-        getMisskeyAPI()?.noteState(NoteRequest(i = getAccount()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.note.id.noteId))
-            ?.enqueue(object : Callback<State>{
-                override fun onResponse(call: Call<State>, response: Response<State>) {
-                    val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
-                    if(nowNoteId == planeNoteViewData.toShowNote.note.id.noteId){
-                        val state = response.body()?: return
-                        Log.d(TAG, "state: $state")
-                        shareNoteState.postValue(state)
-                    }
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val response = getMisskeyAPI()?.noteState(NoteRequest(i = getAccount()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.note.id.noteId))
+                    ?.throwIfHasError()
+                val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
+                if(nowNoteId == planeNoteViewData.toShowNote.note.id.noteId){
+                    val state = response?.body()
+                    requireNotNull(state)
+                    Log.d(TAG, "state: $state")
+                    shareNoteState.postValue(state)
                 }
-                override fun onFailure(call: Call<State>, t: Throwable) {
-                    Log.e(TAG, "note stateの取得に失敗しました", t)
-                }
-            })
+            }.onFailure { t->
+                Log.e(TAG, "note stateの取得に失敗しました", t)
+            }
+        }
+
     }
 
-    fun showFile(media: MediaViewData, file: FileViewData){
-        targetFile.event = Pair(file, media)
-    }
 
     fun vote(poll: PollViewData, choice: PollViewData.Choice){
         if(SafeUnbox.unbox(poll.canVote.value)){
-            getMisskeyAPI()?.vote(
-                Vote(
-                    i = getAccount()?.getI(encryption)!!,
-                    choice = choice.number,
-                    noteId = poll.noteId
-                )
-            )?.enqueue(object : Callback<Unit>{
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if(response.code() == 204){
-                        Log.d(TAG, "投票に成功しました")
-                    }else{
-                        Log.d(TAG, "投票に失敗しました")
-                    }
-                }
-
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    getMisskeyAPI()?.vote(
+                        Vote(
+                            i = getAccount()?.getI(encryption)!!,
+                            choice = choice.number,
+                            noteId = poll.noteId
+                        )
+                    )?.throwIfHasError()
+                }.onSuccess {
+                    Log.d(TAG, "投票に成功しました")
+                }.onFailure {
                     Log.d(TAG, "投票に失敗しました")
                 }
-            })
+            }
         }
     }
     
