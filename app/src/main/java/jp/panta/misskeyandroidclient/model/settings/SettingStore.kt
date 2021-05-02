@@ -119,7 +119,10 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         }
 
     fun setNoteVisibility(createNote: CreateNote) {
-        if(!(createNote.renoteId == null && createNote.replyId == null && !isLearnVisibility)) {
+        if(!isLearnVisibility) {
+            return
+        }
+        if(!(createNote.renoteId == null && createNote.replyId == null)) {
             return
         }
         isVisibleLocalOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly?: false
@@ -129,6 +132,7 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             is Visibility.Followers -> "followers"
             is Visibility.Specified -> "specified"
         }
+        Log.d("SettingStore", "visibility: $str")
         sharedPreferences.edit { putString("accountId:${createNote.author.accountId}:NOTE_VISIBILITY", str) }
     }
 
