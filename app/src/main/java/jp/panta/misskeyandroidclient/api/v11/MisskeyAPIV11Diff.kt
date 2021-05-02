@@ -4,48 +4,48 @@ import jp.panta.misskeyandroidclient.api.groups.*
 import jp.panta.misskeyandroidclient.api.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.model.I
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface MisskeyAPIV11Diff {
 
     @POST("api/users/followers")
-    fun followers(@Body userRequest: RequestUser) : Call<List<FollowFollowerUser>>
+    suspend fun followers(@Body userRequest: RequestUser) : Response<List<FollowFollowerUser>>
 
     @POST("api/users/following")
-    fun following(@Body userRequest: RequestUser) : Call<List<FollowFollowerUser>>
+    suspend fun following(@Body userRequest: RequestUser) : Response<List<FollowFollowerUser>>
 
     @POST("api/users/groups/create")
-    fun createGroup(@Body body: CreateGroupDTO) : Call<GroupDTO>
+    suspend fun createGroup(@Body body: CreateGroupDTO) : Response<GroupDTO>
 
     @POST("api/users/groups/delete")
-    fun deleteGroup(@Body body: DeleteGroupDTO) : Call<Unit>
+    suspend fun deleteGroup(@Body body: DeleteGroupDTO) : Response<Unit>
 
     @POST("api/users/invitations/accept")
-    fun acceptInvitation(@Body body: AcceptInvitationDTO) : Call<Unit>
+    suspend fun acceptInvitation(@Body body: AcceptInvitationDTO) : Response<Unit>
 
     @POST("api/users/invitations/reject")
-    fun rejectInvitation(@Body body: RejectInvitationDTO) : Call<Unit>
+    suspend fun rejectInvitation(@Body body: RejectInvitationDTO) : Response<Unit>
 
     @POST("api/users/groups/invite")
-    fun invite(@Body body: InviteUserDTO) : Call<Unit>
+    suspend fun invite(@Body body: InviteUserDTO) : Response<Unit>
 
     @POST("api/users/groups/joined")
-    fun joinedGroups(@Body body: I) : Call<List<GroupDTO>>
+    suspend fun joinedGroups(@Body body: I) : Response<List<GroupDTO>>
 
     @POST("api/users/groups/owned")
-    fun ownedGroups(@Body body: I) : Call<List<GroupDTO>>
+    suspend fun ownedGroups(@Body body: I) : Response<List<GroupDTO>>
 
     @POST("api/users/groups/owned")
-    fun pullUser(@Body body: RemoveUserDTO) : Call<Unit>
+    suspend fun pullUser(@Body body: RemoveUserDTO) : Response<Unit>
 
     @POST("api/users/groups/show")
-    fun showGroup(@Body body: ShowGroupDTO) : Call<GroupDTO>
+    suspend fun showGroup(@Body body: ShowGroupDTO) : Response<GroupDTO>
 
     @POST("api/users/groups/transfer")
-    fun transferGroup(@Body body: TransferGroupDTO) : Call<GroupDTO>
+    suspend fun transferGroup(@Body body: TransferGroupDTO) : Response<GroupDTO>
 
     @POST("api/users/groups/update")
-    fun updateGroup(@Body body: UpdateGroupDTO) : Call<GroupDTO>
+    suspend fun updateGroup(@Body body: UpdateGroupDTO) : Response<GroupDTO>
 }

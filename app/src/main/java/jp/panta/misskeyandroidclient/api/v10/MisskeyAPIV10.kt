@@ -25,121 +25,121 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
-import retrofit2.Call
+import retrofit2.Response
 
 open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI{
-    override fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
+    override suspend fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
 
-    override fun children(noteRequest: NoteRequest) = misskey.children(noteRequest)
+    override suspend fun children(noteRequest: NoteRequest) = misskey.children(noteRequest)
 
-    override fun conversation(noteRequest: NoteRequest) = misskey.conversation(noteRequest)
+    override suspend fun conversation(noteRequest: NoteRequest) = misskey.conversation(noteRequest)
 
-    override fun create(createNote: CreateNote): Call<CreateNote.Response> = misskey.create(createNote)
-    override fun createApp(createApp: CreateApp) = misskey.createApp(createApp)
+    override suspend fun create(createNote: CreateNote): Response<CreateNote.Response> = misskey.create(createNote)
+    override suspend fun createApp(createApp: CreateApp) = misskey.createApp(createApp)
 
-    override fun createFavorite(noteRequest: NoteRequest) = misskey.createFavorite(noteRequest)
+    override suspend fun createFavorite(noteRequest: NoteRequest) = misskey.createFavorite(noteRequest)
 
-    override fun createMessage(messageAction: MessageAction) = misskey.createMessage(messageAction)
+    override suspend fun createMessage(messageAction: MessageAction) = misskey.createMessage(messageAction)
 
-    override fun createReaction(reaction: CreateReaction) = misskey.createReaction(reaction)
+    override suspend fun createReaction(reaction: CreateReaction) = misskey.createReaction(reaction)
 
-    override fun mentions(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.mentions(noteRequest)
+    override suspend fun mentions(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.mentions(noteRequest)
 
-    override fun delete(deleteNote: DeleteNote) = misskey.delete(deleteNote)
+    override suspend fun delete(deleteNote: DeleteNote) = misskey.delete(deleteNote)
 
-    override fun deleteFavorite(noteRequest: NoteRequest): Call<Unit> = misskey.deleteFavorite(noteRequest)
+    override suspend fun deleteFavorite(noteRequest: NoteRequest): Response<Unit> = misskey.deleteFavorite(noteRequest)
 
-    override fun deleteMessage(messageAction: MessageAction): Call<Unit> = misskey.deleteMessage(messageAction)
+    override suspend fun deleteMessage(messageAction: MessageAction): Response<Unit> = misskey.deleteMessage(messageAction)
 
-    override fun deleteReaction(deleteNote: DeleteNote): Call<Unit> = misskey.deleteReaction(deleteNote)
+    override suspend fun deleteReaction(deleteNote: DeleteNote): Response<Unit> = misskey.deleteReaction(deleteNote)
 
-    override fun favorites(noteRequest: NoteRequest): Call<List<Favorite>?> = misskey.favorites(noteRequest)
+    override suspend fun favorites(noteRequest: NoteRequest): Response<List<Favorite>?> = misskey.favorites(noteRequest)
 
-    override fun featured(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.featured(noteRequest)
+    override suspend fun featured(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.featured(noteRequest)
 
-    override fun followUser(requestUser: RequestUser): Call<UserDTO> = misskey.followUser(requestUser)
+    override suspend fun followUser(requestUser: RequestUser): Response<UserDTO> = misskey.followUser(requestUser)
 
-    open fun following(followFollower: RequestFollowFollower): Call<FollowFollowerUsers> = diff.following(followFollower)
+    open suspend fun following(followFollower: RequestFollowFollower): Response<FollowFollowerUsers> = diff.following(followFollower)
 
-    open fun followers(followFollower: RequestFollowFollower): Call<FollowFollowerUsers> = diff.followers(followFollower)
+    open suspend fun followers(followFollower: RequestFollowFollower): Response<FollowFollowerUsers> = diff.followers(followFollower)
 
-    override fun getFiles(fileRequest: RequestFile): Call<List<FileProperty>> = misskey.getFiles(fileRequest)
+    override suspend fun getFiles(fileRequest: RequestFile): Response<List<FileProperty>> = misskey.getFiles(fileRequest)
 
-    override fun getFolders(folderRequest: RequestFolder): Call<List<FolderProperty>> = misskey.getFolders(folderRequest)
+    override suspend fun getFolders(folderRequest: RequestFolder): Response<List<FolderProperty>> = misskey.getFolders(folderRequest)
 
-    override fun createFolder(createFolder: CreateFolder): Call<Unit> = misskey.createFolder(createFolder)
+    override suspend fun createFolder(createFolder: CreateFolder): Response<Unit> = misskey.createFolder(createFolder)
 
-    override fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Call<List<MessageDTO>> = misskey.getMessageHistory(requestMessageHistory)
+    override suspend fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Response<List<MessageDTO>> = misskey.getMessageHistory(requestMessageHistory)
 
-    override fun getMessages(requestMessage: RequestMessage): Call<List<MessageDTO>> = misskey.getMessages(requestMessage)
+    override suspend fun getMessages(requestMessage: RequestMessage): Response<List<MessageDTO>> = misskey.getMessages(requestMessage)
 
-    override fun getMeta(requestMeta: RequestMeta): Call<Meta> = misskey.getMeta(requestMeta)
+    override suspend fun getMeta(requestMeta: RequestMeta): Response<Meta> = misskey.getMeta(requestMeta)
 
-    override fun globalTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.globalTimeline(noteRequest)
+    override suspend fun globalTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.globalTimeline(noteRequest)
 
-    override fun homeTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.homeTimeline(noteRequest)
+    override suspend fun homeTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.homeTimeline(noteRequest)
 
-    override fun hybridTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.hybridTimeline(noteRequest)
+    override suspend fun hybridTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.hybridTimeline(noteRequest)
 
-    override fun i(i: I): Call<UserDTO> = misskey.i(i)
+    override suspend fun i(i: I): Response<UserDTO> = misskey.i(i)
 
-    override fun localTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.localTimeline(noteRequest)
+    override suspend fun localTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.localTimeline(noteRequest)
 
-    override fun muteUser(requestUser: RequestUser): Call<Unit> = misskey.muteUser(requestUser)
+    override suspend fun muteUser(requestUser: RequestUser): Response<Unit> = misskey.muteUser(requestUser)
 
-    override fun myApps(i: I): Call<List<App>> = misskey.myApps(i)
+    override suspend fun myApps(i: I): Response<List<App>> = misskey.myApps(i)
 
-    override fun noteState(noteRequest: NoteRequest): Call<State> = misskey.noteState(noteRequest)
+    override suspend fun noteState(noteRequest: NoteRequest): Response<State> = misskey.noteState(noteRequest)
 
-    override fun notification(notificationRequest: NotificationRequest): Call<List<NotificationDTO>?> = misskey.notification(notificationRequest)
+    override suspend fun notification(notificationRequest: NotificationRequest): Response<List<NotificationDTO>?> = misskey.notification(notificationRequest)
 
-    override fun readMessage(messageAction: MessageAction): Call<Unit> = misskey.readMessage(messageAction)
+    override suspend fun readMessage(messageAction: MessageAction): Response<Unit> = misskey.readMessage(messageAction)
 
-    override fun searchByTag(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.searchByTag(noteRequest)
+    override suspend fun searchByTag(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.searchByTag(noteRequest)
 
-    override fun searchNote(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.searchNote(noteRequest)
+    override suspend fun searchNote(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.searchNote(noteRequest)
 
-    override fun showApp(showApp: ShowApp): Call<App> = misskey.showApp(showApp)
+    override suspend fun showApp(showApp: ShowApp): Response<App> = misskey.showApp(showApp)
 
-    override fun showNote(requestNote: NoteRequest): Call<NoteDTO> = misskey.showNote(requestNote)
+    override suspend fun showNote(requestNote: NoteRequest): Response<NoteDTO> = misskey.showNote(requestNote)
 
-    override fun showUser(requestUser: RequestUser): Call<UserDTO> = misskey.showUser(requestUser)
+    override suspend fun showUser(requestUser: RequestUser): Response<UserDTO> = misskey.showUser(requestUser)
 
-    override fun searchUser(requestUser: RequestUser): Call<List<UserDTO>> = misskey.searchUser(requestUser)
+    override suspend fun searchUser(requestUser: RequestUser): Response<List<UserDTO>> = misskey.searchUser(requestUser)
 
-    override fun signIn(signIn: SignIn): Call<I> = misskey.signIn(signIn)
+    override suspend fun signIn(signIn: SignIn): Response<I> = misskey.signIn(signIn)
 
-    override fun unFollowUser(requestUser: RequestUser): Call<UserDTO> = misskey.unFollowUser(requestUser)
+    override suspend fun unFollowUser(requestUser: RequestUser): Response<UserDTO> = misskey.unFollowUser(requestUser)
 
-    override fun unblockUser(requestUser: RequestUser): Call<Unit> = misskey.unblockUser(requestUser)
+    override suspend fun unblockUser(requestUser: RequestUser): Response<Unit> = misskey.unblockUser(requestUser)
 
-    override fun unmuteUser(requestUser: RequestUser): Call<Unit> = misskey.unmuteUser(requestUser)
+    override suspend fun unmuteUser(requestUser: RequestUser): Response<Unit> = misskey.unmuteUser(requestUser)
 
-    override fun userNotes(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.userNotes(noteRequest)
+    override suspend fun userNotes(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.userNotes(noteRequest)
 
-    override fun vote(vote: Vote): Call<Unit> = misskey.vote(vote)
+    override suspend fun vote(vote: Vote): Response<Unit> = misskey.vote(vote)
 
-    override fun userListTimeline(noteRequest: NoteRequest): Call<List<NoteDTO>?> = misskey.userListTimeline(noteRequest)
+    override suspend fun userListTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.userListTimeline(noteRequest)
 
-    override fun createList(createList: CreateList): Call<UserListDTO> = misskey.createList(createList)
+    override suspend fun createList(createList: CreateList): Response<UserListDTO> = misskey.createList(createList)
 
-    override fun deleteList(listId: ListId): Call<Unit> = misskey.deleteList(listId)
+    override suspend fun deleteList(listId: ListId): Response<Unit> = misskey.deleteList(listId)
 
-    override fun showList(listId: ListId): Call<UserListDTO> = misskey.showList(listId)
+    override suspend fun showList(listId: ListId): Response<UserListDTO> = misskey.showList(listId)
 
-    override fun updateList(createList: UpdateList): Call<Unit> = misskey.updateList(createList)
+    override suspend fun updateList(createList: UpdateList): Response<Unit> = misskey.updateList(createList)
 
-    override fun userList(i: I): Call<List<UserListDTO>> = misskey.userList(i)
+    override suspend fun userList(i: I): Response<List<UserListDTO>> = misskey.userList(i)
 
-    override fun pullUserFromList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pullUserFromList(listUserOperation)
+    override suspend fun pullUserFromList(listUserOperation: ListUserOperation): Response<Unit> = misskey.pullUserFromList(listUserOperation)
 
-    override fun pushUserToList(listUserOperation: ListUserOperation): Call<Unit> = misskey.pushUserToList(listUserOperation)
+    override suspend fun pushUserToList(listUserOperation: ListUserOperation): Response<Unit> = misskey.pushUserToList(listUserOperation)
 
-    override fun unrenote(deleteNote: DeleteNote): Call<Unit> = misskey.unrenote(deleteNote)
+    override suspend fun unrenote(deleteNote: DeleteNote): Response<Unit> = misskey.unrenote(deleteNote)
 
-    override fun getHashTagList(requestHashTagList: RequestHashTagList): Call<List<HashTag>> = misskey.getHashTagList(requestHashTagList)
+    override suspend fun getHashTagList(requestHashTagList: RequestHashTagList): Response<List<HashTag>> = misskey.getHashTagList(requestHashTagList)
 
-    override fun getUsers(requestUser: RequestUser): Call<List<UserDTO>> = misskey.getUsers(requestUser)
+    override suspend fun getUsers(requestUser: RequestUser): Response<List<UserDTO>> = misskey.getUsers(requestUser)
 
-    override fun reactions(body: RequestReactionHistoryDTO): Call<List<ReactionHistoryDTO>> = misskey.reactions(body)
+    override suspend fun reactions(body: RequestReactionHistoryDTO): Response<List<ReactionHistoryDTO>> = misskey.reactions(body)
 }
