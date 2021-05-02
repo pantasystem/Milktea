@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
-@Suppress("BlockingMethodInNonBlockingContext")
 @ExperimentalCoroutinesApi
 @FlowPreview
 class MessageHistoryViewModel(
@@ -126,7 +125,7 @@ class MessageHistoryViewModel(
         val request = RequestMessageHistory(i = account.getI(encryption), group = isGroup, limit = 100)
 
         return runCatching {
-            val res = getMisskeyAPI().getMessageHistory(request).execute()
+            val res = getMisskeyAPI().getMessageHistory(request)
             res.throwIfHasError()
             res.body()?.map {
                 it.group?.let {  groupDTO ->
