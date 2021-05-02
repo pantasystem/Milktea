@@ -78,7 +78,7 @@ class UserListDetailViewModel(
                         i = account.getI(miCore.getEncryption()),
                         listId = listId.userListId
                     )
-                ).execute()
+                )
                 res.throwIfHasError()
                 res.body()?.toEntity(account)
             }.onSuccess {
@@ -101,7 +101,7 @@ class UserListDetailViewModel(
                         listId = listId.userListId,
                         name = name
                     )
-                ).execute()
+                )
                 res.throwIfHasError()
 
             }.onSuccess {
@@ -127,7 +127,7 @@ class UserListDetailViewModel(
                         listId = listId.userListId,
                         userId = userId.id
                     )
-                ).execute()
+                )
                 res.throwIfHasError()
 
             }.onSuccess {
@@ -150,7 +150,7 @@ class UserListDetailViewModel(
                         listId = listId.userListId,
                         userId = userId.id
                     )
-                ).execute()
+                )
                 result.throwIfHasError()
                 if(result.isSuccessful) userId else null
             }.onFailure { t ->
