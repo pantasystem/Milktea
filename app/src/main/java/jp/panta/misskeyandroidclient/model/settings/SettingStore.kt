@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.settings
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.core.content.edit
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.model.notes.CanLocalOnly
@@ -121,7 +122,7 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         if(!(createNote.renoteId == null && createNote.replyId == null && !isLearnVisibility)) {
             return
         }
-        isVisibleLocalOnly = (createNote.visibility as CanLocalOnly).isLocalOnly
+        isVisibleLocalOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly?: false
         val str = when(createNote.visibility) {
             is Visibility.Public -> "public"
             is Visibility.Home -> "home"
