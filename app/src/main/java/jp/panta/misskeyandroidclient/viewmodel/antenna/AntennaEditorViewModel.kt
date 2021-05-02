@@ -131,7 +131,7 @@ class AntennaEditorViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                miCore.getMisskeyAPI(account).userList(I(account.getI(miCore.getEncryption()))).execute()?.body()
+                miCore.getMisskeyAPI(account).userList(I(account.getI(miCore.getEncryption()))).body()
             }.onSuccess {
                 postValue(it)
             }
@@ -230,9 +230,9 @@ class AntennaEditorViewModel (
 
                 )
                 val res = if(antennaId == null) {
-                    api.createAntenna(request).execute()
+                    api.createAntenna(request)
                 }else{
-                    api.updateAntenna(request).execute()
+                    api.updateAntenna(request)
                 }
 
                 res.body()?.toEntity(account)
@@ -262,7 +262,7 @@ class AntennaEditorViewModel (
                 val account = getAccount()
                 (miCore.getMisskeyAPI(account) as MisskeyAPIV12).deleteAntenna(
                     AntennaQuery(antennaId = antennaId.antennaId, i = account.getI(miCore.getEncryption()), limit = null)
-                ).execute()
+                )
             }.onSuccess {
                 if(it.isSuccessful) {
                     antennaRemovedEvent.event = Unit
@@ -311,7 +311,7 @@ class AntennaEditorViewModel (
             val account = miCore.getAccount(antennaId.accountId)
             val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
                 ?: return null
-            val res = api.showAntenna(AntennaQuery(i = account.getI(miCore.getEncryption()), antennaId = antennaId.antennaId, limit = null)).execute()
+            val res = api.showAntenna(AntennaQuery(i = account.getI(miCore.getEncryption()), antennaId = antennaId.antennaId, limit = null))
             res.throwIfHasError()
             res.body()?.toEntity(account)
 
