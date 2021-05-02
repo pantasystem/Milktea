@@ -30,7 +30,7 @@ class NoteRepositoryImpl(
         )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.runCatching {
             getOrThrow().let {
-                miCore.getMisskeyAPI(createNote.author).create(it).execute().body()?.createdNote
+                miCore.getMisskeyAPI(createNote.author).create(it).body()?.createdNote
             }
         }
 
@@ -52,7 +52,7 @@ class NoteRepositoryImpl(
         val account = miCore.getAccountRepository().get(noteId.accountId)
         return miCore.getMisskeyAPI(account).delete(
             DeleteNote(i = account.getI(miCore.getEncryption()), noteId = noteId.noteId)
-        ).execute().isSuccessful
+        ).isSuccessful
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -67,10 +67,12 @@ class NoteRepositoryImpl(
         }
 
         logger.debug("request notes/show=$noteId")
-        note = miCore.getMisskeyAPI(account).showNote(NoteRequest(
-            i = account.getI(miCore.getEncryption()),
-            noteId = noteId.noteId
-        )).execute().body()?.let{
+        note = runCatching {
+            miCore.getMisskeyAPI(account).showNote(NoteRequest(
+                i = account.getI(miCore.getEncryption()),
+                noteId = noteId.noteId
+            ))
+        }.getOrNull()?.body()?.let{
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
         note?: throw NoteNotFoundException(noteId)
@@ -111,7 +113,6 @@ class NoteRepositoryImpl(
                 && miCore.getNoteDataSource().add(note.onIUnReacted()) != AddResult.CANCEL))
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
         val account = miCore.getAccount(createReaction.noteId.accountId)
         val res = miCore.getMisskeyAPI(account).createReaction(
@@ -120,19 +121,18 @@ class NoteRepositoryImpl(
                 noteId = createReaction.noteId.noteId,
                 reaction = createReaction.reaction
             )
-        ).execute()
+        )
         res.throwIfHasError()
         return res.isSuccessful
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun postUnReaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
         val account  = miCore.getAccount(noteId.accountId)
         val res = miCore.getMisskeyAPI(account).deleteReaction(DeleteNote(
             noteId = note.id.noteId,
             i = account.getI(miCore.getEncryption())
-        )).execute()
+        ))
         res.throwIfHasError()
         return res.isSuccessful
 

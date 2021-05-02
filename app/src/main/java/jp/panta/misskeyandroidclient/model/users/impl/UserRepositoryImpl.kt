@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Call
+import retrofit2.Response
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class UserRepositoryImpl(
@@ -38,7 +39,7 @@ class UserRepositoryImpl(
                 i = account.getI(miCore.getEncryption()),
                 userId = userId.id,
                 detail = true
-            )).execute()
+            ))
             res.throwIfHasError()
             res.body()?.let{
                 val user = it.toUser(account, true)
@@ -69,7 +70,7 @@ class UserRepositoryImpl(
                 userName = userName,
                 host = host
             )
-        ).execute()
+        )
         res.throwIfHasError()
 
         res.body()?.let {
@@ -113,7 +114,7 @@ class UserRepositoryImpl(
         val account = miCore.getAccountRepository().get(userId.accountId)
         val req = RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))
         logger.debug("follow req:$req")
-        val res = miCore.getMisskeyAPI(account).followUser(req).execute()
+        val res = miCore.getMisskeyAPI(account).followUser(req)
         res.throwIfHasError()
         if(res.isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(isFollowing = true)
@@ -124,7 +125,7 @@ class UserRepositoryImpl(
 
     override suspend fun unfollow(userId: User.Id): Boolean {
         val account = miCore.getAccountRepository().get(userId.accountId)
-        val res = miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))).execute()
+        val res = miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
         res.throwIfHasError()
         if(res.isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(isFollowing = false)
@@ -133,9 +134,9 @@ class UserRepositoryImpl(
         return res.isSuccessful
     }
 
-    private suspend fun action(requestAPI: (RequestUser)-> Call<Unit>, userId: User.Id, reducer: (User.Detail)-> User.Detail): Boolean {
+    private suspend fun action(requestAPI: suspend (RequestUser)-> Response<Unit>, userId: User.Id, reducer: (User.Detail)-> User.Detail): Boolean {
         val account = miCore.getAccountRepository().get(userId.accountId)
-        val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))).execute()
+        val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
         res.throwIfHasError()
         if(res.isSuccessful) {
 

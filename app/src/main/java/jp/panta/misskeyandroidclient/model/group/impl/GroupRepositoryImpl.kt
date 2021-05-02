@@ -25,8 +25,8 @@ class GroupRepositoryImpl(
         val account = accountRepository.get(createGroup.author)
         val api = getMisskeyAPI(account)
 
-        val res = api.createGroup(CreateGroupDTO(i = account.getI(encryption), name = createGroup.name)).execute()?.throwIfHasError()
-        val group = res?.body()?.toGroup(account.accountId)
+        val res = api.createGroup(CreateGroupDTO(i = account.getI(encryption), name = createGroup.name)).throwIfHasError()
+        val group = res.body()?.toGroup(account.accountId)
         require(group != null)
         groupDataSource.add(group)
         return group
@@ -46,8 +46,8 @@ class GroupRepositoryImpl(
         val account = accountRepository.get(groupId.accountId)
         val api = getMisskeyAPI(account)
 
-        val res = api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId)).execute()?.throwIfHasError()
-        val body = res?.body()
+        val res = api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId)).throwIfHasError()
+        val body = res.body()
             ?: throw GroupNotFoundException(groupId)
         group = body.toGroup(account.accountId)
         groupDataSource.add(group)
@@ -58,8 +58,8 @@ class GroupRepositoryImpl(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun joined(accountId: Long): List<Group> {
         val account = accountRepository.get(accountId)
-        val api = getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).execute()?.throwIfHasError()
-        val groups = api?.body()?.map {
+        val api = getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
+        val groups = api.body()?.map {
             it.toGroup(account.accountId)
         }?: emptyList()
         groupDataSource.addAll(groups)
@@ -69,8 +69,8 @@ class GroupRepositoryImpl(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun owned(accountId: Long): List<Group> {
         val account = accountRepository.get(accountId)
-        val api = getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).execute()?.throwIfHasError()
-        val groups = api?.body()?.map {
+        val api = getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
+        val groups = api.body()?.map {
             it.toGroup(account.accountId)
         }?: emptyList()
         groupDataSource.addAll(groups)
@@ -81,9 +81,8 @@ class GroupRepositoryImpl(
     override suspend fun pull(pull: Pull): Group {
         var group = find(pull.groupId)
         val account = accountRepository.get(pull.groupId.accountId)
-        val res = getMisskeyAPI(account).pullUser(RemoveUserDTO(i = account.getI(encryption), userId = pull.userId.id, groupId = pull.groupId.groupId)).execute()
-            ?.throwIfHasError()
-        require(res != null)
+        getMisskeyAPI(account).pullUser(RemoveUserDTO(i = account.getI(encryption), userId = pull.userId.id, groupId = pull.groupId.groupId))
+            .throwIfHasError()
 
         group = group.copy( userIds = group.userIds.filterNot {
             pull.userId == pull.userId
@@ -99,7 +98,7 @@ class GroupRepositoryImpl(
             i = account.getI(encryption),
             groupId = transfer.groupId.groupId,
             userId = transfer.userId.id
-        )).execute().throwIfHasError().body()
+        )).throwIfHasError().body()
 
         require(body != null)
         return body.toGroup(account.accountId).also {
@@ -110,8 +109,8 @@ class GroupRepositoryImpl(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun update(updateGroup: UpdateGroup): Group {
         val account = accountRepository.get(updateGroup.groupId.accountId)
-        val body = getMisskeyAPI(account).updateGroup(UpdateGroupDTO(i = account.getI(encryption), groupId = updateGroup.groupId.groupId, name = updateGroup.name)).execute()
-            ?.throwIfHasError()?.body()
+        val body = getMisskeyAPI(account).updateGroup(UpdateGroupDTO(i = account.getI(encryption), groupId = updateGroup.groupId.groupId, name = updateGroup.name))
+            .throwIfHasError().body()
         require(body != null)
 
         val group = body.toGroup(account.accountId)
