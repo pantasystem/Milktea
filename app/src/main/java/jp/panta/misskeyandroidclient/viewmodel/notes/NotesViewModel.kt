@@ -177,7 +177,9 @@ class NotesViewModel(
         }
         viewModelScope.launch(Dispatchers.IO){
             //リアクション解除処理をする
-            submittedNotesOnReaction.event = planeNoteViewData
+            withContext(Dispatchers.Main) {
+                submittedNotesOnReaction.event = planeNoteViewData
+            }
             Log.d("NotesViewModel", "postReaction(n, n)")
             runCatching {
                 val result = miCore.getNoteRepository().reaction(
@@ -226,10 +228,14 @@ class NotesViewModel(
             }.onSuccess {
                 requireNotNull(it)
                 Log.d(TAG, "お気に入りに追加しました")
-                statusMessage.event = "お気に入りに追加しました"
+                withContext(Dispatchers.Main) {
+                    statusMessage.event = "お気に入りに追加しました"
+                }
             }.onFailure { t ->
                 Log.e(TAG, "お気に入りに追加失敗しました", t)
-                statusMessage.event = "お気に入りにへの追加に失敗しました"
+                withContext(Dispatchers.Main) {
+                    statusMessage.event = "お気に入りにへの追加に失敗しました"
+                }
             }
         }
     }
@@ -237,7 +243,7 @@ class NotesViewModel(
     fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event){
         note?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            val result = runCatching {
                 val res = getMisskeyAPI()?.deleteFavorite(
                     NoteRequest(
                         i = getAccount()?.getI(encryption)!!,
@@ -246,12 +252,13 @@ class NotesViewModel(
                 )
                 requireNotNull(res)
                 res
-            }.onSuccess {
-                Log.d(TAG, "お気に入りから削除しました")
-                statusMessage.event = "お気に入りから削除しました"
-            }.onFailure {
-                Log.e(TAG, "お気に入りの削除に追加失敗しました", it)
-                statusMessage.event = "お気に入りの削除に失敗しました"
+            }.getOrNull() != null
+            withContext(Dispatchers.Main) {
+                statusMessage.event = if(result) {
+                    "お気に入りから削除しました"
+                }else{
+                    "お気に入りの削除に失敗しました"
+                }
             }
         }
 
@@ -278,7 +285,9 @@ class NotesViewModel(
                 miCore.getNoteRepository().delete(note.id)
             }.onSuccess {
                 if(it) {
-                    openNoteEditor.event = note
+                    withContext(Dispatchers.Main) {
+                        openNoteEditor.event = note
+                    }
                 }
             }.onFailure { t ->
                 Log.e(TAG, "削除に失敗しました", t)
