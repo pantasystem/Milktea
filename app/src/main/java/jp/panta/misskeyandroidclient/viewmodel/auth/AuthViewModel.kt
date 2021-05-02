@@ -48,7 +48,7 @@ class AuthViewModel(
             runCatching {
 
                 MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
-                    .execute().throwIfHasError().body()
+                    .throwIfHasError().body()
                     ?: throw IllegalStateException("response bodyがありません。")
             }.onSuccess {
                 val authenticated = Authorization.Approved(

@@ -277,7 +277,6 @@ class TimelineViewModel(
 
 
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun syncLoad(request: Request?, isRetry: Boolean = false): Pair<BodyLessResponse, List<PlaneNoteViewData>?>?{
         if(request == null && isRetry){
             return null
@@ -308,7 +307,7 @@ class TimelineViewModel(
                     i = account.getI(miCore.getEncryption()),
                     noteId = targetNoteId
                 )
-            ).execute()
+            )
         }catch(e: Throwable){
             null
         }

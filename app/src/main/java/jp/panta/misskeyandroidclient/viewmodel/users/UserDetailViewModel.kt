@@ -119,7 +119,11 @@ class UserDetailViewModel(
 
     fun load(){
         viewModelScope.launch(dispatcher) {
-            var user = userId?.let { miCore.getUserRepository().find(userId, true) }
+            var user = userId?.let {
+                runCatching {
+                    miCore.getUserRepository().find(userId, true)
+                }.getOrNull()
+            }
             if(user == null){
                 user = fqdnUserName?.let {
                     val account = getAccount()

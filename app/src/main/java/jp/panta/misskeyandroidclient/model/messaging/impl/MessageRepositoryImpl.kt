@@ -28,7 +28,7 @@ class MessageRepositoryImpl(
                 null,
                 messageId.messageId
             )
-        ).execute().isSuccessful
+        ).isSuccessful
 
         if(result) {
             miCore.getMessageDataSource().find(messageId)?.read()?.let{
@@ -66,7 +66,7 @@ class MessageRepositoryImpl(
             }
         }
 
-        val body: MessageDTO = miCore.getMisskeyAPI(account).createMessage(action).execute().body()
+        val body: MessageDTO = miCore.getMisskeyAPI(account).createMessage(action).body()
             ?: throw IllegalStateException("メッセージの作成に失敗しました")
 
         return miCore.getGetters().messageRelationGetter.get(account, body).message
@@ -85,7 +85,7 @@ class MessageRepositoryImpl(
                 null,
                 messageId.messageId
             )
-        ).execute().isSuccessful
+        ).isSuccessful
 
         if(result) {
             miCore.getMessageDataSource().delete(messageId)

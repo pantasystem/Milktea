@@ -25,188 +25,189 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDT
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface MisskeyAPI {
 
     @POST("api/signin")
-    fun signIn(@Body signIn: SignIn): Call<I>
+    suspend fun signIn(@Body signIn: SignIn): Response<I>
 
     @POST("api/app/create")
-    fun createApp(@Body createApp: CreateApp): Call<App>
+    suspend fun createApp(@Body createApp: CreateApp): Response<App>
 
     @POST("api/my/apps")
-    fun myApps(@Body i: I) : Call<List<App>>
+    suspend fun myApps(@Body i: I) : Response<List<App>>
 
     @POST("api/app/show")
-    fun showApp(@Body showApp: ShowApp) : Call<App>
+    suspend fun showApp(@Body showApp: ShowApp) : Response<App>
 
     @POST("api/blocking/create")
-    fun blockUser(@Body requestUser: RequestUser): Call<Unit>
+    suspend fun blockUser(@Body requestUser: RequestUser): Response<Unit>
 
     @POST("api/blocking/delete")
-    fun unblockUser(@Body requestUser: RequestUser): Call<Unit>
+    suspend fun unblockUser(@Body requestUser: RequestUser): Response<Unit>
 
 
     @POST("api/i")
-    fun i(@Body i: I): Call<UserDTO>
+    suspend fun i(@Body i: I): Response<UserDTO>
 
     //users
     @POST("api/users")
-    fun getUsers(@Body requestUser: RequestUser): Call<List<UserDTO>>
+    suspend fun getUsers(@Body requestUser: RequestUser): Response<List<UserDTO>>
 
     @POST("api/users/show")
-    fun showUser(@Body requestUser: RequestUser): Call<UserDTO>
+    suspend fun showUser(@Body requestUser: RequestUser): Response<UserDTO>
 
     @POST("api/users/search")
-    fun searchUser(@Body requestUser: RequestUser): Call<List<UserDTO>>
+    suspend fun searchUser(@Body requestUser: RequestUser): Response<List<UserDTO>>
 
     @POST("api/users/lists/list")
-    fun userList(@Body i: I): Call<List<UserListDTO>>
+    suspend fun userList(@Body i: I): Response<List<UserListDTO>>
 
     @POST("api/users/lists/show")
-    fun showList(@Body listId: ListId): Call<UserListDTO>
+    suspend fun showList(@Body listId: ListId): Response<UserListDTO>
 
     @POST("api/users/lists/create")
-    fun createList(@Body createList: CreateList): Call<UserListDTO>
+    suspend fun createList(@Body createList: CreateList): Response<UserListDTO>
 
     @POST("api/lists/delete")
-    fun deleteList(@Body listId: ListId): Call<Unit>
+    suspend fun deleteList(@Body listId: ListId): Response<Unit>
 
     @POST("api/users/lists/update")
-    fun updateList(@Body createList: UpdateList): Call<Unit>
+    suspend fun updateList(@Body createList: UpdateList): Response<Unit>
 
     @POST("api/users/lists/push")
-    fun pushUserToList(@Body listUserOperation: ListUserOperation): Call<Unit>
+    suspend fun pushUserToList(@Body listUserOperation: ListUserOperation): Response<Unit>
 
     @POST("api/users/lists/pull")
-    fun pullUserFromList(@Body listUserOperation: ListUserOperation): Call<Unit>
+    suspend fun pullUserFromList(@Body listUserOperation: ListUserOperation): Response<Unit>
 
     @POST("api/following/delete")
-    fun unFollowUser(@Body requestUser: RequestUser): Call<UserDTO>
+    suspend fun unFollowUser(@Body requestUser: RequestUser): Response<UserDTO>
 
     @POST("api/following/create")
-    fun followUser(@Body requestUser: RequestUser): Call<UserDTO>
+    suspend fun followUser(@Body requestUser: RequestUser): Response<UserDTO>
 
     //account
     @POST("api/i/favorites")
-    fun favorites(@Body noteRequest: NoteRequest): Call<List<Favorite>?>
+    suspend fun favorites(@Body noteRequest: NoteRequest): Response<List<Favorite>?>
 
     @POST("api/notes/favorites/create")
-    fun createFavorite(@Body noteRequest: NoteRequest): Call<Unit>
+    suspend fun createFavorite(@Body noteRequest: NoteRequest): Response<Unit>
 
     @POST("api/notes/favorites/delete")
-    fun deleteFavorite(@Body noteRequest: NoteRequest): Call<Unit>
+    suspend fun deleteFavorite(@Body noteRequest: NoteRequest): Response<Unit>
 
     @POST("api/i/notifications")
-    fun notification(@Body notificationRequest: NotificationRequest): Call<List<NotificationDTO>?>
+    suspend fun notification(@Body notificationRequest: NotificationRequest): Response<List<NotificationDTO>?>
 
     @POST("api/notes/create")
-    fun create(@Body createNote: CreateNote): Call<CreateNote.Response>
+    suspend fun create(@Body createNote: CreateNote): Response<CreateNote.Response>
 
     @POST("api/notes/delete")
-    fun delete(@Body deleteNote: DeleteNote): Call<Unit>
+    suspend fun delete(@Body deleteNote: DeleteNote): Response<Unit>
 
     @POST("api/notes/reactions")
-    fun reactions(@Body body: RequestReactionHistoryDTO): Call<List<ReactionHistoryDTO>>
+    suspend fun reactions(@Body body: RequestReactionHistoryDTO): Response<List<ReactionHistoryDTO>>
 
     @POST("api/notes/reactions/create")
-    fun createReaction(@Body reaction: CreateReaction): Call<Unit>
+    suspend fun createReaction(@Body reaction: CreateReaction): Response<Unit>
     @POST("api/notes/reactions/delete")
-    fun deleteReaction(@Body deleteNote: DeleteNote): Call<Unit>
+    suspend fun deleteReaction(@Body deleteNote: DeleteNote): Response<Unit>
 
     @POST("api/notes/unrenote")
-    fun unrenote(@Body deleteNote: DeleteNote): Call<Unit>
+    suspend fun unrenote(@Body deleteNote: DeleteNote): Response<Unit>
 
     @POST("api/notes/search")
-    fun searchNote(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun searchNote(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/state")
-    fun noteState(@Body noteRequest: NoteRequest): Call<State>
+    suspend fun noteState(@Body noteRequest: NoteRequest): Response<State>
 
     @POST("api/notes/show")
-    fun showNote(@Body requestNote: NoteRequest): Call<NoteDTO>
+    suspend fun showNote(@Body requestNote: NoteRequest): Response<NoteDTO>
 
     @POST("api/notes/children")
-    fun children(@Body noteRequest: NoteRequest): Call<List<NoteDTO>>
+    suspend fun children(@Body noteRequest: NoteRequest): Response<List<NoteDTO>>
 
     @POST("api/notes/conversation")
-    fun conversation(@Body noteRequest: NoteRequest): Call<List<NoteDTO>>
+    suspend fun conversation(@Body noteRequest: NoteRequest): Response<List<NoteDTO>>
 
     @POST("api/notes/featured")
-    fun featured(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun featured(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     //timeline
     @POST("api/notes/timeline")
-    fun homeTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun homeTimeline(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
 
     @POST("api/notes/hybrid-timeline")
-    fun hybridTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun hybridTimeline(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/local-timeline")
-    fun localTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun localTimeline(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/global-timeline")
-    fun globalTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun globalTimeline(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/polls/vote")
-    fun vote(@Body vote: Vote) : Call<Unit>
+    suspend fun vote(@Body vote: Vote) : Response<Unit>
 
     @POST("api/notes/search-by-tag")
-    fun searchByTag(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun searchByTag(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/user-list-timeline")
-    fun userListTimeline(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun userListTimeline(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
     //user
     @POST("api/users/notes")
-    fun userNotes(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun userNotes(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/mentions")
-    fun mentions(@Body noteRequest: NoteRequest): Call<List<NoteDTO>?>
+    suspend fun mentions(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
 
 
     //drive
     @POST("api/drive/files")
-    fun getFiles(@Body fileRequest: RequestFile): Call<List<FileProperty>>
+    suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FileProperty>>
 
     @POST("api/drive/folders")
-    fun getFolders(@Body folderRequest: RequestFolder): Call<List<FolderProperty>>
+    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<FolderProperty>>
 
     @POST("api/drive/folders/create")
-    fun createFolder(@Body createFolder: CreateFolder): Call<Unit>
+    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Unit>
 
 
     //meta
     @POST("api/meta")
-    fun getMeta(@Body requestMeta: RequestMeta): Call<Meta>
+    suspend fun getMeta(@Body requestMeta: RequestMeta): Response<Meta>
 
 
     //message
     @POST("api/messaging/history")
-    fun getMessageHistory(@Body requestMessageHistory: RequestMessageHistory): Call<List<MessageDTO>>
+    suspend fun getMessageHistory(@Body requestMessageHistory: RequestMessageHistory): Response<List<MessageDTO>>
 
     @POST("api/messaging/messages")
-    fun getMessages(@Body requestMessage: RequestMessage): Call<List<MessageDTO>>
+    suspend fun getMessages(@Body requestMessage: RequestMessage): Response<List<MessageDTO>>
 
     @POST("api/messaging/messages/create")
-    fun createMessage(@Body messageAction: MessageAction): Call<MessageDTO>
+    suspend fun createMessage(@Body messageAction: MessageAction): Response<MessageDTO>
 
     @POST("api/messaging/messages/delete")
-    fun deleteMessage(@Body messageAction: MessageAction): Call<Unit>
+    suspend fun deleteMessage(@Body messageAction: MessageAction): Response<Unit>
 
     @POST("api/messaging/messages/read")
-    fun readMessage(@Body messageAction: MessageAction): Call<Unit>
+    suspend fun readMessage(@Body messageAction: MessageAction): Response<Unit>
 
     @POST("api/mute/create")
-    fun muteUser(@Body requestUser: RequestUser): Call<Unit>
+    suspend fun muteUser(@Body requestUser: RequestUser): Response<Unit>
 
     @POST("api/mute/delete")
-    fun unmuteUser(@Body requestUser: RequestUser): Call<Unit>
+    suspend fun unmuteUser(@Body requestUser: RequestUser): Response<Unit>
 
     @POST("api/hashtags/list")
-    fun getHashTagList(@Body requestHashTagList: RequestHashTagList): Call<List<HashTag>>
+    suspend fun getHashTagList(@Body requestHashTagList: RequestHashTagList): Response<List<HashTag>>
 
 }

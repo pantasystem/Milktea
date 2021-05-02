@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -96,7 +97,7 @@ class NotificationViewModel(
             val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
 
             runCatching {
-                val notificationDTOList = misskeyAPI.notification(request).execute()?.body()
+                val notificationDTOList = misskeyAPI.notification(request).throwIfHasError().body()
                 logger.debug("res: $notificationDTOList")
                 val viewDataList = notificationDTOList?.toNotificationViewData(account)
                     ?: emptyList()
@@ -134,7 +135,7 @@ class NotificationViewModel(
 
             val request = NotificationRequest(i = account.getI(encryption), limit = 20, untilId = untilId.notificationId)
             val notifications = runCatching {
-                misskeyAPI.notification(request).execute()?.body()
+                misskeyAPI.notification(request).throwIfHasError().body()
             }.getOrNull()
             val list = notifications?.toNotificationViewData(account)
             if(list.isNullOrEmpty()) {

@@ -168,9 +168,9 @@ class SearchResultActivity : AppCompatActivity() {
                 SEARCH_NOTES, SEARCH_NOTES_WITH_FILES ->{
                     val request: Pageable = if(isTag){
                         if(pages[position] == SEARCH_NOTES){
-                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
+                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = false)
                         }else{
-                            Pageable.SearchByTag(tag = keyword.replace("#", ""))
+                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
                         }
 
                     }else{

@@ -35,20 +35,20 @@ class FavoriteNotePagingStore(
 
     override suspend fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         return if(request == null){
-            val res =favorites(builder.build(NoteRequest.Conditions())).execute()
+            val res =favorites(builder.build(NoteRequest.Conditions()))
             makeResponse(res, false)
         }else{
-            makeResponse(favorites(request).execute(), false)
+            makeResponse(favorites(request), false)
         }
     }
 
     override suspend fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val res = favorites(builder.build(NoteRequest.Conditions(sinceId = sinceId))).execute()
+        val res = favorites(builder.build(NoteRequest.Conditions(sinceId = sinceId)))
         return makeResponse(res, true)
     }
 
     override suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
-        val res = favorites(builder.build(NoteRequest.Conditions(untilId = untilId))).execute()
+        val res = favorites(builder.build(NoteRequest.Conditions(untilId = untilId)))
         return makeResponse(res, false)
     }
 

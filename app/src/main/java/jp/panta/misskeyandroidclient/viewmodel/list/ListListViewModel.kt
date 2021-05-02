@@ -1,15 +1,15 @@
 package jp.panta.misskeyandroidclient.viewmodel.list
 
-import android.util.Log
-import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.list.CreateList
 import jp.panta.misskeyandroidclient.api.list.ListId
-import jp.panta.misskeyandroidclient.api.list.UserListDTO
 import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.model.I
+import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -18,11 +18,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.lang.IllegalStateException
 import kotlin.collections.LinkedHashMap
+import kotlin.collections.List
+import kotlin.collections.Set
+import kotlin.collections.any
+import kotlin.collections.emptyList
+import kotlin.collections.emptyMap
+import kotlin.collections.filter
+import kotlin.collections.firstOrNull
+import kotlin.collections.map
+import kotlin.collections.set
+import kotlin.collections.toList
+import kotlin.collections.toMap
+import kotlin.collections.toSet
 
 @ExperimentalCoroutinesApi
 class ListListViewModel(
@@ -92,7 +100,7 @@ class ListListViewModel(
     private suspend fun loadListList(accountId: Long): List<UserList>{
         val account = miCore.getAccountRepository().get(accountId)
         val i = account.getI(encryption)
-        val res = miCore.getMisskeyAPI(account).userList(I(i)).execute()
+        val res = miCore.getMisskeyAPI(account).userList(I(i))
         res.throwIfHasError()
 
         val userListMap = res.body()?.map {
@@ -166,7 +174,7 @@ class ListListViewModel(
                         i = account.getI(miCore.getEncryption()),
                         listId = userList.id.userListId
                     )
-                ).execute()
+                )
                 res.throwIfHasError()
 
             }.onSuccess {
@@ -182,7 +190,7 @@ class ListListViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().getCurrentAccount()
-                val res = miCore.getMisskeyAPI(account).createList(CreateList(i = account.getI(miCore.getEncryption()), name)).execute()
+                val res = miCore.getMisskeyAPI(account).createList(CreateList(i = account.getI(miCore.getEncryption()), name))
                 res.throwIfHasError()
                 res.body()?.toEntity(account)
                     ?: throw IllegalStateException()

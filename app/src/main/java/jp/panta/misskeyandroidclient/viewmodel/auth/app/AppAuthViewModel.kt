@@ -92,7 +92,7 @@ class AppAuthViewModel(
                 this@AppAuthViewModel.app.postValue(app)
                 val secret = app.secret
                 val authApi = MisskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
-                val session = authApi.generateSession(AppSecret(secret!!)).execute().body()
+                val session = authApi.generateSession(AppSecret(secret!!)).body()
                     ?: throw IllegalStateException("セッションの作成に失敗しました。")
                 customAuthStore.setCustomAuthBridge(
                     app.createAuth(instanceBase, session)
@@ -117,8 +117,8 @@ class AppAuthViewModel(
 
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private fun createApp(url: String, version: Version, appName: String): App {
+
+    private suspend fun createApp(url: String, version: Version, appName: String): App {
         val misskeyAPI = misskeyAPIProvider.get(url, version)
         return misskeyAPI.createApp(
             CreateApp(
@@ -128,7 +128,7 @@ class AppAuthViewModel(
                 CALL_BACK_URL,
                 permission = DefaultPermission.defaultPermission
             )
-        ).execute().throwIfHasError().body()
+        ).throwIfHasError().body()
             ?: throw IllegalStateException("Appの作成に失敗しました。")
     }
 

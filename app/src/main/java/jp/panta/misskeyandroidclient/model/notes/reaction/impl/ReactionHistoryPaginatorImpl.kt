@@ -48,7 +48,6 @@ class ReactionHistoryPaginatorImpl(
 
     private var offset: Int = 0
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun next(): Boolean {
         lock.withLock {
             val account = accountRepository.get(reactionHistoryRequest.noteId.accountId)
@@ -61,7 +60,7 @@ class ReactionHistoryPaginatorImpl(
                     noteId = reactionHistoryRequest.noteId.noteId,
                     type = reactionHistoryRequest.type
                 )
-            ).execute()?.throwIfHasError()?.body()?: emptyList()
+            ).throwIfHasError().body()?: emptyList()
 
             if(res.isNotEmpty()) {
                 offset += res.size

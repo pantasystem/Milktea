@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -48,22 +49,20 @@ class FileViewModel(
         isLoading = true
         isRefreshing.postValue(true)
         val request = RequestFile(i = account.getI(encryption), folderId = currentFolder.value, limit = 20)
-        misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
-            override fun onResponse(
-                call: Call<List<FileProperty>>,
-                response: Response<List<FileProperty>>
-            ) {
-                val rawList = response.body()
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching{
+                val rawList = misskeyAPI.getFiles(request).throwIfHasError().body()
                 if(rawList == null){
                     isLoading = false
                     isRefreshing.postValue(false)
-                    return
+                    return@launch
                 }
 
                 val viewDataList = rawList.map{
                     FileViewData(it)
                 }
-
+                viewDataList
+            }.onSuccess { viewDataList ->
                 filesLiveData.postValue(viewDataList)
                 //selectedItemMap.clear()
                 viewDataList.forEach{
@@ -79,14 +78,12 @@ class FileViewModel(
 
                 isLoading = false
                 isRefreshing.postValue(false)
-
-            }
-
-            override fun onFailure(call: Call<List<FileProperty>>, t: Throwable) {
+            }.onFailure {
                 isLoading = false
                 isRefreshing.postValue(false)
             }
-        })
+        }
+
     }
 
     fun loadNext(){
@@ -101,38 +98,33 @@ class FileViewModel(
             return
         }
         val request = RequestFile(i = account.getI(encryption), folderId = currentFolder.value, limit = 20, untilId = untilId)
-        misskeyAPI.getFiles(request).enqueue(object : Callback<List<FileProperty>>{
-            override fun onResponse(
-                call: Call<List<FileProperty>>,
-                response: Response<List<FileProperty>>
-            ) {
-                val rawList = response.body()
-                if(rawList == null || rawList.isEmpty()){
-                    isLoading = false
-                    return
-                }
 
-                val viewDataList = ArrayList<FileViewData>(beforeList).apply{
-                    addAll(rawList.map{
-                        FileViewData(it).apply{
-                            val selected = selectedFileMapLiveData?.value?.get(it.id)
-                            if(selected != null){
-                                isSelect.postValue(true)
-                            }else{
-                                isEnabledSelect.postValue(selectedFileMapLiveData?.value?.size?:0  < maxSelectableItemSize)
-                            }
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val rawList = misskeyAPI.getFiles(request).throwIfHasError().body()
+
+                requireNotNull(rawList)
+                require(rawList.isNotEmpty())
+                rawList.map{
+                    FileViewData(it).apply{
+                        val selected = selectedFileMapLiveData?.value?.get(it.id)
+                        if(selected != null){
+                            isSelect.postValue(true)
+                        }else{
+                            isEnabledSelect.postValue(selectedFileMapLiveData?.value?.size?:0  < maxSelectableItemSize)
                         }
-                    })
+                    }
                 }
-
-                filesLiveData.postValue(viewDataList)
+            }.onSuccess { viewDataList ->
+                filesLiveData.postValue(ArrayList(beforeList).also {
+                    it.addAll(viewDataList)
+                })
+            }.onFailure {
                 isLoading = false
             }
 
-            override fun onFailure(call: Call<List<FileProperty>>, t: Throwable) {
-                isLoading = false
-            }
-        })
+        }
+
     }
 
     fun changeSelectItemState(fileViewData: FileViewData){

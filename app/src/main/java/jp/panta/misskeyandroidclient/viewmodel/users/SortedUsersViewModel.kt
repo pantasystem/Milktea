@@ -117,7 +117,7 @@ class SortedUsersViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).execute().body() }
+            runCatching { miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).body() }
                 .map {
                     it?.map{ dto ->
                         dto.toUser(account, true).also{ u ->

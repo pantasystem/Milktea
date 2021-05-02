@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.tags
 
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -9,7 +10,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import okhttp3.Dispatcher
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,23 +72,21 @@ class SortedHashTagListViewModel(
             return
         }
 
-        miCore.getMisskeyAPI(account).getHashTagList(
-            RequestHashTagList(
-                i = i,
-                sort = conditions.sort,
-                attachedToRemoteUserOnly = conditions.isAttachedToRemoteUserOnly,
-                attachedToUserOnly = conditions.isAttachedToUserOnly,
-                attachedToLocalUserOnly = conditions.isAttachedToLocalUserOnly
-            )
-        ).enqueue(object : Callback<List<HashTag>>{
-            override fun onResponse(call: Call<List<HashTag>>, response: Response<List<HashTag>>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                miCore.getMisskeyAPI(account).getHashTagList(
+                    RequestHashTagList(
+                        i = i,
+                        sort = conditions.sort,
+                        attachedToRemoteUserOnly = conditions.isAttachedToRemoteUserOnly,
+                        attachedToUserOnly = conditions.isAttachedToUserOnly,
+                        attachedToLocalUserOnly = conditions.isAttachedToLocalUserOnly
+                    )
+                ).throwIfHasError()
+            }.onSuccess { response ->
                 hashTags.postValue(response.body())
-                isLoading.postValue(false)
             }
-
-            override fun onFailure(call: Call<List<HashTag>>, t: Throwable) {
-                isLoading.postValue(false)
-            }
-        })
+            isLoading.postValue(false)
+        }
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -18,10 +19,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.IllegalStateException
 
 class PageSettingViewModel(
     val miCore: MiCore,
@@ -106,20 +109,18 @@ class PageSettingViewModel(
     }
 
     fun addUserPageById(userId: String){
-        miCore.getMisskeyAPI(account!!).showUser(
-            RequestUser(userId = userId, i = account?.getI(encryption))
-        ).enqueue(object : Callback<UserDTO>{
-            override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
-                val user = response.body()
-                if(user != null){
-                    addUserPage(user)
-                }
-            }
-
-            override fun onFailure(call: Call<UserDTO>, t: Throwable) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                miCore.getMisskeyAPI(account!!).showUser(
+                    RequestUser(userId = userId, i = account?.getI(encryption))
+                ).throwIfHasError().body()?: throw IllegalStateException()
+            }.onSuccess {
+                addUserPage(it)
+            }.onFailure { t ->
                 Log.e("PageSettingVM", "ユーザーの取得に失敗した", t)
             }
-        })
+
+        }
     }
     fun addUserPage(user: UserDTO){
         val page = if(settingStore.isUserNameDefault){
@@ -136,23 +137,6 @@ class PageSettingViewModel(
         setList(list)
     }
 
-    fun asyncAddUser(userId: String){
-        miCore.getMisskeyAPI(account!!).showUser(
-            RequestUser(
-                i = account?.getI(encryption)!!,
-                userId = userId
-            )
-        ).enqueue(object : Callback<UserDTO>{
-            override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
-                if(response.code() in 200.until(300)){
-                    addPage(PageableTemplate(account!!).user(response.body()!!, settingStore.isUserNameDefault))
-                }
-            }
-
-            override fun onFailure(call: Call<UserDTO>, t: Throwable) {
-            }
-        })
-    }
 
 
     override fun add(type: PageType) {
