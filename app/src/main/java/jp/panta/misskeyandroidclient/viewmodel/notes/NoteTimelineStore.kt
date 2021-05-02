@@ -35,7 +35,7 @@ class NoteTimelineStore(
     private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
 
 
-    private fun getStore(): ((NoteRequest)-> Call<List<NoteDTO>?>)? {
+    private fun getStore(): (suspend (NoteRequest)-> Response<List<NoteDTO>?>)? {
         return try{
             when(pageableTimeline){
                 is Pageable.GlobalTimeline -> miCore.getMisskeyAPI(account)::globalTimeline
@@ -66,32 +66,29 @@ class NoteTimelineStore(
 
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun loadInit(request: NoteRequest?): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val res = if(request == null){
             val req = requestBuilder.build( null)
-            getStore()?.invoke(req)?.execute()
+            getStore()?.invoke(req)
         }else{
-            getStore()?.invoke(request)?.execute()
+            getStore()?.invoke(request)
         }
         res?.throwIfHasError()
         return makeResponse(res?.body(), res)
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun loadNew(sinceId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
 
         val req = requestBuilder.build(NoteRequest.Conditions(sinceId = sinceId))
-        val res = getStore()?.invoke(req)?.execute()
+        val res = getStore()?.invoke(req)
         val reversedList = res?.body()?.asReversed()
         res?.throwIfHasError()
         return makeResponse(reversedList, res)
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun loadOld(untilId: String): Pair<BodyLessResponse, List<PlaneNoteViewData>?> {
         val req = requestBuilder.build(NoteRequest.Conditions(untilId = untilId))
-        val res = getStore()?.invoke(req)?.execute()
+        val res = getStore()?.invoke(req)
         res?.throwIfHasError()
 
         return makeResponse(res?.body(), res)
