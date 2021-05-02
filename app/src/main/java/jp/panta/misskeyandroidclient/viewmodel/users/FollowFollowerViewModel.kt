@@ -14,6 +14,8 @@ import jp.panta.misskeyandroidclient.api.v10.RequestFollowFollower
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -29,6 +31,7 @@ class FollowFollowerViewModel(
     val userId: User.Id,
     val type: Type,
     private val miCore: MiCore,
+    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
 ) : ViewModel(), ShowUserDetails{
     @Suppress("UNCHECKED_CAST")
     class Factory(
@@ -59,7 +62,7 @@ class FollowFollowerViewModel(
         val userId: User.Id,
         val type: Type,
         val encryption: Encryption,
-        val noteRelationGetter: NoteRelationGetter,
+        val noteDataSourceAdder: NoteDataSourceAdder,
         val userDataSource: UserDataSource,
         private val logger: Logger?
 
@@ -76,7 +79,7 @@ class FollowFollowerViewModel(
                     account.getI(encryption),
                     userId = userId.id,
                     untilId = nextId
-                )).execute().body()
+                )).body()
                     ?: return emptyList()
                 nextId = res.last().id
                 require(nextId != null)
@@ -84,7 +87,7 @@ class FollowFollowerViewModel(
                     it.followee ?: it.follower
                 }.map { userDTO ->
                     userDTO.pinnedNotes?.forEach { noteDTO ->
-                        noteRelationGetter.get(account, noteDTO)
+                        noteDataSourceAdder.addNoteDtoToDataSource(account, noteDTO)
                     }
                     (userDTO.toUser(account, true) as User.Detail).also {
                         userDataSource.add(it)
@@ -107,7 +110,7 @@ class FollowFollowerViewModel(
         val userId: User.Id,
         val type: Type,
         val encryption: Encryption,
-        val noteRelationGetter: NoteRelationGetter,
+        val noteDataSourceAdder: NoteDataSourceAdder,
         val userDataSource: UserDataSource
     ) : Paginator{
         private val lock = Mutex()
@@ -122,11 +125,11 @@ class FollowFollowerViewModel(
                         cursor = nextId,
                         userId = userId.id
                     )
-                ).execute().body() ?: return emptyList()
+                ).body() ?: return emptyList()
                 nextId = res.next
                 return res.users.map { userDTO ->
                     userDTO.pinnedNotes?.forEach {
-                        noteRelationGetter.get(account, it)
+                        noteDataSourceAdder.addNoteDtoToDataSource(account, it)
                     }
                     (userDTO.toUser(account, true) as User.Detail).also {
                         userDataSource.add(it)
@@ -231,9 +234,9 @@ class FollowFollowerViewModel(
         mPaginator = mAccount?.let { account ->
             val api = misskeyAPIProvider.get(account.instanceDomain)
             if(api is MisskeyAPIV10){
-                V10Paginator(account, api, userId, type, encryption, noteRelationGetter, userDataSource)
+                V10Paginator(account, api, userId, type, encryption, noteDataSourceAdder, userDataSource)
             }else{
-                DefaultPaginator(account, api as MisskeyAPIV11, userId, type, encryption, noteRelationGetter, userDataSource, miCore.loggerFactory.create("DefaultPaginator"))
+                DefaultPaginator(account, api as MisskeyAPIV11, userId, type, encryption, noteDataSourceAdder, userDataSource, miCore.loggerFactory.create("DefaultPaginator"))
             }
         }
         require(mPaginator != null)

@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.SearchByUserAndHost
 import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +24,8 @@ import java.util.concurrent.TimeUnit
 @ExperimentalCoroutinesApi
 class SearchUserViewModel(
     val miCore: MiCore,
-    val hasDetail: Boolean?
+    val hasDetail: Boolean?,
+    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
 ) : ViewModel(){
 
     private val logger = miCore.loggerFactory.create("SearchUserViewModel")
@@ -93,7 +95,7 @@ class SearchUserViewModel(
             val account = miCore.getAccountRepository().getCurrentAccount()
             isLoading.postValue(true)
             val resUsers = runCatching {
-                getSearchByUserAndHost()?.search(request)?.execute()?.body()
+                getSearchByUserAndHost()?.search(request)?.body()
             }.onFailure {
                 logger.error("request api/users/searchエラー", it)
             }.getOrNull()?.map {
@@ -101,7 +103,7 @@ class SearchUserViewModel(
                     miCore.getUserDataSource().add(u)
                 }
                 it.pinnedNotes?.forEach { dto ->
-                    miCore.getGetters().noteRelationGetter.get(account, dto)
+                    noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
                 }
                 UserViewData(u, miCore, viewModelScope)
             }?: emptyList()
