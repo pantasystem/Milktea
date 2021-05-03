@@ -37,6 +37,7 @@ object KeyStore {
 
         IS_USER_NAME_DEFAULT(true),
         IS_POST_BUTTON_TO_BOTTOM(false),
-        IS_SIMPLE_EDITOR_ENABLED(false)
+        IS_SIMPLE_EDITOR_ENABLED(false),
+        IS_LEARN_NOTE_VISIBILITY(true)
     }
 }

@@ -324,5 +324,6 @@
     <string name="waiting_4_approval">認可されるのを待っています。</string>
     <string name="i_have_approved">私は認可をしました</string>
     <string name="waiting_4_u_to_approve">あなたが認可するのを待っています</string>
+    <string name="learn_note_visibility">ノートの公開範囲を記憶する</string>
 
 </resources>

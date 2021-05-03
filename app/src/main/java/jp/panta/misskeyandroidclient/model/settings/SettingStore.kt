@@ -101,11 +101,11 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
     var isLearnVisibility: Boolean
         set(value) {
             sharedPreferences.edit {
-                putBoolean("IS_LEARN_VISIBILITY", value)
+                putBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, value)
             }
         }
         get() {
-            return sharedPreferences.getBoolean("IS_LEAR_VISIBILITY", true)
+            return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, true)
         }
 
     private var isVisibleLocalOnly: Boolean
@@ -137,6 +137,9 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
     }
 
     fun getNoteVisibility(accountId: Long): Visibility {
+        if(!isLearnVisibility) {
+            return Visibility.Public(false)
+        }
         return when(sharedPreferences.getString("accountId:${accountId}:NOTE_VISIBILITY", "public")) {
             "home"-> Visibility.Home(isVisibleLocalOnly)
             "followers" -> Visibility.Followers(isVisibleLocalOnly)
@@ -144,4 +147,5 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             else -> Visibility.Public(isVisibleLocalOnly)
         }
     }
+
 }
