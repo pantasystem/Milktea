@@ -19,13 +19,14 @@ import java.net.CookiePolicy
 import java.net.URL
 
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class OkHttpDriveFileUploader(
     val context: Context,
     val account: Account,
     val gson: Gson,
     val encryption: Encryption
 ) : FileUploader{
-    override fun upload(file: File, isForce: Boolean): FileProperty? {
+    override suspend fun upload(file: File, isForce: Boolean): FileProperty? {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
