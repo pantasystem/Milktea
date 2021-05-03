@@ -115,11 +115,26 @@ class SettingMovementActivity : AppCompatActivity() {
             context = this
         )
 
+
+        val learnNoteVisibility = BooleanSharedItem(
+            key = KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name,
+            default = KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.default,
+            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
+            context = this,
+            titleStringRes = R.string.learn_note_visibility
+        )
+
+        val postGroup = Group(
+            titleStringRes = R.string.post,
+            items = listOf(learnNoteVisibility),
+            context = this
+        )
+
         val adapter = SettingAdapter(this)
         setting_list.adapter = adapter
         setting_list.layoutManager = LinearLayoutManager(this)
 
-        adapter.submitList(listOf(timelineGroup, syncGroup, noteTextLimitGroup))
+        adapter.submitList(listOf(timelineGroup, syncGroup, noteTextLimitGroup, postGroup))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

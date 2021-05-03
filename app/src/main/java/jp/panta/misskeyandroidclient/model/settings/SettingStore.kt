@@ -1,7 +1,12 @@
 package jp.panta.misskeyandroidclient.model.settings
 
 import android.content.SharedPreferences
+import android.util.Log
+import androidx.core.content.edit
 import jp.panta.misskeyandroidclient.KeyStore
+import jp.panta.misskeyandroidclient.model.notes.CanLocalOnly
+import jp.panta.misskeyandroidclient.model.notes.CreateNote
+import jp.panta.misskeyandroidclient.model.notes.Visibility
 
 class SettingStore(private val sharedPreferences: SharedPreferences) {
 
@@ -92,4 +97,55 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         get(){
             return sharedPreferences.getInt(KeyStore.AutoTextFoldingCount.RETURNS.name, KeyStore.AutoTextFoldingCount.RETURNS.default)
         }
+
+    var isLearnVisibility: Boolean
+        set(value) {
+            sharedPreferences.edit {
+                putBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, value)
+            }
+        }
+        get() {
+            return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, true)
+        }
+
+    private var isVisibleLocalOnly: Boolean
+        set(value) {
+            sharedPreferences.edit {
+                putBoolean("IS_VISIBLE_LOCAL_ONLY", value)
+            }
+        }
+        get() {
+            return sharedPreferences.getBoolean("IS_VISIBLE_LOCAL_ONLY", false)
+        }
+
+    fun setNoteVisibility(createNote: CreateNote) {
+        if(!isLearnVisibility) {
+            return
+        }
+        if(!(createNote.renoteId == null && createNote.replyId == null)) {
+            return
+        }
+        isVisibleLocalOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly?: false
+        val str = when(createNote.visibility) {
+            is Visibility.Public -> "public"
+            is Visibility.Home -> "home"
+            is Visibility.Followers -> "followers"
+            is Visibility.Specified -> "specified"
+        }
+        Log.d("SettingStore", "visibility: $str")
+        sharedPreferences.edit { putString("accountId:${createNote.author.accountId}:NOTE_VISIBILITY", str) }
+    }
+
+    fun getNoteVisibility(accountId: Long): Visibility {
+        if(!isLearnVisibility) {
+            return Visibility.Public(false)
+        }
+        return when(sharedPreferences.getString("accountId:${accountId}:NOTE_VISIBILITY", "public")) {
+            "home"-> Visibility.Home(isVisibleLocalOnly)
+            "followers" -> Visibility.Followers(isVisibleLocalOnly)
+            "specified" -> Visibility.Specified(emptyList())
+            else -> Visibility.Public(isVisibleLocalOnly)
+        }
+    }
+
 }

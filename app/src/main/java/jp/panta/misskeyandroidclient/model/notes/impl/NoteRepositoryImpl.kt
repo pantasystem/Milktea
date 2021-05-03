@@ -43,6 +43,8 @@ class NoteRepositoryImpl(
         createNote.draftNoteId?.let{
             miCore.getDraftNoteDAO().deleteDraftNote(createNote.author.accountId, draftNoteId = it)
         }
+        miCore.getSettingStore().setNoteVisibility(createNote)
+
         return noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
 
     }
