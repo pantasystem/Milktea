@@ -5,13 +5,7 @@ package jp.panta.misskeyandroidclient
 import android.app.IntentService
 import android.content.Intent
 import android.util.Log
-import com.google.gson.GsonBuilder
-import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 @Suppress("DEPRECATION")
 @Deprecated("MiApplicationへ移植したため非推奨")

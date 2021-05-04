@@ -31,7 +31,7 @@ class FollowFollowerViewModel(
     val userId: User.Id,
     val type: Type,
     private val miCore: MiCore,
-    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 ) : ViewModel(), ShowUserDetails{
     @Suppress("UNCHECKED_CAST")
     class Factory(

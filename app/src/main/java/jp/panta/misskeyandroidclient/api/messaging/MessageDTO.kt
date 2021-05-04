@@ -3,10 +3,9 @@ package jp.panta.misskeyandroidclient.api.messaging
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.mfm.Root
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.api.groups.GroupDTO
-import jp.panta.misskeyandroidclient.api.groups.toGroup
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.messaging.Message
@@ -29,7 +28,7 @@ data class MessageDTO(
     val groupId: String? = null,
     val group: GroupDTO? = null,
     val fileId: String? = null,
-    val file: FileProperty? = null,
+    val file: FilePropertyDTO? = null,
     val isRead: Boolean,
     val emojis: List<Emoji>? = null
 ): JavaSerializable{
@@ -57,7 +56,7 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             text,
             User.Id(account.accountId, userId),
             fileId,
-            file,
+            file?.toFileProperty(account),
             isRead,
             emojis?: emptyList(),
             recipientId = User.Id(account.accountId, recipientId)
@@ -69,7 +68,7 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             text,
             User.Id(account.accountId, userId),
             fileId,
-            file,
+            file?.toFileProperty(account),
             isRead,
             emojis?: emptyList(),
             GroupEntity.Id(account.accountId, groupId),

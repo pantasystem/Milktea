@@ -12,19 +12,18 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.drive.Directory
+import jp.panta.misskeyandroidclient.viewmodel.drive.DirectoryViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
@@ -71,7 +70,7 @@ class DriveActivity : AppCompatActivity() {
 
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
         val selectedItem = (intent.getSerializableExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
-            it as FileProperty
+            it as FilePropertyDTO
         }
 
         if(maxSize > -1){
@@ -150,7 +149,7 @@ class DriveActivity : AppCompatActivity() {
                 val files = mDriveViewModel?.getSelectedFileList()
                 if(ids != null && files != null){
                     intent.putStringArrayListExtra(EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID, ArrayList(ids))
-                    intent.putExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FileProperty>(files))
+                    intent.putExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FilePropertyDTO>(files))
                     setResult(RESULT_OK, intent)
                     finish()
 
@@ -225,12 +224,12 @@ class DriveActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<Directory>(){
-        override fun areContentsTheSame(oldItem: Directory, newItem: Directory): Boolean {
+    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<DirectoryViewData>(){
+        override fun areContentsTheSame(oldItem: DirectoryViewData, newItem: DirectoryViewData): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: Directory, newItem: Directory): Boolean {
+        override fun areItemsTheSame(oldItem: DirectoryViewData, newItem: DirectoryViewData): Boolean {
             return oldItem.id == newItem.id
 
         }

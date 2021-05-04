@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="directory"
-                type="jp.panta.misskeyandroidclient.viewmodel.drive.Directory" />
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.DirectoryViewData" />
         <variable
                 name="driveViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel" />

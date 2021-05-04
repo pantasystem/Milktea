@@ -18,7 +18,7 @@ abstract class MessageViewData (val message: MessageRelation, account: Account){
     abstract val avatarIcon: String
     val text = message.message.text
     val textNode = MFMParser.parse(message.message.text, message.message.emojis)
-    val file = if(message.message.file == null) null else message.message.file?.toFile(account.instanceDomain)?.let{
+    val file = if(message.message.file == null) null else message.message.file?.toFile()?.let{
         FileViewData(it)
     }
     //val isRead = message.message.isRead

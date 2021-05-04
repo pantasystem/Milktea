@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.drive
+package jp.panta.misskeyandroidclient.api.drive
 
 import kotlinx.serialization.Serializable
 

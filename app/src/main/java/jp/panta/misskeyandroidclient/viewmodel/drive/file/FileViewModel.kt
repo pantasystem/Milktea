@@ -8,14 +8,10 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
-import jp.panta.misskeyandroidclient.model.drive.RequestFile
+import jp.panta.misskeyandroidclient.api.drive.RequestFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class FileViewModel(
     private val account: Account,

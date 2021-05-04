@@ -69,7 +69,7 @@ class NotesViewModel(
 
     val showInputReactionEvent = EventBus<Unit>()
 
-    val openNoteEditor = EventBus<Note?>()
+    val openNoteEditor = EventBus<NoteRelation?>()
 
     val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
 
@@ -279,10 +279,10 @@ class NotesViewModel(
 
     }
 
-    fun removeAndEditNote(note: Note){
+    fun removeAndEditNote(note: NoteRelation){
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getNoteRepository().delete(note.id)
+                miCore.getNoteRepository().delete(note.note.id)
             }.onSuccess {
                 if(it) {
                     withContext(Dispatchers.Main) {

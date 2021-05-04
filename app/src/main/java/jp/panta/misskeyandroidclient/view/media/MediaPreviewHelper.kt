@@ -11,10 +11,7 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.util.CircleOutlineProvider
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import java.lang.IllegalArgumentException

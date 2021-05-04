@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.messaging
 
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.GroupRepository

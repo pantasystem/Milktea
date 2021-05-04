@@ -57,6 +57,7 @@ data class DraftNoteDTO(
 
     @Ignore
     fun toDraftNote(
+        accountId: Long,
         visibilityUserIds: List<UserIdDTO>?,
         draftFiles: List<DraftFileDTO>?,
         pollChoicesDTO: List<PollChoiceDTO>?
@@ -70,7 +71,7 @@ data class DraftNoteDTO(
             text,
             cw,
             draftFiles?.map{
-                it.toFile()
+                it.toFile(accountId)
             },
             viaMobile,
             localOnly,

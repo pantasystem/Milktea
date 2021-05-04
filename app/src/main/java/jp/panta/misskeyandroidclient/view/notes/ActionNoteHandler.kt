@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.getPreferenceName
@@ -108,7 +109,7 @@ class ActionNoteHandler(
         dialog.show(activity.supportFragmentManager, "")
     }
 
-    private val openNoteEditor = Observer<Note?>{ note ->
+    private val openNoteEditor = Observer<NoteRelation?>{ note ->
         activity.startActivity(NoteEditorActivity.newBundle(activity, note = note))
     }
 
@@ -126,7 +127,7 @@ class ActionNoteHandler(
             null,
             activity.getString(R.string.confirm_delete_and_edit_note_description),
             eventType = "delete_and_edit_note",
-            args = it.toShowNote.note
+            args = it.toShowNote
         )
     }
 
@@ -145,7 +146,7 @@ class ActionNoteHandler(
                 }
             }
             "delete_and_edit_note" ->{
-                if(it.args is Note){
+                if(it.args is NoteRelation){
                     mNotesViewModel.removeAndEditNote(it.args)
                 }
             }

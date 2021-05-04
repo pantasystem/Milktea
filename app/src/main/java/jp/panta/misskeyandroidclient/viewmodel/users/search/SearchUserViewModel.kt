@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 class SearchUserViewModel(
     val miCore: MiCore,
     val hasDetail: Boolean?,
-    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 ) : ViewModel(){
 
     private val logger = miCore.loggerFactory.create("SearchUserViewModel")

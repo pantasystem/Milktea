@@ -1,16 +1,13 @@
-package jp.panta.misskeyandroidclient.model.drive
+package jp.panta.misskeyandroidclient.api.drive
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RequestFolder(
+data class RequestFile (
     val i: String,
     val limit: Int? = null,
     val sinceId: String? = null,
     val untilId: String? = null,
     val folderId: String? = null,
-    val name: String? = null,
-    val parentId: String? = null
-
-
+    val type: String? = null
 )

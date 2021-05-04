@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.drive
+package jp.panta.misskeyandroidclient.api.drive
 
 import android.content.Context
 import android.net.Uri
@@ -8,24 +8,22 @@ import android.webkit.MimeTypeMap
 import com.google.gson.Gson
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.core.EncryptedConnectionInformation
+import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
 import okhttp3.*
-import okhttp3.logging.HttpLoggingInterceptor
 import okio.BufferedSink
 import okio.Okio
-import java.net.CookieManager
-import java.net.CookiePolicy
 import java.net.URL
 
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class OkHttpDriveFileUploader(
     val context: Context,
     val account: Account,
     val gson: Gson,
     val encryption: Encryption
-) : FileUploader{
-    override fun upload(file: File, isForce: Boolean): FileProperty? {
+) : FileUploader {
+    override suspend fun upload(file: File, isForce: Boolean): FilePropertyDTO? {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
@@ -50,7 +48,7 @@ class OkHttpDriveFileUploader(
             val response = client.newCall(request).execute()
             val code = response.code()
             if(code in 200 until 300){
-                gson.fromJson(response.body()?.string(), FileProperty::class.java)
+                gson.fromJson(response.body()?.string(), FilePropertyDTO::class.java)
             }else{
                 Log.d("OkHttpConnection", "code: $code, error${response.body()?.string()}")
                 null

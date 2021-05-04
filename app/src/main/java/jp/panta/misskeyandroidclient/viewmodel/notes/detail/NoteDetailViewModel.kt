@@ -28,7 +28,7 @@ class NoteDetailViewModel(
     val miCore: MiCore,
     val accountId: Long? = null,
     val encryption: Encryption = miCore.getEncryption(),
-    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 ) : ViewModel(){
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()

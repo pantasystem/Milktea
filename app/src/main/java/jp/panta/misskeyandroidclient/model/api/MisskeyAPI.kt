@@ -7,8 +7,8 @@ import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.app.ShowApp
+import jp.panta.misskeyandroidclient.api.drive.*
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
-import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
@@ -24,7 +24,7 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
-import retrofit2.Call
+import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -171,10 +171,10 @@ interface MisskeyAPI {
 
     //drive
     @POST("api/drive/files")
-    suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FileProperty>>
+    suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FilePropertyDTO>>
 
     @POST("api/drive/folders")
-    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<FolderProperty>>
+    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
 
     @POST("api/drive/folders/create")
     suspend fun createFolder(@Body createFolder: CreateFolder): Response<Unit>

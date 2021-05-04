@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.media
 
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
 
 class FileViewData(val file: File) {

@@ -29,7 +29,7 @@ class FavoriteNotePagingStore(
 
     //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 
-    private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 
     private val builder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()))
 

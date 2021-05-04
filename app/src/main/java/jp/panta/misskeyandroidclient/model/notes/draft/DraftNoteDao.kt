@@ -52,18 +52,18 @@ abstract class DraftNoteDao {
 
     fun findDraftNotesByAccount(accountId: Long): List<DraftNote>{
         return findDraftNotesRelation(accountId).map{
-            it.toDraftNote()
+            it.toDraftNote(accountId)
         }
     }
 
     fun searchDraftNotes(accountId: Long, word: String): List<DraftNote>{
         return searchByWordDraftNotesRelation(accountId, word).map{
-            it.toDraftNote()
+            it.toDraftNote(accountId)
         }
     }
 
     fun getDraftNote(accountId: Long, draftNoteId: Long): DraftNote?{
-        return getDraftNoteRelation(accountId, draftNoteId)?.toDraftNote()
+        return getDraftNoteRelation(accountId, draftNoteId)?.toDraftNote(accountId)
     }
 
     fun deleteDraftNote(draftNote: DraftNote){

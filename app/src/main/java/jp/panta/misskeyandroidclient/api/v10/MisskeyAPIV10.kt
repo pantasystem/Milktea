@@ -8,8 +8,8 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.app.ShowApp
+import jp.panta.misskeyandroidclient.api.drive.*
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
-import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
@@ -25,6 +25,7 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 
 open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI{
@@ -63,9 +64,9 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     open suspend fun followers(followFollower: RequestFollowFollower): Response<FollowFollowerUsers> = diff.followers(followFollower)
 
-    override suspend fun getFiles(fileRequest: RequestFile): Response<List<FileProperty>> = misskey.getFiles(fileRequest)
+    override suspend fun getFiles(fileRequest: RequestFile): Response<List<FilePropertyDTO>> = misskey.getFiles(fileRequest)
 
-    override suspend fun getFolders(folderRequest: RequestFolder): Response<List<FolderProperty>> = misskey.getFolders(folderRequest)
+    override suspend fun getFolders(folderRequest: RequestFolder): Response<List<Directory>> = misskey.getFolders(folderRequest)
 
     override suspend fun createFolder(createFolder: CreateFolder): Response<Unit> = misskey.createFolder(createFolder)
 

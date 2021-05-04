@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Relation
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
 @Entity
@@ -21,8 +22,8 @@ class DraftNoteRelation{
     var pollChoices: List<PollChoiceDTO>? = null
 
     @Ignore
-    fun toDraftNote(): DraftNote{
-        return draftNoteDTO.toDraftNote(visibilityUserIds, draftFiles, pollChoices)
+    fun toDraftNote(accountId: Long): DraftNote{
+        return draftNoteDTO.toDraftNote(accountId, visibilityUserIds, draftFiles, pollChoices)
     }
 
 }
