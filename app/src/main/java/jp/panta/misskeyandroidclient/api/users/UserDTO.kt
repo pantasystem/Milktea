@@ -50,7 +50,9 @@ data class UserDTO(
 
     val isBlocking: Boolean? = null,
     val isMuted: Boolean? = null,
-    val url: String? = null
+    val url: String? = null,
+    val hasPendingFollowRequestFromYou: Boolean? = null,
+    val hasPendingFollowRequestToYou: Boolean? = null
 
     //JsonProperty("isVerified") val isVerified: Boolean,
     //@JsonProperty("isLocked") val isLocked: Boolean
@@ -97,7 +99,9 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User{
             isFollowing = this.isFollowing?: false,
             isFollower = this.isFollowed?: false,
             isBlocking = this.isBlocking?: false,
-            isMuting = this.isMuted?: false
+            isMuting = this.isMuted?: false,
+            hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou?: false,
+            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou?: false
         )
     }else{
         return User.Simple(
