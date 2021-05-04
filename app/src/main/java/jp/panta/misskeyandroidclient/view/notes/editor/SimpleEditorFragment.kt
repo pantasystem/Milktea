@@ -18,7 +18,7 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
@@ -28,6 +28,7 @@ import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
@@ -320,17 +321,19 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK){
                     val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
-                        it as FileProperty
+                        it as FilePropertyDTO
                     }
                     //mViewModel?.driveFiles?.postValue(files)
                     if(files != null){
                         val exFiles = mViewModel?.files?.value
                         val addFiles = files.filter{out ->
                             exFiles?.firstOrNull {
-                                it.remoteFileId == out.id
+                                it.remoteFileId?.fileId == out.id
                             } == null
                         }
-                        mViewModel?.addAllFileProperty(addFiles)
+                        mViewModel?.addAllFileProperty(addFiles.map {
+                            it.toFileProperty((context?.applicationContext as MiCore).getCurrentAccount().value!!)
+                        })
                     }
                 }
             }

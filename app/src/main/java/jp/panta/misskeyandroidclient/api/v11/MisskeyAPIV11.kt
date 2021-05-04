@@ -9,8 +9,8 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.app.ShowApp
+import jp.panta.misskeyandroidclient.api.drive.*
 import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
-import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
@@ -27,6 +27,7 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDT
 import jp.panta.misskeyandroidclient.api.users.FollowFollowerUser
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 
 open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI by misskeyAPI{
@@ -50,8 +51,8 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun featured(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.featured(noteRequest)
     open suspend fun followers(userRequest: RequestUser): Response<List<FollowFollowerUser>> = apiDiff.followers(userRequest)
     open suspend fun following(userRequest: RequestUser): Response<List<FollowFollowerUser>> = apiDiff.following(userRequest)
-    override suspend fun getFiles(fileRequest: RequestFile): Response<List<FileProperty>> = misskeyAPI.getFiles(fileRequest)
-    override suspend fun getFolders(folderRequest: RequestFolder): Response<List<FolderProperty>> = misskeyAPI.getFolders(folderRequest)
+    override suspend fun getFiles(fileRequest: RequestFile): Response<List<FilePropertyDTO>> = misskeyAPI.getFiles(fileRequest)
+    override suspend fun getFolders(folderRequest: RequestFolder): Response<List<Directory>> = misskeyAPI.getFolders(folderRequest)
     override suspend fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Response<List<MessageDTO>> = misskeyAPI.getMessageHistory(requestMessageHistory)
     override suspend fun getMessages(requestMessage: RequestMessage): Response<List<MessageDTO>> = misskeyAPI.getMessages(requestMessage)
     override suspend fun getMeta(requestMeta: RequestMeta): Response<Meta> = misskeyAPI.getMeta(requestMeta)
