@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.gettters
 import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.notification.HasNote
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
@@ -12,7 +13,8 @@ import jp.panta.misskeyandroidclient.model.users.UserDataSource
 class NotificationRelationGetter(
     private val userDataSource: UserDataSource,
     private val notificationDataSource: NotificationDataSource,
-    private val noteRelationGetter: NoteRelationGetter
+    private val noteRelationGetter: NoteRelationGetter,
+    private val noteDataSourceAdder: NoteDataSourceAdder
 ) {
 
 
@@ -20,7 +22,7 @@ class NotificationRelationGetter(
         val user = notificationDTO.user.toUser(account, false)
         userDataSource.add(user)
         val noteRelation = notificationDTO.note?.let{
-            noteRelationGetter.get(account, it)
+            noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(account, it))
         }
         val notification = notificationDTO.toNotification(account)
         notificationDataSource.add(notification)
