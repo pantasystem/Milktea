@@ -1,64 +1,39 @@
 package jp.panta.misskeyandroidclient.model.drive
 
-import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.file.File
-import java.io.Serializable
+import jp.panta.misskeyandroidclient.model.users.User
+import java.util.*
 
-@kotlinx.serialization.Serializable
-data class FileProperty(
-    val id: String,
-    //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date?,
+data class FileProperty (
+    val id: Id,
     val name: String,
-    val type: String? = null,
-    val md5: String? = null,
-    val size: Int? = null,
-    val userId: String? = null,
+    val createdAt: Date,
+    val type: String,
+    val md5: String,
+    val size: Int,
+    val userId: User.Id? = null,
     val folderId: String? = null,
     val comment: String? = null,
-    //@JsonProperty("properties") val properties: Property? = null,
-    val isSensitive: Boolean? = null,
+    val properties: Properties? = null,
+    val isSensitive: Boolean = false,
     val url: String,
-    //@SerializedName("webpublicUrl") val webPublicUrl: String? = null,
     val thumbnailUrl: String? = null,
-    val attachedNoteIds: List<String>? = null
-): Serializable{
+) {
+    data class Id(
+        val accountId: Long,
+        val fileId: String
+    )
+    data class Properties(
+        val width: Int,
+        val height: Int
+    )
 
+    fun toFile(): File {
 
-    fun getThumbnailUrl(instanceBaseUrl: String): String{
-        return getUrl(instanceBaseUrl, thumbnailUrl?: url)
-    }
-
-    fun getUrl(instanceBaseUrl: String): String{
-        return getUrl(instanceBaseUrl, url)
-    }
-
-    private fun getUrl(instanceBaseUrl: String, url: String): String{
-        val hostUrl = if(instanceBaseUrl.endsWith("/")){
-            instanceBaseUrl.substring(0, instanceBaseUrl.length - 1)
-        }else{
-            instanceBaseUrl
-        }
-
-        return when {
-            url.startsWith("https://") -> {
-                url
-            }
-            url.startsWith("/") -> {
-                hostUrl + url
-            }
-            else -> {
-                "$hostUrl/$url"
-            }
-        }
-    }
-
-    fun toFile(instanceBaseUrl: String): File{
-        val path = getUrl(instanceBaseUrl)
-        val thumbnailUrl = getThumbnailUrl(instanceBaseUrl)
 
         return File(
             name,
-            path,
+            url,
             type,
             id,
             null,
@@ -66,5 +41,4 @@ data class FileProperty(
             isSensitive
         )
     }
-
 }
