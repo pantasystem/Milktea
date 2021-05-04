@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
 import java.util.*
+import java.io.Serializable as JSerializable
 
 data class Note(
     val id: Id,
@@ -73,7 +74,7 @@ data class Note(
     }
 }
 
-sealed class NoteRelation {
+sealed class NoteRelation : JSerializable{
     abstract val note: Note
     abstract val user: User
     abstract val reply: NoteRelation?
