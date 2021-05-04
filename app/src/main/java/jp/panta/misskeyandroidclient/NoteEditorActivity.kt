@@ -22,10 +22,11 @@ import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
@@ -36,6 +37,7 @@ import jp.panta.misskeyandroidclient.view.notes.editor.*
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
@@ -63,7 +65,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
 
-        fun newBundle(context: Context, replyTo: Note.Id? = null, quoteTo: Note.Id? = null, note: Note? =null, draftNote: DraftNote? = null): Intent {
+        fun newBundle(context: Context, replyTo: Note.Id? = null, quoteTo: Note.Id? = null, note: NoteRelation? =null, draftNote: DraftNote? = null): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let{
                     putExtra(EXTRA_REPLY_TO_NOTE_ID, replyTo.noteId)
@@ -77,7 +79,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
                 note?.let {
                     putExtra(EXTRA_NOTE, note)
-                    putExtra(EXTRA_ACCOUNT_ID, note.id.accountId)
+                    putExtra(EXTRA_ACCOUNT_ID, note.note.id.accountId)
                 }
 
                 draftNote?.let {
@@ -143,7 +145,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
 
 
-        val note: Note? = intent.getSerializableExtra(EXTRA_NOTE) as? Note
+        val note: NoteRelation? = intent.getSerializableExtra(EXTRA_NOTE) as? NoteRelation
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
@@ -447,17 +449,19 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK){
                     val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
-                        it as FileProperty
+                        it as FilePropertyDTO
                     }
                     //mViewModel?.driveFiles?.postValue(files)
                     if(files != null){
                         val exFiles = mViewModel?.files?.value
                         val addFiles = files.filter{out ->
                             exFiles?.firstOrNull {
-                                it.remoteFileId == out.id
+                                it.remoteFileId?.fileId == out.id
                             } == null
                         }
-                        mViewModel?.addAllFileProperty(addFiles)
+                        mViewModel?.addAllFileProperty(addFiles.map {
+                            it.toFileProperty((applicationContext as MiCore).getCurrentAccount().value!!)
+                        })
                     }
                 }
             }

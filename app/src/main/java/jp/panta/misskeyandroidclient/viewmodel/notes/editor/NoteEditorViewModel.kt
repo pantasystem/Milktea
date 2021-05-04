@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
@@ -24,7 +25,7 @@ class NoteEditorViewModel(
     replyId: Note.Id? = null,
     private val quoteToNoteId: Note.Id? = null,
     loggerFactory: Logger.Factory,
-    n: Note? = null,
+    n: NoteRelation? = null,
     dn: DraftNote? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel(){
@@ -57,7 +58,7 @@ class NoteEditorViewModel(
     val currentUser: LiveData<UserViewData> = mCurrentUser
 
     val draftNote = MutableLiveData<DraftNote>(dn)
-    val note = MutableLiveData<Note>(n)
+    val note = MutableLiveData<Note>(n?.note)
 
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
     private val mReply = MutableStateFlow<Note?>(null)
@@ -115,7 +116,7 @@ class NoteEditorViewModel(
     val files = MediatorLiveData<List<File>>().apply{
         this.postValue(
             n?.files?.map{
-                it.toFile(getInstanceBaseUrl()?: "")
+                it.toFile()
             }?:dn?.files?: emptyList<File>()
         )
     }
@@ -185,7 +186,7 @@ class NoteEditorViewModel(
     @FlowPreview
     @ExperimentalCoroutinesApi
     val address = MutableLiveData(
-        n?.visibleUserIds?.map(::setUpUserViewData)
+        n?.note?.visibleUserIds?.map(::setUpUserViewData)
             ?: dn?.visibleUserIds?.mapNotNull {
             miCore.getCurrentAccount().value?.accountId?.let { ac ->
                 User.Id(ac, it)
@@ -205,7 +206,7 @@ class NoteEditorViewModel(
     }
 
     val poll = MutableLiveData<PollEditor?>(
-        n?.poll?.let{
+        n?.note?.poll?.let{
             PollEditor(it)
         }?: dn?.draftPoll?.let{
             PollEditor(it)
@@ -264,7 +265,7 @@ class NoteEditorViewModel(
     }
 
     fun add(fp: FileProperty){
-        add(fp.toFile(getInstanceBaseUrl()?: ""))
+        add(fp.toFile())
     }
 
 
@@ -272,7 +273,7 @@ class NoteEditorViewModel(
     fun addAllFileProperty(fpList: List<FileProperty>){
         val files = files.value.toArrayList()
         files.addAll(fpList.map{
-            it.toFile(getInstanceBaseUrl()?: "")
+            it.toFile()
         })
         this.files.value = files
     }
