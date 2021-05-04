@@ -9,6 +9,9 @@ import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.serialization.SerialName
 import java.io.Serializable
 
+/**
+ * @param isLocked フォロー承認制
+ */
 @kotlinx.serialization.Serializable
 data class UserDTO(
     val id:String,
@@ -52,10 +55,10 @@ data class UserDTO(
     val isMuted: Boolean? = null,
     val url: String? = null,
     val hasPendingFollowRequestFromYou: Boolean? = null,
-    val hasPendingFollowRequestToYou: Boolean? = null
+    val hasPendingFollowRequestToYou: Boolean? = null,
 
     //JsonProperty("isVerified") val isVerified: Boolean,
-    //@JsonProperty("isLocked") val isLocked: Boolean
+    val isLocked: Boolean? = null
 ): Serializable{
     fun getDisplayUserName(): String{
         return "@" + this.userName + if(this.host == null){
@@ -101,7 +104,8 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User{
             isBlocking = this.isBlocking?: false,
             isMuting = this.isMuted?: false,
             hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou?: false,
-            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou?: false
+            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou?: false,
+            isLocked = isLocked?: false
         )
     }else{
         return User.Simple(

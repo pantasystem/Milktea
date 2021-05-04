@@ -64,6 +64,7 @@ sealed class User : Entity{
         val isMuting: Boolean,
         val hasPendingFollowRequestFromYou: Boolean,
         val hasPendingFollowRequestToYou: Boolean,
+        val isLocked: Boolean,
         override var instanceUpdatedAt: Date = Date()
     ) : User()
 
