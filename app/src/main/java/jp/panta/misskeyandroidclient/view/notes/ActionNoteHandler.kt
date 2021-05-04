@@ -127,7 +127,7 @@ class ActionNoteHandler(
             null,
             activity.getString(R.string.confirm_delete_and_edit_note_description),
             eventType = "delete_and_edit_note",
-            args = it.toShowNote.note
+            args = it.toShowNote
         )
     }
 
