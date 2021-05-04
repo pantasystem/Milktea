@@ -19,11 +19,14 @@ import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
+import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
-class NotificationListAdapter(
+class NotificationListAdapter @ExperimentalCoroutinesApi constructor(
     diffUtilCallBack: DiffUtil.ItemCallback<NotificationViewData>,
     val notesViewModel: NotesViewModel,
+    val notificationViewModel: NotificationViewModel,
     private val lifecycleOwner: LifecycleOwner
     ) : ListAdapter<NotificationViewData, NotificationListAdapter.NotificationHolder>(diffUtilCallBack){
     class NotificationHolder(val binding: ItemNotificationBinding) : RecyclerView.ViewHolder(binding.root)
@@ -32,18 +35,11 @@ class NotificationListAdapter(
         holder.binding.notesViewModel = notesViewModel
         holder.binding.notification = getItem(position)
         holder.binding.simpleNote
+        holder.binding.notificationViewModel = notificationViewModel
 
         val note = getItem(position).noteViewData
         note?: return
 
-        /*val adapter = ReactionCountAdapter(
-            note, notesViewModel)
-        adapter.submitList(note.reactionCounts.value?.toList())
-        note.reactionCounts.observe(lifecycleOwner, Observer {
-            adapter.submitList(it.toList())
-        })*/
-        //holder.binding.simpleNote.reactionView.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
-        //holder.binding.simpleNote.reactionView.adapter = adapter
         setReactionCounter(note, holder.binding.simpleNote.reactionView)
         holder.binding.lifecycleOwner = lifecycleOwner
         holder.binding.executePendingBindings()

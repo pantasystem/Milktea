@@ -118,6 +118,7 @@
     <string name="mention_by">さんにメンションされました</string>
     <string name="reacted_by">さんにリアクションされました</string>
     <string name="renoted_by">さんにリノートされました</string>
+    <string name="receive_follow_request">フォローリクエストされました。</string>
 
     <string name="input_message">相手に思いを伝えてください</string>
 
@@ -325,5 +326,7 @@
     <string name="i_have_approved">私は認可をしました</string>
     <string name="waiting_4_u_to_approve">あなたが認可するのを待っています</string>
     <string name="learn_note_visibility">ノートの公開範囲を記憶する</string>
+    <string name="accept">承認</string>
+    <string name="reject">拒否</string>
 
 </resources>
