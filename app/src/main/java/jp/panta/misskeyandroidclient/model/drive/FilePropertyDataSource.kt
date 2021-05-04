@@ -16,6 +16,12 @@ interface FilePropertyDataSource {
     suspend fun remove(fileProperty: FileProperty) : Boolean
 
     suspend fun find(filePropertyId: FileProperty.Id) : FileProperty
+
+    suspend fun findIn(ids: List<FileProperty.Id>) : List<FileProperty> {
+        return ids.map {
+            find(it)
+        }
+    }
 }
 
 class InMemoryFilePropertyDataSource : FilePropertyDataSource{
