@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.drive
 
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
+import java.io.Serializable as JSerializable
 import java.util.*
 
 data class FileProperty (
@@ -18,15 +19,15 @@ data class FileProperty (
     val isSensitive: Boolean = false,
     val url: String,
     val thumbnailUrl: String? = null,
-) {
+) : JSerializable{
     data class Id(
         val accountId: Long,
         val fileId: String
-    )
+    ) : JSerializable
     data class Properties(
         val width: Int,
         val height: Int
-    )
+    ) : JSerializable
 
     fun toFile(): File {
 
