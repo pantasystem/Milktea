@@ -48,21 +48,21 @@ open class PlaneNoteViewData (
 
     val isMyNote = account.remoteId == toShowNote.user.id.id
 
-    val isRenotedByMe = (note.note.renoteId != null && note.note.text == null && note.note.files.isNullOrEmpty()) && note.user.id.id == account.remoteId
+    val isRenotedByMe = (note.note.renoteId != null && note.note.text == null && note.files.isNullOrEmpty()) && note.user.id.id == account.remoteId
 
     val statusMessage: String?
         get(){
             if(note.reply != null){
                 //reply
                 return "${note.user.getDisplayUserName()}が返信しました"
-            }else if(note.note.renoteId == null && (note.note.text != null || note.note.files != null)){
+            }else if(note.note.renoteId == null && (note.note.text != null || note.files != null)){
                 //Note
                 return null
-            }else if(note.note.renoteId != null && note.note.text == null && note.note.files.isNullOrEmpty()){
+            }else if(note.note.renoteId != null && note.note.text == null && note.files.isNullOrEmpty()){
                 //reNote
                 return "${note.user.getDisplayUserName()}がリノートしました"
 
-            }else if(note.note.renoteId != null && (note.note.text != null || note.note.files != null)){
+            }else if(note.note.renoteId != null && (note.note.text != null || note.files != null)){
                 //quote
                 //"${note.user.name}が引用リノートしました"
                 return null
@@ -109,8 +109,8 @@ open class PlaneNoteViewData (
         it.name to it
     }?.toMap()?: mapOf())
 
-    val files = toShowNote.note.files?.map{ fileProperty ->
-        fileProperty.toFile(account.instanceDomain)
+    val files = toShowNote.files?.map{ fileProperty ->
+        fileProperty.toFile()
     }
     private val previewableFiles = files?.filter{
         it.type?.startsWith("image") == true || it.type?.startsWith("video") == true
@@ -179,8 +179,8 @@ open class PlaneNoteViewData (
     val subContentFoldingStatusMessage = Transformations.map(subContentFolding){
         if(it) "もっと見る: ${subNoteText?.length}" else "閉じる"
     }
-    val subNoteFiles = subNote?.note?.files?.map{
-        it.toFile(account.instanceDomain)
+    val subNoteFiles = subNote?.files?.map{
+        it.toFile()
     }?: emptyList()
     val subNoteMedia = MediaViewData(subNoteFiles)
 
