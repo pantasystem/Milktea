@@ -32,7 +32,7 @@ class NoteTimelineStore(
 ) : NotePagedStore{
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
-    private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 
 
     private fun getStore(): (suspend (NoteRequest)-> Response<List<NoteDTO>?>)? {

@@ -1,29 +1,22 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.FileUploader
-import jp.panta.misskeyandroidclient.model.drive.UploadFile
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 
 class DriveViewModel(
     val selectableMaxSize: Int
 ) : ViewModel(){
 
-    val currentDirectory = MutableLiveData<Directory>(Directory(null))
+    val currentDirectory = MutableLiveData<DirectoryViewData>(DirectoryViewData(null))
 
-    val hierarchyDirectory = MutableLiveData<List<Directory>>()
+    val hierarchyDirectory = MutableLiveData<List<DirectoryViewData>>()
 
-    val openFileEvent = EventBus<FileProperty>()
+    val openFileEvent = EventBus<FilePropertyDTO>()
     //val selectedFilesMap = HashMap<String, FileViewData>()
     val selectedFilesMapLiveData = if(selectableMaxSize > -1){
         MutableLiveData<Map<String, FileViewData>>()
@@ -46,13 +39,13 @@ class DriveViewModel(
         }
     }
 
-    fun getSelectedFileList(): List<FileProperty>?{
+    fun getSelectedFileList(): List<FilePropertyDTO>?{
         return selectedFilesMapLiveData?.value?.values?.map{
             it.file
         }?.toList()
     }
 
-    fun setSelectedFileList(files: List<FileProperty>){
+    fun setSelectedFileList(files: List<FilePropertyDTO>){
         selectedFilesMapLiveData?.postValue(
         files.map{
             Pair<String, FileViewData>(it.id , FileViewData(it))
@@ -60,7 +53,7 @@ class DriveViewModel(
     }
 
     fun moveChildDirectory(childDirectory: FolderViewData){
-        val current = Directory(childDirectory.folderProperty)
+        val current = DirectoryViewData(childDirectory.folderProperty)
         currentDirectory.postValue(current)
         val list = hierarchyDirectory.value
         val newList = if(list == null){
@@ -76,7 +69,7 @@ class DriveViewModel(
     fun moveParentDirectory(){
         val list = hierarchyDirectory.value
             ?: return
-        val arrayList = ArrayList<Directory>(list)
+        val arrayList = ArrayList<DirectoryViewData>(list)
         val currentIndex = arrayList.size - 1
         if(currentIndex < 1){
             return
@@ -89,7 +82,7 @@ class DriveViewModel(
         }
     }
 
-    fun moveDirectory(directory: Directory){
+    fun moveDirectory(directory: DirectoryViewData){
         val dirs = hierarchyDirectory.value
             ?:return
         val index = dirs.indexOf(directory)
@@ -99,7 +92,7 @@ class DriveViewModel(
         hierarchyDirectory.postValue(newDirs)
     }
 
-    fun openFile(fileProperty: FileProperty){
+    fun openFile(fileProperty: FilePropertyDTO){
         openFileEvent.event = fileProperty
     }
 

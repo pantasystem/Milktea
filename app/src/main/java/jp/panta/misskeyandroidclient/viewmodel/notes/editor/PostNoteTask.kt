@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 
+import com.google.android.exoplayer2.upstream.FileDataSource
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -20,7 +22,8 @@ class PostNoteTask(
     val encryption: Encryption,
     val createNote: CreateNote,
     val account: Account,
-    loggerFactory: Logger.Factory
+    loggerFactory: Logger.Factory,
+    val filePropertyDataSource: FilePropertyDataSource
     //private val fileUploader: FileUploader
 ): Serializable{
 
@@ -82,7 +85,9 @@ class PostNoteTask(
             runCatching {
                 tmpFiles?.map {
                     async(Dispatchers.IO) {
-                        it.remoteFileId ?: fileUploader.upload(it, true)?.id
+                        it.remoteFileId?.fileId ?: fileUploader.upload(it, true)?.also {
+                            filePropertyDataSource.add(it.toFileProperty(account))
+                        }?.id
                     }
                 }?.awaitAll()
             }.getOrNull()?.filterNotNull()

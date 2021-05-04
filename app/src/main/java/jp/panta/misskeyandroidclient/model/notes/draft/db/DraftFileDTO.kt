@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
 import androidx.room.*
+import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
 
 @Entity(
@@ -34,7 +36,7 @@ data class DraftFileDTO(
         fun make(file: File, draftNoteId: Long): DraftFileDTO{
             return DraftFileDTO(
                 file.name,
-                file.remoteFileId,
+                file.remoteFileId?.fileId,
                 file.path,
                 file.isSensitive,
                 file.type,
@@ -50,12 +52,12 @@ data class DraftFileDTO(
 
 
     @Ignore
-    fun toFile(): File{
+    fun toFile(accountId: Long): File{
         return File(
             name,
             filePath?: "",
             type,
-            remoteFileId,
+            remoteFileId?.let { FileProperty.Id(accountId, it) },
             fileId,
             thumbnailUrl,
             isSensitive,

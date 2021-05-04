@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.util.Hash
 import java.io.Serializable
+import java.net.URL
 
 @Entity(
     tableName = "account_table",
@@ -76,23 +77,7 @@ data class Account (
                 emptyList()
             )
 
-    /*fun update(user: User): Account{
-        if(user.id != this.remoteId){
-            return this
-        }
-        return this.copy(
-            name = user.name,
-            description = user.description,
-            followingCount = user.followingCount?: this.followingCount,
-            followersCount = user.followersCount?: this.followersCount,
-            notesCount = user.notesCount?: this.notesCount,
-            isBot = user.isBot,
-            isCat = user.isCat,
-            avatarUrl = user.avatarUrl,
-            bannerUrl = user.bannerUrl,
-            emojis = user.emojis?: emptyList()
-        )
-    }*/
+
 
     fun getI(encryption: Encryption): String{
         return try{
@@ -103,6 +88,9 @@ data class Account (
         }
     }
 
+    fun getHost(): String {
+        return URL(this.instanceDomain).host
+    }
 }
 
 

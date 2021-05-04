@@ -4,7 +4,6 @@ import android.app.DownloadManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -14,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.media.ImageFragment
 import jp.panta.misskeyandroidclient.view.media.PlayerFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -115,9 +113,7 @@ class MediaActivity : AppCompatActivity() {
                     val file = if(m is Media.FileMedia){
                         m.file
                     }else if(m is Media.FilePropertyMedia){
-                        val miCore = applicationContext as? MiCore
-                        val currentAccount = miCore?.getCurrentAccount()?.value?: return false
-                        m.fileProperty.toFile(currentAccount.instanceDomain)
+                        m.fileProperty.toFile()
                     }else{
                         null
                     }?: return false
@@ -188,10 +184,10 @@ class MediaActivity : AppCompatActivity() {
         val miCore = applicationContext as? MiCore
         val baseUrl = miCore?.getCurrentAccount()?.value?.instanceDomain?: ""
         if(fileProperty != null){
-            return if(fileProperty.type?.contains("image") == true){
-                ImageFragment.newInstance(index, fileProperty.getUrl(baseUrl))
+            return if(fileProperty.type.contains("image")){
+                ImageFragment.newInstance(index, fileProperty.url)
             }else{
-                PlayerFragment.newInstance(index, fileProperty.getUrl(baseUrl))
+                PlayerFragment.newInstance(index, fileProperty.url)
             }
         }
         if(uri != null){

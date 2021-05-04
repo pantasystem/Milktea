@@ -17,7 +17,7 @@ class UserRepositoryImpl(
     val miCore: MiCore
 ) : UserRepository{
     private val logger = miCore.loggerFactory.create("UserRepositoryImpl")
-    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 
     override suspend fun find(userId: User.Id, detail: Boolean): User {
         val localResult = runCatching {

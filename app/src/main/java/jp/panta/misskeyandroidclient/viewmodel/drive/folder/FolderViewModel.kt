@@ -8,17 +8,12 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.model.drive.CreateFolder
-import jp.panta.misskeyandroidclient.model.drive.FolderProperty
-import jp.panta.misskeyandroidclient.model.drive.RequestFolder
+import jp.panta.misskeyandroidclient.api.drive.CreateFolder
+import jp.panta.misskeyandroidclient.api.drive.RequestFolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class FolderViewModel(
     val account: Account,

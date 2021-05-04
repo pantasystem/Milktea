@@ -51,7 +51,7 @@ class TimelineViewModel(
 
     private val removeSize = 50
 
-    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 
 
     val isLoading = MutableLiveData<Boolean>()

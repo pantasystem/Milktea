@@ -22,7 +22,9 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
-import jp.panta.misskeyandroidclient.model.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
+import jp.panta.misskeyandroidclient.model.drive.InMemoryFilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.group.impl.GroupRepositoryImpl
@@ -143,6 +145,8 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
+
+    private val mFilePropertyDataSource: FilePropertyDataSource = InMemoryFilePropertyDataSource()
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
@@ -267,7 +271,7 @@ class MiApplication : Application(), MiCore {
         }
         mMessageRepository = MessageRepositoryImpl(this)
 
-        mGetters = Getters(mNoteDataSource, mNoteRepository,mUserDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource, loggerFactory)
+        mGetters = Getters(mNoteDataSource, mNoteRepository,mUserDataSource,mFilePropertyDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource, loggerFactory)
 
         messageStreamFilter = MessageStreamFilter(this)
 
@@ -574,6 +578,9 @@ class MiApplication : Application(), MiCore {
         return metaStore
     }
 
+    override fun getFilePropertyDataSource(): FilePropertyDataSource {
+        return mFilePropertyDataSource
+    }
 
     private suspend fun loadAndInitializeAccounts(){
         try{

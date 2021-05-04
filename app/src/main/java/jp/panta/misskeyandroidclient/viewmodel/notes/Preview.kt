@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import java.io.Serializable

@@ -9,8 +9,7 @@ import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -108,7 +107,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == Activity.RESULT_OK){
                     mViewModel.file.value = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>).map{
-                        it as FileProperty
+                        it as FilePropertyDTO
                     }.firstOrNull()
                 }
             }

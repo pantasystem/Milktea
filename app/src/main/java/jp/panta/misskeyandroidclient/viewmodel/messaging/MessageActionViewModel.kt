@@ -1,21 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.api.messaging.MessageAction
-import retrofit2.Call
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import java.lang.IllegalArgumentException
-import retrofit2.Callback
-import retrofit2.Response
-import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.CreateMessage
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -46,7 +37,7 @@ class MessageActionViewModel(
     private val logger = miCore.loggerFactory.create("MessageActionViewModel")
 
     val text = MutableLiveData<String>()
-    val file = MutableLiveData<FileProperty>()
+    val file = MutableLiveData<FilePropertyDTO>()
 
     private val mErrors = MutableStateFlow<Throwable?>(null)
     val errors = mErrors.asStateFlow()

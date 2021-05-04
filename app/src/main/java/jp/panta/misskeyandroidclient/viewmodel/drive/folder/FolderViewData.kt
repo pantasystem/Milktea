@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive.folder
 
-import jp.panta.misskeyandroidclient.model.drive.FolderProperty
+import jp.panta.misskeyandroidclient.model.drive.Directory
 
-class FolderViewData (val folderProperty: FolderProperty){
+class FolderViewData (val folderProperty: Directory){
     val id = folderProperty.id
     val createdAt = folderProperty.createdAt
     val name = folderProperty.name
