@@ -4,6 +4,7 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.notes.toEntities
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
@@ -14,6 +15,7 @@ class NoteRelationGetter(
     private val noteDataSource: NoteDataSource,
     private val noteRepository: NoteRepository,
     private val userDataSource: UserDataSource,
+    private val filePropertyDataSource: FilePropertyDataSource,
     private val logger: Logger
 ) {
 
@@ -32,13 +34,7 @@ class NoteRelationGetter(
     }
 
 
-    @Deprecated("副作用を持ちややこしいため非推奨")
-    suspend fun get(account: Account, noteDTO: NoteDTO): NoteRelation {
-        val entities = noteDTO.toEntities(account)
-        userDataSource.addAll(entities.third)
-        noteDataSource.addAll(entities.second)
-        return get(entities.first, featuredId = noteDTO.tmpFeaturedId, promotionId = noteDTO.promotionId)
-    }
+
 
     suspend fun get(note: Note, deep: Boolean = true, featuredId: String? = null, promotionId: String? = null): NoteRelation {
         val user = userDataSource.get(note.userId)
@@ -60,6 +56,7 @@ class NoteRelationGetter(
                 user,
                 renote,
                 reply,
+                note.fileIds?.let { filePropertyDataSource.findIn(it) },
                 featuredId
             )
         }
@@ -70,6 +67,7 @@ class NoteRelationGetter(
                 user,
                 renote,
                 reply,
+                note.fileIds?.let { filePropertyDataSource.findIn(it) },
                 promotionId
             )
         }
@@ -77,7 +75,8 @@ class NoteRelationGetter(
             note = note,
             user = user,
             renote = renote,
-            reply = reply
+            reply = reply,
+            note.fileIds?.let { filePropertyDataSource.findIn(it) },
         )
     }
 }

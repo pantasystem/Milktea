@@ -33,7 +33,7 @@ data class Note(
     val reactionCounts: List<ReactionCount>,
     val emojis: List<Emoji>?,
     val repliesCount: Int,
-    val files: List<FileProperty>?,
+    val fileIds: List<FileProperty.Id>?,
     val poll: Poll?,
     val myReaction: String?,
 
@@ -69,7 +69,7 @@ data class Note(
      * ファイル、投票、テキストなどのコンテンツを持っているか
      */
     fun hasContent(): Boolean {
-        return !(text == null && files.isNullOrEmpty() && poll == null)
+        return !(text == null && fileIds.isNullOrEmpty() && poll == null)
     }
 }
 
@@ -78,12 +78,14 @@ sealed class NoteRelation {
     abstract val user: User
     abstract val reply: NoteRelation?
     abstract val renote: NoteRelation?
+    abstract val files: List<FileProperty>?
 
     data class Normal(
         override val note: Note,
         override val user: User,
         override val renote: NoteRelation?,
-        override val reply: NoteRelation?
+        override val reply: NoteRelation?,
+        override val files: List<FileProperty>?
     ) : NoteRelation()
 
     data class Featured(
@@ -91,6 +93,7 @@ sealed class NoteRelation {
         override val user: User,
         override val renote: NoteRelation?,
         override val reply: NoteRelation?,
+        override val files: List<FileProperty>?,
         val featuredId: String
     ) : NoteRelation()
 
@@ -99,6 +102,7 @@ sealed class NoteRelation {
         override val user: User,
         override val renote: NoteRelation?,
         override val reply: NoteRelation?,
+        override val files: List<FileProperty>?,
         val promotionId: String
     ) : NoteRelation()
 }
