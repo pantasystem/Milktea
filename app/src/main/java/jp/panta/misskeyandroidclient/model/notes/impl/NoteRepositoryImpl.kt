@@ -20,11 +20,11 @@ class NoteRepositoryImpl(
 
     private val logger = miCore.loggerFactory.create("NoteRepositoryImpl")
     private val noteDataSourceAdder: NoteDataSourceAdder by lazy {
-        NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource())
+        NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
     }
 
     override suspend fun create(createNote: CreateNote): Note {
-        val task = PostNoteTask(miCore.getEncryption(), createNote, createNote.author, miCore.loggerFactory)
+        val task = PostNoteTask(miCore.getEncryption(), createNote, createNote.author, miCore.loggerFactory, miCore.getFilePropertyDataSource())
         val result = runCatching {task.execute(
             miCore.createFileUploader(createNote.author)
         )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
