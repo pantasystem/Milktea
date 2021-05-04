@@ -3,11 +3,12 @@ package jp.panta.misskeyandroidclient.api.notes
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
@@ -53,8 +54,9 @@ data class NoteDTO(
     @SerialName("repliesCount")
     val replyCount: Int,
     val user: UserDTO,
-    val files: List<FileProperty>? = null,
+    val files: List<FilePropertyDTO>? = null,
     //@JsonProperty("fileIds") val mediaIds: List<String?>? = null,    //v10, v11の互換性が取れない
+    val fileIds: List<String>? = null,
     val poll: Poll? = null,
     @SerializedName("renote")
     @SerialName("renote")
@@ -91,7 +93,7 @@ fun NoteDTO.toNote(account: Account): Note{
         localOnly = this.localOnly,
         emojis = this.emojis,
         app = this.app,
-        files = this.files,
+        fileIds = this.fileIds?.map { FileProperty.Id(account.accountId, it) },
         poll = this.poll,
         reactionCounts = this.reactionCounts?.map{
             ReactionCount(reaction = it.key, it.value)
@@ -113,23 +115,54 @@ fun NoteDTO.toNoteAndUser(account: Account): Pair<Note, User> {
     return note to user
 }
 
-fun NoteDTO.toEntities(account: Account): Triple<Note, List<Note>, List<User>>{
+data class NoteRelationEntities(
+    val note: Note,
+    val notes: List<Note>,
+    val users: List<User>,
+    val files: List<FileProperty>
+)
+
+fun NoteDTO.toEntities(account: Account): NoteRelationEntities{
+    val dtoList = mutableListOf<NoteDTO>()
+    dtoList.add(this)
+
+
+    if(this.reply != null){
+
+        dtoList.add(this.reply)
+    }
+    if(this.reNote != null){
+        dtoList.add(reNote)
+    }
+
+    val note = this.toNote(account)
     val users = mutableListOf<User>()
     val notes = mutableListOf<Note>()
-    val note = this.toNote(account)
+    val files = mutableListOf<FileProperty>()
+
+    pickEntities(account, notes, users, files)
+    return NoteRelationEntities(
+        note = note,
+        notes = notes,
+        users = users,
+        files = files
+    )
+}
+
+private fun NoteDTO.pickEntities(account: Account, notes: MutableList<Note>, users: MutableList<User>, files: MutableList<FileProperty>) {
+    val (note, user) = this.toNoteAndUser(account)
     notes.add(note)
-    users.add(this.user.toUser(account, false))
-    if(this.reply != null){
-        val nAndU = this.reply.toNoteAndUser(account)
-        notes.add(nAndU.first)
-        users.add(nAndU.second)
+    users.add(user)
+    files.addAll(
+        this.files?.map {
+            it.toFileProperty(account)
+        }?: emptyList()
+    )
+    if(this.reply != null) {
+        this.reply.pickEntities(account, notes, users, files)
     }
 
-    if(this.reNote != null){
-        val nAndU = this.reNote.toNoteAndUser(account)
-        notes.add(nAndU.first)
-        users.add(nAndU.second)
+    if(this.reNote != null) {
+        this.reNote.pickEntities(account, notes, users, files)
     }
-
-    return Triple(note, notes, users)
 }
