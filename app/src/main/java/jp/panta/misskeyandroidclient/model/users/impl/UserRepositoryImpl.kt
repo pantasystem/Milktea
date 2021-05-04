@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.users.impl
 
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
+import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
@@ -148,6 +149,20 @@ class UserRepositoryImpl(
         }
         return res.isSuccessful
 
+    }
+
+    override suspend fun rejectFollowRequest(userId: User.Id): Boolean {
+        val account = miCore.getAccountRepository().get(userId.accountId)
+        val user = find(userId, true) as User.Detail
+        if(!user.hasPendingFollowRequestToYou) {
+            return false
+        }
+        val res = miCore.getMisskeyAPI(account).rejectFollowRequest(RejectFollowRequest(i = account.getI(miCore.getEncryption()), userId = userId.id))
+            .throwIfHasError()
+        if(res.isSuccessful) {
+            miCore.getUserDataSource().add(user.copy(hasPendingFollowRequestToYou = false, isFollower = false))
+        }
+        return res.isSuccessful
     }
 
     private suspend fun action(requestAPI: suspend (RequestUser)-> Response<Unit>, userId: User.Id, reducer: (User.Detail)-> User.Detail): Boolean {

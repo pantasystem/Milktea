@@ -20,4 +20,6 @@ interface UserRepository {
 
     suspend fun acceptFollowRequest(userId: User.Id) : Boolean
 
+    suspend fun rejectFollowRequest(userId: User.Id) : Boolean
+
 }

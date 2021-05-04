@@ -9,13 +9,17 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.model.notification.FollowRequestAcceptedNotification
+import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
+import jp.panta.misskeyandroidclient.model.notification.ReceiveFollowRequestNotification
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthImpl
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -43,6 +47,8 @@ class NotificationViewModel(
 
 
     val notificationsLiveData = MutableLiveData<List<NotificationViewData>>()
+    private val _error = MutableSharedFlow<Throwable>(onBufferOverflow = BufferOverflow.DROP_LATEST, extraBufferCapacity = 100)
+    val error: Flow<Throwable> = _error
     private var notifications: List<NotificationViewData> = emptyList()
         set(value) {
             notificationsLiveData.postValue(value)
@@ -156,6 +162,45 @@ class NotificationViewModel(
         }
 
 
+    }
+
+    fun acceptFollowRequest(notification: Notification) {
+        if(notification is ReceiveFollowRequestNotification) {
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    miCore.getUserRepository().acceptFollowRequest(notification.userId)
+                }.onSuccess {
+                    if(it) {
+                        notifications = notifications.filterNot { n ->
+                            n.id == notification.id
+                        }
+                    }
+                }.onFailure {
+                    logger.error("acceptFollowRequest error:$it")
+                    _error.tryEmit(it)
+                }
+            }
+        }
+
+    }
+
+    fun rejectFollowRequest(notification: Notification) {
+        if(notification is ReceiveFollowRequestNotification) {
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    miCore.getUserRepository().rejectFollowRequest(notification.userId)
+                }.onSuccess {
+                    if(it) {
+                        notifications = notifications.filterNot { n ->
+                            n.id == notification.id
+                        }
+                    }
+                }.onFailure {
+                    logger.error("rejectFollowRequest error:$it")
+                    _error.tryEmit(it)
+                }
+            }
+        }
     }
 
     private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
