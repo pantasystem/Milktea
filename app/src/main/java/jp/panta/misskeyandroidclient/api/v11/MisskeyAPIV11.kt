@@ -24,9 +24,7 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
-import jp.panta.misskeyandroidclient.api.users.FollowFollowerUser
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 
@@ -102,5 +100,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     open suspend fun transferGroup( body: TransferGroupDTO) : Response<GroupDTO> = apiDiff.transferGroup(body)
     open suspend fun updateGroup( body: UpdateGroupDTO) : Response<GroupDTO> = apiDiff.updateGroup(body)
     override suspend fun reactions(body: RequestReactionHistoryDTO): Response<List<ReactionHistoryDTO>> = misskeyAPI.reactions(body)
+    override suspend fun rejectFollowRequest(rejectFollowRequest: RejectFollowRequest): Response<Unit> = misskeyAPI.rejectFollowRequest(rejectFollowRequest)
+
 
 }

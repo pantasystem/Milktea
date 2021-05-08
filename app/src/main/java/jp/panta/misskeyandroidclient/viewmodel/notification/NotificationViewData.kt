@@ -43,6 +43,12 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
     val userName = notification.user.userName
 
     val reaction =  (notification.notification as? ReactionNotification)?.reaction
+
+    /**
+     * ユーザーに関連する通知
+     */
+    val isUserNotification: Boolean = type == Type.FOLLOW || type == Type.FOLLOW_REQUEST_ACCEPTED || type == Type.RECEIVE_FOLLOW_REQUEST
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

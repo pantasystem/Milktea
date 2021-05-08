@@ -43,7 +43,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
 
 
-        val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, viewLifecycleOwner)
+        val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, mViewModel, viewLifecycleOwner)
         notification_list_view.adapter = adapter
         notification_list_view.layoutManager = mLinearLayoutManager
 

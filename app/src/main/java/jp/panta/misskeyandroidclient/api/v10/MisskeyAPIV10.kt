@@ -23,6 +23,8 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
+import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
@@ -60,9 +62,13 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override suspend fun followUser(requestUser: RequestUser): Response<UserDTO> = misskey.followUser(requestUser)
 
+    override suspend fun acceptFollowRequest(followRequest: AcceptFollowRequest): Response<Unit> = misskey.acceptFollowRequest(followRequest)
+
     open suspend fun following(followFollower: RequestFollowFollower): Response<FollowFollowerUsers> = diff.following(followFollower)
 
     open suspend fun followers(followFollower: RequestFollowFollower): Response<FollowFollowerUsers> = diff.followers(followFollower)
+
+    override suspend fun rejectFollowRequest(rejectFollowRequest: RejectFollowRequest): Response<Unit> = misskey.rejectFollowRequest(rejectFollowRequest)
 
     override suspend fun getFiles(fileRequest: RequestFile): Response<List<FilePropertyDTO>> = misskey.getFiles(fileRequest)
 

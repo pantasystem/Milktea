@@ -4,6 +4,7 @@
     <data>
         <variable name="notification" type="jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData"/>
 
+        <import type="jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData" />
         <import type="android.view.View"/>
 
         <import type="jp.panta.misskeyandroidclient.R"/>
@@ -11,6 +12,9 @@
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+        <variable
+                name="notificationViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -101,6 +105,37 @@
                         app:elapsedTime="@{notification.notification.notification.createdAt}"
                         android:layout_gravity="center"/>
             </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/follow_request"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="8dp"
+                    android:visibility="@{notification.type == NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST ? View.VISIBLE : View.GONE}"
+                    >
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/receive_follow_request"
+                        android:layout_weight="1"
+                        />
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reject"
+                        android:layout_marginEnd="4dp"
+                        android:onClick="@{()-> notificationViewModel.rejectFollowRequest(notification.notification.notification) }"
+
+                        />
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/accept"
+                        android:onClick="@{()-> notificationViewModel.acceptFollowRequest(notification.notification.notification) }"
+                        style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                        />
+            </LinearLayout>
             <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -113,6 +148,8 @@
                         app:notesViewModel="@{notesViewModel}"
                         />
             </FrameLayout>
+
+
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

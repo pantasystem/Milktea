@@ -22,6 +22,8 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
+import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
@@ -90,6 +92,11 @@ interface MisskeyAPI {
     @POST("api/following/create")
     suspend fun followUser(@Body requestUser: RequestUser): Response<UserDTO>
 
+    @POST("api/following/requests/accept")
+    suspend fun acceptFollowRequest(@Body followRequest: AcceptFollowRequest) : Response<Unit>
+
+    @POST("api/following/requests/reject")
+    suspend fun rejectFollowRequest(@Body rejectFollowRequest: RejectFollowRequest) : Response<Unit>
     //account
     @POST("api/i/favorites")
     suspend fun favorites(@Body noteRequest: NoteRequest): Response<List<Favorite>?>

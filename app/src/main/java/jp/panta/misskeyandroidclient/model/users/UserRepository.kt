@@ -18,5 +18,8 @@ interface UserRepository {
 
     suspend fun unblock(userId: User.Id): Boolean
 
+    suspend fun acceptFollowRequest(userId: User.Id) : Boolean
+
+    suspend fun rejectFollowRequest(userId: User.Id) : Boolean
 
 }
