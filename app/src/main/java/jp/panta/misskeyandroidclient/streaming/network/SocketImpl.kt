@@ -202,7 +202,7 @@ class SocketImpl(
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
-        logger.debug("onOpen webSocket:url=$url 接続")
+        logger.debug("onOpen webSocket 接続")
         synchronized(this){
             mState = Socket.State.Connected
         }

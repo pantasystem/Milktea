@@ -19,7 +19,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 class ShareBottomSheetDialog : BottomSheetDialogFragment(){
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog =  super.onCreateDialog(savedInstanceState)
-        val view = View.inflate(dialog.context, R.layout.fragment_share_bottom_sheet, null)
+        val view = View.inflate(context, R.layout.fragment_share_bottom_sheet, null)
         dialog.setContentView(view)
         val dataBinding = DataBindingUtil.bind<FragmentShareBottomSheetBinding>(view)
         dialog.setContentView(view)

@@ -198,6 +198,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     is APIError.ClientException -> {
                         Toast.makeText(requireContext(), R.string.parameter_error, Toast.LENGTH_LONG).show()
                     }
+                    else -> {
+                        Toast.makeText(requireContext(), "error:$error", Toast.LENGTH_SHORT).show()
+                    }
 
                 }
             }
