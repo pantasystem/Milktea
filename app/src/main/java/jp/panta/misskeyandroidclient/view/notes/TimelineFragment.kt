@@ -4,11 +4,9 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.api.APIError
+import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.setMenuTint
@@ -26,13 +25,12 @@ import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableView
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
-import kotlinx.android.synthetic.main.fragment_swipe_refresh_recycler_view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
+class TimelineFragment : Fragment(), ScrollableTop, PageableView{
 
     companion object{
 
@@ -82,6 +80,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     lateinit var miApplication: MiApplication
 
+    lateinit var mBinding: FragmentSwipeRefreshRecyclerViewBinding
 
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,6 +107,15 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_swipe_refresh_recycler_view, container, false)
+        return mBinding.root
+    }
+
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -120,29 +128,29 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         //sharedPreference = view.context.getSharedPreferences()
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
-        list_view.layoutManager = mLinearLayoutManager
+        mBinding.listView.layoutManager = mLinearLayoutManager
 
         //データ受け取り
 
 
 
-        list_view.addOnScrollListener(mScrollListener)
-        list_view.layoutManager = mLinearLayoutManager
+        mBinding.listView.addOnScrollListener(mScrollListener)
+        mBinding.listView.layoutManager = mLinearLayoutManager
 
 
-        refresh.setOnRefreshListener {
+        mBinding.refresh.setOnRefreshListener {
             mViewModel?.loadNew()
         }
 
         mViewModel?.isLoading?.observe(viewLifecycleOwner){
             if(it != null && !it){
-                refresh?.isRefreshing = false
+                mBinding.refresh.isRefreshing = false
             }
         }
 
         //mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
-        list_view.adapter = adapter
+        mBinding.listView.adapter = adapter
 
         var  timelineState: TimelineState? = null
         lifecycleScope.launchWhenResumed {
@@ -151,13 +159,13 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 timelineState = tm
 
                 if(tm.notes.isNullOrEmpty()){
-                    timelineEmptyView.visibility = View.VISIBLE
-                    refresh.visibility = View.GONE
+                    mBinding.timelineEmptyView.visibility = View.VISIBLE
+                    mBinding.refresh.visibility = View.GONE
                 }else{
-                    timelineEmptyView.visibility = View.GONE
-                    refresh.visibility = View.VISIBLE
+                    mBinding.timelineEmptyView.visibility = View.GONE
+                    mBinding.refresh.visibility = View.VISIBLE
                 }
-                timelineProgressBar.visibility = View.GONE
+                mBinding.timelineProgressBar.visibility = View.GONE
             }
         }
 
@@ -165,11 +173,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         mViewModel?.isInitLoading?.observe( viewLifecycleOwner){
             if(it){
 
-                timelineProgressBar.visibility = View.VISIBLE
-                refresh.visibility = View.GONE
-                timelineEmptyView.visibility = View.GONE
+                mBinding.timelineProgressBar.visibility = View.VISIBLE
+                mBinding.refresh.visibility = View.GONE
+                mBinding.timelineEmptyView.visibility = View.GONE
             } else {
-                timelineProgressBar.visibility = View.GONE
+                mBinding.timelineProgressBar.visibility = View.GONE
 
             }
         }
@@ -226,7 +234,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         }
 
-        retryLoadButton.setOnClickListener {
+        mBinding.retryLoadButton.setOnClickListener {
             Log.d("TimelineFragment", "リトライボタンを押しました")
             mViewModel?.loadInit()
         }
