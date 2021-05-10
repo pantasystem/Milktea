@@ -22,7 +22,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewMode
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
+class NotificationFragment : Fragment(), ScrollableTop {
 
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
