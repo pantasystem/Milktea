@@ -7,14 +7,15 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.databinding.ActivityAntennaEditorBinding
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
-import kotlinx.android.synthetic.main.activity_antenna_editor.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -33,12 +34,15 @@ class AntennaEditorActivity : AppCompatActivity() {
     @FlowPreview
     private var mViewModel: AntennaEditorViewModel? = null
 
+    private lateinit var mBinding: ActivityAntennaEditorBinding
+
     @FlowPreview
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_antenna_editor)
-        setSupportActionBar(antennaEditorToolbar)
+        mBinding = DataBindingUtil.setContentView<ActivityAntennaEditorBinding>(this, R.layout.activity_antenna_editor)
+        setSupportActionBar(mBinding.antennaEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val antennaId = intent.getSerializableExtra(EXTRA_ANTENNA_ID) as? Antenna.Id
