@@ -70,7 +70,8 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
             .setView(view)
 
         binding?.isLocalOnlySwitch?.setOnCheckedChangeListener { _, isChecked ->
-            val visibility = (viewModel.visibility.value ?: Visibility.Public(isChecked)) as CanLocalOnly
+            val visibility = (viewModel.visibility.value ?: Visibility.Public(isChecked)) as? CanLocalOnly
+                ?: return@setOnCheckedChangeListener
             viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as Visibility)
         }
         binding?.lifecycleOwner = requireActivity()
