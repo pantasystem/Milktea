@@ -4,11 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import jp.panta.misskeyandroidclient.databinding.ActivityAntennaListBinding
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
-import kotlinx.android.synthetic.main.activity_antenna_list.*
 
 class AntennaListActivity : AppCompatActivity() {
 
@@ -17,11 +18,12 @@ class AntennaListActivity : AppCompatActivity() {
     }
     private lateinit var mAntennaListViewModel: AntennaListViewModel
 
+    private lateinit var mBinding: ActivityAntennaListBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        setContentView(R.layout.activity_antenna_list)
-        setSupportActionBar(antennaListToolbar)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_antenna_list)
+        setSupportActionBar(mBinding.antennaListToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         mAntennaListViewModel = ViewModelProvider(
@@ -38,7 +40,7 @@ class AntennaListActivity : AppCompatActivity() {
             startActivityForResult(intent, REQUEST_ANTENNA_EDITOR_CODE)
         })
 
-        addAntennaFab.setOnClickListener {
+        mBinding.addAntennaFab.setOnClickListener {
             startActivityForResult(Intent(this, AntennaEditorActivity::class.java), REQUEST_ANTENNA_EDITOR_CODE)
         }
 
