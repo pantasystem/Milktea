@@ -12,12 +12,14 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.databinding.ActivityDriveBinding
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
@@ -30,7 +32,6 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
-import kotlinx.android.synthetic.main.activity_drive.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -57,16 +58,18 @@ class DriveActivity : AppCompatActivity() {
 
     private var mCurrentFragmentType: Type = Type.FOLDER
 
+    private lateinit var mBinding: ActivityDriveBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        setContentView(R.layout.activity_drive)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_drive)
 
-        setSupportActionBar(driveToolbar)
+        setSupportActionBar(mBinding.driveToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        dirListView.layoutManager = layoutManager
+        mBinding.dirListView.layoutManager = layoutManager
 
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
         val selectedItem = (intent.getSerializableExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
@@ -98,7 +101,7 @@ class DriveActivity : AppCompatActivity() {
                 driveViewModel.setSelectedFileList(selectedItem)
             }
             val adapter = DirListAdapter(diffUtilItemCallback, driveViewModel)
-            dirListView.adapter = adapter
+            mBinding.dirListView.adapter = adapter
             driveViewModel.hierarchyDirectory.observe(this, { dir ->
                 Log.d("DriveActivity", "更新がありました: $dir")
                 adapter.submitList(dir)
@@ -120,7 +123,7 @@ class DriveActivity : AppCompatActivity() {
             ft.commit()
         }
 
-        addItemButton.setOnClickListener {
+        mBinding.addItemButton.setOnClickListener {
             if(mCurrentFragmentType == Type.FILE){
                 showFileManager()
             }else{
