@@ -22,7 +22,7 @@ data class NotificationDTO(
     val note: NoteDTO? = null,
     val noteId: String? = null,
     val reaction: String? = null,
-    val isRead: Boolean,
+    val isRead: Boolean?,
     val choice: Int? = null
 ) {
 
@@ -31,37 +31,37 @@ data class NotificationDTO(
         return when(this.type) {
             "follow" -> {
                 FollowNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), isRead ?: true
                 )
             }
             "followRequestAccepted" -> {
                 FollowRequestAcceptedNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), isRead ?: true
                 )
             }
             "receiveFollowRequest" -> {
                 ReceiveFollowRequestNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), isRead ?: true
                 )
             }
             "mention" -> {
                 MentionNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead ?: true
                 )
             }
             "reply" -> {
                 ReplyNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead ?: true
                 )
             }
             "renote" -> {
                 RenoteNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead ?: true
                 )
             }
             "quote" -> {
                 QuoteNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), Note.Id(account.accountId, note?.id?: throw IllegalStateException("noteId参照不能")),isRead ?: true
                 )
             }
             "reaction" -> {
@@ -72,14 +72,14 @@ data class NotificationDTO(
                 require(note != null)
                 val n = note.toNote(account)
                 ReactionNotification(
-                    id, createdAt, User.Id(account.accountId, this.userId), n.id, reaction, isRead
+                    id, createdAt, User.Id(account.accountId, this.userId), n.id, reaction, isRead ?: true
                 )
             }
             "pollVote" -> {
                 require(noteId != null || note != null)
                 require(choice != null)
                 PollVoteNotification(
-                    id, Note.Id(account.accountId, noteId?: note?.id!!), createdAt, User.Id(account.accountId, this.userId), choice, isRead
+                    id, Note.Id(account.accountId, noteId?: note?.id!!), createdAt, User.Id(account.accountId, this.userId), choice, isRead ?: true
                 )
             }
             else -> throw IllegalStateException("対応していないタイプの通知です。:$this")
