@@ -12,9 +12,11 @@
                 name="accountViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
     </data>
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:gravity="center_vertical"
             >
 
         <ImageButton
@@ -22,37 +24,47 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_alignParentStart="true"
                 app:srcCompat="@drawable/ic_arrow_back_black_24dp"
-                android:layout_centerVertical="true"
                 tools:ignore="ContentDescription"
                 android:tint="?attr/colorNoteActionButtonTint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 />
-        <Button
-                android:id="@+id/postButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerHorizontal="true"
-                android:clickable="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
-                android:onClick="@{()-> viewModel.post()}"
-                android:text="@string/post" />
+
 
 
         <ImageButton
                 android:id="@+id/currentAccountAvatarIcon"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                tools:src="@mipmap/ic_launcher"
+                android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/actionUpButton"
-                android:layout_marginEnd="8dp"
-                android:layout_centerInParent="true"
-                app:circleIcon="@{viewModel.currentUser.user.avatarUrl}"
+                android:onClick="@{ ()-> accountViewModel.showSwitchDialog() }"
                 android:padding="4dp"
+                app:layout_constraintStart_toEndOf="@id/actionUpButton"
 
+                app:circleIcon="@{viewModel.currentUser.user.avatarUrl}"
                 tools:ignore="ContentDescription"
-                android:onClick="@{ ()-> accountViewModel.showSwitchDialog() }"/>
+                tools:src="@mipmap/ic_launcher"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="8dp"
+                />
+
+        <TextView
+                android:id="@+id/localOnly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/noteVisibility"
+                android:layout_centerVertical="true"
+                android:text="@string/local"
+                android:visibility="@{ viewModel.isLocalOnly ? View.VISIBLE : View.GONE}"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/noteVisibility"
+                />
         <ImageButton
                 android:id="@+id/noteVisibility"
                 style="@style/Widget.AppCompat.Button.Borderless"
@@ -65,7 +77,11 @@
                 android:onClick="@{()-> viewModel.showVisibilitySelection()}"
                 android:layout_marginEnd="4dp"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/textCounter"/>
+                android:layout_toStartOf="@id/textCounter"
+                app:layout_constraintEnd_toStartOf="@id/textCounter"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textCounter"
                 android:layout_width="wrap_content"
@@ -76,8 +92,25 @@
                 android:textSize="18sp"
                 android:text="@{String.valueOf(viewModel.textRemaining)}"
                 tools:text="200"
-                tools:ignore="RelativeOverlap" />
+                tools:ignore="RelativeOverlap"
+                app:layout_constraintEnd_toStartOf="@id/postButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
 
-    </RelativeLayout>
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/postButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
+                android:onClick="@{()-> viewModel.post()}"
+                android:text="@string/post"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+
+
+                />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

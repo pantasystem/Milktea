@@ -45,7 +45,6 @@ import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
-import kotlinx.android.synthetic.main.activity_note_editor.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -101,7 +100,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_note_editor)
-        setSupportActionBar(note_editor_toolbar)
+        val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
+        mBinding = binding
+
+        setSupportActionBar(mBinding.noteEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         var text: String? = null
@@ -109,11 +111,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             text = intent.getStringExtra(Intent.EXTRA_TEXT)
         }
 
-        val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
-        mBinding = binding
 
         val miApplication = applicationContext as MiApplication
 
+        // 設定をもとにToolbarを下か上にセットしている
         val toolbarBase = if(miApplication.getSettingStore().isPostButtonAtTheBottom){
             binding.noteEditorToolbar.visibility = View.GONE
             binding.bottomToolbarBase.visibility = View.VISIBLE
@@ -250,11 +251,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
 
 
-        selectFileFromDrive.setOnClickListener {
+        mBinding.selectFileFromDrive.setOnClickListener {
             showDriveFileSelector()
         }
 
-        selectFileFromLocal.setOnClickListener {
+        mBinding.selectFileFromLocal.setOnClickListener {
             showFileManager()
         }
 
