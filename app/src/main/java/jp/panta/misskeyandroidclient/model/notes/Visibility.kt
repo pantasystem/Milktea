@@ -9,15 +9,27 @@ import kotlin.jvm.Throws
 sealed class Visibility : Serializable{
     data class Public(
         override val isLocalOnly: Boolean
-    ) : CanLocalOnly, Visibility()
+    ) : CanLocalOnly, Visibility() {
+        override fun changeLocalOnly(isLocalOnly: Boolean): CanLocalOnly {
+            return this.copy(isLocalOnly = isLocalOnly)
+        }
+    }
 
     data class Home(
         override val isLocalOnly: Boolean
-    ) : Visibility(), CanLocalOnly
+    ) : Visibility(), CanLocalOnly {
+        override fun changeLocalOnly(isLocalOnly: Boolean): CanLocalOnly {
+            return this.copy(isLocalOnly = isLocalOnly)
+        }
+    }
 
     data class Followers(
         override val isLocalOnly: Boolean
-    ) : Visibility(), CanLocalOnly
+    ) : Visibility(), CanLocalOnly {
+        override fun changeLocalOnly(isLocalOnly: Boolean): CanLocalOnly {
+            return this.copy(isLocalOnly = isLocalOnly)
+        }
+    }
 
     data class Specified(
         val visibleUserIds: List<User.Id>
@@ -33,7 +45,10 @@ sealed class Visibility : Serializable{
 
 interface CanLocalOnly {
     val isLocalOnly: Boolean
+
+    fun changeLocalOnly(isLocalOnly: Boolean): CanLocalOnly
 }
+
 
 fun Visibility.type(): String {
     return when(this) {

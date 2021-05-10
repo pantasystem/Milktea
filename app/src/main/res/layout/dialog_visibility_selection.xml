@@ -11,13 +11,13 @@
 
     </data>
     <Switch
+            android:id="@+id/isLocalOnlySwitch"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:text="@string/local_only"
             android:layout_marginTop="8dp"
             android:enabled="@{ SafeUnbox.unbox(noteEditorViewModel.isLocalOnlyEnabled) }"
-            android:checked="@{ SafeUnbox.unbox(noteEditorViewModel.isLocalOnly) }"
-            android:onClick="@{()-> noteEditorViewModel.toggleLocalOnly()}"
+            android:checked="@{ noteEditorViewModel.isLocalOnly == true }"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:textColor="@android:color/white"

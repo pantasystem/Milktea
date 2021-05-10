@@ -168,11 +168,10 @@ class NoteEditorViewModel(
         }
     }
 
-    val isLocalOnly = MediatorLiveData<Boolean>().apply{
-        addSource(visibility){
-            value = it.isLocalOnly()
-        }
+    val isLocalOnly = Transformations.map(visibility) {
+        it.isLocalOnly()
     }
+
 
     val isLocalOnlyEnabled = MediatorLiveData<Boolean>().apply{
         addSource(visibility){
@@ -334,14 +333,9 @@ class NoteEditorViewModel(
     }
 
     fun setVisibility(visibility: Visibility){
+        logger.debug("公開範囲がセットされた:$visibility")
         this.visibility.value = visibility
         this.visibilitySelectedEvent.event = Unit
-    }
-
-    fun toggleLocalOnly() {
-        if(this.isLocalOnlyEnabled.value == true){
-            this.isLocalOnly.value = !(this.isLocalOnly.value?: false)
-        }
     }
 
 
