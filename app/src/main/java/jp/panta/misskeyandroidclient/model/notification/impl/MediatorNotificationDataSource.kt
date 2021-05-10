@@ -13,9 +13,8 @@ class MediatorNotificationDataSource(
 ) : NotificationDataSource{
 
     override suspend fun add(notification: Notification): AddResult {
-        if(notification.isRead) {
-            unreadNotificationDAO.delete(notification.id.accountId, notification.id.notificationId)
-        } else {
+        unreadNotificationDAO.delete(notification.id.accountId, notification.id.notificationId)
+        if(!notification.isRead) {
             unreadNotificationDAO.insert(UnreadNotification(notification.id.accountId, notification.id.notificationId))
         }
         return inMemoryNotificationDataSource.add(notification)

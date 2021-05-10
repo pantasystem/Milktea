@@ -110,6 +110,7 @@ class NotificationViewModel(
                 viewDataList.forEach {
                     it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
                 }
+                miCore.getNotificationDataSource().readAllNotification(account.accountId)
                 viewDataList
             }.onSuccess {
                 notifications = it
