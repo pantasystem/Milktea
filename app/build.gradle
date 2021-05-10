@@ -118,7 +118,8 @@ dependencies {
     implementation 'com.caverock:androidsvg-aar:1.4'
 
     //ExoPlayer
-    implementation 'com.google.android.exoplayer:exoplayer:2.13.3'
+    //noinspection GradleDependency
+    implementation 'com.google.android.exoplayer:exoplayer:2.10.8'
 
     //PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'

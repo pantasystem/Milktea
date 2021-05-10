@@ -234,7 +234,7 @@ class TimelineViewModel(
 
     fun loadInit(){
         synchronized(timelineState) {
-            Log.d("TimelineViewModel", "初期読み込みを開始します")
+            Log.d("TimelineViewModel", "初期読み込みを開始します isLoading:${mIsLoading}, isInitLoading:${isInitLoading}")
 
             if(  mIsInitLoading || mIsLoading ) {
                 return
