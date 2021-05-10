@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -114,16 +115,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         val miApplication = applicationContext as MiApplication
 
-        // 設定をもとにToolbarを下か上にセットしている
-        val toolbarBase = if(miApplication.getSettingStore().isPostButtonAtTheBottom){
-            binding.noteEditorToolbar.visibility = View.GONE
-            binding.bottomToolbarBase.visibility = View.VISIBLE
-            binding.bottomToolbarBase
-        }else{
-            binding.bottomToolbarBase.visibility = View.GONE
-            binding.bottomToolbarBase.visibility = View.VISIBLE
-            binding.noteEditorToolbar
-        }
+        val toolbarBase = getToolbarBase()
         val noteEditorToolbar = DataBindingUtil.inflate<ViewNoteEditorToolbarBinding>(
             LayoutInflater.from(this),
             R.layout.view_note_editor_toolbar,
@@ -343,6 +335,22 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             val ft = supportFragmentManager.beginTransaction()
             ft.remove(fragment)
             ft.commit()
+        }
+    }
+
+    /**
+     * 設定をもとにToolbarを表示するベースとなるViewGroupを非表示・表示＆取得をしている
+     */
+    private fun getToolbarBase() : ViewGroup {
+        val miCore = applicationContext as MiCore
+        return if(miCore.getSettingStore().isPostButtonAtTheBottom){
+            mBinding.noteEditorToolbar.visibility = View.GONE
+            mBinding.bottomToolbarBase.visibility = View.VISIBLE
+            mBinding.bottomToolbarBase
+        }else{
+            mBinding.bottomToolbarBase.visibility = View.GONE
+            mBinding.bottomToolbarBase.visibility = View.VISIBLE
+            mBinding.noteEditorToolbar
         }
     }
 
