@@ -16,9 +16,9 @@ object FileThumbnailHelper {
         val thumbnailUrl = thumbnailFileViewData.thumbnailUrl
         setThumbnail(fileThumbnailMain, thumbnailUrl)
 
-        if(thumbnailFileViewData.type?.contains("image") == true){
+        if(thumbnailFileViewData.type.contains("image")){
             fileThumbnailMask.visibility = View.GONE
-        }else if(thumbnailFileViewData.type?.contains("video") == true){
+        }else if(thumbnailFileViewData.type.contains("video")){
             fileThumbnailMask.visibility = View.VISIBLE
             Glide
                 .with(fileThumbnailMask)

@@ -181,8 +181,6 @@ class MediaActivity : AppCompatActivity() {
     }
 
     private fun createFragment(index: Int, fileProperty: FileProperty?, uri: Uri?, file: File?): Fragment{
-        val miCore = applicationContext as? MiCore
-        val baseUrl = miCore?.getCurrentAccount()?.value?.instanceDomain?: ""
         if(fileProperty != null){
             return if(fileProperty.type.contains("image")){
                 ImageFragment.newInstance(index, fileProperty.url)

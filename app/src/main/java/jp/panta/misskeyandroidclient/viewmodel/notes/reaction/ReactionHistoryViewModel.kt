@@ -48,7 +48,7 @@ class ReactionHistoryViewModel(
     init {
         reactionHistoryDataSource.filter(paginator.reactionHistoryRequest.noteId, paginator.reactionHistoryRequest.type).onEach {
             histories.postValue(it)
-        }.catch { e ->
+        }.catch {
 
         }.launchIn(viewModelScope + Dispatchers.IO)
     }

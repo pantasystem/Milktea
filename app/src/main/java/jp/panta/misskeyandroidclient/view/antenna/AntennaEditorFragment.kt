@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
+import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
@@ -148,12 +149,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
         val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
         binding.specifiedUserListView.adapter = userChipAdapter
-        val flexBoxLayoutManager = FlexboxLayoutManager(view.context)
-        flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-        flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-        flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-        binding.specifiedUserListView.layoutManager = flexBoxLayoutManager
+        binding.specifiedUserListView.applyFlexBoxLayout(requireContext())
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.users.collect {
