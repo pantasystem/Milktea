@@ -53,7 +53,7 @@ class SocketWithAccountProviderImpl(
             }catch (e: UnauthorizedException) {
                 logger.debug("未認証アカウント:id=${account.accountId}, baseURL=${account.instanceDomain}")
             }
-            logger.debug("url:$uri")
+            //logger.debug("url:$uri")
 
             socket = SocketImpl(
                 url = uri,
