@@ -3,17 +3,19 @@ package jp.panta.misskeyandroidclient
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.core.app.NavUtils
-import kotlinx.android.synthetic.main.activity_draft_notes.*
+import androidx.databinding.DataBindingUtil
+import jp.panta.misskeyandroidclient.databinding.ActivityDraftNotesBinding
 
 class DraftNotesActivity : AppCompatActivity() {
 
+    private lateinit var mBinding: ActivityDraftNotesBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_draft_notes)
         setContentView(R.layout.activity_draft_notes)
 
-        setSupportActionBar(draftNotesToolbar)
+        setSupportActionBar(mBinding.draftNotesToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
