@@ -5,16 +5,17 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
+import jp.panta.misskeyandroidclient.databinding.ActivityFollowFollowerBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.TitleSettable
 import jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
-import kotlinx.android.synthetic.main.activity_follow_follower.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
@@ -33,12 +34,14 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         }
     }
 
+    lateinit var mBinding: ActivityFollowFollowerBinding
+
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        setContentView(R.layout.activity_follow_follower)
-        setSupportActionBar(follow_follower_toolbar)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_follow_follower)
+        setSupportActionBar(mBinding.followFollowerToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         //val user = intent.getSerializableExtra(EXTRA_USER) as UserDTO?
@@ -50,9 +53,9 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
             setTitle(it.getDisplayName())
         }
 
-        follow_follower_pager.adapter = FollowFollowerPagerAdapter(userId)
-        follow_follower_tab.setupWithViewPager(follow_follower_pager)
-        follow_follower_pager.currentItem = intent.getIntExtra(EXTRA_VIEW_CURRENT, FOLLOWER_VIEW_MODE)
+        mBinding.followFollowerPager.adapter = FollowFollowerPagerAdapter(userId)
+        mBinding.followFollowerTab.setupWithViewPager(mBinding.followFollowerPager)
+        mBinding.followFollowerPager.currentItem = intent.getIntExtra(EXTRA_VIEW_CURRENT, FOLLOWER_VIEW_MODE)
 
 
     }
