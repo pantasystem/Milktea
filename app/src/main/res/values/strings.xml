@@ -325,5 +325,6 @@
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
     <string name="receive_follow_request">Receive follow request</string>
+    <string name="local">local</string>
 
 </resources>

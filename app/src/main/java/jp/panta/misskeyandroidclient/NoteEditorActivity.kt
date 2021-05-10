@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,6 +31,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
+import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
@@ -45,7 +47,6 @@ import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
-import kotlinx.android.synthetic.main.activity_note_editor.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -101,7 +102,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_note_editor)
-        setSupportActionBar(note_editor_toolbar)
+        val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
+        mBinding = binding
+
+        setSupportActionBar(mBinding.noteEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         var text: String? = null
@@ -109,20 +113,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             text = intent.getStringExtra(Intent.EXTRA_TEXT)
         }
 
-        val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
-        mBinding = binding
 
         val miApplication = applicationContext as MiApplication
 
-        val toolbarBase = if(miApplication.getSettingStore().isPostButtonAtTheBottom){
-            binding.noteEditorToolbar.visibility = View.GONE
-            binding.bottomToolbarBase.visibility = View.VISIBLE
-            binding.bottomToolbarBase
-        }else{
-            binding.bottomToolbarBase.visibility = View.GONE
-            binding.bottomToolbarBase.visibility = View.VISIBLE
-            binding.noteEditorToolbar
-        }
+        val toolbarBase = getToolbarBase()
         val noteEditorToolbar = DataBindingUtil.inflate<ViewNoteEditorToolbarBinding>(
             LayoutInflater.from(this),
             R.layout.view_note_editor_toolbar,
@@ -159,12 +153,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         val userChipAdapter = UserChipListAdapter(this)
         binding.addressUsersView.adapter = userChipAdapter
-        val flexBoxLayoutManager = FlexboxLayoutManager(this)
-        flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-        flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-        flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-        binding.addressUsersView.layoutManager = flexBoxLayoutManager
+        binding.addressUsersView.applyFlexBoxLayout(this)
 
 
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
@@ -250,11 +239,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
 
 
-        selectFileFromDrive.setOnClickListener {
+        mBinding.selectFileFromDrive.setOnClickListener {
             showDriveFileSelector()
         }
 
-        selectFileFromLocal.setOnClickListener {
+        mBinding.selectFileFromLocal.setOnClickListener {
             showFileManager()
         }
 
@@ -342,6 +331,22 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             val ft = supportFragmentManager.beginTransaction()
             ft.remove(fragment)
             ft.commit()
+        }
+    }
+
+    /**
+     * 設定をもとにToolbarを表示するベースとなるViewGroupを非表示・表示＆取得をしている
+     */
+    private fun getToolbarBase() : ViewGroup {
+        val miCore = applicationContext as MiCore
+        return if(miCore.getSettingStore().isPostButtonAtTheBottom){
+            mBinding.noteEditorToolbar.visibility = View.GONE
+            mBinding.bottomToolbarBase.visibility = View.VISIBLE
+            mBinding.bottomToolbarBase
+        }else{
+            mBinding.bottomToolbarBase.visibility = View.GONE
+            mBinding.bottomToolbarBase.visibility = View.VISIBLE
+            mBinding.noteEditorToolbar
         }
     }
 

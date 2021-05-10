@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBinding
+import jp.panta.misskeyandroidclient.model.notes.CanLocalOnly
 import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
@@ -68,6 +69,11 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
             }
             .setView(view)
 
+        binding?.isLocalOnlySwitch?.setOnCheckedChangeListener { _, isChecked ->
+            val visibility = (viewModel.visibility.value ?: Visibility.Public(isChecked)) as? CanLocalOnly
+                ?: return@setOnCheckedChangeListener
+            viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as Visibility)
+        }
         binding?.lifecycleOwner = requireActivity()
         binding?.noteEditorViewModel = viewModel
 

@@ -328,5 +328,6 @@
     <string name="learn_note_visibility">ノートの公開範囲を記憶する</string>
     <string name="accept">承認</string>
     <string name="reject">拒否</string>
+    <string name="local">ローカル</string>
 
 </resources>

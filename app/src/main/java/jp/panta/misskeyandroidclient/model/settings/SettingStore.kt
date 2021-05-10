@@ -108,15 +108,6 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, true)
         }
 
-    private var isVisibleLocalOnly: Boolean
-        set(value) {
-            sharedPreferences.edit {
-                putBoolean("IS_VISIBLE_LOCAL_ONLY", value)
-            }
-        }
-        get() {
-            return sharedPreferences.getBoolean("IS_VISIBLE_LOCAL_ONLY", false)
-        }
 
     fun setNoteVisibility(createNote: CreateNote) {
         if(!isLearnVisibility) {
@@ -125,7 +116,7 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         if(!(createNote.renoteId == null && createNote.replyId == null)) {
             return
         }
-        isVisibleLocalOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly?: false
+        val localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly?: false
         val str = when(createNote.visibility) {
             is Visibility.Public -> "public"
             is Visibility.Home -> "home"
@@ -133,18 +124,22 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             is Visibility.Specified -> "specified"
         }
         Log.d("SettingStore", "visibility: $str")
-        sharedPreferences.edit { putString("accountId:${createNote.author.accountId}:NOTE_VISIBILITY", str) }
+        sharedPreferences.edit {
+            putString("accountId:${createNote.author.accountId}:NOTE_VISIBILITY", str)
+            putBoolean("accountId:${createNote.author.accountId}:IS_LOCAL_ONLY", localOnly)
+        }
     }
 
     fun getNoteVisibility(accountId: Long): Visibility {
         if(!isLearnVisibility) {
             return Visibility.Public(false)
         }
+        val localOnly = sharedPreferences.getBoolean("accountId:${accountId}:IS_LOCAL_ONLY", false)
         return when(sharedPreferences.getString("accountId:${accountId}:NOTE_VISIBILITY", "public")) {
-            "home"-> Visibility.Home(isVisibleLocalOnly)
-            "followers" -> Visibility.Followers(isVisibleLocalOnly)
+            "home"-> Visibility.Home(localOnly)
+            "followers" -> Visibility.Followers(localOnly)
             "specified" -> Visibility.Specified(emptyList())
-            else -> Visibility.Public(isVisibleLocalOnly)
+            else -> Visibility.Public(localOnly)
         }
     }
 
