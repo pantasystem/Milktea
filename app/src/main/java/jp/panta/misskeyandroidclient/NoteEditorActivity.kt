@@ -31,6 +31,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
+import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
@@ -152,12 +153,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         val userChipAdapter = UserChipListAdapter(this)
         binding.addressUsersView.adapter = userChipAdapter
-        val flexBoxLayoutManager = FlexboxLayoutManager(this)
-        flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-        flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-        flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-        binding.addressUsersView.layoutManager = flexBoxLayoutManager
+        binding.addressUsersView.applyFlexBoxLayout(this)
 
 
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
