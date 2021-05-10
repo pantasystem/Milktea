@@ -48,7 +48,7 @@ android {
 
 ext {
     retrofit = '2.8.0'
-    room_version = "2.2.6"
+    room_version = "2.3.0"
     coroutines_version = '1.4.3'
 }
 
@@ -60,12 +60,12 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     // NOTE: リアクションピッカーなどでリフレクションを行っているのでバージョンを変更しないこと
-    implementation 'com.google.android.material:material:1.4.0-alpha02'
+    implementation 'com.google.android.material:material:1.4.0-beta01'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation 'androidx.preference:preference-ktx:1.1.1'
     // Required for local unit tests (JUnit 4 framework)
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
 
 
@@ -118,7 +118,7 @@ dependencies {
     implementation 'com.caverock:androidsvg-aar:1.4'
 
     //ExoPlayer
-    implementation 'com.google.android.exoplayer:exoplayer:2.10.8'
+    implementation 'com.google.android.exoplayer:exoplayer:2.13.3'
 
     //PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
