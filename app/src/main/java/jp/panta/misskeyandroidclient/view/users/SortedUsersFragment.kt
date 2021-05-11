@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.Activities
 
 import jp.panta.misskeyandroidclient.R
@@ -23,7 +24,7 @@ import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-class SortedUsersFragment : Fragment(), ShowUserDetails{
+class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails{
 
     companion object{
         const val EXTRA_EXPLORE_USERS_TYPE = "jp.panta.misskeyandroidclient.viewmodel.users.ExploreUsersViewModel.Type"
@@ -61,16 +62,8 @@ class SortedUsersFragment : Fragment(), ShowUserDetails{
         }
     }
 
-    lateinit var mBinding: FragmentExploreUsersBinding
+    val mBinding: FragmentExploreUsersBinding by dataBinding()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_explore_users, container, false)
-        return mBinding.root
-    }
 
     @FlowPreview
     @ExperimentalCoroutinesApi

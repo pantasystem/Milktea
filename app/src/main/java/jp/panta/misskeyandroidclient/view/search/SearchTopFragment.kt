@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
@@ -17,17 +18,9 @@ import jp.panta.misskeyandroidclient.view.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import java.lang.IllegalArgumentException
 
-class SearchTopFragment : Fragment(){
+class SearchTopFragment : Fragment(R.layout.fragment_search_top){
 
-    lateinit var mBinding: FragmentSearchTopBinding
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_top, container, false)
-        return mBinding.root
-    }
+    private val mBinding: FragmentSearchTopBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

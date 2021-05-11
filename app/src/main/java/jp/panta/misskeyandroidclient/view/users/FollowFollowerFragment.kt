@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentFollowFollwerBinding
 import jp.panta.misskeyandroidclient.model.users.User
@@ -18,7 +19,7 @@ import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-class FollowFollowerFragment : Fragment(){
+class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
     companion object{
         private const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment.EXTRA_USER_ID"
@@ -36,16 +37,7 @@ class FollowFollowerFragment : Fragment(){
 
     private var mViewModel: FollowFollowerViewModel? = null
     private lateinit var mLinearLayoutManager: LinearLayoutManager
-    private lateinit var mBinding: FragmentFollowFollwerBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_follow_follwer, container, false)
-        return mBinding.root
-    }
+    private val mBinding: FragmentFollowFollwerBinding by dataBinding()
 
     @FlowPreview
     @ExperimentalCoroutinesApi

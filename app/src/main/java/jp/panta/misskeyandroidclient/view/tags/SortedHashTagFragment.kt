@@ -9,12 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.*
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSortedHashTagBinding
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 
-class SortedHashTagFragment : Fragment(){
+class SortedHashTagFragment : Fragment(R.layout.fragment_sorted_hash_tag){
 
     companion object{
         /*const val EXTRA_SORT = "jp.panta.misskeyandroidclient.view.tags.EXTRA_SORT"
@@ -48,15 +49,8 @@ class SortedHashTagFragment : Fragment(){
         }
     }
 
-    lateinit var mBinding: FragmentSortedHashTagBinding
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_sorted_hash_tag,container, false)
-        return mBinding.root
-    }
+    private val mBinding: FragmentSortedHashTagBinding by dataBinding()
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

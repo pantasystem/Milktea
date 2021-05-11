@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
 import jp.panta.misskeyandroidclient.view.notes.TimelineListAdapter
@@ -17,18 +18,9 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class PinNoteFragment : Fragment(){
+class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
 
-    lateinit var mBinding: FragmentPinNoteBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_pin_note, container, false)
-        return mBinding.root
-    }
+    val mBinding: FragmentPinNoteBinding by dataBinding()
 
     @ExperimentalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {

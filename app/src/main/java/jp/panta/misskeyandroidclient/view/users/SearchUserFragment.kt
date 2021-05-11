@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
@@ -19,7 +20,7 @@ import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-class SearchUserFragment : Fragment(), ShowUserDetails{
+class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDetails{
 
     companion object{
         const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.view.users.SearchUserFragment"
@@ -36,15 +37,8 @@ class SearchUserFragment : Fragment(), ShowUserDetails{
         }
     }
 
-    lateinit var mBinding: FragmentSearchUserBinding
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_user, container, false)
-        return mBinding.root
-    }
+    val mBinding: FragmentSearchUserBinding by dataBinding()
+
 
     @FlowPreview
     @ExperimentalCoroutinesApi
