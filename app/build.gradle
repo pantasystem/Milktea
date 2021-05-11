@@ -144,4 +144,5 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0"
 
+    implementation 'com.github.wada811:DataBinding-ktx:5.0.1'
 }

@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
@@ -22,23 +23,15 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewMode
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class NotificationFragment : Fragment(), ScrollableTop {
+class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
 
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
     @ExperimentalCoroutinesApi
     lateinit var mViewModel: NotificationViewModel
 
-    private lateinit var mBinding: FragmentNotificationBinding
+    private val mBinding: FragmentNotificationBinding by dataBinding()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_notification, container, false)
-        return mBinding.root
-    }
 
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
