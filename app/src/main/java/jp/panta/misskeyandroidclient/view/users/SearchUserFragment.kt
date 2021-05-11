@@ -1,22 +1,25 @@
 package jp.panta.misskeyandroidclient.view.users
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
-import kotlinx.android.synthetic.main.fragment_search_user.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDetails{
+class SearchUserFragment : Fragment(), ShowUserDetails{
 
     companion object{
         const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.view.users.SearchUserFragment"
@@ -31,6 +34,16 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
                 }
             }
         }
+    }
+
+    lateinit var mBinding: FragmentSearchUserBinding
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_user, container, false)
+        return mBinding.root
     }
 
     @FlowPreview
@@ -48,15 +61,15 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
         val toggleFollowViewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miCore))[ToggleFollowViewModel::class.java]
 
         val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
-        searchUsersView.adapter = adapter
-        searchUsersView.layoutManager = LinearLayoutManager(requireContext())
+        mBinding.searchUsersView.adapter = adapter
+        mBinding.searchUsersView.layoutManager = LinearLayoutManager(requireContext())
         viewModel.getUsers().observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
         viewModel.isLoading.observe(viewLifecycleOwner, {
-            searchUserSwipeRefresh.isRefreshing = it?: false
+            mBinding.searchUserSwipeRefresh.isRefreshing = it?: false
         })
-        searchUserSwipeRefresh.setOnRefreshListener {
+        mBinding.searchUserSwipeRefresh.setOnRefreshListener {
             viewModel.search()
         }
     }
