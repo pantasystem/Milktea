@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
 import jp.panta.misskeyandroidclient.view.users.ClickableUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
-import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -30,13 +30,15 @@ class SearchActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     private lateinit var mSearchUserViewModel: SearchUserViewModel
 
+    private val binding: ActivitySearchBinding by dataBinding()
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_search)
-        setSupportActionBar(search_toolbar)
+        setSupportActionBar(binding.searchToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -46,8 +48,8 @@ class SearchActivity : AppCompatActivity() {
         mSearchUserViewModel = ViewModelProvider(this, SearchUserViewModel.Factory(miCore, null))[SearchUserViewModel::class.java]
 
         val usersAdapter = ClickableUserListAdapter(this)
-        searchedUsers.adapter = usersAdapter
-        searchedUsers.layoutManager = LinearLayoutManager(this)
+        binding.searchedUsers.adapter = usersAdapter
+        binding.searchedUsers.layoutManager = LinearLayoutManager(this)
         mSearchUserViewModel.getUsers().observe(this, {
             usersAdapter.submitList(it)
         })
