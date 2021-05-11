@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBinding
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -30,7 +31,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
     }
 
     private  lateinit var mSettingStore: SettingStore
-    private lateinit var mBinding: ActivitySettingAppearanceBinding
+    private val mBinding: ActivitySettingAppearanceBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
