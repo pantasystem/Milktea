@@ -1,49 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-    <TextView
-            android:id="@+id/titleView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:layout_marginBottom="8dp"
-            android:text="@string/edit_tab_name"
-            />
-    <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tabNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_below="@id/titleView"
-            >
-        <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTabName"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        >
+
+    <RelativeLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+        <TextView
+                android:id="@+id/titleView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginBottom="8dp"
+                android:text="@string/edit_tab_name"
+                />
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tabNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/edit_tab_name"
-                android:singleLine="true"/>
-    </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="8dp"
+                android:layout_below="@id/titleView"
+                >
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTabName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/edit_tab_name"
+                    android:singleLine="true"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tabNameInput"
-            android:id="@+id/cancelButton"
-            android:layout_toStartOf="@id/okButton"
-            android:layout_marginEnd="8dp"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:text="@android:string/cancel"/>
-    <Button
-            android:id="@+id/okButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tabNameInput"
-            android:layout_alignParentEnd="true"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:text="@android:string/ok"/>
-</RelativeLayout>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tabNameInput"
+                android:id="@+id/cancelButton"
+                android:layout_toStartOf="@id/okButton"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:text="@android:string/cancel"/>
+        <Button
+                android:id="@+id/okButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tabNameInput"
+                android:layout_alignParentEnd="true"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:text="@android:string/ok"/>
+    </RelativeLayout>
+</layout>

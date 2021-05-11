@@ -4,17 +4,19 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.DialogEditTabNameBinding
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
-import kotlinx.android.synthetic.main.dialog_edit_tab_name.view.*
-import kotlinx.android.synthetic.main.item_detail_note.view.*
 
 class EditTabNameDialog : AppCompatDialogFragment(){
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_edit_tab_name, null)
+        val binding = DataBindingUtil.bind<DialogEditTabNameBinding>(view)
+        requireNotNull(binding)
         dialog.setContentView(view)
         val pageSettingViewModel = ViewModelProvider(requireActivity())[PageSettingViewModel::class.java]
 
@@ -23,17 +25,17 @@ class EditTabNameDialog : AppCompatDialogFragment(){
             dismiss()
             return dialog
         }
-        view.editTabName.setText(page.title)
+        binding.editTabName.setText(page.title)
 
-        view.okButton.setOnClickListener {
-            val name = view.editTabName.text?.toString()
+        binding.okButton.setOnClickListener {
+            val name = binding.editTabName.text?.toString()
             if(name?.isNotBlank() == true){
                 val updated = page.copy(title = name)
                 pageSettingViewModel.updatePage(updated)
             }
             dismiss()
         }
-        view.cancelButton.setOnClickListener{
+        binding.cancelButton.setOnClickListener{
             dismiss()
         }
         return dialog
