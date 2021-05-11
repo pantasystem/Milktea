@@ -1,18 +1,20 @@
 package jp.panta.misskeyandroidclient.view.tags
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentSortedHashTagBinding
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
-import kotlinx.android.synthetic.main.fragment_sorted_hash_tag.view.*
 
-class SortedHashTagFragment : Fragment(R.layout.fragment_sorted_hash_tag){
+class SortedHashTagFragment : Fragment(){
 
     companion object{
         /*const val EXTRA_SORT = "jp.panta.misskeyandroidclient.view.tags.EXTRA_SORT"
@@ -46,6 +48,16 @@ class SortedHashTagFragment : Fragment(R.layout.fragment_sorted_hash_tag){
         }
     }
 
+    lateinit var mBinding: FragmentSortedHashTagBinding
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_sorted_hash_tag,container, false)
+        return mBinding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -55,23 +67,23 @@ class SortedHashTagFragment : Fragment(R.layout.fragment_sorted_hash_tag){
         val viewModel = ViewModelProvider(this, SortedHashTagListViewModel.Factory(miCore, conditions))[SortedHashTagListViewModel::class.java]
 
         val adapter = HashTagListAdapter()
-        view.hashTagListView.adapter = adapter
+        mBinding.hashTagListView.adapter = adapter
 
         val flexBoxLayoutManager = FlexboxLayoutManager(view.context)
         flexBoxLayoutManager.flexDirection = FlexDirection.ROW
         flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
         flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
         flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-        view.hashTagListView.layoutManager = flexBoxLayoutManager
-        viewModel.hashTags.observe(viewLifecycleOwner, Observer {
+        mBinding.hashTagListView.layoutManager = flexBoxLayoutManager
+        viewModel.hashTags.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer {
-            view.hashTagListSwipeRefresh.isRefreshing = it
+        viewModel.isLoading.observe(viewLifecycleOwner, {
+            mBinding.hashTagListSwipeRefresh.isRefreshing = it
         })
 
-        view.hashTagListSwipeRefresh.setOnRefreshListener {
+        mBinding.hashTagListSwipeRefresh.setOnRefreshListener {
             viewModel.load()
         }
 
