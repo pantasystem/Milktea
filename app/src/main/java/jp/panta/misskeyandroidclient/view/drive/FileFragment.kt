@@ -10,15 +10,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentFileBinding
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
-import kotlinx.android.synthetic.main.fragment_file.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -51,6 +52,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
         }
     }
 
+    private val binding: FragmentFileBinding by dataBinding()
     private var mViewModel: FileViewModel? = null
     private lateinit var mLinearLayoutManager: LinearLayoutManager
 
@@ -61,7 +63,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
         val folderId = arguments?.getString(ARGS_FOLDER_ID)
 
         mLinearLayoutManager = LinearLayoutManager(context)
-        files_view.layoutManager = mLinearLayoutManager
+        binding.filesView.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
         miApplication.getCurrentAccount().filterNotNull().onEach{
@@ -75,30 +77,30 @@ class FileFragment : Fragment(R.layout.fragment_file){
 
 
 
-            driveViewModel.currentDirectory.observe(viewLifecycleOwner, Observer {directory ->
+            driveViewModel.currentDirectory.observe(viewLifecycleOwner, {directory ->
                 viewModel.currentFolder.postValue(directory.id)
             })
 
             mViewModel = viewModel
-            viewModel.isRefreshing.observe(viewLifecycleOwner, Observer { isRefreshing ->
-                refresh.isRefreshing = isRefreshing
+            viewModel.isRefreshing.observe(viewLifecycleOwner, { isRefreshing ->
+                binding.refresh.isRefreshing = isRefreshing
             })
 
             val adapter = FileListAdapter(fileDiffUtilCallback, viewModel,driveViewModel, viewLifecycleOwner)
-            files_view.adapter = adapter
+            binding.filesView.adapter = adapter
 
-            viewModel.filesLiveData.observe(viewLifecycleOwner, Observer {files ->
+            viewModel.filesLiveData.observe(viewLifecycleOwner, {files ->
                 adapter.submitList(files)
             })
-            viewModel.currentFolder.observe(viewLifecycleOwner, Observer {
+            viewModel.currentFolder.observe(viewLifecycleOwner, {
                 viewModel.loadInit()
             })
 
-            refresh.setOnRefreshListener {
+            binding.refresh.setOnRefreshListener {
                 viewModel.loadInit()
             }
         }.launchIn(lifecycleScope)
-        files_view.addOnScrollListener(mScrollListener)
+        binding.filesView.addOnScrollListener(mScrollListener)
     }
 
     override fun onResume() {

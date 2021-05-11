@@ -5,21 +5,21 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentFolderBinding
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
-import kotlinx.android.synthetic.main.fragment_folder.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,11 +29,13 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
     lateinit var mLinearLayoutManager: LinearLayoutManager
     private var mFolderViewModel: FolderViewModel? = null
 
+    private val binding: FragmentFolderBinding by dataBinding()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mLinearLayoutManager = LinearLayoutManager(context)
-        folder_view.layoutManager = mLinearLayoutManager
+        binding.folderView.layoutManager = mLinearLayoutManager
 
         val miApplication  = context?.applicationContext as MiApplication
 
@@ -51,14 +53,14 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
             })
 
             val adapter = FolderListAdapter(diffUtilItemCallback, driveViewModel, folderViewModel)
-            folder_view.adapter = adapter
+            binding.folderView.adapter = adapter
 
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, {
                 folderViewModel.currentFolder.postValue(it.id)
             })
 
             folderViewModel.isRefreshing.observe(viewLifecycleOwner, {
-                refresh.isRefreshing = it
+                binding.refresh.isRefreshing = it
             })
 
             folderViewModel.currentFolder.observe(viewLifecycleOwner, {
@@ -69,7 +71,7 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
                 adapter.submitList(it)
             })
 
-            refresh.setOnRefreshListener {
+            binding.refresh.setOnRefreshListener {
                 folderViewModel.loadInit()
             }
 
@@ -80,7 +82,7 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
 
         }.launchIn(lifecycleScope)
 
-        folder_view.addOnScrollListener(mScrollListener)
+        binding.folderView.addOnScrollListener(mScrollListener)
 
     }
 
