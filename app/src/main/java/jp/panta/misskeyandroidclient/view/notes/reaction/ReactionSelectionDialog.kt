@@ -7,15 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import kotlinx.android.synthetic.main.dialog_select_reaction.*
 
 class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
@@ -32,6 +31,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val binding = DialogSelectReactionBinding.bind(view)
 
         val activity = activity
         val miApplication = context?.applicationContext as MiApplication
@@ -68,10 +68,10 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         val pagerAdapter = ReactionChoicesPagerAdapter(category)
 
-        reaction_choices_view_pager.adapter = pagerAdapter
-        reaction_choices_tab.setupWithViewPager(reaction_choices_view_pager)
+        binding.reactionChoicesViewPager.adapter = pagerAdapter
+        binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
 
-        reaction_input_keyboard.setOnClickListener {
+        binding.reactionInputKeyboard.setOnClickListener {
 
             /*val dialog = ReactionInputDialog()
             dialog.show(childFragmentManager, "ReactionSelectionDialog")*/
