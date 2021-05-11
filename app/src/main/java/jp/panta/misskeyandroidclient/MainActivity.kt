@@ -92,15 +92,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setSupportActionBar(mainBinding.appBarMain.toolbar)
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, mainBinding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this, mainBinding.drawerLayout, mainBinding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
-        drawerLayout.addDrawerListener(toggle)
+        mainBinding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        navView.setNavigationItemSelectedListener(this)
+        mainBinding.navView.setNavigationItemSelectedListener(this)
 
         mainBinding.appBarMain.fab.setOnClickListener{
             startActivity(Intent(this, NoteEditorActivity::class.java))
@@ -137,7 +135,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Major.V_12)?: false
         }.flowOn(Dispatchers.IO).onEach { isV12 ->
             Log.d("MainActivity", if(isV12) "v12のようです" else "v12以外のようです")
-            navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
+            mainBinding.navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
         }.launchIn(lifecycleScope)
 
         miApplication.connectionStatus.observe(this, { status ->
