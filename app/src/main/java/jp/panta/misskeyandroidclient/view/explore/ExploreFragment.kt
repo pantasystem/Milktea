@@ -4,16 +4,19 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentExploreBinding
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.explore.Explore
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
-import kotlinx.android.synthetic.main.fragment_explore.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 class ExploreFragment : Fragment(R.layout.fragment_explore){
+
+    val binding: FragmentExploreBinding by dataBinding()
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -32,8 +35,8 @@ class ExploreFragment : Fragment(R.layout.fragment_explore){
 
         val exploreInLocalAdapter = ExploresAdapter()
         exploreInLocalAdapter.submitList(localExplores)
-        view.exploresLocalView.adapter = exploreInLocalAdapter
-        view.exploresLocalView.layoutManager = LinearLayoutManager(view.context)
+        binding.exploresLocalView.adapter = exploreInLocalAdapter
+        binding.exploresLocalView.layoutManager = LinearLayoutManager(view.context)
 
         val remoteExplores = listOf(
             Explore.UserType( getString(R.string.trending_users), SortedUsersViewModel.Type.REMOTE_TRENDING_USER ),
@@ -44,8 +47,8 @@ class ExploreFragment : Fragment(R.layout.fragment_explore){
         )
 
         val exploreInRemoteAdapter = ExploresAdapter()
-        view.exploresRemoteView.adapter = exploreInRemoteAdapter
-        view.exploresRemoteView.layoutManager = LinearLayoutManager(view.context)
+        binding.exploresRemoteView.adapter = exploreInRemoteAdapter
+        binding.exploresRemoteView.layoutManager = LinearLayoutManager(view.context)
         exploreInRemoteAdapter.submitList(remoteExplores)
     }
 }

@@ -8,7 +8,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import jp.panta.misskeyandroidclient.R
-import kotlinx.android.synthetic.main.dialog_user_list_editor.view.*
+import jp.panta.misskeyandroidclient.databinding.DialogUserListEditorBinding
 
 class UserListEditorDialog : AppCompatDialogFragment(){
 
@@ -48,39 +48,40 @@ class UserListEditorDialog : AppCompatDialogFragment(){
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_user_list_editor, null)
         dialog.setContentView(view)
+        val binding = DialogUserListEditorBinding.bind(view)
 
         val modeOrdinal = arguments?.getInt(EXTRA_MODE)?: 0
 
         val mode = Mode.values()[modeOrdinal]
 
-        view.titleView.text = when(mode){
+        binding.titleView.text = when(mode){
             Mode.CREATE -> getString(R.string.create_user_list)
             Mode.UPDATE -> getString(R.string.update_user_list)
         }
 
         if(mode == Mode.UPDATE){
-            view.editListName.setText(
+            binding.editListName.setText(
                 arguments?.getString(EXTRA_LIST_NAME)?: ""
             )
         }
 
-        view.okButton.isEnabled = !view.editListName.text.isNullOrBlank()
+        binding.okButton.isEnabled = !binding.editListName.text.isNullOrBlank()
 
-        view.editListName.addTextChangedListener(object : TextWatcher{
+        binding.editListName.addTextChangedListener(object : TextWatcher{
 
             override fun afterTextChanged(s: Editable?) = Unit
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                view.okButton.isEnabled = !s.isNullOrBlank()
+                binding.okButton.isEnabled = !s.isNullOrBlank()
 
             }
         })
 
         //val viewModel = ViewModelProvider(requireActivity(), UserListOperateViewModel.Factory(account, miCore))[UserListOperateViewModel::class.java]
-        view.okButton.setOnClickListener{
-            val name = view.editListName.text.toString()
+        binding.okButton.setOnClickListener{
+            val name = binding.editListName.text.toString()
             val context = requireContext()
             if(context is OnSubmittedListener){
                 context.onSubmit(name)
@@ -90,7 +91,7 @@ class UserListEditorDialog : AppCompatDialogFragment(){
 
             dismiss()
         }
-        view.cancelButton.setOnClickListener{
+        binding.cancelButton.setOnClickListener{
             dismiss()
         }
         return dialog

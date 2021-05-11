@@ -13,7 +13,6 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
-import kotlinx.android.synthetic.main.fragment_player.*
 
 class PlayerFragment : Fragment(R.layout.fragment_player){
 
