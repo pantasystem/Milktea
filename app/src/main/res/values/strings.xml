@@ -327,5 +327,6 @@
     <string name="receive_follow_request">Receive follow request</string>
     <string name="local">local</string>
     <string name="add_user_list">Add user list</string>
+    <string name="edit_note">Edit note</string>
 
 </resources>

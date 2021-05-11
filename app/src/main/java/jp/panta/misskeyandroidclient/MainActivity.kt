@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
@@ -24,6 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
@@ -55,9 +55,6 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingS
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -78,6 +75,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var logger: Logger? = null
 
+    private lateinit var mBinding: ActivityMainBinding
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,24 +84,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //setTheme(R.style.AppThemeDark)
         setTheme()
 
-        setContentView(R.layout.activity_main)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
 
         val mainBinding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+
+        setSupportActionBar(mainBinding.appBarMain.toolbar)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this, drawerLayout, mainBinding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
         navView.setNavigationItemSelectedListener(this)
 
-        fab.setOnClickListener{
+        mainBinding.appBarMain.fab.setOnClickListener{
             startActivity(Intent(this, NoteEditorActivity::class.java))
         }
 
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }.map {
             it.size
         }.flowOn(Dispatchers.IO).onEach { count ->
-            bottom_navigation.getOrCreateBadge(R.id.navigation_message_list).let{
+            mainBinding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_message_list).let{
                 it.isVisible = count > 0
                 it.number = count
             }
@@ -160,9 +160,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             miApplication.getNotificationRepository().countUnreadNotification(it.accountId)
         }.flowOn(Dispatchers.IO).onEach { count ->
             if(count <= 0) {
-                bottom_navigation.getBadge(R.id.navigation_notification)?.clearNumber()
+                mainBinding.appBarMain.bottomNavigation.getBadge(R.id.navigation_notification)?.clearNumber()
             }
-            bottom_navigation.getOrCreateBadge(R.id.navigation_notification).apply{
+            mainBinding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_notification).apply{
                 isVisible = count > 0
                 number = count
             }
@@ -186,14 +186,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }.launchIn(lifecycleScope + Dispatchers.Main)
 
         startService(Intent(this, NotificationService::class.java))
-        mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState)
+        mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState, mainBinding.appBarMain.bottomNavigation)
 
     }
 
 
-    inner class MainBottomNavigationAdapter(savedInstanceState: Bundle?)
-        : BottomNavigationAdapter(bottom_navigation, supportFragmentManager, R.id.navigation_home, R.id.content_main, savedInstanceState){
-        private val home = bottom_navigation.menu.findItem(R.id.navigation_home)
+    inner class MainBottomNavigationAdapter(savedInstanceState: Bundle?, bottomNavigation: BottomNavigationView)
+        : BottomNavigationAdapter(bottomNavigation, supportFragmentManager, R.id.navigation_home, R.id.content_main, savedInstanceState){
+
         var currentMenuItem: MenuItem? = null
 
         override fun viewChanged(menuItem: MenuItem, fragment: Fragment) {
@@ -235,12 +235,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val editor = supportFragmentManager.findFragmentByTag("simpleEditor")
 
         if(miApplication.getSettingStore().isSimpleEditorEnabled){
-            fab.visibility = View.GONE
+            mBinding.appBarMain.fab.visibility = View.GONE
             if(editor == null){
                 ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
             }
         }else{
-            fab.visibility = View.VISIBLE
+            mBinding.appBarMain.fab.visibility = View.VISIBLE
 
             editor?.let{
                 ft.remove(it)
@@ -272,14 +272,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + " ${getString(R.string.followed_by)}"
             NotificationViewData.Type.FOLLOW_REQUEST_ACCEPTED -> name + " ${getString(R.string.follow_request_accepted)}"
         }
-        val snackBar = Snackbar.make(simple_notification, msg, Snackbar.LENGTH_LONG)
+        val snackBar = Snackbar.make(mBinding.appBarMain.simpleNotification, msg, Snackbar.LENGTH_LONG)
 
         snackBar.show()
     }
 
     private val switchAccountButtonObserver = Observer<Int>{
         runOnUiThread{
-            drawer_layout.closeDrawer(GravityCompat.START)
+            mBinding.drawerLayout.closeDrawer(GravityCompat.START)
             val dialog = AccountSwitchingDialog()
             dialog.show(supportFragmentManager, "mainActivity")
         }
@@ -354,8 +354,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     @MainThread
     private fun closeDrawerWhenOpenedDrawer(){
-        if(drawer_layout.isDrawerOpen(GravityCompat.START)){
-            drawer_layout.closeDrawer(GravityCompat.START)
+        if(mBinding.drawerLayout.isDrawerOpen(GravityCompat.START)){
+            mBinding.drawerLayout.closeDrawer(GravityCompat.START)
         }
     }
 
@@ -499,7 +499,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val path = SettingStore(getSharedPreferences(getPreferenceName() ,Context.MODE_PRIVATE)).backgroundImagePath
         Glide.with(this)
             .load(path)
-            .into(backgroundImage)
+            .into(mBinding.appBarMain.contentMain.backgroundImage)
     }
 
     @MainThread
@@ -507,7 +507,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         invalidateOptionsMenu()
         setSimpleEditor()
 
-        bottom_navigation.visibility = if(getSettingStore().isClassicUI){
+        mBinding.appBarMain.bottomNavigation.visibility = if(getSettingStore().isClassicUI){
             View.GONE
         }else{
             View.VISIBLE
