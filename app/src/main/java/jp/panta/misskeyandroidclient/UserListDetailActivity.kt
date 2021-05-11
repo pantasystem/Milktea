@@ -7,15 +7,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.api.list.UserListDTO
+import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
@@ -27,7 +26,6 @@ import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
-import kotlinx.android.synthetic.main.activity_user_list_detail.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -61,6 +59,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     private var mIsNameUpdated: Boolean = false
     private var mUserListName: String = ""
+    private val binding: ActivityUserListDetailBinding by dataBinding()
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -69,7 +68,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         setTheme()
         setContentView(R.layout.activity_user_list_detail)
 
-        setSupportActionBar(userListToolbar)
+        setSupportActionBar(binding.userListToolbar)
 
         val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
         //val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
@@ -88,8 +87,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             supportActionBar?.title = ul.name
             mUserListName = ul.name
 
-            userListDetailViewPager.adapter = PagerAdapter(ul.id)
-            userListDetailTab.setupWithViewPager(userListDetailViewPager)
+            binding.userListDetailViewPager.adapter = PagerAdapter(ul.id)
+            binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
 
             if(intent.action == ACTION_EDIT_NAME){
                 intent.action = ACTION_SHOW
