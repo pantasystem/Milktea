@@ -1,19 +1,16 @@
 package jp.panta.misskeyandroidclient.view.media
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentImageBinding
 import jp.panta.misskeyandroidclient.model.file.File
-import kotlinx.android.synthetic.main.fragment_image.*
-import java.lang.IllegalArgumentException
 
 class ImageFragment : Fragment(R.layout.fragment_image){
 
@@ -47,6 +44,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
     }
 
     var index = 0
+    val binding: FragmentImageBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,7 +65,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
             } else {
                 it.load(uri)
             }
-        }.into(imageView)
+        }.into(binding.imageView)
     }
 
     override fun onResume() {

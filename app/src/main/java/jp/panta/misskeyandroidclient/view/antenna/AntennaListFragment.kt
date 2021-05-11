@@ -1,19 +1,20 @@
 package jp.panta.misskeyandroidclient.view.antenna
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import jp.panta.misskeyandroidclient.AntennaEditorActivity
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentAntennaListBinding
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
-import kotlinx.android.synthetic.main.fragment_antenna_list.*
 
 class AntennaListFragment : Fragment(R.layout.fragment_antenna_list){
+
+    val binding: FragmentAntennaListBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -25,19 +26,19 @@ class AntennaListFragment : Fragment(R.layout.fragment_antenna_list){
         val antennaViewModel = ViewModelProvider(requireActivity() , AntennaListViewModel.Factory(miApplication))[AntennaListViewModel::class.java]
 
         val adapter = AntennaListAdapter(antennaViewModel, viewLifecycleOwner)
-        antennaListView.adapter = adapter
-        antennaListView.layoutManager = layoutManager
+        binding.antennaListView.adapter = adapter
+        binding.antennaListView.layoutManager = layoutManager
 
-        antennaViewModel.antennas.observe(viewLifecycleOwner, Observer {
+        antennaViewModel.antennas.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
-        antennaListSwipeRefresh.setOnRefreshListener {
+        binding.antennaListSwipeRefresh.setOnRefreshListener {
             antennaViewModel.loadInit()
         }
 
-        antennaViewModel.isLoading.observe(viewLifecycleOwner, Observer {
-            antennaListSwipeRefresh.isRefreshing = it
+        antennaViewModel.isLoading.observe(viewLifecycleOwner, {
+            binding.antennaListSwipeRefresh.isRefreshing = it
         })
 
 
