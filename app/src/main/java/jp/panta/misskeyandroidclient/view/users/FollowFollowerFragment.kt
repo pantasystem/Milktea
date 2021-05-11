@@ -1,24 +1,24 @@
 package jp.panta.misskeyandroidclient.view.users
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.databinding.FragmentFollowFollwerBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
-import kotlinx.android.synthetic.main.fragment_follow_follwer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
+class FollowFollowerFragment : Fragment(){
 
     companion object{
         private const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment.EXTRA_USER_ID"
@@ -36,6 +36,16 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
     private var mViewModel: FollowFollowerViewModel? = null
     private lateinit var mLinearLayoutManager: LinearLayoutManager
+    private lateinit var mBinding: FragmentFollowFollwerBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_follow_follwer, container, false)
+        return mBinding.root
+    }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -49,8 +59,8 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
         mLinearLayoutManager = LinearLayoutManager(view.context)
 
-        follow_follower_list.layoutManager = mLinearLayoutManager
-        follow_follower_list.addOnScrollListener(mScrollListener)
+        mBinding.followFollowerList.layoutManager = mLinearLayoutManager
+        mBinding.followFollowerList.addOnScrollListener(mScrollListener)
 
 
         val miApplication = context?.applicationContext as MiApplication
@@ -63,7 +73,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
             viewLifecycleOwner, followFollowerViewModel, ViewModelProvider(this, ToggleFollowViewModel.Factory(miApplication))[ToggleFollowViewModel::class.java]
         )
 
-        follow_follower_list.adapter = adapter
+        mBinding.followFollowerList.adapter = adapter
 
         followFollowerViewModel.users.observe(viewLifecycleOwner,  {
             adapter.submitList(it)
@@ -72,7 +82,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
         followFollowerViewModel.loadInit()
 
         mViewModel?.isInitializing?.observe(viewLifecycleOwner,  {
-            swipe_refresh.isRefreshing = it
+            mBinding.swipeRefresh.isRefreshing = it
         })
 
         mViewModel?.showUserEventBus?.observe(viewLifecycleOwner,  {
@@ -82,7 +92,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
             requireActivity().startActivity(intent)
         })
 
-        swipe_refresh.setOnRefreshListener {
+        mBinding.swipeRefresh.setOnRefreshListener {
             mViewModel?.loadInit()
         }
 
