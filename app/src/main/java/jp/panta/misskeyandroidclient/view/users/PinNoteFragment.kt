@@ -1,21 +1,34 @@
 package jp.panta.misskeyandroidclient.view.users
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
 import jp.panta.misskeyandroidclient.view.notes.TimelineListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
-import kotlinx.android.synthetic.main.fragment_pin_note.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
+class PinNoteFragment : Fragment(){
+
+    lateinit var mBinding: FragmentPinNoteBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_pin_note, container, false)
+        return mBinding.root
+    }
 
     @ExperimentalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -38,8 +51,8 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
                 return oldItem.id == newItem.id
             }
         }, viewLifecycleOwner, notesViewModel)
-        pin_notes_view.adapter = adapter
-        pin_notes_view.layoutManager = LinearLayoutManager(this.context)
+        mBinding.pinNotesView.adapter = adapter
+        mBinding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
         userViewModel.pinNotes.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
