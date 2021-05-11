@@ -7,20 +7,23 @@ import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.view.settings.activities.*
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.MoveSettingActivityPanel
-import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity() {
+
+    private val binding: ActivitySettingsBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_settings)
 
-        setSupportActionBar(settingToolbar)
+        setSupportActionBar(binding.settingToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val movementSetting = MoveSettingActivityPanel<SettingMovementActivity>(
@@ -28,7 +31,7 @@ class SettingsActivity : AppCompatActivity() {
             activity = SettingMovementActivity::class.java,
             context = this
         )
-        movementSetting.startActivityEventBus.observe(this, Observer {
+        movementSetting.startActivityEventBus.observe(this, {
             startActivity(Intent(this, it))
         })
 
@@ -37,7 +40,7 @@ class SettingsActivity : AppCompatActivity() {
             activity = PageSettingActivity::class.java,
             context = this
         )
-        tabSetting.startActivityEventBus.observe(this, Observer {
+        tabSetting.startActivityEventBus.observe(this, {
             startActivity(Intent(this, it))
         })
 
@@ -47,7 +50,7 @@ class SettingsActivity : AppCompatActivity() {
             context = this
         )
 
-        appearanceSetting.startActivityEventBus.observe(this, Observer{
+        appearanceSetting.startActivityEventBus.observe(this, {
             startActivity(Intent(this, it))
         })
 
@@ -56,7 +59,7 @@ class SettingsActivity : AppCompatActivity() {
             activity = ReactionSettingActivity::class.java,
             context = this
         ).apply{
-            startActivityEventBus.observe(this@SettingsActivity, Observer{
+            startActivityEventBus.observe(this@SettingsActivity, {
                 startActivity(Intent(this@SettingsActivity, it))
             })
         }
@@ -67,7 +70,7 @@ class SettingsActivity : AppCompatActivity() {
             UrlPreviewSourceSettingActivity::class.java,
             this
         )
-        urlPreviewSource.startActivityEventBus.observe(this, Observer {
+        urlPreviewSource.startActivityEventBus.observe(this, {
             startActivity(Intent(this, it))
         })
 
@@ -77,7 +80,7 @@ class SettingsActivity : AppCompatActivity() {
             activity = OssLicensesMenuActivity::class.java,
             context = this
         )
-        licenseActivitySetting.startActivityEventBus.observe(this, Observer {
+        licenseActivitySetting.startActivityEventBus.observe(this, {
             val intent = Intent(this, it)
             intent.putExtra("title", getString(R.string.license))
             startActivity(intent)
@@ -90,8 +93,8 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         val adapter = SettingAdapter(this)
-        setting_list.adapter = adapter
-        setting_list.layoutManager = LinearLayoutManager(this)
+        binding.settingList.adapter = adapter
+        binding.settingList.layoutManager = LinearLayoutManager(this)
         adapter.submitList(listOf(group))
 
     }

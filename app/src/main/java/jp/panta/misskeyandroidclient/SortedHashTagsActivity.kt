@@ -3,9 +3,10 @@ package jp.panta.misskeyandroidclient
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.databinding.ActivitySortedHashTagsBinding
 import jp.panta.misskeyandroidclient.view.tags.SortedHashTagFragment
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
-import kotlinx.android.synthetic.main.activity_sorted_hash_tags.*
 
 class SortedHashTagsActivity : AppCompatActivity() {
 
@@ -15,12 +16,14 @@ class SortedHashTagsActivity : AppCompatActivity() {
         const val EXTRA_TITLE = "jp.panta.misskeyandroidclient.view.tags.EXTRA_TITLE"
     }
 
+    val binding: ActivitySortedHashTagsBinding by dataBinding()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_sorted_hash_tags)
 
-        setSupportActionBar(sortedHashTagToolbar)
+        setSupportActionBar(binding.sortedHashTagToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val conditions = intent.getSerializableExtra(EXTRA_HASH_TAG_CONDITION) as SortedHashTagListViewModel.Conditions
 
