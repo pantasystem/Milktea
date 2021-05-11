@@ -17,7 +17,6 @@ import jp.panta.misskeyandroidclient.databinding.ItemConversationBinding
 import jp.panta.misskeyandroidclient.databinding.ItemDetailNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
-import jp.panta.misskeyandroidclient.view.notes.TimelineListAdapter
 import jp.panta.misskeyandroidclient.view.notes.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -25,7 +24,6 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteConversationViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel
-import kotlinx.android.synthetic.main.item_detail_note.view.*
 import java.lang.IllegalArgumentException
 
 class NoteDetailAdapter(
@@ -124,10 +122,11 @@ class NoteDetailAdapter(
                 note.conversation.observe(viewLifecycleOwner, {
                     adapter.submitList(it)
                 })
-                if(note.poll != null){
-                    holder.binding.conversationView.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)
-                    holder.binding.conversationView.poll.layoutManager = LinearLayoutManager(holder.binding.root.context)
-                }
+                // FIXME なぜ今まで動いていたのか何故エラーが出るようになったのかわからない
+                /*if(note.poll != null){
+                     holder.binding.conversationView.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)
+                     holder.binding.conversationView.poll.layoutManager = LinearLayoutManager(holder.binding.root.context)
+                }*/
                 holder.binding.lifecycleOwner = viewLifecycleOwner
 
                 holder.binding.executePendingBindings()
