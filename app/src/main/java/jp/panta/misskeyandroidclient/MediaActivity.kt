@@ -9,14 +9,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import jp.panta.misskeyandroidclient.databinding.ActivityMediaBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.view.media.ImageFragment
 import jp.panta.misskeyandroidclient.view.media.PlayerFragment
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.android.synthetic.main.activity_media.*
 import java.io.Serializable
 
 class MediaActivity : AppCompatActivity() {
@@ -55,12 +55,13 @@ class MediaActivity : AppCompatActivity() {
 
     private var mCurrentMedia: Media? = null
     private var mMedias: List<Media>? = null
+    private lateinit var mBinding: ActivityMediaBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        setContentView(R.layout.activity_media)
-        setSupportActionBar(mediaToolbar)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_media)
+        setSupportActionBar(mBinding.mediaToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
@@ -100,9 +101,9 @@ class MediaActivity : AppCompatActivity() {
         mMedias = list
 
         val pagerAdapter = MediaPagerAdapter(list)
-        mediaViewPager.adapter = pagerAdapter
+        mBinding.mediaViewPager.adapter = pagerAdapter
 
-        mediaViewPager.currentItem = fileCurrentIndex
+        mBinding.mediaViewPager.currentItem = fileCurrentIndex
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
