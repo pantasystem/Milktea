@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.api.APIError
@@ -30,7 +31,7 @@ import kotlinx.coroutines.flow.collect
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class TimelineFragment : Fragment(), ScrollableTop, PageableView{
+class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop, PageableView{
 
     companion object{
 
@@ -80,7 +81,7 @@ class TimelineFragment : Fragment(), ScrollableTop, PageableView{
 
     lateinit var miApplication: MiApplication
 
-    lateinit var mBinding: FragmentSwipeRefreshRecyclerViewBinding
+    val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,14 +108,7 @@ class TimelineFragment : Fragment(), ScrollableTop, PageableView{
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_swipe_refresh_recycler_view, container, false)
-        return mBinding.root
-    }
+
 
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
