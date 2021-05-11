@@ -6,18 +6,18 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MessageActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentMessagingHistoryBinding
 import jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModelFactory
-import kotlinx.android.synthetic.main.fragment_messaging_history.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
@@ -28,13 +28,15 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
 
     private var mLinearLayoutManager: LinearLayoutManager? = null
 
+    private val binding: FragmentMessagingHistoryBinding by dataBinding()
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val layoutManager = LinearLayoutManager(context)
-        history_list_view.layoutManager = layoutManager
+        binding.historyListView.layoutManager = layoutManager
         mLinearLayoutManager = layoutManager
 
         val miApplication = context?.applicationContext as MiApplication
@@ -47,7 +49,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
 
             val adapter =
                 HistoryListAdapter(diffUtilItemCallback, historyViewModel, viewLifecycleOwner)
-            history_list_view.adapter = adapter
+            binding.historyListView.adapter = adapter
 
 
             historyViewModel.historyGroupAndUserLiveData.observe(viewLifecycleOwner, {
@@ -55,10 +57,10 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
             })
 
             historyViewModel.isRefreshing.observe(viewLifecycleOwner, {
-                refresh.isRefreshing = it
+                binding.refresh.isRefreshing = it
             })
 
-            refresh.setOnRefreshListener {
+            binding.refresh.setOnRefreshListener {
                 historyViewModel.loadGroupAndUser()
             }
 
