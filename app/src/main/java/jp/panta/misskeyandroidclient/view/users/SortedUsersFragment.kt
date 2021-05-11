@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.view.users
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,18 +13,17 @@ import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.databinding.FragmentExploreUsersBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
 import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
-import kotlinx.android.synthetic.main.fragment_explore_users.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails{
+class SortedUsersFragment : Fragment(), ShowUserDetails{
 
     companion object{
         const val EXTRA_EXPLORE_USERS_TYPE = "jp.panta.misskeyandroidclient.viewmodel.users.ExploreUsersViewModel.Type"
@@ -60,6 +61,17 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         }
     }
 
+    lateinit var mBinding: FragmentExploreUsersBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_explore_users, container, false)
+        return mBinding.root
+    }
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,16 +90,16 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
 
 
         exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner, {
-            exploreUsersSwipeRefresh.isRefreshing = it?: false
+            mBinding.exploreUsersSwipeRefresh.isRefreshing = it?: false
         })
 
-        exploreUsersSwipeRefresh.setOnRefreshListener {
+        mBinding.exploreUsersSwipeRefresh.setOnRefreshListener {
             exploreUsersViewModel.loadUsers()
         }
 
         val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
-        exploreUsersView.adapter = adapter
-        exploreUsersView.layoutManager = LinearLayoutManager(view.context)
+        mBinding.exploreUsersView.adapter = adapter
+        mBinding.exploreUsersView.layoutManager = LinearLayoutManager(view.context)
         exploreUsersViewModel.users.observe( viewLifecycleOwner, {
             adapter.submitList(it)
         })
