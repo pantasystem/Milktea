@@ -68,6 +68,10 @@ data class Update(
 )
 
 
-
+@Serializable
+data class Delete(
+    val i: String,
+    val postId: String
+)
 
 

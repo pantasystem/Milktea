@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11Diff
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12Diff
+import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
+import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275Diff
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -47,7 +49,13 @@ object MisskeyAPIServiceBuilder {
                 val misskeyAPIV11Diff = retrofit.create(MisskeyAPIV11Diff::class.java)
                 if(version.isInRange(Version.Major.V_12)){
                     val misskeyAPI12DiffImpl = retrofit.create(MisskeyAPIV12Diff::class.java)
-                     MisskeyAPIV12(baseAPI, misskeyAPI12DiffImpl, misskeyAPIV11Diff)
+                    if(version >= Version("12.75.0")) {
+                        val misskeyAPIV1275Diff = retrofit.create(MisskeyAPIV1275Diff::class.java)
+                        MisskeyAPIV1275(baseAPI, misskeyAPIV1275Diff, misskeyAPI12DiffImpl, misskeyAPIV11Diff)
+                    }else{
+                        MisskeyAPIV12(baseAPI, misskeyAPI12DiffImpl, misskeyAPIV11Diff)
+                    }
+
                 }else{
                     MisskeyAPIV11(baseAPI, misskeyAPIV11Diff)
                 }
