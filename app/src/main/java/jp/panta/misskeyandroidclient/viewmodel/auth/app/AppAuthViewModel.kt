@@ -55,11 +55,7 @@ class AppAuthViewModel(
 
     init{
         meta.addSource(instanceDomain){ base ->
-            val url = if(base.startsWith("https://")){
-                base
-            }else{
-                "https://$base"
-            }.replace(" ", "").replace("\t", "").replace("　", "")
+            val url = toEnableUrl(base)
             if(urlPattern.matcher(url).find()){
 
                 viewModelScope.launch(Dispatchers.IO) {
@@ -82,7 +78,7 @@ class AppAuthViewModel(
     fun auth(){
         generatingToken.value = true
         val url = this.instanceDomain.value?: return
-        val instanceBase = "https://$url"
+        val instanceBase = toEnableUrl(url)
         val appName = this.appName.value?: return
         val meta = this.meta.value?: return
         viewModelScope.launch(Dispatchers.IO){
@@ -131,5 +127,17 @@ class AppAuthViewModel(
             ?: throw IllegalStateException("Appの作成に失敗しました。")
     }
 
+    private fun toEnableUrl(base: String) : String{
+        var url = if(base.startsWith("https://")){
+            base
+        }else{
+            "https://$base"
+        }.replace(" ", "").replace("\t", "").replace("　", "")
+
+        if(url.endsWith("/")) {
+            url = url.substring(url.indices)
+        }
+        return url
+    }
 
 }
