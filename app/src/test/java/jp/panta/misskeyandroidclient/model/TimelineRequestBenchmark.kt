@@ -16,14 +16,14 @@ class TimelineRequestBenchmark {
         misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
     }
     @Test
-    fun beforeShowNoteTest(){
+    suspend fun beforeShowNoteTest(){
         val time = Date().time
         val noteId = "8915y6o8w6"
         val res = misskeyAPI.showNote(
             NoteRequest(
                 noteId = noteId
             )
-        ).execute()
+        )
         println("code:${res.code()}")
 
         val midTime = Date().time
@@ -32,7 +32,7 @@ class TimelineRequestBenchmark {
             NoteRequest(
                 untilId = noteId
             )
-        ).execute()
+        )
 
         val end = Date().time
 

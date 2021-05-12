@@ -23,23 +23,23 @@ class APIErrorTest {
     }
 
     @Test(expected = APIError.ForbiddenException::class)
-    fun testClientError() {
-        misskeyAPI.create(CreateNote("", text = null)).execute()?.throwIfHasError()
+    suspend fun testClientError() {
+        misskeyAPI.create(CreateNote("", text = null)).throwIfHasError()
     }
 
 
 
     @Test(expected = APIError.AuthenticationException::class)
-    fun testAuthenticationError() {
-        val res = misskeyAPI.i(I(null)).execute()
+    suspend fun testAuthenticationError() {
+        val res = misskeyAPI.i(I(null))
 
         res.throwIfHasError()
     }
 
 
     @Test
-    fun testHasErrorBody() {
-        val res = misskeyAPI.i(I(null)).execute()
+    suspend fun testHasErrorBody() {
+        val res = misskeyAPI.i(I(null))
 
         try{
             res.throwIfHasError()
