@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var logger: Logger? = null
 
-    private lateinit var mBinding: ActivityMainBinding
+    private val mBinding: ActivityMainBinding by dataBinding()
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -83,24 +84,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         //setTheme(R.style.AppThemeDark)
         setTheme()
-
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-
-        val mainBinding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        setContentView(R.layout.activity_main)
 
 
-        setSupportActionBar(mainBinding.appBarMain.toolbar)
+
+
+
+
+        setSupportActionBar(mBinding.appBarMain.toolbar)
 
         val toggle = ActionBarDrawerToggle(
-            this, mainBinding.drawerLayout, mainBinding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this, mBinding.drawerLayout, mBinding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
-        mainBinding.drawerLayout.addDrawerListener(toggle)
+        mBinding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        mainBinding.navView.setNavigationItemSelectedListener(this)
+        mBinding.navView.setNavigationItemSelectedListener(this)
 
-        mainBinding.appBarMain.fab.setOnClickListener{
+        mBinding.appBarMain.fab.setOnClickListener{
             startActivity(Intent(this, NoteEditorActivity::class.java))
         }
 
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mAccountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         initAccountViewModelListener()
-        setHeaderProfile(mainBinding)
+        setHeaderProfile(mBinding)
 
 
 
@@ -122,7 +123,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }.map {
             it.size
         }.flowOn(Dispatchers.IO).onEach { count ->
-            mainBinding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_message_list).let{
+            mBinding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_message_list).let{
                 it.isVisible = count > 0
                 it.number = count
             }
@@ -135,7 +136,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Major.V_12)?: false
         }.flowOn(Dispatchers.IO).onEach { isV12 ->
             Log.d("MainActivity", if(isV12) "v12のようです" else "v12以外のようです")
-            mainBinding.navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
+            mBinding.navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
         }.launchIn(lifecycleScope)
 
         miApplication.connectionStatus.observe(this, { status ->
@@ -158,9 +159,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             miApplication.getNotificationRepository().countUnreadNotification(it.accountId)
         }.flowOn(Dispatchers.IO).onEach { count ->
             if(count <= 0) {
-                mainBinding.appBarMain.bottomNavigation.getBadge(R.id.navigation_notification)?.clearNumber()
+                mBinding.appBarMain.bottomNavigation.getBadge(R.id.navigation_notification)?.clearNumber()
             }
-            mainBinding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_notification).apply{
+            mBinding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_notification).apply{
                 isVisible = count > 0
                 number = count
             }
@@ -184,7 +185,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }.launchIn(lifecycleScope + Dispatchers.Main)
 
         startService(Intent(this, NotificationService::class.java))
-        mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState, mainBinding.appBarMain.bottomNavigation)
+        mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState, mBinding.appBarMain.bottomNavigation)
 
     }
 
