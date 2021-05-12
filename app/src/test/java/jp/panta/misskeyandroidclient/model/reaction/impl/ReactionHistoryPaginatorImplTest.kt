@@ -107,7 +107,7 @@ class ReactionHistoryPaginatorImplTest {
             assertTrue(paginator.next())
         }
         val api = misskeyAPIProvider.get(account.instanceDomain)
-        val body = api.reactions(RequestReactionHistoryDTO(i = account.getI(EncryptionStub()), noteId = noteId, limit = 5 * 20, type = null)).execute()?.body()
+        val body = api.reactions(RequestReactionHistoryDTO(i = account.getI(EncryptionStub()), noteId = noteId, limit = 5 * 20, type = null)).body()
 
         assertNotNull(body)
         val except = body!!.map {

@@ -9,12 +9,12 @@ import org.junit.Test
 class APITest {
 
     @Test
-    fun testV11Following(){
+    suspend fun testV11Following(){
         val api = MisskeyAPIServiceBuilder.build("https://misskey.io", Version("12"))
         val v12 = api as? MisskeyAPIV11
         Assert.assertNotEquals(v12, null)
 
-        val response = v12!!.followers(RequestUser(i = null, userName = "Panta", host = null, userId = null)).execute().body()
+        val response = v12!!.followers(RequestUser(i = null, userName = "Panta", host = null, userId = null)).body()
         Assert.assertNotEquals(response, null)
         println(response)
     }
