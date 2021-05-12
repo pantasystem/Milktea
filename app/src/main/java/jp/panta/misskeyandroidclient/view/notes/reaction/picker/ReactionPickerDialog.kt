@@ -9,17 +9,16 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.DialogReactionPickerBinding
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import kotlinx.android.synthetic.main.dialog_reaction_picker.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -30,6 +29,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_reaction_picker, null)
         dialog.setContentView(view)
+        val binding = DialogReactionPickerBinding.bind(view)
 
         val miApplication = view.context.applicationContext as MiApplication
         val ac = miApplication.getCurrentAccount().value
@@ -39,13 +39,13 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             ReactionChoicesAdapter(
                 notesViewModel
             )
-        view.reactionsView.adapter = adapter
+        binding.reactionsView.adapter = adapter
 
         notesViewModel.submittedNotesOnReaction.observe(requireActivity(), {
             dismiss()
         })
         
-        view.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
+        binding.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
         //adapter.submitList(ReactionResourceMap.defaultReaction)
 
         GlobalScope.launch(Dispatchers.IO){
@@ -74,13 +74,13 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
                 emojis,
                 view.context
             )
-        view.reactionField.setAdapter(autoCompleteAdapter)
-        view.reactionField.setOnItemClickListener { _, _, i, _ ->
+        binding.reactionField.setAdapter(autoCompleteAdapter)
+        binding.reactionField.setOnItemClickListener { _, _, i, _ ->
             val reaction = autoCompleteAdapter.suggestions[i]
             notesViewModel.postReaction(reaction)
             dismiss()
         }
-        view.reactionField.setOnEditorActionListener { v, _, event ->
+        binding.reactionField.setOnEditorActionListener { v, _, event ->
             if(event != null && event.keyCode == KeyEvent.KEYCODE_ENTER){
                 if(event.action == KeyEvent.ACTION_UP){
                     notesViewModel.postReaction(v.text.toString())
@@ -91,7 +91,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             }
             false
         }
-        view.reactionField
+        binding.reactionField
         return dialog
     }
     

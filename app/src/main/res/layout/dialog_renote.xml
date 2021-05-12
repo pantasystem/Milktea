@@ -1,103 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        android:paddingBottom="5dp"
-        android:background="?attr/colorSurface"
-        >
-    <LinearLayout
-            android:id="@+id/unRenoteBase"
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp">
-
-        <ImageButton
-                android:id="@+id/unRenoteIcon"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/ic_delete_black_24dp"
-                android:tint="?attr/colorNoteActionButtonTint"
-                tools:ignore="ContentDescription" />
-
-        <Button
-                style="@style/Widget.AppCompat.Button.Borderless"
+            android:orientation="vertical"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:paddingBottom="5dp"
+            android:background="?attr/colorSurface"
+            >
+        <LinearLayout
+                android:id="@+id/unRenoteBase"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/unrenote"
-                android:textSize="20sp"
-                android:id="@+id/unRenote"
+                android:orientation="horizontal"
+                android:padding="5dp">
 
-                />
-    </LinearLayout>
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp">
+            <ImageButton
+                    android:id="@+id/unRenoteIcon"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/ic_delete_black_24dp"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    tools:ignore="ContentDescription" />
 
-        <ImageButton
-                android:id="@+id/imageButton5"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/ic_re_note"
-                android:tint="?attr/colorNoteActionButtonTint"
-                tools:ignore="ContentDescription" />
+            <Button
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/unrenote"
+                    android:textSize="20sp"
+                    android:id="@+id/unRenote"
 
-        <Button
-                style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+        </LinearLayout>
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/renote"
-                android:textSize="20sp"
-                android:id="@+id/renote"
+                android:orientation="horizontal"
+                android:padding="5dp">
 
-                />
-    </LinearLayout>
+            <ImageButton
+                    android:id="@+id/imageButton5"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/ic_re_note"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    tools:ignore="ContentDescription" />
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp">
+            <Button
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/renote"
+                    android:textSize="20sp"
+                    android:id="@+id/renote"
 
-        <ImageButton
-                android:id="@+id/imageButton6"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:scaleType="centerCrop"
-                android:tint="?attr/colorNoteActionButtonTint"
-                app:srcCompat="@drawable/ic_format_quote_black_24dp"
-                tools:ignore="ContentDescription" />
+                    />
+        </LinearLayout>
 
-        <Button
-                style="@style/Widget.AppCompat.Button.Borderless"
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/quote_renote"
-                android:textSize="20sp"
-                android:id="@+id/quote_renote"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+            <ImageButton
+                    android:id="@+id/imageButton6"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop"
+                    android:tint="?attr/colorNoteActionButtonTint"
+                    app:srcCompat="@drawable/ic_format_quote_black_24dp"
+                    tools:ignore="ContentDescription" />
+
+            <Button
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/quote_renote"
+                    android:textSize="20sp"
+                    android:id="@+id/quote_renote"
 
 
-                />
+                    />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</layout>

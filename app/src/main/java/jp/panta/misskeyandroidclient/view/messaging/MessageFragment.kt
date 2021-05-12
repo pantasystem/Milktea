@@ -4,20 +4,19 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.databinding.FragmentMessageBinding
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.view.TitleSettable
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageViewData
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageViewModelFactory
-import kotlinx.android.synthetic.main.fragment_message.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalArgumentException
@@ -41,6 +40,8 @@ class MessageFragment : Fragment(R.layout.fragment_message){
     private var mMessageViewModel: MessageViewModel? = null
     private var mLayoutManager: LinearLayoutManager? = null
 
+    private val mBinding: FragmentMessageBinding by dataBinding()
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,14 +58,14 @@ class MessageFragment : Fragment(R.layout.fragment_message){
 
         val lm = LinearLayoutManager(context)
         //lm.stackFromEnd = true
-        messages_view.layoutManager = lm
+        mBinding.messagesView.layoutManager = lm
         mLayoutManager = lm
 
         val messageViewModel = ViewModelProvider(this, MessageViewModelFactory(messagingId, miApplication))[MessageViewModel::class.java]
         mMessageViewModel = messageViewModel
 
         val adapter = MessageListAdapter(diffUtilItemCallback, viewLifecycleOwner)
-        messages_view.adapter = adapter
+        mBinding.messagesView.adapter = adapter
 
         var messageState: MessageViewModel.State? = null
         messageViewModel.messagesLiveData.observe(viewLifecycleOwner, {
@@ -98,7 +99,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
             }
 
         })
-        messages_view.addOnScrollListener(scrollListener)
+        mBinding.messagesView.addOnScrollListener(scrollListener)
 
         messageViewModel.title.observe(viewLifecycleOwner) { title ->
             if(title != null) {

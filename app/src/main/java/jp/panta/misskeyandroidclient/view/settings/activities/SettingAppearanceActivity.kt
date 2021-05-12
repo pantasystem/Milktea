@@ -14,13 +14,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBinding
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
 import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
-import kotlinx.android.synthetic.main.activity_setting_appearance.*
 
 class SettingAppearanceActivity : AppCompatActivity() {
 
@@ -30,13 +31,14 @@ class SettingAppearanceActivity : AppCompatActivity() {
     }
 
     private  lateinit var mSettingStore: SettingStore
+    private val mBinding: ActivitySettingAppearanceBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_setting_appearance)
 
-        setSupportActionBar(appearanceToolbar)
+        setSupportActionBar(mBinding.appearanceToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val themeChoices = listOf(
@@ -71,8 +73,8 @@ class SettingAppearanceActivity : AppCompatActivity() {
         mSettingStore = SettingStore(getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE))
         //val group = Group(null, listOf(themeSelection), this)
         val adapter = SettingAdapter(this)
-        setting_list.layoutManager = LinearLayoutManager(this)
-        setting_list.adapter = adapter
+        mBinding.settingList.layoutManager = LinearLayoutManager(this)
+        mBinding.settingList.adapter = adapter
         adapter.submitList(
             listOf(
                 themeSelection,
@@ -109,7 +111,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
         val miApplication = applicationContext as MiApplication
 
-        noteOpacitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        mBinding.noteOpacitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 miApplication.colorSettingStore.surfaceColorOpaque = progress
             }
@@ -118,14 +120,14 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
         })
-        noteOpacitySeekBar.progress = miApplication.colorSettingStore.surfaceColorOpaque
+        mBinding.noteOpacitySeekBar.progress = miApplication.colorSettingStore.surfaceColorOpaque
         setBackgroundImagePath(mSettingStore.backgroundImagePath)
-        attachedBackgroundImageFile.setOnClickListener {
+        mBinding.attachedBackgroundImageFile.setOnClickListener {
             // show file manager
             showFileManager()
         }
 
-        delete_background_image.setOnClickListener{
+        mBinding.deleteBackgroundImage.setOnClickListener{
             setBackgroundImagePath(null)
         }
 
@@ -190,10 +192,10 @@ class SettingAppearanceActivity : AppCompatActivity() {
     }
 
     private fun setBackgroundImagePath(path: String?){
-        background_image_path.text = path?: ""
+        mBinding.backgroundImagePath.text = path?: ""
         Glide.with(this)
             .load(path)
-            .into(backgroundImagePreview)
+            .into(mBinding.backgroundImagePreview)
 
         mSettingStore.backgroundImagePath = path
 

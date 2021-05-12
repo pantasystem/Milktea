@@ -2,22 +2,25 @@ package jp.panta.misskeyandroidclient.view.notification
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
-import kotlinx.android.synthetic.main.fragment_notification.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
@@ -26,6 +29,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
     lateinit var mLinearLayoutManager: LinearLayoutManager
     @ExperimentalCoroutinesApi
     lateinit var mViewModel: NotificationViewModel
+
+    private val mBinding: FragmentNotificationBinding by dataBinding()
+
 
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,8 +50,10 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
 
         val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, mViewModel, viewLifecycleOwner)
-        notification_list_view.adapter = adapter
-        notification_list_view.layoutManager = mLinearLayoutManager
+
+        mBinding.notificationListView.adapter = adapter
+        mBinding.notificationListView.layoutManager = mLinearLayoutManager
+
 
         //mViewModel.loadInit()
 
@@ -55,15 +63,15 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         })
 
         mViewModel.isLoading.observe(viewLifecycleOwner, {
-            notification_swipe_refresh.isRefreshing = it
+            mBinding.notificationSwipeRefresh.isRefreshing = it
         })
 
-        notification_swipe_refresh.setOnRefreshListener {
+        mBinding.notificationSwipeRefresh.setOnRefreshListener {
             mViewModel.loadInit()
         }
 
 
-        notification_list_view.addOnScrollListener(mScrollListener)
+        mBinding.notificationListView.addOnScrollListener(mScrollListener)
 
 
     }

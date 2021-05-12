@@ -17,7 +17,6 @@ import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
 import jp.panta.misskeyandroidclient.view.messaging.MessageFragment
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.view.TitleSettable
-import kotlinx.android.synthetic.main.activity_message.*
 
 class MessageActivity : AppCompatActivity(), TitleSettable {
 
@@ -29,13 +28,14 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
     }
 
     private lateinit var mViewModel: MessageActionViewModel
+    private lateinit var mBinding: ActivityMessageBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        val binding = DataBindingUtil.setContentView<ActivityMessageBinding>(this, R.layout.activity_message)
-        binding.lifecycleOwner = this
-        setSupportActionBar(messageToolbar)
+        mBinding = DataBindingUtil.setContentView<ActivityMessageBinding>(this, R.layout.activity_message)
+        mBinding.lifecycleOwner = this
+        setSupportActionBar(mBinding.messageToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -65,16 +65,16 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
         val factory = MessageActionViewModel.Factory(messagingId, application as MiApplication)
         val messageActionViewModel = ViewModelProvider(this, factory)[MessageActionViewModel::class.java]
         mViewModel = messageActionViewModel
-        binding.actionViewModel = messageActionViewModel
+        mBinding.actionViewModel = messageActionViewModel
 
-        binding.openDrive.setOnClickListener {
+        mBinding.openDrive.setOnClickListener {
             openDriveActivity()
         }
 
         val miCore = application as MiCore
         miCore.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
-            binding.inputMessage.setTokenizer(CustomEmojiTokenizer())
-            binding.inputMessage.setAdapter(
+            mBinding.inputMessage.setTokenizer(CustomEmojiTokenizer())
+            mBinding.inputMessage.setAdapter(
                 CustomEmojiCompleteAdapter(
                     emojis,
                     this

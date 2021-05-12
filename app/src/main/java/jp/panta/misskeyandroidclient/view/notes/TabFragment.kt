@@ -8,20 +8,19 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.ScrollableTop
-import kotlinx.android.synthetic.main.fragment_tab.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 
@@ -30,6 +29,8 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
 
     private var mPagerAdapter: TimelinePagerAdapter? = null
+
+    private val binding: FragmentTabBinding by dataBinding()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,10 +43,10 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
         val includeRenotedMyNotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name, true)
         val includeLocalRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
 
-        mPagerAdapter = viewPager.adapter as? TimelinePagerAdapter
+        mPagerAdapter = binding.viewPager.adapter as? TimelinePagerAdapter
         if(mPagerAdapter == null){
             mPagerAdapter = TimelinePagerAdapter(this.childFragmentManager, emptyList())
-            viewPager.adapter = mPagerAdapter
+            binding.viewPager.adapter = mPagerAdapter
         }
 
 
@@ -66,20 +67,20 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
             //mPagerAdapter?.notifyDataSetChanged()
 
 
-            tabLayout.setupWithViewPager(viewPager)
+            binding.tabLayout.setupWithViewPager(binding.viewPager)
 
 
             if(pages.size <= 1){
-                tabLayout.visibility = View.GONE
-                elevationView.visibility = View.VISIBLE
+                binding.tabLayout.visibility = View.GONE
+                binding.elevationView.visibility = View.VISIBLE
             }else{
-                tabLayout.visibility = View.VISIBLE
-                elevationView.visibility = View.GONE
-                tabLayout.elevation
+                binding.tabLayout.visibility = View.VISIBLE
+                binding.elevationView.visibility = View.GONE
+                binding.tabLayout.elevation
                 if(pages.size > 5) {
-                    tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+                    binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
                 }else{
-                    tabLayout.tabMode = TabLayout.MODE_FIXED
+                    binding.tabLayout.tabMode = TabLayout.MODE_FIXED
                 }
             }
         }.launchIn(lifecycleScope)

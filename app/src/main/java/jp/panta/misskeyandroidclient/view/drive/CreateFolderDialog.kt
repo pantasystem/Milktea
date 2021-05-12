@@ -6,24 +6,25 @@ import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.DialogCreateFolderBinding
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
-import kotlinx.android.synthetic.main.dialog_create_folder.view.*
 
 class CreateFolderDialog : AppCompatDialogFragment(){
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog =  super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_create_folder, null)
+        val binding = DialogCreateFolderBinding.bind(view)
         dialog.setContentView(view)
         val folderViewModel = ViewModelProvider(requireActivity())[FolderViewModel::class.java]
-        view.okButton.setOnClickListener {
-            val name = view.editFolderName.text.toString()
+        binding.okButton.setOnClickListener {
+            val name = binding.editFolderName.text.toString()
             if(name.isNotBlank()){
                 folderViewModel.createFolder(name)
                 dismiss()
 
             }
         }
-        view.cancelButton.setOnClickListener {
+        binding.cancelButton.setOnClickListener {
             dismiss()
         }
         return dialog

@@ -8,8 +8,9 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.app.TaskStackBuilder
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -18,7 +19,6 @@ import jp.panta.misskeyandroidclient.view.notes.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import kotlinx.android.synthetic.main.activity_note_detail.*
 
 class NoteDetailActivity : AppCompatActivity() {
     companion object{
@@ -43,12 +43,14 @@ class NoteDetailActivity : AppCompatActivity() {
 
     private var mParentActivity: Activities? = null
 
+    private val binding: ActivityNoteDetailBinding by dataBinding()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_note_detail)
 
-        setSupportActionBar(noteDetailToolbar)
+        setSupportActionBar(binding.noteDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

@@ -12,10 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import kotlinx.android.synthetic.main.fragment_reaction_choices.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -56,6 +56,7 @@ class ReactionChoicesFragment : Fragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val binding = FragmentReactionChoicesBinding.bind(view)
 
         val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
 
@@ -67,8 +68,8 @@ class ReactionChoicesFragment : Fragment(){
             )
         val layoutManager = GridLayoutManager(view.context, columns)
 
-        view.reactions_view.layoutManager = layoutManager
-        view.reactions_view.adapter = adapter
+        binding.reactionsView.layoutManager = layoutManager
+        binding.reactionsView.adapter = adapter
 
 
         val typeOrdinal = arguments?.getInt(EXTRA_TYPE)?: 0

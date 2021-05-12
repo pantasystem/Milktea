@@ -1,82 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity"
-        android:id="@+id/app_bar_base">
+        xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:stateListAnimator="@null"
-            >
-        <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity"
+            android:id="@+id/app_bar_base">
+
+        <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways"
-                />
-    </com.google.android.material.appbar.AppBarLayout>
+                android:stateListAnimator="@null"
+                >
+            <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    />
+        </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main"/>
+        <include
+                android:id="@+id/contentMain"
+                layout="@layout/content_main"
+        />
 
 
 
 
 
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="vertical">
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-            <androidx.coordinatorlayout.widget.CoordinatorLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:id="@+id/simple_notification"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"/>
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:tint="#FFFFFF"
-                    app:srcCompat="@drawable/ic_mode_edit_black_24dp" />
-        </LinearLayout>
-        <FrameLayout
-                android:id="@+id/simpleEditorBase"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottom_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
                 android:layout_gravity="bottom"
-                android:background="?attr/colorPrimary"
-                app:itemBackground="?attr/colorPrimary"
-                app:itemIconTint="@drawable/bottom_navigation_colors"
-                app:itemTextColor="@drawable/bottom_navigation_colors"
-                app:labelVisibilityMode="unlabeled"
-                app:menu="@menu/bottom_menu"
-                app:itemIconSize="28dp"
-                >
+                android:orientation="vertical">
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:id="@+id/simple_notification"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"/>
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:tint="#FFFFFF"
+                        app:srcCompat="@drawable/ic_mode_edit_black_24dp"
+                        android:contentDescription="@string/edit_note"/>
+            </LinearLayout>
+            <FrameLayout
+                    android:id="@+id/simpleEditorBase"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/bottom_navigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_gravity="bottom"
+                    android:background="?attr/colorPrimary"
+                    app:itemBackground="?attr/colorPrimary"
+                    app:itemIconTint="@drawable/bottom_navigation_colors"
+                    app:itemTextColor="@drawable/bottom_navigation_colors"
+                    app:labelVisibilityMode="unlabeled"
+                    app:menu="@menu/bottom_menu"
+                    app:itemIconSize="28dp"
+                    >
 
 
-        </com.google.android.material.bottomnavigation.BottomNavigationView>
-    </LinearLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            </com.google.android.material.bottomnavigation.BottomNavigationView>
+        </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

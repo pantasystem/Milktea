@@ -3,10 +3,11 @@ package jp.panta.misskeyandroidclient
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.api.users.RequestUser
+import jp.panta.misskeyandroidclient.databinding.ActivitySortedUsesBinding
 import jp.panta.misskeyandroidclient.view.users.SortedUsersFragment
 import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
-import kotlinx.android.synthetic.main.activity_sorted_uses.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -23,13 +24,15 @@ class SortedUsersActivity : AppCompatActivity() {
 
     }
 
+    val binding: ActivitySortedUsesBinding by dataBinding()
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_sorted_uses)
-        setSupportActionBar(sortedUsersToolbar)
+        setSupportActionBar(binding.sortedUsersToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val type = intent.getSerializableExtra(EXTRA_SORTED_USERS_TYPE) as? SortedUsersViewModel.Type?

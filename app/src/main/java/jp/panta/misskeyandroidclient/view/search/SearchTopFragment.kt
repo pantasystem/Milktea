@@ -4,32 +4,29 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
+import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.view.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
-import kotlinx.android.synthetic.main.fragment_search_top.*
 import java.lang.IllegalArgumentException
 
-class SearchTopFragment : Fragment(){
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_search_top, container, false)
-    }
+class SearchTopFragment : Fragment(R.layout.fragment_search_top){
+
+    private val mBinding: FragmentSearchTopBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        search_view_pager.adapter = SearchPagerAdapter(this.childFragmentManager, requireContext())
-        search_tab_layout.setupWithViewPager(search_view_pager)
+        mBinding.searchViewPager.adapter = SearchPagerAdapter(this.childFragmentManager, requireContext())
+        mBinding.searchTabLayout.setupWithViewPager(mBinding.searchViewPager)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

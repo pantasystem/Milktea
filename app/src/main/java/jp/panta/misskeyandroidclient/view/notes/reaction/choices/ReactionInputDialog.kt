@@ -11,9 +11,9 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.DialogReactionInputBinding
 import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import kotlinx.android.synthetic.main.dialog_reaction_input.view.*
 
 class ReactionInputDialog : AppCompatDialogFragment(){
 
@@ -22,6 +22,7 @@ class ReactionInputDialog : AppCompatDialogFragment(){
         val dialog =  super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_reaction_input, null)
         dialog.setContentView(view)
+        val binding = DialogReactionInputBinding.bind(view)
 
         val lp = dialog.window?.attributes
         lp?.gravity = Gravity.BOTTOM
@@ -35,13 +36,13 @@ class ReactionInputDialog : AppCompatDialogFragment(){
                 emojis,
                 view.context
             )
-        view.input_reaction.setAdapter(adapter)
-        view.input_reaction.setOnItemClickListener { _, _, position, _ ->
+        binding.inputReaction.setAdapter(adapter)
+        binding.inputReaction.setOnItemClickListener { _, _, position, _ ->
             val reaction = adapter.suggestions[position]
             notesViewModel.postReaction(reaction)
             dismiss()
         }
-        view.input_reaction.setOnEditorActionListener { v, _, event ->
+        binding.inputReaction.setOnEditorActionListener { v, _, event ->
             if(event != null && event.keyCode == KeyEvent.KEYCODE_ENTER){
                 if(event.action == KeyEvent.ACTION_UP){
                     notesViewModel.postReaction(v.text.toString())

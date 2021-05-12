@@ -9,12 +9,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.flexbox.*
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
@@ -23,6 +22,7 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
+import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
@@ -35,7 +35,6 @@ import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
-import kotlinx.android.synthetic.main.activity_note_editor.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -61,7 +60,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
     }
 
     var mViewModel: NoteEditorViewModel? = null
-    private lateinit var mBinding: FragmentSimpleEditorBinding
+    private val mBinding: FragmentSimpleEditorBinding by dataBinding()
 
     override val isShowEditorMenu: MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -70,26 +69,19 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val binding = DataBindingUtil.bind<FragmentSimpleEditorBinding>(requireView())
-            ?: throw IllegalArgumentException("bindできません！！")
-        binding.simpleEditor = this
-        mBinding = binding
+
+        mBinding.simpleEditor = this
 
         val miApplication = requireContext().applicationContext as MiApplication
-        binding.lifecycleOwner = this
+        mBinding.lifecycleOwner = this
 
         val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
-        binding.addressUsersView.adapter = userChipAdapter
-        val flexBoxLayoutManager = FlexboxLayoutManager(requireContext())
-        flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-        flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-        flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-        binding.addressUsersView.layoutManager = flexBoxLayoutManager
+        mBinding.addressUsersView.adapter = userChipAdapter
+        mBinding.addressUsersView.applyFlexBoxLayout(requireContext())
 
 
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
-        binding.accountViewModel = accountViewModel
+        mBinding.accountViewModel = accountViewModel
         accountViewModel.switchAccount.observe(this,  {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         })
@@ -101,32 +93,32 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         })
 
         miApplication.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
-            binding.inputMainText.setAdapter(
+            mBinding.inputMainText.setAdapter(
                 CustomEmojiCompleteAdapter(
                     emojis,
                     requireContext()
                 )
             )
-            binding.inputMainText.setTokenizer(CustomEmojiTokenizer())
+            mBinding.inputMainText.setTokenizer(CustomEmojiTokenizer())
 
-            binding.inputCw.setAdapter(
+            mBinding.inputCw.setAdapter(
                 CustomEmojiCompleteAdapter(
                     emojis,
                     requireContext()
                 )
             )
-            binding.inputCw.setTokenizer(CustomEmojiTokenizer())
+            mBinding.inputCw.setTokenizer(CustomEmojiTokenizer())
         }
 
         val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = null, quoteToNoteId = null, note = null, draftNote = null)
         val viewModel = ViewModelProvider(requireActivity(), factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
 
-        binding.noteEditorViewModel = viewModel
+        mBinding.noteEditorViewModel = viewModel
 
         val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
-        binding.imageListPreview.adapter = simpleImagePreviewAdapter
-        binding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        mBinding.imageListPreview.adapter = simpleImagePreviewAdapter
+        mBinding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         viewModel.files.observe(viewLifecycleOwner, {list ->
             simpleImagePreviewAdapter.submitList(list)
@@ -164,28 +156,28 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
 
 
-        selectFileFromDrive.setOnClickListener {
+        mBinding.selectFileFromDrive.setOnClickListener {
             showDriveFileSelector()
         }
 
-        selectFileFromLocal.setOnClickListener {
+        mBinding.selectFileFromLocal.setOnClickListener {
             showFileManager()
         }
 
-        binding.addAddress.setOnClickListener {
+        mBinding.addAddress.setOnClickListener {
             startSearchAndSelectUser()
         }
 
-        binding.mentionButton.setOnClickListener {
+        mBinding.mentionButton.setOnClickListener {
             startMentionToSearchAndSelectUser()
         }
 
-        binding.showEmojisButton.setOnClickListener {
+        mBinding.showEmojisButton.setOnClickListener {
             CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
         }
 
 
-        binding.postButton.setOnClickListener {
+        mBinding.postButton.setOnClickListener {
             viewModel.post()
         }
 

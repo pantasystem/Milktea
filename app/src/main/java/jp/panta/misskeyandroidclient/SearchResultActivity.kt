@@ -9,9 +9,10 @@ import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -22,7 +23,6 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import kotlinx.android.synthetic.main.activity_search_result.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -39,12 +39,13 @@ class SearchResultActivity : AppCompatActivity() {
     private var mIsTag: Boolean? = null
 
     private var mAccountRelation: Account? = null
+    private val binding: ActivitySearchResultBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_search_result)
-        setSupportActionBar(search_result_toolbar)
+        setSupportActionBar(binding.searchResultToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val keyword: String? = intent.getStringExtra(EXTRA_SEARCH_WORLD)
@@ -62,8 +63,8 @@ class SearchResultActivity : AppCompatActivity() {
         mIsTag = isTag
 
         val pager = PagerAdapter(this, keyword, supportFragmentManager)
-        searchResultPager.adapter = pager
-        searchResultTab.setupWithViewPager(searchResultPager)
+        binding.searchResultPager.adapter = pager
+        binding.searchResultTab.setupWithViewPager(binding.searchResultPager)
 
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()

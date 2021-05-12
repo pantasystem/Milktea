@@ -1,48 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-    <TextView
-            android:id="@+id/titleView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/create_folder"
-            android:textSize="24sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:layout_marginBottom="8dp"
-            />
-    <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/folderNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_below="@id/titleView"
-            >
-        <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editFolderName"
+<layout>
+
+    <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+        <TextView
+                android:id="@+id/titleView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_folder"
+                android:textSize="24sp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginBottom="8dp"
+                />
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/folderNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/folder_name"
-                android:singleLine="true"/>
-    </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="8dp"
+                android:layout_below="@id/titleView"
+                >
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editFolderName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/folder_name"
+                    android:singleLine="true"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/folderNameInput"
-            android:id="@+id/cancelButton"
-            android:layout_toStartOf="@id/okButton"
-            android:layout_marginEnd="8dp"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:text="@android:string/cancel"/>
-    <Button
-            android:id="@+id/okButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/folderNameInput"
-            android:layout_alignParentEnd="true"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:text="@android:string/ok"/>
-</RelativeLayout>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/folderNameInput"
+                android:id="@+id/cancelButton"
+                android:layout_toStartOf="@id/okButton"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:text="@android:string/cancel"/>
+        <Button
+                android:id="@+id/okButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/folderNameInput"
+                android:layout_alignParentEnd="true"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:text="@android:string/ok"/>
+    </RelativeLayout>
+</layout>

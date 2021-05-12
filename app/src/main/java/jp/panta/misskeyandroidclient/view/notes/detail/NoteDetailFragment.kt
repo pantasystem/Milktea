@@ -3,16 +3,16 @@ package jp.panta.misskeyandroidclient.view.notes.detail
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModelFactory
-import kotlinx.android.synthetic.main.fragment_note_detail.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -52,6 +52,8 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
         }
     }
 
+    private val binding: FragmentNoteDetailBinding by dataBinding()
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,7 +82,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
         })
 
 
-        notes_view.adapter = adapter
-        notes_view.layoutManager = LinearLayoutManager(context)
+        binding.notesView.adapter = adapter
+        binding.notesView.layoutManager = LinearLayoutManager(context)
     }
 }

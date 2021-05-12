@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<layout>
 
-    <View
-            android:id="@+id/elevationView"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical" android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            android:background="?attr/colorPrimary"
-            android:elevation="4dp"
-            />
+        <View
+                android:id="@+id/elevationView"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/refresh"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                />
 
-            >
-
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/history_list_view"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingBottom="?attr/actionBarSize"
-                />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</LinearLayout>
+                >
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/history_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="?attr/actionBarSize"
+                    />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
+</layout>

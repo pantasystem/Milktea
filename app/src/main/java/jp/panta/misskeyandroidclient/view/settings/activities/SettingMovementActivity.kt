@@ -3,26 +3,27 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.lifecycle.Observer
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.TextSharedItem
-import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingMovementActivity : AppCompatActivity() {
+
+    lateinit var mBinding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        setContentView(R.layout.activity_settings)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
 
-        setSupportActionBar(settingToolbar)
+        setSupportActionBar(mBinding.settingToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val includeLocalRenotes = BooleanSharedItem(
@@ -131,8 +132,8 @@ class SettingMovementActivity : AppCompatActivity() {
         )
 
         val adapter = SettingAdapter(this)
-        setting_list.adapter = adapter
-        setting_list.layoutManager = LinearLayoutManager(this)
+        mBinding.settingList.adapter = adapter
+        mBinding.settingList.layoutManager = LinearLayoutManager(this)
 
         adapter.submitList(listOf(timelineGroup, syncGroup, noteTextLimitGroup, postGroup))
     }

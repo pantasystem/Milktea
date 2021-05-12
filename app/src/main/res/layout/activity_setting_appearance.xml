@@ -1,114 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".view.settings.activities.SettingAppearanceActivity"
-        android:orientation="vertical"
-        >
-
-    <androidx.appcompat.widget.Toolbar
-            android:id="@+id/appearanceToolbar"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme" />
+            android:layout_height="match_parent"
+            tools:context=".view.settings.activities.SettingAppearanceActivity"
+            android:orientation="vertical"
+            >
 
-
-    <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        <LinearLayout
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/appearanceToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp">
-            <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/setting_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                android:background="?attr/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme" />
 
 
-            <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:text="@string/background_image"
-                    android:layout_marginTop="8dp"/>
-
-            <ImageView
-                    android:id="@+id/backgroundImagePreview"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:scaleType="fitCenter"
-                    tools:ignore="ContentDescription"
-                     />
+        <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                <ImageButton
-                        android:id="@+id/attachedBackgroundImageFile"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_attach_file_black_24dp"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        tools:ignore="ContentDescription" />
+                    android:orientation="vertical"
+                    android:padding="8dp">
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/setting_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+
                 <TextView
-                        android:id="@+id/background_image_path"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="content://src/image.jpg"
-                        android:layout_weight="1"
-                        android:layout_gravity="center_vertical"/>
-                <ImageButton
-                        android:id="@+id/delete_background_image"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/ic_delete_black_24dp"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        android:layout_gravity="end|center_vertical"
-                        tools:ignore="ContentDescription" />
+                        android:textSize="24sp"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:text="@string/background_image"
+                        android:layout_marginTop="8dp"/>
+
+                <ImageView
+                        android:id="@+id/backgroundImagePreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:scaleType="fitCenter"
+                        tools:ignore="ContentDescription"
+                        />
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                    <ImageButton
+                            android:id="@+id/attachedBackgroundImageFile"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/ic_attach_file_black_24dp"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:tint="?attr/colorNoteActionButtonTint"
+                            tools:ignore="ContentDescription" />
+                    <TextView
+                            android:id="@+id/background_image_path"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            tools:text="content://src/image.jpg"
+                            android:layout_weight="1"
+                            android:layout_gravity="center_vertical"/>
+                    <ImageButton
+                            android:id="@+id/delete_background_image"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@drawable/ic_delete_black_24dp"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:tint="?attr/colorNoteActionButtonTint"
+                            android:layout_gravity="end|center_vertical"
+                            tools:ignore="ContentDescription" />
+
+                </LinearLayout>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/note_opacity"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="24sp" />
+
+                <SeekBar
+                        android:id="@+id/noteOpacitySeekBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="255"
+                        android:progress="255" />
+                <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:text="@string/transparent"/>
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/opaque"
+                            android:layout_gravity="end"/>
+
+                </FrameLayout>
 
             </LinearLayout>
-
-            <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/note_opacity"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="24sp" />
-
-            <SeekBar
-                    android:id="@+id/noteOpacitySeekBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="255"
-                    android:progress="255" />
-            <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:text="@string/transparent"/>
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/opaque"
-                        android:layout_gravity="end"/>
-
-            </FrameLayout>
-
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</layout>
