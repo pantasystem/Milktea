@@ -5,19 +5,45 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.users.User
 import java.util.*
 
-data class GalleryPost (
-    val id: Id,
-    val createdAt: Date,
-    val updatedAt: Date,
-    val title: String,
-    val description: String?,
-    val userId: User.Id,
-    val fileIds: List<FileProperty.Id>,
-    val tags: List<String>,
-    val isSensitive: Boolean
-) {
+sealed class GalleryPost {
     data class Id(
         val accountId: Long,
         val galleryId: String
     ) : EntityId
+
+    abstract val id: Id
+    abstract val createdAt: Date
+    abstract val updatedAt: Date
+    abstract val title: String
+    abstract val description: String?
+    abstract val userId: User.Id
+    abstract val fileIds: List<FileProperty.Id>
+    abstract val tags: List<String>
+    abstract val isSensitive: Boolean
+
+    data class Normal(
+        override val id: Id,
+        override val createdAt: Date,
+        override val updatedAt: Date,
+        override val title: String,
+        override val description: String?,
+        override val userId: User.Id,
+        override val fileIds: List<FileProperty.Id>,
+        override val tags: List<String>,
+        override val isSensitive: Boolean
+    ) : GalleryPost()
+
+    data class Authenticated(
+        override val id: Id,
+        override val createdAt: Date,
+        override val updatedAt: Date,
+        override val title: String,
+        override val description: String?,
+        override val userId: User.Id,
+        override val fileIds: List<FileProperty.Id>,
+        override val tags: List<String>,
+        override val isSensitive: Boolean,
+        val likedCount: Int,
+        val isLiked: Boolean
+    ) : GalleryPost()
 }
