@@ -7,12 +7,11 @@ import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.api.auth.AppSecret
-import jp.panta.misskeyandroidclient.api.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.*
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.auth.DefaultPermission
+import jp.panta.misskeyandroidclient.viewmodel.auth.Permissions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
@@ -56,11 +55,7 @@ class AppAuthViewModel(
 
     init{
         meta.addSource(instanceDomain){ base ->
-            val url = if(base.startsWith("https://")){
-                base
-            }else{
-                "https://$base"
-            }.replace(" ", "").replace("\t", "").replace("　", "")
+            val url = toEnableUrl(base)
             if(urlPattern.matcher(url).find()){
 
                 viewModelScope.launch(Dispatchers.IO) {
@@ -83,7 +78,7 @@ class AppAuthViewModel(
     fun auth(){
         generatingToken.value = true
         val url = this.instanceDomain.value?: return
-        val instanceBase = "https://$url"
+        val instanceBase = toEnableUrl(url)
         val appName = this.appName.value?: return
         val meta = this.meta.value?: return
         viewModelScope.launch(Dispatchers.IO){
@@ -126,11 +121,23 @@ class AppAuthViewModel(
                 appName,
                 "misskey android application",
                 CALL_BACK_URL,
-                permission = DefaultPermission.defaultPermission
+                permission = Permissions.getPermission(version)
             )
         ).throwIfHasError().body()
             ?: throw IllegalStateException("Appの作成に失敗しました。")
     }
 
+    private fun toEnableUrl(base: String) : String{
+        var url = if(base.startsWith("https://")){
+            base
+        }else{
+            "https://$base"
+        }.replace(" ", "").replace("\t", "").replace("　", "")
+
+        if(url.endsWith("/")) {
+            url = url.substring(url.indices)
+        }
+        return url
+    }
 
 }
