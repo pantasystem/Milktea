@@ -125,7 +125,7 @@ class AppAuthViewModel(
                 appName,
                 "misskey android application",
                 CALL_BACK_URL,
-                permission = Permissions.defaultPermission
+                permission = Permissions.getPermission(version)
             )
         ).throwIfHasError().body()
             ?: throw IllegalStateException("Appの作成に失敗しました。")
