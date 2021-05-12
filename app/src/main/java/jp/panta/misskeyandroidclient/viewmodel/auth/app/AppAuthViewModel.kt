@@ -7,12 +7,11 @@ import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.api.auth.AppSecret
-import jp.panta.misskeyandroidclient.api.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.*
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.auth.DefaultPermission
+import jp.panta.misskeyandroidclient.viewmodel.auth.Permissions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
@@ -126,7 +125,7 @@ class AppAuthViewModel(
                 appName,
                 "misskey android application",
                 CALL_BACK_URL,
-                permission = DefaultPermission.defaultPermission
+                permission = Permissions.defaultPermission
             )
         ).throwIfHasError().body()
             ?: throw IllegalStateException("Appの作成に失敗しました。")
