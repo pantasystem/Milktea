@@ -13,7 +13,7 @@ class DraftNotesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_draft_notes)
-        setContentView(R.layout.activity_draft_notes)
+        mBinding.lifecycleOwner = this
 
         setSupportActionBar(mBinding.draftNotesToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

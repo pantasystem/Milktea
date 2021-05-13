@@ -15,7 +15,7 @@ class GetUsersTest {
     }
 
     @Test
-    fun ascFollower(){
+    suspend fun ascFollower(){
         val res = misskeyAPI.getUsers(
             RequestUser(
                 null,
@@ -23,7 +23,7 @@ class GetUsersTest {
                 sort = RequestUser.Sort().follower().asc(),
                 state = RequestUser.State.ALIVE.state
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
         val list = res.body()
@@ -35,14 +35,14 @@ class GetUsersTest {
     }
 
     @Test
-    fun ascUpdatedAt(){
+    suspend fun ascUpdatedAt(){
         val res = misskeyAPI.getUsers(
             RequestUser(
                 null,
                 origin = RequestUser.Origin.LOCAL.origin,
                 sort = RequestUser.Sort().updatedAt().asc()
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
         val list = res.body()
@@ -54,7 +54,7 @@ class GetUsersTest {
     }
 
     @Test
-    fun ascNewUser(){
+    suspend fun ascNewUser(){
 
         val res = misskeyAPI.getUsers(
             RequestUser(
@@ -63,7 +63,7 @@ class GetUsersTest {
                 sort = RequestUser.Sort().createdAt().asc(),
                 state = RequestUser.State.ALIVE.state
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
         val list = res.body()
@@ -75,7 +75,7 @@ class GetUsersTest {
     }
 
     @Test
-    fun remoteAscFollower(){
+    suspend fun remoteAscFollower(){
         val res = misskeyAPI.getUsers(
             RequestUser(
                 null,
@@ -83,7 +83,7 @@ class GetUsersTest {
                 sort = RequestUser.Sort().follower().asc(),
                 state = RequestUser.State.ALIVE.state
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
         val list = res.body()
@@ -95,7 +95,7 @@ class GetUsersTest {
     }
 
     @Test
-    fun remoteAscUpdatedAt(){
+    suspend fun remoteAscUpdatedAt(){
         val res = misskeyAPI.getUsers(
             RequestUser(
                 null,
@@ -103,7 +103,7 @@ class GetUsersTest {
                 sort = RequestUser.Sort().updatedAt().asc(),
                 state = RequestUser.State.ALIVE.state
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
         val list = res.body()
@@ -115,14 +115,14 @@ class GetUsersTest {
     }
 
     @Test
-    fun remoteNewUsers(){
+    suspend fun remoteNewUsers(){
         val res = misskeyAPI.getUsers(
             RequestUser(
                 null,
                 origin = RequestUser.Origin.COMBINED.origin,
                 sort = RequestUser.Sort().createdAt().asc()
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
         val list = res.body()

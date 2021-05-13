@@ -339,6 +339,8 @@ class MiApplication : Application(), MiCore {
                     mSocketConnectionQueue.connect(socket)
                 }
             }
+        }.catch { e ->
+            logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
 

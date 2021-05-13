@@ -8,7 +8,7 @@ import org.junit.Test
 class HashTagListTest {
 
     @Test
-    fun testM544(){
+    suspend fun testM544(){
         val api  = MisskeyAPIServiceBuilder.build("https://misskey.m544.net", Version("v10"))
         val res = api.getHashTagList(
             RequestHashTagList(
@@ -16,7 +16,7 @@ class HashTagListTest {
                 sort = RequestHashTagList.Sort().attachedLocalUsers().asc(),
                 attachedToLocalUserOnly = true
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
 
@@ -28,7 +28,7 @@ class HashTagListTest {
     }
 
     @Test
-    fun testV11(){
+    suspend fun testV11(){
         val api  = MisskeyAPIServiceBuilder.build("https://misskey.dev", Version("v11"))
         val res = api.getHashTagList(
             RequestHashTagList(
@@ -36,7 +36,7 @@ class HashTagListTest {
                 sort = RequestHashTagList.Sort().attachedLocalUsers().asc(),
                 attachedToLocalUserOnly = true
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
 
@@ -47,7 +47,7 @@ class HashTagListTest {
     }
 
     @Test
-    fun testV12(){
+    suspend fun testV12(){
         val api  = MisskeyAPIServiceBuilder.build("https://misskey.io", Version("v12"))
         val res = api.getHashTagList(
             RequestHashTagList(
@@ -55,7 +55,7 @@ class HashTagListTest {
                 sort = RequestHashTagList.Sort().attachedLocalUsers().asc(),
                 attachedToLocalUserOnly = true
             )
-        ).execute()
+        )
 
         Assert.assertEquals(true, res.code() in 200 until 300)
 
