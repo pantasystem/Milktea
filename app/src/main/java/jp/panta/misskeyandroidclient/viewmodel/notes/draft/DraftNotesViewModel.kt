@@ -29,6 +29,8 @@ class DraftNotesViewModel(
         }
     }
 
+    val logger = miCore.loggerFactory.create("DraftNotesVM")
+
     val draftNotes = object : MediatorLiveData<List<DraftNoteViewData>>(){
         override fun onActive() {
             super.onActive()
@@ -45,14 +47,16 @@ class DraftNotesViewModel(
     val isLoading = MutableLiveData<Boolean>()
 
     fun loadDraftNotes(ac: Account){
+        logger.debug("読み込み開始")
         viewModelScope.launch(Dispatchers.IO){
             try{
                 val notes = draftNoteDao.findDraftNotesByAccount(ac.accountId)
+                logger.debug("notes:$notes")
                 draftNotes.postValue(notes.map{
                     DraftNoteViewData(it)
                 }.asReversed())
             }catch(e: Exception){
-
+                logger.error("下書きノート読み込みエラー", e)
             }finally {
                 isLoading.postValue(false)
             }

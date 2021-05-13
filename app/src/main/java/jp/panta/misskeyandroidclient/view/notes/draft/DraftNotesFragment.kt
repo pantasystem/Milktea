@@ -22,6 +22,9 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.draft.DraftNotesViewModel
 
+/**
+ * NOTE: 直接的なコードによる参照はないが、activity_draft_notesから参照されているので削除しないこと。
+ */
 class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteActionCallback, FileListener{
 
     companion object{
