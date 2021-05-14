@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+
+        <variable
+                name="galleryPost"
+                type="jp.panta.misskeyandroidclient.model.gallery.GalleryPost" />
+        <variable
+                name="user"
+                type="jp.panta.misskeyandroidclient.model.users.User" />
+    </data>
+    <androidx.cardview.widget.CardView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:layout_margin="4dp"
+            >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent" android:layout_height="match_parent">
+            <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@drawable/ic_reaction_angry"
+                    app:layout_constraintDimensionRatio="w,3:4"
+                    android:contentDescription="@{galleryPost.title}"
+                    app:setCardViewSurfaceColor="@{null}"
+                    android:id="@+id/galleryImageView"
+                    />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/galleryImageView"
+                    tools:text="Gallery Post Title"
+                    android:textSize="24sp"
+
+                    android:background="@color/black_overlay"
+                    android:textColor="#FFFFFF"
+                    android:paddingStart="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingEnd="50dp"
+                    android:id="@+id/title"
+                    android:minHeight="50dp"
+                    android:gravity="center|start"
+
+                    />
+
+            <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:src="@drawable/ic_reaction_hmm"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@{user.name}"
+                    circleIcon="@{user.avatarUrl}"
+
+                    />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+</layout>
