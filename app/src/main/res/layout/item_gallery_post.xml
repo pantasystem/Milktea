@@ -5,11 +5,9 @@
     <data>
 
         <variable
-                name="galleryPost"
-                type="jp.panta.misskeyandroidclient.model.gallery.GalleryPost" />
-        <variable
-                name="user"
-                type="jp.panta.misskeyandroidclient.model.users.User" />
+                name="galleryPostState"
+                type="jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostState" />
+
     </data>
     <androidx.cardview.widget.CardView
 
@@ -27,7 +25,7 @@
                 android:paddingBottom="4dp"
                 mainNameView="@{primaryUserName}"
                 subNameView="@{secondaryUserName}"
-                user="@{user}"
+                user="@{galleryPostState.user}"
                 >
             <ImageView
                     android:layout_width="match_parent"
@@ -37,7 +35,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:src="@drawable/ic_reaction_confused"
                     app:layout_constraintDimensionRatio="w,3:4"
-                    android:contentDescription="@{galleryPost.title}"
+                    android:contentDescription="@{galleryPostState.galleryPost.title}"
                     android:id="@+id/galleryImageView"
                     />
 
@@ -64,7 +62,11 @@
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     tools:src="@drawable/ic_baseline_favorite_border_24"
                     android:layout_marginEnd="8dp"
-                    android:contentDescription="@string/gallery_favorite_button" />
+                    android:contentDescription="@string/gallery_favorite_button"
+                    galleryPostLiked="@{galleryPostState.galleryPost}"
+                    isSendingFavorite="@{galleryPostState.isSending ?? false}"
+                    android:onClick="@{()-> galleryPostState.toggleFavorite()}"
+                    />
 
             <ImageView
                     android:layout_width="30dp"
@@ -76,8 +78,8 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginBottom="8dp"
-                    android:contentDescription="@{user.name}"
-                    circleIcon="@{user.avatarUrl}"
+                    android:contentDescription="@{galleryPostState.user.name}"
+                    circleIcon="@{galleryPostState.user.avatarUrl}"
                     android:id="@+id/avatarIcon"
 
                     />
