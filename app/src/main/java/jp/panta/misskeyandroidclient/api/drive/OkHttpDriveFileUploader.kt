@@ -59,25 +59,6 @@ class OkHttpDriveFileUploader(
         }
     }
 
-    private fun getFileName(uri: Uri) : String{
-        return when(uri.scheme){
-            "content" ->{
-                context.contentResolver
-                    .query(uri, arrayOf(MediaStore.MediaColumns.DISPLAY_NAME), null, null, null)?.use{
-                        if(it.moveToFirst()){
-                            it.getString(it.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME))
-                        }else{
-                            null
-                        }
-                    }?: throw IllegalArgumentException("ファイル名の取得に失敗しました")
-            }
-            "file" ->{
-                java.io.File(uri.path!!).name
-            }
-            else -> throw IllegalArgumentException("scheme不明")
-        }
-    }
-
 
     private fun createRequestBody(uri: Uri): RequestBody{
         return object : RequestBody(){
