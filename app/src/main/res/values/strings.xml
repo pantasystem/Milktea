@@ -328,5 +328,6 @@
     <string name="local">local</string>
     <string name="add_user_list">Add user list</string>
     <string name="edit_note">Edit note</string>
+    <string name="gallery_favorite_button">gallery favorite button</string>
 
 </resources>

@@ -331,5 +331,6 @@
     <string name="local">ローカル</string>
     <string name="add_user_list">ユーザーリストを追加する</string>
     <string name="edit_note">ノートを編集</string>
+    <string name="gallery_favorite_button">gallery favorite button</string>
 
 </resources>
