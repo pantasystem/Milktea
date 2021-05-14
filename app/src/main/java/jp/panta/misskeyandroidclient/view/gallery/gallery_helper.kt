@@ -6,15 +6,14 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.util.ImageButtonResourceHelper.srcCompat
 
-@BindingAdapter("galleryPostLiked", "isSendingFavorite")
-fun ImageButton.setLikeButtonState(galleryPostLiked: GalleryPost?, isSendingFavorite: Boolean?) {
-    val galleryPost = galleryPostLiked as? GalleryPost.Authenticated
-    if(galleryPost == null || isSendingFavorite == false) {
+@BindingAdapter("isLiked", "isSendingLiked")
+fun ImageButton.setLikeButtonState(isLiked: Boolean?, isSendingFavorite: Boolean?) {
+    if(isLiked == null || isSendingFavorite == false) {
         this.isEnabled = false
         return
     }
     this.isEnabled = true
-    if(galleryPost.isLiked) {
+    if(isLiked) {
         this.srcCompat(R.drawable.ic_baseline_red_favorite_24)
     }else{
         this.srcCompat(R.drawable.ic_baseline_favorite_border_24)

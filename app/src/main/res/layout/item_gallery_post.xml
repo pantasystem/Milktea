@@ -63,8 +63,8 @@
                     tools:src="@drawable/ic_baseline_favorite_border_24"
                     android:layout_marginEnd="8dp"
                     android:contentDescription="@string/gallery_favorite_button"
-                    galleryPostLiked="@{galleryPostState.galleryPost}"
-                    isSendingFavorite="@{galleryPostState.isSending ?? false}"
+                    isLiked="@{galleryPostState.isLiked ?? false}"
+                    isSendingLiked="@{galleryPostState.isSending ?? false}"
                     android:onClick="@{()-> galleryPostState.toggleFavorite()}"
                     />
 
