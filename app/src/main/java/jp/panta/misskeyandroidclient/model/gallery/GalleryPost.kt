@@ -1,9 +1,15 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
+import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.EntityId
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
+import jp.panta.misskeyandroidclient.model.drive.InMemoryFilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import java.util.*
+import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 
 sealed class GalleryPost {
     data class Id(
@@ -46,4 +52,43 @@ sealed class GalleryPost {
         val likedCount: Int,
         val isLiked: Boolean
     ) : GalleryPost()
+}
+
+suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: FilePropertyDataSource, userDataSource: UserDataSource) : GalleryPost{
+    filePropertyDataSource.addAll(files.map {
+        it.toFileProperty(account)
+    })
+    userDataSource.add(user.toUser(account, true))
+    if(this.likedCount == null || this.isLiked == null) {
+
+        return GalleryPost.Normal(
+            GalleryPost.Id(account.accountId, this.id),
+            createdAt,
+            updatedAt,
+            title,
+            description,
+            User.Id(account.accountId, userId),
+            files.map {
+                FileProperty.Id(account.accountId, it.id)
+            },
+            tags,
+            isSensitive
+        )
+    }else{
+        return GalleryPost.Authenticated(
+            GalleryPost.Id(account.accountId, this.id),
+            createdAt,
+            updatedAt,
+            title,
+            description,
+            User.Id(account.accountId, userId),
+            files.map {
+                FileProperty.Id(account.accountId, it.id)
+            },
+            tags,
+            isSensitive,
+            likedCount,
+            isLiked
+        )
+    }
 }

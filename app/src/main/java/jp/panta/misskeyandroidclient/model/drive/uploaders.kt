@@ -14,8 +14,11 @@ import okhttp3.OkHttpClient
 import java.lang.IllegalStateException
 
 interface FileUploader {
-    suspend fun upload(file: File, isForce: Boolean): FilePropertyDTO?
+    @Throws(FileUploadFailedException::class)
+    suspend fun upload(file: File, isForce: Boolean): FilePropertyDTO
 }
+
+class FileUploadFailedException(val file: File, val throwable: Throwable?, val statusCode: Int?) : IllegalStateException()
 
 interface FileUploaderProvider {
     fun create(account: Account): FileUploader
