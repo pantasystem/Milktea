@@ -159,6 +159,24 @@ data class PageParams (
                     )
 
                 }
+                GALLERY_POPULAR -> {
+                    Pageable.Gallery.Popular
+                }
+                GALLERY_FEATURED -> {
+                    Pageable.Gallery.Featured
+                }
+                GALLERY_POSTS -> {
+                    Pageable.Gallery.Posts
+                }
+                USERS_GALLERY_POSTS -> {
+                    Pageable.Gallery.User(userId!!)
+                }
+                I_LIKED_GALLERY_POSTS -> {
+                    Pageable.Gallery.ILikedPosts
+                }
+                MY_GALLERY_POSTS -> {
+                    Pageable.Gallery.MyPosts
+                }
             }
         }catch(e: NullPointerException){
             throw IllegalStateException("パラメーターに問題があります: $this")

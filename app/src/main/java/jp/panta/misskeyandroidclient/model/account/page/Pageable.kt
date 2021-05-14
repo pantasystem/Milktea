@@ -219,6 +219,45 @@ sealed class Pageable : Serializable{
         }
     }
 
+    sealed class Gallery : Pageable() {
+        object Posts : Gallery(), UntilPaginate, SincePaginate {
+            override fun toParams(): PageParams {
+                return PageParams(type = PageType.GALLERY_POSTS)
+            }
+        }
+
+        object Featured : Gallery() {
+            override fun toParams(): PageParams {
+                return PageParams(type = PageType.GALLERY_FEATURED)
+            }
+        }
+
+        object Popular : Gallery() {
+            override fun toParams(): PageParams {
+                return PageParams(type = PageType.GALLERY_POPULAR)
+            }
+        }
+
+        data class User(val userId: String) : Gallery(), UntilPaginate, SincePaginate {
+            override fun toParams(): PageParams {
+                return PageParams(type = PageType.USERS_GALLERY_POSTS)
+            }
+        }
+
+        object MyPosts : Gallery(), UntilPaginate, SincePaginate {
+            override fun toParams(): PageParams {
+                return PageParams(type = PageType.MY_GALLERY_POSTS)
+            }
+        }
+
+        object ILikedPosts : Gallery(), UntilPaginate, SincePaginate {
+            override fun toParams(): PageParams {
+                return PageParams(type = PageType.I_LIKED_GALLERY_POSTS)
+            }
+        }
+    }
+
+
 
     abstract fun toParams() : PageParams
 

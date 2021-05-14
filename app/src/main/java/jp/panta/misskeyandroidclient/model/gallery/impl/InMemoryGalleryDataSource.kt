@@ -62,4 +62,14 @@ class InMemoryGalleryDataSource(
         galleryEvents.tryEmit(GalleryDataSource.Event.Deleted(galleryPostId))
         return result
     }
+
+    override suspend fun findAll(): List<GalleryPost> {
+        return galleries.values.toList()
+    }
+
+    override suspend fun filterByAccountId(accountId: Long): List<GalleryPost> {
+        return findAll().filter {
+            it.id.accountId == accountId
+        }
+    }
 }

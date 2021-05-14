@@ -18,5 +18,7 @@ interface GalleryDataSource {
     suspend fun remove(galleryPostId: GalleryPost.Id) : Boolean
     suspend fun find(galleryPostId: GalleryPost.Id) : GalleryPost
     suspend fun addAll(posts: List<GalleryPost>) : List<AddResult>
+    suspend fun findAll() : List<GalleryPost>
+    suspend fun filterByAccountId(accountId: Long) : List<GalleryPost>
 }
 
