@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.gallery
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.throwIfHasError
@@ -23,6 +24,7 @@ import jp.panta.misskeyandroidclient.model.gallery.toEntity
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -36,14 +38,34 @@ import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 class GalleryPostsViewModel(
     val pageable: Pageable.Gallery,
     private var accountId: Long?,
-    val galleryDataSource: GalleryDataSource,
-    val galleryRepository: GalleryRepository,
-    val accountRepository: AccountRepository,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val filePropertyDataSource: FilePropertyDataSource,
-    val userDataSource: UserDataSource,
-    val encryption: Encryption,
+    private val galleryDataSource: GalleryDataSource,
+    private val galleryRepository: GalleryRepository,
+    private val accountRepository: AccountRepository,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val userDataSource: UserDataSource,
+    private val encryption: Encryption,
 ) : ViewModel(), GalleryToggleLikeOrUnlike{
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(
+        val pageable: Pageable.Gallery,
+        val accountId: Long?,
+        val miCore: MiCore
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return GalleryPostsViewModel(
+                pageable,
+                accountId,
+                miCore.getGalleryDataSource(),
+                miCore.getGalleryRepository(),
+                miCore.getAccountRepository(),
+                miCore.getMisskeyAPIProvider(),
+                miCore.getFilePropertyDataSource(),
+                miCore.getUserDataSource(),
+                miCore.getEncryption()) as T
+        }
+    }
 
     private val _galleryPosts = MutableStateFlow<State<List<GalleryPostState>>>(State.Fixed(StateContent.NotExist()))
     val galleryPosts: StateFlow<State<List<GalleryPostState>>> = _galleryPosts
