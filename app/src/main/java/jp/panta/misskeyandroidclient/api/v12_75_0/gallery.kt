@@ -23,7 +23,8 @@ data class GetPosts(
     val i: String,
     val limit: Int = 10,
     val sinceId: String? = null,
-    val untilId: String? = null
+    val untilId: String? = null,
+    val userId: String? = null
 )
 
 @Serializable
