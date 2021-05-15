@@ -22,7 +22,7 @@ enum class PageType(val defaultName: String){
     GALLERY_POSTS("GalleryPosts"),
     USERS_GALLERY_POSTS("UsersGalleryPosts"),
     MY_GALLERY_POSTS("MyGalleryPosts"),
-    I_LIKED_GALLERY_POSTS("ILikedGallryPosts")
+    I_LIKED_GALLERY_POSTS("ILikedGalleryPosts")
     //USER_PINは別
 }
 
