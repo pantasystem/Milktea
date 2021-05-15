@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
@@ -76,5 +77,20 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         binding.refresh.setOnRefreshListener {
             viewModel.loadFuture()
         }
+        binding.retryLoadButton.setOnClickListener {
+            viewModel.loadInit()
+        }
+
+        binding.listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if(layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount - 1){
+                    viewModel.loadPrevious()
+                }
+            }
+
+        })
     }
+
 }

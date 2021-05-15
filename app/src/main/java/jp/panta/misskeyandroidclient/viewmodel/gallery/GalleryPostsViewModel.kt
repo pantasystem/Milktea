@@ -34,6 +34,7 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
+import java.util.Collections.addAll
 import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 
 class GalleryPostsViewModel(
@@ -128,7 +129,7 @@ class GalleryPostsViewModel(
         }
         viewModelScope.launch(Dispatchers.IO) {
             if(pageable is UntilPaginate) {
-                val untilId = (_galleryPosts.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()?.galleryPost?.id
+                val untilId = (_galleryPosts.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()?.galleryPost?.id
                 load(untilId = untilId?.galleryId)
             }
         }
@@ -172,9 +173,10 @@ class GalleryPostsViewModel(
                     list.addAll(0, loaded.asReversed())
                     _galleryPosts.value = State.Fixed(StateContent.Exist(list))
                 }else if(untilId != null && content is StateContent.Exist){
-                    val list = content.rawContent.toMutableList()
-                    list.addAll(0, loaded.asReversed())
-                    _galleryPosts.value = State.Fixed(StateContent.Exist(list))
+                    val list = content.rawContent.toMutableList().also {
+                        it.addAll(loaded)
+                    }
+                    _galleryPosts.value = State.Fixed(StateContent.Exist(ArrayList(list)))
                 }
             }.onFailure {
                 logger?.debug("load error:$it")
