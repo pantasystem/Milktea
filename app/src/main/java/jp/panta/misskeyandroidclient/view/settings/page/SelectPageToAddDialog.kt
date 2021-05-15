@@ -14,6 +14,9 @@ import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 
+/**
+ * タブに追加する要素の候補を表示するダイアログ
+ */
 class SelectPageToAddDialog : BottomSheetDialogFragment(){
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

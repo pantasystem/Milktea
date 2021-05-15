@@ -11,6 +11,9 @@ import jp.panta.misskeyandroidclient.databinding.ItemSelectPageToAddBinding
 import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.SelectPageTypeToAdd
 
+/**
+ * タブに追加する候補を表示するリストアダプター
+ */
 class PageTypeListAdapter(private val selectPageTypeToAdd: SelectPageTypeToAdd) : ListAdapter<PageType, PageTypeListAdapter.VH>(ItemCallback()){
 
     class ItemCallback : DiffUtil.ItemCallback<PageType>(){
