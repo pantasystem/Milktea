@@ -37,6 +37,7 @@
                     app:layout_constraintDimensionRatio="w,3:4"
                     android:contentDescription="@{galleryPostState.galleryPost.title}"
                     android:id="@+id/galleryImageView"
+                    galleryPostImageSrc="@{galleryPostState}"
                     />
 
             <androidx.emoji.widget.EmojiTextView
@@ -50,7 +51,9 @@
                     app:layout_constraintEnd_toStartOf="@+id/favoriteButton"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/galleryImageView"
-                    tools:text="Gallery Post Title" />
+                    tools:text="Gallery Post Title"
+                    android:text="@{galleryPostState.galleryPost.title}"
+                    />
 
             <ImageButton
                     android:id="@+id/favoriteButton"

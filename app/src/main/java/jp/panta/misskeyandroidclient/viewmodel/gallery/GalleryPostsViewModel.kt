@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.gallery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12_75_0.GetPosts
@@ -45,6 +46,7 @@ class GalleryPostsViewModel(
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userDataSource: UserDataSource,
     private val encryption: Encryption,
+    private val logger: Logger?
 ) : ViewModel(), GalleryToggleLikeOrUnlike{
 
     @Suppress("UNCHECKED_CAST")
@@ -63,7 +65,9 @@ class GalleryPostsViewModel(
                 miCore.getMisskeyAPIProvider(),
                 miCore.getFilePropertyDataSource(),
                 miCore.getUserDataSource(),
-                miCore.getEncryption()) as T
+                miCore.getEncryption(),
+                miCore.loggerFactory.create("GalleryPostVM")
+            ) as T
         }
     }
 
@@ -92,10 +96,12 @@ class GalleryPostsViewModel(
                 }
             }
         }.launchIn(viewModelScope + Dispatchers.IO)
+        loadInit()
     }
 
     fun loadInit() {
         if(lock.isLocked) {
+            logger?.debug("locked")
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -129,10 +135,11 @@ class GalleryPostsViewModel(
     }
 
     private suspend fun load(sinceId: String? = null, untilId: String? = null) {
-        require(pageable is SincePaginate || sinceId == null) {
+        logger?.debug("call load sinceId:$sinceId, untilId:$untilId")
+        require(pageable is SincePaginate || sinceId != null) {
             "sinceId読み込みには対応していません。"
         }
-        require(untilId == null || pageable is UntilPaginate) {
+        require(pageable is UntilPaginate || untilId != null) {
             "untilId読み込みには対応していません。"
         }
 
@@ -170,6 +177,7 @@ class GalleryPostsViewModel(
                     _galleryPosts.value = State.Fixed(StateContent.Exist(list))
                 }
             }.onFailure {
+                logger?.debug("load error:$it")
                 _galleryPosts.value = State.Error(state.content, it)
             }
 
@@ -215,12 +223,7 @@ class GalleryPostsViewModel(
     }
 
     private fun Account.getGalleryPosts(sinceId: String? = null, untilId: String? = null) : suspend ()->Response<List<GalleryPostDTO>>{
-        require(sinceId != null && pageable !is SincePaginate) {
-            "sinceId読み込みには対応していません。"
-        }
-        require(untilId != null && pageable !is UntilPaginate) {
-            "untilId読み込みには対応していません。"
-        }
+
         val api = getMisskeyAPI()
         val i = getI(encryption)
         when(pageable) {

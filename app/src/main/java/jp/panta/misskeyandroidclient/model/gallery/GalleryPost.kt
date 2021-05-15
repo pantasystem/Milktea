@@ -71,7 +71,7 @@ suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: Fi
             files.map {
                 FileProperty.Id(account.accountId, it.id)
             },
-            tags,
+            tags?: emptyList(),
             isSensitive
         )
     }else{
@@ -85,7 +85,7 @@ suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: Fi
             files.map {
                 FileProperty.Id(account.accountId, it.id)
             },
-            tags,
+            tags?: emptyList(),
             isSensitive,
             likedCount,
             isLiked

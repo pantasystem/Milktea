@@ -37,7 +37,7 @@ data class GalleryPost(
     val userId: String,
     val user: UserDTO,
     val files: List<FilePropertyDTO>,
-    val tags: List<String>,
+    val tags: List<String>?,
     val isSensitive: Boolean,
     val likedCount: Int?,
     val isLiked: Boolean?
