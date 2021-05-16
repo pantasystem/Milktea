@@ -43,7 +43,7 @@ interface MisskeyAPIV1275Diff {
     @POST("/api/i/gallery/likes")
     suspend fun likedGalleryPosts(@Body request: GetPosts) : Response<List<GalleryPost>>
 
-    @POST("users/gallery/posts")
+    @POST("/api/users/gallery/posts")
     suspend fun userPosts(@Body request: GetPosts) : Response<List<GalleryPost>>
 }
 open class MisskeyAPIV1275(misskey: MisskeyAPI, private val misskeyAPIV1275Diff: MisskeyAPIV1275Diff, misskeyAPIV12Diff: MisskeyAPIV12Diff, misskeyAPIV11Diff: MisskeyAPIV11Diff) : MisskeyAPIV12(misskey, misskeyAPIV12Diff, misskeyAPIV11Diff), MisskeyAPIV1275Diff{
