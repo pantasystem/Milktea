@@ -15,8 +15,7 @@ import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostsViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 
 class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view){
 
@@ -52,27 +51,29 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
 
         val miCore = requireContext().applicationContext as MiCore
         val viewModel = ViewModelProvider(this, GalleryPostsViewModel.Factory(pageable, accountId, miCore))[GalleryPostsViewModel::class.java]
-        viewModel.galleryPosts.onEach { state ->
-            if(state.content is StateContent.Exist) {
-                // 要素を表示する
-                binding.refresh.visibility = View.VISIBLE
-                binding.timelineEmptyView.visibility = View.GONE
-                binding.timelineProgressBar.visibility = View.GONE
-                galleryPostsListAdapter.submitList(state.content.rawContent)
-                binding.refresh.isRefreshing = state is State.Loading
-            }else{
-                // エラーメッセージやプログレスバーなどを表示する
-                binding.refresh.isRefreshing = false
-                binding.refresh.visibility = View.GONE
-                if(state is State.Loading) {
-                    binding.timelineProgressBar.visibility = View.VISIBLE
+        lifecycleScope.launchWhenStarted {
+            viewModel.galleryPosts.collect { state ->
+                if(state.content is StateContent.Exist) {
+                    // 要素を表示する
+                    binding.refresh.visibility = View.VISIBLE
                     binding.timelineEmptyView.visibility = View.GONE
-                }else{
                     binding.timelineProgressBar.visibility = View.GONE
-                    binding.timelineEmptyView.visibility = View.VISIBLE
+                    galleryPostsListAdapter.submitList(state.content.rawContent)
+                    binding.refresh.isRefreshing = state is State.Loading
+                }else{
+                    // エラーメッセージやプログレスバーなどを表示する
+                    binding.refresh.isRefreshing = false
+                    binding.refresh.visibility = View.GONE
+                    if(state is State.Loading) {
+                        binding.timelineProgressBar.visibility = View.VISIBLE
+                        binding.timelineEmptyView.visibility = View.GONE
+                    }else{
+                        binding.timelineProgressBar.visibility = View.GONE
+                        binding.timelineEmptyView.visibility = View.VISIBLE
+                    }
                 }
             }
-        }.launchIn(lifecycleScope)
+        }
 
         binding.refresh.setOnRefreshListener {
             viewModel.loadFuture()
