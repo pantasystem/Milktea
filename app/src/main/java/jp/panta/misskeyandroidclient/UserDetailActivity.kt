@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
@@ -31,6 +32,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.view.gallery.GalleryPostsFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -113,12 +115,11 @@ class UserDetailActivity : AppCompatActivity() {
             mViewModel = viewModel
             binding.userViewModel = viewModel
 
-
-
+            val isEnableGallery = miApplication.getMisskeyAPIProvider().get(ar.instanceDomain) is MisskeyAPIV1275
             viewModel.load()
             viewModel.user.observe(this,  { detail ->
                 if(detail != null){
-                    val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, detail.id.id)
+                    val adapter =UserTimelinePagerAdapter(supportFragmentManager, ar, detail.id.id, isEnableGallery)
                     //userTimelinePager.adapter = adapter
                     binding.userTimelinePager.adapter = adapter
                     binding.userTimelineTab.setupWithViewPager(binding.userTimelinePager)
@@ -176,10 +177,11 @@ class UserDetailActivity : AppCompatActivity() {
     inner class UserTimelinePagerAdapter(
         fm: FragmentManager,
         val account: Account,
-        val userId: String
+        val userId: String,
+        enableGallery: Boolean = false
     ) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
-        private val titles = listOf(getString(R.string.post), getString(R.string.pin), getString(R.string.media))
+        private val titles = if(enableGallery)  listOf(getString(R.string.post), getString(R.string.pin), getString(R.string.media), getString(R.string.gallery)) else listOf(getString(R.string.post), getString(R.string.pin), getString(R.string.media))
         private val requestMedia = Pageable.UserTimeline(userId, withFiles = true)
 
         private val requestTimeline = Pageable.UserTimeline(userId)
@@ -196,6 +198,7 @@ class UserDetailActivity : AppCompatActivity() {
                 0 -> TimelineFragment.newInstance(requestTimeline)
                 1 -> PinNoteFragment()
                 2 -> TimelineFragment.newInstance(requestMedia)
+                3 -> GalleryPostsFragment.newInstance(Pageable.Gallery.User(userId), account.accountId)
                 else -> throw IllegalArgumentException("こんなものはない！！")
             }
         }
