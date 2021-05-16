@@ -58,7 +58,8 @@ suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: Fi
     filePropertyDataSource.addAll(files.map {
         it.toFileProperty(account)
     })
-    userDataSource.add(user.toUser(account, true))
+    // NOTE: API上ではdetailだったが実際に受信されたデータはSimpleだったのでfalse
+    userDataSource.add(user.toUser(account, false))
     if(this.likedCount == null || this.isLiked == null) {
 
         return GalleryPost.Normal(
