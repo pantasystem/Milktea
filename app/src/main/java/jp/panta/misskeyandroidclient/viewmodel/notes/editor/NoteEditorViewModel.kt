@@ -80,7 +80,9 @@ class NoteEditorViewModel(
 
     val cw = MediatorLiveData<String>().apply {
         addSourceFromNoteAndDraft { noteDTO, draftNote ->
-            value = noteDTO?.cw ?: draftNote?.cw
+            (noteDTO?.cw ?: draftNote?.cw)?.let{
+                value = it
+            }
         }
     }
 
@@ -92,7 +94,9 @@ class NoteEditorViewModel(
     }
     val text = MediatorLiveData<String>().apply {
         addSourceFromNoteAndDraft { noteDTO, draftNote ->
-            value = noteDTO?.text ?: draftNote?.text
+            (noteDTO?.text ?: draftNote?.text)?.let {
+                value = it
+            }
         }
     }
     var maxTextLength = Transformations.map(currentAccount){
