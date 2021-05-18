@@ -7,7 +7,7 @@
         <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
         <variable
                 name="fileViewData"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData" />
+                type="jp.panta.misskeyandroidclient.viewmodel.file.FileViewData" />
     </data>
     <FrameLayout android:id="@+id/baseFrame"
             android:layout_width="match_parent"
