@@ -14,7 +14,7 @@ class ViewDataBindingSimpleRecyclerViewAdapter<T, VDB: ViewDataBinding>(
     private val onBind: (binding: VDB, item: T)-> Unit,
     @LayoutRes val layoutRes: Int,
     val lifecycleOwner: LifecycleOwner,
-    onEqual: (new: T, old: T)-> Boolean = { i, n -> i == n },
+    key: (item: T)-> Any,
     onDeepEqual: (new: T, old: T)-> Boolean = { i, n -> i == n },
 ) : ListAdapter<T, ViewDataBindingSimpleRecyclerViewAdapter.ViewBindingViewHolder<VDB>>(
     object : DiffUtil.ItemCallback<T>() {
@@ -23,7 +23,7 @@ class ViewDataBindingSimpleRecyclerViewAdapter<T, VDB: ViewDataBinding>(
         }
 
         override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
-            return onEqual(newItem, oldItem)
+            return key(oldItem) == key(newItem)
         }
     }
 ) {

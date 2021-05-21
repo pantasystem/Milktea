@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -16,7 +17,8 @@ class GalleryPostState(
     val gallerySendToggleLikeOrUnlike: GalleryToggleLikeOrUnlike,
     val galleryDataSource: GalleryDataSource,
     val coroutineScope: CoroutineScope,
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    currentIndex: Int = 0
 ) {
 
     init {
@@ -38,6 +40,17 @@ class GalleryPostState(
 
     private val _isSending = MutableLiveData<Boolean>(false)
     val isSending: LiveData<Boolean> = _isSending
+
+    private val _currentIndex = MutableStateFlow(currentIndex)
+    val currentIndex: StateFlow<Int> = _currentIndex
+
+    val fileViewDataList = files.map {
+        FileViewData(it.toFile())
+    }
+
+    fun setCurrentIndex(index: Int) {
+        _currentIndex.value = index
+    }
 
     fun toggleFavorite() {
         coroutineScope.launch(dispatcher) {

@@ -30,7 +30,7 @@
                 subNameView="@{secondaryUserName}"
                 user="@{galleryPostState.user}"
                 >
-            <ImageView
+            <androidx.viewpager2.widget.ViewPager2
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -38,10 +38,10 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:src="@drawable/ic_reaction_confused"
                     app:layout_constraintDimensionRatio="w,3:4"
-                    android:contentDescription="@{galleryPostState.galleryPost.title}"
-                    android:id="@+id/galleryImageView"
-                    galleryPostImageSrc="@{galleryPostState}"
+                    android:id="@+id/galleryImagePager"
+
                     />
+
 
             <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/title"
@@ -53,7 +53,7 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@+id/favoriteButton"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/galleryImageView"
+                    app:layout_constraintTop_toBottomOf="@id/galleryImagePager"
                     tools:text="Gallery Post Title"
                     android:text="@{galleryPostState.galleryPost.title}"
                     />
@@ -62,7 +62,7 @@
                     android:id="@+id/favoriteButton"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
-                    app:layout_constraintTop_toBottomOf="@id/galleryImageView"
+                    app:layout_constraintTop_toBottomOf="@id/galleryImagePager"
 
                     app:layout_constraintEnd_toEndOf="parent"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
