@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayoutMediator
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemGalleryPhotoBinding
 import jp.panta.misskeyandroidclient.databinding.ItemGalleryPostBinding
@@ -54,6 +55,9 @@ class GalleryPostViewHolder(
         adapter.submitList(galleryPostState.fileViewDataList)
 
         itemGalleryPostBinding.galleryImagePager.adapter = adapter
+        TabLayoutMediator(itemGalleryPostBinding.imagesTab, itemGalleryPostBinding.galleryImagePager) { _, _ ->
+
+        }.attach()
 
         itemGalleryPostBinding.executePendingBindings()
 
