@@ -32,7 +32,7 @@ data class FilePropertyDTO(
     data class Properties(
         val width: Int? = null,
         val height: Int? = null
-    )
+    ) : Serializable
 
     fun getThumbnailUrl(instanceBaseUrl: String): String{
         return getUrl(instanceBaseUrl, thumbnailUrl?: url)
