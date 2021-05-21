@@ -15,8 +15,8 @@ android {
         applicationId "jp.panta.misskeyandroidclient"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 45
-        versionName "v2.2.8"
+        versionCode 46
+        versionName "v2.2.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
