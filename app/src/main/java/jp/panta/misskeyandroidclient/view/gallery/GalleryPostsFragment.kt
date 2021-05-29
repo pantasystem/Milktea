@@ -1,14 +1,18 @@
 package jp.panta.misskeyandroidclient.view.gallery
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.AuthorizationActivity
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.api.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.util.State
@@ -80,6 +84,16 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         }
         binding.retryLoadButton.setOnClickListener {
             viewModel.loadInit()
+        }
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.error.collect {
+                if(it is APIError.ClientException && it.error?.error?.code == "PERMISSION_DENIED") {
+                    Toast.makeText(requireContext(), "再認証が必要です。", Toast.LENGTH_LONG).show()
+                    // 再認証をする
+                    startActivity(Intent(requireContext(), AuthorizationActivity::class.java))
+                }
+            }
         }
 
         binding.listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {

@@ -181,6 +181,7 @@ class GalleryPostsViewModel(
             }.onFailure {
                 logger?.debug("load error:$it")
                 _galleryPosts.value = State.Error(state.content, it)
+                _error.emit(it)
             }
 
 
