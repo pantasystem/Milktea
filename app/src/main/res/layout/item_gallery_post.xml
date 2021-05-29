@@ -69,6 +69,8 @@
                     android:layout_marginTop="2dp"
                     android:textSize="20sp"
                     android:textStyle="bold"
+
+
                     app:layout_constraintEnd_toStartOf="@+id/favoriteButton"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/imagesTab"
@@ -76,29 +78,39 @@
                     android:text="@{galleryPostState.galleryPost.title}"
                     />
 
+            <androidx.emoji.widget.EmojiTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="description"
+                    android:id="@+id/description"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{galleryPostState.galleryPost.description}"
+                    />
+
             <ImageButton
-                    android:id="@+id/favoriteButton"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
-                    app:layout_constraintTop_toBottomOf="@id/imagesTab"
-
                     app:layout_constraintEnd_toEndOf="parent"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    tools:src="@drawable/ic_baseline_favorite_border_24"
+                    app:layout_constraintTop_toBottomOf="@id/imagesTab"
                     android:layout_marginEnd="8dp"
-                    android:contentDescription="@string/gallery_favorite_button"
-                    isLiked="@{galleryPostState.isLiked ?? false}"
-                    isSendingLiked="@{galleryPostState.isSending ?? false}"
-                    android:onClick="@{()-> galleryPostState.toggleFavorite()}"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    tools:src="@drawable/ic_baseline_keyboard_arrow_down_24"
+                    tools:ignore="ContentDescription"
+                    android:visibility="gone"
+
                     />
 
             <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    app:layout_constraintTop_toBottomOf="@id/title"
+                    app:layout_constraintTop_toBottomOf="@id/description"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:src="@drawable/ic_reaction_hmm"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginBottom="8dp"
@@ -113,12 +125,18 @@
                     app:layout_constraintStart_toEndOf="@id/avatarIcon"
                     app:layout_constraintBottom_toBottomOf="@id/avatarIcon"
                     app:layout_constraintTop_toTopOf="@id/avatarIcon"
-                    tools:text="userName"
+                    app:layout_constraintLeft_toRightOf="@id/secondaryUserName"
+                    tools:text="userNameawef"
+                    android:lines="1"
                     android:layout_marginStart="8dp"
                     android:id="@+id/primaryUserName"
+                    app:layout_constrainedWidth="true"
+
+
+
                     />
             <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
 
                     app:layout_constraintBottom_toBottomOf="@id/avatarIcon"
@@ -126,7 +144,26 @@
                     tools:text="userName"
                     android:layout_marginStart="8dp"
                     android:id="@+id/secondaryUserName"
-                    app:layout_constraintStart_toEndOf="@id/primaryUserName"
+
+                    app:layout_constraintRight_toLeftOf="@id/favoriteButton"
+                    app:layout_constraintLeft_toRightOf="@id/primaryUserName"
+                    android:lines="1"
+                    />
+            <ImageButton
+                    android:id="@+id/favoriteButton"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+
+                    app:layout_constraintEnd_toEndOf="parent"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    tools:src="@drawable/ic_baseline_favorite_border_24"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/gallery_favorite_button"
+                    isLiked="@{galleryPostState.isLiked ?? false}"
+                    isSendingLiked="@{galleryPostState.isSending ?? false}"
+                    android:onClick="@{()-> galleryPostState.toggleFavorite()}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+
                     />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
