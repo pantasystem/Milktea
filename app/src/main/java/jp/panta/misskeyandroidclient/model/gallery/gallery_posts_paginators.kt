@@ -16,13 +16,21 @@ import retrofit2.Response
 import java.lang.IllegalStateException
 import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 
+
+interface GetGalleryPostsStateFlow {
+    fun getFlow(): Flow<State<List<GalleryPost.Id>>>
+}
 /**
  * EntityはDataSourceが保持しているので、ここではタイムラインの順番を保持する
  */
-class GalleryPostsState : PageableState<GalleryPost.Id>, IdGetter<String> {
+class GalleryPostsState : PageableState<GalleryPost.Id>, IdGetter<String>, GetGalleryPostsStateFlow {
 
     private val _state = MutableStateFlow<State<List<GalleryPost.Id>>>(State.Fixed(StateContent.NotExist()))
     override val state: Flow<State<List<GalleryPost.Id>>> = _state
+
+    override fun getFlow(): Flow<State<List<GalleryPost.Id>>> {
+        return state
+    }
 
     private fun getList(): List<GalleryPost.Id> {
         return (_state.value.content as? StateContent.Exist)?.rawContent?: emptyList()
