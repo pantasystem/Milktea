@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.v12_75_0.GetPosts
 import jp.panta.misskeyandroidclient.api.v12_75_0.LikedGalleryPost
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
@@ -74,16 +75,20 @@ class LikedGalleryPostsState : PageableState<LikedGalleryPostId>, IdGetter<Strin
 }
 
 class LikedGalleryPostsAdder(
-    private val account: Account,
+    private val getAccount: suspend () -> Account,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val userDataSource: UserDataSource
+    private val userDataSource: UserDataSource,
+    private val galleryDataSource: GalleryDataSource
 ) : EntityAdder<LikedGalleryPost, LikedGalleryPostId> {
 
     override suspend fun addAll(list: List<LikedGalleryPost>): List<LikedGalleryPostId> {
+        val account = getAccount.invoke()
         return list.map {
             LikedGalleryPostId(
                 it.id,
-                it.post.toEntity(account, filePropertyDataSource, userDataSource).id
+                it.post.toEntity(account, filePropertyDataSource, userDataSource).also { post ->
+                    galleryDataSource.add(post)
+                }.id
             )
         }
     }
@@ -91,22 +96,26 @@ class LikedGalleryPostsAdder(
 
 class LikedGalleryPostsLoader(
     private val idGetter: IdGetter<String>,
-    private val misskeyAPIV1275: MisskeyAPIV1275,
-    private val account: Account,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val getAccount: suspend ()->Account,
     private val encryption: Encryption
 ) : FutureLoader<LikedGalleryPost>, PreviousLoader<LikedGalleryPost> {
 
     override suspend fun loadFuture(): Response<List<LikedGalleryPost>> {
-        return misskeyAPIV1275.likedGalleryPosts(GetPosts(
+        val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
+            ?: throw IllegalVersionException()
+        return api.likedGalleryPosts(GetPosts(
            sinceId = idGetter.getSinceId(),
-            i = account.getI(encryption)
-        ));
+            i = getAccount.invoke().getI(encryption)
+        ))
     }
 
     override suspend fun loadPrevious(): Response<List<LikedGalleryPost>> {
-        return misskeyAPIV1275.likedGalleryPosts(GetPosts(
+        val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
+            ?: throw IllegalVersionException()
+        return api.likedGalleryPosts(GetPosts(
             untilId = idGetter.getUntilId(),
-            i = account.getI(encryption)
-        ));
+            i = getAccount.invoke().getI(encryption)
+        ))
     }
 }

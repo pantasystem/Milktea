@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.v12_75_0.GetPosts
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.model.*
@@ -53,23 +54,26 @@ class GalleryPostsState : PageableState<GalleryPost.Id>, IdGetter<String>, GetGa
 }
 
 class GalleryPostsAdder(
-    private val account: Account,
+    private val getAccount: suspend ()-> Account,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val userDataSource: UserDataSource
+    private val userDataSource: UserDataSource,
+    private val galleryDataSource: GalleryDataSource
 ) : EntityAdder<GalleryPostDTO, GalleryPost.Id> {
 
     override suspend fun addAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
         return list.map {
-            it.toEntity(account, filePropertyDataSource, userDataSource).id
+            it.toEntity(getAccount.invoke(), filePropertyDataSource, userDataSource).also { post ->
+                galleryDataSource.add(post)
+            }.id
         }
     }
 }
 
-class GalleryPostLoader (
+class GalleryPostsLoader (
     private val pageable: Pageable.Gallery,
     private val idGetter: IdGetter<String>,
-    private val api: MisskeyAPIV1275,
-    private val account: Account,
+    private val apiProvider: MisskeyAPIProvider,
+    private val getAccount: suspend () -> Account,
     private val encryption: Encryption
 ) : FutureLoader<GalleryPostDTO>, PreviousLoader<GalleryPostDTO>{
     init{
@@ -87,8 +91,10 @@ class GalleryPostLoader (
     }
 
 
-    fun api(sinceId: String? = null, untilId: String? = null) : suspend ()-> Response<List<GalleryPostDTO>>{
-        val i = account.getI(encryption)
+    suspend fun api(sinceId: String? = null, untilId: String? = null) : suspend ()-> Response<List<GalleryPostDTO>>{
+        val i = getAccount.invoke().getI(encryption)
+        val api = apiProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
+            ?: throw IllegalVersionException()
         when(pageable) {
             is Pageable.Gallery.MyPosts -> {
                 return {
