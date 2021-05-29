@@ -115,7 +115,7 @@ class FuturePaginatorController<DTO, E>(
             runCatching {
                 val res = futureLoader.loadFuture().throwIfHasError()
                 res.throwIfHasError()
-                entityAdder.addAll(res.body()!!)
+                entityAdder.addAll(res.body()!!).asReversed()
             }.onFailure {
                 val errorState = State.Error(
                     state.getState().content,
