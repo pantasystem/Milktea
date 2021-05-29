@@ -44,6 +44,12 @@ data class GalleryPost(
 )
 
 @Serializable
+data class LikedGalleryPost(
+    val id: String,
+    val post: GalleryPost
+)
+
+@Serializable
 data class Like(
     val i: String,
     val postId: String

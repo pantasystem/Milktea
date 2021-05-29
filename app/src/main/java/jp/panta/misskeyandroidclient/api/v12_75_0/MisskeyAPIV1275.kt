@@ -41,7 +41,7 @@ interface MisskeyAPIV1275Diff {
     suspend fun myGalleryPosts(@Body request: GetPosts) : Response<List<GalleryPost>>
 
     @POST("/api/i/gallery/likes")
-    suspend fun likedGalleryPosts(@Body request: GetPosts) : Response<List<GalleryPost>>
+    suspend fun likedGalleryPosts(@Body request: GetPosts) : Response<List<LikedGalleryPost>>
 
     @POST("/api/users/gallery/posts")
     suspend fun userPosts(@Body request: GetPosts) : Response<List<GalleryPost>>
@@ -66,7 +66,7 @@ open class MisskeyAPIV1275(misskey: MisskeyAPI, private val misskeyAPIV1275Diff:
 
     override suspend fun updateGallery(update: Update): Response<GalleryPost> = misskeyAPIV1275Diff.updateGallery(update)
 
-    override suspend fun likedGalleryPosts(request: GetPosts): Response<List<GalleryPost>> = misskeyAPIV1275Diff.likedGalleryPosts(request)
+    override suspend fun likedGalleryPosts(request: GetPosts): Response<List<LikedGalleryPost>> = misskeyAPIV1275Diff.likedGalleryPosts(request)
 
     override suspend fun myGalleryPosts(request: GetPosts): Response<List<GalleryPost>> = misskeyAPIV1275Diff.myGalleryPosts(request)
 
