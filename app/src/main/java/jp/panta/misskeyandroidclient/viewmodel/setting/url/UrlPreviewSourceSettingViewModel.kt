@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.setting.url
 
 import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -71,7 +72,7 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
 
     private var urlPreviewLoadCounter = 0
 
-    private val releaseUrlPreviewLoadQueue = Handler()
+    private val releaseUrlPreviewLoadQueue = Handler(Looper.myLooper()!!)
 
     private val releaseUrlPreviewLoadCounter = Runnable {
         urlPreviewLoadCounter = 0

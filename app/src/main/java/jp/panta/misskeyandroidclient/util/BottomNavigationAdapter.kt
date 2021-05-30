@@ -39,7 +39,7 @@ abstract class BottomNavigationAdapter(
     }
 
     private fun initFragment(){
-        bottomNavigationView.setOnNavigationItemSelectedListener {
+        bottomNavigationView.setOnItemSelectedListener {
             setFragment(it)
         }
         /*if(selectedItemId == R.id.navigation_home){

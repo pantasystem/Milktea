@@ -8,6 +8,6 @@ class RemoteMetaStore : MetaStore{
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun get(instanceDomain: String): Meta? {
-        return MisskeyGetMeta.getMeta(instanceDomain).execute()?.body()
+        return MisskeyGetMeta.getMeta(instanceDomain).execute().body()
     }
 }

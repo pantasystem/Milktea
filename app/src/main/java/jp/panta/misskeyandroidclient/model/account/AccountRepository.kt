@@ -48,7 +48,7 @@ fun AccountRepository.listenEvent(): Flow<AccountRepository.Event> {
     return channelFlow {
 
         val listener: (e: AccountRepository.Event)-> Unit = {
-            offer(it)
+            trySend(it)
         }
         addEventListener(listener)
 

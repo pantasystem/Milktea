@@ -22,7 +22,7 @@ class PollViewData(private val poll: Poll, val noteId: String){
         }*/
         val text = choice.text
     }
-    val totalVoteCount = MutableLiveData<Int>(poll.choices.sumBy {
+    val totalVoteCount = MutableLiveData<Int>(poll.choices.sumOf {
         it.votes
     })
 

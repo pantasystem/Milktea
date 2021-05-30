@@ -69,7 +69,7 @@ fun Visibility.type(): String {
 
 @Throws(IllegalArgumentException::class)
 fun Visibility(type: String, isLocalOnly: Boolean, visibleUserIds: List<User.Id>? = null): Visibility {
-    return when(type.toLowerCase(Locale.US)){
+    return when(type.lowercase()){
         "public" -> Visibility.Public(isLocalOnly)
         "home" -> Visibility.Home(isLocalOnly)
         "followers" -> Visibility.Followers(isLocalOnly)
