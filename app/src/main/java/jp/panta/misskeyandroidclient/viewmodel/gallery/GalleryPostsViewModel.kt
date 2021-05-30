@@ -18,23 +18,17 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.account.page.SincePaginate
 import jp.panta.misskeyandroidclient.model.account.page.UntilPaginate
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
-import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
-import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.gallery.toEntity
+import jp.panta.misskeyandroidclient.model.gallery.*
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
-import java.util.Collections.addAll
 import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 
 class GalleryPostsViewModel(
@@ -44,10 +38,7 @@ class GalleryPostsViewModel(
     private val galleryRepository: GalleryRepository,
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val filePropertyDataSource: FilePropertyDataSource,
-    private val userDataSource: UserDataSource,
-    private val encryption: Encryption,
-    private val logger: Logger?
+    miCore: MiCore
 ) : ViewModel(), GalleryToggleLikeOrUnlike{
 
     @Suppress("UNCHECKED_CAST")
@@ -64,13 +55,12 @@ class GalleryPostsViewModel(
                 miCore.getGalleryRepository(),
                 miCore.getAccountRepository(),
                 miCore.getMisskeyAPIProvider(),
-                miCore.getFilePropertyDataSource(),
-                miCore.getUserDataSource(),
-                miCore.getEncryption(),
-                miCore.loggerFactory.create("GalleryPostVM")
+                miCore
             ) as T
         }
     }
+
+    private val galleryPostsStore = miCore.createGalleryPostsStore(pageable, this::getAccount)
 
     private val _galleryPosts = MutableStateFlow<State<List<GalleryPostState>>>(State.Fixed(StateContent.NotExist()))
     val galleryPosts: StateFlow<State<List<GalleryPostState>>> = _galleryPosts
@@ -78,6 +68,7 @@ class GalleryPostsViewModel(
 
     private val _error = MutableSharedFlow<Throwable>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val error: Flow<Throwable> = _error
+
 
     init {
         galleryDataSource.events().mapNotNull {
@@ -100,103 +91,79 @@ class GalleryPostsViewModel(
         loadInit()
     }
 
-    fun loadInit() {
-        if(lock.isLocked) {
-            logger?.debug("locked")
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
+    init {
+        // FIXME: 毎回Stateオブジェクトを生成してしまうのでユーザーの捜査情報が初期化されてしまうので何とかする
+        galleryPostsStore.state.map {
+            val content = if(it.content is StateContent.Exist<List<GalleryPost.Id>>) {
+                val list = coroutineScope {
+                    it.content.rawContent.map { id ->
+                        async {
+                            runCatching {
+                                miCore.getGalleryDataSource().find(id)
+                            }.getOrNull()
+                        }
 
-            load()
+                    }.awaitAll().filterNotNull().map { post ->
+                        GalleryPostState(
+                            post,
+                            miCore.getFilePropertyDataSource().findIn(post.fileIds),
+                            miCore.getUserRepository().find(post.userId, false),
+                            this@GalleryPostsViewModel,
+                            miCore.getGalleryDataSource(),
+                            viewModelScope
+                        )
+                    }
+                }
+                StateContent.Exist(list)
+
+            }else{
+                StateContent.NotExist()
+            }
+            when(it) {
+                is State.Fixed -> State.Fixed(content)
+                is State.Error -> State.Error(content, it.throwable)
+                is State.Loading -> State.Loading(content)
+            }
+        }.onEach {
+            this._galleryPosts.value = it
+            if(it is State.Error) {
+                _error.emit(it.throwable)
+            }
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+    }
+
+    fun loadInit() {
+       if(galleryPostsStore.mutex.isLocked) {
+           return
+       }
+        viewModelScope.launch(Dispatchers.IO) {
+            galleryPostsStore.clear()
+            galleryPostsStore.loadPrevious()
         }
     }
 
     fun loadFuture() {
-        if(lock.isLocked) {
+        if(galleryPostsStore.mutex.isLocked) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            val sinceId = (_galleryPosts.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()?.galleryPost?.id
-            if(pageable is SincePaginate) {
-                load(sinceId = sinceId?.galleryId)
-            }
+            galleryPostsStore.loadFuture()
         }
     }
 
     fun loadPrevious() {
-        if(lock.isLocked) {
+        if(galleryPostsStore.mutex.isLocked) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            if(pageable is UntilPaginate) {
-                val untilId = (_galleryPosts.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()?.galleryPost?.id
-                load(untilId = untilId?.galleryId)
-            }
-        }
-    }
-
-    private suspend fun load(sinceId: String? = null, untilId: String? = null) {
-        logger?.debug("call load sinceId:$sinceId, untilId:$untilId")
-        require(pageable is SincePaginate || sinceId != null) {
-            "sinceId読み込みには対応していません。"
-        }
-        require(pageable is UntilPaginate || untilId != null) {
-            "untilId読み込みには対応していません。"
-        }
-
-        lock.withLock {
-            val state = _galleryPosts.value
-            val content = state.content
-            _galleryPosts.value = if(sinceId == null && untilId == null) State.Loading(StateContent.NotExist()) else State.Loading(state.content)
-            runCatching {
-                val body = getAccount().getGalleryPosts(sinceId, untilId).invoke().throwIfHasError()
-                    .body()
-                requireNotNull(body)
-                body.map {
-                    it.toEntity(getAccount(), filePropertyDataSource, userDataSource)
-                }.map {
-                    GalleryPostState(
-                        it,
-                        it.fileIds.map { fileId -> filePropertyDataSource.find(fileId) },
-                        userDataSource.get(it.userId),
-                        this,
-                        galleryDataSource,
-                        viewModelScope,
-                        Dispatchers.IO
-                    )
-                }
-            }.onSuccess { loaded ->
-                if((sinceId == null && untilId == null) || content is StateContent.NotExist) {
-                    _galleryPosts.value = State.Fixed(StateContent.Exist(loaded))
-                }else if(sinceId != null && content is StateContent.Exist) {
-                    val list = content.rawContent.toMutableList()
-                    list.addAll(0, loaded.asReversed())
-                    _galleryPosts.value = State.Fixed(StateContent.Exist(list))
-                }else if(untilId != null && content is StateContent.Exist){
-                    val list = content.rawContent.toMutableList().also {
-                        it.addAll(loaded)
-                    }
-                    _galleryPosts.value = State.Fixed(StateContent.Exist(ArrayList(list)))
-                }
-            }.onFailure {
-                logger?.debug("load error:$it")
-                _galleryPosts.value = State.Error(state.content, it)
-                _error.emit(it)
-            }
-
-
+            galleryPostsStore.loadPrevious()
         }
     }
 
 
-    /**
-     * 使用しているアカウントを変更します。
-     * 使用した場合状態が初期化されます。
-     */
-    suspend fun setAccount(accountId: Long) {
-        this.accountId = accountId
-        load()
-    }
+
+
 
     override suspend fun toggle(galleryId: GalleryPost.Id) {
         runCatching {
@@ -225,43 +192,7 @@ class GalleryPostsViewModel(
             ?: throw IllegalVersionException()
     }
 
-    private fun Account.getGalleryPosts(sinceId: String? = null, untilId: String? = null) : suspend ()->Response<List<GalleryPostDTO>>{
 
-        val api = getMisskeyAPI()
-        val i = getI(encryption)
-        when(pageable) {
-            is Pageable.Gallery.MyPosts -> {
-                return {
-                    api.myGalleryPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20,))
-                }
-            }
-            is Pageable.Gallery.ILikedPosts -> {
-                return {
-                    api.likedGalleryPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20,))
-                }
-            }
-            is Pageable.Gallery.User -> {
-                return {
-                    api.userPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20, userId = pageable.userId))
-                }
-            }
-            is Pageable.Gallery.Posts -> {
-                return {
-                    api.galleryPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20))
-                }
-            }
-            is Pageable.Gallery.Featured -> {
-                return {
-                    api.featuredGalleries(I(i))
-                }
-            }
-            is Pageable.Gallery.Popular -> {
-                return {
-                    api.popularGalleries(I(i))
-                }
-            }
-        }
-    }
 
 }
 

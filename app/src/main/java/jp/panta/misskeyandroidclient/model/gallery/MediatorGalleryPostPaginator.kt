@@ -17,7 +17,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 
-interface GalleryPostsStore {
+interface GalleryPostsStore : StateLocker{
     val state: Flow<State<List<GalleryPost.Id>>>
 
     suspend fun loadPrevious()
@@ -59,7 +59,7 @@ class GalleryPostsStoreImpl(
     userDataSource: UserDataSource,
     galleryDataSource: GalleryDataSource,
     encryption: Encryption
-) : GalleryPostsStore, StateLocker{
+) : GalleryPostsStore{
 
     override val mutex: Mutex = Mutex()
 
@@ -91,7 +91,7 @@ class LikedGalleryPostStoreImpl(
     userDataSource: UserDataSource,
     galleryDataSource: GalleryDataSource,
     encryption: Encryption
-) : GalleryPostsStore, StateLocker{
+) : GalleryPostsStore{
 
     override val mutex: Mutex = Mutex()
 
