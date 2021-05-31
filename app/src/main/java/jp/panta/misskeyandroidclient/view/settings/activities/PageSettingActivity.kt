@@ -142,10 +142,6 @@ class PageSettingActivity : AppCompatActivity() {
                     }
                 }
             }
-        }else if(requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {
-            if(resultCode == RESULT_OK && data != null) {
-
-            }
         }
     }
 
