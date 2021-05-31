@@ -66,13 +66,15 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     //private var isViewCreated: Boolean = false
     //private var isLoadInited: Boolean = false
-    private var isLoadInit: Boolean = false
 
     //private var mPageableTimeline: Page.Timeline? = null
     private var mPage: Page? = null
 
     private var mPageable: Pageable? = null
 
+    /**
+     * タイムラインが画面上に表示されているかを判定するフラグ
+     */
     private var isShowing: Boolean = false
 
     private var mFirstVisibleItemPosition: Int? = null
@@ -268,13 +270,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         isShowing = true
 
-        if(!isLoadInit){
-            isLoadInit = true
 
-        }
-        if(mViewModel?.getTimelineState()?.value?.notes?.isNotEmpty() == true){
-            mViewModel?.loadNew()
-        }
 
         //(activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
     }
