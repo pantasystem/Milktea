@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -116,7 +117,7 @@ class ReactionChoicesFragment : Fragment(){
             Log.d(TAG, "emojiの取得に失敗しました")
             return
         }
-        GlobalScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO){
             val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map{
                 it.reaction
             }

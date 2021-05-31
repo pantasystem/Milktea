@@ -10,6 +10,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -48,7 +49,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         binding.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
         //adapter.submitList(ReactionResourceMap.defaultReaction)
 
-        GlobalScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO){
             var reactionSettings = miApplication.reactionUserSettingDao.findByInstanceDomain(
                 ac?.instanceDomain!!
             )?.sortedBy {

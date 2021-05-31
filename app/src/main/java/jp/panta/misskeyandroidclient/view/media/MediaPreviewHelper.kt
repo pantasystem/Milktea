@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import java.lang.IllegalArgumentException
 import java.lang.IndexOutOfBoundsException
@@ -133,49 +133,44 @@ object MediaPreviewHelper{
 
     }
 
-    @BindingAdapter("thumbnailView", "nsfwMessage", "playButton", "mediaViewData", "fileIndex")
+    @BindingAdapter("thumbnailView", "playButton", "fileViewData", "fileViewDataList")
     @JvmStatic
-    fun FrameLayout.setPreview(thumbnailView: ImageView, nsfwMessage: TextView, playButton: ImageButton, mediaViewData: MediaViewData?, fileIndex: Int){
-        try{
-            val file = mediaViewData!!.files[fileIndex]
-            this.visibility = View.VISIBLE
+    fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?, fileViewDataList: List<FileViewData>?) {
+        setPreview(thumbnailView, playButton, fileViewData)
+        fileViewData?: return
 
-            Log.d("MediaPreviewHelper", "type: ${file.type}, url:${file.thumbnailUrl}")
-            setPreview(thumbnailView, playButton, file)
-
-            val listener = View.OnClickListener {
-                val context = it.context
-                val intent = Intent(context, MediaActivity::class.java)
-                intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(mediaViewData.files.map{ fvd ->
-                    fvd.file
-                }))
-                intent.putExtra(MediaActivity.EXTRA_FILE_CURRENT_INDEX, fileIndex)
-                if(context is Activity){
-                    val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(context, thumbnailView, "image")
-                    context.startActivity(intent, compat.toBundle())
-
-                }else{
-                    context.startActivity(intent)
-                }
-            }
-            thumbnailView.setOnClickListener(listener)
-            playButton.setOnClickListener(listener)
-        }catch(e: IndexOutOfBoundsException){
-            this.visibility = View.GONE
-        }catch(e: NullPointerException){
-            this.visibility = View.GONE
-        }catch (e: Exception){
-            Log.d("", "other file")
+        if(fileViewDataList.isNullOrEmpty()) {
+            return
         }
+        val listener = View.OnClickListener {
+            val context = it.context
+            val intent = Intent(context, MediaActivity::class.java)
+            intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(fileViewDataList.map{ fvd ->
+                fvd.file
+            }))
+            intent.putExtra(MediaActivity.EXTRA_FILE_CURRENT_INDEX, fileViewDataList.indexOfFirst { f ->
+                f === fileViewData
+            })
+            if(context is Activity){
+                val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(context, thumbnailView, "image")
+                context.startActivity(intent, compat.toBundle())
+
+            }else{
+                context.startActivity(intent)
+            }
+        }
+        thumbnailView.setOnClickListener(listener)
+        playButton.setOnClickListener(listener)
     }
+
 
     @BindingAdapter("thumbnailView", "playButton", "fileViewData")
     @JvmStatic
     fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?){
 
         try{
-            this.visibility = View.VISIBLE
             this@MediaPreviewHelper.setPreview(thumbnailView, playButton, fileViewData!!)
+            this.visibility = View.VISIBLE
 
         }catch(e: Exception){
             this.visibility = View.GONE

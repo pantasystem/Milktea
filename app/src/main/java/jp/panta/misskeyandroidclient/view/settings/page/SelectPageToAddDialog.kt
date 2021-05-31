@@ -10,10 +10,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
+import jp.panta.misskeyandroidclient.model.account.page.galleryTypes
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 
+/**
+ * タブに追加する要素の候補を表示するダイアログ
+ */
 class SelectPageToAddDialog : BottomSheetDialogFragment(){
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -29,9 +34,15 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
             dismiss()
         })
 
-        val pageTypeList = ArrayList(PageType.values().toList())
-        if(miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!) !is MisskeyAPIV12){
+        var pageTypeList = PageType.values().toList().toMutableList()
+        val api = miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!)
+        if(api !is MisskeyAPIV12){
             pageTypeList.remove(PageType.ANTENNA)
+        }
+        if(api !is MisskeyAPIV1275) {
+            pageTypeList = pageTypeList.filterNot {
+                galleryTypes.contains(it)
+            }.toMutableList()
         }
         val adapter = PageTypeListAdapter(viewModel)
         binding.pageTypeListView.adapter = adapter

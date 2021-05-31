@@ -4,10 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
-import jp.panta.misskeyandroidclient.viewmodel.notes.media.FileViewData
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import java.lang.IllegalArgumentException
 
 

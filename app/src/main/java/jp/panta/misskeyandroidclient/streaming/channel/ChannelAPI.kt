@@ -41,7 +41,8 @@ class ChannelAPI(
     fun connect(type: Type) : Flow<ChannelBody> {
         return channelFlow {
             val callback: (ChannelBody)-> Unit = {
-                if(!offer(it)){
+                val result = trySend(it)
+                if(!result.isSuccess){
                     logger.debug("スルーされたメッセージ: $it")
                 }
                 //logger.debug("ChannelAPI message:${if(it.toString().length > 50) it.toString().subSequence(0, 50) else it.toString()}")

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel.notes.media
+package jp.panta.misskeyandroidclient.viewmodel.file
 
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.file.File

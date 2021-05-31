@@ -63,7 +63,7 @@ class NoteCaptureAPIAdapter(
         val account = accountRepository.get(id.accountId)
 
         val repositoryEventListener: (NoteDataSource.Event)->Unit = { ev ->
-            offer(ev)
+            trySend(ev)
         }
 
         synchronized(noteIdWithJob) {

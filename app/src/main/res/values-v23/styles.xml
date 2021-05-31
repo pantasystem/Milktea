@@ -47,7 +47,8 @@ x
 
         <item name="snackbarTextViewStyle">@style/NotificationSnackBarTextView</item>
 
-
+        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
+        <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
@@ -83,7 +84,8 @@ x
 
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
         <item name="materialAlertDialogTheme">@style/DialogStyle</item>
-
+        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
+        <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
 
     </style>
 </resources>

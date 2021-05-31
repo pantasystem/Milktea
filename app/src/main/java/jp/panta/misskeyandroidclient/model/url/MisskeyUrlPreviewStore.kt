@@ -10,7 +10,7 @@ class MisskeyUrlPreviewStore(
 
     override fun get(url: String): UrlPreview? {
         return try {
-            return retrofitMisskeyUrlPreview.getUrl(url).execute()?.body()
+            return retrofitMisskeyUrlPreview.getUrl(url).execute().body()
         } catch (e: Exception){
             Log.d("MisskeyUrlPreviewStore", "get url preview error", e)
             null

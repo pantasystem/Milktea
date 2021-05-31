@@ -36,7 +36,7 @@ class NoteCaptureAPIImpl(
 
             val listener: (NoteUpdated)-> Unit = { noteUpdated ->
                 logger?.debug("受信:$noteUpdated")
-                offer(noteUpdated.body)
+                trySend(noteUpdated.body)
             }
             //logger?.debug("before capture")
             capture(noteId, listener)

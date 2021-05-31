@@ -21,10 +21,12 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.drive.InMemoryFilePropertyDataSource
+import jp.panta.misskeyandroidclient.model.drive.*
+import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
+import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
+import jp.panta.misskeyandroidclient.model.gallery.impl.InMemoryGalleryDataSource
+import jp.panta.misskeyandroidclient.model.gallery.impl.createGalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.group.impl.GroupRepositoryImpl
@@ -80,6 +82,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import okhttp3.OkHttpClient
 import java.util.concurrent.ConcurrentHashMap
 
 //基本的な情報はここを返して扱われる
@@ -153,6 +156,17 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
+    private val mGalleryDataSource: GalleryDataSource by lazy {
+        InMemoryGalleryDataSource()
+    }
+
+    private val mGalleryRepository: GalleryRepository by lazy {
+        createGalleryRepository()
+    }
+
+    private val mFileUploaderProvider: FileUploaderProvider by lazy {
+        OkHttpFileUploaderProvider(OkHttpClient(), this, GsonFactory.create(), getEncryption())
+    }
 
 
     @ExperimentalCoroutinesApi
@@ -582,6 +596,18 @@ class MiApplication : Application(), MiCore {
 
     override fun getFilePropertyDataSource(): FilePropertyDataSource {
         return mFilePropertyDataSource
+    }
+
+    override fun getFileUploaderProvider(): FileUploaderProvider {
+        return mFileUploaderProvider
+    }
+
+    override fun getGalleryDataSource(): GalleryDataSource {
+        return mGalleryDataSource
+    }
+
+    override fun getGalleryRepository(): GalleryRepository {
+        return mGalleryRepository
     }
 
     private suspend fun loadAndInitializeAccounts(){

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.media
 
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 
 class MediaViewData(files: List<File>) {
 

@@ -85,9 +85,9 @@ class PostNoteTask(
             runCatching {
                 tmpFiles?.map {
                     async(Dispatchers.IO) {
-                        it.remoteFileId?.fileId ?: fileUploader.upload(it, true)?.also {
+                        it.remoteFileId?.fileId ?: fileUploader.upload(it, true).also {
                             filePropertyDataSource.add(it.toFileProperty(account))
-                        }?.id
+                        }.id
                     }
                 }?.awaitAll()
             }.getOrNull()?.filterNotNull()

@@ -8,8 +8,11 @@ import android.webkit.MimeTypeMap
 import com.google.gson.Gson
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.FileUploadFailedException
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import okio.BufferedSink
 import okio.Okio
@@ -23,7 +26,7 @@ class OkHttpDriveFileUploader(
     val gson: Gson,
     val encryption: Encryption
 ) : FileUploader {
-    override suspend fun upload(file: File, isForce: Boolean): FilePropertyDTO? {
+    override suspend fun upload(file: File, isForce: Boolean): FilePropertyDTO {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
@@ -51,30 +54,11 @@ class OkHttpDriveFileUploader(
                 gson.fromJson(response.body()?.string(), FilePropertyDTO::class.java)
             }else{
                 Log.d("OkHttpConnection", "code: $code, error${response.body()?.string()}")
-                null
+                throw FileUploadFailedException(file, null, code)
             }
         }catch(e: Exception){
             Log.w("OkHttpConnection", "post file error", e)
-            null
-        }
-    }
-
-    private fun getFileName(uri: Uri) : String{
-        return when(uri.scheme){
-            "content" ->{
-                context.contentResolver
-                    .query(uri, arrayOf(MediaStore.MediaColumns.DISPLAY_NAME), null, null, null)?.use{
-                        if(it.moveToFirst()){
-                            it.getString(it.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME))
-                        }else{
-                            null
-                        }
-                    }?: throw IllegalArgumentException("ファイル名の取得に失敗しました")
-            }
-            "file" ->{
-                java.io.File(uri.path!!).name
-            }
-            else -> throw IllegalArgumentException("scheme不明")
+            throw FileUploadFailedException(file, e, null)
         }
     }
 

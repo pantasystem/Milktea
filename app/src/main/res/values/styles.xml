@@ -22,6 +22,9 @@
 
         <attr name="colorSeparator" format="color" />
 
+        <attr name="colorDotTabNormal" format="color" />
+        <attr name="colorDotTabSelected" format="color" />
+
     </declare-styleable>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -51,6 +54,8 @@
         <item name="radioButtonStyle">@style/Widget.AppCompat.CompoundButton.RadioButton</item>
 
         <item name="snackbarTextViewStyle">@style/NotificationSnackBarTextView</item>
+        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
+        <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
 
     </style>
 
@@ -94,7 +99,8 @@
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
         <item name="materialAlertDialogTheme">@style/DialogStyle</item>
-
+        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
+        <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
 
     </style>
 
@@ -126,6 +132,8 @@
         <item name="colorSurface">@color/colorBreadSurface</item>
         <item name="colorAccent">@color/colorBreadAccent</item>
         <item name="colorBottomNavigationSelected">@color/colorBreadBottomNavSelected</item>
+        <item name="colorDotTabSelected">@color/colorBreadAccent</item>
+
     </style>
 
 

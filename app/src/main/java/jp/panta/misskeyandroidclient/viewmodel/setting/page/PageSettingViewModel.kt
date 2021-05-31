@@ -12,6 +12,8 @@ import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -131,6 +133,18 @@ class PageSettingViewModel(
         addPage(page)
     }
 
+    fun addUsersGalleryById(userId: String) {
+        val pageable = Pageable.Gallery.User(userId = userId)
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val user = miCore.getUserRepository().find(User.Id(accountId = account!!.accountId, id = userId))
+                val name = if(settingStore.isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
+                val page =  account!!.newPage(pageable, name = name)
+                addPage(page)
+            }
+        }
+    }
+
     fun removePage(page: Page){
         val list = ArrayList<Page>(selectedPages.value?: emptyList())
         list.remove(page)
@@ -167,8 +181,13 @@ class PageSettingViewModel(
             PageType.MENTION ->{
                 addPage(PageableTemplate(account!!).mention(name))
             }
+            PageType.GALLERY_FEATURED -> addPage(account!!.newPage(Pageable.Gallery.Featured, name))
+            PageType.GALLERY_POPULAR -> addPage(account!!.newPage(Pageable.Gallery.Popular, name))
+            PageType.GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.Posts, name))
+            PageType.MY_GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.MyPosts, name))
+            PageType.I_LIKED_GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.ILikedPosts, name))
             else -> {
-
+                Log.d("PageSettingViewModel", "管轄外な設定パターン:$type, name:$name")
             }
         }
     }

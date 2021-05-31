@@ -60,3 +60,6 @@ class PageableTemplate(val account: Account?) {
 
 }
 
+fun Account.newPage(pageable: Pageable, name: String): Page {
+    return Page(this.accountId, name, 0, pageable)
+}

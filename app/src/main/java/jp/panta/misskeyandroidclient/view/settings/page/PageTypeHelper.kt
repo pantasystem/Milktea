@@ -37,6 +37,12 @@ object PageTypeHelper{
             MENTION -> context.getString(R.string.mention)
             NOTIFICATION -> context.getString(R.string.notification)
             ANTENNA -> context.getString(R.string.antenna)
+            GALLERY_FEATURED -> context.getString(R.string.featured) + String.format("(%s)", context.getString(R.string.gallery))
+            GALLERY_POPULAR -> context.getString(R.string.popular_posts) + String.format("(%s)", context.getString(R.string.gallery))
+            GALLERY_POSTS -> context.getString(R.string.gallery)
+            USERS_GALLERY_POSTS -> context.getString(R.string.gallery) + "(User)"
+            MY_GALLERY_POSTS -> context.getString(R.string.my_posts) + String.format("(%s)", context.getString(R.string.gallery))
+            I_LIKED_GALLERY_POSTS -> context.getString(R.string.my_liking) + String.format("(%s)", context.getString(R.string.gallery))
         }
     }
 }

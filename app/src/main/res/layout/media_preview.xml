@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -15,11 +14,11 @@
     <LinearLayout
             android:orientation="horizontal" android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:leftMediaBase="@{leftMediaBase}"
-            app:rightMediaBase="@{rightMediaBase}"
-            app:mediaViewData="@{media}"
+            leftMediaBase="@{leftMediaBase}"
+            rightMediaBase="@{rightMediaBase}"
+            mediaViewData="@{media}"
             android:baselineAligned="false"
-            app:rect="@{30F}"
+            rect="@{30F}"
 
 
             >
@@ -38,11 +37,11 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     tools:ignore="NestedWeights"
-                    app:thumbnailView="@{thumbnailTopLeft}"
-                    app:nsfwMessage="@{nsfwMessageTopLeft}"
-                    app:playButton="@{actionButtonTopLeft}"
-                    app:mediaViewData="@{media}"
-                    app:fileIndex="@{0}"
+                    thumbnailView="@{thumbnailTopLeft}"
+                    playButton="@{actionButtonTopLeft}"
+                    fileViewDataList="@{media.files}"
+                    fileViewData="@{media.fileOne}"
+
                     android:onClick="@{()-> media.fileOne.show()}"
                     >
 
@@ -83,12 +82,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-
-                    app:thumbnailView="@{thumbnailBottomLeft}"
-                    app:nsfwMessage="@{nsfwMessageBottomLeft}"
-                    app:playButton="@{actionButtonBottomLeft}"
-                    app:mediaViewData="@{media}"
-                    app:fileIndex="@{2}"
+                    thumbnailView="@{thumbnailBottomLeft}"
+                    playButton="@{actionButtonBottomLeft}"
+                    fileViewDataList="@{media.files}"
+                    fileViewData="@{media.fileThree}"
                     android:onClick="@{()-> media.fileThree.show()}"
                     android:layout_marginTop="4dp"
                     >
@@ -138,11 +135,12 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     tools:ignore="NestedWeights"
-                    app:thumbnailView="@{thumbnailTopRight}"
-                    app:nsfwMessage="@{nsfwMessageTopRight}"
-                    app:playButton="@{actionButtonTopRight}"
-                    app:mediaViewData="@{media}"
-                    app:fileIndex="@{1}"
+                    thumbnailView="@{thumbnailTopRight}"
+
+                    playButton="@{actionButtonTopRight}"
+
+                    fileViewData="@{media.fileTwo}"
+                    fileViewDataList="@{media.files}"
                     android:onClick="@{()-> media.fileTwo.show() }"
 
                     >
@@ -181,11 +179,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    app:thumbnailView="@{thumbnailBottomRight}"
-                    app:nsfwMessage="@{nsfwMessageBottomRight}"
-                    app:playButton="@{actionButtonBottomRight}"
-                    app:mediaViewData="@{media}"
-                    app:fileIndex="@{3}"
+                    thumbnailView="@{thumbnailBottomRight}"
+
+                    playButton="@{actionButtonBottomRight}"
+
+                    fileViewDataList="@{media.files}"
+                    fileViewData="@{media.fileFour}"
                     android:onClick="@{()-> media.fileFour.show() }"
                     android:layout_marginTop="4dp"
                     >

@@ -16,7 +16,13 @@ enum class PageType(val defaultName: String){
     USER_LIST("List"),
     MENTION("Mention"),
     ANTENNA("Antenna"),
-    NOTIFICATION("Notification")
+    NOTIFICATION("Notification"),
+    GALLERY_FEATURED("GalleryFeatured"),
+    GALLERY_POPULAR("GalleryPopular"),
+    GALLERY_POSTS("GalleryPosts"),
+    USERS_GALLERY_POSTS("UsersGalleryPosts"),
+    MY_GALLERY_POSTS("MyGalleryPosts"),
+    I_LIKED_GALLERY_POSTS("ILikedGalleryPosts")
     //USER_PINは別
 }
 
@@ -32,3 +38,13 @@ class TimelinePageTypeConverter{
         return PageType.valueOf(type)
     }
 }
+
+
+val galleryTypes = setOf(
+    PageType.GALLERY_FEATURED,
+    PageType.GALLERY_POSTS,
+    PageType.GALLERY_POPULAR,
+    PageType.USERS_GALLERY_POSTS,
+    PageType.I_LIKED_GALLERY_POSTS,
+    PageType.MY_GALLERY_POSTS
+)

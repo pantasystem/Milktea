@@ -15,6 +15,9 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
+import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
+import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
+import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
@@ -136,5 +139,11 @@ interface MiCore{
     fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory
 
     fun getReactionHistoryDataSource(): ReactionHistoryDataSource
+
+    fun getGalleryDataSource(): GalleryDataSource
+
+    fun getGalleryRepository(): GalleryRepository
+
+    fun getFileUploaderProvider(): FileUploaderProvider
 
 }

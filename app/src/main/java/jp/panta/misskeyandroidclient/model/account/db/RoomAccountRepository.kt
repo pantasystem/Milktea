@@ -56,6 +56,10 @@ class RoomAccountRepository(
                 exAccount = accountDao.get(id)?: throw AccountRegistrationFailedException()
                 Log.d("RoomAccountRepository", "insertしました: $exAccount")
                 isNeedDeepUpdate = true
+            }else{
+                exAccount = exAccount.copy(remoteId = account.remoteId, instanceDomain = account.instanceDomain, encryptedToken = account.encryptedToken, userName = account.userName).also {
+                    accountDao.update(it)
+                }
             }
 
 
