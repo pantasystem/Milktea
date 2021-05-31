@@ -26,20 +26,12 @@ class NotificationService : Service() {
         private const val TAG = "NotificationService"
         private const val NOTIFICATION_CHANNEL_ID = "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
         private const val MESSAGE_CHANEL_ID = "jp.panta.misskeyandroidclient.NotificationService.MESSAGE_CHANEL_ID"
-        private const val GROUP_KEY = "NotificationService.GROUP_KEY"
 
-        const val SUBSCRIBE_ALL_NOTIFICATIONS = 0
-        const val START_PUSH_NOTIFICATION = 4
-        const val STOP_PUSH_NOTIFICATION = 5
     }
-    private val mGson = GsonBuilder().create()
-    //private lateinit var mClientMessageHandler: ClientMessageHandler
-    //private lateinit var mMessenger: Messenger
 
     private lateinit var mBinder: NotificationBinder
     private var mNotificationManager: NotificationManager? = null
 
-    var isShowNotification: Boolean = true
 
     private val mStopNotificationAccountMap = HashMap<Long, Account>()
 
@@ -48,8 +40,6 @@ class NotificationService : Service() {
     override fun onBind(intent: Intent): IBinder {
         return mBinder
     }
-
-    private val mDisposable = CompositeDisposable()
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -61,8 +51,6 @@ class NotificationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        //mClientMessageHandler = ClientMessageHandler(this)
-        //mMessenger = Messenger(mClientMessageHandler)
         mBinder = NotificationBinder()
     }
 
