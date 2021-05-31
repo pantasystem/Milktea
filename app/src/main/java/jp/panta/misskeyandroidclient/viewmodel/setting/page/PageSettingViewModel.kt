@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -130,6 +131,18 @@ class PageSettingViewModel(
             PageableTemplate(account!!).user(user.id, title = user.getDisplayName())
         }
         addPage(page)
+    }
+
+    fun addUsersGalleryById(userId: String) {
+        val pageable = Pageable.Gallery.User(userId = userId)
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val user = miCore.getUserRepository().find(User.Id(accountId = account!!.accountId, id = userId))
+                val name = if(settingStore.isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
+                val page =  account!!.newPage(pageable, name = name)
+                addPage(page)
+            }
+        }
     }
 
     fun removePage(page: Page){

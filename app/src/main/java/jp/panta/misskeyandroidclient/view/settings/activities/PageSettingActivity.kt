@@ -31,6 +31,7 @@ class PageSettingActivity : AppCompatActivity() {
 
     companion object{
         const val SEARCH_AND_SELECT_USER_RESULT_CODE = 30
+        const val SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE = 31
     }
 
     private lateinit var mPageSettingViewModel: PageSettingViewModel
@@ -81,6 +82,10 @@ class PageSettingActivity : AppCompatActivity() {
                 PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
                 PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
                 PageType.ANTENNA -> startActivity(Intent(this, AntennaListActivity::class.java))
+                PageType.USERS_GALLERY_POSTS -> {
+                    val intent = SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
+                    startActivityForResult(intent, SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE)
+                }
                 else ->{
                     // auto add
                 }
@@ -125,13 +130,21 @@ class PageSettingActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE){
+        if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE || requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE){
             if(resultCode == RESULT_OK && data != null){
                 val changeDiff = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as SelectedUserViewModel.ChangedDiffResult
                 val userId = changeDiff.selectedUsers.firstOrNull()?.id?.id
-                userId?.let {
-                    mPageSettingViewModel.addUserPageById(userId)
+                if(userId != null) {
+                    if(resultCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {
+                        mPageSettingViewModel.addUsersGalleryById(userId)
+                    }else{
+                        mPageSettingViewModel.addUserPageById(userId)
+                    }
                 }
+            }
+        }else if(requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {
+            if(resultCode == RESULT_OK && data != null) {
+
             }
         }
     }
