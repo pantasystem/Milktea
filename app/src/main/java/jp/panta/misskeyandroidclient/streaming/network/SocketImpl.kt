@@ -12,7 +12,7 @@ class SocketImpl(
     val url: String,
     val okHttpClient: OkHttpClient = OkHttpClient(),
     val onBeforeConnectListener: BeforeConnectListener,
-    loggerFactory: Logger.Factory
+    loggerFactory: Logger.Factory,
 ) : Socket, WebSocketListener() {
     val logger = loggerFactory.create("SocketImpl")
 
@@ -179,7 +179,7 @@ class SocketImpl(
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
-            logger.warning("デコードエラー msg:$text", e = t)
+            logger.error("デコードエラー msg:$text", e = t)
         }.getOrNull()?: return
 
         val iterator = messageListeners.iterator()
