@@ -34,8 +34,10 @@ import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.model.streaming.stateEvent
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
@@ -184,6 +186,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             logger?.error("通知取得エラー", e = e)
         }.launchIn(lifecycleScope + Dispatchers.Main)
 
+        lifecycleScope.launchWhenResumed {
+            miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+                miApplication.getSocket(it).stateEvent()
+            }.catch { e ->
+                logger?.error("WebSocket　状態取得エラー", e)
+            }.collect {
+                val message = when(it){
+                    is Socket.State.Connected -> getString(R.string.connected)
+                    is Socket.State.Connecting -> getString(R.string.connecting)
+                    is Socket.State.Closing -> getString(R.string.closing)
+                    is Socket.State.Failure -> getString(R.string.websocket_error) + it.throwable
+                    is Socket.State.Closed -> getString(R.string.closed)
+                    is Socket.State.NeverConnected -> ""
+                }
+                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState, mBinding.appBarMain.bottomNavigation)
 
@@ -271,7 +292,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + " ${getString(R.string.followed_by)}"
             NotificationViewData.Type.FOLLOW_REQUEST_ACCEPTED -> name + " ${getString(R.string.follow_request_accepted)}"
         }
-        val snackBar = Snackbar.make(mBinding.appBarMain.simpleNotification, msg, Snackbar.LENGTH_LONG)
+        showSnackBar(msg)
+    }
+
+    private fun showSnackBar(message: String) {
+        val snackBar = Snackbar.make(mBinding.appBarMain.simpleNotification, message, Snackbar.LENGTH_LONG)
 
         snackBar.show()
     }

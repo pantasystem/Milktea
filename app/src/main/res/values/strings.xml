@@ -333,6 +333,12 @@
     <string name="gallery">Gallery</string>
     <string name="my_posts">My Posts</string>
     <string name="my_liking">Liked</string>
+    <string name="websocket_error">WebSocket error</string>
+    <string name="connecting">Connecting…</string>
+    <string name="connected">Connected</string>
+    <string name="closing">Closing…</string>
+    <string name="closed">Closed</string>
+
 
 
 </resources>

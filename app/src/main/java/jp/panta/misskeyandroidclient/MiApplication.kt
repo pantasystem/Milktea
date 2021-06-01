@@ -590,6 +590,10 @@ class MiApplication : Application(), MiCore {
         return mChannelAPIWithAccountProvider.get(account)
     }
 
+    override fun getSocket(account: Account): Socket {
+        return mSocketWithAccountProvider.get(account)
+    }
+
     override fun getMetaStore(): MetaStore {
         return metaStore
     }
