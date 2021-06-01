@@ -7,7 +7,7 @@ data class App(
     val id: String,
     val name: String,
     val callbackUrl: String,
-    val isAuthorized: Boolean,
+    val isAuthorized: Boolean? = null,
     val permission: List<String>,
-    val secret: String?
+    val secret: String? = null
 ): Serializable

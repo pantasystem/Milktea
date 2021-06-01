@@ -336,7 +336,10 @@
     <string name="gallery">ギャラリー</string>
     <string name="my_posts">私の投稿</string>
     <string name="my_liking">お気に入り</string>
-
-
+    <string name="websocket_error">WebSocketエラー</string>
+    <string name="connecting">接続中・・・</string>
+    <string name="connected">接続完了</string>
+    <string name="closing">切断中・・・</string>
+    <string name="closed">切断済み</string>
 
 </resources>
