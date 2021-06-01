@@ -178,8 +178,9 @@ class SocketImpl(
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
-        val e = json.decodeFromString<StreamingEvent>(text)
-
+        val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
+            logger.error("デコードエラー msg:$text", e = t)
+        }.getOrNull()?: return
 
         val iterator = messageListeners.iterator()
         while(iterator.hasNext()) {
