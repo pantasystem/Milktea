@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.view.gallery
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -16,7 +17,9 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val appCompatActivity = (requireActivity() as AppCompatActivity)
+        appCompatActivity.setSupportActionBar(binding.toolbar)
+        appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.galleryTab.setupWithViewPager(binding.viewPager)
         val adapter = GalleryPostTabPagerAdapter(
             listOf(

@@ -4,6 +4,7 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityGalleryPostsBinding
 import jp.panta.misskeyandroidclient.view.gallery.GalleryPostTabFragment
@@ -38,21 +39,34 @@ class GalleryPostsActivity : AppCompatActivity() {
         ft.commit()
     }
 
-    private fun changeFragment(tag: String) {
-        //val ft = supportFragmentManager.beginTransaction()
-        //ft.replace(R.id.base, )
-    }
 
 
     override fun onBackPressed() {
         super.onBackPressed()
 
+        pop()
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            android.R.id.home ->{
+                if(currentFragmentTag == EDITOR) {
+                    supportFragmentManager.popBackStack(GALLERY_POSTS_TAB, 0)
+                }else{
+                    finish()
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun pop() {
         if(supportFragmentManager.backStackEntryCount > 1) {
             supportFragmentManager.popBackStack()
         }else{
             finish()
         }
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
