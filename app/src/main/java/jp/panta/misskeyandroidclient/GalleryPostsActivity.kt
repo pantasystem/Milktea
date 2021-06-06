@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityGalleryPostsBinding
+import jp.panta.misskeyandroidclient.view.gallery.GalleryPostTabFragment
 
 class GalleryPostsActivity : AppCompatActivity() {
 
@@ -31,7 +32,10 @@ class GalleryPostsActivity : AppCompatActivity() {
         if(action == Intent.ACTION_EDIT) {
             currentFragmentTag = EDITOR
         }
-        changeFragment(currentFragmentTag)
+        //changeFragment(currentFragmentTag)
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.base, GalleryPostTabFragment())
+        ft.commit()
     }
 
     private fun changeFragment(tag: String) {

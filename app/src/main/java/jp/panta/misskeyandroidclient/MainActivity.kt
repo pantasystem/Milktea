@@ -462,6 +462,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Intent(this, DraftNotesActivity::class.java)
                 )
             }
+            R.id.nav_gallery -> {
+                startActivity(Intent(this, GalleryPostsActivity::class.java))
+            }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)

@@ -46,7 +46,10 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         super.onViewCreated(view, savedInstanceState)
 
         val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
-        val accountId = arguments?.getLong(EXTRA_ACCOUNT_ID)
+        var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
+        if(accountId == -1L) {
+            accountId = null
+        }
 
         val galleryPostsListAdapter = GalleryPostsListAdapter(viewLifecycleOwner)
         binding.listView.adapter = galleryPostsListAdapter
