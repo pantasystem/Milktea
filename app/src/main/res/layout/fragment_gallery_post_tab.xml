@@ -40,6 +40,16 @@
                     android:layout_height="match_parent"
                     />
         </LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/fab"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/ic_baseline_add_photo_alternate_24"
+                android:contentDescription="@string/create_gallery"
+                />
 
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -341,5 +341,5 @@
     <string name="connected">接続完了</string>
     <string name="closing">切断中・・・</string>
     <string name="closed">切断済み</string>
-
+    <string name="create_gallery">ギャラリーを作成する</string>
 </resources>

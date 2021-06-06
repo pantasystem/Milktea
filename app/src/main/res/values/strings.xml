@@ -338,6 +338,7 @@
     <string name="connected">Connected</string>
     <string name="closing">Closing…</string>
     <string name="closed">Closed</string>
+    <string name="create_gallery">Create gallery</string>
 
 
 </resources>
