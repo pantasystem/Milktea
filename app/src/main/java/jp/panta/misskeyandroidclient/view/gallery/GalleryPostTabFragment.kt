@@ -6,14 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.fragment.app.activityViewModels
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryPostTabBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostActionViewModel
 
 class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
     val binding: FragmentGalleryPostTabBinding by dataBinding()
+    private val actionViewModel: GalleryPostActionViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -21,6 +24,7 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
         appCompatActivity.setSupportActionBar(binding.toolbar)
         appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.galleryTab.setupWithViewPager(binding.viewPager)
+
         val adapter = GalleryPostTabPagerAdapter(
             listOf(
                 Pageable.Gallery.Posts,
@@ -36,6 +40,10 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
         )
         binding.viewPager.adapter = adapter
 
+
+        binding.fab.setOnClickListener {
+            actionViewModel.showEditor()
+        }
 
     }
 
