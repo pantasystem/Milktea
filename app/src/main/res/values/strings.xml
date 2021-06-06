@@ -339,6 +339,9 @@
     <string name="closing">Closing…</string>
     <string name="closed">Closed</string>
     <string name="create_gallery">Create gallery</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="pick_image">Pick image</string>
 
 
 </resources>
