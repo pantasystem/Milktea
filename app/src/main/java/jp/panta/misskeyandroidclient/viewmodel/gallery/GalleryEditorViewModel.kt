@@ -8,11 +8,13 @@ import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.Serializable
 
 
-sealed class EditType {
+sealed class EditType : Serializable{
     data class Update(
         val postId: GalleryPost.Id
     ) : EditType()
@@ -27,7 +29,7 @@ class GalleryEditorViewModel(
     val galleryRepository: GalleryRepository,
     val filePropertyDataSource: FilePropertyDataSource,
     val logger: Logger
-) : ViewModel(){
+) : ViewModel(), FileListener{
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val editType: EditType, val miCore: MiCore) : ViewModelProvider.Factory {
@@ -75,5 +77,13 @@ class GalleryEditorViewModel(
                 it.toFile()
             }
         )
+    }
+
+    override fun onSelect(file: File?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDetach(file: File?) {
+        TODO("Not yet implemented")
     }
 }
