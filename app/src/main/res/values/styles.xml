@@ -149,8 +149,15 @@
 
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="hintTextColor">?attr/colorAccent</item>
+        <item name="boxStrokeColor">?attr/colorAccent</item>
+        <item name="colorControlActivated">?attr/colorAccent</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.TextInputEditText</item>
     </style>
-    
+
+    <style name="ThemeOverlay.TextInputEditText" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="colorControlActivated">?attr/colorAccent</item>
+    </style>
+
     <style name="DialogStyle" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
