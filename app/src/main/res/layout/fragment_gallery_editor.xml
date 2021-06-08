@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
@@ -48,17 +49,35 @@
                         app:layout_constraintTop_toBottomOf="@id/pickedImageLabel"
                         />
                 <Button
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@id/pickedImages"
-                        android:id="@+id/pickedImageButton"
-                        android:text="@string/pick_image"
-                        />
+                        android:id="@+id/pickedImageFromLocalButton"
+                        android:text="@string/pick_image_from_device"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+
+                        android:drawableLeft="@drawable/ic_menu_gallery"
+                        android:backgroundTint="?attr/colorAccent"
+
+                        tools:ignore="RtlHardcoded" />
+                <Button
+                        android:id="@+id/pickedImageFromDriveButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/pickedImageFromLocalButton"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:drawableLeft="@drawable/ic_cloud_black_24dp"
+                        android:text="@string/pick_image_from_device"
+                        android:backgroundTint="?attr/colorAccent"
+
+                        tools:ignore="RtlHardcoded" />
 
                 <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@id/pickedImageButton"
+                        app:layout_constraintTop_toBottomOf="@id/pickedImageFromDriveButton"
                         android:layout_marginTop="16dp"
                         android:id="@+id/titleInputLayout"
                         >

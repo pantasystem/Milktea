@@ -49,7 +49,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         binding.pickedImages.adapter = pickedImageAdapter
         binding.pickedImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        binding.pickedImageButton.setOnClickListener {
+        binding.pickedImageFromLocalButton.setOnClickListener {
             // TODO: Galleryからなのかローカルからなのかソースを選択できるようにする
         }
 
