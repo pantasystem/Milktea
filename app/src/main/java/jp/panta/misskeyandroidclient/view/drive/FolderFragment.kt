@@ -49,14 +49,14 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
             val driveViewModelFactory = DriveViewModelFactory(0)
             val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, {
-                folderViewModel.currentFolder.postValue(it.id)
+                folderViewModel.currentFolder.postValue(it?.id)
             })
 
             val adapter = FolderListAdapter(diffUtilItemCallback, driveViewModel, folderViewModel)
             binding.folderView.adapter = adapter
 
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, {
-                folderViewModel.currentFolder.postValue(it.id)
+                folderViewModel.currentFolder.postValue(it?.id)
             })
 
             folderViewModel.isRefreshing.observe(viewLifecycleOwner, {
