@@ -1,14 +1,18 @@
 package jp.panta.misskeyandroidclient.view.gallery
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -28,6 +32,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
     }
 
     val binding: FragmentGalleryEditorBinding by dataBinding()
+    private lateinit var viewModel: GalleryEditorViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,7 +41,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
         val miCore = requireContext().applicationContext as MiCore
 
-        val viewModel = ViewModelProvider(this, GalleryEditorViewModel.Factory(args, miCore))[GalleryEditorViewModel::class.java]
+        viewModel = ViewModelProvider(this, GalleryEditorViewModel.Factory(args, miCore))[GalleryEditorViewModel::class.java]
 
         (requireActivity() as AppCompatActivity).also { appCompatActivity ->
             appCompatActivity.setSupportActionBar(binding.toolbar)
@@ -53,5 +58,26 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
             // TODO: Galleryからなのかローカルからなのかソースを選択できるようにする
         }
 
+        binding.pickedImageFromDriveButton.setOnClickListener {
+            showDrivePicker()
+        }
+
+    }
+
+    private fun showDrivePicker() {
+        val intent = Intent(requireContext(), DriveActivity::class.java)
+        intent.putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, Int.MAX_VALUE)
+
+        driveActivityResult.launch(intent)
+    }
+
+    private val driveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if(it.resultCode == RESULT_OK && it.data != null) {
+            val result = it.data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as? ArrayList<*>
+            val list = result?.mapNotNull { obj ->
+                obj as? FilePropertyDTO
+            }?: emptyList()
+            viewModel.addFilePropertyDTOs(list)
+        }
     }
 }

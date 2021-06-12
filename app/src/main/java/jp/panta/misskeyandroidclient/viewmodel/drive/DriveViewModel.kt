@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.drive
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
@@ -12,7 +13,7 @@ class DriveViewModel(
     val selectableMaxSize: Int
 ) : ViewModel(){
 
-    val currentDirectory = MutableLiveData<DirectoryViewData>(DirectoryViewData(null))
+    val currentDirectory = MutableLiveData<DirectoryViewData?>(DirectoryViewData(null))
 
     val hierarchyDirectory = MutableLiveData<List<DirectoryViewData>>()
 
@@ -35,20 +36,20 @@ class DriveViewModel(
 
     fun getSelectedFileIds(): List<String>?{
         return selectedFilesMapLiveData?.value?.values?.map{
-            it.id
+            it.id.fileId
         }
     }
 
-    fun getSelectedFileList(): List<FilePropertyDTO>?{
+    fun getSelectedFileList(): List<FileProperty>?{
         return selectedFilesMapLiveData?.value?.values?.map{
             it.file
         }?.toList()
     }
 
-    fun setSelectedFileList(files: List<FilePropertyDTO>){
+    fun setSelectedFileList(files: List<FileProperty>){
         selectedFilesMapLiveData?.postValue(
         files.map{
-            Pair<String, FileViewData>(it.id , FileViewData(it))
+            Pair<String, FileViewData>(it.id.fileId , FileViewData(it))
         }.toMap())
     }
 
