@@ -10,23 +10,60 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
+import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.notes.TimelineListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
+import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
 
     val mBinding: FragmentPinNoteBinding by dataBinding()
 
-    @ExperimentalCoroutinesApi
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    companion object {
 
-        val userViewModel = ViewModelProvider(requireActivity())[UserDetailViewModel::class.java]
+        fun newInstance(userId: User.Id?, fqcnUserName: String?) : PinNoteFragment{
+            require(!(userId == null && fqcnUserName == null)) {
+                "userId, fqcnUserNameどちらか一つは必須です。"
+            }
+            return PinNoteFragment().also {
+                it.arguments = Bundle().also { bundle ->
+                    if(userId != null) {
+                        bundle.putString("USER_ID", userId.id)
+                        bundle.putLong("ACCOUNT_ID", userId.accountId)
+                    }
+                    if(fqcnUserName != null) {
+                        bundle.putString("FQCN_USER_NAME", fqcnUserName)
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val userId = arguments?.getString("USER_ID")
+        val accountId = arguments?.getLong("ACCOUNT_ID")
+        val fqcnUserName = arguments?.getString("FQCN_USER_NAME")
+        val miApplication = requireContext().applicationContext as MiApplication
+        val userViewModel = ViewModelProvider(
+            requireActivity(),
+            UserDetailViewModelFactory(
+                miApplication,
+                userId = userId?.let {
+                    User.Id(accountId!!, userId)
+                },
+                fqcnUserName = fqcnUserName
+            )
+        )[UserDetailViewModel::class.java]
         val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
         val adapter = TimelineListAdapter(object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
             override fun areContentsTheSame(
@@ -49,4 +86,5 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
             adapter.submitList(it)
         })
     }
+
 }
