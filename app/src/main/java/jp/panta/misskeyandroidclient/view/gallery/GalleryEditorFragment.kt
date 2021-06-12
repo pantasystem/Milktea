@@ -11,11 +11,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
+import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.gallery.EditType
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel
 
@@ -48,11 +51,34 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
             appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
 
+        val fileListener = object : FileListener {
+            override fun onDetach(file: File?) {
+                file?.let {
+                    viewModel.detach(file)
+                }
+
+            }
+
+            override fun onSelect(file: File?) {
+                val intent = Intent(requireContext(), MediaActivity::class.java)
+                intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(viewModel.pickedImages.value))
+                val index = viewModel.pickedImages.value?.indexOfFirst {
+                    it.path == file?.path
+                }
+                intent.putExtra(MediaActivity.EXTRA_FILE_CURRENT_INDEX, index)
+                startActivity(intent)
+            }
+        }
+
         val pickedImageAdapter = SimpleImagePreviewAdapter(
-            viewModel
+            fileListener
         )
         binding.pickedImages.adapter = pickedImageAdapter
         binding.pickedImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        viewModel.pickedImages.observe(viewLifecycleOwner) {
+            pickedImageAdapter.submitList(it)
+        }
 
         binding.pickedImageFromLocalButton.setOnClickListener {
             // TODO: Galleryからなのかローカルからなのかソースを選択できるようにする
@@ -75,9 +101,9 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         if(it.resultCode == RESULT_OK && it.data != null) {
             val result = it.data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as? ArrayList<*>
             val list = result?.mapNotNull { obj ->
-                obj as? FilePropertyDTO
+                obj as? FileProperty
             }?: emptyList()
-            viewModel.addFilePropertyDTOs(list)
+            viewModel.addFileProperties(list)
         }
     }
 }
