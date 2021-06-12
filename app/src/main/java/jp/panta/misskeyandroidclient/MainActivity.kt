@@ -27,6 +27,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
+import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.TaskState
@@ -132,12 +134,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             logger?.error("メッセージ既読数取得エラー", e = e)
         }.launchIn(lifecycleScope)
 
-        // NOTE: インスタンスのバージョンを調べ、メニューを制御する
-        miApplication.getCurrentAccount().map {
-            miApplication.getCurrentInstanceMeta()?.getVersion()?.isInRange(Version.Major.V_12)?: false
-        }.flowOn(Dispatchers.IO).onEach { isV12 ->
-            Log.d("MainActivity", if(isV12) "v12のようです" else "v12以外のようです")
-            mBinding.navView.menu.findItem(R.id.nav_antenna).isVisible = isV12
+        // NOTE: 各ばーしょんに合わせMenuを制御している
+        miApplication.getCurrentAccount().filterNotNull().map {
+            miApplication.getMisskeyAPI(it)
+        }.onEach { api ->
+            mBinding.navView.menu.also { menu ->
+                menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
+                menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
+            }
         }.launchIn(lifecycleScope)
 
         miApplication.connectionStatus.observe(this, { status ->
