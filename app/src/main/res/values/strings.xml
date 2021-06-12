@@ -345,6 +345,6 @@
     <string name="pick_image_from_device">Pick image from device</string>
     <string name="pick_image_from_drive">Pick image from drive</string>
     <string name="successfully_created_note">Successfully created the note</string>
-
+    <string name="sensitive">Sensitive</string>
 
 </resources>

@@ -61,7 +61,6 @@ class GalleryRepositoryImpl(
                 createGalleryPost.author.getI(encryption),
                 createGalleryPost.title,
                 createGalleryPost.description,
-                tags = createGalleryPost.tags,
                 fileIds = files.map {
                     it.fileId
                 },

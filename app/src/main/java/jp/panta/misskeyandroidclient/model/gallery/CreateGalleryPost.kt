@@ -10,7 +10,6 @@ class CreateGalleryPost (
     val files: List<File>,
     val description: String?,
     val isSensitive: Boolean,
-    val tags: List<String>
 )
 
 

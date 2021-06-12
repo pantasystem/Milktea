@@ -4,13 +4,16 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.gallery.CreateGalleryPost
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
+import jp.panta.misskeyandroidclient.model.gallery.toTask
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +38,8 @@ class GalleryEditorViewModel(
     val galleryRepository: GalleryRepository,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
-    val logger: Logger
+    val taskExecutor: TaskExecutor,
+    val logger: Logger,
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
@@ -46,6 +50,7 @@ class GalleryEditorViewModel(
                 miCore.getGalleryRepository(),
                 miCore.getFilePropertyDataSource(),
                 miCore.getAccountRepository(),
+                miCore.getTaskExecutor(),
                 miCore.loggerFactory.create("GalleryEditorVM")
             ) as T
         }
@@ -59,6 +64,8 @@ class GalleryEditorViewModel(
 
     private val _pickedImages = MutableLiveData<List<File>>()
     val pickedImages: LiveData<List<File>> = _pickedImages
+
+    val isSensitive = MutableLiveData(false)
 
 
     init {
@@ -88,13 +95,13 @@ class GalleryEditorViewModel(
     }
 
     fun detach(file: File) {
-        _pickedImages.value = (_pickedImages.value?: listOf()).filterNot {
+        _pickedImages.value = (_pickedImages.value?: emptyList()).filterNot {
             it == file
         }
     }
 
     fun addFileProperties(list: List<FileProperty>) {
-        _pickedImages.value = (_pickedImages.value?: listOf()).toMutableList().also { mutable ->
+        _pickedImages.value = (_pickedImages.value?: emptyList()).toMutableList().also { mutable ->
             mutable.addAll(
                 list.map {
                     it.toFile()
@@ -104,9 +111,30 @@ class GalleryEditorViewModel(
     }
 
     fun addFile(file: File) {
-        _pickedImages.value = (_pickedImages.value?: listOf()).toMutableList().also { mutable ->
+        _pickedImages.value = (_pickedImages.value?: emptyList()).toMutableList().also { mutable ->
             mutable.add(file)
         }
+    }
+
+    fun validate() : Boolean {
+        return this.pickedImages.value?.isNotEmpty() == true && this.title.value?.isNotBlank() == true
+    }
+    suspend fun save(){
+        val files = this.pickedImages.value?: emptyList()
+        val title = this.title.value?: ""
+        val description = this.description.value?: ""
+        val isSensitive = this.isSensitive.value?: false
+        if(validate()) {
+            val create = CreateGalleryPost(
+                title,
+                getAccount(),
+                files,
+                description,
+                isSensitive
+            )
+            taskExecutor.dispatch(create.toTask(galleryRepository))
+        }
+
     }
 
     private var _accountId: Long? = null
