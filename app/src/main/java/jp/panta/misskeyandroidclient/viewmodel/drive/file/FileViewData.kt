@@ -2,13 +2,14 @@ package jp.panta.misskeyandroidclient.viewmodel.drive.file
 
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import java.io.Serializable
 
 class FileViewData(
-    val file: FilePropertyDTO
+    val file: FileProperty
 ): Serializable{
 
-    val id: String = file.id
+    val id = file.id
     val name = file.name
     val type = file.type
     val md5 = file.md5
@@ -18,7 +19,7 @@ class FileViewData(
     val isSensitive = file.isSensitive
     val url = file.url
     val thumbnailUrl = file.thumbnailUrl
-    val attachedNoteIds = file.attachedNoteIds
+
     val folderId = file.folderId
 
 
@@ -43,7 +44,6 @@ class FileViewData(
         if (isSensitive != other.isSensitive) return false
         if (url != other.url) return false
         if (thumbnailUrl != other.thumbnailUrl) return false
-        if (attachedNoteIds != other.attachedNoteIds) return false
         if (folderId != other.folderId) return false
         if (isSelect != other.isSelect) return false
         if (isEnabledSelect != other.isEnabledSelect) return false
@@ -60,10 +60,9 @@ class FileViewData(
         result = 31 * result + (size ?: 0)
         result = 31 * result + (userId?.hashCode() ?: 0)
         result = 31 * result + (comment?.hashCode() ?: 0)
-        result = 31 * result + (isSensitive?.hashCode() ?: 0)
+        result = 31 * result + (isSensitive.hashCode() ?: 0)
         result = 31 * result + (url.hashCode())
         result = 31 * result + (thumbnailUrl?.hashCode() ?: 0)
-        result = 31 * result + (attachedNoteIds?.hashCode() ?: 0)
         result = 31 * result + (folderId?.hashCode() ?: 0)
         result = 31 * result + isSelect.hashCode()
         result = 31 * result + isEnabledSelect.hashCode()
