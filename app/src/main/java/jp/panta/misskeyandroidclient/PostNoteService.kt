@@ -5,6 +5,8 @@ package jp.panta.misskeyandroidclient
 import android.app.IntentService
 import android.content.Intent
 import android.util.Log
+import jp.panta.misskeyandroidclient.model.notes.CreateNoteTask
+import jp.panta.misskeyandroidclient.model.notes.task
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
 
 @Suppress("DEPRECATION")
@@ -23,7 +25,9 @@ class PostNoteService : IntentService("PostNoteService") {
             return
         }
         val miApplication = applicationContext as MiApplication
-        miApplication.createNote(noteTask.createNote)
+
+
+        miApplication.getTaskExecutor().dispatch(noteTask.createNote.task(miApplication.getNoteRepository()))
 
     }
 

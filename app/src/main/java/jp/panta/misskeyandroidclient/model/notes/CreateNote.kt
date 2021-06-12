@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 
+import jp.panta.misskeyandroidclient.model.ITask
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
@@ -28,3 +29,15 @@ data class CreateNote(
 
 )
 
+class CreateNoteTask(
+    val noteRepository: NoteRepository,
+    val createNote: CreateNote
+) : ITask<Note> {
+    override suspend fun execute(): Note {
+        return noteRepository.create(createNote)
+    }
+}
+
+fun CreateNote.task(noteRepository: NoteRepository) : CreateNoteTask{
+    return CreateNoteTask(noteRepository, this)
+}

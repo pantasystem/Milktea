@@ -133,9 +133,6 @@ interface MiCore{
 
     fun getDraftNoteDAO(): DraftNoteDao
 
-    fun createFileUploader(account: Account): FileUploader
-
-    fun createNote(createNote: CreateNote)
 
     fun getTaskExecutor() : TaskExecutor
 

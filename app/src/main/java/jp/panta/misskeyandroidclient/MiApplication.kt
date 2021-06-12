@@ -557,14 +557,7 @@ class MiApplication : Application(), MiCore {
         return draftNoteDao
     }
 
-    override fun createFileUploader(account: Account): FileUploader {
-        return OkHttpDriveFileUploader(
-            context = this,
-            account = account,
-            gson = GsonFactory.create(),
-            encryption = getEncryption()
-        )
-    }
+
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
@@ -792,26 +785,7 @@ class MiApplication : Application(), MiCore {
         return ArrayList(this)
     }
 
-    /**
-     * プラットフォームへの依存をなるべく少なくしたかったためApplicationから作成している
-     */
-    override fun createNote(createNote: CreateNote) {
-        applicationScope.launch(Dispatchers.IO) {
-            runCatching {
-                getNoteRepository().create(createNote)
-            }.onSuccess {
-                logger.debug("投稿に成功しました。")
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@MiApplication, getString(R.string.success), Toast.LENGTH_LONG).show()
-                }
-            }.onFailure {
-                logger.error("投稿に失敗しました。", e = it)
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@MiApplication, "error: $it", Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-    }
+
 
     override fun getTaskExecutor(): TaskExecutor {
         return _taskExecutor
