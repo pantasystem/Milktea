@@ -196,7 +196,7 @@ class UserDetailActivity : AppCompatActivity() {
         override fun getItem(position: Int): Fragment {
             return when(position){
                 0 -> TimelineFragment.newInstance(requestTimeline)
-                1 -> PinNoteFragment()
+                1 -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
                 2 -> TimelineFragment.newInstance(requestMedia)
                 3 -> GalleryPostsFragment.newInstance(Pageable.Gallery.User(userId), account.accountId)
                 else -> throw IllegalArgumentException("こんなものはない！！")
