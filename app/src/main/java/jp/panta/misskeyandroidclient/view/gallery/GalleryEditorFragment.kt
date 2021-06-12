@@ -1,11 +1,14 @@
 package jp.panta.misskeyandroidclient.view.gallery
 
+import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +19,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
@@ -81,7 +85,11 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         }
 
         binding.pickedImageFromLocalButton.setOnClickListener {
-            // TODO: Galleryからなのかローカルからなのかソースを選択できるようにする
+            if(!checkPermission()) {
+                requestReadExternalStoragePermissionResultListener.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }else{
+                showFilePicker()
+            }
         }
 
         binding.pickedImageFromDriveButton.setOnClickListener {
@@ -89,6 +97,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         }
 
     }
+
 
     private fun showDrivePicker() {
         val intent = Intent(requireContext(), DriveActivity::class.java)
@@ -104,6 +113,31 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
                 obj as? FileProperty
             }?: emptyList()
             viewModel.addFileProperties(list)
+        }
+    }
+
+    private fun checkPermission(): Boolean {
+        val permissionCheck = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+        return permissionCheck == PackageManager.PERMISSION_GRANTED
+    }
+
+    private val pickFileResultListener = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val uri = it.data?.data
+        if(uri != null) {
+            viewModel.addFile(uri.toFile(requireContext()))
+        }
+    }
+
+    private fun showFilePicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.type = "image/*"
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        pickFileResultListener.launch(intent)
+    }
+
+    private val requestReadExternalStoragePermissionResultListener = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if(it) {
+            showFilePicker()
         }
     }
 }

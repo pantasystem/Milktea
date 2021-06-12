@@ -88,8 +88,8 @@ class GalleryEditorViewModel(
     }
 
     fun detach(file: File) {
-        _pickedImages.value = (_pickedImages.value?: listOf()).filter {
-            it.path == file.path
+        _pickedImages.value = (_pickedImages.value?: listOf()).filterNot {
+            it == file
         }
     }
 
@@ -101,8 +101,12 @@ class GalleryEditorViewModel(
                 }
             )
         }
+    }
 
-
+    fun addFile(file: File) {
+        _pickedImages.value = (_pickedImages.value?: listOf()).toMutableList().also { mutable ->
+            mutable.add(file)
+        }
     }
 
     private var _accountId: Long? = null
