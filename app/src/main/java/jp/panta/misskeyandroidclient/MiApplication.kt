@@ -182,6 +182,10 @@ class MiApplication : Application(), MiCore {
     private lateinit var mActiveNetworkState: Flow<Boolean>
     private var mIsActiveNetwork: Boolean = false
 
+    private val _taskExecutor: TaskExecutor by lazy {
+        AppTaskExecutor(applicationScope)
+    }
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate() {
@@ -807,6 +811,10 @@ class MiApplication : Application(), MiCore {
                 }
             }
         }
+    }
+
+    override fun getTaskExecutor(): TaskExecutor {
+        return _taskExecutor
     }
 
     @ExperimentalCoroutinesApi

@@ -4,6 +4,8 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.ITask
+import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
@@ -134,6 +136,8 @@ interface MiCore{
     fun createFileUploader(account: Account): FileUploader
 
     fun createNote(createNote: CreateNote)
+
+    fun getTaskExecutor() : TaskExecutor
 
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
