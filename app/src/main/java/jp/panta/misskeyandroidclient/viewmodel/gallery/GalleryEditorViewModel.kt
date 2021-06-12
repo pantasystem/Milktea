@@ -117,6 +117,7 @@ class GalleryEditorViewModel(
     }
 
     fun validate() : Boolean {
+        logger.debug("title:${this.title.value}, images:${pickedImages.value}")
         return this.pickedImages.value?.isNotEmpty() == true && this.title.value?.isNotBlank() == true
     }
     suspend fun save(){

@@ -10,10 +10,13 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityGalleryPostsBinding
+import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.view.gallery.GalleryEditorFragment
 import jp.panta.misskeyandroidclient.view.gallery.GalleryPostTabFragment
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.gallery.Action
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostActionViewModel
+import kotlinx.coroutines.flow.onEach
 
 class GalleryPostsActivity : AppCompatActivity() {
 

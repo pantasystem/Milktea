@@ -183,7 +183,7 @@ class MiApplication : Application(), MiCore {
     private var mIsActiveNetwork: Boolean = false
 
     private val _taskExecutor: TaskExecutor by lazy {
-        AppTaskExecutor(applicationScope)
+        AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
     }
 
     @FlowPreview

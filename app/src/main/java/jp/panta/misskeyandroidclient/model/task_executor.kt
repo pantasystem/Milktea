@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model
 
+import jp.panta.misskeyandroidclient.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -26,7 +27,8 @@ interface TaskExecutor {
 }
 
 class AppTaskExecutor(
-    val coroutineScope: CoroutineScope
+    val coroutineScope: CoroutineScope,
+    val logger: Logger
 ) : TaskExecutor {
 
     private val _tasks = MutableSharedFlow<TaskState>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 100)
@@ -40,6 +42,7 @@ class AppTaskExecutor(
             }.onSuccess {
                 emit(TaskState.Success(it))
             }.onFailure {
+                logger.debug("タスクの実行中にエラーが発生しました", e = it)
                 emit(TaskState.Error(it))
             }
         }.onEach {

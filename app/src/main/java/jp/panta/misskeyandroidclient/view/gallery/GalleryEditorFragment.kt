@@ -54,6 +54,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         val miCore = requireContext().applicationContext as MiCore
 
         viewModel = ViewModelProvider(this, GalleryEditorViewModel.Factory(args, miCore))[GalleryEditorViewModel::class.java]
+        binding.viewModel = viewModel
 
         (requireActivity() as AppCompatActivity).also { appCompatActivity ->
             appCompatActivity.setSupportActionBar(binding.toolbar)
