@@ -11,9 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
+import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
@@ -25,6 +27,9 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.gallery.EditType
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
@@ -94,6 +99,18 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
         binding.pickedImageFromDriveButton.setOnClickListener {
             showDrivePicker()
+        }
+
+        binding.saveButton.setOnClickListener {
+            if(!viewModel.validate()) {
+                return@setOnClickListener
+            }
+            lifecycleScope.launch(Dispatchers.IO) {
+                viewModel.save()
+                withContext(Dispatchers.Main) {
+                    (requireActivity() as? GalleryPostsActivity)?.pop()
+                }
+            }
         }
 
     }

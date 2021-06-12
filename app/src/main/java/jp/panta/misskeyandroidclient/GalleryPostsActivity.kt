@@ -63,7 +63,7 @@ class GalleryPostsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun pop() {
+    fun pop() {
         if(supportFragmentManager.backStackEntryCount > 0) {
             Log.d("count", "backStackEntryCount:${supportFragmentManager.backStackEntryCount}")
             supportFragmentManager.popBackStack()
