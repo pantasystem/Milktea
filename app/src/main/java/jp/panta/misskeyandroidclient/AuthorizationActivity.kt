@@ -32,7 +32,7 @@ class AuthorizationActivity : AppCompatActivity() {
         val authViewModel = ViewModelProvider(this, AuthViewModel.Factory(miCore))[AuthViewModel::class.java]
         mViewModel = authViewModel
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launchWhenResumed {
             authViewModel.authorization.collect {
                 if(it is Authorization.Finish) {
                     startActivity(Intent(this@AuthorizationActivity, MainActivity::class.java))
