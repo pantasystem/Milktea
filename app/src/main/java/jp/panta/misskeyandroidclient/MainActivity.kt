@@ -29,9 +29,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
+import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
+import jp.panta.misskeyandroidclient.model.notes.CreateNote
+import jp.panta.misskeyandroidclient.model.notes.CreateNoteTask
+import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streaming.stateEvent
@@ -87,11 +91,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //setTheme(R.style.AppThemeDark)
         setTheme()
         setContentView(R.layout.activity_main)
-
-
-
-
-
 
         setSupportActionBar(mBinding.appBarMain.toolbar)
 
@@ -204,6 +203,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
+        lifecycleScope.launchWhenCreated {
+            miApplication.getTaskExecutor().tasks.mapNotNull {
+                it as? TaskState.Success<*>
+            }.mapNotNull {
+                it.res as? Note
+            }.collect {
+                showSnackBar(getString(R.string.successfully_created_note))
+            }
+        }
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState, mBinding.appBarMain.bottomNavigation)
@@ -461,6 +469,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(
                     Intent(this, DraftNotesActivity::class.java)
                 )
+            }
+            R.id.nav_gallery -> {
+                startActivity(Intent(this, GalleryPostsActivity::class.java))
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)

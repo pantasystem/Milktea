@@ -42,9 +42,9 @@
                         android:layout_width="65dp"
                         android:layout_height="65dp"
                         android:layout_marginEnd="8dp"
-                        app:fileThumbnailMain="@{thumbnailMain}"
-                        app:fileThumbnailMask="@{thumbnailMask}"
-                        app:thumbnailFileViewData="@{fileViewData}"
+                        fileThumbnailMain="@{thumbnailMain}"
+                        fileThumbnailMask="@{thumbnailMask}"
+                        thumbnailFileViewData="@{fileViewData}"
                         android:onClick="@{()-> driveViewModel.openFile(fileViewData.file)}"
                         >
                     <ImageView
@@ -93,7 +93,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_toEndOf="@+id/file_meta"
                         tools:text="24byte"
-                        android:text="@{fileViewData.size.toString()}"
+                        android:text="@{String.valueOf(fileViewData.size)}"
                         />
 
                 <androidx.emoji.widget.EmojiTextView

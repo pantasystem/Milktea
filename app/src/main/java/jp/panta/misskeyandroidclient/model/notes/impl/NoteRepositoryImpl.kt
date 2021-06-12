@@ -26,7 +26,7 @@ class NoteRepositoryImpl(
     override suspend fun create(createNote: CreateNote): Note {
         val task = PostNoteTask(miCore.getEncryption(), createNote, createNote.author, miCore.loggerFactory, miCore.getFilePropertyDataSource())
         val result = runCatching {task.execute(
-            miCore.createFileUploader(createNote.author)
+            miCore.getFileUploaderProvider().get(createNote.author)
         )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.runCatching {
             getOrThrow().let {

@@ -10,13 +10,14 @@ import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.api.drive.RequestFile
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FileViewModel(
     private val account: Account,
     private val misskeyAPI: MisskeyAPI,
-    private val selectedFileMapLiveData: MutableLiveData<Map<String, FileViewData>>?,
+    private val selectedFileMapLiveData: MutableLiveData<Map<FileProperty.Id, FileViewData>>?,
     private val maxSelectableItemSize: Int,
     folderId: String?,
     private val encryption: Encryption
@@ -54,7 +55,9 @@ class FileViewModel(
                     return@launch
                 }
 
-                val viewDataList = rawList.map{
+                val viewDataList = rawList.map {
+                    it.toFileProperty(account)
+                }.map{
                     FileViewData(it)
                 }
                 viewDataList
@@ -93,7 +96,7 @@ class FileViewModel(
             isLoading = false
             return
         }
-        val request = RequestFile(i = account.getI(encryption), folderId = currentFolder.value, limit = 20, untilId = untilId)
+        val request = RequestFile(i = account.getI(encryption), folderId = currentFolder.value, limit = 20, untilId = untilId.fileId)
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
@@ -101,7 +104,9 @@ class FileViewModel(
 
                 requireNotNull(rawList)
                 require(rawList.isNotEmpty())
-                rawList.map{
+                rawList.map {
+                    it.toFileProperty(account)
+                }.map{
                     FileViewData(it).apply{
                         val selected = selectedFileMapLiveData?.value?.get(it.id)
                         if(selected != null){
@@ -131,9 +136,9 @@ class FileViewModel(
         val tmp = selectedFileMapLiveData?.value
         val selectedItemMap =
             if(tmp != null){
-            HashMap<String, FileViewData>(tmp)
+            HashMap<FileProperty.Id, FileViewData>(tmp)
         }else{
-            HashMap<String, FileViewData>()
+            HashMap()
         }
         val isSelect = fileViewData.isSelect.value
         if(isSelect == null){

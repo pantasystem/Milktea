@@ -46,7 +46,12 @@ class GalleryRepositoryImpl(
         val files = coroutineScope {
             createGalleryPost.files.map {
                 async {
-                    fileUploaderProvider.get(createGalleryPost.author).upload(it, true)
+                    it.remoteFileId?:
+                    fileUploaderProvider.get(createGalleryPost.author).upload(it, true).let {
+                        it.toFileProperty(createGalleryPost.author).also { entity ->
+                            filePropertyDataSource.add(entity)
+                        }
+                    }.id
                 }
             }.awaitAll()
         }
@@ -56,9 +61,8 @@ class GalleryRepositoryImpl(
                 createGalleryPost.author.getI(encryption),
                 createGalleryPost.title,
                 createGalleryPost.description,
-                tags = createGalleryPost.tags,
                 fileIds = files.map {
-                    it.id
+                    it.fileId
                 },
                 isSensitive = createGalleryPost.isSensitive
             )

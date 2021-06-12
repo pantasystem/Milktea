@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
 import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 
 
 @Suppress("UNCHECKED_CAST")
 class FileViewModelFactory(
     private val account: Account,
     private val miApplication: MiApplication,
-    private val selectedFileViewDataMapLiveData: MutableLiveData<Map<String, FileViewData>>? = null,
+    private val selectedFileViewDataMapLiveData: MutableLiveData<Map<FileProperty.Id, FileViewData>>? = null,
     private val maxSelectableItemSize: Int = 0,
     private val folderId: String? = null
 ) : ViewModelProvider.Factory{

@@ -15,7 +15,6 @@ data class CreateGallery(
     val description: String?,
     val fileIds: List<String>,
     val isSensitive: Boolean,
-    val tags: List<String>
 )
 
 @Serializable

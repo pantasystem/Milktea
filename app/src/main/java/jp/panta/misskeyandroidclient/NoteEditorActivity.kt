@@ -23,7 +23,7 @@ import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -454,19 +454,17 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK){
                     val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
-                        it as FilePropertyDTO
+                        it as FileProperty
                     }
                     //mViewModel?.driveFiles?.postValue(files)
                     if(files != null){
                         val exFiles = mViewModel?.files?.value
                         val addFiles = files.filter{out ->
                             exFiles?.firstOrNull {
-                                it.remoteFileId?.fileId == out.id
+                                it.remoteFileId?.fileId == out.id.fileId
                             } == null
                         }
-                        mViewModel?.addAllFileProperty(addFiles.map {
-                            it.toFileProperty((applicationContext as MiCore).getCurrentAccount().value!!)
-                        })
+                        mViewModel?.addAllFileProperty(addFiles)
                     }
                 }
             }

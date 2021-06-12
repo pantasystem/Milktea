@@ -78,7 +78,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
 
 
             driveViewModel.currentDirectory.observe(viewLifecycleOwner, {directory ->
-                viewModel.currentFolder.postValue(directory.id)
+                viewModel.currentFolder.postValue(directory?.id)
             })
 
             mViewModel = viewModel

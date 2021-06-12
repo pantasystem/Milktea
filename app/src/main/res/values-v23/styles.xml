@@ -22,7 +22,7 @@
         <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
         <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
-x
+
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="colorMessageSelf">@color/colorMessageSelf</item>

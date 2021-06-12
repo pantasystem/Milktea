@@ -17,9 +17,10 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".AuthorizationActivity"
-                android:launchMode="singleInstance"
-                >
+        <activity android:name=".GalleryPostsActivity"></activity>
+        <activity
+                android:name=".AuthorizationActivity"
+                android:launchMode="singleInstance">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -38,7 +39,6 @@
         <activity android:name=".AntennaEditorActivity" />
         <activity android:name=".AntennaListActivity" />
         <activity android:name=".view.settings.activities.PageSettingActivity" />
-
         <activity android:name=".MessagingListActivity" />
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".view.settings.activities.ReactionSettingActivity" />

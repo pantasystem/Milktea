@@ -251,7 +251,8 @@ class NoteEditorViewModel(
                 poll = poll.value?.buildCreatePoll(),
                 draftNoteId = draftNote.value?.draftNoteId
             )
-            miCore.createNote(createNote)
+
+            miCore.getTaskExecutor().dispatch(createNote.task(miCore.getNoteRepository()))
 
 
             this.isPost.event = true
