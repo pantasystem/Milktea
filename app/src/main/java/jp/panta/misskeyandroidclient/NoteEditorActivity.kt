@@ -106,7 +106,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         mBinding = binding
 
         setSupportActionBar(mBinding.noteEditorToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
 
         var text: String? = null
         if(intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true){
