@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:tools="http://schemas.android.com/tools"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        >
     <data>
         <variable
                 name="in"
@@ -23,16 +23,16 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="5dp"
-            app:reactionImageTypeView="@{reactionImage}"
-            app:reactionTextTypeView="@{reactionText}"
-            app:reaction="@{reaction.reaction}"
-            app:note="@{note}"
+            reactionImageTypeView="@{reactionImage}"
+            reactionTextTypeView="@{reactionText}"
+            reaction="@{reaction.reaction}"
+            note="@{note}"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="4dp"
             tools:background="@drawable/shape_normal_reaction_backgruond"
 
-            app:reactionNote="@{note}"
-            app:reactionBackground="@{reaction}"
+            reactionNote="@{note}"
+            reactionBackground="@{reaction}"
 
             android:onClick="@{ () -> notesViewModel.postReaction(note, reaction.reaction) }"
 
