@@ -40,18 +40,22 @@ class AuthFragment : Fragment(){
         val authViewModel = ViewModelProvider(requireActivity(), AuthViewModel.Factory(miCore))[AuthViewModel::class.java]
         binding.lifecycleOwner = this
         binding.appAuthViewModel = appAuthViewModel
-        appAuthViewModel.waiting4UserAuthorization.observe(viewLifecycleOwner,  {
-            it?.let{
+        appAuthViewModel.waiting4UserAuthorization.observe(viewLifecycleOwner) {
+            it?.let {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.session.url)))
                 authViewModel.setState(it)
                 appAuthViewModel.waiting4UserAuthorization.postValue(null)
             }
-        })
+        }
 
-        appAuthViewModel.app.observe(viewLifecycleOwner, { app ->
-            if(app != null){
-                Toast.makeText(requireContext(), getString(R.string.successfully_created_the_app) + " ${app.name}", Toast.LENGTH_SHORT).show()
+        appAuthViewModel.app.observe(viewLifecycleOwner) { app ->
+            if (app != null) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.successfully_created_the_app) + " ${app.name}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-        })
+        }
     }
 }
