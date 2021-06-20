@@ -1,8 +1,12 @@
 package jp.panta.misskeyandroidclient.view.auth
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -41,7 +45,12 @@ class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_u
         }.launchIn(lifecycleScope)
 
         binding.copyToClipboardButton.setOnClickListener {
-
+            (requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.also { clipboardManager ->
+                (authViewModel.authorization.value as? Authorization.Waiting4UserAuthorization)?.session?.url?.let {
+                    clipboardManager.setPrimaryClip(ClipData.newPlainText("misskey auth url", it))
+                    Toast.makeText(requireContext(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+                }
+            }
         }
 
         binding.approvedButton.setOnClickListener {

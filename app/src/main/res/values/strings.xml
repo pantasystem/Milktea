@@ -350,5 +350,6 @@
     <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy the URL of the authentication
         destination to the clipboard.
     </string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
 
 </resources>
