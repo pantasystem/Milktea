@@ -110,15 +110,15 @@
     <string name="play_media">メディアを再生する</string>
     <string name="avataricon">avatarIcon</string>
     <string name="reaction">リアクション</string>
-    <string name="followed_by">さんにフォローされました</string>
-    <string name="replied_by">さんに返信されました</string>
-    <string name="quoted_by">さんに引用されました</string>
-    <string name="voted_by">さんに投票されました</string>
-    <string name="request_follow">さんがフォローリクエストしてます</string>
-    <string name="mention_by">さんにメンションされました</string>
-    <string name="reacted_by">さんにリアクションされました</string>
-    <string name="renoted_by">さんにリノートされました</string>
-    <string name="receive_follow_request">フォローリクエストされました。</string>
+    <string name="followed_by">%sさんにフォローされました</string>
+    <string name="replied_by">%sさんに返信されました</string>
+    <string name="quoted_by">%sさんに引用されました</string>
+    <string name="voted_by">%sさんに投票されました</string>
+    <string name="request_follow">%sさんがフォローリクエストしてます</string>
+    <string name="mention_by">%sさんにメンションされました</string>
+    <string name="reacted_by">%sさんにリアクションされました</string>
+    <string name="renoted_by">%sさんにリノートされました</string>
+    <string name="follow_requested_by">%sさんにフォローリクエストされました。</string>
 
     <string name="input_message">相手に思いを伝えてください</string>
 
@@ -245,7 +245,7 @@
     <string name="edit_tab_name">タブ名を編集</string>
     <string name="update_timeline_in_background">タイムラインをバックグラウンドで更新する(消費電力大)</string>
 
-    <string name="follow_request_accepted">フォローが承認されました</string>
+    <string name="follow_request_accepted_by">%sさんにフォローリクエストが承認されました</string>
     <string name="confirm_deletion">削除の確認</string>
     <string name="name">名前</string>
     <string name="receiving_source">受信ソース</string>
