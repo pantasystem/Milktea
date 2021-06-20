@@ -346,5 +346,9 @@
     <string name="pick_image_from_drive">Pick image from drive</string>
     <string name="successfully_created_note">Successfully created the note</string>
     <string name="sensitive">Sensitive</string>
+    <string name="authentication_url">Authentication URL</string>
+    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy the URL of the authentication
+        destination to the clipboard.
+    </string>
 
 </resources>

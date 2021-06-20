@@ -349,4 +349,7 @@
     <string name="pick_image_from_drive">ドライブから画像を選択</string>
     <string name="successfully_created_note">ノートの作成に成功しました</string>
     <string name="sensitive">センシティブ</string>
+    <string name="authentication_url">認証URL</string>
+    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする
+    </string>
 </resources>

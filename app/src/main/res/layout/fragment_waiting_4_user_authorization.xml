@@ -44,5 +44,38 @@
                 android:textStyle="bold"
                 />
 
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/authUrlView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/textView5"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintEnd_toStartOf="@id/copyToClipboardButton"
+                app:layout_constraintStart_toStartOf="parent"
+
+                >
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/authenticationUrlViewEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/authentication_url"
+                    android:enabled="false"
+            />
+
+        </com.google.android.material.textfield.TextInputLayout>
+        <ImageButton
+                android:id="@+id/copyToClipboardButton"
+                android:layout_width="40dp" android:layout_height="40dp"
+                     app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintTop_toTopOf="@id/authUrlView"
+                app:layout_constraintBottom_toBottomOf="@id/authUrlView"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:srcCompat="@drawable/ic_content_copy_black_24dp"
+                android:contentDescription="@string/copy_the_url_of_the_authentication_destination_to_the_clipboard"
+
+        />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
