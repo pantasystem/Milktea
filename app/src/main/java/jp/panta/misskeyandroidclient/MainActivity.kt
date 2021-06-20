@@ -33,17 +33,13 @@ import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.model.notes.CreateNote
-import jp.panta.misskeyandroidclient.model.notes.CreateNoteTask
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streaming.stateEvent
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
@@ -55,8 +51,10 @@ import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
 import jp.panta.misskeyandroidclient.view.notes.TabFragment
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleEditorFragment
 import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
+import jp.panta.misskeyandroidclient.view.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
+import jp.panta.misskeyandroidclient.view.strings_helper.webSocketStateMessageScope
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -184,26 +182,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }.map {
             miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
         }.flowOn(Dispatchers.IO).onEach { notificationRelation ->
-            showNotification(notificationRelation)
+            notificationMessageScope {
+                notificationRelation.showSnackBarMessage(mBinding.appBarMain.simpleNotification)
+            }
         }.catch { e ->
             logger?.error("通知取得エラー", e = e)
         }.launchIn(lifecycleScope + Dispatchers.Main)
 
-        lifecycleScope.launchWhenResumed {
-            miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
-                miApplication.getSocket(it).stateEvent()
-            }.catch { e ->
-                logger?.error("WebSocket　状態取得エラー", e)
-            }.collect {
-                val message = when(it){
-                    is Socket.State.Connected -> getString(R.string.connected)
-                    is Socket.State.Connecting -> getString(R.string.connecting)
-                    is Socket.State.Closing -> getString(R.string.closing)
-                    is Socket.State.Failure -> getString(R.string.websocket_error) + it.throwable
-                    is Socket.State.Closed -> getString(R.string.closed)
-                    is Socket.State.NeverConnected -> ""
+        if(BuildConfig.DEBUG) {
+            lifecycleScope.launchWhenResumed {
+                miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+                    miApplication.getSocket(it).stateEvent()
+                }.catch { e ->
+                    logger?.error("WebSocket　状態取得エラー", e)
+                }.collect {
+                    webSocketStateMessageScope {
+                        it.showToastMessage()
+                    }
                 }
-                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -282,30 +278,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         ft.commit()
     }
 
-    /**
-     * 通知をSnackBarに表示する
-     */
-    @MainThread
-    private fun showNotification(notify: NotificationRelation){
-        val account = (application as MiApplication).getCurrentAccount().value?: return
-        val miCore = application as MiCore
-
-        val viewData = NotificationViewData(notify, account, DetermineTextLengthSettingStore((application as MiCore).getSettingStore()), miCore.getNoteCaptureAdapter())
-        //Log.d("MainActivity")
-        val name = notify.user.name?: notify.user.userName
-        val msg = when(viewData.type){
-            NotificationViewData.Type.FOLLOW ->  name + " ${getString(R.string.followed_by)}"
-            NotificationViewData.Type.MENTION -> name + " ${getString(R.string.mention_by)}"
-            NotificationViewData.Type.REPLY -> name + " ${getString(R.string.replied_by)}"
-            NotificationViewData.Type.RENOTE -> name + " ${getString(R.string.renoted_by)}"
-            NotificationViewData.Type.QUOTE -> name + " ${getString(R.string.quoted_by)}"
-            NotificationViewData.Type.REACTION -> name + " ${getString(R.string.reacted_by)}"
-            NotificationViewData.Type.POLL_VOTE -> name + " ${getString(R.string.voted_by)}"
-            NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST -> name + " ${getString(R.string.followed_by)}"
-            NotificationViewData.Type.FOLLOW_REQUEST_ACCEPTED -> name + " ${getString(R.string.follow_request_accepted)}"
-        }
-        showSnackBar(msg)
-    }
 
     private fun showSnackBar(message: String) {
         val snackBar = Snackbar.make(mBinding.appBarMain.simpleNotification, message, Snackbar.LENGTH_LONG)
