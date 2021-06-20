@@ -6,16 +6,14 @@ import android.content.Intent
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.google.gson.GsonBuilder
-import io.reactivex.disposables.CompositeDisposable
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.notification.*
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.view.SafeUnbox
+import jp.panta.misskeyandroidclient.view.notification.notificationMessageScope
 import java.util.*
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData.Type.*
 import kotlinx.coroutines.*
@@ -115,43 +113,8 @@ class NotificationService : Service() {
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
         builder.setSmallIcon(R.mipmap.ic_launcher_foreground)
 
-        when(notification.notification) {
-            is FollowNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName() + " " +applicationContext.getString(R.string.followed_by))
-            }
-            is MentionNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.mention_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note?.note?.text))
-            }
-            is ReplyNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.replied_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note?.note?.text))
-            }
-            is QuoteNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.quoted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note?.note?.text))
-            }
-            is PollVoteNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName()  + " " + getString(R.string.voted_by))
-            }
-            is ReactionNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.reacted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.notification.reaction))
-            }
-            is RenoteNotification -> {
-                // builder.setSmallIcon(R.drawable.ic_re_note)
-                builder.setContentTitle(notification.user.getDisplayUserName()  + " " + applicationContext.getString(R.string.renoted_by))
-                builder.setContentText(SafeUnbox.unbox(notification.note?.renote?.note?.text?: ""))
-            }
-            is ReceiveFollowRequestNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName() + getString(R.string.request_follow))
-            }
-            is FollowRequestAcceptedNotification -> {
-                builder.setContentTitle(notification.user.getDisplayUserName() + " " + getString(R.string.follow_request_accepted))
-            }
-
-
-
+        notificationMessageScope {
+            builder.setContentTitle(notification.getMessage())
         }
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
