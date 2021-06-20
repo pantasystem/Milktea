@@ -273,12 +273,11 @@
                     android:layout_height="40dp" app:srcCompat="@drawable/ic_reply_black_24dp"
                     android:id="@+id/imageButton"
                     style="?android:attr/borderlessButtonStyle"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:padding="8dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                     android:contentDescription="@string/reply_title"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint"/>
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
                     android:layout_width="50dp"
@@ -292,12 +291,11 @@
                     android:layout_height="40dp" app:srcCompat="@drawable/ic_re_note"
                     android:id="@+id/imageButton2"
                     style="?android:attr/borderlessButtonStyle"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:padding="8dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
                     android:contentDescription="@string/renote"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint"/>
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
                     android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
@@ -315,12 +313,11 @@
                     tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                     android:id="@+id/imageButton3"
                     style="?android:attr/borderlessButtonStyle"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:padding="8dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
                     android:contentDescription="@string/reaction"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint"/>
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
 
@@ -337,12 +334,11 @@
                     android:layout_height="40dp" app:srcCompat="@drawable/ic_more_horiz_black_24dp"
                     android:id="@+id/imageButton4"
                     style="?android:attr/borderlessButtonStyle"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:padding="8dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
                     android:contentDescription="@string/more"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint"/>
         </LinearLayout>
 
     </RelativeLayout>
