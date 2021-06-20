@@ -17,7 +17,17 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".GalleryPostsActivity"></activity>
+        <service
+                android:name=".FCMService"
+                android:enabled="true"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+
+        </service>
+
+        <activity android:name=".GalleryPostsActivity" />
         <activity
                 android:name=".AuthorizationActivity"
                 android:launchMode="singleInstance">
