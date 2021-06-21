@@ -1,16 +1,11 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
 import androidx.lifecycle.*
-import io.reactivex.disposables.CompositeDisposable
-import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.group.Group
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -18,9 +13,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import kotlin.collections.ArrayList
 
 @ExperimentalCoroutinesApi

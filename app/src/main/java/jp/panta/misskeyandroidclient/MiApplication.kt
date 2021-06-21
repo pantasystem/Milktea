@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
@@ -18,10 +17,9 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
@@ -360,7 +358,6 @@ class MiApplication : Application(), MiCore {
         }.catch { e ->
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
-
 
     }
 
@@ -742,7 +739,7 @@ class MiApplication : Application(), MiCore {
 
     }
 
-    override fun getMisskeyAPI(account: Account): MisskeyAPI{
+    override fun getMisskeyAPI(account: Account): MisskeyAPI {
         return getMisskeyAPI(account.instanceDomain)
     }
 

@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11Diff
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12Diff
 import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

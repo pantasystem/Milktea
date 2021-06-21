@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.api.list.*
 import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.app.ShowApp
@@ -30,7 +30,7 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 
-open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI{
+open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI {
     override suspend fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
 
     override suspend fun children(noteRequest: NoteRequest) = misskey.children(noteRequest)

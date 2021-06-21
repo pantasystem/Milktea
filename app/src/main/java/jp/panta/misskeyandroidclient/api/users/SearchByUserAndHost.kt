@@ -1,12 +1,7 @@
 package jp.panta.misskeyandroidclient.api.users
 
-import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
-import okhttp3.Request
-import okio.Timeout
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 
 class SearchByUserAndHost(val misskeyAPI: MisskeyAPI){
