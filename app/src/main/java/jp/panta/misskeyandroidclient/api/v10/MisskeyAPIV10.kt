@@ -23,6 +23,8 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.sw.register.Subscription
+import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
@@ -149,4 +151,6 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
     override suspend fun getUsers(requestUser: RequestUser): Response<List<UserDTO>> = misskey.getUsers(requestUser)
 
     override suspend fun reactions(body: RequestReactionHistoryDTO): Response<List<ReactionHistoryDTO>> = misskey.reactions(body)
+
+    override suspend fun swRegister(subscription: Subscription): Response<SubscriptionState> = misskey.swRegister(subscription)
 }

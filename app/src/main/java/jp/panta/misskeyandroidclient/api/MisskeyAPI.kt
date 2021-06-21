@@ -22,6 +22,8 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.sw.register.Subscription
+import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
@@ -217,4 +219,6 @@ interface MisskeyAPI {
     @POST("api/hashtags/list")
     suspend fun getHashTagList(@Body requestHashTagList: RequestHashTagList): Response<List<HashTag>>
 
+    @POST("api/sw/register")
+    suspend fun swRegister(@Body subscription: Subscription) : Response<SubscriptionState>
 }
