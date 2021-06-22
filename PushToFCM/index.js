@@ -3,6 +3,13 @@ const app = express();
 
 console.log('start server');
 
+app.use(function(req, _, next){
+    req.pipe(concat(function(data){
+      req.body = data;
+      next();
+    }));
+});
+
 app.post('/webpushcallback', (req, res)=>{
     console.log();
     let deviceToken = req.query.deviceToken
