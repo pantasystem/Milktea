@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.api.sw.register
 import java.io.Serializable as JSerializable
 
 data class Subscription(
+    val i: String,
     val endpoint: String,
     val auth: String,
     val publicKey: String
