@@ -118,15 +118,15 @@ exports.decrypt = function (body64, receiverKey, verbose) {
 
   // aes-128-gcm
   const decipher = crypto.createDecipheriv("aes-128-gcm", cek, iv);
-  result = decipher.update(content);
+  let result = decipher.update(content);
   log(verbose, 'type:', typeof(result));
-  log(verbose, "decrypted: ", result.toString("UTF-8"));
+  log(verbose, "decrypted: ", result.toString(crypto.enc.Utf8));
 
   // remove padding and GCM auth tag
   while (result.slice(result.length-1,result.length) != "}") { // jsonの末端が見えるまで一文字ずつ消していく
     result = result.slice(0,result.length-1);
   }
 
-  log(verbose, "shaped:", result.toString("UTF-8"));
-  return result.toString("UTF-8");
+  log(verbose, "shaped:", result.toString("utf8"));
+  return result.toString("utf8");
 };
