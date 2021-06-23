@@ -8,6 +8,8 @@
 // https://gist.github.com/tateisu/685eab242549d9c9ffc85020f09a4b71
 // ↑一部 @tateisu氏のコードを参考にしています
 // (アドバイスありがとうございました！→ https://mastodon.juggler.jp/@tateisu/104098620591598243)
+// こちらのコードは@YuigaWadaさんのコードを一部改変して利用しています。
+// https://github.com/YuigaWada/MissCat/blob/develop/ApiServer/api.js
 
 const util = require("util");
 const crypto = require("crypto");
