@@ -4,7 +4,7 @@ const Concat = require('concat-stream');
 const fs = require('fs');
 const webPushDecipher = require('./webPushDecipher.js');
 
-const AUTH_SECRET = fs.readFileSync('./key/auth_secret.txt');
+const AUTH_SECRET = fs.readFileSync('./key/auth_secret.txt', 'utf8');
 const PUBLICK_KEY = fs.readFileSync('./key/public_key.txt', 'utf8');
 const PRIVATE_KEY = fs.readFileSync('./key/private_key.txt', 'utf8');
 
