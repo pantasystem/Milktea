@@ -2,11 +2,19 @@ const express = require('express');
 const app = express();
 const Concat = require('concat-stream');
 const fs = require('fs');
+
 const webPushDecipher = require('./webPushDecipher.js');
 
 const AUTH_SECRET = fs.readFileSync('./key/auth_secret.txt', 'utf8');
 const PUBLICK_KEY = fs.readFileSync('./key/public_key.txt', 'utf8');
 const PRIVATE_KEY = fs.readFileSync('./key/private_key.txt', 'utf8');
+const SERVER_KEY = fs.readFileSync('./key/serverkey.txt', 'utf8');
+
+const admin = require('firebase-admin');
+admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+});
+const messaging = admin.messaging();
 
 console.log('start server');
 
@@ -41,15 +49,23 @@ const parseJsonMiddleware = (req, res, next) => {
 }
 
 app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware ,(req, res)=>{
-    console.log();
     let deviceToken = req.query.deviceToken
     let accountId = req.query.accountId;
-
     if(!(deviceToken && accountId)) {
-        return res.status(422).end();
+        return res.status(410).end();
     }
-    console.log(`deviceToken:${deviceToken}, accountId:${accountId}`);
-    console.log(req.json);
+
+    messaging.sendToDevice(deviceToken, JSON.stringify(
+        {
+            accountId: accountId,
+            data: req.json
+        }
+    )).then((res)=>{
+        console.log('送信成功');
+    }).catch((e)=>{
+        console.error('fcm送信失敗:', e);
+    });
+
     res.json({status: 'ok'});
 });
 app.listen(3000);

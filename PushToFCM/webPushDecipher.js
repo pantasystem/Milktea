@@ -10,7 +10,6 @@
 // (アドバイスありがとうございました！→ https://mastodon.juggler.jp/@tateisu/104098620591598243)
 // こちらのコードは@YuigaWadaさんのコードを一部改変して利用しています。
 // https://github.com/YuigaWada/MissCat/blob/develop/ApiServer/api.js
-
 const util = require("util");
 const crypto = require("crypto");
 const encoding = require('encoding-japanese');
