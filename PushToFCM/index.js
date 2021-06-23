@@ -39,7 +39,6 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware ,(req, res)=
     if(!(deviceToken && accountId)) {
         return cres.status(422).end();
     }
-    console.log(`rawBody:${req.rawBody}`);
     console.log(`deviceToken:${deviceToken}, accountId:${accountId}`);
     res.json({status: 'ok'});
 });
