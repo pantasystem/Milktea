@@ -35,12 +35,11 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware ,(req, res)=
     let deviceToken = req.query.deviceToken
     let accountId = req.query.accountId;
     let rawJson = req.rawJson;
-    //console.log(JSON.parse(rawJson));
+    console.log(JSON.parse(rawJson));
     if(!(deviceToken && accountId)) {
         return cres.status(422).end();
     }
     console.log(`deviceToken:${deviceToken}, accountId:${accountId}`);
-    //res.json({status: 'ok'});
-    res.status(410).end();
+    res.json({status: 'ok'});
 });
 app.listen(3000);
