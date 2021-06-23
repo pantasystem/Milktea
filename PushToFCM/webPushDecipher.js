@@ -121,7 +121,7 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   const decipher = crypto.createDecipheriv("aes-128-gcm", cek, iv);
   let result = decipher.update(content);
   log(verbose, 'type:', typeof(result));
-  log(verbose, "decrypted: ", result.toString("utf8"));
+  log(verbose, "decrypted: ", result.toString("utf16"));
   log(verbose, '文字コード:', encoding.detect(result));
 
   // remove padding and GCM auth tag
@@ -129,6 +129,6 @@ exports.decrypt = function (body64, receiverKey, verbose) {
     result = result.slice(0,result.length-1);
   }
 
-  log(verbose, "shaped:", result.toString("utf8"));
-  return result.toString("utf8");
+  log(verbose, "shaped:", result.toString("utf16"));
+  return result.toString("utf16");
 };
