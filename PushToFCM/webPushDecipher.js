@@ -44,6 +44,7 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   // bodyを分解してsalt, keyid, 暗号化されたcontentsを取り出す
   // bodyの構造は以下の通り↓
   /*
+  https://tools.ietf.org/id/draft-ietf-httpbis-encryption-encoding-09.xml#header
 	+-----------+--------+-----------+---------------+
 	| salt (16) | rs (4) | idlen (1) | keyid (idlen) |
 	+-----------+--------+-----------+---------------+
@@ -103,15 +104,18 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   const ikm = sha256(prk_key, keyInfo);
 
   // prk
+  // https://tools.ietf.org/id/draft-ietf-httpbis-encryption-encoding-09.xml#derivation
   const prk = sha256(salt, ikm);
   log(verbose, "prk", prk.toString("base64"));
 
   // cek
+  // https://tools.ietf.org/id/draft-ietf-httpbis-encryption-encoding-09.xml#derivation
   const cekInfo = Buffer.from("Content-Encoding: aes128gcm\0\1");
   const cek = sha256(prk, cekInfo).slice(0, 16);
   log(verbose, "cek", cek.toString("base64"));
 
   // initialization vector
+  // https://tools.ietf.org/id/draft-ietf-httpbis-encryption-encoding-09.xml#nonce
   const nonceInfo = Buffer.from("Content-Encoding: nonce\0\1");
   const nonce = sha256(prk, nonceInfo).slice(0, 12);
   const iv = nonce;

@@ -15,6 +15,7 @@
     "encoding-japanese": "^1.0.30",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
+    "urlsafe-base64": "^1.0.0",
     "util": "^0.12.4"
   }
 }
