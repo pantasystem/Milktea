@@ -55,8 +55,11 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     }
 
     messaging.sendToDevice(deviceToken, {
-        accountId: accountId,
-        data: req.json
+        data: {
+            accountId: accountId,
+            body: req.json,
+            src: 'misskey',
+        }
     }).then((res)=>{
         console.log('送信成功');
     }).catch((e)=>{
