@@ -54,12 +54,10 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
         return res.status(410).end();
     }
 
-    messaging.sendToDevice(deviceToken, JSON.stringify(
-        {
-            accountId: accountId,
-            data: req.json
-        }
-    )).then((res)=>{
+    messaging.sendToDevice(deviceToken, {
+        accountId: accountId,
+        data: req.json
+    }).then((res)=>{
         console.log('送信成功');
     }).catch((e)=>{
         console.error('fcm送信失敗:', e);
