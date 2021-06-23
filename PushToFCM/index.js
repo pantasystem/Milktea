@@ -35,8 +35,8 @@ const parseJsonMiddleware = (req, res, next) => {
         req.json = JSON.parse(req.rawJson);
         next();
     }catch(e) {
-        console.log('parse error', e);
-        return res.status(410).end();
+        console.log('parse error', req.rawJson, e);
+        return res.status(400).end();
     }
 }
 
