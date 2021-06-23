@@ -14,6 +14,7 @@ console.log('start server');
 const rawBodyMiddlware = (req, _, next) => {
     req.pipe(new Concat(function(data) {
         req.body = data;
+        next();
     }))
 }
 
