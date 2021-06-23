@@ -12,6 +12,7 @@
   "dependencies": {
     "concat-stream": "^2.0.0",
     "crypt": "^0.0.2",
+    "encoding-japanese": "^1.0.30",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "util": "^0.12.4"

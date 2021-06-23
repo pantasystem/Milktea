@@ -11,6 +11,7 @@
 
 const util = require("util");
 const crypto = require("crypto");
+const encoding = require('encoding-japanese');
 
 function decodeBase64(src) {
   return Buffer.from(src, "base64");
@@ -35,7 +36,7 @@ exports.buildReciverKey = function (public, private, authSecret) {
 
 // WebPushで流れてきた通知をdecrypt
 exports.decrypt = function (body64, receiverKey, verbose) {
-  body = decodeBase64(body64);
+  let body = decodeBase64(body64);
   let auth_secret = receiverKey.authSecret;
   let receiver_public = receiverKey.public;
   let receiver_private = receiverKey.private;
@@ -60,7 +61,7 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   const sender_public = decodeBase64(keyid.toString("base64"));
 
   // 共有秘密鍵を生成(ECDH)
-  receiver_curve = crypto.createECDH("prime256v1");
+  let receiver_curve = crypto.createECDH("prime256v1");
   receiver_curve.setPrivateKey(receiver_private);
   const sharedSecret = receiver_curve.computeSecret(keyid);
 
@@ -121,6 +122,7 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   let result = decipher.update(content);
   log(verbose, 'type:', typeof(result));
   log(verbose, "decrypted: ", result.toString("utf8"));
+  log(verbose, '文字コード:', encoding.detect(result));
 
   // remove padding and GCM auth tag
   while (result.slice(result.length-1,result.length) != "}") { // jsonの末端が見えるまで一文字ずつ消していく
