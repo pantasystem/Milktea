@@ -3,14 +3,20 @@ const app = express();
 
 console.log('start server');
 
-app.use(function(req, _, next){
+/*app.use(function(req, _, next){
     req.pipe(concat(function(data){
       req.body = data;
       next();
     }));
-});
+});*/
 
-app.post('/webpushcallback', (req, res)=>{
+const rawBodyMiddlware = (req, _, next) => {
+    req.pipe(concat(function(data) {
+        req.body = data;
+    }))
+}
+
+app.post('/webpushcallback', rawBodyMiddlware ,(req, res)=>{
     console.log();
     let deviceToken = req.query.deviceToken
     let accountId = req.query.accountId;
