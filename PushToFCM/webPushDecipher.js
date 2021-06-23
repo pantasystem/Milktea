@@ -120,7 +120,7 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   const decipher = crypto.createDecipheriv("aes-128-gcm", cek, iv);
   let result = decipher.update(content);
   log(verbose, 'type:', typeof(result));
-  log(verbose, "decrypted: ", result.toString(crypto.enc.Utf8));
+  log(verbose, "decrypted: ", result.toString("utf8"));
 
   // remove padding and GCM auth tag
   while (result.slice(result.length-1,result.length) != "}") { // jsonの末端が見えるまで一文字ずつ消していく
