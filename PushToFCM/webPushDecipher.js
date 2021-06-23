@@ -36,9 +36,9 @@ exports.buildReciverKey = function (public, private, authSecret) {
 // WebPushで流れてきた通知をdecrypt
 exports.decrypt = function (body64, receiverKey, verbose) {
   body = decodeBase64(body64);
-  auth_secret = receiverKey.authSecret;
-  receiver_public = receiverKey.public;
-  receiver_private = receiverKey.private;
+  let auth_secret = receiverKey.authSecret;
+  let receiver_public = receiverKey.public;
+  let receiver_private = receiverKey.private;
 
   // bodyを分解してsalt, keyid, 暗号化されたcontentsを取り出す
   // bodyの構造は以下の通り↓
