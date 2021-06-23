@@ -18,7 +18,12 @@ const rawBodyMiddlware = (req, _, next) => {
     }))
 }
 
-app.post('/webpushcallback', rawBodyMiddlware ,(req, res)=>{
+const decodeBodyMiddleware = (req, res, next) => {
+    console.log('decodeBody');
+    next();
+}
+
+app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware ,(req, res)=>{
     console.log();
     let deviceToken = req.query.deviceToken
     let accountId = req.query.accountId;
