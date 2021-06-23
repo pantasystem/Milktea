@@ -30,11 +30,22 @@ const decodeBodyMiddleware = (req, res, next) => {
     next();
 }
 
-app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware ,(req, res)=>{
+const parseJsonMiddleware = (req, res, next) => {
+    try {
+        req.json = JSON.parse(req.rawJson);
+        next();
+    }catch(e) {
+        console.log('parse error', e);
+        return res.status(410).end();
+    }
+}
+
+app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware ,(req, res)=>{
     console.log();
     let deviceToken = req.query.deviceToken
     let accountId = req.query.accountId;
     let rawJson = req.rawJson;
+
     console.log(JSON.parse(rawJson));
     if(!(deviceToken && accountId)) {
         return res.status(422).end();
