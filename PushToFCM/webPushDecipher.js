@@ -119,6 +119,7 @@ exports.decrypt = function (body64, receiverKey, verbose) {
   // aes-128-gcm
   const decipher = crypto.createDecipheriv("aes-128-gcm", cek, iv);
   result = decipher.update(content);
+  log(verbose, 'type:', typeof(result));
   log(verbose, "decrypted: ", result.toString("UTF-8"));
 
   // remove padding and GCM auth tag
