@@ -26,7 +26,7 @@ function log(verbose, label, text) {
 }
 
 // 通知を受け取る側で生成したキーを渡す
-exports.reciverKeyBuilder = function (public, private, authSecret) {
+exports.buildReciverKey = function (public, private, authSecret) {
   this.public = decodeBase64(public);
   this.private = decodeBase64(private);
   this.authSecret = decodeBase64(authSecret);
