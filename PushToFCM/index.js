@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const Concat = require('concat-stream');
 
 console.log('start server');
 
@@ -11,7 +12,7 @@ console.log('start server');
 });*/
 
 const rawBodyMiddlware = (req, _, next) => {
-    req.pipe(concat(function(data) {
+    req.pipe(new Concat(function(data) {
         req.body = data;
     }))
 }
