@@ -25,7 +25,7 @@ const decodeBodyMiddleware = (req, res, next) => {
     }
     const converted = rawBody.toString('base64');
     const key = webPushDecipher.buildReciverKey(PUBLICK_KEY, PRIVATE_KEY, AUTH_SECRET);
-    let decrypted = webPushDecipher.decrypt(converted, key, false);
+    let decrypted = webPushDecipher.decrypt(converted, key, true);
     req.rawJson = decrypted;
     next();
 }
