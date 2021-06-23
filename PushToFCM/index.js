@@ -1,15 +1,14 @@
 const express = require('express');
 const app = express();
 const Concat = require('concat-stream');
+const fs = require('fs');
+
+const AUTH_SECRET = fs.readFileSync('./key/auth_secret.txt');
+const PUBLICK_KEY = fs.readFileSync('./key/public_key.txt', 'utf8');
+const PRIVATE_KEY = fs.readFileSync('./key/private_key.txt', 'utf8');
 
 console.log('start server');
 
-/*app.use(function(req, _, next){
-    req.pipe(concat(function(data){
-      req.body = data;
-      next();
-    }));
-});*/
 
 const rawBodyMiddlware = (req, _, next) => {
     req.pipe(new Concat(function(data) {
@@ -19,7 +18,8 @@ const rawBodyMiddlware = (req, _, next) => {
 }
 
 const decodeBodyMiddleware = (req, res, next) => {
-    console.log('decodeBody');
+    let rawBody = req.rawBody;
+
     next();
 }
 

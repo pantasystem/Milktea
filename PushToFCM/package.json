@@ -11,6 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "concat-stream": "^2.0.0",
-    "express": "^4.17.1"
+    "crypt": "^0.0.2",
+    "express": "^4.17.1",
+    "fs": "^0.0.1-security",
+    "util": "^0.12.4"
   }
 }
