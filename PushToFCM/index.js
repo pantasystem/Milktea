@@ -74,7 +74,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
         return res.status(410).end();
     }
 
-    if(res.decodeJson.type != 'notification') {
+    if(req.decodeJson.type != 'notification') {
         return;
     }
     let convertedNotification = notificationBuilder.generateNotification(res, res.decodeJson.body);
@@ -86,7 +86,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             title: convertedNotification.title,
             body: convertedNotification.body,
             type: convertedNotification.type,
-            notificationId: res.decodeJson.body.id,
+            notificationId: req.decodeJson.body.id,
             accountId: accountId
         }
     };
