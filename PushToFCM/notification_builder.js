@@ -17,6 +17,13 @@ function buildTitle(res, notification) {
         return res.__('title.reaction', {name : getDisplayUserName(notification.user), reaction: notification.reaction });
     }
 
+    if(notification.type == notificationType.follow 
+        || notification.type == notificationType.receiveFollowRequest
+        || notification.type == notificationType.followRequestAccepted
+        || notification.type == notificationType.followRequestAccepted
+    ) {
+        return res.__(`title.${notification.type}`);
+    } 
     return res.__(`title.${notification.type}`, {name: getDisplayUserName(notification.user)});
 }
 

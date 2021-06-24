@@ -1,14 +1,14 @@
 {
     "title": {
-        "follow": "{{name}}さんにフォローされました",
+        "follow": "フォローされました",
         "mention": "{{name}}からメンションがきました",
         "reply": "{{name}}さんから返信がきました",
         "renote": "{{name}}さんにリノートされました",
         "quote": "{{name}}さんに引用されました",
         "reaction": "{{reaction}}:{{name}}",
         "pollVote": "{{name}}さんが投票しました",
-        "receiveFollowRequest": "{{name}}さんからフォローリクエストを受け取りました",
-        "followRequestAccepted": "{{name}}さんがフォローリクエストを承認しました"
+        "receiveFollowRequest": "フォローリクエストを受け取りました",
+        "followRequestAccepted": "フォローリクエストを承認しました"
     },
     "test": {
         "message": "てすと"
