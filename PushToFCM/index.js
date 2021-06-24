@@ -3,7 +3,7 @@ const app = express();
 const Concat = require('concat-stream');
 const fs = require('fs');
 const i18n = require('i18n');
-const notificationBuilder = require(__dirname + '/notification_builder');
+const notificationBuilder = require('./notification_builder');
 
 const webPushDecipher = require('./webPushDecipher.js');
 
@@ -75,6 +75,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     }
 
     if(res.json.type != 'notification') {
+        console.warn('notification以外のメッセージ');
         return;
     }
     let convertedNotification = notificationBuilder.generateNotification(res, res.json.body);
