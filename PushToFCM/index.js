@@ -92,7 +92,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             noteId: req.decodeJson.body.noteId
         }
     };
-    console.log(data);
+    console.log(message);
     
     messaging.send(message).then((res)=>{
         console.log(`send:${res}`);
