@@ -52,7 +52,7 @@ const decodeBodyMiddleware = (req, res, next) => {
     }
     const converted = rawBody.toString('base64');
     const key = webPushDecipher.buildReciverKey(PUBLICK_KEY, PRIVATE_KEY, AUTH_SECRET);
-    let decrypted = webPushDecipher.decrypt(converted, key, true);
+    let decrypted = webPushDecipher.decrypt(converted, key, false);
     req.rawJson = decrypted;
     next();
 }
@@ -92,6 +92,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             noteId: req.decodeJson.body.noteId
         }
     };
+    console.log(data);
     
     messaging.send(message).then((res)=>{
         console.log(`send:${res}`);
