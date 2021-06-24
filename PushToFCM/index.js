@@ -88,10 +88,14 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             type: convertedNotification.type,
             notificationId: req.decodeJson.body.id,
             accountId: accountId,
-            userId: req.decodeJson.body.userId,
-            noteId: req.decodeJson.body.noteId
         }
     };
+    if(req.decodeJson.body.noteId != null) {
+        message.data.noteId = req.decodeJson.body.noteId;
+    }
+    if(req.decodeJson.body.userId != null) {
+        message.data.userId = req.decodeJson.body.userId;
+    }
     console.log(message);
     
     messaging.send(message).then((res)=>{
