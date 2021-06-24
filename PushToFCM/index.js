@@ -87,7 +87,9 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             body: convertedNotification.body,
             type: convertedNotification.type,
             notificationId: req.decodeJson.body.id,
-            accountId: accountId
+            accountId: accountId,
+            userId: req.decodeJson.body.userId,
+            noteId: req.decodeJson.body.noteId
         }
     };
     
