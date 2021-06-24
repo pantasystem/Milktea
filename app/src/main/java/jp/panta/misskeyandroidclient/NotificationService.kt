@@ -64,7 +64,7 @@ class NotificationService : Service() {
         val miApplication = applicationContext
         if(miApplication is MiApplication){
 
-            miApplication.getAccounts().flatMapLatest { acList ->
+            /*miApplication.getAccounts().flatMapLatest { acList ->
                 acList.map{ a ->
                     miApplication.getChannelAPI(a).connect(ChannelAPI.Type.MAIN).map {
                         a to it
@@ -80,7 +80,7 @@ class NotificationService : Service() {
                 val notification = miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
                 showNotification(notification)
             }.launchIn(coroutineScope + Dispatchers.IO)
-
+            */
 
             miApplication.messageStreamFilter.getAllMergedAccountMessages().onEach {
                 val msgRelation = miApplication.getGetters().messageRelationGetter.get(it)
