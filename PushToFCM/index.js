@@ -59,7 +59,7 @@ const decodeBodyMiddleware = (req, res, next) => {
 
 const parseJsonMiddleware = (req, res, next) => {
     try {
-        req.json = JSON.parse(req.rawJson);
+        req.decodeJson = JSON.parse(req.rawJson);
         next();
     }catch(e) {
         console.log('parse error', req.rawJson, e);
@@ -74,11 +74,10 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
         return res.status(410).end();
     }
 
-    if(res.json.type != 'notification') {
-        console.warn('notification以外のメッセージ');
+    if(res.decodeJson.type != 'notification') {
         return;
     }
-    let convertedNotification = notificationBuilder.generateNotification(res, res.json.body);
+    let convertedNotification = notificationBuilder.generateNotification(res, res.decodeJson.body);
 
 
     const message = {
@@ -87,7 +86,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             title: convertedNotification.title,
             body: convertedNotification.body,
             type: convertedNotification.type,
-            notificationId: res.json.body.id,
+            notificationId: res.decodeJson.body.id,
             accountId: accountId
         }
     };
