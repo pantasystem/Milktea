@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "firebase-admin": "^9.9.0",
     "fs": "^0.0.1-security",
+    "i18n": "^0.13.3",
     "urlsafe-base64": "^1.0.0",
     "util": "^0.12.4"
   }

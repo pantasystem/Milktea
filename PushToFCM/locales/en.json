@@ -1,0 +1,17 @@
+{
+    "title": {
+        "follow": "Followed by {{name}}",
+        "mention": "Mentioned by {{name}}",
+        "reply": "Replyed by {{name}}",
+        "renote": "Renoted by {{name}",
+        "quote": "Quoted by {{name}}",
+        "reaction": "{{name}}:{{reaction}}",
+        "pollVote": "Voted by {{name}}",
+        "receiveFollowRequest": "Receive follow request from {{name}}",
+        "followRequestAccepted": "{{name}} accepted the follow request"
+    },
+    
+    "test": {
+        "message": "Test"
+    }
+}

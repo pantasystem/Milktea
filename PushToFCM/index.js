@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const Concat = require('concat-stream');
 const fs = require('fs');
+const i18n = require('i18n');
+const notificationBuilder = require(__dirname + '/notification_builder');
 
 const webPushDecipher = require('./webPushDecipher.js');
 
@@ -15,8 +17,26 @@ admin.initializeApp({
 });
 const messaging = admin.messaging();
 
+i18n.configure({
+    locales: ['ja', 'en'],
+    defaultLocal: 'en',
+    directory: __dirname + "/locales",
+    objectNotation: true
+});
+
+
 console.log('start server');
 
+app.use(i18n.init);
+
+const switchLangMiddleware = (req, _, next) => {
+    if(req.query.lang) {
+        i18n.setLocale(req, req.query.lang);
+    }else{
+        i18n.setLocale(req, 'en');
+    }
+    next();
+}
 
 const rawBodyMiddlware = (req, _, next) => {
     req.pipe(new Concat(function(data) {
@@ -47,25 +67,41 @@ const parseJsonMiddleware = (req, res, next) => {
     }
 }
 
-app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware ,(req, res)=>{
+app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,(req, res)=>{
     let deviceToken = req.query.deviceToken
     let accountId = req.query.accountId;
     if(!(deviceToken && accountId)) {
         return res.status(410).end();
     }
 
-    messaging.sendToDevice(deviceToken, {
+    if(res.json.type != 'notification') {
+        return;
+    }
+    let convertedNotification = notificationBuilder.generateNotification(res, res.json.body);
+
+
+    const message = {
+        token: deviceToken,
         data: {
-            accountId: accountId,
-            body: req.json,
-            src: 'misskey',
+            title: convertedNotification.title,
+            body: convertedNotification.body,
+            type: convertedNotification.type,
+            notificationId: res.json.body.id,
+            accountId: accountId
         }
-    }).then((res)=>{
-        console.log('送信成功');
+    };
+    
+    messaging.send(message).then((res)=>{
+        console.log(`send:${res}`);
     }).catch((e)=>{
-        console.error('fcm送信失敗:', e);
+        console.error('message送信失敗', e);
     });
 
     res.json({status: 'ok'});
 });
+
+app.get('/test', switchLangMiddleware,(req, res)=>{
+    let msg= res.__('test.message');
+    res.json({'msg': msg});
+})
 app.listen(3000);
