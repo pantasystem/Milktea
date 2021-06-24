@@ -7,6 +7,7 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
+import com.google.firebase.messaging.FirebaseMessaging
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.gettters.Getters
@@ -62,6 +63,7 @@ import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.streaming.MediatorMainEventDispatcher
+import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
 import jp.panta.misskeyandroidclient.model.url.*
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -81,7 +83,10 @@ import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -359,6 +364,28 @@ class MiApplication : Application(), MiCore {
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            if(!it.isSuccessful) {
+                return@addOnCompleteListener
+            }
+            it.result?.also { token ->
+                applicationScope.launch(Dispatchers.IO) {
+                    runCatching {
+
+                        SubscriptionRegistration(
+                            getAccountRepository(),
+                            getMetaStore(),
+                            getEncryption(),
+                            getMisskeyAPIProvider(),
+                            deviceToken = token,
+                            lang = Locale.getDefault().displayName
+                        ).registerAll()
+                    }.onFailure {
+                        logger.error("register error", it)
+                    }
+                }
+            }
+        }
     }
 
     override fun getAccounts(): StateFlow<List<Account>> {

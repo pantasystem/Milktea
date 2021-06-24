@@ -17,6 +17,7 @@ internal class SubscriptionRegistration(
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val deviceToken: String,
+    val lang: String,
     val endpointBase: String = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
     val auth: String = BuildConfig.PUSH_TO_FCM_AUTH,
     val publicKey: String = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY
@@ -28,7 +29,7 @@ internal class SubscriptionRegistration(
     suspend fun register(accountId: Long) : SubscriptionState?{
 
         val account = accountRepository.get(accountId)
-        val endpoint = "$endpointBase/webpushcallback?=${deviceToken}&accountId=${account.accountId}"
+        val endpoint = "$endpointBase/webpushcallback?=${deviceToken}&accountId=${account.accountId}&lang=${lang}"
 
         val api = misskeyAPIProvider.get(account.instanceDomain)
         val res = api.swRegister(
