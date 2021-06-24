@@ -17,7 +17,7 @@ function buildTitle(res, notification) {
         return res.__('title.reaction', {name : getDisplayUserName(notification.user), reaction: notification.reaction });
     }
 
-    return res._(`title.${notification.type}`, {name: getDisplayUserName(notification.user)});
+    return res.__(`title.${notification.type}`, {name: getDisplayUserName(notification.user)});
 }
 
 function getShortMessageFromNote(note) {
