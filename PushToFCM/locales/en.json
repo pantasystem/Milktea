@@ -5,7 +5,7 @@
         "reply": "Replyed by {{name}}",
         "renote": "Renoted by {{name}",
         "quote": "Quoted by {{name}}",
-        "reaction": "{{name}}:{{reaction}}",
+        "reaction": "{{reaction}}:{{name}}",
         "pollVote": "Voted by {{name}}",
         "receiveFollowRequest": "Receive follow request from {{name}}",
         "followRequestAccepted": "{{name}} accepted the follow request"

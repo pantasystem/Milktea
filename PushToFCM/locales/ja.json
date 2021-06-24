@@ -5,7 +5,7 @@
         "reply": "{{name}}さんから返信がきました",
         "renote": "{{name}}さんにリノートされました",
         "quote": "{{name}}さんに引用されました",
-        "reaction": "{{name}}:{{reaction}}",
+        "reaction": "{{reaction}}:{{name}}",
         "pollVote": "{{name}}さんが投票しました",
         "receiveFollowRequest": "{{name}}さんからフォローリクエストを受け取りました",
         "followRequestAccepted": "{{name}}さんがフォローリクエストを承認しました"
