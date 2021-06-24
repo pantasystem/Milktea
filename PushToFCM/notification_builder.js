@@ -67,7 +67,7 @@ class MessagingNotification {
 }
 
 
-module.exports = function generateNotification(res, notification) {
+exports.generateNotification = function (res, notification) {
 
     let type = notification.type;
     let title = buildTitle(res, notification);
