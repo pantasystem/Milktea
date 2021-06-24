@@ -77,7 +77,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     if(req.decodeJson.type != 'notification') {
         return;
     }
-    let convertedNotification = notificationBuilder.generateNotification(res, res.decodeJson.body);
+    let convertedNotification = notificationBuilder.generateNotification(res, req.decodeJson.body);
 
 
     const message = {
