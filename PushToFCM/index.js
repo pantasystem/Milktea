@@ -69,8 +69,9 @@ const parseJsonMiddleware = (req, res, next) => {
 
 app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,(req, res)=>{
     let deviceToken = req.query.deviceToken
-    let accountId = req.query.accountId;
-    if(!(deviceToken && accountId)) {
+    let userId = req.query.userId;
+    let host = req.query.host;
+    if(!(deviceToken && userId && host)) {
         return res.status(410).end();
     }
 
@@ -91,7 +92,8 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             body: convertedNotification.body,
             type: convertedNotification.type,
             notificationId: req.decodeJson.body.id,
-            accountId: accountId,
+            host: host,
+            userId: userId
         }
     };
     if(req.decodeJson.body.noteId != null) {
