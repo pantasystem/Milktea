@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient
 
 import android.app.*
 import android.content.Context
+import android.os.Binder as ABinder
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,11 +15,15 @@ import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 
 const val NOTIFICATION_CHANNEL_ID = "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
+const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifications"
 
 
 class FCMService : FirebaseMessagingService() {
 
     private var _isActivityActive = false
+    private val _binder: Binder by lazy {
+        Binder(this)
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -30,6 +35,7 @@ class FCMService : FirebaseMessagingService() {
             override fun onActivityResumed(activity: Activity) = Unit
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
             override fun onActivityStarted(activity: Activity) {
+                Log.d("onActivityStarted", "FCMService")
                 if(activity is MainActivity) {
                     _isActivityActive = true
                 }
@@ -61,15 +67,17 @@ class FCMService : FirebaseMessagingService() {
         val pushNotification = msg.data.toPushNotification()
         val isCurrentAccountsNotification = (application as? MiCore)?.getCurrentAccount()?.value?.accountId == pushNotification.accountId
 
-        if(isCurrentAccountsNotification && _isActivityActive) {
+        //if(isCurrentAccountsNotification && _isActivityActive) {
             // 通知がcurrent accountでプッシュ通知の不要なActivityがActiveな時はこれ以上処理をしない
-            return
-        }
+        //    return
+        //}
         Log.d("FCMService", "pushNotification:$pushNotification")
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
         builder.setContentTitle(pushNotification.title)
             .setContentText(pushNotification.body)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
+            .setGroup(GROUP_KEY_MISSKEY_NOTIFICATION)
+            .setGroupSummary(true)
 
         /*when(pushNotification.type) {
             "follow" -> {
@@ -105,6 +113,12 @@ class FCMService : FirebaseMessagingService() {
         }
         return notificationManager
 
+    }
+
+    class Binder(private val fcmService: FCMService) : ABinder() {
+        fun getService () : FCMService {
+            return fcmService
+        }
     }
 
 }
