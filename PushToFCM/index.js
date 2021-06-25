@@ -72,6 +72,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     let userId = req.query.userId;
     let host = req.query.host;
     if(!(deviceToken && userId && host)) {
+        console.warn('無効な値');
         return res.status(410).end();
     }
 
