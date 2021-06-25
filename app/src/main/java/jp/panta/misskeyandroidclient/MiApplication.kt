@@ -377,14 +377,17 @@ class MiApplication : Application(), MiCore {
                             getMetaStore(),
                             getEncryption(),
                             getMisskeyAPIProvider(),
+                            loggerFactory = loggerFactory,
                             deviceToken = token,
                             lang = Locale.getDefault().displayName
                         ).registerAll()
-                    }.onFailure {
-                        logger.error("register error", it)
+                    }.onFailure { e ->
+                        logger.error("register error", e)
                     }
                 }
             }
+        }.addOnFailureListener {
+            logger.debug("fcm token取得失敗", e = it)
         }
     }
 

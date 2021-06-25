@@ -48,6 +48,7 @@ const rawBodyMiddlware = (req, _, next) => {
 const decodeBodyMiddleware = (req, res, next) => {
     let rawBody = req.rawBody;
     if (!rawBody) { 
+        console.log('Invalid Body');
         return res.status(200).send('Invalid Body.').end(); 
     }
     const converted = rawBody.toString('base64');
@@ -68,10 +69,10 @@ const parseJsonMiddleware = (req, res, next) => {
 }
 
 app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,(req, res)=>{
-    let deviceToken = req.query.deviceToken
-    let userId = req.query.userId;
-    let host = req.query.host;
-    if(!(deviceToken && userId && host)) {
+    let deviceToken = req.query.deviceToken;
+    let accountId = req.query.accountId;
+    console.log('call webpushcallback');
+    if(!(deviceToken && accountId)) {
         console.warn('無効な値');
         return res.status(410).end();
     }
@@ -93,8 +94,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             body: convertedNotification.body,
             type: convertedNotification.type,
             notificationId: req.decodeJson.body.id,
-            host: host,
-            userId: userId
+            accountId: accountId
         }
     };
     if(req.decodeJson.body.noteId != null) {
@@ -114,7 +114,7 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     res.json({status: 'ok'});
 });
 
-app.get('/test', switchLangMiddleware,(req, res)=>{
+app.get('/health', switchLangMiddleware,(req, res)=>{
     let msg= res.__('test.message');
     res.json({'msg': msg});
 })
