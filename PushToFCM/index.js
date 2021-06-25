@@ -82,6 +82,10 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
 
     const message = {
         token: deviceToken,
+        notification: {
+            title: convertedNotification.title,
+            body: convertedNotification.body
+        },
         data: {
             title: convertedNotification.title,
             body: convertedNotification.body,
