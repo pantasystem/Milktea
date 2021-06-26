@@ -17,9 +17,6 @@ const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifi
 
 class FCMService : FirebaseMessagingService() {
 
-    private val _binder: Binder by lazy {
-        Binder(this)
-    }
 
 
     override fun onNewToken(token: String) {
@@ -87,10 +84,6 @@ class FCMService : FirebaseMessagingService() {
 
     }
 
-    class Binder(private val fcmService: FCMService) : ABinder() {
-        fun getService () : FCMService {
-            return fcmService
-        }
-    }
+
 
 }
