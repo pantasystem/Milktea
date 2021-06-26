@@ -107,7 +107,8 @@ class NotificationViewModel(
                 viewDataList.forEach {
                     it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
                 }
-                miCore.getNotificationDataSource().readAllNotification(account.accountId)
+                miCore.getUnreadNotificationDAO().deleteWhereAccountId(account.accountId)
+
                 viewDataList
             }.onSuccess {
                 notifications = it

@@ -58,6 +58,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSou
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
+import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.notification.impl.MediatorNotificationDataSource
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -189,6 +190,8 @@ class MiApplication : Application(), MiCore {
         AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
     }
 
+    private lateinit var _unreadNotificationDAO: UnreadNotificationDAO
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate() {
@@ -227,6 +230,8 @@ class MiApplication : Application(), MiCore {
         mEncryption = KeyStoreSystemEncryption(this)
 
         urlPreviewDAO = database.urlPreviewDAO()
+
+        _unreadNotificationDAO = database.unreadNotificationDAO()
 
         metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
 
@@ -448,6 +453,8 @@ class MiApplication : Application(), MiCore {
     override fun getGetters(): Getters {
         return mGetters
     }
+
+    override fun getUnreadNotificationDAO() = _unreadNotificationDAO
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->

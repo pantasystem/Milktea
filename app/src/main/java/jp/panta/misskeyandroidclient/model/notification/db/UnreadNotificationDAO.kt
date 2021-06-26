@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.notification.db
 
 import androidx.room.*
 import jp.panta.misskeyandroidclient.model.notification.AccountNotificationCount
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class UnreadNotificationDAO {
@@ -12,15 +13,19 @@ abstract class UnreadNotificationDAO {
     @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId AND notificationId = :notificationId")
     abstract suspend fun delete(accountId: Long, notificationId: String)
 
-    @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId")
-    abstract suspend fun deleteByAccountId(accountId: Long)
+
 
     @Query("SELECT un.accountId AS accountId, COUNT(un.notificationId) AS count FROM unread_notifications_table AS un GROUP BY un.accountId")
-    abstract suspend fun countByAccount(): List<AccountNotificationCount>
+    abstract fun countByAccount(): Flow<List<AccountNotificationCount>>
+
+
 
     @Query("SELECT COUNT(*) FROM unread_notifications_table WHERE accountId = :accountId")
-    abstract suspend fun countByAccountId(accountId: Long): Int
+    abstract fun countByAccountId(accountId: Long) : Flow<Int>
 
     @Query("SELECT * FROM unread_notifications_table WHERE accountId = :accountId")
     abstract suspend fun findByAccountId(accountId: Long): List<UnreadNotification>
+
+    @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId")
+    abstract suspend fun deleteWhereAccountId(accountId: Long)
 }
