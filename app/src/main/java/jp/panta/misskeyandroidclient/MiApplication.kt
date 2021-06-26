@@ -379,7 +379,7 @@ class MiApplication : Application(), MiCore {
                             getMisskeyAPIProvider(),
                             loggerFactory = loggerFactory,
                             deviceToken = token,
-                            lang = Locale.getDefault().displayName
+                            lang = Locale.getDefault().language
                         ).registerAll()
                     }.onFailure { e ->
                         logger.error("register error", e)

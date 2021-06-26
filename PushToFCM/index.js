@@ -8,7 +8,7 @@ const notificationBuilder = require('./notification_builder');
 const webPushDecipher = require('./webPushDecipher.js');
 
 const AUTH_SECRET = fs.readFileSync('./key/auth_secret.txt', 'utf8');
-const PUBLICK_KEY = fs.readFileSync('./key/public_key.txt', 'utf8');
+const PUBLIC_KEY = fs.readFileSync('./key/public_key.txt', 'utf8');
 const PRIVATE_KEY = fs.readFileSync('./key/private_key.txt', 'utf8');
 
 const admin = require('firebase-admin');
@@ -52,7 +52,8 @@ const decodeBodyMiddleware = (req, res, next) => {
         return res.status(200).send('Invalid Body.').end(); 
     }
     const converted = rawBody.toString('base64');
-    const key = webPushDecipher.buildReciverKey(PUBLICK_KEY, PRIVATE_KEY, AUTH_SECRET);
+    const key = webPushDecipher.buildReciverKey(PUBLIC_KEY, PRIVATE_KEY, AUTH_SECRET);
+    //console.log(`public_key:${PUBLIC_KEY}, private_key:${PRIVATE_KEY}, auth_secret:${AUTH_SECRET}`);
     let decrypted = webPushDecipher.decrypt(converted, key, false);
     req.rawJson = decrypted;
     next();
