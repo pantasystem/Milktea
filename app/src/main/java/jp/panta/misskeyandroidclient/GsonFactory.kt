@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.content.Intent
 import com.google.gson.*
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -14,18 +15,18 @@ import java.util.*
 object GsonFactory {
     private val gson = GsonBuilder()
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-        .registerTypeAdapter(LocalDateTime::class.java, object : TypeAdapter<LocalDateTime?>() {
-            override fun read(jsonReader: JsonReader?): LocalDateTime? {
+        .registerTypeAdapter(Instant::class.java, object : TypeAdapter<Instant?>() {
+            override fun read(jsonReader: JsonReader?): Instant? {
                 if(jsonReader?.peek() == JsonToken.NULL) {
                     return null
                 }
                 return jsonReader?.nextString()?.let { dateTime ->
-                    LocalDateTime.parse(dateTime)
-                } ?: Clock.System.now().toLocalDateTime(TimeZone.UTC)
+                    return Instant.parse(dateTime)
+                } ?: Clock.System.now()
             }
 
-            override fun write(out: JsonWriter?, value: LocalDateTime?) {
-                out?.value(value?.toInstant(TimeZone.UTC).toString())
+            override fun write(out: JsonWriter?, value: Instant?) {
+                out?.value(value.toString())
             }
         })
         .create()

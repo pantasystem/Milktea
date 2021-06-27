@@ -11,6 +11,10 @@ import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.serializers.InstantIso8601Serializer
+import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
 import kotlinx.serialization.Serializable
 import java.io.Serializable as JavaSerializable
 import java.util.Date
@@ -19,7 +23,7 @@ import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
 @Serializable
 data class MessageDTO(
     val id: String,
-    @Serializable(with = DateSerializer::class) val createdAt: Date,
+    @Serializable(with = InstantIso8601Serializer::class) val createdAt: Instant,
     val text: String? = null,
     val userId: String,
     val user: UserDTO,

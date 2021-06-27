@@ -13,17 +13,19 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.serializers.InstantIso8601Serializer
+import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
 import kotlinx.serialization.SerialName
 import java.io.Serializable
-import java.util.*
 import kotlin.collections.LinkedHashMap
 
 @kotlinx.serialization.Serializable
 data class NoteDTO(
     val id: String,
     //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date,
-    @kotlinx.serialization.Serializable(with = DateSerializer::class) val createdAt: Date,
+    @kotlinx.serialization.Serializable(with = InstantIso8601Serializer::class) val createdAt: Instant,
     val text: String? = null,
     val cw: String? = null,
     val userId: String,

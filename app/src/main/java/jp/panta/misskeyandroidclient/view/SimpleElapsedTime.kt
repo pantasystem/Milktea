@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.util.date.toCurrentLocaleDate
+import kotlinx.datetime.*
+import kotlinx.datetime.TimeZone
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -15,14 +17,14 @@ class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
     }
 
     // 送られてくる時間はUS
-    fun format(date: Date): String{
+    fun format(date: Instant): String{
 
         val nowDate = Date()
+        val epoch = date.toEpochMilliseconds()
+        val nowEpoch = Clock.System.now().toEpochMilliseconds()
 
-        val formatter = GsonFactory.createSimpleDateFormat()
-        val nowUtcDate = nowDate.toCurrentLocaleDate()
 
-        return when(val elapsedMilliTime = nowUtcDate.time - date.time){
+        return when(val elapsedMilliTime = nowEpoch - epoch){
             in Long.MIN_VALUE until 5 * 1000 ->{
                 // 5秒未満
                 getString.invoke(TimeUnit.FUTURE)

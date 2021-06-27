@@ -80,7 +80,7 @@
                     android:id="@+id/updated_at"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    app:elapsedTime="@{historyViewData.message.message.createdAt}"
+                    elapsedTime="@{historyViewData.message.message.createdAt}"
                     tools:text="13m"
                     android:layout_below="@id/history_message"
                     android:layout_toEndOf="@id/message_image"

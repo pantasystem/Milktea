@@ -7,6 +7,8 @@ import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.util.date.toCurrentLocaleDate
 import jp.panta.misskeyandroidclient.view.SimpleElapsedTime
+import kotlinx.datetime.*
+import kotlinx.datetime.TimeZone
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,8 +32,8 @@ object DateFormatHelper {
 
     @BindingAdapter("elapsedTime")
     @JvmStatic
-    fun TextView.setElapsedTime(elapsedTime: Date?){
-        val date = elapsedTime?: Date()
+    fun TextView.setElapsedTime(elapsedTime: Instant?){
+
         val simpleElapsedTime = SimpleElapsedTime{
             when(it){
                 SimpleElapsedTime.TimeUnit.YEAR -> context.getString(R.string.year_ago)
@@ -44,13 +46,14 @@ object DateFormatHelper {
                 SimpleElapsedTime.TimeUnit.FUTURE -> context.getString(R.string.future)
             }
         }
-        this.text = simpleElapsedTime.format(date)
+        this.text = simpleElapsedTime.format(elapsedTime ?: Clock.System.now())
     }
 
     @BindingAdapter("createdAt")
     @JvmStatic
-    fun TextView.setCreatedAt(createdAt: Date?){
-        val date = createdAt?: Date()
-        this.text = SimpleDateFormat.getDateTimeInstance().format(date.toCurrentLocaleDate())
+    fun TextView.setCreatedAt(createdAt: Instant?){
+        val date = createdAt?: Clock.System.now()
+        val javaDate = Date(date.toEpochMilliseconds())
+        this.text = SimpleDateFormat.getDateTimeInstance().format(javaDate)
     }
 }

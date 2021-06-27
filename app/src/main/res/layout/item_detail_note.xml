@@ -282,7 +282,7 @@
                     android:id="@+id/elapsed_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:createdAt="@{note.toShowNote.note.createdAt}"
+                    createdAt="@{note.toShowNote.note.createdAt}"
                     android:layout_below="@id/contentMain"
                     tools:text="10秒前"
                     android:singleLine="true"

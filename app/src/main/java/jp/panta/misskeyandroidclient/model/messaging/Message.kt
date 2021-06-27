@@ -2,14 +2,14 @@ package jp.panta.misskeyandroidclient.model.messaging
 
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserRepository
-import java.util.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 
 
 sealed class Message{
@@ -19,7 +19,7 @@ sealed class Message{
     ) : EntityId
 
     abstract val id: Id
-    abstract val createdAt: Date
+    abstract val createdAt: Instant
     abstract val text: String?
     abstract val userId: User.Id
     abstract val fileId: String?
@@ -43,7 +43,7 @@ sealed class Message{
 
     data class Group(
         override val id: Id,
-        override val createdAt: Date,
+        override val createdAt: Instant,
         override val text: String?,
         override val userId: User.Id,
         override val fileId: String?,
@@ -62,7 +62,7 @@ sealed class Message{
      */
     data class Direct(
         override val id: Id,
-        override val createdAt: Date,
+        override val createdAt: Instant,
         override val text: String?,
         override val userId: User.Id,
         override val fileId: String?,

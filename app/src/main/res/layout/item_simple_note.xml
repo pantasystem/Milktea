@@ -74,7 +74,7 @@
                 android:layout_marginStart="8dp"
                 android:singleLine="true"
                 android:ellipsize="end"
-                app:elapsedTime="@{note.toShowNote.note.createdAt}"
+                elapsedTime="@{note.toShowNote.note.createdAt}"
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"

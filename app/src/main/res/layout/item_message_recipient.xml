@@ -83,7 +83,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="8dp"
                 tools:text="10秒前"
-                app:elapsedTime="@{message.message.message.createdAt}"
+                elapsedTime="@{message.message.message.createdAt}"
 
                 />
 

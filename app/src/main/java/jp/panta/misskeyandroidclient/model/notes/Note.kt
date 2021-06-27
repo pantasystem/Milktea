@@ -8,12 +8,14 @@ import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import java.util.*
 import java.io.Serializable as JSerializable
 
 data class Note(
     val id: Id,
-    val createdAt: Date,
+    val createdAt: Instant,
     val text: String?,
     val cw: String?,
     val userId: User.Id,

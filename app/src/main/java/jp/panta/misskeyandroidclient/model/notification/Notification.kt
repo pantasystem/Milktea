@@ -1,21 +1,15 @@
 package jp.panta.misskeyandroidclient.model.notification
 
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.serializations.DateSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import java.util.*
-
+import kotlinx.datetime.Instant
 
 
 sealed class Notification {
     abstract val id: Id
     abstract val userId: User.Id
-    abstract val createdAt: Date
+    abstract val createdAt: Instant
     abstract val isRead: Boolean
 
     abstract fun read(): Notification
@@ -34,7 +28,7 @@ interface HasNote {
 data class FollowNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val isRead: Boolean
 ) : Notification() {
@@ -46,7 +40,7 @@ data class FollowNotification(
 data class FollowRequestAcceptedNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val isRead: Boolean
 
@@ -59,7 +53,7 @@ data class FollowRequestAcceptedNotification(
 data class ReceiveFollowRequestNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val isRead: Boolean
 
@@ -72,7 +66,7 @@ data class ReceiveFollowRequestNotification(
 data class MentionNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
@@ -87,7 +81,7 @@ data class MentionNotification(
 data class ReplyNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
@@ -101,7 +95,7 @@ data class ReplyNotification(
 data class RenoteNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
@@ -115,7 +109,7 @@ data class RenoteNotification(
 data class QuoteNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
@@ -129,7 +123,7 @@ data class QuoteNotification(
 data class ReactionNotification(
     override val id: Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     override val noteId: Note.Id,
     val reaction: String,
@@ -145,7 +139,7 @@ data class PollVoteNotification(
     override val id: Id,
     override val noteId: Note.Id,
 
-    override val createdAt: Date,
+    override val createdAt: Instant,
     override val userId: User.Id,
     val choice: Int,
     override val isRead: Boolean
