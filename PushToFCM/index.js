@@ -98,8 +98,8 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
             accountId: accountId
         }
     };
-    if(req.decodeJson.body.noteId != null) {
-        message.data.noteId = req.decodeJson.body.noteId;
+    if(req.decodeJson.body.note != null) {
+        message.data.noteId = req.decodeJson.body.note.id;
     }
     if(req.decodeJson.body.userId != null) {
         message.data.userId = req.decodeJson.body.userId;
