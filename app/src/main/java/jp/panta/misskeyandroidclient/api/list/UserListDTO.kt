@@ -3,14 +3,14 @@ package jp.panta.misskeyandroidclient.api.list
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.datetime.Instant
+import kotlinx.datetime.serializers.InstantIso8601Serializer
 import java.io.Serializable
-import java.util.Date
 
 @kotlinx.serialization.Serializable
 data class UserListDTO(
     val id: String,
-    @kotlinx.serialization.Serializable(with = DateSerializer::class) val createdAt: Date,
+    @kotlinx.serialization.Serializable(with = InstantIso8601Serializer::class) val createdAt: Instant,
     val name: String,
     val userIds: List<String>
 ) : Serializable {

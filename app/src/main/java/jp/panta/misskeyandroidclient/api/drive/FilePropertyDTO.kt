@@ -5,6 +5,8 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.datetime.Instant
+import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.io.Serializable
 import java.util.*
@@ -13,7 +15,7 @@ import java.util.*
 data class FilePropertyDTO(
     val id: String,
     //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date?,
-    @kotlinx.serialization.Serializable(with = DateSerializer::class) val createdAt: Date,
+    @kotlinx.serialization.Serializable(with = InstantIso8601Serializer::class) val createdAt: Instant,
     val name: String,
     val type: String,
     val md5: String,

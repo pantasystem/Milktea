@@ -2,13 +2,14 @@ package jp.panta.misskeyandroidclient.model.drive
 
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
+import kotlinx.datetime.Instant
 import java.io.Serializable as JSerializable
 import java.util.*
 
 data class FileProperty (
     val id: Id,
     val name: String,
-    val createdAt: Date,
+    val createdAt: Instant,
     val type: String,
     val md5: String,
     val size: Int,
