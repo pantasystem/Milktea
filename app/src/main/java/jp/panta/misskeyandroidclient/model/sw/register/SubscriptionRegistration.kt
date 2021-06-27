@@ -13,12 +13,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
-internal class SubscriptionRegistration(
+class SubscriptionRegistration(
     val accountRepository: AccountRepository,
     val metaStore: MetaStore,
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val deviceToken: String,
     val lang: String,
     loggerFactory: Logger.Factory,
     val endpointBase: String = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
@@ -30,7 +29,7 @@ internal class SubscriptionRegistration(
     /**
      * 特定のアカウントをsw/registerに登録します。
      */
-    suspend fun register(accountId: Long) : SubscriptionState?{
+    suspend fun register(deviceToken: String, accountId: Long) : SubscriptionState?{
 
         logger.debug("call register(accountId:$accountId)")
         val account = accountRepository.get(accountId)
@@ -55,13 +54,13 @@ internal class SubscriptionRegistration(
      * 全てのアカウントをsw/registerに登録します。
      * @return 成功件数
      */
-    suspend fun registerAll() : Int{
+    suspend fun registerAll(deviceToken: String) : Int{
         val accounts = accountRepository.findAll()
         return coroutineScope {
             accounts.map {
                 async {
                     val result: SubscriptionState? = runCatching {
-                        register(it.accountId)
+                        register(deviceToken, it.accountId)
                     }.onFailure {
                         logger.error("sw/registerに失敗しました", it)
                     }.getOrNull()

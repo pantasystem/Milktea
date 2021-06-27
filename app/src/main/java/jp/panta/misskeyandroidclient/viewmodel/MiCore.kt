@@ -33,6 +33,7 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
+import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -82,6 +83,8 @@ interface MiCore{
     fun getGroupRepository(): GroupRepository
 
     fun getFilePropertyDataSource() : FilePropertyDataSource
+
+    fun getSubscriptionRegistration() : SubscriptionRegistration
 
     suspend fun setCurrentAccount(account: Account)
 

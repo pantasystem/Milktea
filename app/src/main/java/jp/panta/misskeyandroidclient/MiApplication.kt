@@ -192,6 +192,17 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var _unreadNotificationDAO: UnreadNotificationDAO
 
+    private val _subscribeRegistration: SubscriptionRegistration by lazy {
+        SubscriptionRegistration(
+            getAccountRepository(),
+            getMetaStore(),
+            getEncryption(),
+            getMisskeyAPIProvider(),
+            lang = Locale.getDefault().language,
+            loggerFactory
+        )
+    }
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate() {
@@ -376,16 +387,7 @@ class MiApplication : Application(), MiCore {
             it.result?.also { token ->
                 applicationScope.launch(Dispatchers.IO) {
                     runCatching {
-
-                        SubscriptionRegistration(
-                            getAccountRepository(),
-                            getMetaStore(),
-                            getEncryption(),
-                            getMisskeyAPIProvider(),
-                            loggerFactory = loggerFactory,
-                            deviceToken = token,
-                            lang = Locale.getDefault().language
-                        ).registerAll()
+                        getSubscriptionRegistration().registerAll(token)
                     }.onFailure { e ->
                         logger.error("register error", e)
                     }
@@ -643,6 +645,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getGalleryRepository(): GalleryRepository {
         return mGalleryRepository
+    }
+
+    override fun getSubscriptionRegistration(): SubscriptionRegistration {
+        return _subscribeRegistration
     }
 
     private suspend fun loadAndInitializeAccounts(){
