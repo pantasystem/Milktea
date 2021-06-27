@@ -25,10 +25,10 @@ object StatusMessageHelper {
         val context = this.context
         val message = when{
             note.reply != null ->{
-                "$name " + context.getString(R.string.replied_by)
+                context.getString(R.string.replied_by, name)
             }
             note.note.isRenote() && !note.note.hasContent() ->{
-                "$name " + context.getString(R.string.renoted_by)
+                context.getString(R.string.renoted_by, name)
             }
             note is NoteRelation.Featured -> {
                 context.getString(R.string.featured)
