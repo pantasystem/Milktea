@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 
 class NoteDataSourceAdder(
     private val userDataSource: UserDataSource,
@@ -22,4 +23,8 @@ class NoteDataSourceAdder(
         filePropertyDataSource.addAll(entities.files)
         return entities.note
     }
+}
+
+fun MiCore.getNoteDataSourceAdder() : NoteDataSourceAdder{
+    return NoteDataSourceAdder(getUserDataSource(), getNoteDataSource(), getFilePropertyDataSource())
 }
