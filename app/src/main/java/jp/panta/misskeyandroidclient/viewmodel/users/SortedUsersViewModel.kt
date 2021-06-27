@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.users
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.notes.getNoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
@@ -20,6 +21,8 @@ class SortedUsersViewModel(
     val orderBy: UserRequestConditions = type?.conditions?: orderBy!!
 
     val logger = miCore.loggerFactory.create("SortedUsersViewModel")
+
+    val noteDataSourceAdder = miCore.getNoteDataSourceAdder()
 
     class Factory(val miCore: MiCore, val type: Type?, private val orderBy: UserRequestConditions?) : ViewModelProvider.Factory{
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -120,6 +123,9 @@ class SortedUsersViewModel(
             runCatching { miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).body() }
                 .map {
                     it?.map{ dto ->
+                        dto.pinnedNotes?.map { noteDTO ->
+                            noteDataSourceAdder.addNoteDtoToDataSource(account, noteDTO)
+                        }
                         dto.toUser(account, true).also{ u ->
                             miCore.getUserDataSource().add(u)
                         }

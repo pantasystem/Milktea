@@ -57,6 +57,8 @@ class UserDetailViewModel(
             it.map {  n ->
                 n.eventFlow
             }.merge()
+        }.catch { e ->
+            logger.warning("", e = e)
         }.launchIn(viewModelScope + dispatcher)
     }
 
