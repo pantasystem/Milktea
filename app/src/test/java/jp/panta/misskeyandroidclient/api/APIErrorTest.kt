@@ -2,13 +2,10 @@ package jp.panta.misskeyandroidclient.api
 
 import jp.panta.misskeyandroidclient.api.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import kotlin.jvm.Throws
 
 class APIErrorTest {
 

@@ -58,19 +58,9 @@ class InMemoryNotificationDataSource : NotificationDataSource{
         }
     }
 
-    override suspend fun countUnreadNotification(accountId: Long): Int {
-        return countUnreadNotificationByAccount(accountId)
-    }
 
-    override suspend fun readAllNotification(accountId: Long) {
-        findAllByAccountId(accountId).filter {
-            !it.isRead
-        }.map{
-            it.read()
-        }.forEach {
-            add(it)
-        }
-    }
+
+
 
 
     private suspend fun countUnreadNotificationByAccount(accountId: Long): Int {

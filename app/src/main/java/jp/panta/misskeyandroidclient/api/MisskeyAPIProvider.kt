@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.api
 
 
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.api.Version
 
 /**

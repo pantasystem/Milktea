@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.api
+package jp.panta.misskeyandroidclient.api
 
 import com.google.gson.JsonSyntaxException
 import jp.panta.misskeyandroidclient.GsonFactory

@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.api.list.*
 import jp.panta.misskeyandroidclient.api.notes.*
 import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
 import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.app.ShowApp
@@ -23,6 +23,8 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.sw.register.Subscription
+import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
@@ -30,7 +32,7 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 
-open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI{
+open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI {
     override suspend fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
 
     override suspend fun children(noteRequest: NoteRequest) = misskey.children(noteRequest)
@@ -149,4 +151,6 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
     override suspend fun getUsers(requestUser: RequestUser): Response<List<UserDTO>> = misskey.getUsers(requestUser)
 
     override suspend fun reactions(body: RequestReactionHistoryDTO): Response<List<ReactionHistoryDTO>> = misskey.reactions(body)
+
+    override suspend fun swRegister(subscription: Subscription): Response<SubscriptionState> = misskey.swRegister(subscription)
 }

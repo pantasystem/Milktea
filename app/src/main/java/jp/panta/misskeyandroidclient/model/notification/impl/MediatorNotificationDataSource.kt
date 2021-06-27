@@ -30,9 +30,6 @@ class MediatorNotificationDataSource(
         inMemoryNotificationDataSource.addEventListener(listener)
     }
 
-    override suspend fun countUnreadNotification(accountId: Long): Int {
-        return unreadNotificationDAO.countByAccountId(accountId)
-    }
 
     override suspend fun get(notificationId: Notification.Id): Notification {
         return inMemoryNotificationDataSource.get(notificationId)
@@ -46,7 +43,5 @@ class MediatorNotificationDataSource(
         inMemoryNotificationDataSource.removeEventListener(listener)
     }
 
-    override suspend fun readAllNotification(accountId: Long) {
-        unreadNotificationDAO.deleteByAccountId(accountId)
-    }
+
 }

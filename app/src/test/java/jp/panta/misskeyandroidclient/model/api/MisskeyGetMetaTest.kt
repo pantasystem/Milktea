@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.api
 
+import jp.panta.misskeyandroidclient.api.MisskeyGetMeta
 import org.junit.Test
 
 class MisskeyGetMetaTest{

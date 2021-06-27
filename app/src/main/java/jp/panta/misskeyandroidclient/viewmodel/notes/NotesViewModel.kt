@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.api.notes.State
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
@@ -321,8 +321,7 @@ class NotesViewModel(
                     ?.throwIfHasError()
                 val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
                 if(nowNoteId == planeNoteViewData.toShowNote.note.id.noteId){
-                    val state = response?.body()
-                    requireNotNull(state)
+                    val state = response?.body()!!
                     Log.d(TAG, "state: $state")
                     shareNoteState.postValue(state)
                 }

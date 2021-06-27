@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient.api
 
 import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.api.MisskeyAuthAPI
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
 import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10Diff
@@ -33,7 +31,7 @@ object MisskeyAPIServiceBuilder {
             .build()
             .create(MisskeyAuthAPI::class.java)
 
-    fun build(baseUrl: String, version: Version): MisskeyAPI{
+    fun build(baseUrl: String, version: Version): MisskeyAPI {
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))

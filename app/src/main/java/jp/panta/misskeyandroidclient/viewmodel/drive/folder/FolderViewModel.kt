@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.drive.CreateFolder
 import jp.panta.misskeyandroidclient.api.drive.RequestFolder
 import kotlinx.coroutines.Dispatchers

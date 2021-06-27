@@ -5,13 +5,12 @@ import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.toUser
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import retrofit2.Call
 import retrofit2.Response
 
 @Suppress("BlockingMethodInNonBlockingContext")

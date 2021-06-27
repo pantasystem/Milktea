@@ -8,15 +8,12 @@ import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.notification.FollowRequestAcceptedNotification
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
 import jp.panta.misskeyandroidclient.model.notification.ReceiveFollowRequestNotification
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthImpl
 import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -110,7 +107,8 @@ class NotificationViewModel(
                 viewDataList.forEach {
                     it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
                 }
-                miCore.getNotificationDataSource().readAllNotification(account.accountId)
+                miCore.getUnreadNotificationDAO().deleteWhereAccountId(account.accountId)
+
                 viewDataList
             }.onSuccess {
                 notifications = it

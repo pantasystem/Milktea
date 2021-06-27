@@ -10,7 +10,7 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.messaging.MessageHistoryRelation
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.messaging.toHistory
@@ -149,7 +149,7 @@ class MessageHistoryViewModel(
         messageHistorySelected.event = messageHistory
     }
 
-    private fun getMisskeyAPI(): MisskeyAPI{
+    private fun getMisskeyAPI(): MisskeyAPI {
         return miCore.getMisskeyAPI(account)
     }
 

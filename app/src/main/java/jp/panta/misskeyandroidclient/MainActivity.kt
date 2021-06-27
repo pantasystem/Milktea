@@ -1,11 +1,8 @@
 package jp.panta.misskeyandroidclient
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
@@ -35,7 +32,6 @@ import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streaming.stateEvent
 import jp.panta.misskeyandroidclient.model.users.User
@@ -55,13 +51,10 @@ import jp.panta.misskeyandroidclient.view.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.view.strings_helper.webSocketStateMessageScope
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -74,7 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var mBottomNavigationAdapter: MainBottomNavigationAdapter? = null
 
 
-    private var mNotificationService: NotificationService? = null
+    private var fcmService: FCMService? = null
 
     private var mSettingStore: SettingStore? = null
 
@@ -142,20 +135,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }.launchIn(lifecycleScope)
 
-        miApplication.connectionStatus.observe(this, { status ->
-            when(status){
+        miApplication.connectionStatus.observe(this) { status ->
+            when (status) {
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
-                ConnectionStatus.ACCOUNT_ERROR ->{
+                ConnectionStatus.ACCOUNT_ERROR -> {
                     startActivity(Intent(this, AuthorizationActivity::class.java))
 
                     finish()
                 }
-                ConnectionStatus.NETWORK_ERROR ->{
+                ConnectionStatus.NETWORK_ERROR -> {
                     Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()
                 }
                 else -> Log.d("MainActivity", "not initialized")
             }
-        })
+        }
 
         // NOTE: 通知の既読数を表示する
         miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
@@ -456,32 +449,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
     override fun onStart() {
         super.onStart()
-
-        bindService(Intent(this, NotificationService::class.java), notificationServiceConnection, Context.BIND_AUTO_CREATE)
         setBackgroundImage()
         applyUI()
     }
 
-    override fun onResume(){
-        super.onResume()
-        (application as? MiApplication?)?.getCurrentAccount()?.value?.let{
-            mNotificationService?.stopShowPushNotification(it)
-        }
-    }
 
-    override fun onPause() {
-        super.onPause()
-        (application as? MiApplication?)?.getCurrentAccount()?.value?.let{
-            mNotificationService?.startShowPushNotification(it)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        mNotificationService = null
-        unbindService(notificationServiceConnection)
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -490,21 +462,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mBottomNavigationAdapter?.saveState(outState)
     }
-    private val notificationServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            val binder = p1 as NotificationService.NotificationBinder?
-            mNotificationService = binder?.getService()
-            (application as MiApplication?)?.getCurrentAccount()?.value?.let{
-                mNotificationService?.stopShowPushNotification(it)
-            }
-        }
 
-        override fun onServiceDisconnected(p0: ComponentName?) {
-            mNotificationService = null
-        }
-
-
-    }
 
     private fun setBackgroundImage(){
         val path = SettingStore(getSharedPreferences(getPreferenceName() ,Context.MODE_PRIVATE)).backgroundImagePath

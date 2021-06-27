@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model.api
+package jp.panta.misskeyandroidclient.api
 
 import jp.panta.misskeyandroidclient.api.auth.AccessToken
 import jp.panta.misskeyandroidclient.api.auth.AppSecret

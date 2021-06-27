@@ -4,9 +4,8 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.ITask
 import jp.panta.misskeyandroidclient.model.TaskExecutor
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -16,7 +15,6 @@ import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
@@ -26,7 +24,6 @@ import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
@@ -35,6 +32,8 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
+import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -85,6 +84,8 @@ interface MiCore{
 
     fun getFilePropertyDataSource() : FilePropertyDataSource
 
+    fun getSubscriptionRegistration() : SubscriptionRegistration
+
     suspend fun setCurrentAccount(account: Account)
 
     fun logoutAccount(account: Account)
@@ -133,6 +134,7 @@ interface MiCore{
 
     fun getDraftNoteDAO(): DraftNoteDao
 
+    fun getUnreadNotificationDAO() : UnreadNotificationDAO
 
     fun getTaskExecutor() : TaskExecutor
 

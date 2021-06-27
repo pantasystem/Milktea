@@ -1,8 +1,7 @@
 package jp.panta.misskeyandroidclient.model.api
 
+import jp.panta.misskeyandroidclient.api.GetUrlPreview
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class GetUrlPreviewTest {
 

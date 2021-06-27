@@ -3,11 +3,11 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
+import com.google.firebase.messaging.FirebaseMessaging
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.gettters.Getters
@@ -18,10 +18,9 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
-import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
@@ -59,11 +58,13 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSou
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
+import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.notification.impl.MediatorNotificationDataSource
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.streaming.MediatorMainEventDispatcher
+import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
 import jp.panta.misskeyandroidclient.model.url.*
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -83,7 +84,10 @@ import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 //基本的な情報はここを返して扱われる
 class MiApplication : Application(), MiCore {
@@ -186,6 +190,19 @@ class MiApplication : Application(), MiCore {
         AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
     }
 
+    private lateinit var _unreadNotificationDAO: UnreadNotificationDAO
+
+    private val _subscribeRegistration: SubscriptionRegistration by lazy {
+        SubscriptionRegistration(
+            getAccountRepository(),
+            getMetaStore(),
+            getEncryption(),
+            getMisskeyAPIProvider(),
+            lang = Locale.getDefault().language,
+            loggerFactory
+        )
+    }
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate() {
@@ -224,6 +241,8 @@ class MiApplication : Application(), MiCore {
         mEncryption = KeyStoreSystemEncryption(this)
 
         urlPreviewDAO = database.urlPreviewDAO()
+
+        _unreadNotificationDAO = database.unreadNotificationDAO()
 
         metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
 
@@ -361,7 +380,22 @@ class MiApplication : Application(), MiCore {
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
-
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            if(!it.isSuccessful) {
+                return@addOnCompleteListener
+            }
+            it.result?.also { token ->
+                applicationScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        getSubscriptionRegistration().registerAll(token)
+                    }.onFailure { e ->
+                        logger.error("register error", e)
+                    }
+                }
+            }
+        }.addOnFailureListener {
+            logger.debug("fcm token取得失敗", e = it)
+        }
     }
 
     override fun getAccounts(): StateFlow<List<Account>> {
@@ -421,6 +455,8 @@ class MiApplication : Application(), MiCore {
     override fun getGetters(): Getters {
         return mGetters
     }
+
+    override fun getUnreadNotificationDAO() = _unreadNotificationDAO
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->
@@ -611,6 +647,10 @@ class MiApplication : Application(), MiCore {
         return mGalleryRepository
     }
 
+    override fun getSubscriptionRegistration(): SubscriptionRegistration {
+        return _subscribeRegistration
+    }
+
     private suspend fun loadAndInitializeAccounts(){
         try{
             val current: Account
@@ -742,7 +782,7 @@ class MiApplication : Application(), MiCore {
 
     }
 
-    override fun getMisskeyAPI(account: Account): MisskeyAPI{
+    override fun getMisskeyAPI(account: Account): MisskeyAPI {
         return getMisskeyAPI(account.instanceDomain)
     }
 

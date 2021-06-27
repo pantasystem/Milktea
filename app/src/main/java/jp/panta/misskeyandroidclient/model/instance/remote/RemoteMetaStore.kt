@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.instance.remote
 
-import jp.panta.misskeyandroidclient.model.api.MisskeyGetMeta
+import jp.panta.misskeyandroidclient.api.MisskeyGetMeta
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
 
