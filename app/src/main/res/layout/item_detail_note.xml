@@ -342,8 +342,8 @@
                         android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                         android:padding="4dp"
                         android:scaleType="centerCrop"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        app:srcCompat="@drawable/ic_reply_black_24dp" />
+                        app:srcCompat="@drawable/ic_reply_black_24dp"
+                        app:tint="?attr/colorNoteActionButtonTint"/>
 
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/textView3"
@@ -364,8 +364,8 @@
                         android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
                         android:padding="4dp"
                         android:scaleType="centerCrop"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        app:srcCompat="@drawable/ic_re_note" />
+                        app:srcCompat="@drawable/ic_re_note"
+                        app:tint="?attr/colorNoteActionButtonTint"/>
 
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/textView4"
@@ -389,9 +389,9 @@
                         android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
                         android:padding="4dp"
                         android:scaleType="centerCrop"
-                        android:tint="?attr/colorNoteActionButtonTint"
                         app:isReacted="@{note.myReaction != null}"
-                        tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp" />
+                        tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
+                        app:tint="?attr/colorNoteActionButtonTint"/>
 
                 <androidx.emoji.widget.EmojiTextView
                         android:layout_width="50dp"
@@ -414,8 +414,8 @@
                         android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
                         android:padding="4dp"
                         android:scaleType="centerCrop"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        app:srcCompat="@drawable/ic_more_horiz_black_24dp" />
+                        app:srcCompat="@drawable/ic_more_horiz_black_24dp"
+                        app:tint="?attr/colorNoteActionButtonTint"/>
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

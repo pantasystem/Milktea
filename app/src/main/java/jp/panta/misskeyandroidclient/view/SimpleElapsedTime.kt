@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.view
 import android.content.Context
 import android.util.Log
 import jp.panta.misskeyandroidclient.GsonFactory
+import jp.panta.misskeyandroidclient.util.date.toCurrentLocaleDate
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -19,11 +20,7 @@ class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
         val nowDate = Date()
 
         val formatter = GsonFactory.createSimpleDateFormat()
-        formatter.timeZone = TimeZone.getTimeZone("UTC")
-        val formatted = formatter.format(nowDate)
-        val nowUtcDate = GsonFactory.createSimpleDateFormat().apply{
-            timeZone = TimeZone.getDefault()
-        }.parse(formatted)?: Date()
+        val nowUtcDate = nowDate.toCurrentLocaleDate()
 
         return when(val elapsedMilliTime = nowUtcDate.time - date.time){
             in Long.MIN_VALUE until 5 * 1000 ->{

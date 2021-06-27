@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.util.date.toCurrentLocaleDate
 import jp.panta.misskeyandroidclient.view.SimpleElapsedTime
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,6 +51,6 @@ object DateFormatHelper {
     @JvmStatic
     fun TextView.setCreatedAt(createdAt: Date?){
         val date = createdAt?: Date()
-        this.text = SimpleDateFormat.getDateTimeInstance().format(date)
+        this.text = SimpleDateFormat.getDateTimeInstance().format(date.toCurrentLocaleDate())
     }
 }
