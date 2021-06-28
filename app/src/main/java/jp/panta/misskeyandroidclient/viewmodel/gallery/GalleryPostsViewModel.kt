@@ -34,7 +34,7 @@ import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 class GalleryPostsViewModel(
     val pageable: Pageable.Gallery,
     private var accountId: Long?,
-    private val galleryDataSource: GalleryDataSource,
+    galleryDataSource: GalleryDataSource,
     private val galleryRepository: GalleryRepository,
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
@@ -104,10 +104,14 @@ class GalleryPostsViewModel(
                         }
 
                     }.awaitAll().filterNotNull().map { post ->
+                        post to miCore.getFilePropertyDataSource().findIn(post.fileIds)
+                    }.filter { postWithFiles ->
+                        postWithFiles.second.isNotEmpty()
+                    }.map { postWithFiles ->
                         GalleryPostState(
-                            post,
-                            miCore.getFilePropertyDataSource().findIn(post.fileIds),
-                            miCore.getUserRepository().find(post.userId, false),
+                            postWithFiles.first,
+                            miCore.getFilePropertyDataSource().findIn(postWithFiles.first.fileIds),
+                            miCore.getUserRepository().find(postWithFiles.first.userId, false),
                             this@GalleryPostsViewModel,
                             miCore.getGalleryDataSource(),
                             viewModelScope
