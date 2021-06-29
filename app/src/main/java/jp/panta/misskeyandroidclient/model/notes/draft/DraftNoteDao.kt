@@ -6,7 +6,7 @@ import jp.panta.misskeyandroidclient.model.notes.draft.db.*
 @Dao
 abstract class DraftNoteDao {
 
-    fun fullInsert(draftNote: DraftNote): Long?{
+    fun fullInsert(draftNote: DraftNote): Long{
         val draftNoteDTO = DraftNoteDTO.make(draftNote)
         val id = insert(draftNoteDTO)
         val files = draftNote.files?.map{
