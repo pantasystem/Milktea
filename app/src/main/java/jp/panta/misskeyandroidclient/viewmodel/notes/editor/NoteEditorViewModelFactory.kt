@@ -13,7 +13,6 @@ class NoteEditorViewModelFactory(
     private val miApplication: MiApplication,
     private val replyToNoteId: Note.Id? = null,
     private val quoteToNoteId: Note.Id? = null,
-    private val note: NoteRelation? = null,
     private val draftNote: DraftNote? = null
 ) : ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -24,7 +23,6 @@ class NoteEditorViewModelFactory(
                 replyId = replyToNoteId,
                 quoteToNoteId = quoteToNoteId,
                 loggerFactory = miApplication.loggerFactory,
-                n = note,
                 dn = draftNote
             ) as T
         }
