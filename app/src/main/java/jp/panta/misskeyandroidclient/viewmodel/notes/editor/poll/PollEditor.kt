@@ -36,7 +36,9 @@ class PollEditor() {
             it.text
         },
         poll?.multiple,
-        poll?.expiresAt
+        poll?.expiresAt?.toEpochMilliseconds()?.let {
+            Date(it)
+        }
     )
 
     constructor(draftPoll: DraftPoll?) : this(
