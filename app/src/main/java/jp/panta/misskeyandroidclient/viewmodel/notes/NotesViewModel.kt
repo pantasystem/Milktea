@@ -10,6 +10,8 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.notes.draft.toDraftNote
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
@@ -66,7 +68,7 @@ class NotesViewModel(
 
     val showInputReactionEvent = EventBus<Unit>()
 
-    val openNoteEditor = EventBus<NoteRelation?>()
+    val openNoteEditor = EventBus<DraftNote?>()
 
     val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
 
@@ -279,12 +281,14 @@ class NotesViewModel(
     fun removeAndEditNote(note: NoteRelation){
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
+
+                val id = miCore.getDraftNoteDAO().fullInsert(note.toDraftNote())
+                val dn = miCore.getDraftNoteDAO().getDraftNote(note.note.id.accountId, id)!!
                 miCore.getNoteRepository().delete(note.note.id)
+                dn
             }.onSuccess {
-                if(it) {
-                    withContext(Dispatchers.Main) {
-                        openNoteEditor.event = note
-                    }
+                withContext(Dispatchers.Main) {
+                    openNoteEditor.event = it
                 }
             }.onFailure { t ->
                 Log.e(TAG, "削除に失敗しました", t)

@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient.model.notes
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
 import java.lang.IllegalArgumentException
-import java.util.*
 import kotlin.jvm.Throws
 
 sealed class Visibility : Serializable{
@@ -34,7 +33,6 @@ sealed class Visibility : Serializable{
     data class Specified(
         val visibleUserIds: List<User.Id>
     ) : Visibility()
-
     /*
     NOTE: LocalOnlyはPub,Ho,Fのいずれかを選択し、そのうちLocalのユーザーに限定に公開されるというものなので、LocalOnlyというVisibilityは存在しない
     object LocalOnly : Visibility(), CanLocalOnly {
@@ -90,5 +88,14 @@ fun Visibility.isLocalOnly(): Boolean {
 fun CreateNote.visibleUserIds(): List<String>? {
     return (this.visibility as? Visibility.Specified)?.visibleUserIds?.map {
         it.id
+    }
+}
+
+fun Visibility.getName() : String{
+    return when(this) {
+        is Visibility.Public -> "public"
+        is Visibility.Home -> "home"
+        is Visibility.Specified -> "specified"
+        is Visibility.Followers -> "followers"
     }
 }

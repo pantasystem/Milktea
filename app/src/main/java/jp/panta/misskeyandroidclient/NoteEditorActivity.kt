@@ -17,7 +17,6 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
@@ -27,7 +26,6 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.file.toFile
@@ -55,7 +53,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
     companion object{
         private const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
         private const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
-        private const val EXTRA_NOTE = "jp.panta.misskeyandroidclient.EXTRA_NOTE"
         private const val EXTRA_DRAFT_NOTE = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
         const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
@@ -66,7 +63,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
 
-        fun newBundle(context: Context, replyTo: Note.Id? = null, quoteTo: Note.Id? = null, note: NoteRelation? =null, draftNote: DraftNote? = null): Intent {
+        fun newBundle(context: Context, replyTo: Note.Id? = null, quoteTo: Note.Id? = null, draftNote: DraftNote? = null): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let{
                     putExtra(EXTRA_REPLY_TO_NOTE_ID, replyTo.noteId)
@@ -78,10 +75,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
                     putExtra(EXTRA_ACCOUNT_ID, quoteTo.accountId)
                 }
 
-                note?.let {
-                    putExtra(EXTRA_NOTE, note)
-                    putExtra(EXTRA_ACCOUNT_ID, note.note.id.accountId)
-                }
 
                 draftNote?.let {
                     putExtra(EXTRA_DRAFT_NOTE, it)
@@ -139,7 +132,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
 
 
-        val note: NoteRelation? = intent.getSerializableExtra(EXTRA_NOTE) as? NoteRelation
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
@@ -159,17 +151,17 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
-        accountViewModel.switchAccount.observe(this, {
+        accountViewModel.switchAccount.observe(this) {
             AccountSwitchingDialog().show(supportFragmentManager, "tag")
-        })
-        accountViewModel.showProfile.observe(this, {
+        }
+        accountViewModel.showProfile.observe(this) {
             val intent = UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
 
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
 
             startActivity(intent)
-        })
+        }
 
         miApplication.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
             binding.inputMain.setAdapter(
@@ -189,7 +181,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             binding.cw.setTokenizer(CustomEmojiTokenizer())
         }
 
-        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, note = note, draftNote = draftNote)
+        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, draftNote = draftNote)
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
         if(!text.isNullOrBlank()){
@@ -202,16 +194,16 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
         binding.imageListPreview.adapter = simpleImagePreviewAdapter
 
-        viewModel.files.observe(this, {list ->
+        viewModel.files.observe(this) { list ->
             simpleImagePreviewAdapter.submitList(list)
-        })
-        viewModel.poll.observe(this, { poll ->
-            if(poll == null){
+        }
+        viewModel.poll.observe(this) { poll ->
+            if (poll == null) {
                 removePollFragment()
-            }else{
+            } else {
                 setPollFragment()
             }
-        })
+        }
 
         viewModel.isPost.observe(this) {
             if(it) {
@@ -259,46 +251,46 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             CustomEmojiPickerDialog().show(supportFragmentManager, "Editor")
         }
 
-        (applicationContext as? MiApplication)?.connectionStatus?.observe(this, { status ->
-            when(status){
+        (applicationContext as? MiApplication)?.connectionStatus?.observe(this) { status ->
+            when (status) {
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
-                ConnectionStatus.ACCOUNT_ERROR ->{
+                ConnectionStatus.ACCOUNT_ERROR -> {
                     finish()
                     startActivity(Intent(this, AuthorizationActivity::class.java))
                 }
-                ConnectionStatus.NETWORK_ERROR ->{
+                ConnectionStatus.NETWORK_ERROR -> {
                     Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()
                 }
                 else -> Log.d("MainActivity", "not initialized")
             }
-        })
+        }
 
-        mConfirmViewModel.confirmedEvent.observe(this, {
-            when(it.eventType){
-                CONFIRM_SAVE_AS_DRAFT_OR_DELETE ->{
-                    if(it.resultType == ResultType.POSITIVE){
+        mConfirmViewModel.confirmedEvent.observe(this) {
+            when (it.eventType) {
+                CONFIRM_SAVE_AS_DRAFT_OR_DELETE -> {
+                    if (it.resultType == ResultType.POSITIVE) {
                         mViewModel?.saveDraft()
-                    }else{
+                    } else {
                         finish()
                     }
                 }
             }
-        })
+        }
 
-        mConfirmViewModel.confirmEvent.observe( this, {
+        mConfirmViewModel.confirmEvent.observe( this) {
             ConfirmDialog().show(supportFragmentManager, "confirm")
-        })
+        }
 
-        mViewModel?.isSaveNoteAsDraft?.observe(this, {
+        mViewModel?.isSaveNoteAsDraft?.observe(this) {
             runOnUiThread {
-                if(it == null){
+                if (it == null) {
                     Toast.makeText(this, "下書きに失敗しました", Toast.LENGTH_LONG).show()
-                }else{
+                } else {
                     upTo()
                 }
             }
 
-        })
+        }
         binding.inputMain.requestFocus()
     }
 

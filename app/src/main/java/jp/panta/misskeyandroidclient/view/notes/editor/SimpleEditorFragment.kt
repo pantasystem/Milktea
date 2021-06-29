@@ -82,15 +82,15 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
         val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         mBinding.accountViewModel = accountViewModel
-        accountViewModel.switchAccount.observe(this,  {
+        accountViewModel.switchAccount.observe(this) {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
-        })
-        accountViewModel.showProfile.observe(this,  {
+        }
+        accountViewModel.showProfile.observe(this) {
             val intent = UserDetailActivity.newInstance(requireContext(), userId = User.Id(it.accountId, it.remoteId))
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
             startActivity(intent)
-        })
+        }
 
         miApplication.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
             mBinding.inputMainText.setAdapter(
@@ -110,7 +110,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             mBinding.inputCw.setTokenizer(CustomEmojiTokenizer())
         }
 
-        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = null, quoteToNoteId = null, note = null, draftNote = null)
+        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = null, quoteToNoteId = null, draftNote = null)
         val viewModel = ViewModelProvider(requireActivity(), factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
 
@@ -120,39 +120,39 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         mBinding.imageListPreview.adapter = simpleImagePreviewAdapter
         mBinding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        viewModel.files.observe(viewLifecycleOwner, {list ->
+        viewModel.files.observe(viewLifecycleOwner) { list ->
             simpleImagePreviewAdapter.submitList(list)
-        })
-        viewModel.poll.observe(viewLifecycleOwner,  { poll ->
-            if(poll == null){
+        }
+        viewModel.poll.observe(viewLifecycleOwner) { poll ->
+            if (poll == null) {
                 removePollFragment()
-            }else{
+            } else {
                 setPollFragment()
             }
-        })
+        }
 
 
         viewModel.isPost.observe(viewLifecycleOwner) {
             viewModel.clear()
         }
 
-        viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner,  {
+        viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner) {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(childFragmentManager, "NoteEditor")
-        })
+        }
 
-        viewModel.address.observe(viewLifecycleOwner, {
+        viewModel.address.observe(viewLifecycleOwner) {
             userChipAdapter.submitList(it)
-        })
+        }
 
-        viewModel.showPollTimePicker.observe(this, {
+        viewModel.showPollTimePicker.observe(this) {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
-        })
+        }
 
-        viewModel.showPollDatePicker.observe(this,  {
+        viewModel.showPollDatePicker.observe(this) {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
-        })
+        }
 
 
 

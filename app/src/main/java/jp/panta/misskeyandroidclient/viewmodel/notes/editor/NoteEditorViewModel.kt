@@ -25,7 +25,6 @@ class NoteEditorViewModel(
     replyId: Note.Id? = null,
     private val quoteToNoteId: Note.Id? = null,
     loggerFactory: Logger.Factory,
-    n: NoteRelation? = null,
     dn: DraftNote? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel(){
@@ -58,7 +57,6 @@ class NoteEditorViewModel(
     val currentUser: LiveData<UserViewData> = mCurrentUser
 
     val draftNote = MutableLiveData<DraftNote>(dn)
-    val note = MutableLiveData<Note>(n?.note)
 
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
     private val mReply = MutableStateFlow<Note?>(null)
@@ -79,10 +77,8 @@ class NoteEditorViewModel(
     val renoteId = MutableStateFlow(quoteToNoteId)
 
     val cw = MediatorLiveData<String>().apply {
-        addSourceFromNoteAndDraft { noteDTO, draftNote ->
-            (noteDTO?.cw ?: draftNote?.cw)?.let{
-                value = it
-            }
+        addSource(draftNote) {
+            value = it?.cw
         }
     }
 
@@ -93,10 +89,9 @@ class NoteEditorViewModel(
         }
     }
     val text = MediatorLiveData<String>().apply {
-        addSourceFromNoteAndDraft { noteDTO, draftNote ->
-            (noteDTO?.text ?: draftNote?.text)?.let {
-                value = it
-            }
+
+        addSource(draftNote) {
+            value = it?.text
         }
     }
     var maxTextLength = Transformations.map(currentAccount){
@@ -119,9 +114,7 @@ class NoteEditorViewModel(
 
     val files = MediatorLiveData<List<File>>().apply{
         this.postValue(
-            n?.files?.map{
-                it.toFile()
-            }?:dn?.files?: emptyList<File>()
+            dn?.files?: emptyList<File>()
         )
     }
 
@@ -151,11 +144,12 @@ class NoteEditorViewModel(
 
     // FIXME リモートのVisibilityを参照するようにする
     val visibility = MediatorLiveData<Visibility>().apply {
-        addSourceFromNoteAndDraft { noteDTO, draftNote ->
-            if(noteDTO != null || draftNote != null) {
-                val local = noteDTO?.localOnly ?: draftNote?.localOnly
-                val type = noteDTO?.visibility?: Visibility(draftNote?.visibility?: "public", local?: false)
-                value = type
+
+        addSource(draftNote) {
+            if(it != null) {
+                val local = it.localOnly
+                val type = it.visibility
+                value = Visibility(type, local ?: false)
             }
         }
 
@@ -189,8 +183,7 @@ class NoteEditorViewModel(
     @FlowPreview
     @ExperimentalCoroutinesApi
     val address = MutableLiveData(
-        n?.note?.visibleUserIds?.map(::setUpUserViewData)
-            ?: dn?.visibleUserIds?.mapNotNull {
+        dn?.visibleUserIds?.mapNotNull {
             miCore.getCurrentAccount().value?.accountId?.let { ac ->
                 User.Id(ac, it)
             }
@@ -209,9 +202,7 @@ class NoteEditorViewModel(
     }
 
     val poll = MutableLiveData<PollEditor?>(
-        n?.note?.poll?.let{
-            PollEditor(it)
-        }?: dn?.draftPoll?.let{
+        dn?.draftPoll?.let{
             PollEditor(it)
         }
     )
@@ -481,7 +472,7 @@ class NoteEditorViewModel(
         return miCore.getCurrentAccount().value
     }
 
-    private fun<T> MediatorLiveData<T>.addSourceFromNoteAndDraft(observer: (Note?, DraftNote?)->Unit) {
+    /*private fun<T> MediatorLiveData<T>.addSourceFromNoteAndDraft(observer: (Note?, DraftNote?)->Unit) {
         addSource(note) {
             observer(it, draftNote.value)
         }
@@ -489,7 +480,7 @@ class NoteEditorViewModel(
         addSource(draftNote) {
             observer(note.value, it)
         }
-    }
+    }*/
 
 
 }
