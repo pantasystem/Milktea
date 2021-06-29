@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model
 
 import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.flow.Flow
@@ -24,10 +25,10 @@ interface StateLocker {
     val mutex: Mutex
 }
 
-interface PageableState<T> {
-    val state: Flow<State<List<T>>>
-    fun setState(state: State<List<T>>)
-    fun getState(): State<List<T>>
+interface PaginationState<T> {
+    val state: Flow<PageableState<List<T>>>
+    fun setState(state: PageableState<List<T>>)
+    fun getState(): PageableState<List<T>>
 }
 
 interface FuturePaginator {
@@ -53,13 +54,13 @@ interface FutureLoader<DTO> {
 class PreviousPaginatorController<DTO, E>(
     private val entityAdder: EntityAdder<DTO, E>,
     private val locker: StateLocker,
-    private val state: PageableState<E>,
+    private val state: PaginationState<E>,
     private val previousLoader: PreviousLoader<DTO>
 ) : PreviousPaginator{
     override suspend fun loadPrevious() {
         locker.mutex.withLock {
 
-            val loading = State.Loading(
+            val loading = PageableState.Loading.Previous(
                 content = state.getState().content
             )
             state.setState(loading)
@@ -68,7 +69,7 @@ class PreviousPaginatorController<DTO, E>(
                 res.throwIfHasError()
                 entityAdder.addAll(res.body()!!)
             }.onFailure {
-                val errorState = State.Error(
+                val errorState = PageableState.Error(
                     state.getState().content,
                     it
                 )
@@ -79,7 +80,7 @@ class PreviousPaginatorController<DTO, E>(
                         val newList = content.rawContent.toMutableList()
                         newList.addAll(it)
                         state.setState(
-                            State.Fixed(
+                            PageableState.Fixed(
                                 StateContent.Exist(
                                     newList
                                 )
@@ -88,7 +89,7 @@ class PreviousPaginatorController<DTO, E>(
                     }
                     is StateContent.NotExist -> {
                         state.setState(
-                            State.Fixed(
+                            PageableState.Fixed(
                                 StateContent.Exist(it)
                             )
                         )
@@ -102,13 +103,13 @@ class PreviousPaginatorController<DTO, E>(
 class FuturePaginatorController<DTO, E>(
     private val entityAdder: EntityAdder<DTO, E>,
     private val locker: StateLocker,
-    private val state: PageableState<E>,
+    private val state: PaginationState<E>,
     private val futureLoader: FutureLoader<DTO>
 ) : FuturePaginator{
     override suspend fun loadFuture() {
         locker.mutex.withLock {
 
-            val loading = State.Loading(
+            val loading = PageableState.Loading.Future(
                 content = state.getState().content
             )
             state.setState(loading)
@@ -117,7 +118,7 @@ class FuturePaginatorController<DTO, E>(
                 res.throwIfHasError()
                 entityAdder.addAll(res.body()!!).asReversed()
             }.onFailure {
-                val errorState = State.Error(
+                val errorState = PageableState.Error(
                     state.getState().content,
                     it
                 )
@@ -128,7 +129,7 @@ class FuturePaginatorController<DTO, E>(
                         val newList = content.rawContent.toMutableList()
                         newList.addAll(0, it)
                         state.setState(
-                            State.Fixed(
+                            PageableState.Fixed(
                                 StateContent.Exist(
                                     newList
                                 )
@@ -137,7 +138,7 @@ class FuturePaginatorController<DTO, E>(
                     }
                     is StateContent.NotExist -> {
                         state.setState(
-                            State.Fixed(
+                            PageableState.Fixed(
                                 StateContent.Exist(it)
                             )
                         )

@@ -8,28 +8,28 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.sync.Mutex
 import retrofit2.Response
 import java.lang.IllegalStateException
 import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 
 
 interface GetGalleryPostsStateFlow {
-    fun getFlow(): Flow<State<List<GalleryPost.Id>>>
+    fun getFlow(): Flow<PageableState<List<GalleryPost.Id>>>
 }
 /**
  * EntityはDataSourceが保持しているので、ここではタイムラインの順番を保持する
  */
-class GalleryPostsState : PageableState<GalleryPost.Id>, IdGetter<String>, GetGalleryPostsStateFlow {
+class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>, GetGalleryPostsStateFlow {
 
-    private val _state = MutableStateFlow<State<List<GalleryPost.Id>>>(State.Fixed(StateContent.NotExist()))
-    override val state: Flow<State<List<GalleryPost.Id>>> = _state
+    private val _state = MutableStateFlow<PageableState<List<GalleryPost.Id>>>(PageableState.Fixed(StateContent.NotExist()))
+    override val state: Flow<PageableState<List<GalleryPost.Id>>> = _state
 
-    override fun getFlow(): Flow<State<List<GalleryPost.Id>>> {
+    override fun getFlow(): Flow<PageableState<List<GalleryPost.Id>>> {
         return state
     }
 
@@ -44,11 +44,11 @@ class GalleryPostsState : PageableState<GalleryPost.Id>, IdGetter<String>, GetGa
         return getList().lastOrNull()?.galleryId
     }
 
-    override fun getState(): State<List<GalleryPost.Id>> {
+    override fun getState(): PageableState<List<GalleryPost.Id>> {
         return _state.value
     }
 
-    override fun setState(state: State<List<GalleryPost.Id>>) {
+    override fun setState(state: PageableState<List<GalleryPost.Id>>) {
         _state.value = state
     }
 }

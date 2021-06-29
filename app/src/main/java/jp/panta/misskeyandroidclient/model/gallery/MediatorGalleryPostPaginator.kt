@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -18,7 +19,7 @@ import kotlinx.coroutines.sync.withLock
 
 
 interface GalleryPostsStore : StateLocker{
-    val state: Flow<State<List<GalleryPost.Id>>>
+    val state: Flow<PageableState<List<GalleryPost.Id>>>
 
     suspend fun loadPrevious()
     suspend fun loadFuture()
@@ -77,11 +78,11 @@ class GalleryPostsStoreImpl(
 
     override suspend fun clear() {
         mutex.withLock {
-            galleryPostState.setState(State.Fixed(StateContent.NotExist()))
+            galleryPostState.setState(PageableState.Fixed(StateContent.NotExist()))
         }
     }
 
-    override val state: Flow<State<List<GalleryPost.Id>>> = galleryPostState.getFlow()
+    override val state: Flow<PageableState<List<GalleryPost.Id>>> = galleryPostState.getFlow()
 }
 
 class LikedGalleryPostStoreImpl(
@@ -109,9 +110,9 @@ class LikedGalleryPostStoreImpl(
 
     override suspend fun clear() {
         mutex.withLock {
-            galleryPostState.setState(State.Fixed(StateContent.NotExist()))
+            galleryPostState.setState(PageableState.Fixed(StateContent.NotExist()))
         }
     }
 
-    override val state: Flow<State<List<GalleryPost.Id>>> = galleryPostState.getFlow()
+    override val state: Flow<PageableState<List<GalleryPost.Id>>> = galleryPostState.getFlow()
 }

@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.util
 
+import jp.panta.misskeyandroidclient.model.Pageable
+
 
 sealed class State<out T>(val content: StateContent<T>) {
     class Fixed<out T>(content: StateContent<T>) : State<T>(content)
@@ -25,7 +27,7 @@ sealed class PageableState<T>(val content: StateContent<T>) {
             return Loading.Future(this.content)
         }
     }
-    sealed class Loading<T>(val content: StateContent<T>) {
+    sealed class Loading<T>(content: StateContent<T>) : PageableState<T>(content) {
         class Init<T>() : Loading<T>(StateContent.NotExist())
         class Previous<T>(content: StateContent<T>) : Loading<T>(content)
         class Future<T>(content: StateContent<T>) : Loading<T>(content)
@@ -42,17 +44,36 @@ sealed class PageableState<T>(val content: StateContent<T>) {
             return Init()
         }
     }
-    class Error<T>(content: StateContent<T>, val throwable: Throwable) : State<T>(content) {
-        fun init() : PageableState.Loading.Init<T> {
-            return PageableState.Loading.Init()
+    class Error<T>(content: StateContent<T>, val throwable: Throwable) : PageableState<T>(content) {
+        fun init() : Loading.Init<T> {
+            return Loading.Init()
         }
 
-        fun previous() : PageableState.Loading.Previous<T> {
-            return PageableState.Loading.Previous(this.content)
+        fun previous() : Loading.Previous<T> {
+            return Loading.Previous(this.content)
         }
 
-        fun future() : PageableState.Loading.Future<T> {
-            return PageableState.Loading.Future(this.content)
+        fun future() : Loading.Future<T> {
+            return Loading.Future(this.content)
+        }
+    }
+
+    fun<O> convert(converter: (T)->O) : PageableState<O>{
+        val content = when(this.content) {
+            is StateContent.Exist -> {
+                StateContent.Exist(converter.invoke(this.content.rawContent))
+            }
+            is StateContent.NotExist -> {
+                StateContent.NotExist()
+            }
+        }
+
+        return when(this) {
+            is Fixed -> Fixed(content)
+            is Loading.Init -> Loading.Init()
+            is Loading.Previous -> Loading.Previous(content)
+            is Loading.Future -> Loading.Future(content)
+            is Error -> Error(content, this.throwable)
         }
     }
 
