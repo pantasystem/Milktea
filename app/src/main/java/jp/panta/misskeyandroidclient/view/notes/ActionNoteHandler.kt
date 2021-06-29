@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.getPreferenceName
@@ -106,8 +107,8 @@ class ActionNoteHandler(
         dialog.show(activity.supportFragmentManager, "")
     }
 
-    private val openNoteEditor = Observer<NoteRelation?>{ note ->
-        activity.startActivity(NoteEditorActivity.newBundle(activity, note = note))
+    private val openNoteEditor = Observer<DraftNote?>{ note ->
+        activity.startActivity(NoteEditorActivity.newBundle(activity, draftNote = note))
     }
 
     private val confirmDeletionEventObserver = Observer<PlaneNoteViewData>{
