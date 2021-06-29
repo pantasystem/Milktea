@@ -20,7 +20,7 @@ class FileViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == FileViewModel::class.java){
             val misskeyAPI = miApplication.getMisskeyAPI(account)
-            return FileViewModel(account, misskeyAPI, selectedFileViewDataMapLiveData, maxSelectableItemSize, folderId, miApplication.getEncryption()) as T
+            return FileViewModel(account, misskeyAPI, selectedFileViewDataMapLiveData, maxSelectableItemSize, folderId, miApplication.getEncryption(), miApplication.getFilePropertyDataSource()) as T
         }
         throw IllegalArgumentException("クラスが一致しない")
     }

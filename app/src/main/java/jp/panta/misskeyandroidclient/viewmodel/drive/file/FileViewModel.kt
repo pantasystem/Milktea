@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.api.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -20,7 +21,8 @@ class FileViewModel(
     private val selectedFileMapLiveData: MutableLiveData<Map<FileProperty.Id, FileViewData>>?,
     private val maxSelectableItemSize: Int,
     folderId: String?,
-    private val encryption: Encryption
+    private val encryption: Encryption,
+    private val filePropertyDataSource: FilePropertyDataSource
 ) : ViewModel(){
 
     val filesLiveData = MutableLiveData<List<FileViewData>>()
@@ -55,12 +57,13 @@ class FileViewModel(
                     return@launch
                 }
 
-                val viewDataList = rawList.map {
+                val entities  = rawList.map {
                     it.toFileProperty(account)
-                }.map{
+                }
+                filePropertyDataSource.addAll(entities)
+                entities.map{
                     FileViewData(it)
                 }
-                viewDataList
             }.onSuccess { viewDataList ->
                 filesLiveData.postValue(viewDataList)
                 //selectedItemMap.clear()
@@ -69,7 +72,7 @@ class FileViewModel(
                     val selected = selectedFileMapLiveData?.value?.get(it.id)
                     if(selected != null){
                         it.isSelect.postValue(true)
-                    }else if(selectedFileMapLiveData?.value?.size?: 0 >= maxSelectableItemSize){
+                    }else if((selectedFileMapLiveData?.value?.size ?: 0) >= maxSelectableItemSize){
                         it.isEnabledSelect.postValue(false)
                     }
 
@@ -104,15 +107,20 @@ class FileViewModel(
 
                 requireNotNull(rawList)
                 require(rawList.isNotEmpty())
-                rawList.map {
+                val entities = rawList.map {
                     it.toFileProperty(account)
-                }.map{
+                }
+                filePropertyDataSource.addAll(entities)
+
+                entities.map{
                     FileViewData(it).apply{
                         val selected = selectedFileMapLiveData?.value?.get(it.id)
                         if(selected != null){
                             isSelect.postValue(true)
                         }else{
-                            isEnabledSelect.postValue(selectedFileMapLiveData?.value?.size?:0  < maxSelectableItemSize)
+                            isEnabledSelect.postValue(
+                                (selectedFileMapLiveData?.value?.size ?: 0) < maxSelectableItemSize
+                            )
                         }
                     }
                 }
@@ -190,7 +198,9 @@ class FileViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                fileUploader.upload(uploadFile, true)
+                fileUploader.upload(uploadFile, true).let {
+                    filePropertyDataSource.add(it.toFileProperty(account))
+                }
             }catch(e: Exception){
                 Log.d("DriveViewModel", "ファイルアップロードに失敗した")
             }
