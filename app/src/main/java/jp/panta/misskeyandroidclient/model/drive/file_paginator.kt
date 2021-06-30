@@ -6,6 +6,8 @@ import jp.panta.misskeyandroidclient.api.drive.RequestFile
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -17,21 +19,27 @@ import retrofit2.Response
 
 
 class FilePropertyPagingStore(
-    private val miCore: MiCore,
     private var currentDirectoryId: String?,
-    val accountId: Long,
+    private var accountId: Long?,
+    private val accountRepository: AccountRepository,
+    misskeyAPIProvider: MisskeyAPIProvider,
+    filePropertyDataSource: FilePropertyDataSource,
+    encryption: Encryption,
+
 ) {
 
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
-        miCore.getMisskeyAPIProvider(),
+        misskeyAPIProvider,
         {
-            miCore.getAccountRepository().get(accountId)
+            accountId?.let {
+                accountRepository.get(it)
+            }?: throw AccountNotFoundException()
         },
         {
             currentDirectoryId
         },
-        miCore.getEncryption(),
-        miCore.getFilePropertyDataSource()
+        encryption,
+        filePropertyDataSource
     )
 
     private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> = PreviousPagingController(
@@ -43,6 +51,8 @@ class FilePropertyPagingStore(
 
     val state = this.filePropertyPagingImpl.state
 
+    val isLoading: Boolean get() = this.filePropertyPagingImpl.mutex.isLocked
+
     suspend fun loadPrevious() {
         previousPagingController.loadPrevious()
     }
@@ -50,16 +60,35 @@ class FilePropertyPagingStore(
     suspend fun clear() {
         this.filePropertyPagingImpl.mutex.withLock {
             this.filePropertyPagingImpl.setState(PageableState.Loading.Init())
-
         }
     }
 
     suspend fun setCurrentDirectory(directory: Directory?) {
         this.clear()
         this.currentDirectoryId = directory?.id
-        this.loadPrevious()
     }
 
+    /**
+     * 現在の状態の初期化とアカウントのIdをセットします。
+     */
+    suspend fun setAccount(account: Account) {
+        val changed = account.accountId != accountId
+        if(changed) {
+            this.clear()
+            this.accountId = account.accountId
+        }
+    }
+}
+
+fun MiCore.filePropertyPagingStore(accountId: Long?, currentDirectoryId: String?) : FilePropertyPagingStore{
+    return FilePropertyPagingStore(
+        currentDirectoryId,
+        accountId,
+        this.getAccountRepository(),
+        this.getMisskeyAPIProvider(),
+        this.getFilePropertyDataSource(),
+        this.getEncryption()
+    )
 }
 class FilePropertyPagingImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
