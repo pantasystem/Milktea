@@ -51,7 +51,7 @@ interface FutureLoader<DTO> {
     suspend fun loadFuture(): Response<List<DTO>>
 }
 
-class PreviousPaginatorController<DTO, E>(
+class PreviousPagingController<DTO, E>(
     private val entityAdder: EntityAdder<DTO, E>,
     private val locker: StateLocker,
     private val state: PaginationState<E>,

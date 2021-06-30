@@ -8,15 +8,76 @@ import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
 
-class FilePropertyPagingState : PaginationState<FileProperty.Id>, IdGetter<String> {
+
+class FilePropertyPagingStore(
+    private val miCore: MiCore,
+    private var currentDirectoryId: String?,
+    val accountId: Long,
+) {
+
+    private val filePropertyPagingImpl = FilePropertyPagingImpl(
+        miCore.getMisskeyAPIProvider(),
+        {
+            miCore.getAccountRepository().get(accountId)
+        },
+        {
+            currentDirectoryId
+        },
+        miCore.getEncryption(),
+        miCore.getFilePropertyDataSource()
+    )
+
+    private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> = PreviousPagingController(
+        filePropertyPagingImpl,
+        filePropertyPagingImpl,
+        filePropertyPagingImpl,
+        filePropertyPagingImpl
+    )
+
+    val state = this.filePropertyPagingImpl.state
+
+    suspend fun loadPrevious() {
+        previousPagingController.loadPrevious()
+    }
+
+    suspend fun clear() {
+        this.filePropertyPagingImpl.mutex.withLock {
+            this.filePropertyPagingImpl.setState(PageableState.Loading.Init())
+
+        }
+    }
+
+    suspend fun setCurrentDirectory(directory: Directory?) {
+        this.clear()
+        this.currentDirectoryId = directory?.id
+        this.loadPrevious()
+    }
+
+}
+class FilePropertyPagingImpl(
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val getAccount: suspend ()-> Account,
+    private val getCurrentFolderId: ()-> String?,
+    private val encryption: Encryption,
+    private val filePropertyDataSource: FilePropertyDataSource
+) : PaginationState<FileProperty.Id>,
+    IdGetter<String>, PreviousLoader<FilePropertyDTO>,
+    EntityAdder<FilePropertyDTO, FileProperty.Id>,
+    StateLocker
+{
 
     private val _state = MutableStateFlow<PageableState<List<FileProperty.Id>>>(PageableState.Fixed(StateContent.NotExist()))
     override val state: Flow<PageableState<List<FileProperty.Id>>>
         get() = _state
+
+    override val mutex: Mutex = Mutex()
 
     override fun setState(state: PageableState<List<FileProperty.Id>>) {
         _state.value = state
@@ -34,38 +95,25 @@ class FilePropertyPagingState : PaginationState<FileProperty.Id>, IdGetter<Strin
         return (getState().content as? StateContent.Exist<List<FileProperty.Id>>)?.rawContent?.lastOrNull()?.fileId
     }
 
-}
+    override suspend fun loadPrevious(): Response<List<FilePropertyDTO>> {
+        return misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
+            RequestFile(
+                folderId = getCurrentFolderId.invoke(),
+                untilId = this.getUntilId(),
+                i = getAccount.invoke().getI(encryption)
+            )
+        ).throwIfHasError()
+    }
 
-class FilePropertyAdder(
-    private val accountLoader: suspend ()-> Account,
-    private val filePropertyDataSource: FilePropertyDataSource
-) : EntityAdder<FilePropertyDTO, FileProperty.Id> {
     override suspend fun addAll(list: List<FilePropertyDTO>): List<FileProperty.Id> {
         val entities = list.map {
-            it.toFileProperty(accountLoader.invoke())
+            it.toFileProperty(getAccount.invoke())
         }
         filePropertyDataSource.addAll(entities)
         return entities.map {
             it.id
         }
     }
+
 }
 
-class FilePropertyLoader (
-    private val idGetter: IdGetter<String>,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getAccount: suspend ()-> Account,
-    private val getCurrentFolderId: ()-> String,
-    private val encryption: Encryption
-) : PreviousLoader<FilePropertyDTO>{
-
-    override suspend fun loadPrevious(): Response<List<FilePropertyDTO>> {
-        return misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
-            RequestFile(
-                folderId = getCurrentFolderId.invoke(),
-                untilId = idGetter.getUntilId(),
-                i = getAccount.invoke().getI(encryption)
-            )
-        ).throwIfHasError()
-    }
-}
