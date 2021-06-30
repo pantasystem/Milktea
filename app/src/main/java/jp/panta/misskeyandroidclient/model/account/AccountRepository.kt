@@ -7,6 +7,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 
 interface AccountRepository{
 
@@ -55,5 +57,20 @@ fun AccountRepository.listenEvent(): Flow<AccountRepository.Event> {
         awaitClose {
             removeEventListener(listener)
         }
+    }
+}
+
+
+@ExperimentalCoroutinesApi
+fun AccountRepository.watchCurrentAccount() : Flow<Account> {
+    return this.listenEvent().map {
+        this.getCurrentAccount()
+    }
+}
+
+@ExperimentalCoroutinesApi
+fun AccountRepository.watchAccount(accountId: Long) : Flow<Account> {
+    return this.listenEvent().map {
+        this.get(accountId)
     }
 }
