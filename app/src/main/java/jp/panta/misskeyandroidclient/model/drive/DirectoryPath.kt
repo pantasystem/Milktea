@@ -39,6 +39,10 @@ class DirectoryPath {
         return true
     }
 
+    fun clear() {
+        this._route.value = emptyList()
+    }
+
     fun isCurrentRoot() : Boolean{
         return this.route.value.isEmpty()
     }
