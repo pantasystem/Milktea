@@ -2,16 +2,30 @@ package jp.panta.misskeyandroidclient.model.drive
 
 import kotlinx.coroutines.flow.*
 
-class SelectedFilePropertyIds {
+class SelectedFilePropertyIds(
+    val selectableMaxCount: Int,
+    selectedIds: List<FileProperty.Id>
+) {
 
     private val _state = MutableStateFlow<Set<FileProperty.Id>>(emptySet())
     val state: StateFlow<Set<FileProperty.Id>> get() = _state
 
-    fun add(id: FileProperty.Id) {
+    init {
+        val set = selectedIds.toSet()
+        require(set.size <= selectableMaxCount) {
+            "selectedIdsの個数はselectableMaxCount以下である必要があります。"
+        }
+        _state.value = selectedIds.toSet()
+    }
+    fun add(id: FileProperty.Id) : Boolean{
         val ids = this.state.value
+        if(ids.size >= selectableMaxCount) {
+            return false
+        }
         this._state.value = ids.toMutableSet().also {
             add(id)
         }
+        return true
     }
 
     fun remove(id: FileProperty.Id) {
