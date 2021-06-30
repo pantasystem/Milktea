@@ -1,15 +1,18 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.SelectedFilePropertyIds
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
 import java.util.*
 
 class DriveViewModel(
-    val selectableMaxSize: Int
+    val selectableMaxSize: Int,
+    val selectedFilePropertyIds: SelectedFilePropertyIds
 ) : ViewModel(){
 
     val currentDirectory = MutableLiveData<DirectoryViewData?>(DirectoryViewData(null))
@@ -18,11 +21,10 @@ class DriveViewModel(
 
     val openFileEvent = EventBus<FileProperty>()
     //val selectedFilesMap = HashMap<String, FileViewData>()
-    val selectedFilesMapLiveData = if(selectableMaxSize > -1){
-        MutableLiveData<Map<FileProperty.Id, FileViewData>>()
-    }else{
-        null
-    }
+
+
+    private val _selectedFileIds = MutableLiveData<Set<FileProperty.Id>>()
+    val selectedFileIds = _selectedFileIds as LiveData<Set<FileProperty.Id>>
 
 
     init{
@@ -33,23 +35,17 @@ class DriveViewModel(
     }
 
 
-    fun getSelectedFileIds(): List<String>?{
-        return selectedFilesMapLiveData?.value?.values?.map{
-            it.id.fileId
-        }
+    fun getSelectedFileIds(): Set<FileProperty.Id>?{
+        return selectedFileIds.value
     }
 
-    fun getSelectedFileList(): List<FileProperty>?{
-        return selectedFilesMapLiveData?.value?.values?.map{
-            it.file
-        }?.toList()
-    }
 
-    fun setSelectedFileList(files: List<FileProperty>){
-        selectedFilesMapLiveData?.postValue(
-        files.map{
-            Pair(it.id , FileViewData(it))
-        }.toMap())
+
+
+
+
+    fun setSelectedFileIds(fileIds: List<FileProperty.Id>) {
+        _selectedFileIds.postValue(fileIds.toSet())
     }
 
     fun moveChildDirectory(childDirectory: FolderViewData){
