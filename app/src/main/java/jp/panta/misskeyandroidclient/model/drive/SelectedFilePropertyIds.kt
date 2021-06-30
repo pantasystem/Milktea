@@ -1,61 +1,45 @@
 package jp.panta.misskeyandroidclient.model.drive
 
-import kotlinx.coroutines.flow.*
 
-class SelectedFilePropertyIds(
+data class SelectedFilePropertyIds(
     val selectableMaxCount: Int,
-    selectedIds: List<FileProperty.Id>
+    val selectedIds: Set<FileProperty.Id>
 ) {
 
-    private val _state = MutableStateFlow<Set<FileProperty.Id>>(emptySet())
-    val state: StateFlow<Set<FileProperty.Id>> get() = _state
-
     init {
-        val set = selectedIds.toSet()
-        require(set.size <= selectableMaxCount) {
+        require(selectedIds.size <= selectableMaxCount) {
             "selectedIdsの個数はselectableMaxCount以下である必要があります。"
         }
-        _state.value = selectedIds.toSet()
-    }
-    fun add(id: FileProperty.Id) : Boolean{
-        val ids = this.state.value
-        if(ids.size >= selectableMaxCount) {
-            return false
-        }
-        this._state.value = ids.toMutableSet().also {
-            add(id)
-        }
-        return true
     }
 
-    fun remove(id: FileProperty.Id) {
-        this._state.value = this.state.value.filterNot {
-            id == it
-        }.toSet()
+    val count: Int get() = selectedIds.size
+    val isAddable: Boolean get() = selectedIds.size < selectableMaxCount
+
+    fun addAndCopy(id: FileProperty.Id) : SelectedFilePropertyIds{
+        val ids = this.selectedIds
+        ids.toMutableSet().also {
+            it.add(id)
+        }
+        return this.copy(selectedIds = ids)
+    }
+
+    fun removeAndCopy(id: FileProperty.Id) : SelectedFilePropertyIds{
+        return this.copy(selectedIds = this.selectedIds.filterNot {
+            it == id
+        }.toSet())
     }
 
     fun exists(id: FileProperty.Id) : Boolean{
-        return this.state.value.contains(id)
+        return this.selectedIds.contains(id)
     }
 
-    fun clear() {
-        this._state.value = emptySet()
+    fun clearSelectedIdsAndCopy() : SelectedFilePropertyIds{
+        return this.copy(selectedIds = emptySet())
     }
 
-    fun count() : Int{
-        return this.state.value.size
-    }
+
+
+
 }
 
 
-fun SelectedFilePropertyIds.watchExists(id: FileProperty.Id) : Flow<Boolean>{
-    return this.state.map {
-        it.contains(id)
-    }
-}
-
-fun SelectedFilePropertyIds.watchCount() : Flow<Int> {
-    return this.state.map {
-        it.size
-    }
-}
