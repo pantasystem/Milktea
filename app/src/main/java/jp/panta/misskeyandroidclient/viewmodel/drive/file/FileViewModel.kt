@@ -1,16 +1,13 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive.file
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.drive.RequestFile
 import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
-import jp.panta.misskeyandroidclient.model.drive.*
+import jp.panta.misskeyandroidclient.model.drive.DirectoryPath
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.SelectedFilePropertyIds
+import jp.panta.misskeyandroidclient.model.drive.filePropertyPagingStore
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -25,7 +22,8 @@ class FileViewModel(
     currentDirectoryId: String?,
     private val miCore: MiCore,
     private val path: DirectoryPath,
-    private val selectedFilePropertyIds: SelectedFilePropertyIds
+    private val selectedFilePropertyIds: SelectedFilePropertyIds,
+    isSelectableMode: Boolean
 
 ) : ViewModel(){
 
@@ -33,6 +31,11 @@ class FileViewModel(
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error
 
+    private val _selectableMode = MutableStateFlow<Boolean>(isSelectableMode)
+    val selectableMode: StateFlow<Boolean> get() = _selectableMode
+    val isAddable = selectableMode.combine(selectedFilePropertyIds.state) { mode, selectedIds ->
+        mode && selectedIds.size < selectedFilePropertyIds.selectableMaxCount
+    }
 
     @ExperimentalCoroutinesApi
     private val account = currentAccountWatcher.account.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
@@ -52,6 +55,7 @@ class FileViewModel(
             }
         }
     }
+
 
 
     init {
@@ -106,12 +110,16 @@ class FileViewModel(
 
 
     fun toggleSelect(id: FileProperty.Id) {
+        if(!selectableMode.value) {
+            return
+        }
         if (selectedFilePropertyIds.exists(id)) {
             selectedFilePropertyIds.remove(id)
-        }else{
+        }else if(selectedFilePropertyIds.count() < selectedFilePropertyIds.selectableMaxCount){
             selectedFilePropertyIds.add(id)
         }
     }
+
 
     fun uploadFile(file: File){
         val uploadFile = file.copy(folderId = path.route.value.lastOrNull()?.id)
