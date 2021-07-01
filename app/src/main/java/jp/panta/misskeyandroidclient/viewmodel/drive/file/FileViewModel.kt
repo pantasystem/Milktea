@@ -4,10 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
-import jp.panta.misskeyandroidclient.model.drive.DirectoryPath
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.SelectedFilePropertyIds
-import jp.panta.misskeyandroidclient.model.drive.filePropertyPagingStore
+import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -22,19 +19,18 @@ class FileViewModel(
     currentDirectoryId: String?,
     private val miCore: MiCore,
     private val path: DirectoryPath,
-    private val selectedFilePropertyIds: SelectedFilePropertyIds,
-    isSelectableMode: Boolean
-
+    private val driveStore: DriveStore,
 ) : ViewModel(){
 
     private val filePropertiesPagingStore = miCore.filePropertyPagingStore(null, currentDirectoryId)
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error
 
-    private val _selectableMode = MutableStateFlow<Boolean>(isSelectableMode)
-    val selectableMode: StateFlow<Boolean> get() = _selectableMode
-    val isAddable = selectableMode.combine(selectedFilePropertyIds.state) { mode, selectedIds ->
-        mode && selectedIds.size < selectedFilePropertyIds.selectableMaxCount
+    val selectableMode: Flow<Boolean> get() = driveStore.state.map {
+        it.isSelectMode
+    }
+    val isAddable = this.driveStore.state.map {
+        it.selectedFilePropertyIds?.isAddable == true
     }
 
     @ExperimentalCoroutinesApi
@@ -48,10 +44,10 @@ class FileViewModel(
                 }
             }
         }
-    }.combine(selectedFilePropertyIds.state) { p, ids ->
+    }.combine(driveStore.state) { p, driveState ->
         p.convert {
             it.map { property ->
-                FileViewData(property, ids.contains(property.id))
+                FileViewData(property, driveState.selectedFilePropertyIds?.exists(property.id) == true)
             }
         }
     }
@@ -59,11 +55,13 @@ class FileViewModel(
 
 
     init {
-        /**
-         * DirectoryPathの現在のCurrentDirをFilePropertiesPagingStoreへ伝達します。
-         */
-        path.route.onEach {
-            filePropertiesPagingStore.setCurrentDirectory(it.lastOrNull())
+
+        driveStore.state.map {
+            it.path
+        }.distinctUntilChangedBy {
+            it.path.lastOrNull()
+        }.onEach {
+            filePropertiesPagingStore.setCurrentDirectory(it.path.lastOrNull())
             filePropertiesPagingStore.loadPrevious()
         }.launchIn(viewModelScope + Dispatchers.IO)
 
@@ -110,19 +108,12 @@ class FileViewModel(
 
 
     fun toggleSelect(id: FileProperty.Id) {
-        if(!selectableMode.value) {
-            return
-        }
-        if (selectedFilePropertyIds.exists(id)) {
-            selectedFilePropertyIds.remove(id)
-        }else if(selectedFilePropertyIds.count() < selectedFilePropertyIds.selectableMaxCount){
-            selectedFilePropertyIds.add(id)
-        }
+        driveStore.toggleSelect(id)
     }
 
 
     fun uploadFile(file: File){
-        val uploadFile = file.copy(folderId = path.route.value.lastOrNull()?.id)
+        val uploadFile = file.copy(folderId = driveStore.state.value.path.path.lastOrNull()?.id)
 
         viewModelScope.launch(Dispatchers.IO) {
             try{
