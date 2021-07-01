@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 data class DriveState (
     val path: DirectoryPath,
-    val accountId: Long,
+    val accountId: Long?,
     val selectedFilePropertyIds: SelectedFilePropertyIds?
 ) {
     val isSelectMode: Boolean get() = selectedFilePropertyIds != null
@@ -50,9 +50,16 @@ class DriveStore(
     }
 
 
-    fun pop() {
+    fun pop() : Boolean{
         val s = this.state.value
-        this._state.value = s.copy(path = s.path.pop())
+        val p = s.path.pop()
+        this._state.value = s.copy(path = p)
+        return p != s.path
+    }
+
+    fun popUntil(directory: Directory) {
+        val s = this.state.value
+        this._state.value = s.copy(path = s.path.popUntil(directory))
     }
 
     fun push(directory: Directory) {
