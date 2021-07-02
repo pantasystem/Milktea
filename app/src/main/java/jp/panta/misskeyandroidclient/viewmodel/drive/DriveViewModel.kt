@@ -6,12 +6,13 @@ import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.io.Serializable
 
 data class DriveSelectableMode(
     val selectableMaxSize: Int,
     val selectedFilePropertyIds: List<FileProperty.Id>,
     val accountId: Long
-)
+) : Serializable
 class DriveViewModel(
     val selectable: DriveSelectableMode?
 ) : ViewModel(){

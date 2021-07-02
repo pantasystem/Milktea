@@ -128,7 +128,7 @@ class DriveActivity : AppCompatActivity() {
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()
-            ft.add(R.id.content_main, DriveFragment())
+            ft.add(R.id.content_main, DriveFragment.newInstance(driveSelectableMode))
             ft.commit()
         }
 
