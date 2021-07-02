@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFolderBinding
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewData
+import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewModel
 
 
 class FolderListAdapter(
-    diffUtilItemCallback: DiffUtil.ItemCallback<FolderViewData>,
+    diffUtilItemCallback: DiffUtil.ItemCallback<DirectoryViewData>,
     private val driveViewModel: DriveViewModel,
-    private val folderViewModel: FolderViewModel
-) : ListAdapter<FolderViewData, FolderListAdapter.FolderViewHolder>(diffUtilItemCallback){
+    private val directoryViewModel: DirectoryViewModel
+) : ListAdapter<DirectoryViewData, FolderListAdapter.FolderViewHolder>(diffUtilItemCallback){
 
     class FolderViewHolder(val binding: ItemFolderBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -30,7 +30,7 @@ class FolderListAdapter(
 
         holder.binding.folder = getItem(position)
         holder.binding.driveViewModel =  driveViewModel
-        holder.binding.folderViewModel = folderViewModel
+        holder.binding.folderViewModel = directoryViewModel
         holder.binding.executePendingBindings()
     }
 }

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.drive
 
+import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -67,4 +68,20 @@ class DriveStore(
         this._state.value = s.copy(path = s.path.push(directory))
     }
 
+    fun moveToRoot() {
+        val s = this.state.value
+        this._state.value = s.copy(path = s.path.clear())
+    }
+
+    fun setAccount(account: Account) {
+        if(this.state.value.accountId == account.accountId) {
+            return
+        }
+        this._state.value = this.state.value.copy(
+            accountId = account.accountId,
+            selectedFilePropertyIds = this.state.value.selectedFilePropertyIds?.clearSelectedIdsAndCopy(),
+            path = this.state.value.path.clear()
+        )
+
+    }
 }

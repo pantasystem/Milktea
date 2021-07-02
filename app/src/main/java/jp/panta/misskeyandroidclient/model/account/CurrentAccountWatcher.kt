@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.account
 
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
@@ -21,4 +22,8 @@ class CurrentAccountWatcher(
             accountRepository.get(it)
         }?: accountRepository.getCurrentAccount()
     }
+}
+
+fun MiCore.watchAccount(currentAccountId: Long? = null) : CurrentAccountWatcher{
+    return CurrentAccountWatcher(currentAccountId, this.getAccountRepository())
 }

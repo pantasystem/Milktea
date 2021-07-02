@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogCreateFolderBinding
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewModel
 
 class CreateFolderDialog : AppCompatDialogFragment(){
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -15,11 +15,11 @@ class CreateFolderDialog : AppCompatDialogFragment(){
         val view = View.inflate(dialog.context, R.layout.dialog_create_folder, null)
         val binding = DialogCreateFolderBinding.bind(view)
         dialog.setContentView(view)
-        val folderViewModel = ViewModelProvider(requireActivity())[FolderViewModel::class.java]
+        val directoryViewModel = ViewModelProvider(requireActivity())[DirectoryViewModel::class.java]
         binding.okButton.setOnClickListener {
             val name = binding.editFolderName.text.toString()
             if(name.isNotBlank()){
-                folderViewModel.createFolder(name)
+                directoryViewModel.createFolder(name)
                 dismiss()
 
             }

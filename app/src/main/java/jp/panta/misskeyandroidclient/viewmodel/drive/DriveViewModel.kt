@@ -4,10 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
+import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.util.*
 
 data class DriveSelectableMode(
     val selectableMaxSize: Int,
@@ -33,19 +32,19 @@ class DriveViewModel(
 
     val currentDirectory = this.driveStore.state.map {
         if(it.path.path.isEmpty()) {
-            DirectoryViewData(null)
+            PathViewData(null)
         }else{
             it.path.path.last()
         }
     }
 
-    val path: Flow<List<DirectoryViewData>> = driveStore.state.map { state ->
+    val path: Flow<List<PathViewData>> = driveStore.state.map { state ->
         mutableListOf(
-            DirectoryViewData(null),
+            PathViewData(null),
         ).also { list ->
             list.addAll(
                 state.path.path.map { directory ->
-                    DirectoryViewData(directory)
+                    PathViewData(directory)
                 }
             )
         }

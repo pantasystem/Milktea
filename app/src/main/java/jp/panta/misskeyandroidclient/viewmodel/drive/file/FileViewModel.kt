@@ -16,13 +16,11 @@ import kotlinx.coroutines.flow.*
 @ExperimentalCoroutinesApi
 class FileViewModel(
     private val currentAccountWatcher: CurrentAccountWatcher,
-    currentDirectoryId: String?,
     private val miCore: MiCore,
-    private val path: DirectoryPath,
     private val driveStore: DriveStore,
 ) : ViewModel(){
 
-    private val filePropertiesPagingStore = miCore.filePropertyPagingStore(null, currentDirectoryId)
+    private val filePropertiesPagingStore = miCore.filePropertyPagingStore(null, driveStore.state.value.path.path.lastOrNull()?.id)
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error
 
@@ -59,7 +57,7 @@ class FileViewModel(
         driveStore.state.map {
             it.path
         }.distinctUntilChangedBy {
-            it.path.lastOrNull()
+            it.path.lastOrNull()?.id
         }.onEach {
             filePropertiesPagingStore.setCurrentDirectory(it.path.lastOrNull())
             filePropertiesPagingStore.loadPrevious()
@@ -71,7 +69,8 @@ class FileViewModel(
         account.distinctUntilChangedBy {
             it.accountId
         }.onEach {
-            path.clear()
+
+            driveStore.setAccount(it)
             filePropertiesPagingStore.setAccount(it)
         }.launchIn(viewModelScope + Dispatchers.IO)
 

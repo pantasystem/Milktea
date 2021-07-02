@@ -8,7 +8,7 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class DriveViewModelFactory(
-    private val driveSelectableMode: DriveSelectableMode
+    private val driveSelectableMode: DriveSelectableMode?
 ) : ViewModelProvider.Factory{
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
