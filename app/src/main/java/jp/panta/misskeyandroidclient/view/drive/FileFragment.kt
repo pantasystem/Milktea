@@ -15,11 +15,18 @@ import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentFileBinding
+import jp.panta.misskeyandroidclient.model.drive.DriveStore
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.util.PageableState
+import jp.panta.misskeyandroidclient.util.StateContent
+import jp.panta.misskeyandroidclient.viewmodel.drive.DriveSelectableMode
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -27,79 +34,78 @@ import kotlinx.coroutines.flow.onEach
 class FileFragment : Fragment(R.layout.fragment_file){
 
     companion object{
-        private const val ARGS_SELECTABLE_MAX_SIZE = "file_fragment_selectable_max_size"
-        private const val ARGS_FOLDER_ID = "file_fragment_folder_id"
 
-        fun newInstance(selectableMaxSize: Int, folderId: String? = null): FileFragment{
-            val bundle = Bundle().apply{
-                require(selectableMaxSize > 0) { "このメソッドを使ってインスタンス化するときは0より大きい数値を指定してください" }
-                putInt(ARGS_SELECTABLE_MAX_SIZE, selectableMaxSize)
-                putString(ARGS_FOLDER_ID, folderId)
-            }
-            return FileFragment().apply{
-                arguments = bundle
-            }
+        private const val MAX_SIZE = "MAX_SIZE"
+        private const val ACCOUNT_ID = "ACCOUNT_ID"
+        private const val SELECTED_FILE_IDS = "SELECTED_FILE_IDS"
+        fun newInstance(mode: DriveSelectableMode?) : Fragment{
+            return FileFragment().also { fragment ->
+                fragment.arguments = Bundle().also { bundle ->
+                    bundle.putInt(MAX_SIZE, mode?.selectableMaxSize?: -1)
+                    bundle.putSerializable(SELECTED_FILE_IDS, mode?.let {
+                        ArrayList(it.selectedFilePropertyIds)
+                    })
+                    bundle.putLong(ACCOUNT_ID, mode?.accountId?: mode?.selectedFilePropertyIds?.map {
+                        it.accountId
+                    }?.toSet()?.lastOrNull()?: -1)
+                }
 
-        }
-
-        fun newInstance(folderId: String): FileFragment{
-            val bundle = Bundle().apply{
-                putString(ARGS_FOLDER_ID, folderId)
-            }
-            return FileFragment().apply{
-                arguments = bundle
             }
         }
     }
 
     private val binding: FragmentFileBinding by dataBinding()
-    private var mViewModel: FileViewModel? = null
+    @ExperimentalCoroutinesApi
+    private lateinit var _viewModel: FileViewModel
     private lateinit var mLinearLayoutManager: LinearLayoutManager
 
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val maxSize = arguments?.getInt(ARGS_SELECTABLE_MAX_SIZE)?: 0
-        val folderId = arguments?.getString(ARGS_FOLDER_ID)
+        val maxSize = arguments?.getInt(MAX_SIZE, -1)?.let {
+            if(it == -1) null else it
+        }
+        val selectedFileIds = (arguments?.getSerializable(SELECTED_FILE_IDS) as? ArrayList<*>)?.let { list ->
+            list.map { it as FileProperty.Id }
+        }
+        val accountId = arguments?.getLong(ACCOUNT_ID, - 1)?.let {
+            if(it == -1L) null else it
+        }
+
+        val mode = if(maxSize == null || selectedFileIds.isNullOrEmpty() || accountId == null) {
+            null
+        }else{
+            DriveSelectableMode(
+                accountId = accountId,
+                selectedFilePropertyIds = selectedFileIds,
+                selectableMaxSize = maxSize,
+            )
+        }
 
         mLinearLayoutManager = LinearLayoutManager(context)
         binding.filesView.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
-        miApplication.getCurrentAccount().filterNotNull().onEach{
-            val activity = activity?: return@onEach
 
-            val driveViewModelFactory = DriveViewModelFactory(maxSize)
-            val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
+        val driveViewModel = ViewModelProvider(requireActivity(), DriveViewModelFactory(mode))[DriveViewModel::class.java]
+        _viewModel = ViewModelProvider(requireActivity(), FileViewModelFactory(accountId, miApplication, driveViewModel.driveStore))[FileViewModel::class.java]
+        val adapter = FileListAdapter(fileDiffUtilCallback, _viewModel,driveViewModel, viewLifecycleOwner)
+        binding.filesView.adapter = adapter
 
-            val factory  = FileViewModelFactory(it, miApplication, driveViewModel.selectedFilesMapLiveData, maxSelectableItemSize = driveViewModel.selectableMaxSize, folderId = folderId)
-            val viewModel  = ViewModelProvider(activity, factory).get(FileViewModel::class.java)
+        _viewModel.state.onEach {
+            binding.refresh.isRefreshing = it is PageableState.Loading
+            val list = if(it.content is StateContent.Exist) it.content.rawContent else emptyList()
+            adapter.submitList(list)
 
+        }.catch {
 
-
-            driveViewModel.currentDirectory.observe(viewLifecycleOwner, {directory ->
-                viewModel.currentFolder.postValue(directory?.id)
-            })
-
-            mViewModel = viewModel
-            viewModel.isRefreshing.observe(viewLifecycleOwner, { isRefreshing ->
-                binding.refresh.isRefreshing = isRefreshing
-            })
-
-            val adapter = FileListAdapter(fileDiffUtilCallback, viewModel,driveViewModel, viewLifecycleOwner)
-            binding.filesView.adapter = adapter
-
-            viewModel.filesLiveData.observe(viewLifecycleOwner, {files ->
-                adapter.submitList(files)
-            })
-            viewModel.currentFolder.observe(viewLifecycleOwner, {
-                viewModel.loadInit()
-            })
-
-            binding.refresh.setOnRefreshListener {
-                viewModel.loadInit()
-            }
         }.launchIn(lifecycleScope)
+
+        binding.refresh.setOnRefreshListener {
+            _viewModel.loadInit()
+        }
+
         binding.filesView.addOnScrollListener(mScrollListener)
     }
 
@@ -118,10 +124,11 @@ class FileFragment : Fragment(R.layout.fragment_file){
         }
 
         override fun areItemsTheSame(oldItem: FileViewData, newItem: FileViewData): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.fileProperty.id == newItem.fileProperty.id
         }
     }
 
+    @ExperimentalCoroutinesApi
     private val mScrollListener = object : RecyclerView.OnScrollListener(){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
@@ -137,7 +144,7 @@ class FileFragment : Fragment(R.layout.fragment_file){
             if(endVisibleItemPosition == (itemCount - 1)){
                 Log.d("", "後ろ")
                 //mTimelineViewModel?.getOldTimeline()
-                mViewModel?.loadNext()
+                _viewModel.loadNext()
 
             }
 
