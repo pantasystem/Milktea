@@ -115,7 +115,7 @@
                     android:visibility='@{SafeUnbox.unboxBool(fileViewModel.selectableMode) ? View.VISIBLE : View.GONE }'
                     android:onClick='@{()-> fileViewModel.toggleSelect(fileViewData.fileProperty.id) }'
                     android:checked="@{SafeUnbox.unboxBool(fileViewData.isSelected)}"
-                    android:enabled="@{SafeUnbox.unboxBool(fileViewModel.isAddable)}"
+                    android:enabled="@{SafeUnbox.unboxBool(fileViewData.isEnabled)}"
                     />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

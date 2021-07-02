@@ -51,7 +51,11 @@ class FileViewModel(
     }.combine(driveStore.state) { p, driveState ->
         p.convert {
             it.map { property ->
-                FileViewData(property, driveState.selectedFilePropertyIds?.exists(property.id) == true)
+                FileViewData(
+                    property,
+                    driveState.selectedFilePropertyIds?.exists(property.id) == true,
+                    driveState.isSelectMode && (driveState.selectedFilePropertyIds?.exists(property.id) == true || driveState.selectedFilePropertyIds?.isAddable == true)
+                )
             }
         }
     }
