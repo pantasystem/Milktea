@@ -31,6 +31,10 @@ class FileViewModel(
         it.selectedFilePropertyIds?.isAddable == true
     }
 
+    val selectedFileIds = this.driveStore.state.map {
+        it.selectedFilePropertyIds?.selectedIds
+    }
+
     @ExperimentalCoroutinesApi
     private val account = currentAccountWatcher.account.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
