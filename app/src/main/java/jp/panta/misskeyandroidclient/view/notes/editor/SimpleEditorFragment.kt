@@ -312,6 +312,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         when(requestCode and 0xffff){
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK){
+                    /*
+                    TODO: 修正する
                     val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
                         it as FilePropertyDTO
                     }
@@ -326,7 +328,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
                         mViewModel?.addAllFileProperty(addFiles.map {
                             it.toFileProperty((context?.applicationContext as MiCore).getCurrentAccount().value!!)
                         })
-                    }
+                    }*/
                 }
             }
             SELECT_LOCAL_FILE_REQUEST_CODE ->{

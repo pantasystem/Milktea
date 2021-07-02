@@ -106,9 +106,13 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
         when(requestCode){
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == Activity.RESULT_OK){
+                    /*
+                    TODO: 動くように修正する
                     mViewModel.file.value = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>).map{
                         it as FilePropertyDTO
                     }.firstOrNull()
+
+                     */
                 }
             }
         }
