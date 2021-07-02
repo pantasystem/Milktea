@@ -21,7 +21,7 @@ class FileViewModel(
     private val driveStore: DriveStore,
 ) : ViewModel(){
 
-    private val filePropertiesPagingStore = miCore.filePropertyPagingStore(null, driveStore.state.value.path.path.lastOrNull()?.id)
+    private val filePropertiesPagingStore = miCore.filePropertyPagingStore({ currentAccountWatcher.getAccount()}, driveStore.state.value.path.path.lastOrNull()?.id)
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error
 
@@ -77,7 +77,8 @@ class FileViewModel(
         }.onEach {
 
             driveStore.setAccount(it)
-            filePropertiesPagingStore.setAccount(it)
+            filePropertiesPagingStore.clear()
+            filePropertiesPagingStore.loadPrevious()
         }.launchIn(viewModelScope + Dispatchers.IO)
 
 

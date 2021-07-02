@@ -97,6 +97,9 @@ class FileFragment : Fragment(R.layout.fragment_file){
             binding.refresh.isRefreshing = it is PageableState.Loading
             val list = if(it.content is StateContent.Exist) it.content.rawContent else emptyList()
             adapter.submitList(list)
+            if(it is PageableState.Error) {
+                Log.w("FileFragment", "読み込みエラー", it.throwable)
+            }
 
         }.catch {
 

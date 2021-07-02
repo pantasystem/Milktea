@@ -20,7 +20,7 @@ import retrofit2.Response
 
 class FilePropertyPagingStore(
     private var currentDirectoryId: String?,
-    private var accountId: Long?,
+    private val getAccount: suspend () -> Account,
     private val accountRepository: AccountRepository,
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
@@ -31,9 +31,7 @@ class FilePropertyPagingStore(
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
         misskeyAPIProvider,
         {
-            accountId?.let {
-                accountRepository.get(it)
-            }?: throw AccountNotFoundException()
+            getAccount.invoke()
         },
         {
             currentDirectoryId
@@ -68,22 +66,12 @@ class FilePropertyPagingStore(
         this.currentDirectoryId = directory?.id
     }
 
-    /**
-     * 現在の状態の初期化とアカウントのIdをセットします。
-     */
-    suspend fun setAccount(account: Account) {
-        val changed = account.accountId != accountId
-        if(changed) {
-            this.clear()
-            this.accountId = account.accountId
-        }
-    }
 }
 
-fun MiCore.filePropertyPagingStore(accountId: Long?, currentDirectoryId: String?) : FilePropertyPagingStore{
+fun MiCore.filePropertyPagingStore(getAccount: suspend () -> Account, currentDirectoryId: String?) : FilePropertyPagingStore{
     return FilePropertyPagingStore(
         currentDirectoryId,
-        accountId,
+        getAccount,
         this.getAccountRepository(),
         this.getMisskeyAPIProvider(),
         this.getFilePropertyDataSource(),
