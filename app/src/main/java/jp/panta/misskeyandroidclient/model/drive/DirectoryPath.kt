@@ -27,7 +27,10 @@ data class DirectoryPath(
     }
 
 
-    fun popUntil(directory: Directory) : DirectoryPath{
+    fun popUntil(directory: Directory?) : DirectoryPath{
+        if(directory == null) {
+            return this.clear()
+        }
         val index = path.lastIndexOf(directory)
         if(index == -1) {
             return this

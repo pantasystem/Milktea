@@ -58,7 +58,7 @@ class DriveStore(
         return p != s.path
     }
 
-    fun popUntil(directory: Directory) {
+    fun popUntil(directory: Directory?) {
         val s = this.state.value
         this._state.value = s.copy(path = s.path.popUntil(directory))
     }

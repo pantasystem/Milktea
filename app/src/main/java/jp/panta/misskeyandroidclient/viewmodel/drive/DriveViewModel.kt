@@ -78,7 +78,7 @@ class DriveViewModel(
         return driveStore.pop()
     }
 
-    fun popUntil(directory: Directory) {
+    fun popUntil(directory: Directory?) {
         driveStore.popUntil(directory)
     }
 
