@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

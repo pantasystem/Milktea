@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel.drive.folder
+package jp.panta.misskeyandroidclient.viewmodel.drive.directory
 
 import jp.panta.misskeyandroidclient.model.drive.Directory
 

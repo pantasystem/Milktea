@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.viewmodel.drive.folder
+package jp.panta.misskeyandroidclient.viewmodel.drive.directory
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData

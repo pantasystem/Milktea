@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogCreateFolderBinding
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
 
 class CreateFolderDialog : AppCompatDialogFragment(){
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

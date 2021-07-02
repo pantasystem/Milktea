@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFolderBinding
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewData
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewData
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
 
 
 class FolderListAdapter(

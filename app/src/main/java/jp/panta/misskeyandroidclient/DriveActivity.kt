@@ -30,8 +30,8 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.DirectoryViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -105,9 +105,10 @@ class DriveActivity : AppCompatActivity() {
             _driveViewModel.driveStore
         ))[FileViewModel::class.java]
 
-        mDirectoryViewModel = ViewModelProvider(this, FolderViewModelFactory(
+        mDirectoryViewModel = ViewModelProvider(this, DirectoryViewModelFactory(
             accountIds?.lastOrNull(), miCore, _driveViewModel.driveStore
-        ))[DirectoryViewModel::class.java]
+        )
+        )[DirectoryViewModel::class.java]
 
         val adapter = DirListAdapter(diffUtilItemCallback, _driveViewModel)
         mBinding.dirListView.adapter = adapter

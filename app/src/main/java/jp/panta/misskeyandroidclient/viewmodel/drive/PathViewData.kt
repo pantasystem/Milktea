@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.drive
 
 import jp.panta.misskeyandroidclient.model.drive.Directory
 
-class DirectoryViewData (val folder: Directory?){
+class PathViewData (val folder: Directory?){
     val id = folder?.id
     val name = folder?.name?: "root"
     val parentId = folder?.parentId
@@ -10,7 +10,7 @@ class DirectoryViewData (val folder: Directory?){
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as DirectoryViewData
+        other as PathViewData
 
         if (folder != other.folder) return false
         if (id != other.id) return false
