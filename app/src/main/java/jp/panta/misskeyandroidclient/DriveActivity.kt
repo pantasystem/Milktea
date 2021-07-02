@@ -42,7 +42,7 @@ class DriveActivity : AppCompatActivity() {
         //const val EXTRA_IS_FILE_SELECTABLE = "jp.panta.misskeyandroidclient.EXTRA_IS_FILE_SELECTABLE"
         const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
         const val EXTRA_SELECTED_FILE_PROPERTY_IDS = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
-
+        const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
 
         private const val OPEN_DOCUMENT_RESULT_CODE = 113
         private const val READ_STORAGE_PERMISSION_REQUEST_CODE = 112
@@ -79,6 +79,9 @@ class DriveActivity : AppCompatActivity() {
             it as FileProperty.Id
         }
 
+        val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)?.let {
+            if(it == -1L) null else it
+        }
         val accountIds = selectedFileIds?.map { it.accountId }?.toSet()
 
         require(selectedFileIds == null || accountIds!!.size == 1) {
@@ -91,22 +94,23 @@ class DriveActivity : AppCompatActivity() {
             supportActionBar?.title = getString(R.string.drive)
         }
 
-        val driveSelectableMode: DriveSelectableMode? = if(selectedFileIds == null || maxSize <= 0) {
+        val driveSelectableMode: DriveSelectableMode? = if(maxSize <= 0) {
             null
         }else{
-            DriveSelectableMode(maxSize, selectedFileIds, accountIds!!.first())
+            DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), accountId?: accountIds!!.first())
         }
+        Log.d("DriveActivity", "mode:$driveSelectableMode")
 
         val miCore = applicationContext as MiCore
         _driveViewModel = ViewModelProvider(this, DriveViewModelFactory(driveSelectableMode))[DriveViewModel::class.java]
         mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
-            accountIds?.lastOrNull(),
+            accountId?: accountIds?.lastOrNull(),
             miCore,
             _driveViewModel.driveStore
         ))[FileViewModel::class.java]
 
         mDirectoryViewModel = ViewModelProvider(this, DirectoryViewModelFactory(
-            accountIds?.lastOrNull(), miCore, _driveViewModel.driveStore
+            accountId?: accountIds?.lastOrNull(), miCore, _driveViewModel.driveStore
         )
         )[DirectoryViewModel::class.java]
 
@@ -201,6 +205,7 @@ class DriveActivity : AppCompatActivity() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == OPEN_DOCUMENT_RESULT_CODE){

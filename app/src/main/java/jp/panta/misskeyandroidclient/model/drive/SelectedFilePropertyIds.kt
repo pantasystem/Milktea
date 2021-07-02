@@ -16,10 +16,12 @@ data class SelectedFilePropertyIds(
     val isAddable: Boolean get() = selectedIds.size < selectableMaxCount
 
     fun addAndCopy(id: FileProperty.Id) : SelectedFilePropertyIds{
-        val ids = this.selectedIds
-        ids.toMutableSet().also {
-            it.add(id)
+        val ids = this.selectedIds.let { ids ->
+            ids.toMutableSet().also {
+                it.add(id)
+            }
         }
+
         return this.copy(selectedIds = ids)
     }
 

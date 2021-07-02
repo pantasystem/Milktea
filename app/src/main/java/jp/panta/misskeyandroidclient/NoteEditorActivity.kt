@@ -357,12 +357,13 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
     private fun showDriveFileSelector(){
         val selectedSize = mViewModel?.totalImageCount?.value?: 0
 
+        val miCore = applicationContext as MiCore
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = 4 - selectedSize
         Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
-
+            .putExtra(DriveActivity.EXTRA_ACCOUNT_ID, miCore.getCurrentAccount().value?.accountId)
         startActivityForResult(intent, SELECT_DRIVE_FILE_REQUEST_CODE)
     }
 
@@ -445,21 +446,16 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         when(requestCode){
             SELECT_DRIVE_FILE_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK){
-                    /*
-                    TODO: 動くように修正する
-                    val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
-                        it as FileProperty
+
+
+                    val ids = (data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS)  as List<*>? )?.mapNotNull {
+                        it as? FileProperty.Id
                     }
-                    //mViewModel?.driveFiles?.postValue(files)
-                    if(files != null){
-                        val exFiles = mViewModel?.files?.value
-                        val addFiles = files.filter{out ->
-                            exFiles?.firstOrNull {
-                                it.remoteFileId?.fileId == out.id.fileId
-                            } == null
-                        }
-                        mViewModel?.addAllFileProperty(addFiles)
-                    }*/
+                    Log.d("NoteEditorActivity", "result:${ids}")
+                    if(ids != null && ids.isNotEmpty()) {
+                        mViewModel?.addFilePropertyFromIds(ids)
+                    }
+
                 }
             }
             SELECT_LOCAL_FILE_REQUEST_CODE ->{
