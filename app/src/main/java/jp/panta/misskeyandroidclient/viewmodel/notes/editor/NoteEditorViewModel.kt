@@ -271,7 +271,7 @@ class NoteEditorViewModel(
         files.addAll(fpList.map{
             it.toFile()
         })
-        this.files.value = files
+        this.files.postValue(files)
     }
 
     fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
