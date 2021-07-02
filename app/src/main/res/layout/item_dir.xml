@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 tools:text="TextView"
                 android:layout_gravity="center"
-                android:text="@{directory.folder.name}"
+                android:text="@{directory.name}"
                 />
 
         <ImageView

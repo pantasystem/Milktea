@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.drive.file
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
 import jp.panta.misskeyandroidclient.model.drive.*
@@ -24,12 +25,13 @@ class FileViewModel(
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error
 
-    val selectableMode: Flow<Boolean> get() = driveStore.state.map {
+    val selectableMode = driveStore.state.map {
         it.isSelectMode
-    }
+    }.asLiveData()
+
     val isAddable = this.driveStore.state.map {
         it.selectedFilePropertyIds?.isAddable == true
-    }
+    }.asLiveData()
 
     val selectedFileIds = this.driveStore.state.map {
         it.selectedFilePropertyIds?.selectedIds

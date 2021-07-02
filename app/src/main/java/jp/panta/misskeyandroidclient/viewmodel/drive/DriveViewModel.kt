@@ -84,7 +84,7 @@ class DriveViewModel(
 
 
 
-    fun openFile(fileProperty: FileProperty){
+    fun openFile(fileProperty: FileProperty?){
         openFileEvent.event = fileProperty
     }
 
