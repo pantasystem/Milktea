@@ -5,11 +5,12 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-kapt'
 
-apply plugin: 'com.google.gms.oss.licenses.plugin'
 
 apply plugin: "org.jetbrains.kotlin.plugin.serialization"
 
 apply plugin: 'com.google.gms.google-services'
+
+apply plugin: "com.google.android.gms.oss-licenses-plugin"
 
 android {
     compileSdkVersion 30
