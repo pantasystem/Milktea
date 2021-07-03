@@ -53,6 +53,10 @@ class DriveViewModel(
     val openFileEvent = EventBus<FileProperty>()
     //val selectedFilesMap = HashMap<String, FileViewData>()
 
+    val isSelectMode = driveStore.state.map {
+        it.isSelectMode
+    }
+
 
     private val _selectedFileIds = MutableLiveData<Set<FileProperty.Id>>()
 
