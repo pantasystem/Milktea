@@ -94,14 +94,17 @@ class DriveActivity : AppCompatActivity() {
             supportActionBar?.title = getString(R.string.drive)
         }
 
+        val miCore = applicationContext as MiCore
+
         val driveSelectableMode: DriveSelectableMode? = if(maxSize <= 0) {
             null
         }else{
-            DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), accountId?: accountIds!!.first())
+            val aId = accountId?: accountIds?.lastOrNull()?:  miCore.getCurrentAccount().value?.accountId
+            requireNotNull(aId)
+            DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
         }
         Log.d("DriveActivity", "mode:$driveSelectableMode")
 
-        val miCore = applicationContext as MiCore
         _driveViewModel = ViewModelProvider(this, DriveViewModelFactory(driveSelectableMode))[DriveViewModel::class.java]
         mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
             accountId?: accountIds?.lastOrNull(),

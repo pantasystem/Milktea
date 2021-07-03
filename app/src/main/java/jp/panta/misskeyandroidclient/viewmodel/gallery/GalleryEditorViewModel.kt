@@ -105,13 +105,14 @@ class GalleryEditorViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val files = filePropertyDataSource.findIn(ids)
 
-            (_pickedImages.value?: emptyList()).toMutableList().also { list ->
+            val list = (_pickedImages.value?: emptyList()).toMutableList().also { list ->
                 list.addAll(
                     files.map {
                         it.toFile()
                     }
                 )
             }
+            _pickedImages.postValue(list)
         }
     }
 
