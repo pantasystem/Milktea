@@ -52,6 +52,7 @@ android {
 
     buildFeatures {
         dataBinding true
+        compose true
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -188,8 +189,8 @@ dependencies {
     // Material design icons
     implementation 'androidx.compose.material:material-icons-core:1.0.0-beta09'
     implementation 'androidx.compose.material:material-icons-extended:1.0.0-beta09'
-    // Integration with observables
-    implementation 'androidx.compose.runtime:runtime-livedata:1.0.0-rc01'
     // UI Tests
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.0.0-beta09'
+    // Integration with observables
+    implementation 'androidx.compose.runtime:runtime-livedata:1.0.0-rc01'
 }
