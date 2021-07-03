@@ -185,12 +185,13 @@ dependencies {
     // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
     implementation 'androidx.compose.foundation:foundation:1.0.0-rc01'
     // Material Design
-    implementation 'androidx.compose.material:material:1.0.0-beta09'
+    implementation 'androidx.compose.material:material:1.0.0-rc01'
     // Material design icons
-    implementation 'androidx.compose.material:material-icons-core:1.0.0-beta09'
+    implementation 'androidx.compose.material:material-icons-core:1.0.0-rc01'
     implementation 'androidx.compose.material:material-icons-extended:1.0.0-beta09'
     // UI Tests
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.0.0-beta09'
     // Integration with observables
     implementation 'androidx.compose.runtime:runtime-livedata:1.0.0-rc01'
+    implementation "com.google.android.material:compose-theme-adapter:1.0.0-rc01"
 }

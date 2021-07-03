@@ -66,9 +66,10 @@ class DriveActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ViewTreeLifecycleOwner.set(window.decorView, this)
 
         setTheme()
+        ViewTreeLifecycleOwner.set(window.decorView, this)
+
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_drive)
 
         setSupportActionBar(mBinding.driveToolbar)

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.R
@@ -96,7 +97,9 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                DirectoryListScreen(_directoryViewModel, _driveViewModel)
+                MdcTheme {
+                    DirectoryListScreen(_directoryViewModel, _driveViewModel)
+                }
             }
         }
     }
