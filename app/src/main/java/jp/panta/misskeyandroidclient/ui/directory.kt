@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewData
 
@@ -37,7 +38,12 @@ fun DirectoryListScreen(viewModel: DirectoryViewModel, driveViewModel: DriveView
         initial = false
     )
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
+    val listState = rememberLazyListState()
 
+
+    if(listState.isScrolledToTheEnd() && listState.layoutInfo.visibleItemsInfo.size !=  listState.layoutInfo.totalItemsCount && listState.isScrollInProgress){
+        viewModel.loadNext()
+    }
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
@@ -45,7 +51,7 @@ fun DirectoryListScreen(viewModel: DirectoryViewModel, driveViewModel: DriveView
         },
         Modifier.fillMaxHeight()
     ) {
-        DirectoryListView(directories) {
+        DirectoryListView(directories, listState = listState) {
             driveViewModel.push(it)
         }
     }
