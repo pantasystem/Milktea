@@ -462,7 +462,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         }
     }
 
-    val requestReadStoragePermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+    private val requestReadStoragePermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if(it){
             showFileManager()
         }else{
