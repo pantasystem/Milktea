@@ -2,97 +2,89 @@ package jp.panta.misskeyandroidclient.viewmodel.drive
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
-import java.util.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import java.io.Serializable
 
+data class DriveSelectableMode(
+    val selectableMaxSize: Int,
+    val selectedFilePropertyIds: List<FileProperty.Id>,
+    val accountId: Long
+) : Serializable
 class DriveViewModel(
-    val selectableMaxSize: Int
+    val selectable: DriveSelectableMode?
 ) : ViewModel(){
 
-    val currentDirectory = MutableLiveData<DirectoryViewData?>(DirectoryViewData(null))
+    val driveStore: DriveStore = DriveStore(
+        DriveState(
+            accountId = selectable?.accountId,
+            path = DirectoryPath(emptyList()),
+            selectedFilePropertyIds = selectable?.let {
+                SelectedFilePropertyIds(
+                    selectableMaxCount = it.selectableMaxSize,
+                    selectedIds = it.selectedFilePropertyIds.toSet()
+                )
+            }
+        )
+    )
 
-    val hierarchyDirectory = MutableLiveData<List<DirectoryViewData>>()
+    val currentDirectory = this.driveStore.state.map {
+        if(it.path.path.isEmpty()) {
+            PathViewData(null)
+        }else{
+            it.path.path.last()
+        }
+    }
+
+    val path: Flow<List<PathViewData>> = driveStore.state.map { state ->
+        mutableListOf(
+            PathViewData(null),
+        ).also { list ->
+            list.addAll(
+                state.path.path.map { directory ->
+                    PathViewData(directory)
+                }
+            )
+        }
+    }
 
     val openFileEvent = EventBus<FileProperty>()
     //val selectedFilesMap = HashMap<String, FileViewData>()
-    val selectedFilesMapLiveData = if(selectableMaxSize > -1){
-        MutableLiveData<Map<FileProperty.Id, FileViewData>>()
-    }else{
-        null
+
+
+    private val _selectedFileIds = MutableLiveData<Set<FileProperty.Id>>()
+
+    fun getSelectedFileIds(): Set<FileProperty.Id>?{
+        return this.driveStore.state.value.selectedFilePropertyIds?.selectedIds
+    }
+
+    fun setSelectedFileIds(fileIds: List<FileProperty.Id>) {
+        _selectedFileIds.postValue(fileIds.toSet())
+    }
+
+    fun push(directory: Directory) {
+        this.driveStore.push(directory)
     }
 
 
-    init{
-        val current = currentDirectory.value
-        if(current != null){
-            hierarchyDirectory.postValue(listOf(current))
+    fun pop() : Boolean{
+        val path = driveStore.state.value.path.path
+        if(path.isEmpty()) {
+            return false
         }
+
+        return driveStore.pop()
+    }
+
+    fun popUntil(directory: Directory?) {
+        driveStore.popUntil(directory)
     }
 
 
-    fun getSelectedFileIds(): List<String>?{
-        return selectedFilesMapLiveData?.value?.values?.map{
-            it.id.fileId
-        }
-    }
 
-    fun getSelectedFileList(): List<FileProperty>?{
-        return selectedFilesMapLiveData?.value?.values?.map{
-            it.file
-        }?.toList()
-    }
-
-    fun setSelectedFileList(files: List<FileProperty>){
-        selectedFilesMapLiveData?.postValue(
-        files.map{
-            Pair(it.id , FileViewData(it))
-        }.toMap())
-    }
-
-    fun moveChildDirectory(childDirectory: FolderViewData){
-        val current = DirectoryViewData(childDirectory.folderProperty)
-        currentDirectory.postValue(current)
-        val list = hierarchyDirectory.value
-        val newList = if(list == null){
-            listOf(current)
-        }else{
-            ArrayList(list).apply{
-                add(current)
-            }
-        }
-        hierarchyDirectory.postValue(newList)
-    }
-
-    fun moveParentDirectory(){
-        val list = hierarchyDirectory.value
-            ?: return
-        val arrayList = ArrayList<DirectoryViewData>(list)
-        val currentIndex = arrayList.size - 1
-        if(currentIndex < 1){
-            return
-        }else{
-            arrayList.removeAt(currentIndex)
-            //val lastItem = arrayList.removeAt(currentIndex)
-            val parentItem = arrayList.lastOrNull()
-            currentDirectory.postValue(parentItem)
-            hierarchyDirectory.postValue(arrayList)
-        }
-    }
-
-    fun moveDirectory(directory: DirectoryViewData){
-        val dirs = hierarchyDirectory.value
-            ?:return
-        val index = dirs.indexOf(directory)
-        val current = dirs.get(index)
-        val newDirs = dirs.subList(0, index + 1)
-        currentDirectory.postValue(current)
-        hierarchyDirectory.postValue(newDirs)
-    }
-
-    fun openFile(fileProperty: FileProperty){
+    fun openFile(fileProperty: FileProperty?){
         openFileEvent.event = fileProperty
     }
 

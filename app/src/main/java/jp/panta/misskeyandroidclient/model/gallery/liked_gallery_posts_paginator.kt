@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.flow.Flow
@@ -20,30 +21,15 @@ data class LikedGalleryPostId(
     val postId: GalleryPost.Id
 )
 
-class LikedGalleryPostsState : PageableState<LikedGalleryPostId>, IdGetter<String>, GetGalleryPostsStateFlow {
+class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<String>, GetGalleryPostsStateFlow {
 
-    private val _state = MutableStateFlow<State<List<LikedGalleryPostId>>>(State.Fixed(StateContent.NotExist()))
+    private val _state = MutableStateFlow<PageableState<List<LikedGalleryPostId>>>(PageableState.Fixed(StateContent.NotExist()))
 
-    override fun getFlow(): Flow<State<List<GalleryPost.Id>>> {
+    override fun getFlow(): Flow<PageableState<List<GalleryPost.Id>>> {
         return _state.map {
-            val content = if(it.content is StateContent.Exist) {
-                StateContent.Exist(
-                    it.content.rawContent.map { liked ->
-                        liked.postId
-                    }
-                )
-            }else{
-                StateContent.NotExist()
-            }
-            when(it) {
-                is State.Fixed -> {
-                    State.Fixed(content)
-                }
-                is State.Error -> {
-                    State.Error(content, it.throwable)
-                }
-                is State.Loading -> {
-                    State.Loading(content)
+            it.convert { list ->
+                list.map { liked ->
+                    liked.postId
                 }
             }
 
@@ -63,13 +49,13 @@ class LikedGalleryPostsState : PageableState<LikedGalleryPostId>, IdGetter<Strin
     }
 
 
-    override val state: Flow<State<List<LikedGalleryPostId>>> = _state
+    override val state: Flow<PageableState<List<LikedGalleryPostId>>> = _state
 
-    override fun getState(): State<List<LikedGalleryPostId>> {
+    override fun getState(): PageableState<List<LikedGalleryPostId>> {
         return _state.value
     }
 
-    override fun setState(state: State<List<LikedGalleryPostId>>) {
+    override fun setState(state: PageableState<List<LikedGalleryPostId>>) {
         this._state.value = state
     }
 }

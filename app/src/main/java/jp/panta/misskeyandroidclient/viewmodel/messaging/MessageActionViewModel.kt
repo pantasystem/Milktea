@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.messaging.CreateMessage
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
@@ -37,10 +38,16 @@ class MessageActionViewModel(
     private val logger = miCore.loggerFactory.create("MessageActionViewModel")
 
     val text = MutableLiveData<String>()
-    val file = MutableLiveData<FilePropertyDTO>()
+    val file = MutableLiveData<FileProperty?>()
 
     private val mErrors = MutableStateFlow<Throwable?>(null)
     val errors = mErrors.asStateFlow()
+
+    fun setFilePropertyFromId(filePropertyId: FileProperty.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            file.postValue(miCore.getFilePropertyDataSource().find(filePropertyId))
+        }
+    }
 
     fun send(){
 
@@ -49,7 +56,7 @@ class MessageActionViewModel(
         //text.value = null
         //file.value = null
         viewModelScope.launch(Dispatchers.IO) {
-            val createMessage = CreateMessage.Factory.create(messagingId, tmpText, tmpFile?.id)
+            val createMessage = CreateMessage.Factory.create(messagingId, tmpText, tmpFile?.id?.fileId)
             runCatching { miCore.getMessageRepository().create(createMessage) }.onFailure {
                 logger.error("メッセージ作成中にエラー発生", e = it)
                 mErrors.value = it

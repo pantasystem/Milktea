@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.filePropertyPagingStore
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -265,12 +266,22 @@ class NoteEditorViewModel(
 
 
 
-    fun addAllFileProperty(fpList: List<FileProperty>){
+    private fun addAllFileProperty(fpList: List<FileProperty>){
         val files = files.value.toArrayList()
         files.addAll(fpList.map{
             it.toFile()
         })
-        this.files.value = files
+        this.files.postValue(files)
+    }
+
+    fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                miCore.getFilePropertyDataSource().findIn(ids)
+            }.onSuccess {
+                addAllFileProperty(it)
+            }
+        }
     }
 
     fun removeFileNoteEditorData(file: File){
@@ -471,6 +482,7 @@ class NoteEditorViewModel(
     private fun getCurrentInformation(): Account?{
         return miCore.getCurrentAccount().value
     }
+
 
     /*private fun<T> MediatorLiveData<T>.addSourceFromNoteAndDraft(observer: (Note?, DraftNote?)->Unit) {
         addSource(note) {

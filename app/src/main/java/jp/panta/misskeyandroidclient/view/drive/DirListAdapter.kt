@@ -8,10 +8,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemDirBinding
-import jp.panta.misskeyandroidclient.viewmodel.drive.DirectoryViewData
+import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 
-class DirListAdapter(itemCallBack: DiffUtil.ItemCallback<DirectoryViewData>, private val driveViewModel: DriveViewModel) : ListAdapter<DirectoryViewData, DirListAdapter.DirViewHolder>(itemCallBack){
+class DirListAdapter(itemCallBack: DiffUtil.ItemCallback<PathViewData>, private val driveViewModel: DriveViewModel) : ListAdapter<PathViewData, DirListAdapter.DirViewHolder>(itemCallBack){
     class DirViewHolder(val binding: ItemDirBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DirViewHolder {

@@ -8,12 +8,12 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class DriveViewModelFactory(
-    private val maxSelectableSize: Int
+    private val driveSelectableMode: DriveSelectableMode?
 ) : ViewModelProvider.Factory{
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == DriveViewModel::class.java){
-            return DriveViewModel(maxSelectableSize) as T
+            return DriveViewModel(driveSelectableMode) as T
         }
         throw IllegalArgumentException("DriveViewModel::class.javaを指定してください")
     }

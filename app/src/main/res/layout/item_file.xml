@@ -45,7 +45,7 @@
                         fileThumbnailMain="@{thumbnailMain}"
                         fileThumbnailMask="@{thumbnailMask}"
                         thumbnailFileViewData="@{fileViewData}"
-                        android:onClick="@{()-> driveViewModel.openFile(fileViewData.file)}"
+                        android:onClick="@{()-> driveViewModel.openFile(fileViewData.fileProperty)}"
                         >
                     <ImageView
                             android:id="@+id/thumbnailMain"
@@ -71,7 +71,7 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
                         tools:text="fileName"
-                        android:text="@{fileViewData.name}"
+                        android:text="@{fileViewData.fileProperty.name}"
                         />
 
                 <androidx.emoji.widget.EmojiTextView
@@ -81,7 +81,7 @@
                         android:layout_below="@+id/file_name"
                         android:layout_toEndOf="@+id/thumbnail_view"
                         tools:text="image/jpg"
-                        android:text="@{fileViewData.type}"
+                        android:text="@{fileViewData.fileProperty.type}"
 
                         />
 
@@ -93,7 +93,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_toEndOf="@+id/file_meta"
                         tools:text="24byte"
-                        android:text="@{String.valueOf(fileViewData.size)}"
+                        android:text="@{String.valueOf(fileViewData.fileProperty.size)}"
                         />
 
                 <androidx.emoji.widget.EmojiTextView
@@ -112,10 +112,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:visibility='@{SafeUnbox.unboxBool(fileViewModel.isSelectable) ? View.VISIBLE : View.GONE }'
-                    android:onClick='@{()-> fileViewModel.changeSelectItemState(fileViewData) }'
-                    android:checked="@{SafeUnbox.unboxBool(fileViewData.isSelect)}"
-                    android:enabled="@{SafeUnbox.unboxBool(fileViewData.isEnabledSelect)}"
+                    android:visibility='@{SafeUnbox.unboxBool(fileViewModel.selectableMode) ? View.VISIBLE : View.GONE }'
+                    android:onClick='@{()-> fileViewModel.toggleSelect(fileViewData.fileProperty.id) }'
+                    android:checked="@{SafeUnbox.unboxBool(fileViewData.isSelected)}"
+                    android:enabled="@{SafeUnbox.unboxBool(fileViewData.isEnabled)}"
                     />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

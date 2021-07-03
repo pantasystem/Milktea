@@ -12,75 +12,102 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentFolderBinding
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.drive.DriveSelectableMode
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewData
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModelFactory
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class FolderFragment : Fragment(R.layout.fragment_folder){
 
-    lateinit var mLinearLayoutManager: LinearLayoutManager
-    private var mFolderViewModel: FolderViewModel? = null
+    private lateinit var _linearLayoutManager: LinearLayoutManager
+    private var mDirectoryViewModel: DirectoryViewModel? = null
+
+    companion object {
+        private const val MAX_SIZE = "MAX_SIZE"
+        private const val ACCOUNT_ID = "ACCOUNT_ID"
+        private const val SELECTED_FILE_IDS = "SELECTED_FILE_IDS"
+        fun newInstance(mode: DriveSelectableMode?) : Fragment{
+            return FolderFragment().also { fragment ->
+                fragment.arguments = Bundle().also { bundle ->
+                    bundle.putInt(MAX_SIZE, mode?.selectableMaxSize?: -1)
+                    bundle.putSerializable(SELECTED_FILE_IDS, mode?.let {
+                        ArrayList(it.selectedFilePropertyIds)
+                    })
+                    bundle.putLong(ACCOUNT_ID, mode?.accountId?: mode?.selectedFilePropertyIds?.map {
+                        it.accountId
+                    }?.toSet()?.lastOrNull()?: -1)
+                }
+
+            }
+        }
+    }
 
     private val binding: FragmentFolderBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mLinearLayoutManager = LinearLayoutManager(context)
-        binding.folderView.layoutManager = mLinearLayoutManager
+        val maxSize = arguments?.getInt(MAX_SIZE, -1)?.let {
+            if(it == -1) null else it
+        }
+        val selectedFileIds = (arguments?.getSerializable(SELECTED_FILE_IDS) as? ArrayList<*>)?.let { list ->
+            list.map { it as FileProperty.Id }
+        }
+        val accountId = arguments?.getLong(ACCOUNT_ID, - 1)?.let {
+            if(it == -1L) null else it
+        }
 
-        val miApplication  = context?.applicationContext as MiApplication
-
-        miApplication.getCurrentAccount().filterNotNull().onEach{ ar ->
-            val folderViewModelFactory = FolderViewModelFactory(ar, miApplication, null)
-            val folderViewModel = ViewModelProvider( requireActivity(), folderViewModelFactory).get(FolderViewModel::class.java)
-            mFolderViewModel = folderViewModel
-
-            val activity = activity
-                ?:return@onEach
-            val driveViewModelFactory = DriveViewModelFactory(0)
-            val driveViewModel = ViewModelProvider(activity, driveViewModelFactory).get(DriveViewModel::class.java)
-            driveViewModel.currentDirectory.observe(viewLifecycleOwner, {
-                folderViewModel.currentFolder.postValue(it?.id)
-            })
-
-            val adapter = FolderListAdapter(diffUtilItemCallback, driveViewModel, folderViewModel)
-            binding.folderView.adapter = adapter
-
-            driveViewModel.currentDirectory.observe(viewLifecycleOwner, {
-                folderViewModel.currentFolder.postValue(it?.id)
-            })
-
-            folderViewModel.isRefreshing.observe(viewLifecycleOwner, {
-                binding.refresh.isRefreshing = it
-            })
-
-            folderViewModel.currentFolder.observe(viewLifecycleOwner, {
-                folderViewModel.loadInit()
-            })
-
-            folderViewModel.foldersLiveData.observe(viewLifecycleOwner, {
-                adapter.submitList(it)
-            })
-
-            binding.refresh.setOnRefreshListener {
-                folderViewModel.loadInit()
-            }
-
-            folderViewModel.error.filterNotNull().onEach {
-                Toast.makeText(requireContext(), "$it", Toast.LENGTH_SHORT).show()
-            }.launchIn(lifecycleScope)
+        val mode = if(maxSize == null || selectedFileIds.isNullOrEmpty() || accountId == null) {
+            null
+        }else{
+            DriveSelectableMode(
+                accountId = accountId,
+                selectedFilePropertyIds = selectedFileIds,
+                selectableMaxSize = maxSize,
+            )
+        }
+        _linearLayoutManager = LinearLayoutManager(context)
+        binding.folderView.layoutManager = _linearLayoutManager
 
 
+        val miCore  = context?.applicationContext as MiCore
+
+        val driveViewModel = ViewModelProvider(requireActivity(), DriveViewModelFactory(mode))[DriveViewModel::class.java]
+
+        val directoryViewModel = ViewModelProvider(this,
+            DirectoryViewModelFactory(accountId, miCore,driveViewModel.driveStore)
+        )[DirectoryViewModel::class.java]
+
+        val adapter = FolderListAdapter(diffUtilItemCallback, driveViewModel, directoryViewModel)
+        binding.folderView.adapter = adapter
+
+
+        directoryViewModel.isRefreshing.observe(viewLifecycleOwner) {
+            binding.refresh.isRefreshing = it
+        }
+
+
+        directoryViewModel.foldersLiveData.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+
+        binding.refresh.setOnRefreshListener {
+            directoryViewModel.loadInit()
+        }
+
+        directoryViewModel.error.filterNotNull().onEach {
+            Toast.makeText(requireContext(), "$it", Toast.LENGTH_SHORT).show()
         }.launchIn(lifecycleScope)
+
 
         binding.folderView.addOnScrollListener(mScrollListener)
 
@@ -94,12 +121,12 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
             ac.setCurrentFragment(DriveActivity.Type.FOLDER)
         }
     }
-    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<FolderViewData>(){
-        override fun areContentsTheSame(oldItem: FolderViewData, newItem: FolderViewData): Boolean {
+    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<DirectoryViewData>(){
+        override fun areContentsTheSame(oldItem: DirectoryViewData, newItem: DirectoryViewData): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: FolderViewData, newItem: FolderViewData): Boolean {
+        override fun areItemsTheSame(oldItem: DirectoryViewData, newItem: DirectoryViewData): Boolean {
             return oldItem.id == newItem.id
         }
     }
@@ -108,9 +135,9 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
-            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
-            val itemCount = mLinearLayoutManager.itemCount
+            val firstVisibleItemPosition = _linearLayoutManager.findFirstVisibleItemPosition()
+            val endVisibleItemPosition = _linearLayoutManager.findLastVisibleItemPosition()
+            val itemCount = _linearLayoutManager.itemCount
 
             if(firstVisibleItemPosition == 0){
                 Log.d("", "先頭")
@@ -119,7 +146,7 @@ class FolderFragment : Fragment(R.layout.fragment_folder){
             if(endVisibleItemPosition == (itemCount - 1)){
                 Log.d("", "後ろ")
                 //mTimelineViewModel?.getOldTimeline()
-                mFolderViewModel?.loadNext()
+                mDirectoryViewModel?.loadNext()
 
             }
 

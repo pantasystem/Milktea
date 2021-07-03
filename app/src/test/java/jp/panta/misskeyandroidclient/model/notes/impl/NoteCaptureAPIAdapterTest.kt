@@ -22,9 +22,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.datetime.Clock
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -68,7 +70,7 @@ class NoteCaptureAPIAdapterTest {
 
             val dto = NoteDTO(
                 "note-1",
-                Date(),
+                Clock.System.now(),
                 renoteCount = 0,
                 replyCount = 0,
                 userId = "hoge",

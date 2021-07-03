@@ -1,22 +1,22 @@
-package jp.panta.misskeyandroidclient.viewmodel.drive.folder
+package jp.panta.misskeyandroidclient.viewmodel.drive.directory
 
 import jp.panta.misskeyandroidclient.model.drive.Directory
 
-class FolderViewData (val folderProperty: Directory){
-    val id = folderProperty.id
-    val createdAt = folderProperty.createdAt
-    val name = folderProperty.name
-    val foldersCount = folderProperty.foldersCount
-    val filesCount = folderProperty.filesCount
-    val parentId = folderProperty.parentId
-    val parent = folderProperty.parent
+class DirectoryViewData (val directory: Directory){
+    val id = directory.id
+    val createdAt = directory.createdAt
+    val name = directory.name
+    val foldersCount = directory.foldersCount
+    val filesCount = directory.filesCount
+    val parentId = directory.parentId
+    val parent = directory.parent
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as FolderViewData
+        other as DirectoryViewData
 
-        if (folderProperty != other.folderProperty) return false
+        if (directory != other.directory) return false
         if (id != other.id) return false
         if (createdAt != other.createdAt) return false
         if (name != other.name) return false
@@ -29,7 +29,7 @@ class FolderViewData (val folderProperty: Directory){
     }
 
     override fun hashCode(): Int {
-        var result = folderProperty.hashCode()
+        var result = directory.hashCode()
         result = 31 * result + id.hashCode()
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + name.hashCode()

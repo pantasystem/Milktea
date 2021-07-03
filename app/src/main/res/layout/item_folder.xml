@@ -9,11 +9,11 @@
                 type="jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel" />
         <variable
                 name="folder"
-                type="jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewData" />
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewData" />
 
         <variable
                 name="folderViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel" />
+                type="jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -25,7 +25,7 @@
         <RelativeLayout
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:onClick="@{()-> driveViewModel.moveChildDirectory(folder) }"
+                android:onClick="@{()-> driveViewModel.push(folder.directory) }"
                 >
 
 

@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.api.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -66,12 +67,12 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
                     binding.timelineEmptyView.visibility = View.GONE
                     binding.timelineProgressBar.visibility = View.GONE
                     galleryPostsListAdapter.submitList(state.content.rawContent)
-                    binding.refresh.isRefreshing = state is State.Loading
+                    binding.refresh.isRefreshing = state is PageableState.Loading
                 }else{
                     // エラーメッセージやプログレスバーなどを表示する
                     binding.refresh.isRefreshing = false
                     binding.refresh.visibility = View.GONE
-                    if(state is State.Loading) {
+                    if(state is PageableState.Loading) {
                         binding.timelineProgressBar.visibility = View.VISIBLE
                         binding.timelineEmptyView.visibility = View.GONE
                     }else{

@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.model.account.page.UntilPaginate
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.gallery.*
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -62,8 +63,8 @@ class GalleryPostsViewModel(
 
     private val galleryPostsStore = miCore.createGalleryPostsStore(pageable, this::getAccount)
 
-    private val _galleryPosts = MutableStateFlow<State<List<GalleryPostState>>>(State.Fixed(StateContent.NotExist()))
-    val galleryPosts: StateFlow<State<List<GalleryPostState>>> = _galleryPosts
+    private val _galleryPosts = MutableStateFlow<PageableState<List<GalleryPostState>>>(PageableState.Fixed(StateContent.NotExist()))
+    val galleryPosts: StateFlow<PageableState<List<GalleryPostState>>> = _galleryPosts
     val lock = Mutex()
 
     private val _error = MutableSharedFlow<Throwable>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -78,7 +79,7 @@ class GalleryPostsViewModel(
                 val state = _galleryPosts.value
                 val content = state.content
                 if(content is StateContent.Exist) {
-                    _galleryPosts.value = State.Fixed(
+                    _galleryPosts.value = PageableState.Fixed(
                         content.copy(
                             content.rawContent.filterNot {
                                 it.galleryPost.id == ev.galleryPostId
@@ -94,9 +95,10 @@ class GalleryPostsViewModel(
     init {
         // FIXME: 毎回Stateオブジェクトを生成してしまうのでユーザーの捜査情報が初期化されてしまうので何とかする
         galleryPostsStore.state.map {
-            val content = if(it.content is StateContent.Exist<List<GalleryPost.Id>>) {
-                val list = coroutineScope {
-                    it.content.rawContent.map { id ->
+          
+            it.convert {
+                runBlocking {
+                    it.map { id ->
                         async {
                             runCatching {
                                 miCore.getGalleryDataSource().find(id)
@@ -118,19 +120,10 @@ class GalleryPostsViewModel(
                         )
                     }
                 }
-                StateContent.Exist(list)
-
-            }else{
-                StateContent.NotExist()
-            }
-            when(it) {
-                is State.Fixed -> State.Fixed(content)
-                is State.Error -> State.Error(content, it.throwable)
-                is State.Loading -> State.Loading(content)
             }
         }.onEach {
             this._galleryPosts.value = it
-            if(it is State.Error) {
+            if(it is PageableState.Error) {
                 _error.emit(it.throwable)
             }
         }.launchIn(viewModelScope + Dispatchers.IO)

@@ -120,17 +120,19 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
     private fun showDrivePicker() {
         val intent = Intent(requireContext(), DriveActivity::class.java)
         intent.putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, Int.MAX_VALUE)
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
 
         driveActivityResult.launch(intent)
     }
 
     private val driveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if(it.resultCode == RESULT_OK && it.data != null) {
-            val result = it.data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as? ArrayList<*>
+            val result = it.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>
             val list = result?.mapNotNull { obj ->
-                obj as? FileProperty
+                obj as? FileProperty.Id
             }?: emptyList()
-            viewModel.addFileProperties(list)
+            viewModel.addFilePropertyIds(list)
+
         }
     }
 

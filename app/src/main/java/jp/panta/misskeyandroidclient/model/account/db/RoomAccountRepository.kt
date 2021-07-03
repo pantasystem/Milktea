@@ -181,6 +181,7 @@ class RoomAccountRepository(
         sharedPreferences.edit().also {
             it.putLong(CURRENT_ACCOUNT_ID_KEY, ac.accountId)
         }.apply()
+        publish(AccountRepository.Event.Updated(ac))
 
         return ac
     }

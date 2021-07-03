@@ -13,12 +13,12 @@ object FileThumbnailHelper {
     @JvmStatic
     @BindingAdapter("fileThumbnailMain", "fileThumbnailMask", "thumbnailFileViewData")
     fun FrameLayout.setFileThumbnail(fileThumbnailMain: ImageView, fileThumbnailMask: ImageView, thumbnailFileViewData: FileViewData){
-        val thumbnailUrl = thumbnailFileViewData.thumbnailUrl
+        val thumbnailUrl = thumbnailFileViewData.fileProperty.thumbnailUrl
         setThumbnail(fileThumbnailMain, thumbnailUrl)
 
-        if(thumbnailFileViewData.type.contains("image")){
+        if(thumbnailFileViewData.fileProperty.type.contains("image")){
             fileThumbnailMask.visibility = View.GONE
-        }else if(thumbnailFileViewData.type.contains("video")){
+        }else if(thumbnailFileViewData.fileProperty.type.contains("video")){
             fileThumbnailMask.visibility = View.VISIBLE
             Glide
                 .with(fileThumbnailMask)

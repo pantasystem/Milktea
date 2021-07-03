@@ -10,6 +10,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -17,7 +20,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.databinding.ActivityDriveBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.util.file.toFile
@@ -25,13 +27,15 @@ import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.view.drive.DirListAdapter
 import jp.panta.misskeyandroidclient.view.drive.DriveFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.drive.DirectoryViewData
+import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
+import jp.panta.misskeyandroidclient.viewmodel.drive.DriveSelectableMode
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.folder.FolderViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -40,19 +44,17 @@ class DriveActivity : AppCompatActivity() {
     companion object{
         //const val EXTRA_IS_FILE_SELECTABLE = "jp.panta.misskeyandroidclient.EXTRA_IS_FILE_SELECTABLE"
         const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
-        const val EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
-        const val EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE = "jp.panta.misskeyandroiclient.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE"
-
-        private const val OPEN_DOCUMENT_RESULT_CODE = 113
-        private const val READ_STORAGE_PERMISSION_REQUEST_CODE = 112
+        const val EXTRA_SELECTED_FILE_PROPERTY_IDS = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
+        const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
     }
     enum class Type{
         FOLDER, FILE
     }
 
-    private var mDriveViewModel: DriveViewModel? = null
-    private var mFileViewModel: FileViewModel? = null
-    private var mFolderViewModel: FolderViewModel? = null
+    private lateinit var _driveViewModel: DriveViewModel
+    @ExperimentalCoroutinesApi
+    private lateinit var mFileViewModel: FileViewModel
+    private lateinit var mDirectoryViewModel: DirectoryViewModel
 
     private var mMenuOpen: MenuItem? = null
 
@@ -60,6 +62,7 @@ class DriveActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityDriveBinding
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -72,8 +75,17 @@ class DriveActivity : AppCompatActivity() {
         mBinding.dirListView.layoutManager = layoutManager
 
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
-        val selectedItem = (intent.getSerializableExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
-            it as FileProperty
+        val selectedFileIds = (intent.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>)?.map {
+            it as FileProperty.Id
+        }
+
+        val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
+            if(it == -1L) null else it
+        }
+        val accountIds = selectedFileIds?.map { it.accountId }?.toSet()
+
+        require(selectedFileIds == null || accountIds!!.size == 1) {
+            "選択したFilePropertyの所有者は全て同一のアカウントである必要があります。"
         }
 
         if(maxSize > -1){
@@ -82,44 +94,48 @@ class DriveActivity : AppCompatActivity() {
             supportActionBar?.title = getString(R.string.drive)
         }
 
-        val miApplication = applicationContext as MiApplication
-        miApplication.getCurrentAccount().filterNotNull().onEach {
-            val driveViewModel = ViewModelProvider(this, DriveViewModelFactory(maxSize)).get(DriveViewModel::class.java)
-            mDriveViewModel = driveViewModel
-            mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
-                it,
-                miApplication,
-                driveViewModel.selectedFilesMapLiveData,
-                maxSelectableItemSize = driveViewModel.selectableMaxSize,
-                folderId = null)
-            )[FileViewModel::class.java]
-            mFolderViewModel = ViewModelProvider(this, FolderViewModelFactory(
-                it, miApplication, null
-            ))[FolderViewModel::class.java]
+        val miCore = applicationContext as MiCore
 
-            if(selectedItem != null){
-                driveViewModel.setSelectedFileList(selectedItem)
-            }
-            val adapter = DirListAdapter(diffUtilItemCallback, driveViewModel)
-            mBinding.dirListView.adapter = adapter
-            driveViewModel.hierarchyDirectory.observe(this, { dir ->
-                Log.d("DriveActivity", "更新がありました: $dir")
-                adapter.submitList(dir)
-            })
+        val driveSelectableMode: DriveSelectableMode? = if(intent.action == Intent.ACTION_OPEN_DOCUMENT) {
+            val aId = accountId?: accountIds?.lastOrNull()?:  miCore.getCurrentAccount().value?.accountId
+            requireNotNull(aId)
+            DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
+        }else{
+            null
+        }
+        Log.d("DriveActivity", "mode:$driveSelectableMode")
 
-            driveViewModel.selectedFilesMapLiveData?.observe(this, { selected ->
-                supportActionBar?.title = "${getString(R.string.selected)} ${selected.size}/${maxSize}"
-                mMenuOpen?.isEnabled = selected.isNotEmpty() && selected.size <= maxSize
-            })
+        _driveViewModel = ViewModelProvider(this, DriveViewModelFactory(driveSelectableMode))[DriveViewModel::class.java]
+        mFileViewModel = ViewModelProvider(this, FileViewModelFactory(
+            accountId?: accountIds?.lastOrNull(),
+            miCore,
+            _driveViewModel.driveStore
+        ))[FileViewModel::class.java]
 
-            driveViewModel.openFileEvent.observe(this, {
-                // TODO ファイルの詳細を開く
-            })
+        mDirectoryViewModel = ViewModelProvider(this, DirectoryViewModelFactory(
+            accountId?: accountIds?.lastOrNull(), miCore, _driveViewModel.driveStore
+        )
+        )[DirectoryViewModel::class.java]
+
+        val adapter = DirListAdapter(diffUtilItemCallback, _driveViewModel)
+        mBinding.dirListView.adapter = adapter
+        _driveViewModel.path.onEach { list ->
+            adapter.submitList(list)
         }.launchIn(lifecycleScope)
+
+
+        mFileViewModel.selectedFileIds.filterNotNull().onEach { fileIds ->
+            supportActionBar?.title = "${getString(R.string.selected)} ${fileIds.size}/${maxSize}"
+        }.launchIn(lifecycleScope)
+
+        _driveViewModel.openFileEvent.observe(this) {
+            // TODO ファイルの詳細を開く
+        }
+
 
         if(savedInstanceState == null){
             val ft = supportFragmentManager.beginTransaction()
-            ft.add(R.id.content_main, DriveFragment())
+            ft.add(R.id.content_main, DriveFragment.newInstance(driveSelectableMode))
             ft.commit()
         }
 
@@ -148,11 +164,9 @@ class DriveActivity : AppCompatActivity() {
         when(item.itemId){
             android.R.id.home -> finish()
             R.id.action_open ->{
-                val ids = mDriveViewModel?.getSelectedFileIds()
-                val files = mDriveViewModel?.getSelectedFileList()
-                if(ids != null && files != null){
-                    intent.putStringArrayListExtra(EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID, ArrayList(ids))
-                    intent.putExtra(EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE, ArrayList<FileProperty>(files))
+                val ids = _driveViewModel.getSelectedFileIds()
+                if(ids != null){
+                    intent.putExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS, ArrayList(ids))
                     setResult(RESULT_OK, intent)
                     finish()
 
@@ -170,12 +184,13 @@ class DriveActivity : AppCompatActivity() {
         CreateFolderDialog().show(supportFragmentManager, "CreateFolder")
     }
 
+    @ExperimentalCoroutinesApi
     private fun showFileManager(){
         if(checkPermissions()){
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            startActivityForResult(intent, OPEN_DOCUMENT_RESULT_CODE)
+            registerForOpenFileActivityResult.launch(intent)
         }else{
             requestPermission()
         }
@@ -186,53 +201,49 @@ class DriveActivity : AppCompatActivity() {
         return permissionCheck == PackageManager.PERMISSION_GRANTED
     }
 
+    @ExperimentalCoroutinesApi
     private fun requestPermission(){
         if(! checkPermissions()){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                READ_STORAGE_PERMISSION_REQUEST_CODE
-            )
+            registerForReadExternalStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == OPEN_DOCUMENT_RESULT_CODE){
-            if(resultCode == RESULT_OK){
-                data?.data?.let{ uri ->
-                    uploadFile(uri)
-                }
-            }
+    @ExperimentalCoroutinesApi
+    val registerForOpenFileActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val uri = result.data?.data
+        if(uri != null) {
+            uploadFile(uri)
         }
-        if(requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE && resultCode == RESULT_OK){
+    }
+
+    @ExperimentalCoroutinesApi
+    val registerForReadExternalStoragePermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if(it) {
             showFileManager()
         }
     }
 
-    private fun uploadFile(uri: Uri){
-        val miCore = application as MiCore
-        miCore.getCurrentAccount().value?.let{ ci ->
-            val uploader = OkHttpDriveFileUploader(this, ci, GsonFactory.create(), miCore.getEncryption())
-            mFileViewModel?.uploadFile(uri.toFile(this), uploader)
-        }
 
+
+
+    @ExperimentalCoroutinesApi
+    private fun uploadFile(uri: Uri){
+        mFileViewModel.uploadFile(uri.toFile(this))
     }
 
     override fun onBackPressed() {
-        val size = mDriveViewModel?.hierarchyDirectory?.value?.size
-        if(size != null && size > 1){
-            mDriveViewModel?.moveParentDirectory()
+        if(_driveViewModel.pop()) {
             return
         }
-        mDriveViewModel
         super.onBackPressed()
     }
 
-    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<DirectoryViewData>(){
-        override fun areContentsTheSame(oldItem: DirectoryViewData, newItem: DirectoryViewData): Boolean {
+    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<PathViewData>(){
+        override fun areContentsTheSame(oldItem: PathViewData, newItem: PathViewData): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: DirectoryViewData, newItem: DirectoryViewData): Boolean {
+        override fun areItemsTheSame(oldItem: PathViewData, newItem: PathViewData): Boolean {
             return oldItem.id == newItem.id
 
         }

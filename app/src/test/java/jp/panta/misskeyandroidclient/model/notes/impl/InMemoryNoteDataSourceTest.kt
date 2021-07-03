@@ -8,6 +8,8 @@ import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -28,7 +30,7 @@ class InMemoryNoteDataSourceTest {
 
         val dto = NoteDTO(
             "",
-            Date(),
+            Clock.System.now(),
             renoteCount = 0,
             replyCount = 0,
             userId = "hoge",
@@ -59,7 +61,7 @@ class InMemoryNoteDataSourceTest {
 
         val dto = NoteDTO(
             "note-1",
-            Date(),
+            Clock.System.now(),
             renoteCount = 0,
             replyCount = 0,
             userId = "hoge",

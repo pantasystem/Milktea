@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.streaming
 
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -16,7 +17,7 @@ class StreamingEventTest {
 
         val noteDTO = NoteDTO(
             "piyo22",
-            Date(),
+            Clock.System.now(),
             "hogehoge",
             null,
             "piyo",
