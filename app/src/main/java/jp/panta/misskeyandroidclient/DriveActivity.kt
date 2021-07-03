@@ -96,12 +96,12 @@ class DriveActivity : AppCompatActivity() {
 
         val miCore = applicationContext as MiCore
 
-        val driveSelectableMode: DriveSelectableMode? = if(maxSize <= 0) {
-            null
-        }else{
+        val driveSelectableMode: DriveSelectableMode? = if(intent.action == Intent.ACTION_OPEN_DOCUMENT) {
             val aId = accountId?: accountIds?.lastOrNull()?:  miCore.getCurrentAccount().value?.accountId
             requireNotNull(aId)
             DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
+        }else{
+            null
         }
         Log.d("DriveActivity", "mode:$driveSelectableMode")
 

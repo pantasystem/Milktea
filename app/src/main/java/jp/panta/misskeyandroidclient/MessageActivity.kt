@@ -6,10 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -22,9 +24,6 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
 
     companion object{
         const val EXTRA_MESSAGING_ID = "jp.panta.misskeyandroidclient.MessageActivity.EXTRA_MESSAGING_ID"
-
-        const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
-
     }
 
     private lateinit var mViewModel: MessageActionViewModel
@@ -97,24 +96,17 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
     private fun openDriveActivity(){
         val intent = Intent(this, DriveActivity::class.java)
         intent.putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 1)
-        startActivityForResult(intent, SELECT_DRIVE_FILE_REQUEST_CODE)
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        openDriveActivityForPickFileResult.launch(intent)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when(requestCode){
-            SELECT_DRIVE_FILE_REQUEST_CODE ->{
-                if(resultCode == Activity.RESULT_OK){
-                    /*
-                    TODO: 動くように修正する
-                    mViewModel.file.value = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>).map{
-                        it as FilePropertyDTO
-                    }.firstOrNull()
-
-                     */
-                }
-            }
+    private val openDriveActivityForPickFileResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val ids = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? List<*>)?.map {
+            it as FileProperty.Id
+        }
+        ids?.firstOrNull()?.let {
+            mViewModel.setFilePropertyFromId(it)
         }
     }
 }

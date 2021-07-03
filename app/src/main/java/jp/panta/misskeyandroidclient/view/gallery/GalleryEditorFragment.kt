@@ -120,6 +120,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
     private fun showDrivePicker() {
         val intent = Intent(requireContext(), DriveActivity::class.java)
         intent.putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, Int.MAX_VALUE)
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
 
         driveActivityResult.launch(intent)
     }
