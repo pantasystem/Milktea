@@ -71,8 +71,7 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
                         tools:text="fileName"
-                        android:text="@{fileViewData.fileProperty.name}"
-                        />
+                        android:text="@{fileViewData.fileProperty.name}" />
 
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/file_meta"

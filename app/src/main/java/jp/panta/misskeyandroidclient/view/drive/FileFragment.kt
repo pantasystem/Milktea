@@ -2,7 +2,10 @@ package jp.panta.misskeyandroidclient.view.drive
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -10,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.MiApplication
@@ -17,6 +21,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentFileBinding
 import jp.panta.misskeyandroidclient.model.drive.DriveStore
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.ui.drive.FilePropertyListScreen
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveSelectableMode
@@ -31,7 +36,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class FileFragment : Fragment(R.layout.fragment_file){
+class FileFragment : Fragment(){
 
     companion object{
 
@@ -54,15 +59,14 @@ class FileFragment : Fragment(R.layout.fragment_file){
         }
     }
 
-    private val binding: FragmentFileBinding by dataBinding()
     @ExperimentalCoroutinesApi
     private lateinit var _viewModel: FileViewModel
-    private lateinit var mLinearLayoutManager: LinearLayoutManager
+    private lateinit var _driveViewModel: DriveViewModel
+
 
     @ExperimentalCoroutinesApi
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         val maxSize = arguments?.getInt(MAX_SIZE, -1)?.let {
             if(it == -1) null else it
         }
@@ -83,34 +87,31 @@ class FileFragment : Fragment(R.layout.fragment_file){
             )
         }
 
-        mLinearLayoutManager = LinearLayoutManager(context)
-        binding.filesView.layoutManager = mLinearLayoutManager
 
         val miApplication = context?.applicationContext as MiApplication
 
-        val driveViewModel = ViewModelProvider(requireActivity(), DriveViewModelFactory(mode))[DriveViewModel::class.java]
-        _viewModel = ViewModelProvider(requireActivity(), FileViewModelFactory(accountId, miApplication, driveViewModel.driveStore))[FileViewModel::class.java]
-        val adapter = FileListAdapter(fileDiffUtilCallback, _viewModel,driveViewModel, viewLifecycleOwner)
-        binding.filesView.adapter = adapter
+        _driveViewModel = ViewModelProvider(requireActivity(), DriveViewModelFactory(mode))[DriveViewModel::class.java]
+        _viewModel = ViewModelProvider(requireActivity(), FileViewModelFactory(accountId, miApplication, _driveViewModel.driveStore))[FileViewModel::class.java]
 
-        _viewModel.state.onEach {
-            binding.refresh.isRefreshing = it is PageableState.Loading
-            val list = if(it.content is StateContent.Exist) it.content.rawContent else emptyList()
-            adapter.submitList(list)
-            if(it is PageableState.Error) {
-                Log.w("FileFragment", "読み込みエラー", it.throwable)
-            }
 
-        }.catch {
-
-        }.launchIn(lifecycleScope)
-
-        binding.refresh.setOnRefreshListener {
-            _viewModel.loadInit()
-        }
-
-        binding.filesView.addOnScrollListener(mScrollListener)
     }
+
+    @ExperimentalCoroutinesApi
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MdcTheme {
+                    FilePropertyListScreen(fileViewModel = _viewModel, driveViewModel = _driveViewModel)
+                }
+            }
+        }
+    }
+
+
 
     override fun onResume() {
         super.onResume()
@@ -121,36 +122,5 @@ class FileFragment : Fragment(R.layout.fragment_file){
         }
 
     }
-    private val fileDiffUtilCallback = object : DiffUtil.ItemCallback<FileViewData>(){
-        override fun areContentsTheSame(oldItem: FileViewData, newItem: FileViewData): Boolean {
-            return oldItem == newItem
-        }
 
-        override fun areItemsTheSame(oldItem: FileViewData, newItem: FileViewData): Boolean {
-            return oldItem.fileProperty.id == newItem.fileProperty.id
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    private val mScrollListener = object : RecyclerView.OnScrollListener(){
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
-
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
-            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
-            val itemCount = mLinearLayoutManager.itemCount
-
-            if(firstVisibleItemPosition == 0){
-                Log.d("", "先頭")
-            }
-
-            if(endVisibleItemPosition == (itemCount - 1)){
-                Log.d("", "後ろ")
-                //mTimelineViewModel?.getOldTimeline()
-                _viewModel.loadNext()
-
-            }
-
-        }
-    }
 }

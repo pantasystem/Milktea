@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui
+package jp.panta.misskeyandroidclient.ui.drive
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -13,7 +13,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +26,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
+import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
@@ -42,6 +45,9 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
     val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
     val files = (filesState.content as? StateContent.Exist)?.rawContent ?: emptyList()
     val listViewState = rememberLazyListState()
+    if(listViewState.isScrolledToTheEnd() && listViewState.layoutInfo.totalItemsCount != listViewState.layoutInfo.visibleItemsInfo.size && listViewState.isScrollInProgress) {
+        fileViewModel.loadNext()
+    }
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh =  {
@@ -65,7 +71,9 @@ fun FileViewDataListView(
     onCheckedChanged: (FileProperty.Id, Boolean) -> Unit,
     state: LazyListState = rememberLazyListState(),
 ) {
-    LazyColumn(state = state) {
+    LazyColumn(
+        state = state,
+    ) {
         this.items(
             list,
             key = {
@@ -83,11 +91,13 @@ fun FileViewDataListView(
 fun FilePropertySimpleCard(file: FileViewData, isSelectMode: Boolean = false, onCheckedChanged: (Boolean)->Unit ) {
     Card(
         shape = RoundedCornerShape(0.dp),
+        modifier = Modifier.padding(0.5.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = rememberGlidePainter(
@@ -95,15 +105,20 @@ fun FilePropertySimpleCard(file: FileViewData, isSelectMode: Boolean = false, on
                 ),
                 contentDescription = null,
                 modifier = Modifier
-                    .weight(1f)
-                    .height(50.dp)
-                    .width(50.dp)
+                    .height(64.dp)
+                    .width(64.dp)
+                    .padding(end = 4.dp),
+                contentScale = ContentScale.Crop
             )
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     file.fileProperty.name,
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+
                 )
                 Row {
                     Text(
