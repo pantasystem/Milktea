@@ -100,13 +100,18 @@ class GalleryEditorViewModel(
         }
     }
 
-    fun addFileProperties(list: List<FileProperty>) {
-        _pickedImages.value = (_pickedImages.value?: emptyList()).toMutableList().also { mutable ->
-            mutable.addAll(
-                list.map {
-                    it.toFile()
-                }
-            )
+
+    fun addFilePropertyIds(ids: List<FileProperty.Id>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val files = filePropertyDataSource.findIn(ids)
+
+            (_pickedImages.value?: emptyList()).toMutableList().also { list ->
+                list.addAll(
+                    files.map {
+                        it.toFile()
+                    }
+                )
+            }
         }
     }
 
