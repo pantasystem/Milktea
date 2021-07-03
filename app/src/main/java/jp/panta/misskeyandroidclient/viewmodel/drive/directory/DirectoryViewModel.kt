@@ -40,7 +40,7 @@ class DirectoryViewModel(
     private val logger = loggerFactory.create("DirectoryVM")
     init {
         driveStore.state.map {
-            it.accountId to it.path.path.lastOrNull()
+            it.accountId to it.path.path
         }.distinctUntilChanged().onEach {
             loadInit()
         }.catch { e ->
@@ -68,6 +68,9 @@ class DirectoryViewModel(
                 }
             }.onSuccess {
                 foldersLiveData.postValue(it)
+            }.onFailure {
+                foldersLiveData.postValue(emptyList())
+                logger.debug("初期ロードに失敗しました")
             }
             isLoading = false
             isRefreshing.postValue(false)

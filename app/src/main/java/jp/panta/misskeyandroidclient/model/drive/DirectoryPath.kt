@@ -36,7 +36,7 @@ data class DirectoryPath(
             return this
         }
         return this.copy(
-            path = this.path.subList(0, index)
+            path = this.path.subList(0, index + 1)
         )
     }
 
