@@ -55,6 +55,11 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    composeOptions {
+        kotlinCompilerVersion '1.5.10'
+        kotlinCompilerExtensionVersion '1.0.0-beta08'
+    }
 }
 
 
@@ -170,4 +175,20 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.2.1"
 
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
+
+
+    implementation 'androidx.compose.ui:ui:1.0.0-rc01'
+    // Tooling support (Previews, etc.)
+    implementation 'androidx.compose.ui:ui-tooling:1.0.0-beta09'
+    // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
+    implementation 'androidx.compose.foundation:foundation:1.0.0-rc01'
+    // Material Design
+    implementation 'androidx.compose.material:material:1.0.0-beta09'
+    // Material design icons
+    implementation 'androidx.compose.material:material-icons-core:1.0.0-beta09'
+    implementation 'androidx.compose.material:material-icons-extended:1.0.0-beta09'
+    // Integration with observables
+    implementation 'androidx.compose.runtime:runtime-livedata:1.0.0-rc01'
+    // UI Tests
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.0.0-beta09'
 }
