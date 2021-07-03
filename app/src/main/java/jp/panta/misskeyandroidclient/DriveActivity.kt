@@ -10,6 +10,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -43,9 +46,6 @@ class DriveActivity : AppCompatActivity() {
         const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
         const val EXTRA_SELECTED_FILE_PROPERTY_IDS = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
         const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
-
-        private const val OPEN_DOCUMENT_RESULT_CODE = 113
-        private const val READ_STORAGE_PERMISSION_REQUEST_CODE = 112
     }
     enum class Type{
         FOLDER, FILE
@@ -79,7 +79,7 @@ class DriveActivity : AppCompatActivity() {
             it as FileProperty.Id
         }
 
-        val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)?.let {
+        val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
             if(it == -1L) null else it
         }
         val accountIds = selectedFileIds?.map { it.accountId }?.toSet()
@@ -181,12 +181,13 @@ class DriveActivity : AppCompatActivity() {
         CreateFolderDialog().show(supportFragmentManager, "CreateFolder")
     }
 
+    @ExperimentalCoroutinesApi
     private fun showFileManager(){
         if(checkPermissions()){
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            startActivityForResult(intent, OPEN_DOCUMENT_RESULT_CODE)
+            registerForOpenFileActivityResult.launch(intent)
         }else{
             requestPermission()
         }
@@ -197,28 +198,30 @@ class DriveActivity : AppCompatActivity() {
         return permissionCheck == PackageManager.PERMISSION_GRANTED
     }
 
+    @ExperimentalCoroutinesApi
     private fun requestPermission(){
         if(! checkPermissions()){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                READ_STORAGE_PERMISSION_REQUEST_CODE
-            )
+            registerForReadExternalStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
 
     @ExperimentalCoroutinesApi
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == OPEN_DOCUMENT_RESULT_CODE){
-            if(resultCode == RESULT_OK){
-                data?.data?.let{ uri ->
-                    uploadFile(uri)
-                }
-            }
+    val registerForOpenFileActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val uri = result.data?.data
+        if(uri != null) {
+            uploadFile(uri)
         }
-        if(requestCode == READ_STORAGE_PERMISSION_REQUEST_CODE && resultCode == RESULT_OK){
+    }
+
+    @ExperimentalCoroutinesApi
+    val registerForReadExternalStoragePermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if(it) {
             showFileManager()
         }
     }
+
+
+
 
     @ExperimentalCoroutinesApi
     private fun uploadFile(uri: Uri){
