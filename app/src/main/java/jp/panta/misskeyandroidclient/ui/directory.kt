@@ -2,10 +2,13 @@ package jp.panta.misskeyandroidclient.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -19,6 +22,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewData
 
@@ -28,10 +33,23 @@ fun DirectoryListScreen(viewModel: DirectoryViewModel, driveViewModel: DriveView
     val directories = list.map {
         it.directory
     }
+    val isLoading: Boolean by viewModel.isRefreshing.observeAsState(
+        initial = false
+    )
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
 
-    DirectoryListView(directories) {
-        driveViewModel.push(it)
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = {
+            viewModel.loadInit()
+        },
+        Modifier.fillMaxHeight()
+    ) {
+        DirectoryListView(directories) {
+            driveViewModel.push(it)
+        }
     }
+
 
 
 }
@@ -58,8 +76,15 @@ fun DirectoryListTile(directory: Directory, onClick:()->Unit) {
 }
 
 @Composable
-fun DirectoryListView(directories: List<Directory>, onDirectorySelected: (Directory)->Unit) {
-    LazyColumn {
+fun DirectoryListView(
+    directories: List<Directory>,
+    listState: LazyListState = rememberLazyListState(),
+    onDirectorySelected: (Directory)->Unit
+) {
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxHeight()
+    ) {
         this.itemsIndexed(directories, { index, _ ->
             directories[index].id
         }){ _, item ->

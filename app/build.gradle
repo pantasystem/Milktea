@@ -194,4 +194,5 @@ dependencies {
     // Integration with observables
     implementation 'androidx.compose.runtime:runtime-livedata:1.0.0-rc01'
     implementation "com.google.android.material:compose-theme-adapter:1.0.0-rc01"
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.13.0"
 }
