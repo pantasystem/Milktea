@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
@@ -240,7 +242,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         val intent = Intent(requireContext(), DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
 
-        startActivityForResult(intent, SELECT_DRIVE_FILE_REQUEST_CODE)
+        registerForOpenDriveActivityResult.launch(intent)
     }
 
     private fun checkPermission(): Boolean{
@@ -304,33 +306,22 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
     }
 
+    private val registerForOpenDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if(result.resultCode == RESULT_OK) {
+            val selectedFilePropertyIds = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
+                it as FileProperty.Id
+            }
+            mViewModel?.addFilePropertyFromIds(selectedFilePropertyIds)
+        }
+
+    }
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         when(requestCode and 0xffff){
-            SELECT_DRIVE_FILE_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK){
-                    /*
-                    TODO: 修正する
-                    val files = (data?.getSerializableExtra(DriveActivity.EXTRA_FILE_PROPERTY_LIST_SELECTED_FILE) as List<*>?)?.map{
-                        it as FilePropertyDTO
-                    }
-                    //mViewModel?.driveFiles?.postValue(files)
-                    if(files != null){
-                        val exFiles = mViewModel?.files?.value
-                        val addFiles = files.filter{out ->
-                            exFiles?.firstOrNull {
-                                it.remoteFileId?.fileId == out.id
-                            } == null
-                        }
-                        mViewModel?.addAllFileProperty(addFiles.map {
-                            it.toFileProperty((context?.applicationContext as MiCore).getCurrentAccount().value!!)
-                        })
-                    }*/
-                }
-            }
+
             SELECT_LOCAL_FILE_REQUEST_CODE ->{
                 if(resultCode == RESULT_OK){
                     Log.d("NoteEditorActivity", "選択した")
