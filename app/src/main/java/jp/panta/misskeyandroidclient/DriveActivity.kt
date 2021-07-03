@@ -123,7 +123,7 @@ class DriveActivity : AppCompatActivity() {
 
         mFileViewModel.selectedFileIds.filterNotNull().onEach { fileIds ->
             supportActionBar?.title = "${getString(R.string.selected)} ${fileIds.size}/${maxSize}"
-        }
+        }.launchIn(lifecycleScope)
 
         _driveViewModel.openFileEvent.observe(this) {
             // TODO ファイルの詳細を開く
