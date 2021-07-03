@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.TaskStackBuilder
@@ -55,11 +56,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         private const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
         private const val EXTRA_DRAFT_NOTE = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
-        const val SELECT_DRIVE_FILE_REQUEST_CODE = 114
-        const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
-        const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
-        const val SELECT_USER_REQUEST_CODE = 810
-        const val SELECT_MENTION_TO_USER_REQUEST_CODE = 931
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
 
@@ -211,23 +207,23 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             }
         }
 
-        viewModel.showVisibilitySelectionEvent.observe(this, {
+        viewModel.showVisibilitySelectionEvent.observe(this) {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(supportFragmentManager, "NoteEditor")
-        })
+        }
 
-        viewModel.address.observe(this, {
+        viewModel.address.observe(this) {
             userChipAdapter.submitList(it)
-        })
+        }
 
-        viewModel.showPollTimePicker.observe(this, {
+        viewModel.showPollTimePicker.observe(this) {
             PollTimePickerDialog().show(supportFragmentManager, "TimePicker")
-        })
+        }
 
-        viewModel.showPollDatePicker.observe(this, {
+        viewModel.showPollDatePicker.observe(this) {
             PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
-        })
+        }
 
 
 
@@ -347,7 +343,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            startActivityForResult(intent, SELECT_LOCAL_FILE_REQUEST_CODE)
+            openLocalStorageResult.launch(intent)
         }else{
             requestPermission()
         }
@@ -364,7 +360,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
             .putExtra(DriveActivity.EXTRA_ACCOUNT_ID, miCore.getCurrentAccount().value?.accountId)
-        startActivityForResult(intent, SELECT_DRIVE_FILE_REQUEST_CODE)
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        openDriveActivityResult.launch(intent)
     }
 
     private fun checkPermission(): Boolean{
@@ -374,8 +371,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
     private fun requestPermission(){
         //val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
         if(! checkPermission()){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                READ_STORAGE_PERMISSION_REQUEST_CODE)
+            requestReadStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
 
@@ -388,12 +384,14 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         val intent  = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selectedUserIds)
 
-        startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
+        selectUserResult.launch(intent)
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private fun startMentionToSearchAndSelectUser(){
         val intent = Intent(this, SearchAndSelectUserActivity::class.java)
-        startActivityForResult(intent, SELECT_MENTION_TO_USER_REQUEST_CODE)
+        selectMentionToUserResult.launch(intent)
     }
 
     @FlowPreview
@@ -438,78 +436,69 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         finishOrConfirmSaveAsDraftOrDelete()
     }
 
-    @FlowPreview
+    private val openDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val ids = (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS)  as List<*>? )?.mapNotNull {
+            it as? FileProperty.Id
+        }
+        Log.d("NoteEditorActivity", "result:${ids}")
+        if(ids != null && ids.isNotEmpty()) {
+            mViewModel?.addFilePropertyFromIds(ids)
+        }
+    }
+
+    private val openLocalStorageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+        val uri = result?.data?.data
+        if(uri != null){
+            val size = mViewModel?.fileTotal()
+
+            if(size != null && size < 4){
+                mViewModel?.add(uri.toFile(this))
+                Log.d("NoteEditorActivity", "成功しました")
+            }else{
+                Log.d("NoteEditorActivity", "失敗しました")
+            }
+
+        }
+    }
+
+    val requestReadStoragePermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if(it){
+            showFileManager()
+        }else{
+            Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
+        }
+    }
+
     @ExperimentalCoroutinesApi
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when(requestCode){
-            SELECT_DRIVE_FILE_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK){
-
-
-                    val ids = (data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS)  as List<*>? )?.mapNotNull {
-                        it as? FileProperty.Id
-                    }
-                    Log.d("NoteEditorActivity", "result:${ids}")
-                    if(ids != null && ids.isNotEmpty()) {
-                        mViewModel?.addFilePropertyFromIds(ids)
-                    }
-
-                }
-            }
-            SELECT_LOCAL_FILE_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK){
-                    Log.d("NoteEditorActivity", "選択した")
-
-                    val uri = data?.data
-                    if(uri != null){
-                        val size = mViewModel?.fileTotal()
-
-                        if(size != null && size < 4){
-                            mViewModel?.add(uri.toFile(this))
-                            Log.d("NoteEditorActivity", "成功しました")
-                        }else{
-                            Log.d("NoteEditorActivity", "失敗しました")
-                        }
-
-                    }
-
-                }
-            }
-            READ_STORAGE_PERMISSION_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK){
-                    showFileManager()
-                }else{
-                    Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
-                }
-            }
-            SELECT_USER_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK && data != null){
-                    //val added = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_ADDED_USER_IDS)
-                    //val removed = data.getStringArrayExtra(SearchAndSelectUserActivity.EXTRA_REMOVED_USER_IDS)
-                    val changed = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-                    if(changed != null) {
-                        mViewModel?.setAddress(changed.added, changed.removed)
-                    }
-                }
-            }
-            SELECT_MENTION_TO_USER_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK && data != null){
-                    val changed = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-
-                    if(changed != null){
-                        val pos = mBinding.inputMain.selectionEnd
-                        mViewModel?.addMentionUsers(changed.selectedUsers, pos)?.let { newPos ->
-                            mBinding.inputMain.setText(mViewModel?.text?.value?: "")
-                            mBinding.inputMain.setSelection(newPos)
-                        }
-                    }
-
-                }
+    @FlowPreview
+    private val selectUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if(result.resultCode == RESULT_OK && result.data != null){
+            val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+            if(changed != null) {
+                mViewModel?.setAddress(changed.added, changed.removed)
             }
         }
     }
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    private val selectMentionToUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if(result.resultCode == RESULT_OK && result.data != null){
+            val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+
+            if(changed != null){
+                val pos = mBinding.inputMain.selectionEnd
+                mViewModel?.addMentionUsers(changed.selectedUsers, pos)?.let { newPos ->
+                    mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+                    mBinding.inputMain.setSelection(newPos)
+                }
+            }
+
+        }
+    }
+
+
 
     override fun onSelect(file: File?) {
         file?.let{
