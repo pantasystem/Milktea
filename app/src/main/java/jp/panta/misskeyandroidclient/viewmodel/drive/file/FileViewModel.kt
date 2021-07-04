@@ -25,9 +25,7 @@ class FileViewModel(
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error
 
-    val selectableMode = driveStore.state.map {
-        it.isSelectMode
-    }.asLiveData()
+
 
     val isAddable = this.driveStore.state.map {
         it.selectedFilePropertyIds?.isAddable == true

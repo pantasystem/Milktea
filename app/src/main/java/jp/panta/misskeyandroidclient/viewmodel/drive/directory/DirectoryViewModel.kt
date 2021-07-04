@@ -115,7 +115,7 @@ class DirectoryViewModel(
 
     fun createFolder(folderName: String){
         if(folderName.isNotBlank()){
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     val account = accountWatcher.getAccount()
                     val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
