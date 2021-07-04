@@ -199,4 +199,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-swiperefresh:0.13.0"
     implementation "com.google.accompanist:accompanist-glide:0.13.0"
     implementation 'androidx.activity:activity-compose:1.3.0-rc01'
+    implementation "com.google.accompanist:accompanist-pager:0.13.0"
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.13.0"
+
 }

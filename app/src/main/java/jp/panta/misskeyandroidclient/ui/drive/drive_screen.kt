@@ -11,25 +11,26 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.asLiveData
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
+import kotlinx.coroutines.launch
 
 
+@ExperimentalPagerApi
 @ExperimentalCoroutinesApi
 @Composable
 fun DriveScreen(
@@ -41,24 +42,24 @@ fun DriveScreen(
     onShowLocalFilePicker: ()->Unit,
     onShowCreateDirectoryEditor: ()-> Unit
 ) {
+    val tabTitles = listOf(
+        stringResource(id = R.string.file),
+        stringResource(id = R.string.folder)
+    )
 
     val isSelectMode: Boolean by  driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
     val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
     val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
     val path: List<PathViewData> by driveViewModel.path.asLiveData().observeAsState(initial = emptyList())
 
+    val pagerState = rememberPagerState(pageCount = tabTitles.size)
+    val scope = rememberCoroutineScope()
 
-    var currentTabIndex: Int by remember {
-        mutableStateOf(0)
-    }
     Scaffold(
         topBar = {
 
             Column {
-                val tabTitles = listOf(
-                    stringResource(id = R.string.file),
-                    stringResource(id = R.string.folder)
-                )
+
                 TopAppBar (
                     title = {
                         if(isSelectMode) {
@@ -90,13 +91,16 @@ fun DriveScreen(
                     driveViewModel.popUntil(dir.folder)
                 }
 
-                TabRow(selectedTabIndex = currentTabIndex) {
+                TabRow(selectedTabIndex = pagerState.currentPage) {
                     tabTitles.forEachIndexed { index, s ->
                         Tab(
                             text = {  Text(text = s) },
-                            selected = index == currentTabIndex,
+                            selected = index == pagerState.currentPage,
                             onClick = {
-                                currentTabIndex = index
+                                scope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+
                             }
 
                         )
@@ -106,7 +110,7 @@ fun DriveScreen(
             }
         },
         floatingActionButton = {
-            if(currentTabIndex == 0) {
+            if(pagerState.currentPage == 0) {
                 FloatingActionButton(onClick = onShowLocalFilePicker) {
                     Icon(imageVector = Icons.Filled.AddAPhoto, contentDescription = null)
                 }
@@ -120,10 +124,12 @@ fun DriveScreen(
 
     ) {
 
-        if(currentTabIndex == 0) {
-            FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
-        }else{
-            DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
+        HorizontalPager(state = pagerState) { page ->
+            if(page == 0) {
+                FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
+            }else{
+                DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
+            }
         }
     }
 }
@@ -133,8 +139,10 @@ fun DriveScreen(
 @Composable
 fun PathHorizontalView(path: List<PathViewData>, onSelected: (PathViewData)->Unit) {
     LazyRow(
-        Modifier.background(MaterialTheme.colors.primary)
-            .fillMaxWidth()
+        Modifier
+            .background(MaterialTheme.colors.primary)
+            .fillMaxWidth(),
+
     ){
         this.items(path, key = {
             it.id to it.name
