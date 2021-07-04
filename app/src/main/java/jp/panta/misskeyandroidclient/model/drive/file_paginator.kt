@@ -117,7 +117,8 @@ class FilePropertyPagingImpl(
             RequestFile(
                 folderId = getCurrentFolderId.invoke(),
                 untilId = this.getUntilId(),
-                i = getAccount.invoke().getI(encryption)
+                i = getAccount.invoke().getI(encryption),
+                limit = 20
             )
         ).throwIfHasError()
     }
