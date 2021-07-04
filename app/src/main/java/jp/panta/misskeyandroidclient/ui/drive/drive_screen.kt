@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.ui.DirectoryListScreen
 import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
 
 

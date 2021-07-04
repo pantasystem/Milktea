@@ -112,11 +112,12 @@ class DriveActivity : AppCompatActivity() {
                         val ids = _driveViewModel.getSelectedFileIds()
                         if(ids.isNullOrEmpty()) {
                             setResult(RESULT_CANCELED)
-                            finish()
                         }else{
                             intent.putExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS, ArrayList(ids))
                             setResult(RESULT_OK, intent)
                         }
+                        finish()
+
                     },
                     onShowLocalFilePicker = {
                         showFileManager()

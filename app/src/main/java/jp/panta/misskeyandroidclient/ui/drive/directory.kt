@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui
+package jp.panta.misskeyandroidclient.ui.drive
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
