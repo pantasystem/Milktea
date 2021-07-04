@@ -133,6 +133,7 @@ fun DriveScreen(
             DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
         }
         /*
+        FIXME: HorizontalPagerを使用するとSwipeRefresh時にクラッシュする
         HorizontalPager(state = pagerState) { page ->
             if(page == 0) {
                 FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
