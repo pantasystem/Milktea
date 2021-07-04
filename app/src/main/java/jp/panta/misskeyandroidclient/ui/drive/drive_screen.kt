@@ -13,21 +13,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.asLiveData
-import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.asLiveData
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
-import kotlinx.coroutines.launch
+import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 @ExperimentalPagerApi
@@ -40,20 +37,25 @@ fun DriveScreen(
     onNavigateUp: ()->Unit,
     onFixSelected: ()->Unit,
     onShowLocalFilePicker: ()->Unit,
-    onShowCreateDirectoryEditor: ()-> Unit
-) {
-    val tabTitles = listOf(
+    onShowCreateDirectoryEditor: ()-> Unit,
+    tabTitles: List<String> = listOf(
         stringResource(id = R.string.file),
         stringResource(id = R.string.folder)
     )
+) {
+    require(tabTitles.size == 2)
 
     val isSelectMode: Boolean by  driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
     val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
     val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
     val path: List<PathViewData> by driveViewModel.path.asLiveData().observeAsState(initial = emptyList())
 
-    val pagerState = rememberPagerState(pageCount = tabTitles.size)
-    val scope = rememberCoroutineScope()
+    //val pagerState = rememberPagerState(pageCount = tabTitles.size)
+    var currentPageIndex: Int by remember {
+        mutableStateOf(0)
+    }
+
+    //val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -91,15 +93,16 @@ fun DriveScreen(
                     driveViewModel.popUntil(dir.folder)
                 }
 
-                TabRow(selectedTabIndex = pagerState.currentPage) {
+                TabRow(selectedTabIndex = currentPageIndex) {
                     tabTitles.forEachIndexed { index, s ->
                         Tab(
                             text = {  Text(text = s) },
-                            selected = index == pagerState.currentPage,
+                            selected = index == currentPageIndex,
                             onClick = {
-                                scope.launch {
+                                /*scope.launch {
                                     pagerState.animateScrollToPage(index)
-                                }
+                                }*/
+                                currentPageIndex = index
 
                             }
 
@@ -110,7 +113,7 @@ fun DriveScreen(
             }
         },
         floatingActionButton = {
-            if(pagerState.currentPage == 0) {
+            if(currentPageIndex == 0) {
                 FloatingActionButton(onClick = onShowLocalFilePicker) {
                     Icon(imageVector = Icons.Filled.AddAPhoto, contentDescription = null)
                 }
@@ -124,6 +127,13 @@ fun DriveScreen(
 
     ) {
 
+        if(currentPageIndex == 0) {
+            FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
+        }else{
+            DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
+        }
+        /*
+        FIXME: HorizontalPagerを使用するとSwipeRefresh時にクラッシュする
         HorizontalPager(state = pagerState) { page ->
             if(page == 0) {
                 FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
@@ -131,6 +141,7 @@ fun DriveScreen(
                 DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
             }
         }
+         */
     }
 }
 
