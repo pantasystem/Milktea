@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.asLiveData
@@ -38,7 +36,9 @@ fun DriveScreen(
     fileViewModel: FileViewModel,
     directoryViewModel: DirectoryViewModel,
     onNavigateUp: ()->Unit,
-    onFixSelected: ()->Unit
+    onFixSelected: ()->Unit,
+    onShowLocalFilePicker: ()->Unit,
+    onShowCreateDirectoryEditor: ()-> Unit
 ) {
 
     val isSelectMode: Boolean by  driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
@@ -103,6 +103,18 @@ fun DriveScreen(
                 }
             }
         },
+        floatingActionButton = {
+            if(currentTabIndex == 0) {
+                FloatingActionButton(onClick = onShowLocalFilePicker) {
+                    Icon(imageVector = Icons.Filled.AddAPhoto, contentDescription = null)
+                }
+            }else{
+                FloatingActionButton(onClick = onShowCreateDirectoryEditor) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+                }
+            }
+
+        }
 
     ) {
 

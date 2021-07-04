@@ -48,11 +48,8 @@ class DriveActivity : AppCompatActivity() {
     private lateinit var _fileViewModel: FileViewModel
     private lateinit var _directoryViewModel: DirectoryViewModel
 
-    private var mMenuOpen: MenuItem? = null
 
-    private var mCurrentFragmentType: Type = Type.FOLDER
 
-    //private lateinit var mBinding: ActivityDriveBinding
 
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -120,6 +117,12 @@ class DriveActivity : AppCompatActivity() {
                             intent.putExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS, ArrayList(ids))
                             setResult(RESULT_OK, intent)
                         }
+                    },
+                    onShowLocalFilePicker = {
+                        showFileManager()
+                    },
+                    onShowCreateDirectoryEditor = {
+                        createDirectoryDialog()
                     }
                 )
             }
@@ -128,36 +131,7 @@ class DriveActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_drive, menu)
-        val openMenu = menu?.findItem(R.id.action_open)
-        mMenuOpen = openMenu
-        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 0)
-        //openMenu?.isCheckable = true
-        //openMenu?.isEnabled = false
-        openMenu?.isVisible = maxSize > 0
 
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            android.R.id.home -> finish()
-            R.id.action_open ->{
-                val ids = _driveViewModel.getSelectedFileIds()
-                if(ids != null){
-                    intent.putExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS, ArrayList(ids))
-                    setResult(RESULT_OK, intent)
-                    finish()
-
-                }else{
-                    setResult(Activity.RESULT_CANCELED)
-                    finish()
-                }
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     private fun createDirectoryDialog(){
 
@@ -218,19 +192,6 @@ class DriveActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<PathViewData>(){
-        override fun areContentsTheSame(oldItem: PathViewData, newItem: PathViewData): Boolean {
-            return oldItem == newItem
-        }
 
-        override fun areItemsTheSame(oldItem: PathViewData, newItem: PathViewData): Boolean {
-            return oldItem.id == newItem.id
 
-        }
-    }
-
-    fun setCurrentFragment(type: Type){
-        mCurrentFragmentType = type
-        Log.d("DriveActivity", "currentFragmentType:$type")
-    }
 }
