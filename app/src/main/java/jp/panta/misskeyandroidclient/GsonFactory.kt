@@ -15,18 +15,16 @@ import java.util.*
 object GsonFactory {
     private val gson = GsonBuilder()
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-        .registerTypeAdapter(Instant::class.java, object : TypeAdapter<Instant?>() {
-            override fun read(jsonReader: JsonReader?): Instant? {
-                if(jsonReader?.peek() == JsonToken.NULL) {
+        .registerTypeAdapter(Instant::class.java, object : JsonDeserializer<Instant?>{
+            override fun deserialize(
+                json: JsonElement?,
+                typeOfT: Type?,
+                context: JsonDeserializationContext?
+            ): Instant? {
+                if(json == null || json.isJsonNull) {
                     return null
                 }
-                return jsonReader?.nextString()?.let { dateTime ->
-                    return Instant.parse(dateTime)
-                } ?: Clock.System.now()
-            }
-
-            override fun write(out: JsonWriter?, value: Instant?) {
-                out?.value(value.toString())
+                return Instant.parse(json.asString)
             }
         })
         .create()
