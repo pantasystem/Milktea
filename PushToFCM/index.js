@@ -69,7 +69,7 @@ const parseJsonMiddleware = (req, res, next) => {
     }
 }
 
-app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,(req, res)=>{
+app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,(req, res, next)=>{
     let deviceToken = req.query.deviceToken;
     let accountId = req.query.accountId;
     console.log('call webpushcallback');
@@ -108,11 +108,12 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
     
     messaging.send(message).then((res)=>{
         console.log(`send:${res}`);
+        res.status(200).end();
     }).catch((e)=>{
         console.error('message送信失敗', e);
+        next(e);
     });
 
-    res.json({status: 'ok'});
 });
 
 app.get('/health', switchLangMiddleware,(req, res)=>{
