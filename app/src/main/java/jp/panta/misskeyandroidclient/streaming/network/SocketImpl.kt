@@ -17,6 +17,9 @@ class SocketImpl(
     val logger = loggerFactory.create("SocketImpl")
 
 
+    private var pollingJob: PollingJob = PollingJob(this)
+
+
     private val json = Json {
         ignoreUnknownKeys = true
     }
@@ -123,6 +126,7 @@ class SocketImpl(
             if(mWebSocket == null){
                 return false
             }
+            pollingJob.cancel()
 
             return mWebSocket?.close(1001, "finish")?: false
         }
@@ -178,6 +182,13 @@ class SocketImpl(
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
+        runCatching {
+            val r = json.decodeFromString<PongRes>(text)
+            r.id.isNotBlank()
+        }.onSuccess {
+            logger.debug("polling成功")
+            return
+        }
         val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
             logger.error("デコードエラー msg:$text", e = t)
         }.getOrNull()?: return
@@ -193,18 +204,29 @@ class SocketImpl(
             }.getOrElse {
                 false
             }
+
             if(res){
                 return
             }
+
         }
+
         logger.debug("受諾されんかったメッセージ: $text")
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
+
+
         logger.debug("onOpen webSocket 接続")
         synchronized(this){
+            pollingJob.cancel()
+            pollingJob = PollingJob(this).also {
+                it.ping(4000, 900)
+            }
             mState = Socket.State.Connected
         }
     }
+
+
 }
