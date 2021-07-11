@@ -59,7 +59,7 @@ fun Context.receiveNetworkEvent() : Flow<NetworkInfo?>{
 
 @ExperimentalCoroutinesApi
 fun Context.activeNetworkFlow(): Flow<Boolean> {
-    return if(Build.VERSION_CODES.M <= Build.VERSION.SDK_INT) {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.activeNetworkFlow()
     }else{
