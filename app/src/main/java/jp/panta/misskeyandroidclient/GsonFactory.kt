@@ -1,14 +1,8 @@
 package jp.panta.misskeyandroidclient
 
-import android.content.Intent
 import com.google.gson.*
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
-import com.google.gson.stream.JsonWriter
-import kotlinx.datetime.*
-import kotlinx.datetime.TimeZone
+import kotlinx.datetime.Instant
 import java.lang.reflect.Type
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
