@@ -10,7 +10,23 @@ import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-class GalleryPostState(
+data class GalleryPostState(
+    val galleryPost: GalleryPost,
+    val files: List<FileProperty>,
+    val user: User,
+    val currentIndex: Int,
+    val isFavoriteSending: Boolean,
+
+) {
+    val isLiked: Boolean get() = (galleryPost as? GalleryPost.Authenticated)?.isLiked?: false
+
+    val fileViewDataList: List<FileViewData> by lazy {
+        files.map {
+            FileViewData(it.toFile())
+        }
+    }
+}
+/*class GalleryPostState(
     val galleryPost: GalleryPost,
     val files: List<FileProperty>,
     val user: User,
@@ -62,3 +78,4 @@ class GalleryPostState(
         }
     }
 }
+ */

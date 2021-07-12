@@ -156,7 +156,7 @@ open class PlaneNoteViewData (
         return@map sum
     }
 
-    val myReaction = MutableLiveData<String>(toShowNote.note.myReaction)
+    val myReaction = MutableLiveData<String?>(toShowNote.note.myReaction)
 
     val poll = toShowNote.note.poll?.let {
         PollViewData(it, toShowNote.note.id.noteId)

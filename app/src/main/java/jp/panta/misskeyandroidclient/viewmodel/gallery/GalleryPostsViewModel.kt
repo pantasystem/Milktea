@@ -3,40 +3,28 @@ package jp.panta.misskeyandroidclient.viewmodel.gallery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.v12_75_0.GetPosts
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.IllegalVersionException
-import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.account.page.SincePaginate
-import jp.panta.misskeyandroidclient.model.account.page.UntilPaginate
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.gallery.*
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import retrofit2.Response
-import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
 
 class GalleryPostsViewModel(
     val pageable: Pageable.Gallery,
     private var accountId: Long?,
     galleryDataSource: GalleryDataSource,
-    private val galleryRepository: GalleryRepository,
+    galleryRepository: GalleryRepository,
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     miCore: MiCore
@@ -67,8 +55,12 @@ class GalleryPostsViewModel(
     val galleryPosts: StateFlow<PageableState<List<GalleryPostState>>> = _galleryPosts
     val lock = Mutex()
 
+    private val galleryPostSendFavoriteStore = GalleryPostSendFavoriteStore(galleryRepository)
+
     private val _error = MutableSharedFlow<Throwable>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val error: Flow<Throwable> = _error
+
+    private val currentIndexes = MutableStateFlow<Map<GalleryPost.Id, Int>>(emptyMap())
 
 
     init {
@@ -93,8 +85,9 @@ class GalleryPostsViewModel(
     }
 
     init {
+
         // FIXME: 毎回Stateオブジェクトを生成してしまうのでユーザーの捜査情報が初期化されてしまうので何とかする
-        galleryPostsStore.state.map {
+        val relations = galleryPostsStore.state.combine(galleryDataSource.state) { it, _ ->
           
             it.convert {
                 runBlocking {
@@ -110,15 +103,26 @@ class GalleryPostsViewModel(
                     }.filter { postWithFiles ->
                         postWithFiles.second.isNotEmpty()
                     }.map { postWithFiles ->
-                        GalleryPostState(
+                        GalleryPostRelation(
                             postWithFiles.first,
                             miCore.getFilePropertyDataSource().findIn(postWithFiles.first.fileIds),
-                            miCore.getUserRepository().find(postWithFiles.first.userId, false),
-                            this@GalleryPostsViewModel,
-                            miCore.getGalleryDataSource(),
-                            viewModelScope
+                            miCore.getUserRepository().find(postWithFiles.first.userId, false)
                         )
                     }
+                }
+            }
+        }
+
+        combine(relations, currentIndexes, galleryPostSendFavoriteStore.state) { posts, indexes, sends ->
+            posts.convert {
+                it.map { relation ->
+                    GalleryPostState(
+                        galleryPost = relation.galleryPost,
+                        files = relation.files,
+                        user = relation.user,
+                        currentIndex = indexes[relation.galleryPost.id] ?: 0,
+                        isFavoriteSending = sends.contains(relation.galleryPost.id)
+                    )
                 }
             }
         }.onEach {
@@ -127,6 +131,7 @@ class GalleryPostsViewModel(
                 _error.emit(it.throwable)
             }
         }.launchIn(viewModelScope + Dispatchers.IO)
+
 
     }
 
@@ -160,17 +165,21 @@ class GalleryPostsViewModel(
 
 
 
+    fun changeIndex(id: GalleryPost.Id, index: Int) {
+        currentIndexes.value = currentIndexes.value.toMutableMap().also {
+            it[id] = index
+        }
+    }
 
+    fun toggleFavorite(galleryId: GalleryPost.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            toggle(galleryId)
+        }
+    }
 
     override suspend fun toggle(galleryId: GalleryPost.Id) {
         runCatching {
-            val gallery = galleryRepository.find(galleryId) as? GalleryPost.Authenticated
-                ?: throw UnauthorizedException()
-            if(gallery.isLiked) {
-                galleryRepository.unlike(galleryId)
-            }else{
-                galleryRepository.like(galleryId)
-            }
+            galleryPostSendFavoriteStore.toggleFavorite(galleryId)
         }.onFailure {
             _error.emit(it)
         }
@@ -188,6 +197,9 @@ class GalleryPostsViewModel(
         return misskeyAPIProvider.get(this.instanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
     }
+
+
+
 
 
 
