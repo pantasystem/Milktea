@@ -93,3 +93,10 @@ suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: Fi
         )
     }
 }
+
+
+data class GalleryPostRelation(
+    val galleryPost: GalleryPost,
+    val files: List<FileProperty>,
+    val user: User,
+)

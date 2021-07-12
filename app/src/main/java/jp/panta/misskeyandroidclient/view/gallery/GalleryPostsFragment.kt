@@ -52,13 +52,16 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
             accountId = null
         }
 
-        val galleryPostsListAdapter = GalleryPostsListAdapter(viewLifecycleOwner)
-        binding.listView.adapter = galleryPostsListAdapter
-        val layoutManager = LinearLayoutManager(this.context)
-        binding.listView.layoutManager = layoutManager
+
 
         val miCore = requireContext().applicationContext as MiCore
         val viewModel = ViewModelProvider(this, GalleryPostsViewModel.Factory(pageable, accountId, miCore))[GalleryPostsViewModel::class.java]
+
+        val galleryPostsListAdapter = GalleryPostsListAdapter(viewLifecycleOwner, viewModel)
+
+        binding.listView.adapter = galleryPostsListAdapter
+        val layoutManager = LinearLayoutManager(this.context)
+        binding.listView.layoutManager = layoutManager
         lifecycleScope.launchWhenStarted {
             viewModel.galleryPosts.collect { state ->
                 if(state.content is StateContent.Exist) {

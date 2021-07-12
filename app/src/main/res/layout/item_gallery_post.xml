@@ -8,6 +8,9 @@
                 name="galleryPostState"
                 type="jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostState" />
         <import type="android.view.View" />
+        <variable
+                name="galleryPostsViewModel"
+                type="jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostsViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView
@@ -159,9 +162,9 @@
                     tools:src="@drawable/ic_baseline_favorite_border_24"
                     android:layout_marginEnd="8dp"
                     android:contentDescription="@string/gallery_favorite_button"
-                    isLiked="@{galleryPostState.isLiked ?? false}"
-                    isSendingLiked="@{galleryPostState.isSending ?? false}"
-                    android:onClick="@{()-> galleryPostState.toggleFavorite()}"
+                    isLiked="@{galleryPostState.isLiked}"
+                    isSendingLiked="@{galleryPostState.isFavoriteSending}"
+                    android:onClick="@{()-> galleryPostsViewModel.toggleFavorite(galleryPostState.galleryPost.id)}"
                     app:layout_constraintBottom_toBottomOf="parent"
 
                     />

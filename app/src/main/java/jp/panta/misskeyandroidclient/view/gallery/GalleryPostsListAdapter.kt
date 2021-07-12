@@ -14,22 +14,25 @@ import jp.panta.misskeyandroidclient.databinding.ItemGalleryPostBinding
 import jp.panta.misskeyandroidclient.view.ViewDataBindingSimpleRecyclerViewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostState
+import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostsViewModel
 
 class GalleryPostsListAdapter(
-    val lifecycleOwner: LifecycleOwner
+    val lifecycleOwner: LifecycleOwner,
+    private val galleryPostsViewModel: GalleryPostsViewModel
 ) : ListAdapter<GalleryPostState, GalleryPostViewHolder>(GalleryPostDiffItemCallback) {
     override fun onBindViewHolder(holder: GalleryPostViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryPostViewHolder {
-        return GalleryPostViewHolder(ItemGalleryPostBinding.inflate(LayoutInflater.from(parent.context), parent, false), lifecycleOwner)
+        return GalleryPostViewHolder(ItemGalleryPostBinding.inflate(LayoutInflater.from(parent.context), parent, false), lifecycleOwner, galleryPostsViewModel)
     }
 }
 
 class GalleryPostViewHolder(
     private val itemGalleryPostBinding: ItemGalleryPostBinding,
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
+    private val galleryPostsViewModel: GalleryPostsViewModel
 ) : RecyclerView.ViewHolder(itemGalleryPostBinding.root) {
     fun bind(galleryPostState: GalleryPostState) {
         itemGalleryPostBinding.galleryPostState = galleryPostState
@@ -53,6 +56,7 @@ class GalleryPostViewHolder(
         )
 
         adapter.submitList(galleryPostState.fileViewDataList)
+        itemGalleryPostBinding.galleryPostsViewModel = galleryPostsViewModel
 
         itemGalleryPostBinding.galleryImagePager.adapter = adapter
         TabLayoutMediator(itemGalleryPostBinding.imagesTab, itemGalleryPostBinding.galleryImagePager) { _, _ ->
