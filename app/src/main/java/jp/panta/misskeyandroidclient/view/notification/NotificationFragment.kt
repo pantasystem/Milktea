@@ -58,7 +58,6 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         //mViewModel.loadInit()
 
         mViewModel.notificationsLiveData.observe(viewLifecycleOwner, {
-            Log.d("NotificationFragment", "新たなデータ: $it")
             adapter.submitList(it)
         })
 
