@@ -4,8 +4,7 @@ import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryNotFoundException
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -19,7 +18,18 @@ class InMemoryGalleryDataSource(
     }
 
     private var galleries = mapOf<GalleryPost.Id, GalleryPost>()
+        set(value) {
+            field = value
+            _state.value = value
+        }
+        get() {
+            return state.value
+        }
     private val lock = Mutex()
+
+    private val _state = MutableStateFlow<Map<GalleryPost.Id, GalleryPost>>(emptyMap())
+
+    override val state: StateFlow<Map<GalleryPost.Id, GalleryPost>> = _state
 
     override suspend fun add(galleryPost: GalleryPost): AddResult {
         val result = lock.withLock {
@@ -70,6 +80,14 @@ class InMemoryGalleryDataSource(
     override suspend fun filterByAccountId(accountId: Long): List<GalleryPost> {
         return findAll().filter {
             it.id.accountId == accountId
+        }
+    }
+}
+
+fun GalleryDataSource.watchIn(ids: List<GalleryPost.Id>) : Flow<List<GalleryPost>>{
+    return this.state.map {
+        ids.map { id ->
+            find(id)
         }
     }
 }

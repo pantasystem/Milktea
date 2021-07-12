@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.gallery
 
 import jp.panta.misskeyandroidclient.model.AddResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface GalleryDataSource {
 
@@ -13,6 +14,7 @@ interface GalleryDataSource {
     }
 
     fun events(): Flow<Event>
+    val state: StateFlow<Map<GalleryPost.Id, GalleryPost>>
 
     suspend fun add(galleryPost: GalleryPost) : AddResult
     suspend fun remove(galleryPostId: GalleryPost.Id) : Boolean
