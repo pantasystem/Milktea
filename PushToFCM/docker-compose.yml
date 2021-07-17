@@ -1,0 +1,16 @@
+version: "3"
+services:
+    push-server:
+        build: ./docker/node
+        user: ${user}
+        ports:
+            - 3000:3000
+        volumes:
+            - ./:/usr/src/app
+        command: ["node", "index.js"]
+        healthcheck:
+            test: ["CMD-SHELL", "curl -fSsO /dev/null http://localhost:3000/health || exit 1"]
+            interval: "1s"
+            timeout: "1s"
+            retries: "2"
+
