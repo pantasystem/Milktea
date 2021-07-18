@@ -92,7 +92,9 @@ class NoteEditorViewModel(
     val text = MediatorLiveData<String>().apply {
 
         addSource(draftNote) {
-            value = it?.text
+            if(it?.text != null) {
+                value = it.text
+            }
         }
     }
     var maxTextLength = Transformations.map(currentAccount){
