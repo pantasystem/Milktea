@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ReactionChoicesFragment : Fragment(){
 
@@ -118,13 +119,24 @@ class ReactionChoicesFragment : Fragment(){
             return
         }
         lifecycleScope.launch(Dispatchers.IO){
+            //val meta = miApplication.getCurrentInstanceMeta()
             val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map{
                 it.reaction
+            }.map { reaction ->
+                if(reaction.codePointCount(0, reaction.length) == 1) {
+                    return@map reaction
+                }
+                if(reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains("@")) {
+                    return@map (reaction.replace(":", "").split("@")[0]).let {
+                        ":$it:"
+                    }
+                }
+                reaction
             }
-
-            Handler(Looper.getMainLooper()).post{
+            withContext(Dispatchers.Main) {
                 adapter.submitList(list)
             }
+
         }
     }
 
