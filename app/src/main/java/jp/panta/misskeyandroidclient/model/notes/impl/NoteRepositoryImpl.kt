@@ -97,7 +97,6 @@ class NoteRepositoryImpl(
         return runCatching {
             if(postReaction(createReaction) && !miCore.getNoteCaptureAPI(account).isCaptured(createReaction.noteId.noteId)) {
                 miCore.getNoteDataSource().add(note.onIReacted(createReaction.reaction))
-                return@runCatching true
             }
             true
         }.getOrThrow()
