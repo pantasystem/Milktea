@@ -140,7 +140,7 @@ class ReactionChoicesFragment : Fragment(){
 
     private fun showUserSettings(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
-        GlobalScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO){
             try{
                 val instance = miApplication.getCurrentAccount().value?.instanceDomain
                 var reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance!!)?.map{
