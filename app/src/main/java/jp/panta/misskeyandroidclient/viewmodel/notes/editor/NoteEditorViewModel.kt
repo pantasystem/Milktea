@@ -152,7 +152,10 @@ class NoteEditorViewModel(
             if(it != null) {
                 val local = it.localOnly
                 val type = it.visibility
-                value = Visibility(type, local ?: false)
+                val visibleUserIds = it.visibleUserIds
+                value = Visibility(type, local ?: false, visibleUserIds = visibleUserIds?.map { userId ->
+                    User.Id(it.accountId, userId)
+                })
             }
         }
 
