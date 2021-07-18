@@ -157,7 +157,8 @@ class NoteEditorViewModel(
         }
 
         reply.filterNotNull().onEach {
-            postValue(it.visibility)
+            val visibility = if(it.visibility is Visibility.Specified) Visibility.Specified(listOf(it.userId)) else it.visibility
+            postValue(visibility)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
 
@@ -183,15 +184,16 @@ class NoteEditorViewModel(
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
+
     @FlowPreview
     @ExperimentalCoroutinesApi
-    val address = MutableLiveData(
-        dn?.visibleUserIds?.mapNotNull {
-            miCore.getCurrentAccount().value?.accountId?.let { ac ->
-                User.Id(ac, it)
-            }
-        }?.map(::setUpUserViewData) ?: emptyList()
-    )
+    val address = visibility.map {
+        it as? Visibility.Specified
+    }.map {
+        it?.visibleUserIds?.map { uId ->
+            setUpUserViewData(uId)
+        }?: emptyList()
+    }.asFlow().asLiveData(viewModelScope.coroutineContext)
 
 
     @FlowPreview
@@ -292,28 +294,11 @@ class NoteEditorViewModel(
         this.files.value = files
     }
 
-    fun localFileTotal(): Int{
-        return files.value?.filter{
-            it.remoteFileId == null
-        }?.size?: 0
-    }
 
-    fun driveFileTotal(): Int{
-        return files.value?.filter{
-            it.remoteFileId != null
-        }?.size?: 0
-    }
 
     fun fileTotal(): Int{
         return files.value?.size?: 0
     }
-
-    fun remoteFiles(): List<File>{
-        return files.value?.filter{
-            it.remoteFileId != null
-        }?: emptyList()
-    }
-
 
 
     fun changeCwEnabled(){
@@ -360,20 +345,22 @@ class NoteEditorViewModel(
     @FlowPreview
     @ExperimentalCoroutinesApi
     fun setAddress(added: List<User.Id>, removed: List<User.Id>){
-        val list = address.value?.let{
+        /*val list = address.value?.let{
             ArrayList(it)
-        }?: ArrayList()
+        }?: ArrayList()*/
+        val list = ((visibility.value as? Visibility.Specified)?.visibleUserIds?: emptyList()).toMutableList()
 
         list.addAll(
-            added.map(::setUpUserViewData)
+            added
         )
 
-        list.removeAll { uv ->
-            removed.any{
-                uv.userId == it
-            }
+        list.removeAll {
+            removed.any()
         }
-        address.postValue(list)
+
+        visibility.value = Visibility.Specified(
+            list
+        )
     }
 
 
@@ -468,33 +455,16 @@ class NoteEditorViewModel(
         return this
     }
 
-    private fun getInstanceBaseUrl(): String?{
-        return currentAccount.value?.instanceDomain
-    }
     @FlowPreview
     @ExperimentalCoroutinesApi
     fun clear(){
         text.value = ""
         cw.value = ""
         files.value = emptyList()
-        address.value = emptyList()
         poll.value = null
     }
 
-    private fun getCurrentInformation(): Account?{
-        return miCore.getCurrentAccount().value
-    }
 
-
-    /*private fun<T> MediatorLiveData<T>.addSourceFromNoteAndDraft(observer: (Note?, DraftNote?)->Unit) {
-        addSource(note) {
-            observer(it, draftNote.value)
-        }
-
-        addSource(draftNote) {
-            observer(note.value, it)
-        }
-    }*/
 
 
 }

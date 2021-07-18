@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.notes
 import jp.panta.misskeyandroidclient.model.users.User
 import java.io.Serializable
 import java.lang.IllegalArgumentException
+import java.util.*
 import kotlin.jvm.Throws
 
 sealed class Visibility : Serializable{
@@ -67,7 +68,7 @@ fun Visibility.type(): String {
 
 @Throws(IllegalArgumentException::class)
 fun Visibility(type: String, isLocalOnly: Boolean, visibleUserIds: List<User.Id>? = null): Visibility {
-    return when(type.lowercase()){
+    return when(type.toLowerCase(Locale.ROOT)){
         "public" -> Visibility.Public(isLocalOnly)
         "home" -> Visibility.Home(isLocalOnly)
         "followers" -> Visibility.Followers(isLocalOnly)
