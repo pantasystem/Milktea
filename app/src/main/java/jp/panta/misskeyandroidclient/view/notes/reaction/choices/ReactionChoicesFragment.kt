@@ -119,7 +119,7 @@ class ReactionChoicesFragment : Fragment(){
             return
         }
         lifecycleScope.launch(Dispatchers.IO){
-            //val meta = miApplication.getCurrentInstanceMeta()
+            val meta = miApplication.getCurrentInstanceMeta()
             val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map{
                 it.reaction
             }.map { reaction ->
@@ -132,7 +132,13 @@ class ReactionChoicesFragment : Fragment(){
                     }
                 }
                 reaction
-            }
+            }.filter { reaction ->
+                reaction.codePointCount(0, reaction.length) == 1
+                        || meta?.emojis?.any {
+                            it.name == reaction.replace(":", "")
+
+                        }?: false
+            }.distinct()
             withContext(Dispatchers.Main) {
                 adapter.submitList(list)
             }
