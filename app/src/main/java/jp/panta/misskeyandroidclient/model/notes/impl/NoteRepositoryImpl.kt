@@ -99,7 +99,7 @@ class NoteRepositoryImpl(
                 miCore.getNoteDataSource().add(note.onIReacted(createReaction.reaction))
                 return@runCatching true
             }
-            false
+            true
         }.getOrThrow()
 
 
