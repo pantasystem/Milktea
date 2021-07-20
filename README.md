@@ -35,4 +35,15 @@ app nameはインスタンスのバージョンによってはvia名として公
 ## ビルドするには
 
 プロジェクトをgit cloneします。<br>
+local.propertiesを作成します。<br>
+```
+touch local.properties
+```
+local.propertiesには<br>
+以下のような属性を追加してプッシュ通知の中継鯖についての設定をします。<br>
+```
+push_to_fcm.server_base_url=https://hogehogehoge-pus
+push_to_fcm.public_key=中継鯖（PushToFCM）に設定したpublic_keyを設定します
+push_to_fcm.auth=中継鯖に設定したauth_secret.txtを設定します
+```
 Android SDK, AndroidStudioでビルドします。
