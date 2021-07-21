@@ -105,7 +105,11 @@ class TimelineViewModel(
         }.filter {
            !mNoteIds.contains(it.note.id) && !this.mIsLoading
         }.map{
-            PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            if(it.reply == null) {
+                PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            }else{
+                HasReplyToNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            }
         }.onEach { note ->
             this.mNoteIds.add(note.id)
             listOf(note).captureNotes()
