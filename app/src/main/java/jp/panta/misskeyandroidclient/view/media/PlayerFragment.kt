@@ -6,11 +6,9 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 
@@ -56,15 +54,16 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
             Log.e(TAG, "uri must not null")
             return
         }
-        val simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(requireContext())
+
+        val simpleExoPlayer = SimpleExoPlayer.Builder(requireContext()).build()
+        view.findViewById<PlayerView>(R.id.player_view).player = simpleExoPlayer
+
+        simpleExoPlayer.setMediaItem(MediaItem.fromUri(uri))
+        simpleExoPlayer.prepare()
+        simpleExoPlayer.play()
+
         mExoPlayer = simpleExoPlayer
 
-        val mediaSource = ProgressiveMediaSource.Factory(DefaultDataSourceFactory(requireContext(), Util.getUserAgent(requireContext(), getString(R.string.app_name))))
-            .createMediaSource(uri)
-
-        simpleExoPlayer.prepare(mediaSource)
-
-        view.findViewById<PlayerView>(R.id.player_view).player = simpleExoPlayer
     }
 
     override fun onResume() {
