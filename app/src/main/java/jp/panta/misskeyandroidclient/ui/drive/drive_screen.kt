@@ -18,6 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
@@ -25,6 +27,7 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 
 
 @ExperimentalPagerApi
@@ -50,10 +53,9 @@ fun DriveScreen(
     val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
     val path: List<PathViewData> by driveViewModel.path.asLiveData().observeAsState(initial = emptyList())
 
-    //val pagerState = rememberPagerState(pageCount = tabTitles.size)
-    var currentPageIndex: Int by remember {
-        mutableStateOf(0)
-    }
+    val pagerState = rememberPagerState(pageCount = tabTitles.size)
+    val scope = rememberCoroutineScope()
+
 
     //val scope = rememberCoroutineScope()
 
@@ -93,16 +95,16 @@ fun DriveScreen(
                     driveViewModel.popUntil(dir.folder)
                 }
 
-                TabRow(selectedTabIndex = currentPageIndex) {
+                TabRow(selectedTabIndex = pagerState.currentPage) {
                     tabTitles.forEachIndexed { index, s ->
                         Tab(
                             text = {  Text(text = s) },
-                            selected = index == currentPageIndex,
+                            selected = index == pagerState.currentPage,
                             onClick = {
-                                /*scope.launch {
+
+                                scope.launch {
                                     pagerState.animateScrollToPage(index)
-                                }*/
-                                currentPageIndex = index
+                                }
 
                             }
 
@@ -113,7 +115,7 @@ fun DriveScreen(
             }
         },
         floatingActionButton = {
-            if(currentPageIndex == 0) {
+            if(pagerState.currentPage == 0) {
                 FloatingActionButton(onClick = onShowLocalFilePicker) {
                     Icon(imageVector = Icons.Filled.AddAPhoto, contentDescription = null)
                 }
@@ -127,13 +129,7 @@ fun DriveScreen(
 
     ) {
 
-        if(currentPageIndex == 0) {
-            FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
-        }else{
-            DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
-        }
-        /*
-        FIXME: HorizontalPagerを使用するとSwipeRefresh時にクラッシュする
+
         HorizontalPager(state = pagerState) { page ->
             if(page == 0) {
                 FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
@@ -141,7 +137,6 @@ fun DriveScreen(
                 DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
             }
         }
-         */
     }
 }
 
