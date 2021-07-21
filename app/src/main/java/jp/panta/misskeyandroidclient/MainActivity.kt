@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
@@ -60,7 +59,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(){
 
     lateinit var mNotesViewModel: NotesViewModel
     @ExperimentalCoroutinesApi
@@ -93,7 +92,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        binding.navView.setNavigationItemSelectedListener(this)
+        binding.navView.setNavigationItemSelectedListener { item ->
+            val activity = when (item.itemId) {
+                R.id.nav_setting -> SettingsActivity::class.java
+                R.id.nav_drive -> DriveActivity::class.java
+                R.id.nav_favorite -> FavoriteActivity::class.java
+                R.id.nav_list -> ListListActivity::class.java
+                R.id.nav_antenna -> AntennaListActivity::class.java
+                R.id.nav_draft -> DraftNotesActivity::class.java
+                R.id.nav_gallery -> GalleryPostsActivity::class.java
+                else -> throw IllegalStateException("未定義なNavigation Itemです")
+            }
+            startActivity(Intent(this, activity))
+            binding.drawerLayout.closeDrawerWhenOpened()
+            false
+        }
 
         binding.appBarMain.fab.setOnClickListener{
             startActivity(Intent(this, NoteEditorActivity::class.java))
@@ -371,49 +384,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val idAndActivityMap = mapOf(
+            R.id.action_settings to SettingsActivity::class.java,
+            R.id.action_tab_setting to PageSettingActivity::class.java,
+            R.id.action_notification to NotificationsActivity::class.java,
+            R.id.action_messaging to MessagingListActivity::class.java,
+            R.id.action_search to SearchActivity::class.java
+        )
 
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            }
-            R.id.action_tab_setting-> {
-                startActivity(Intent(this,
-                    PageSettingActivity::class.java))
-                true
-            }
-            R.id.action_notification ->{
-                startActivity(Intent(this, NotificationsActivity::class.java))
-                true
-            }
-            R.id.action_messaging ->{
-                startActivity(Intent(this, MessagingListActivity::class.java))
-                true
-            }
-            R.id.action_search ->{
-                startActivity(Intent(this, SearchActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+        val targetActivity = idAndActivityMap[item.itemId]
+            ?: return super.onOptionsItemSelected(item)
+        startActivity(Intent(this, targetActivity))
+        return true
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        val activity = when (item.itemId) {
-            R.id.nav_setting -> SettingsActivity::class.java
-            R.id.nav_drive -> DriveActivity::class.java
-            R.id.nav_favorite -> FavoriteActivity::class.java
-            R.id.nav_list -> ListListActivity::class.java
-            R.id.nav_antenna -> AntennaListActivity::class.java
-            R.id.nav_draft -> DraftNotesActivity::class.java
-            R.id.nav_gallery -> GalleryPostsActivity::class.java
-            else -> throw IllegalStateException("未定義なNavigation Itemです")
-        }
-        startActivity(Intent(this, activity))
-        binding.drawerLayout.closeDrawerWhenOpened()
-        return false
-    }
     override fun onStart() {
         super.onStart()
         setBackgroundImage()
