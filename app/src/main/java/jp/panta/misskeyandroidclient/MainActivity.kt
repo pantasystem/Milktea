@@ -400,36 +400,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        when (item.itemId) {
-
-            R.id.nav_setting ->{
-                startActivity(Intent(this, SettingsActivity::class.java))
-            }
-            R.id.nav_drive ->{
-                startActivity(Intent(this, DriveActivity::class.java))
-            }
-            R.id.nav_favorite ->{
-                startActivity(Intent(this, FavoriteActivity::class.java))
-            }
-            R.id.nav_list ->{
-                startActivity(
-                    Intent(this, ListListActivity::class.java)
-                )
-            }
-            R.id.nav_antenna ->{
-                startActivity(Intent(this, AntennaListActivity::class.java))
-            }
-            R.id.nav_draft ->{
-                startActivity(
-                    Intent(this, DraftNotesActivity::class.java)
-                )
-            }
-            R.id.nav_gallery -> {
-                startActivity(Intent(this, GalleryPostsActivity::class.java))
-            }
+        val activity = when (item.itemId) {
+            R.id.nav_setting -> SettingsActivity::class.java
+            R.id.nav_drive -> DriveActivity::class.java
+            R.id.nav_favorite -> FavoriteActivity::class.java
+            R.id.nav_list -> ListListActivity::class.java
+            R.id.nav_antenna -> AntennaListActivity::class.java
+            R.id.nav_draft -> DraftNotesActivity::class.java
+            R.id.nav_gallery -> GalleryPostsActivity::class.java
+            else -> throw IllegalStateException("未定義なNavigation Itemです")
         }
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        drawerLayout.closeDrawer(GravityCompat.START)
+        startActivity(Intent(this, activity))
+        binding.drawerLayout.closeDrawerWhenOpened()
         return false
     }
     override fun onStart() {
