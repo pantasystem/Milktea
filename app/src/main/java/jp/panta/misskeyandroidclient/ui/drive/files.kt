@@ -73,6 +73,7 @@ fun FileViewDataListView(
 ) {
     LazyColumn(
         state = state,
+        modifier = Modifier.fillMaxSize()
     ) {
         this.items(
             list,
