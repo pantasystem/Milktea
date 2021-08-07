@@ -73,8 +73,12 @@ sealed class User : Entity{
                     return FollowState.FOLLOWING
                 }
                 
-                if(isLocked && hasPendingFollowRequestFromYou) {
-                    return FollowState.PENDING_FOLLOW_REQUEST
+                if(isLocked) {
+                    return if(hasPendingFollowRequestFromYou) {
+                        FollowState.PENDING_FOLLOW_REQUEST
+                    }else{
+                        FollowState.UNFOLLOWING_LOCKED
+                    }
                 }
 
                 return FollowState.UNFOLLOWING
@@ -103,7 +107,7 @@ sealed class User : Entity{
 }
 
 enum class FollowState {
-    PENDING_FOLLOW_REQUEST, FOLLOWING, UNFOLLOWING
+    PENDING_FOLLOW_REQUEST, FOLLOWING, UNFOLLOWING, UNFOLLOWING_LOCKED
 }
 
 sealed class UserState {
