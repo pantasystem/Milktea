@@ -75,15 +75,7 @@ class UserDetailViewModel(
         }
     }
 
-    val followButtonStatus = MediatorLiveData<String>().apply{
-        addSource(isFollowing){
-            if(it == true){
-                this.value = "フォロー中"
-            }else{
-                this.value = "フォロー"
-            }
-        }
-    }
+
 
     val userName = MediatorLiveData<String>().apply{
         addSource(user){user ->
