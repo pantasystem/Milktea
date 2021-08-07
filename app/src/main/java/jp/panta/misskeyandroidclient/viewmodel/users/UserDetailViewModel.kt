@@ -157,7 +157,7 @@ class UserDetailViewModel(
             userState.value?.let{
                 runCatching {
                     val user = miCore.getUserRepository().find(it.id) as User.Detail
-                    if(user.isFollowing) {
+                    if(user.isFollowing || user.hasPendingFollowRequestFromYou) {
                         miCore.getUserRepository().unfollow(user.id)
                     }else{
                         miCore.getUserRepository().follow(user.id)
