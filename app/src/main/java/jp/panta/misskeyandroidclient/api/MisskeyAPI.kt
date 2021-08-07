@@ -24,11 +24,9 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
-import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
-import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
+import jp.panta.misskeyandroidclient.model.notes.draft.db.UserIdDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -221,4 +219,7 @@ interface MisskeyAPI {
 
     @POST("api/sw/register")
     suspend fun swRegister(@Body subscription: Subscription) : Response<SubscriptionState>
+
+    @POST("api/following/requests/cancel")
+    suspend fun cancelFollowRequest(@Body req: CancelFollow) : Response<UserDTO>
 }

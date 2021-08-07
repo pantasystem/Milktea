@@ -114,7 +114,6 @@
     <string name="replied_by">Replied by %s</string>
     <string name="quoted_by">Quoted by %s</string>
     <string name="voted_by">poll voted by %s</string>
-    <string name="request_follow">following request</string>
     <string name="mention_by">mentioned by %s</string>
     <string name="reacted_by">reacted by %s</string>
     <string name="renoted_by">renoted by %s</string>
@@ -350,6 +349,11 @@
     <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy the URL of the authentication
         destination to the clipboard.
     </string>
+    <string name="request_follow">%s request follow to you</string>
+
     <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="follow_approval_pending">Follow approval pending</string>
+    <string name="request_follow_from_u">Request follow</string>
+    <string name="unfollow">Unfollow</string>
 
 </resources>

@@ -1,11 +1,8 @@
 package jp.panta.misskeyandroidclient.model.users.impl
 
 import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
-import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
@@ -113,12 +110,16 @@ class UserRepositoryImpl(
 
     override suspend fun follow(userId: User.Id): Boolean {
         val account = miCore.getAccountRepository().get(userId.accountId)
+        val user = find(userId, true) as User.Detail
         val req = RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))
         logger.debug("follow req:$req")
         val res = miCore.getMisskeyAPI(account).followUser(req)
         res.throwIfHasError()
         if(res.isSuccessful) {
-            val updated = (find(userId, true) as User.Detail).copy(isFollowing = true)
+            val updated = (find(userId, true) as User.Detail).copy(
+                isFollowing = if(user.isLocked) user.isFollowing else true,
+                hasPendingFollowRequestFromYou = if(user.isLocked) true else user.hasPendingFollowRequestFromYou
+            )
             miCore.getUserDataSource().add(updated)
         }
         return res.isSuccessful
@@ -126,10 +127,20 @@ class UserRepositoryImpl(
 
     override suspend fun unfollow(userId: User.Id): Boolean {
         val account = miCore.getAccountRepository().get(userId.accountId)
-        val res = miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
+        val user = find(userId, true) as User.Detail
+
+
+        val res = if(user.isLocked) {
+            miCore.getMisskeyAPI(account).cancelFollowRequest(CancelFollow(userId = userId.id, i = account.getI(miCore.getEncryption())))
+        }else{
+            miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
+        }
         res.throwIfHasError()
         if(res.isSuccessful) {
-            val updated = (find(userId, true) as User.Detail).copy(isFollowing = false)
+            val updated = user.copy(
+                isFollowing = if(user.isLocked) user.isFollowing else false,
+                hasPendingFollowRequestFromYou = if(user.isLocked) false else user.hasPendingFollowRequestFromYou
+            )
             miCore.getUserDataSource().add(updated)
         }
         return res.isSuccessful

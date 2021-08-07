@@ -66,7 +66,24 @@ sealed class User : Entity{
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
         override var instanceUpdatedAt: Date = Date()
-    ) : User()
+    ) : User() {
+        val followState: FollowState
+            get() {
+                if(isFollowing) {
+                    return FollowState.FOLLOWING
+                }
+                
+                if(isLocked) {
+                    return if(hasPendingFollowRequestFromYou) {
+                        FollowState.PENDING_FOLLOW_REQUEST
+                    }else{
+                        FollowState.UNFOLLOWING_LOCKED
+                    }
+                }
+
+                return FollowState.UNFOLLOWING
+            }
+    }
 
     fun updated(){
         instanceUpdatedAt = Date()
@@ -87,6 +104,10 @@ sealed class User : Entity{
     fun getShortDisplayName(): String{
         return "@" + this.userName
     }
+}
+
+enum class FollowState {
+    PENDING_FOLLOW_REQUEST, FOLLOWING, UNFOLLOWING, UNFOLLOWING_LOCKED
 }
 
 sealed class UserState {

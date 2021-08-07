@@ -353,4 +353,10 @@
     <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする
     </string>
     <string name="copied_to_clipboard">クリップボードにコピーしました</string>
+    <string name="follow_approval_pending">フォロー承認待ち</string>
+    <string name="request_follow_from_u">フォロー申請</string>
+    <string name="unfollow">フォロー解除</string>
+
+
+
 </resources>

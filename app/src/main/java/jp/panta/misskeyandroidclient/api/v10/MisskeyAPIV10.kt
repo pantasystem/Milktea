@@ -25,12 +25,10 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
-import jp.panta.misskeyandroidclient.api.users.AcceptFollowRequest
-import jp.panta.misskeyandroidclient.api.users.RejectFollowRequest
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
+import retrofit2.http.Body
 
 open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI {
     override suspend fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
@@ -153,4 +151,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
     override suspend fun reactions(body: RequestReactionHistoryDTO): Response<List<ReactionHistoryDTO>> = misskey.reactions(body)
 
     override suspend fun swRegister(subscription: Subscription): Response<SubscriptionState> = misskey.swRegister(subscription)
+
+    override suspend fun cancelFollowRequest(@Body req: CancelFollow) : Response<UserDTO> = misskey.cancelFollowRequest(req)
+
 }

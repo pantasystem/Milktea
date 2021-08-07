@@ -95,7 +95,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom"
                                 tools:text="フォロー"
-                                android:text="@{userViewModel.followButtonStatus}"
+                                followState="@{userViewModel.user.followState}"
                                 android:visibility="@{userViewModel.mine ? View.GONE : View.VISIBLE}"
                                 android:onClick="@{()-> userViewModel.changeFollow()}"
                                 />
