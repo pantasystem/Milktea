@@ -13,10 +13,13 @@ import retrofit2.Response
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.sync.withLock
 
 interface RenotesPagingService {
+    val state: Flow<PageableState<List<Renote>>>
     suspend fun next()
+    suspend fun refresh()
     suspend fun clear()
 }
 
@@ -32,7 +35,8 @@ class RenotesPagingServiceImpl(
     private val pagingImpl = RenotesPagingImpl(targetNoteId, misskeyAPIProvider, accountRepository, noteDataSourceAdder, encryption)
     private val controller = PreviousPagingController(pagingImpl, pagingImpl, pagingImpl, pagingImpl)
 
-    val state = pagingImpl.state
+    override val state: Flow<PageableState<List<Renote>>>
+        get() = pagingImpl.state
 
     override suspend fun clear() {
         pagingImpl.mutex.withLock {
@@ -42,6 +46,11 @@ class RenotesPagingServiceImpl(
 
     override suspend fun next() {
         controller.loadPrevious()
+    }
+
+    override suspend fun refresh() {
+        this.clear()
+        this.next()
     }
 }
 class RenotesPagingImpl(
@@ -100,7 +109,18 @@ class RenotesPagingImpl(
     }
 
 
+}
 
-
-
+fun MiCore.createRenotesPagingService(targetNoteId: Note.Id): RenotesPagingService {
+    return RenotesPagingServiceImpl(
+        targetNoteId,
+        this.getMisskeyAPIProvider(),
+        this.getAccountRepository(),
+        NoteDataSourceAdder(
+            this.getUserDataSource(),
+            this.getNoteDataSource(),
+            this.getFilePropertyDataSource()
+        ),
+        this.getEncryption(),
+    )
 }
