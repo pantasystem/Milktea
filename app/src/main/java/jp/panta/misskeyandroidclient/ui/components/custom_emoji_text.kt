@@ -24,7 +24,7 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>) : List<EmojiPos> {
 
     val pattern = StringBuilder(":(").also { patternBuilder ->
         emojis.forEachIndexed { index, emoji ->
-            patternBuilder.append(emoji.name)
+            patternBuilder.append(Pattern.quote(emoji.name))
             if(emojis.size - 1 != index) {
                 patternBuilder.append("|")
             }
