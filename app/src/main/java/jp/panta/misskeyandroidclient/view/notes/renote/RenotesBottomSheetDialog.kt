@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.notes.RenoteUsersScreen
@@ -54,16 +55,18 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
 
         return ComposeView(requireContext()).apply {
             setContent {
-                RenoteUsersScreen(
-                    renotesViewModel = viewModel,
-                    onSelected = { nr ->
-                        dismiss()
-                        Intent(requireContext(), UserDetailActivity::class.java)
-                        val intent = UserDetailActivity.newInstance(requireContext(), nr.user.id)
-                        startActivity(intent)
-                    },
-                    noteCaptureAPIAdapter = miCore.getNoteCaptureAdapter()
-                )
+                MdcTheme {
+                    RenoteUsersScreen(
+                        renotesViewModel = viewModel,
+                        onSelected = { nr ->
+                            dismiss()
+                            Intent(requireContext(), UserDetailActivity::class.java)
+                            val intent = UserDetailActivity.newInstance(requireContext(), nr.user.id)
+                            startActivity(intent)
+                        },
+                        noteCaptureAPIAdapter = miCore.getNoteCaptureAdapter()
+                    )
+                }
             }
 
         }
