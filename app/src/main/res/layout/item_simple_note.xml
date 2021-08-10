@@ -293,9 +293,11 @@
                     style="?android:attr/borderlessButtonStyle"
                     android:padding="8dp"
                     android:scaleType="centerCrop"
-                    android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
                     android:contentDescription="@string/renote"
-                    app:tint="?attr/colorNoteActionButtonTint"/>
+                    app:tint="?attr/colorNoteActionButtonTint"
+                    app:clickTargetNote="@{note}"
+                    app:notesViewModelForClickRenote="@{notesViewModel}"
+                    />
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
                     android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
