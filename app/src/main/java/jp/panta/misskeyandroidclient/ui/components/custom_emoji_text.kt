@@ -29,7 +29,7 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>) : List<EmojiPos> {
                 patternBuilder.append("|")
             }
         }
-        patternBuilder.append(":)")
+        patternBuilder.append("):")
     }.toString()
 
     val matcher = Pattern.compile(pattern).matcher(this)
@@ -67,8 +67,8 @@ fun CustomEmojiText(text: String, emojis: List<Emoji>, fontSize: TextUnit = 14.s
             appendInlineContent(m.emoji.name, text.substring(m.start, m.end))
             pos = m.end
         }
-        if(pos != text.length -1) {
-            append(text.substring(pos, text.length - 1))
+        if(pos != text.length && text.isNotBlank()) {
+            append(text.substring(pos, text.length))
         }
     }
 
