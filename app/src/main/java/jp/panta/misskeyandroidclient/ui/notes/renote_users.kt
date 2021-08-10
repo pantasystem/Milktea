@@ -1,10 +1,12 @@
 package jp.panta.misskeyandroidclient.ui.notes
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
@@ -17,6 +19,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.renote.RenotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 
@@ -28,9 +31,14 @@ fun RenoteUsersScreen(
     onSelected: (NoteRelation) -> Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 ) {
+
     val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(StateContent.NotExist()))
 
-    if(renotes.content is StateContent.Exist) {
+    LaunchedEffect(true) {
+        renotesViewModel.refresh()
+    }
+
+    if(renotes.content is StateContent.Exist && (renotes.content as StateContent.Exist).rawContent.isNotEmpty()) {
         val content = (renotes.content as StateContent.Exist).rawContent
         RenoteUserList(
             notes = content,
@@ -42,16 +50,21 @@ fun RenoteUsersScreen(
             modifier = Modifier.fillMaxSize()
         )
     }else{
-        Column(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             when (renotes) {
                 is PageableState.Loading -> {
                     CircularProgressIndicator()
                 }
                 is PageableState.Error -> {
-
+                    val error = (renotes as PageableState.Error).throwable
+                    Text(text = "load error:${error}")
                 }
                 else -> {
-
+                    Text("renote not exist")
                 }
             }
         }

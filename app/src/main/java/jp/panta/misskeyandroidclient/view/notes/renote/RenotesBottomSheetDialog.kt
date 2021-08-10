@@ -57,6 +57,7 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
                 RenoteUsersScreen(
                     renotesViewModel = viewModel,
                     onSelected = { nr ->
+                        dismiss()
                         Intent(requireContext(), UserDetailActivity::class.java)
                         val intent = UserDetailActivity.newInstance(requireContext(), nr.user.id)
                         startActivity(intent)
