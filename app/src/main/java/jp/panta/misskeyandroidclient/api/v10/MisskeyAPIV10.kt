@@ -154,4 +154,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override suspend fun cancelFollowRequest(@Body req: CancelFollow) : Response<UserDTO> = misskey.cancelFollowRequest(req)
 
+    override suspend fun renotes(req: FindRenotes) : Response<List<NoteDTO>> = misskey.renotes(req)
+
+
 }

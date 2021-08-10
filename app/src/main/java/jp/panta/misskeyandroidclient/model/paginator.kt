@@ -39,14 +39,24 @@ interface PreviousPaginator {
     suspend fun loadPrevious()
 }
 
+
+/**
+ * DTOをEntityに変換し共通のDataStoreにEntityを追加するためのInterface
+ */
 interface EntityAdder<DTO, E> {
     suspend fun addAll(list: List<DTO>) : List<E>
 }
 
+/**
+ * 過去のページを取得するためのAPIのアダプター
+ */
 interface PreviousLoader<DTO> {
     suspend fun loadPrevious(): Response<List<DTO>>
 }
 
+/**
+ * 新たなページを取得するためのAPIのアダプター
+ */
 interface FutureLoader<DTO> {
     suspend fun loadFuture(): Response<List<DTO>>
 }

@@ -22,6 +22,7 @@ import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.picker.ReactionPickerDialog
+import jp.panta.misskeyandroidclient.view.notes.renote.RenotesBottomSheetDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
@@ -157,6 +158,12 @@ class ActionNoteHandler(
         }
     }
 
+    private val showRenotesDialogObserver: (Note.Id?)-> Unit = { id ->
+        id?.let{
+            RenotesBottomSheetDialog.newInstance(id).show(activity.supportFragmentManager, "")
+        }
+    }
+
 
 
     fun initViewModelListener(){
@@ -210,5 +217,8 @@ class ActionNoteHandler(
 
         mNotesViewModel.showReactionHistoryEvent.removeObserver(showReactionHistoryDialogObserver)
         mNotesViewModel.showReactionHistoryEvent.observe(activity, showReactionHistoryDialogObserver)
+
+        mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
+        mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
     }
 }

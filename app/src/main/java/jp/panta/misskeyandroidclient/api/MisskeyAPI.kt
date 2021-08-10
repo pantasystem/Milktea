@@ -222,4 +222,7 @@ interface MisskeyAPI {
 
     @POST("api/following/requests/cancel")
     suspend fun cancelFollowRequest(@Body req: CancelFollow) : Response<UserDTO>
+
+    @POST("api/notes/renotes")
+    suspend fun renotes(@Body req: FindRenotes) : Response<List<NoteDTO>>
 }

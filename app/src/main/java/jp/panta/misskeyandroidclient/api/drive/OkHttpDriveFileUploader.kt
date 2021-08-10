@@ -16,6 +16,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import okio.BufferedSink
 import okio.Okio
+import okio.source
 import java.net.URL
 
 
@@ -87,12 +88,10 @@ class OkHttpDriveFileUploader(
 
             override fun writeTo(sink: BufferedSink) {
                 val inputStream = context.contentResolver.openInputStream(uri)
-                if(inputStream != null){
-                    Okio.source(inputStream)
-                        .use{
-                            sink.writeAll(it)
-                        }
-                }
+                inputStream?.source()
+                    ?.use{
+                        sink.writeAll(it)
+                    }
 
             }
         }
