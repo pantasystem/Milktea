@@ -188,14 +188,14 @@
     <string name="indefinite_period">Indefinite period</string>
     <string name="date_and_time_specification">Date and time specification</string>
 
-    <string name="future">Future</string>
+    <string name="future">future</string>
     <string name="now">Now</string>
-    <string name="year_ago">Year</string>
-    <string name="month_ago">Month</string>
-    <string name="date_ago">Day</string>
-    <string name="hour_ago">Time</string>
-    <string name="minute_ago">Minute</string>
-    <string name="second_ago">Second</string>
+    <string name="year_ago">YR</string>
+    <string name="month_ago">MOS</string>
+    <string name="date_ago">D</string>
+    <string name="hour_ago">HR</string>
+    <string name="minute_ago">MIN</string>
+    <string name="second_ago">S</string>
 
     <string name="select_file">Select file</string>
 
