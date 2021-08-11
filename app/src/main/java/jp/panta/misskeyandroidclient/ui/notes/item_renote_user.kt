@@ -74,7 +74,8 @@ fun ItemRenoteUser(
         ) {
 
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
             ) {
                 Image(
                     painter = rememberImagePainter(note.user.avatarUrl),
