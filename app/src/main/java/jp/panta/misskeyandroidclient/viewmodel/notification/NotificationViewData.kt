@@ -18,7 +18,8 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
         REACTION("reaction"),
         POLL_VOTE("pollVote"),
         RECEIVE_FOLLOW_REQUEST("receiveFollowRequest"),
-        FOLLOW_REQUEST_ACCEPTED("followRequestAccepted")
+        FOLLOW_REQUEST_ACCEPTED("followRequestAccepted"),
+        UNKNOWN("unknown"),
 
     }
     val id = notification.notification.id
@@ -34,6 +35,7 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
         is PollVoteNotification -> Type.POLL_VOTE
         is ReceiveFollowRequestNotification -> Type.RECEIVE_FOLLOW_REQUEST
         is FollowRequestAcceptedNotification -> Type.FOLLOW_REQUEST_ACCEPTED
+        is UnknownNotification -> Type.UNKNOWN
     }
     val statusType: String = type.default
 
