@@ -311,7 +311,7 @@ class NotesViewModel(
                     miCore.getNoteRepository().delete(planeNoteViewData.note.note.id)
                 }.onSuccess {
                     if(it) {
-                        withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.Main) {
                             statusMessage.event = "削除に成功しました"
                         }
                     }
