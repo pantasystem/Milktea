@@ -357,6 +357,9 @@
     <string name="request_follow_from_u">フォロー申請</string>
     <string name="unfollow">フォロー解除</string>
 
+    <string name="unknown_notification">不明な通知</string>
+    <string name="unknown_notification_msg">不明な通知。未対応な通知を受信しました、開発者にスクリーンショットを報告してください。 notificationId:%s, type:%s, senderID: %s, </string>
+
 
 
 </resources>

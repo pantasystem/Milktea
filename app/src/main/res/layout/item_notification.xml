@@ -148,6 +148,14 @@
                         app:notesViewModel="@{notesViewModel}"
                         />
             </FrameLayout>
+            <TextView
+                    android:id="@+id/unknown_notification_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:visibility='@{notification.statusType == "unknown" ? View.VISIBLE : View.GONE }'
+                    notification="@{notification.notification.notification}"
+                    />
 
 
 
