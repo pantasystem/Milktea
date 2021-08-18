@@ -13,13 +13,23 @@ import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275Diff
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object MisskeyAPIServiceBuilder {
+    private const val READ_TIMEOUT_S = 30L
+    private const val WRITE_TIMEOUT_S = 30L
+    private const val CONNECTION_TIMEOUT_S = 30L
+    private val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(CONNECTION_TIMEOUT_S, TimeUnit.SECONDS)
+        .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
+        .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS)
+        .build()
+
     fun build(baseUrl: String): MisskeyAPI =
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
-            .client(OkHttpClient.Builder().build())
+            .client(okHttpClient)
             .build()
             .create(MisskeyAPI::class.java)
 
@@ -27,7 +37,7 @@ object MisskeyAPIServiceBuilder {
         Retrofit.Builder()
             .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
-            .client(OkHttpClient.Builder().build())
+            .client(okHttpClient)
             .build()
             .create(MisskeyAuthAPI::class.java)
 

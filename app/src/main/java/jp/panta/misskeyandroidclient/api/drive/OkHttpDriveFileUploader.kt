@@ -18,6 +18,7 @@ import okio.BufferedSink
 import okio.Okio
 import okio.source
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -31,7 +32,11 @@ class OkHttpDriveFileUploader(
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
-            val client = OkHttpClient()
+            val client = OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(114514, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build()
 
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
