@@ -358,4 +358,8 @@
     <string name="unknown_notification">Unknown notification</string>
     <string name="unknown_notification_msg">Unknown notification. Please report the screenshot to the developer. notificationId:%s, type:%s, senderID: %s, </string>
 
+    <string name="translated_from_s">Translated from %s: \n</string>
+    <string name="error_s">Error %s</string>
+    <string name="translate">Translate</string>
+
 </resources>

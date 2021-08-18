@@ -138,17 +138,26 @@
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                         app:textNode="@{note.textNode}"
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw" />
-
+                <include
+                        android:layout_below="@id/text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/translationView"
+                        layout="@layout/view_translation"
+                        android:layout_marginTop="8dp"
+                        emojis="@{note.toShowNote.note.emojis}"
+                        translationState="@{note.translateState}"
+                        android:layout_marginBottom="8dp"
+                        />
                 <include
                         android:id="@+id/mediaPreview"
                         layout="@layout/media_preview"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
-                        android:layout_below="@id/text"
+                        android:layout_below="@id/translationView"
                         android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                         app:media="@{note.media}"
                         tools:visibility="gone"
-
                         />
 
                 <androidx.recyclerview.widget.RecyclerView

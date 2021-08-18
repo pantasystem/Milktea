@@ -6,13 +6,9 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
-import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.selects.select
-import kotlin.coroutines.suspendCoroutine
 
 class NoteRepositoryImpl(
     val miCore: MiCore
@@ -49,7 +45,6 @@ class NoteRepositoryImpl(
 
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun delete(noteId: Note.Id): Boolean {
         val account = miCore.getAccountRepository().get(noteId.accountId)
         return miCore.getMisskeyAPI(account).delete(
@@ -57,7 +52,6 @@ class NoteRepositoryImpl(
         ).isSuccessful
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun find(noteId: Note.Id): Note {
         val account = miCore.getAccount(noteId.accountId)
 
@@ -82,7 +76,6 @@ class NoteRepositoryImpl(
     }
 
     @ExperimentalCoroutinesApi
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun reaction(createReaction: CreateReaction): Boolean {
         val account = miCore.getAccount(createReaction.noteId.accountId)
         var note = find(createReaction.noteId)
@@ -104,7 +97,6 @@ class NoteRepositoryImpl(
 
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun unreaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
         val account = miCore.getAccountRepository().get(noteId.accountId)

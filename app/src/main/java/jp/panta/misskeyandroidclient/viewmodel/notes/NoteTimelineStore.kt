@@ -16,6 +16,7 @@ import java.lang.NullPointerException
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
+import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 
@@ -27,8 +28,7 @@ class NoteTimelineStore(
     val include: NoteRequest.Include,
     private val miCore: MiCore,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val coroutineScope: CoroutineScope,
-    private val coroutineDispatcher: CoroutineDispatcher
+    private val noteTranslationStore: NoteTranslationStore
 ) : NotePagedStore{
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
@@ -108,9 +108,9 @@ class NoteTimelineStore(
                     }
                     val store = DetermineTextLengthSettingStore(miCore.getSettingStore())
                     if (it.reply == null) {
-                        PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter)
+                        PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter, noteTranslationStore)
                     } else {
-                        HasReplyToNoteViewData(related, account, store, noteCaptureAPIAdapter)
+                        HasReplyToNoteViewData(related, account, store, noteCaptureAPIAdapter, noteTranslationStore)
                     }
                 } catch (e: Exception) {
                     Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)

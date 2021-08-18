@@ -22,6 +22,8 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
 import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.notes.translation.Translate
+import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.*
@@ -225,4 +227,7 @@ interface MisskeyAPI {
 
     @POST("api/notes/renotes")
     suspend fun renotes(@Body req: FindRenotes) : Response<List<NoteDTO>>
+
+    @POST("api/notes/translate")
+    suspend fun translate(@Body req: Translate) : Response<TranslationResult>
 }

@@ -30,9 +30,7 @@ sealed class APIError(msg: String) : Exception(msg){
     data class SomethingException(override val error: Error?) : APIError("error:$error")
 }
 
-val formatter = Json {
-
-}
+val formatter = Json
 
 fun<T> Response<T>.throwIfHasError(): Response<T> {
     val error = runCatching {

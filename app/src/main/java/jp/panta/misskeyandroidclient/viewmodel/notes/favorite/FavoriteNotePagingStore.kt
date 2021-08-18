@@ -21,8 +21,7 @@ class FavoriteNotePagingStore(
     override val pageableTimeline: Pageable.Favorite,
     private val miCore: MiCore,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val coroutineScope: CoroutineScope,
-    private val coroutineDispatcher: CoroutineDispatcher
+
 ) : NotePagedStore{
 
     val favorites = miCore.getMisskeyAPI(account)::favorites
@@ -59,7 +58,7 @@ class FavoriteNotePagingStore(
                 adder.addNoteDtoToDataSource(account, it.note).let { note ->
                     miCore.getGetters().noteRelationGetter.get(note)
                 },
-                account, DetermineTextLengthSettingStore(miCore.getSettingStore()), noteCaptureAPIAdapter, coroutineScope, coroutineDispatcher)
+                account, DetermineTextLengthSettingStore(miCore.getSettingStore()), noteCaptureAPIAdapter, miCore.getTranslationStore())
         }
         return Pair(BodyLessResponse(res), list)
     }

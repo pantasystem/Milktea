@@ -27,6 +27,7 @@ import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
+import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
@@ -151,5 +152,7 @@ interface MiCore{
     fun getGalleryRepository(): GalleryRepository
 
     fun getFileUploaderProvider(): FileUploaderProvider
+
+    fun getTranslationStore(): NoteTranslationStore
 
 }

@@ -69,7 +69,7 @@ class NotificationViewModel(
         }.map {  accountAndNotificationRelation ->
             val notificationRelation = accountAndNotificationRelation.second
             val account = accountAndNotificationRelation.first
-            NotificationViewData(notificationRelation, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            NotificationViewData(notificationRelation, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
         }.onEach {
 
             it.noteViewData?.eventFlow?.launchIn(viewModelScope + Dispatchers.IO)
@@ -214,7 +214,7 @@ class NotificationViewModel(
 
     private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
         return this.toNotificationRelations(account).map {
-            NotificationViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            NotificationViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
         }
     }
 

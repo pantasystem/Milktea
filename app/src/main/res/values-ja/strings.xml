@@ -359,6 +359,9 @@
 
     <string name="unknown_notification">不明な通知</string>
     <string name="unknown_notification_msg">不明な通知。未対応な通知を受信しました、開発者にスクリーンショットを報告してください。 notificationId:%s, type:%s, senderID: %s, </string>
+    <string name="translated_from_s">%sから翻訳:\n</string>
+    <string name="error_s">エラー %s</string>
+    <string name="translate">翻訳</string>
 
 
 

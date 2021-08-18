@@ -1,33 +1,34 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes
 
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.State
+import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 open class PlaneNoteViewData (
     val note: NoteRelation,
     val account: Account,
     var determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    private val noteTranslationStore: NoteTranslationStore
 ) : NoteViewData{
 
 
@@ -48,7 +49,7 @@ open class PlaneNoteViewData (
 
     val isMyNote = account.remoteId == toShowNote.user.id.id
 
-    val isRenotedByMe = (note.note.renoteId != null && note.note.text == null && note.files.isNullOrEmpty()) && note.user.id.id == account.remoteId
+    val isRenotedByMe = note.note.hasContent() && note.user.id.id == account.remoteId
 
     val statusMessage: String?
         get(){
@@ -75,14 +76,9 @@ open class PlaneNoteViewData (
         get() = toShowNote.user.id
 
     val name: String
-        get() = toShowNote.user.name?: toShowNote.user.userName
+        get() = toShowNote.user.getDisplayName()
 
-    val userName: String
-        get() = if(toShowNote.user.host == null){
-            "@" + toShowNote.user.userName
-        }else{
-            "@" + toShowNote.user.userName + "@" + toShowNote.user.host
-        }
+    val userName: String = toShowNote.user.getDisplayUserName()
 
     val avatarUrl = toShowNote.user.avatarUrl
 
@@ -102,6 +98,9 @@ open class PlaneNoteViewData (
 
     val textNode = MFMParser.parse(toShowNote.note.text, toShowNote.note.emojis)
     val urls = textNode?.getUrls()
+
+
+    val translateState = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
 
     var emojis = toShowNote.note.emojis?: emptyList()
 
@@ -165,12 +164,9 @@ open class PlaneNoteViewData (
     //reNote先
     val subNote: NoteRelation? = toShowNote.renote
 
-    val subNoteUserName = subNote?.user?.userName
-    val subNoteName = subNote?.user?.name
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteText = subNote?.note?.text
     val subNoteTextNode = MFMParser.parse(subNote?.note?.text, subNote?.note?.emojis)
-    val subNoteEmojis = subNote?.note?.emojis
 
     val subCw = subNote?.note?.cw
     val subCwNode = MFMParser.parse(subNote?.note?.cw, subNote?.note?.emojis)
@@ -195,9 +191,6 @@ open class PlaneNoteViewData (
         subContentFolding.value = !isFolding
     }
 
-    fun setUrlPreviews(list: List<UrlPreview>){
-        urlPreviewList.postValue(list)
-    }
 
     val urlPreviewLoadTaskCallback = object : UrlPreviewLoadTask.Callback{
         override fun accept(list: List<UrlPreview>) {
