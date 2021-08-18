@@ -27,23 +27,22 @@ object TranslationHelper {
             this.visibility = View.GONE
             return
         }
-        if(state.content is StateContent.NotExist) {
-            this.visibility = View.GONE
-            return
-        }
+
         val translation = runCatching {
             (state.content as StateContent.Exist).rawContent
         }.getOrNull()
+        this.visibility = View.VISIBLE
+
+        if(state is State.Error) {
+            this.text = context.getString(R.string.error_s, state.throwable.toString())
+        }
         if(translation == null) {
-            this.visibility = View.GONE
             return
         }
-        this.visibility = View.VISIBLE
 
         val text = context.getString(R.string.translated_from_s, translation.sourceLang) + translation.text
         val root = MFMParser.parse(text, emojis)!!
-
-        MFMDecorator.decorate(this, root)
+        this.text = MFMDecorator.decorate(this, root)
 
     }
 
@@ -54,7 +53,7 @@ object TranslationHelper {
             this.visibility = View.GONE
             return
         }
-        this.visibility = if(state.content is StateContent.NotExist && state !is State.Loading) {
+        this.visibility = if(state.content is StateContent.NotExist && state is State.Fixed) {
             View.GONE
         }else{
             View.VISIBLE
