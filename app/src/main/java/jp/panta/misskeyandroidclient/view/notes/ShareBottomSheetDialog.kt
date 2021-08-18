@@ -62,6 +62,11 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
             dismiss()
         }
 
+        dataBinding.translateText.setOnClickListener {
+            viewModel.translate(note?.toShowNote?.note?.id!!)
+            dismiss()
+        }
+
         val clipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
 
         dataBinding.copyContent.setOnClickListener{
