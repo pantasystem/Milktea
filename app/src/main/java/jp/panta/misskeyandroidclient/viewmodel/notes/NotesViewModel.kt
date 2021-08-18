@@ -362,6 +362,13 @@ class NotesViewModel(
             }
         }
     }
+
+    fun translate(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            miCore.getTranslationStore().translate(noteId)
+        }
+    }
     
     private fun getMisskeyAPI(): MisskeyAPI?{
         return miCore.getCurrentAccount().value?.let{
