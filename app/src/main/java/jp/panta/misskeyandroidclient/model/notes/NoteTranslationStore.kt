@@ -7,12 +7,9 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.*
@@ -109,12 +106,14 @@ class NoteTranslationStore(
         runCatching {
             val account = accountRepository.get(noteId.accountId)
             val api = misskeyAPIProvider.get(account.instanceDomain)
+            val req = Translate(
+                i = account.getI(encryption),
+                targetLang = Locale.getDefault().language,
+                noteId = noteId.noteId,
+            )
+
             val res = api.translate(
-                Translate(
-                    i = account.getI(encryption),
-                    targetLang = Locale.getDefault().toString(),
-                    noteId = noteId.noteId,
-                )
+                req
             )
             res.throwIfHasError().body()!!
         }.onFailure {
