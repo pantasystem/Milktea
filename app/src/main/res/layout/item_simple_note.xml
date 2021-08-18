@@ -129,6 +129,7 @@
                     android:layout_below="@id/text"
                     android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                     tools:visibility="visible"
+                    tools:layout_height="20dp"
                     />
 
 
@@ -240,7 +241,7 @@
                         android:layout_height="200dp"
                         android:layout_below="@id/subNoteText"
                         android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
-                        tools:layout_height="100dp"
+                        tools:layout_height="20dp"
                         />
 
 

@@ -106,9 +106,9 @@ class TimelineViewModel(
            !mNoteIds.contains(it.note.id) && !this.mIsLoading
         }.map{
             if(it.reply == null) {
-                PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+                PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
             }else{
-                HasReplyToNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+                HasReplyToNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
             }
         }.onEach { note ->
             this.mNoteIds.add(note.id)
@@ -438,8 +438,6 @@ class TimelineViewModel(
                 pageable,
                 miCore,
                 miCore.getNoteCaptureAdapter(),
-                viewModelScope,
-                Dispatchers.IO
             )
             else -> NoteTimelineStore(
                 this,
@@ -447,8 +445,7 @@ class TimelineViewModel(
                 include,
                 miCore,
                 miCore.getNoteCaptureAdapter(),
-                viewModelScope,
-                Dispatchers.IO
+                miCore.getTranslationStore()
             )
         }
     }

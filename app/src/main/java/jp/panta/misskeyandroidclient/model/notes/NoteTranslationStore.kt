@@ -84,7 +84,6 @@ data class NoteTranslationsState(
 }
 class NoteTranslationStore(
     val noteRepository: NoteRepository,
-    val coroutineScope: CoroutineScope,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption

@@ -17,7 +17,7 @@ class UserDetailViewModelFactory(
     @ExperimentalCoroutinesApi
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if(modelClass == UserDetailViewModel::class.java){
-            return UserDetailViewModel(userId, fqcnUserName, miApplication) as T
+            return UserDetailViewModel(userId, fqcnUserName, miApplication, translationStore = miApplication.getTranslationStore()) as T
         }
         throw IllegalArgumentException("対応していません")
     }
