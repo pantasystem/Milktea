@@ -120,13 +120,23 @@
 
                     />
             <include
+                    android:layout_below="@id/text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/translationView"
+                    layout="@layout/view_translation"
+                    android:layout_marginTop="8dp"
+                    emojis="@{note.toShowNote.note.emojis}"
+                    translationState="@{note.translateState}"
+                    />
+            <include
                     android:id="@+id/mediaPreview"
 
                     layout="@layout/media_preview"
                     app:media="@{note.media}"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_below="@id/text"
+                    android:layout_below="@id/translationView"
                     android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                     tools:visibility="visible"
                     tools:layout_height="20dp"

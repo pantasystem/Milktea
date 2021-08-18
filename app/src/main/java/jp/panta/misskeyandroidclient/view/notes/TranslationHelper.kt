@@ -49,8 +49,12 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState")
-    fun ViewGroup.translationVisibility(state: State<Translation>) {
-        this.visibility = if(state.content is StateContent.Exist && state !is State.Loading) {
+    fun ViewGroup.translationVisibility(state: State<Translation>?) {
+        if(state == null) {
+            this.visibility = View.GONE
+            return
+        }
+        this.visibility = if(state.content is StateContent.NotExist && state !is State.Loading) {
             View.GONE
         }else{
             View.VISIBLE
