@@ -203,6 +203,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
         viewModel.isPost.observe(this) {
             if(it) {
+                noteEditorToolbar.postButton.isEnabled = false
                 finish()
             }
         }
