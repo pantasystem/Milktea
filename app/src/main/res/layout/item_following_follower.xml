@@ -83,7 +83,7 @@
                     android:layout_alignTop="@id/mainName"
                     app:isFollowing="@{SafeUnbox.unbox(user.isFollowing)}"
                     android:onClick="@{()-> toggleFollowViewModel.toggleFollow(user.id)}"
-
+                    followState="@{user.followState}"
                     />
             <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/description"
