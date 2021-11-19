@@ -76,12 +76,17 @@ class NoteRepositoryImpl(
     }
 
     @ExperimentalCoroutinesApi
-    override suspend fun reaction(createReaction: CreateReaction): Boolean {
+    override suspend fun toggleReaction(createReaction: CreateReaction): Boolean {
         val account = miCore.getAccount(createReaction.noteId.accountId)
         var note = find(createReaction.noteId)
-        if(note.myReaction != null) {
+        if(note.myReaction?.isNotBlank() == true) {
             if(!unreaction(createReaction.noteId)) {
                 return false
+            }
+
+            if(note.myReaction == createReaction.reaction) {
+                logger.debug("同一のリアクションが選択されています。")
+                return true
             }
             note = miCore.getNoteDataSource().get(createReaction.noteId)
         }
