@@ -187,7 +187,7 @@ class NotesViewModel(
             }
             Log.d("NotesViewModel", "postReaction(n, n)")
             runCatching {
-                val result = miCore.getNoteRepository().reaction(
+                val result = miCore.getNoteRepository().toggleReaction(
                     CreateReaction(
                         noteId = planeNoteViewData.toShowNote.note.id,
                         reaction = reaction
@@ -207,7 +207,9 @@ class NotesViewModel(
      * 既にリアクションが含まれている場合のみ実行される
      */
     private suspend fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
-        planeNoteViewData.myReaction.value?: return
+        if(planeNoteViewData.myReaction.value.isNullOrBlank()) {
+            return
+        }
         miCore.getNoteRepository().unreaction(planeNoteViewData.toShowNote.note.id)
     }
 
