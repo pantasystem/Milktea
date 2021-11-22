@@ -62,6 +62,46 @@ data class NoteEditingState(
         )
     }
 
+    fun setAccount(account: Account) : NoteEditingState{
+        if(author == null) {
+            return this.copy(
+                author = account
+            )
+        }
+        if(files.any { it.remoteFileId != null }) {
+            throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
+        }
+        if(!(replyId == null || author.instanceDomain == account.instanceDomain)) {
+            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(replyId)。")
+        }
+
+        if(!(renoteId == null || author.instanceDomain == account.instanceDomain)) {
+            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(renoteId)。")
+        }
+
+        if(visibility is Visibility.Specified
+            && (visibility.visibleUserIds.isNotEmpty()
+                    || author.instanceDomain == account.instanceDomain)
+        ) {
+            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(visibility)。")
+        }
+
+        return this.copy(
+            author = account,
+            files = files,
+            replyId = replyId?.copy(accountId = account.accountId),
+            renoteId = renoteId?.copy(accountId = account.accountId),
+            visibility = if(visibility is Visibility.Specified) {
+                visibility.copy(visibleUserIds = visibility.visibleUserIds.map {
+                    it.copy(accountId = account.accountId)
+                })
+            }else{
+                visibility
+            }
+        )
+
+    }
+
     fun toggleCw() : NoteEditingState {
         return this.copy(
             cw = if(this.hasCw) null else ""
@@ -69,6 +109,7 @@ data class NoteEditingState(
     }
 
 }
+
 
 data class PollEditingState(
     val choices: List<PollChoiceState>,
