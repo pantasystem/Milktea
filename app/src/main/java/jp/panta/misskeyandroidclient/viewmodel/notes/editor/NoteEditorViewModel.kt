@@ -62,7 +62,7 @@ class NoteEditorViewModel(
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
     private val mReply = MutableStateFlow<Note?>(null)
     val reply: StateFlow<Note?> = mReply
-    val replyToNoteId = MutableStateFlow(replyId).also { replyId ->
+    private val replyToNoteId = MutableStateFlow(replyId).also { replyId ->
         replyId.map { id ->
             id?.let{
                 miCore.getNoteRepository().find(it)
@@ -86,7 +86,7 @@ class NoteEditorViewModel(
 
     val hasCw = MediatorLiveData<Boolean>().apply {
         addSource(cw){
-            value = !it.isNullOrBlank()
+            value = it != null
         }
     }
     val text = MediatorLiveData<String>().apply {
@@ -306,9 +306,8 @@ class NoteEditorViewModel(
 
     fun changeCwEnabled(){
         hasCw.value = !(hasCw.value?: false)
-        if(hasCw.value == false){
-            cw.value = ""
-        }
+        cw.value = if(hasCw.value == true) "" else null
+        logger.debug("cw:${cw.value}")
     }
 
     fun enablePoll(){
@@ -446,8 +445,7 @@ class NoteEditorViewModel(
     @ExperimentalCoroutinesApi
     @FlowPreview
     fun canSaveDraft(): Boolean{
-        return !(cw.value.isNullOrBlank()
-                && text.value.isNullOrBlank()
+        return !(text.value.isNullOrBlank()
                 && files.value.isNullOrEmpty()
                 && poll.value?.choices?.value.isNullOrEmpty()
                 && address.value.isNullOrEmpty())
@@ -462,7 +460,7 @@ class NoteEditorViewModel(
     @ExperimentalCoroutinesApi
     fun clear(){
         text.value = ""
-        cw.value = ""
+        cw.value = null
         files.value = emptyList()
         poll.value = null
     }
