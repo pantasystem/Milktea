@@ -13,11 +13,11 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: "com.google.android.gms.oss-licenses-plugin"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "jp.panta.misskeyandroidclient"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         multiDexEnabled true
         versionCode 63
         versionName "v2.6.2"
