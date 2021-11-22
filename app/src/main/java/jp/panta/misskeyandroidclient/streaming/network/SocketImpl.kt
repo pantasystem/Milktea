@@ -81,6 +81,9 @@ class SocketImpl(
                 logger.debug("接続済みのためキャンセル")
                 return false
             }
+            if(!(mState is Socket.State.NeverConnected || mState is Socket.State.Failure || mState is Socket.State.Closed)) {
+                return false
+            }
             mState = Socket.State.Connecting
             val request = Request.Builder()
                 .url(url)
@@ -136,6 +139,7 @@ class SocketImpl(
         logger.debug("メッセージ送信: $msg, state${state()}")
         if(state() != Socket.State.Connected){
             logger.debug("送信をキャンセル state:${state()}")
+            connect()
             return false
         }
 
