@@ -36,13 +36,14 @@ class NoteEditorViewModel(
                 replyId = replyId
             )
     )
+    val state: StateFlow<NoteEditingState> = _state
 
     val text = _state.map {
         it.text
-    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
     val cw = _state.map {
         it.cw
-    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
     //val text = MutableStateFlow("")
     //val cw = MutableStateFlow("")
 
