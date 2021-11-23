@@ -2,6 +2,8 @@ package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Instant
 import java.util.*
 
@@ -46,6 +48,12 @@ data class NoteEditingState(
         )
     }
 
+    fun changeCw(text: String) : NoteEditingState {
+        return this.copy(
+            cw = text
+        )
+    }
+
     fun addFile(file: File) : NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
@@ -62,11 +70,14 @@ data class NoteEditingState(
         )
     }
 
-    fun setAccount(account: Account) : NoteEditingState{
+    fun setAccount(account: Account?) : NoteEditingState{
         if(author == null) {
             return this.copy(
                 author = account
             )
+        }
+        if(account == null) {
+            throw IllegalArgumentException("現在の状態に未指定のAccountを指定することはできません")
         }
         if(files.any { it.remoteFileId != null }) {
             throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
@@ -102,10 +113,64 @@ data class NoteEditingState(
 
     }
 
+    fun removePollChoice(id: UUID) : NoteEditingState {
+        return this.copy(
+            poll = this.poll?.let {
+                it.copy(
+                    choices = it.choices.filterNot { choice ->
+                        choice.id == id
+                    }
+                )
+            }
+        )
+    }
+
+    fun addPollChoice() : NoteEditingState {
+        return this.copy(
+            poll = this.poll?.let {
+                it.copy(
+                    choices = it.choices.toMutableList().also { list ->
+                        list.add(
+                            PollChoiceState("")
+                        )
+                    }
+                )
+            }
+        )
+    }
+
+    fun updatePollChoice(id: UUID, text: String) : NoteEditingState {
+        return this.copy(
+            poll = this.poll?.let {
+                it.copy(
+                    choices = it.choices.map { choice ->
+                        if(choice.id == id) {
+                            choice.copy(
+                                text = text
+                            )
+                        }else{
+                            choice
+                        }
+                    }
+                )
+            }
+        )
+    }
+
     fun toggleCw() : NoteEditingState {
         return this.copy(
             cw = if(this.hasCw) null else ""
         )
+    }
+
+    fun togglePoll() : NoteEditingState {
+        return this.copy(
+            poll = if(poll == null) PollEditingState(emptyList(), false, null) else null
+        )
+    }
+
+    fun clear() : NoteEditingState {
+        return NoteEditingState(author = this.author)
     }
 
 }
@@ -125,5 +190,35 @@ data class PollEditingState(
 
 data class PollChoiceState(
     val text: String,
-    val id: String = UUID.randomUUID().toString()
+    val id: UUID = UUID.randomUUID()
 )
+
+fun DraftNote.toNoteEditingState() : NoteEditingState{
+    return NoteEditingState(
+        text = this.text,
+        cw = this.cw,
+        draftNoteId = this.draftNoteId,
+        visibility = Visibility(type = this.visibility, isLocalOnly = this.localOnly ?: false, visibleUserIds = this.visibleUserIds?.map {
+            User.Id(accountId = accountId, id = it)
+        }),
+        viaMobile = this.viaMobile ?: true,
+        poll = this.draftPoll?.let {
+            PollEditingState(
+                choices = it.choices.map { choice ->
+                    PollChoiceState(choice)
+                },
+                expiresAt = it.expiresAt?.let { ex ->
+                    Instant.fromEpochMilliseconds(ex)
+                },
+                multiple = it.multiple
+            )
+        },
+        replyId = this.replyId?.let {
+            Note.Id(accountId = accountId, noteId = it)
+        },
+        renoteId = this.renoteId?.let {
+            Note.Id(accountId = accountId, noteId = it)
+        },
+        files = this.files ?: emptyList()
+    )
+}
