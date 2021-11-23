@@ -340,7 +340,7 @@ class NoteEditorViewModel(
         _state.value = _state.value.changeText(text)
     }
 
-    fun setCw(text: String) {
+    fun setCw(text: String?) {
         _state.value = _state.value.changeCw(text)
     }
 
