@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.model.notes
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
+import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Instant
 import java.util.*
@@ -220,5 +222,25 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
             Note.Id(accountId = accountId, noteId = it)
         },
         files = this.files ?: emptyList()
+    )
+}
+
+fun PollEditingState.toCreatePoll() : CreatePoll {
+    return CreatePoll(
+        choices = this.choices.map {
+            it.text
+        },
+        multiple = multiple,
+        expiresAt = expiresAt?.toEpochMilliseconds()
+    )
+}
+
+fun PollEditingState.toDraftPoll() : DraftPoll {
+    return DraftPoll(
+        choices = this.choices.map {
+            it.text
+        },
+        multiple = multiple,
+        expiresAt = expiresAt?.toEpochMilliseconds()
     )
 }
