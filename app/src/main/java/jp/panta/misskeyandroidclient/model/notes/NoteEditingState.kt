@@ -50,7 +50,7 @@ data class NoteEditingState(
         )
     }
 
-    fun changeCw(text: String) : NoteEditingState {
+    fun changeCw(text: String?) : NoteEditingState {
         return this.copy(
             cw = text
         )
