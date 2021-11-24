@@ -46,8 +46,6 @@ class NoteEditorViewModel(
     val cw = _state.map {
         it.cw
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
-    //val text = MutableStateFlow("")
-    //val cw = MutableStateFlow("")
 
     private val currentAccount = MutableLiveData<Account>().apply{
         miCore.getCurrentAccount().onEach {
@@ -57,7 +55,7 @@ class NoteEditorViewModel(
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    val currentUser: LiveData<UserViewData> = miCore.getCurrentAccount().filterNotNull().map {
+    val currentUser: StateFlow<UserViewData?> = miCore.getCurrentAccount().filterNotNull().map {
         val userId = User.Id(it.accountId, it.remoteId)
         UserViewData(
             userId,
@@ -65,7 +63,7 @@ class NoteEditorViewModel(
             viewModelScope,
             dispatcher
         )
-    }.asLiveData(Dispatchers.IO)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val draftNote = MutableLiveData<DraftNote>(dn)
 
@@ -175,6 +173,13 @@ class NoteEditorViewModel(
             }.getOrElse {
                 NoteEditingState()
             }
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        miCore.getCurrentAccount().filterNotNull().onEach {
+            val v = miCore.getSettingStore().getNoteVisibility(it.accountId)
+            _state.value = _state.value.copy(
+                visibility = v
+            )
         }.launchIn(viewModelScope + Dispatchers.IO)
 
     }
