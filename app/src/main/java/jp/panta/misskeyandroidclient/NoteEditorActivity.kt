@@ -51,6 +51,7 @@ import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
@@ -198,7 +199,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         }
 
         lifecycleScope.launchWhenResumed {
-            viewModel.poll.collect { poll ->
+            viewModel.poll.distinctUntilChangedBy {
+                it == null
+            }.collect { poll ->
                 if(poll == null) {
                     removePollFragment()
                 }else{
