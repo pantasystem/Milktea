@@ -16,6 +16,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NoteEditorViewModel(
     private val miCore: MiCore,
@@ -137,10 +139,10 @@ class NoteEditorViewModel(
 
 
     val isPostAvailable = _state.map {
-        it.checkValidate(textMaxLength = maxTextLength.value ?: 1500)
+        it.checkValidate(textMaxLength = maxTextLength.value)
     }.asLiveData()
 
-    // FIXME リモートのVisibilityを参照するようにする
+    // TODO: stateのVisiblityをベースにする
     val visibility = MediatorLiveData<Visibility>().apply {
 
         addSource(draftNote) {
@@ -241,6 +243,22 @@ class NoteEditorViewModel(
         _state.value = _state.value.changeText(text)
     }
 
+    fun addPollChoice() {
+        _state.value = _state.value.addPollChoice()
+    }
+    
+    fun changePollChoice(id: UUID, text: String) {
+        _state.value = _state.value.updatePollChoice(id, text)
+    }
+    
+    fun removePollChoice(id: UUID) {
+        _state.value = _state.value.removePollChoice(id)
+    }
+
+    fun updateState(state: NoteEditingState) {
+        _state.value = state
+    }
+
     fun post(){
         currentAccount.value?.let{ account ->
 
@@ -305,11 +323,7 @@ class NoteEditorViewModel(
     }
 
     fun removeFileNoteEditorData(file: File){
-        val files = files.value.toArrayList()
-        files.remove(file)
-        _state.value = _state.value.copy(
-            files = files
-        )
+        _state.value = _state.value.removeFile(file)
     }
 
 
