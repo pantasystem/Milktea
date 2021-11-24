@@ -181,6 +181,8 @@ class NoteEditorViewModel(
         }
     }
 
+
+
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
 
@@ -214,7 +216,7 @@ class NoteEditorViewModel(
 
     val poll = _state.map {
         it.poll
-    }.distinctUntilChanged().stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
+    }.distinctUntilChanged().stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
     //val noteTask = MutableLiveData<PostNoteTask>()
     val isPost = EventBus<Boolean>()
 
@@ -257,6 +259,12 @@ class NoteEditorViewModel(
 
     fun updateState(state: NoteEditingState) {
         _state.value = state
+    }
+
+    fun togglePollMultiple() {
+        _state.value = state.value.copy(
+            poll = state.value.poll?.toggleMultiple()
+        )
     }
 
     fun post(){
