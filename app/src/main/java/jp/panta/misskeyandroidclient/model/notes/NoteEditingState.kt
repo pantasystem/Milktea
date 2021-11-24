@@ -72,6 +72,12 @@ data class NoteEditingState(
         )
     }
 
+    fun changePollExpiresAt(expiresAt: PollExpiresAt) : NoteEditingState{
+        return this.copy(
+            poll = this.poll?.copy(expiresAt = expiresAt)
+        )
+    }
+
     fun setAccount(account: Account?) : NoteEditingState{
         if(author == null) {
             return this.copy(
@@ -180,14 +186,18 @@ data class NoteEditingState(
 sealed interface PollExpiresAt {
     object Infinity : PollExpiresAt
     data class DateAndTime(val expiresAt: Instant) : PollExpiresAt
-    data class SpecifyLapse(val expiresAt: Instant) : PollExpiresAt
+
+    fun asDate(): Date? {
+        return this.expiresAt()?.toEpochMilliseconds()?.let{
+            Date(it)
+        }
+    }
 }
 
 fun PollExpiresAt.expiresAt() : Instant? {
     return when(this) {
         is PollExpiresAt.Infinity -> null
         is PollExpiresAt.DateAndTime -> this.expiresAt
-        is PollExpiresAt.SpecifyLapse -> this.expiresAt
     }
 }
 
@@ -196,10 +206,20 @@ data class PollEditingState(
     val multiple: Boolean,
     val expiresAt: PollExpiresAt = PollExpiresAt.Infinity
 ) {
+
+    val isExpiresAtDateTime: Boolean
+        get() = expiresAt is PollExpiresAt.DateAndTime
+
     fun checkValidate() : Boolean {
         return choices.all {
             it.text.isNotBlank()
         }
+    }
+
+    fun toggleMultiple() : PollEditingState{
+        return this.copy(
+            multiple = !this.multiple
+        )
     }
 }
 
