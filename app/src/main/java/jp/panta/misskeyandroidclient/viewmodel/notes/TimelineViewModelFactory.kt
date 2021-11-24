@@ -23,7 +23,7 @@ class TimelineViewModelFactory(
 ) : ViewModelProvider.Factory{
 
     @ExperimentalCoroutinesApi
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == TimelineViewModel::class.java){
 
             val sharedPreferences = miApplication.getSharedPreferences(miApplication.getPreferenceName(), Context.MODE_PRIVATE)

@@ -31,7 +31,7 @@ class ReactionHistoryViewModel(
         val type: String?,
         val miCore: MiCore
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ReactionHistoryViewModel(
                 miCore.getReactionHistoryDataSource(),
                 miCore.getReactionHistoryPaginatorFactory().create(

@@ -22,7 +22,7 @@ class AntennaListViewModel (
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AntennaListViewModel(miCore) as T
         }
     }

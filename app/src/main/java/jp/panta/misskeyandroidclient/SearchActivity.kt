@@ -57,11 +57,11 @@ class SearchActivity : AppCompatActivity() {
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         menuInflater.inflate(R.menu.menu_search, menu)
 
-        val searchView = menu?.findItem(R.id.app_bar_search)?.actionView as SearchView
+        val searchView = menu.findItem(R.id.app_bar_search)?.actionView as SearchView
         mSearchView = searchView
 
         searchView.isIconifiedByDefault = false

@@ -27,7 +27,7 @@ class ReactionHistoryPagerViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val noteId: Note.Id, val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ReactionHistoryPagerViewModel(noteId = noteId,
                 noteRepository = miCore.getNoteRepository(),
                 adapter = miCore.getNoteCaptureAdapter(),

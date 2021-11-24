@@ -75,7 +75,7 @@
                             android:layout_height="wrap_content"
                             android:ems="10"
                             android:inputType="text"
-                            android:text="@={viewModel.cw}"
+                            android:text="@{viewModel.cw}"
                             android:hint="@string/cw_hint"
                             android:visibility="@{SafeUnbox.unboxBool(viewModel.hasCw) ? View.VISIBLE : View.GONE}"
                             />
@@ -88,7 +88,7 @@
                             android:gravity="top"
                             android:hint="@string/please_speak"
                             android:inputType="textMultiLine"
-                            android:text="@={viewModel.text}"
+                            android:text="@{viewModel.text}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar"

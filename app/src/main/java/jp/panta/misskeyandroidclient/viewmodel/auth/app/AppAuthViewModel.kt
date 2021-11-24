@@ -28,7 +28,7 @@ class AppAuthViewModel(
     }
 
     class Factory(val customAuthStore: CustomAuthStore, private val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AppAuthViewModel(customAuthStore, miCore) as T
         }
     }

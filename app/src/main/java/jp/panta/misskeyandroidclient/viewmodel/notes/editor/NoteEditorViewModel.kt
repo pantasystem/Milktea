@@ -3,9 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes.editor
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.filePropertyPagingStore
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.*
@@ -14,11 +12,12 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NoteEditorViewModel(
     private val miCore: MiCore,
@@ -32,157 +31,99 @@ class NoteEditorViewModel(
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
+    private val _state = MutableStateFlow(
+        dn?.toNoteEditingState()
+            ?: NoteEditingState(
+                renoteId = quoteToNoteId,
+                replyId = replyId
+            )
+    )
+    val state: StateFlow<NoteEditingState> = _state
+
+    val text = _state.map {
+        it.text
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+    val cw = _state.map {
+        it.cw
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+
     private val currentAccount = MutableLiveData<Account>().apply{
         miCore.getCurrentAccount().onEach {
             this.postValue(it)
         }.launchIn(viewModelScope + dispatcher)
     }
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    private val mCurrentUser = MutableLiveData<UserViewData>().apply{
-        miCore.getCurrentAccount().filterNotNull().onEach {
-            val userId = User.Id(it.accountId, it.remoteId)
-            this.postValue(
-                UserViewData(
-                    userId,
-                    miCore,
-                    viewModelScope,
-                    dispatcher
 
-                )
-            )
-        }.launchIn(viewModelScope + dispatcher)
-    }
     @FlowPreview
     @ExperimentalCoroutinesApi
-    val currentUser: LiveData<UserViewData> = mCurrentUser
+    val currentUser: StateFlow<UserViewData?> = miCore.getCurrentAccount().filterNotNull().map {
+        val userId = User.Id(it.accountId, it.remoteId)
+        UserViewData(
+            userId,
+            miCore,
+            viewModelScope,
+            dispatcher
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val draftNote = MutableLiveData<DraftNote>(dn)
 
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
-    private val mReply = MutableStateFlow<Note?>(null)
-    val reply: StateFlow<Note?> = mReply
-    private val replyToNoteId = MutableStateFlow(replyId).also { replyId ->
-        replyId.map { id ->
-            id?.let{
-                miCore.getNoteRepository().find(it)
-            }
-        }.onEach {
-            mReply.value = it
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
-
-
-
-    //val renoteId = MutableLiveData<Note.Id>(quoteToNoteId)
-    val renoteId = MutableStateFlow(quoteToNoteId)
-
-    val cw = MediatorLiveData<String>().apply {
-        addSource(draftNote) {
-            value = it?.cw
+    val reply = _state.map {
+        it.replyId?.let { noteId ->
+            runCatching {
+                miCore.getNoteRepository().find(noteId)
+            }.getOrNull()
         }
-    }
+    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
+
+    val renoteId = _state.map {
+        it.renoteId
+    }.asLiveData()
+
+    val hasCw = _state.map {
+        it.hasCw
+    }.asLiveData()
 
 
-    val hasCw = MediatorLiveData<Boolean>().apply {
-        addSource(cw){
-            value = it != null
-        }
-    }
-    val text = MediatorLiveData<String>().apply {
-
-        addSource(draftNote) {
-            if(it?.text != null) {
-                value = it.text
-            }
-        }
-    }
-    var maxTextLength = Transformations.map(currentAccount){
+    var maxTextLength = miCore.getCurrentAccount().map {
         miCore.getCurrentInstanceMeta()?.maxNoteTextLength?: 1500
-    }
-    /*val textRemaining = Transformations.map(text){ t: String? ->
-        (maxTextLength.value?: 1500) - (t?.codePointCount(0, t.length)?: 0)
-    }*/
-    val textRemaining = MediatorLiveData<Int>().apply{
-        addSourceChain(maxTextLength){ maxSize ->
-            val t = text.value
-            value = (maxSize?: 1500) - (t?.codePointCount(0, t.length)?: 0)
-        }
-        addSource(text){ t ->
-            val max = maxTextLength.value?: 1500
-            value = max - (t?.codePointCount(0, t.length)?: 0)
-        }
-    }
+    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
+
+    val textRemaining = combine(maxTextLength, text) { max, t ->
+        max - (t?.codePointCount(0, t.length)?:0)
+    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
 
-    val files = MediatorLiveData<List<File>>().apply{
-        this.postValue(
-            dn?.files?: emptyList<File>()
-        )
-    }
-
-    val totalImageCount = MediatorLiveData<Int>().apply{
-
-        this.addSource(files){
-            logger.debug( "list$it, sizeは: ${it.size}")
-            this.value = it.size
-        }
-    }
 
 
-    val isPostAvailable = MediatorLiveData<Boolean>().apply{
-        this.addSource(textRemaining){
-            val totalImageTmp = totalImageCount.value
-            this.value =  it in 0 until (maxTextLength.value?: 1500)
-                    || (totalImageTmp != null && totalImageTmp > 0 && totalImageTmp <= 4)
-                    || quoteToNoteId != null
-        }
-        this.addSource(totalImageCount){
-            val tmpTextSize = textRemaining.value
-            this.value = tmpTextSize in 0 until (maxTextLength.value?: 1500)
-                    || (it != null && it > 0 && it <= 4)
-                    || quoteToNoteId != null
-        }
-    }
+    val files = _state.map {
+        it.files
+    }.asLiveData()
 
-    // FIXME リモートのVisibilityを参照するようにする
-    val visibility = MediatorLiveData<Visibility>().apply {
-
-        addSource(draftNote) {
-            if(it != null) {
-                val local = it.localOnly
-                val type = it.visibility
-                val visibleUserIds = it.visibleUserIds
-                value = Visibility(type, local ?: false, visibleUserIds = visibleUserIds?.map { userId ->
-                    User.Id(it.accountId, userId)
-                })
-            }
-        }
-
-        reply.filterNotNull().onEach {
-            val visibility = if(it.visibility is Visibility.Specified) Visibility.Specified(listOf(it.userId)) else it.visibility
-            postValue(visibility)
-        }.launchIn(viewModelScope + Dispatchers.IO)
+    val totalImageCount = _state.map {
+        it.totalFilesCount
+    }.asLiveData()
 
 
-        if(replyId == null || renoteId.value == null) {
-            miCore.getCurrentAccount().filterNotNull().onEach {
-                this.value = miCore.getSettingStore().getNoteVisibility(it.accountId)
-                logger.debug("公開範囲:${this.value}")
-            }.launchIn(viewModelScope)
-        }
-    }
+    val isPostAvailable = _state.map {
+        it.checkValidate(textMaxLength = maxTextLength.value)
+    }.asLiveData()
 
-    val isLocalOnly = Transformations.map(visibility) {
-        it.isLocalOnly()
-    }
+    val visibility = _state.map {
+        it.visibility
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = Visibility.Public(false))
 
 
-    val isLocalOnlyEnabled = MediatorLiveData<Boolean>().apply{
-        addSource(visibility){
-            value = it is CanLocalOnly
-        }
-    }
+    val isLocalOnly = _state.map {
+        it.visibility.isLocalOnly()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+
+    val isLocalOnlyEnabled = _state.map {
+        it.visibility is CanLocalOnly
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
+
 
     val showVisibilitySelectionEvent = EventBus<Unit>()
     val visibilitySelectedEvent = EventBus<Unit>()
@@ -196,7 +137,7 @@ class NoteEditorViewModel(
         it?.visibleUserIds?.map { uId ->
             setUpUserViewData(uId)
         }?: emptyList()
-    }.asFlow().asLiveData(viewModelScope.coroutineContext)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
 
     @FlowPreview
@@ -205,16 +146,13 @@ class NoteEditorViewModel(
         return UserViewData(userId, miCore, viewModelScope, dispatcher)
     }
 
-    val isSpecified = Transformations.map(visibility){
-        it is Visibility.Specified
-    }
+    val isSpecified = _state.map {
+        it.isSpecified
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    val poll = MutableLiveData<PollEditor?>(
-        dn?.draftPoll?.let{
-            PollEditor(it)
-        }
-    )
-
+    val poll = _state.map {
+        it.poll
+    }.distinctUntilChanged().stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
     //val noteTask = MutableLiveData<PostNoteTask>()
     val isPost = EventBus<Boolean>()
 
@@ -228,26 +166,68 @@ class NoteEditorViewModel(
         currentAccount.observeForever {
             miCore.getCurrentInstanceMeta()
         }
+
+        miCore.getCurrentAccount().filterNotNull().onEach {
+            _state.value = runCatching {
+                _state.value.setAccount(it)
+            }.getOrElse {
+                NoteEditingState()
+            }
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        miCore.getCurrentAccount().filterNotNull().onEach {
+            val v = miCore.getSettingStore().getNoteVisibility(it.accountId)
+            _state.value = _state.value.copy(
+                visibility = v
+            )
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+    }
+
+    fun changeText(text: String) {
+        _state.value = _state.value.changeText(text)
+    }
+
+    fun addPollChoice() {
+        _state.value = _state.value.addPollChoice()
+    }
+    
+    fun changePollChoice(id: UUID, text: String) {
+        _state.value = _state.value.updatePollChoice(id, text)
+    }
+    
+    fun removePollChoice(id: UUID) {
+        _state.value = _state.value.removePollChoice(id)
+    }
+
+    fun updateState(state: NoteEditingState) {
+        _state.value = state
+    }
+
+    fun togglePollMultiple() {
+        _state.value = state.value.copy(
+            poll = state.value.poll?.toggleMultiple()
+        )
     }
 
     fun post(){
         currentAccount.value?.let{ account ->
 
             // FIXME 本来はreplyToNoteIdの時点でNote.Idを使うべきだが現状は厳しい
-            val replyId = replyToNoteId.value
+            val replyId = _state.value.replyId
 
             val renoteId = renoteId.value
             // FIXME viaMobileを設定できるようにする
             val createNote = CreateNote(
                 author = account,
-                visibility = visibility.value?: Visibility.Public(false),
+                visibility = _state.value.visibility,
                 text = text.value,
                 cw = cw.value,
                 viaMobile = false,
                 files = files.value,
                 replyId = replyId,
                 renoteId = renoteId,
-                poll = poll.value?.buildCreatePoll(),
+                poll = poll.value?.toCreatePoll(),
                 draftNoteId = draftNote.value?.draftNoteId
             )
 
@@ -264,7 +244,7 @@ class NoteEditorViewModel(
         files.add(
             file
         )
-        this.files.value = files
+        _state.value = _state.value.addFile(file)
     }
 
     fun add(fp: FileProperty){
@@ -278,7 +258,9 @@ class NoteEditorViewModel(
         files.addAll(fpList.map{
             it.toFile()
         })
-        this.files.postValue(files)
+        _state.value = _state.value.copy(
+            files = files
+        )
     }
 
     fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
@@ -292,9 +274,7 @@ class NoteEditorViewModel(
     }
 
     fun removeFileNoteEditorData(file: File){
-        val files = files.value.toArrayList()
-        files.remove(file)
-        this.files.value = files
+        _state.value = _state.value.removeFile(file)
     }
 
 
@@ -305,32 +285,36 @@ class NoteEditorViewModel(
 
 
     fun changeCwEnabled(){
-        hasCw.value = !(hasCw.value?: false)
-        cw.value = if(hasCw.value == true) "" else null
+        _state.value = _state.value.toggleCw()
         logger.debug("cw:${cw.value}")
     }
 
     fun enablePoll(){
-        val p = poll.value
-        if(p == null){
-            poll.value = PollEditor()
-        }
+        _state.value = _state.value.togglePoll()
+
     }
 
     fun disablePoll(){
-        val p = poll.value
-        if(p != null){
-            poll.value = null
-        }
+        _state.value = _state.value.togglePoll()
     }
 
     fun showVisibilitySelection(){
         showVisibilitySelectionEvent.event = Unit
     }
 
+    fun setText(text: String) {
+        _state.value = _state.value.changeText(text)
+    }
+
+    fun setCw(text: String?) {
+        _state.value = _state.value.changeCw(text)
+    }
+
     fun setVisibility(visibility: Visibility){
         logger.debug("公開範囲がセットされた:$visibility")
-        this.visibility.value = visibility
+        _state.value = _state.value.copy(
+            visibility = visibility
+        )
         this.visibilitySelectedEvent.event = Unit
     }
 
@@ -347,11 +331,7 @@ class NoteEditorViewModel(
     @FlowPreview
     @ExperimentalCoroutinesApi
     fun setAddress(added: List<User.Id>, removed: List<User.Id>){
-        /*val list = address.value?.let{
-            ArrayList(it)
-        }?: ArrayList()*/
         val list = ((visibility.value as? Visibility.Specified)?.visibleUserIds?: emptyList()).toMutableList()
-
         list.addAll(
             added
         )
@@ -360,8 +340,8 @@ class NoteEditorViewModel(
             removed.any()
         }
 
-        visibility.value = Visibility.Specified(
-            list
+        _state.value = _state.value.copy(
+            visibility = Visibility.Specified(list)
         )
     }
 
@@ -378,7 +358,7 @@ class NoteEditorViewModel(
         }
         val builder = StringBuilder(text.value?: "")
         builder.insert(pos, mentionBuilder.toString())
-        text.value = builder.toString()
+        _state.value = _state.value.changeText(builder.toString())
         return pos + mentionBuilder.length
     }
 
@@ -387,9 +367,9 @@ class NoteEditorViewModel(
     }
 
     fun addEmoji(emoji: String, pos: Int): Int{
-        val builder = StringBuilder(text.value?: "")
+        val builder = StringBuilder(_state.value.text?: "")
         builder.insert(pos, emoji)
-        text.value = builder.toString()
+        _state.value = _state.value.changeText(builder.toString())
         logger.debug( "position:${pos + emoji.length - 1}")
         return pos + emoji.length
     }
@@ -399,16 +379,16 @@ class NoteEditorViewModel(
     fun toDraftNote(): DraftNote{
         return DraftNote(
             accountId = currentAccount.value?.accountId!!,
-            text = text.value,
-            cw = cw.value,
-            visibleUserIds = address.value?.mapNotNull {
+            text = _state.value.text,
+            cw = _state.value.cw,
+            visibleUserIds = address.value.mapNotNull {
                 it.userId?.id ?: it.user.value?.id?.id
             },
             draftPoll = poll.value?.toDraftPoll(),
-            visibility = visibility.value?.type()?: "public",
-            localOnly = visibility.value?.isLocalOnly(),
+            visibility = visibility.value.type(),
+            localOnly = visibility.value.isLocalOnly(),
             renoteId = quoteToNoteId?.noteId,
-            replyId = replyToNoteId.value?.noteId,
+            replyId = _state.value.replyId?.noteId,
             files = files.value
         ).apply{
             this.draftNoteId = draftNote.value?.draftNoteId
@@ -445,9 +425,9 @@ class NoteEditorViewModel(
     @ExperimentalCoroutinesApi
     @FlowPreview
     fun canSaveDraft(): Boolean{
-        return !(text.value.isNullOrBlank()
+        return !(_state.value.text.isNullOrBlank()
                 && files.value.isNullOrEmpty()
-                && poll.value?.choices?.value.isNullOrEmpty()
+                && poll.value?.choices.isNullOrEmpty()
                 && address.value.isNullOrEmpty())
     }
 
@@ -459,10 +439,7 @@ class NoteEditorViewModel(
     @FlowPreview
     @ExperimentalCoroutinesApi
     fun clear(){
-        text.value = ""
-        cw.value = null
-        files.value = emptyList()
-        poll.value = null
+        _state.value = _state.value.clear()
     }
 
 

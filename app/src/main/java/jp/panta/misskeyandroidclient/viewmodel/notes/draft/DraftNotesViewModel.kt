@@ -23,7 +23,7 @@ class DraftNotesViewModel(
     class Factory(
         val miApplication: MiApplication
     ) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return DraftNotesViewModel(miApplication.draftNoteDao, miApplication) as T
 
         }

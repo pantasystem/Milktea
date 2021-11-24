@@ -25,7 +25,7 @@ class SortedUsersViewModel(
     val noteDataSourceAdder = miCore.getNoteDataSourceAdder()
 
     class Factory(val miCore: MiCore, val type: Type?, private val orderBy: UserRequestConditions?) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SortedUsersViewModel(
                 miCore,
                 type,

@@ -5,15 +5,18 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
@@ -40,6 +43,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelF
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
 
 interface SimpleEditor{
 
@@ -119,11 +123,14 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         viewModel.files.observe(viewLifecycleOwner) { list ->
             simpleImagePreviewAdapter.submitList(list)
         }
-        viewModel.poll.observe(viewLifecycleOwner) { poll ->
-            if (poll == null) {
-                removePollFragment()
-            } else {
-                setPollFragment()
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.poll.collect { poll ->
+                if(poll == null) {
+                    removePollFragment()
+                }else{
+                    setPollFragment()
+                }
             }
         }
 
@@ -138,8 +145,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             dialog.show(childFragmentManager, "NoteEditor")
         }
 
-        viewModel.address.observe(viewLifecycleOwner) {
-            userChipAdapter.submitList(it)
+        lifecycleScope.launchWhenResumed {
+            viewModel.address.collect {
+                userChipAdapter.submitList(it)
+            }
         }
 
         viewModel.showPollTimePicker.observe(this) {
@@ -149,6 +158,15 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         viewModel.showPollDatePicker.observe(this) {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
         }
+
+        mBinding.inputCw.addTextChangedListener { e ->
+            viewModel.setCw((e?.toString()?: ""))
+        }
+
+        mBinding.inputMainText.addTextChangedListener { e ->
+            viewModel.setText((e?.toString()?: ""))
+        }
+
 
 
 

@@ -26,7 +26,7 @@ class RenotesViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(private val targetNoteId: Note.Id, private val miCore: MiCore) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return RenotesViewModel(
                 miCore.createRenotesPagingService(targetNoteId),
                 miCore.getGetters().noteRelationGetter,

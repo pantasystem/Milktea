@@ -76,11 +76,9 @@ class NoteDetailActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.note_detail_menu, menu)
-        if(menu != null){
-            setMenuTint(menu)
-        }
+        setMenuTint(menu)
         return super.onCreateOptionsMenu(menu)
     }
 
