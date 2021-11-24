@@ -4,9 +4,10 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         >
     <data>
+
         <variable
-                name="pollEditor"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor" />
+                name="pollEditingState"
+                type="jp.panta.misskeyandroidclient.model.notes.PollEditingState" />
         <variable
                 name="noteEditorViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
@@ -31,7 +32,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-                android:id="@+id/button"
+                android:id="@+id/addChoiceButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/add_choice"
@@ -41,13 +42,12 @@
 
                 android:textColor="?android:attr/textColorPrimary"
                 android:padding="5dp"
-                android:onClick="@{()-> pollEditor.makeAndAddChoice() }"
                 />
         <Spinner
                 android:id="@+id/deadLineType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/button"
+                app:layout_constraintTop_toBottomOf="@id/addChoiceButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:entries="@array/deadline_choices"
@@ -72,8 +72,8 @@
                 tools:text="19/20"
                 app:layout_constraintStart_toEndOf="@+id/dateButton"
                 app:layout_constraintTop_toBottomOf="@+id/deadLineType"
-                android:visibility="@{pollEditor.deadLineType == DeadLineType.DATE_AND_TIME ? View.VISIBLE : View.GONE}"
-                app:timeOnly="@{pollEditor.expiresAt}"
+                timeOnly="@{noteEditorViewModel.poll.expiresAt.asDate()}"
+                android:visibility="@{noteEditorViewModel.poll.expiresAtDateTime ? View.VISIBLE : View.GONE}"
                 />
 
         <Button
@@ -83,16 +83,18 @@
                 tools:text="2019/6/3"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/deadLineType"
-                android:visibility="@{pollEditor.deadLineType == DeadLineType.DATE_AND_TIME ? View.VISIBLE : View.GONE}"
-                app:dateOnly="@{pollEditor.expiresAt}"/>
+                android:visibility="@{noteEditorViewModel.poll.expiresAtDateTime ? View.VISIBLE : View.GONE}"
+                dateOnly="@{noteEditorViewModel.poll.expiresAt.asDate()}"
+               />
 
-        <Switch
-                android:id="@+id/switch1"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/multipleAnswerSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="@={SafeUnbox.unboxBool(pollEditor.isMutable)}"
                 android:padding="5dp"
                 android:text="@string/multiple_answer"
+                android:checked="@{noteEditorViewModel.poll.multiple}"
+                android:onClick="@{()-> noteEditorViewModel.togglePollMultiple()}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/dateButton" />
 
