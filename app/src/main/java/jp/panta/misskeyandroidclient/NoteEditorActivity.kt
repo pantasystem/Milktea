@@ -232,8 +232,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             dialog.show(supportFragmentManager, "NoteEditor")
         }
 
-        viewModel.address.observe(this) {
-            userChipAdapter.submitList(it)
+        lifecycleScope.launchWhenResumed {
+            viewModel.address.collect {
+                userChipAdapter.submitList(it)
+            }
         }
 
         viewModel.showPollTimePicker.observe(this) {

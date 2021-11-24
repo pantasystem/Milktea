@@ -78,49 +78,18 @@ class NoteEditorViewModel(
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
 
-
-
-
     val renoteId = _state.map {
         it.renoteId
     }.asLiveData()
-
-
 
     val hasCw = _state.map {
         it.hasCw
     }.asLiveData()
 
-    /*val text = MediatorLiveData<String>().apply {
-
-        addSource(draftNote) {
-            if(it?.text != null) {
-                value = it.text
-            }
-        }
-    }*/
-
 
     var maxTextLength = miCore.getCurrentAccount().map {
         miCore.getCurrentInstanceMeta()?.maxNoteTextLength?: 1500
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
-
-    /*val textRemaining = Transformations.map(text){ t: String? ->
-        (maxTextLength.value?: 1500) - (t?.codePointCount(0, t.length)?: 0)
-    }*/
-    /*val textRemaining = text.map {
-        (maxTextLength.value?: 1500) - (it.codePointCount(0, it.length))
-    }*/
-    /*val textRemaining = MediatorLiveData<Int>().apply{
-        addSourceChain(maxTextLength){ maxSize ->
-            val t = text.value
-            value = (maxSize?: 1500) - (t?.codePointCount(0, t.length)?: 0)
-        }
-        addSource(text){ t ->
-            val max = maxTextLength.value?: 1500
-            value = max - (t?.codePointCount(0, t.length)?: 0)
-        }
-    }*/
 
     val textRemaining = combine(maxTextLength, text) { max, t ->
         max - (t?.codePointCount(0, t.length)?:0)
@@ -142,44 +111,19 @@ class NoteEditorViewModel(
         it.checkValidate(textMaxLength = maxTextLength.value)
     }.asLiveData()
 
-    // TODO: stateのVisiblityをベースにする
-    val visibility = MediatorLiveData<Visibility>().apply {
-
-        addSource(draftNote) {
-            if(it != null) {
-                val local = it.localOnly
-                val type = it.visibility
-                val visibleUserIds = it.visibleUserIds
-                value = Visibility(type, local ?: false, visibleUserIds = visibleUserIds?.map { userId ->
-                    User.Id(it.accountId, userId)
-                })
-            }
-        }
-
-        reply.filterNotNull().onEach {
-            val visibility = if(it.visibility is Visibility.Specified) Visibility.Specified(listOf(it.userId)) else it.visibility
-            postValue(visibility)
-        }.launchIn(viewModelScope + Dispatchers.IO)
+    val visibility = _state.map {
+        it.visibility
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = Visibility.Public(false))
 
 
-        if(replyId == null || renoteId.value == null) {
-            miCore.getCurrentAccount().filterNotNull().onEach {
-                this.value = miCore.getSettingStore().getNoteVisibility(it.accountId)
-                logger.debug("公開範囲:${this.value}")
-            }.launchIn(viewModelScope)
-        }
-    }
-
-    val isLocalOnly = Transformations.map(visibility) {
-        it.isLocalOnly()
-    }
+    val isLocalOnly = _state.map {
+        it.visibility.isLocalOnly()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
 
-    val isLocalOnlyEnabled = MediatorLiveData<Boolean>().apply{
-        addSource(visibility){
-            value = it is CanLocalOnly
-        }
-    }
+    val isLocalOnlyEnabled = _state.map {
+        it.visibility is CanLocalOnly
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
 
 
@@ -195,7 +139,7 @@ class NoteEditorViewModel(
         it?.visibleUserIds?.map { uId ->
             setUpUserViewData(uId)
         }?: emptyList()
-    }.asFlow().asLiveData(viewModelScope.coroutineContext)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
 
     @FlowPreview
@@ -204,15 +148,9 @@ class NoteEditorViewModel(
         return UserViewData(userId, miCore, viewModelScope, dispatcher)
     }
 
-    val isSpecified = Transformations.map(visibility){
-        it is Visibility.Specified
-    }
-
-    /*val poll = MutableLiveData<PollEditor?>(
-        dn?.draftPoll?.let{
-            PollEditor(it)
-        }
-    )*/
+    val isSpecified = _state.map {
+        it.isSpecified
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val poll = _state.map {
         it.poll
@@ -369,7 +307,9 @@ class NoteEditorViewModel(
 
     fun setVisibility(visibility: Visibility){
         logger.debug("公開範囲がセットされた:$visibility")
-        this.visibility.value = visibility
+        _state.value = _state.value.copy(
+            visibility = visibility
+        )
         this.visibilitySelectedEvent.event = Unit
     }
 
@@ -386,11 +326,7 @@ class NoteEditorViewModel(
     @FlowPreview
     @ExperimentalCoroutinesApi
     fun setAddress(added: List<User.Id>, removed: List<User.Id>){
-        /*val list = address.value?.let{
-            ArrayList(it)
-        }?: ArrayList()*/
         val list = ((visibility.value as? Visibility.Specified)?.visibleUserIds?: emptyList()).toMutableList()
-
         list.addAll(
             added
         )
@@ -399,8 +335,8 @@ class NoteEditorViewModel(
             removed.any()
         }
 
-        visibility.value = Visibility.Specified(
-            list
+        _state.value = _state.value.copy(
+            visibility = Visibility.Specified(list)
         )
     }
 
@@ -440,12 +376,12 @@ class NoteEditorViewModel(
             accountId = currentAccount.value?.accountId!!,
             text = _state.value.text,
             cw = _state.value.cw,
-            visibleUserIds = address.value?.mapNotNull {
+            visibleUserIds = address.value.mapNotNull {
                 it.userId?.id ?: it.user.value?.id?.id
             },
             draftPoll = poll.value?.toDraftPoll(),
-            visibility = visibility.value?.type()?: "public",
-            localOnly = visibility.value?.isLocalOnly(),
+            visibility = visibility.value.type(),
+            localOnly = visibility.value.isLocalOnly(),
             renoteId = quoteToNoteId?.noteId,
             replyId = _state.value.replyId?.noteId,
             files = files.value
