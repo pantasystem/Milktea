@@ -9,31 +9,20 @@
     </style>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <!--
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorOnPrimary">?android:textColorPrimary</item>
-        <item name="colorPrimaryDark">@color/navigationColor</item>
-        <item name="colorAccent">@color/colorDarkAccent</item>
-        <item name="colorOnSurface">?android:attr/textColorPrimary</item>
-        -->
-        <item name="colorPrimary">#4E66EA</item>
-        <item name="colorSecondary">#4E65E4</item>
 
-
-        <!--<item name="colorPrimaryDark">#00b2cc</item>-->
-
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="colorSecondary">#575DAE</item>
 
         <item name="actionBarSize">53dp</item>
 
         <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
-        <item name="colorSelectedReactionCounterBackground">#6579E8</item>
+        <item name="colorSelectedReactionCounterBackground">#808EDD</item>
         <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="colorMessageSelf">@color/colorMessageSelf</item>
+        <item name="colorMessageSelf">#808EDD</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
 
         <item name="colorSeparator">@color/colorSeparator</item>
@@ -50,7 +39,7 @@
 
 
 
-        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
+        <item name="colorDotTabSelected">#575DAE</item>
         <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
     </style>
 
