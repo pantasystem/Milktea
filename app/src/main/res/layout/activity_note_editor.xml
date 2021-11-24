@@ -21,7 +21,6 @@
                 android:id="@+id/note_editor_toolbar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
                 android:elevation="4dp"
                 android:minHeight="?attr/actionBarSize"
                 android:text="@string/post"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <LinearLayout
             android:layout_width="match_parent"
@@ -12,7 +13,6 @@
                 android:id="@+id/appearanceToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme" />
 
@@ -59,8 +59,8 @@
                             android:layout_gravity="center_vertical"
                             android:src="@drawable/ic_attach_file_black_24dp"
                             style="@style/Widget.AppCompat.Button.Borderless"
-                            android:tint="?attr/colorNoteActionButtonTint"
-                            tools:ignore="ContentDescription" />
+                            tools:ignore="ContentDescription"
+                            app:tint="?attr/colorNoteActionButtonTint" />
                     <TextView
                             android:id="@+id/background_image_path"
                             android:layout_width="0dp"
@@ -74,9 +74,9 @@
                             android:layout_height="30dp"
                             android:src="@drawable/ic_delete_black_24dp"
                             style="@style/Widget.AppCompat.Button.Borderless"
-                            android:tint="?attr/colorNoteActionButtonTint"
                             android:layout_gravity="end|center_vertical"
-                            tools:ignore="ContentDescription" />
+                            tools:ignore="ContentDescription"
+                            app:tint="?attr/colorNoteActionButtonTint" />
 
                 </LinearLayout>
 
