@@ -15,20 +15,17 @@ import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
 import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.poll.PollEditor
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
-import java.util.*
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
     private val mBinding: FragmentPollEditorBinding by dataBinding()
-    //private var mPollEditor: PollEditor? = null
     private var mNoteEditorViewModel: NoteEditorViewModel? = null
 
 
