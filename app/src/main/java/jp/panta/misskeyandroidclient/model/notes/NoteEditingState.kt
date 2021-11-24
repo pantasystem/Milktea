@@ -167,7 +167,7 @@ data class NoteEditingState(
 
     fun togglePoll() : NoteEditingState {
         return this.copy(
-            poll = if(poll == null) PollEditingState(emptyList(), false, null) else null
+            poll = if(poll == null) PollEditingState(emptyList(), false) else null
         )
     }
 
@@ -177,11 +177,24 @@ data class NoteEditingState(
 
 }
 
+sealed interface PollExpiresAt {
+    object Infinity : PollExpiresAt
+    data class DateAndTime(val expiresAt: Instant) : PollExpiresAt
+    data class SpecifyLapse(val expiresAt: Instant) : PollExpiresAt
+}
+
+fun PollExpiresAt.expiresAt() : Instant? {
+    return when(this) {
+        is PollExpiresAt.Infinity -> null
+        is PollExpiresAt.DateAndTime -> this.expiresAt
+        is PollExpiresAt.SpecifyLapse -> this.expiresAt
+    }
+}
 
 data class PollEditingState(
     val choices: List<PollChoiceState>,
     val multiple: Boolean,
-    val expiresAt: Instant?
+    val expiresAt: PollExpiresAt = PollExpiresAt.Infinity
 ) {
     fun checkValidate() : Boolean {
         return choices.all {
@@ -210,8 +223,10 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
                     PollChoiceState(choice)
                 },
                 expiresAt = it.expiresAt?.let { ex ->
-                    Instant.fromEpochMilliseconds(ex)
-                },
+                    PollExpiresAt.DateAndTime(
+                        Instant.fromEpochMilliseconds(ex)
+                    )
+                }?: PollExpiresAt.Infinity,
                 multiple = it.multiple
             )
         },
@@ -231,7 +246,7 @@ fun PollEditingState.toCreatePoll() : CreatePoll {
             it.text
         },
         multiple = multiple,
-        expiresAt = expiresAt?.toEpochMilliseconds()
+        expiresAt = expiresAt.expiresAt()?.toEpochMilliseconds()
     )
 }
 
@@ -241,6 +256,6 @@ fun PollEditingState.toDraftPoll() : DraftPoll {
             it.text
         },
         multiple = multiple,
-        expiresAt = expiresAt?.toEpochMilliseconds()
+        expiresAt = expiresAt.expiresAt()?.toEpochMilliseconds()
     )
 }
