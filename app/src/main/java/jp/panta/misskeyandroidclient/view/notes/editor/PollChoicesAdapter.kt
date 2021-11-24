@@ -55,7 +55,6 @@ class PollChoicesAdapter(
 
     override fun onBindViewHolder(holder: ChoiceHolder, position: Int) {
         holder.bind(getItem(position))
-        Log.d("PollChoicesAdapter", "onBindViewHolder")
         holder.binding.lifecycleOwner = lifecycleOwner
     }
 
