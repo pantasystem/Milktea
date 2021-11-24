@@ -29,7 +29,7 @@ class SelectedUserViewModel(
         val selectedUserIds: List<User.Id>?,
         val selectedUsers: List<User>?
     ) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SelectedUserViewModel(
                 miCore,
                 selectableSize,

@@ -27,7 +27,7 @@ class MessageActionViewModel(
         val messagingId: MessagingId,
         val miApplication: MiApplication,
     ) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if(modelClass == MessageActionViewModel::class.java){
                 return MessageActionViewModel(messagingId, miApplication) as T
             }

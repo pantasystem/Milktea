@@ -14,7 +14,7 @@ class NoteDetailViewModelFactory(
     val miApplication: MiApplication,
     val accountId: Long? = null
 ) : ViewModelProvider.Factory{
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == NoteDetailViewModel::class.java){
             return NoteDetailViewModel(show, miApplication, accountId = accountId, encryption = miApplication.getEncryption()) as T
         }

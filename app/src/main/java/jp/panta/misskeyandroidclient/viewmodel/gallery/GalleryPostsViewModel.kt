@@ -36,7 +36,7 @@ class GalleryPostsViewModel(
         val accountId: Long?,
         val miCore: MiCore
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GalleryPostsViewModel(
                 pageable,
                 accountId,

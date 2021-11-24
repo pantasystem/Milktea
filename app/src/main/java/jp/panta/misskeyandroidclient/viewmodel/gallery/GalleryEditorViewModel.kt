@@ -44,7 +44,7 @@ class GalleryEditorViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val editType: EditType, val miCore: MiCore) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GalleryEditorViewModel(
                 editType,
                 miCore.getGalleryRepository(),

@@ -76,18 +76,16 @@ class SearchResultActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_search_menu, menu)
-        if(menu != null){
-            val item = menu.findItem(R.id.nav_search_add_to_tab)
+        val item = menu.findItem(R.id.nav_search_add_to_tab)
 
-            if(isAddedPage()){
-                item.setIcon(R.drawable.ic_remove_to_tab_24px)
-            }else{
-                item.setIcon(R.drawable.ic_add_to_tab_24px)
-            }
-            setMenuTint(menu)
+        if(isAddedPage()){
+            item.setIcon(R.drawable.ic_remove_to_tab_24px)
+        }else{
+            item.setIcon(R.drawable.ic_add_to_tab_24px)
         }
+        setMenuTint(menu)
         return super.onCreateOptionsMenu(menu)
     }
 

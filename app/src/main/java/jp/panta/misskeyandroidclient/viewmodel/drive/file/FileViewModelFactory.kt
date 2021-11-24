@@ -25,7 +25,7 @@ class FileViewModelFactory(
 ) : ViewModelProvider.Factory{
 
     @ExperimentalCoroutinesApi
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == FileViewModel::class.java){
             return FileViewModel(
                 miCore.watchAccount(accountId),

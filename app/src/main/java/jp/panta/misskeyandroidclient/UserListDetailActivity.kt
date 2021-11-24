@@ -110,9 +110,9 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         mUserListDetailViewModel?.updateName(name)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_user_list_detail, menu)
-        val addToTabItem = menu?.findItem(R.id.action_add_to_tab)
+        val addToTabItem = menu.findItem(R.id.action_add_to_tab)
         val page = account?.pages?.firstOrNull {
             (it.pageable() as? Pageable.UserListTimeline)?.listId == mListId?.userListId && mListId != null
         }
@@ -121,9 +121,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }else{
             addToTabItem?.setIcon(R.drawable.ic_remove_to_tab_24px)
         }
-        menu?.let{
-            setMenuTint(it)
-        }
+        setMenuTint(menu)
         return super.onCreateOptionsMenu(menu)
     }
 

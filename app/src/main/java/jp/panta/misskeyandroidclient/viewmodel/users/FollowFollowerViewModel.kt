@@ -33,7 +33,7 @@ class FollowFollowerViewModel(
         val type: Type,
         val miCore: MiCore,
     ) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return FollowFollowerViewModel(userId, type, miCore) as T
         }
 

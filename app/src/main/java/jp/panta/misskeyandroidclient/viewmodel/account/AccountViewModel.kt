@@ -20,7 +20,7 @@ class AccountViewModel(
 ) : ViewModel(){
 
     class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if(modelClass == AccountViewModel::class.java){
                 return AccountViewModel(miCore) as T
             }

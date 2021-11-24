@@ -205,13 +205,13 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
     @ExperimentalCoroutinesApi
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
-        val block = menu?.findItem(R.id.block)
-        val mute = menu?.findItem(R.id.mute)
-        val unblock = menu?.findItem(R.id.unblock)
-        val unmute = menu?.findItem(R.id.unmute)
+        val block = menu.findItem(R.id.block)
+        val mute = menu.findItem(R.id.mute)
+        val unblock = menu.findItem(R.id.unblock)
+        val unmute = menu.findItem(R.id.unmute)
         mute?.isVisible = !(mViewModel?.isMuted?.value?: true)
         block?.isVisible = !(mViewModel?.isBlocking?.value?: true)
         unblock?.isVisible = mViewModel?.isBlocking?.value?: false
@@ -223,7 +223,7 @@ class UserDetailActivity : AppCompatActivity() {
             unmute?. isVisible = false
         }
 
-        val tab = menu?.findItem(R.id.nav_add_to_tab)
+        val tab = menu.findItem(R.id.nav_add_to_tab)
         val page = mAccountRelation?.pages?.firstOrNull {
             val pageable = it.pageable()
             if(pageable is Pageable.UserTimeline){
@@ -238,9 +238,7 @@ class UserDetailActivity : AppCompatActivity() {
             tab?.setIcon(R.drawable.ic_remove_to_tab_24px)
         }
 
-        menu?.let{
-            setMenuTint(it)
-        }
+        setMenuTint(menu)
 
         return super.onCreateOptionsMenu(menu)
     }

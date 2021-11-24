@@ -16,7 +16,7 @@ class MessageHistoryViewModelFactory(
 ) : ViewModelProvider.Factory{
     @FlowPreview
     @ExperimentalCoroutinesApi
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == MessageHistoryViewModel::class.java){
             return MessageHistoryViewModel(account, miApplication) as T
         }

@@ -30,7 +30,7 @@ class UserListDetailViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val listId: UserList.Id, private val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return UserListDetailViewModel(listId, miCore) as T
         }
     }

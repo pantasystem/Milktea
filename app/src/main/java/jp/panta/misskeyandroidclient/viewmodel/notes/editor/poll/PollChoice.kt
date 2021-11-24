@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import java.util.*
 import kotlin.contracts.contract
 
+@Deprecated("gomi")
 class PollChoice() {
 
 
