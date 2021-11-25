@@ -97,11 +97,13 @@
         <item name="colorPrimary">@color/colorBreadPrimary</item>
         <item name="colorPrimaryDark">@color/colorBreadPrimaryDark</item>
         <item name="colorSurface">@color/colorBreadSurface</item>
-        <item name="colorSecondary">@color/colorBreadAccent</item>
+        <item name="colorSecondary">#8BC34A</item>
         <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Primary</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="tabStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface</item>
+        <item name="colorSelectedReactionCounterBackground">#FFCA28</item>
+        <item name="colorNormalReactionCounterBackground">#A6A6A6</item>
 
     </style>
 
