@@ -29,6 +29,7 @@ import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.*
+import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 
@@ -107,5 +108,5 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun rejectFollowRequest(rejectFollowRequest: RejectFollowRequest): Response<Unit> = misskeyAPI.rejectFollowRequest(rejectFollowRequest)
     override suspend fun swRegister(subscription: Subscription): Response<SubscriptionState> = misskeyAPI.swRegister(subscription)
     override suspend fun translate(req: Translate): Response<TranslationResult> = misskeyAPI.translate(req)
-
+    override suspend fun report(req: ReportDTO): Response<Unit> = misskeyAPI.report(req)
 }

@@ -33,6 +33,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.gallery.GalleryPostsFragment
+import jp.panta.misskeyandroidclient.view.users.ReportDialog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -212,6 +213,7 @@ class UserDetailActivity : AppCompatActivity() {
         val mute = menu.findItem(R.id.mute)
         val unblock = menu.findItem(R.id.unblock)
         val unmute = menu.findItem(R.id.unmute)
+        val report = menu.findItem(R.id.report_user)
         mute?.isVisible = !(mViewModel?.isMuted?.value?: true)
         block?.isVisible = !(mViewModel?.isBlocking?.value?: true)
         unblock?.isVisible = mViewModel?.isBlocking?.value?: false
@@ -221,6 +223,7 @@ class UserDetailActivity : AppCompatActivity() {
             mute?.isVisible = false
             unblock?.isVisible = false
             unmute?. isVisible = false
+            report?.isVisible = false
         }
 
         val tab = menu.findItem(R.id.nav_add_to_tab)
@@ -270,6 +273,11 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.add_list ->{
                 val intent = ListListActivity.newInstance(this, mUserId)
                 startActivity(intent)
+            }
+            R.id.report_user -> {
+                mUserId?.let{
+                    ReportDialog.newInstance(it).show(supportFragmentManager, "")
+                }
             }
             else -> return false
 

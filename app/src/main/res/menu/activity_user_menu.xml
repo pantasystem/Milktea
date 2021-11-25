@@ -26,4 +26,7 @@
     <item
             android:id="@+id/add_list"
             android:title="@string/add_to_list"/>
+    <item
+            android:id="@+id/report_user"
+            android:title="@string/report"/>
 </menu>

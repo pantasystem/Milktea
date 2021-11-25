@@ -19,6 +19,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistor
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.report.Report
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -55,6 +56,8 @@ class NotesViewModel(
     val confirmDeletionEvent = EventBus<PlaneNoteViewData>()
 
     val confirmDeleteAndEditEvent = EventBus<PlaneNoteViewData>()
+
+    val confirmReportEvent = EventBus<Report>()
 
     val shareNoteState = MutableLiveData<State>()
 

@@ -239,6 +239,40 @@
                     android:text="@string/remove_note"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     />
+
+        </LinearLayout>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorSeparator"
+                android:visibility="visible" />
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="@{notesViewModel.shareTarget.event.isMyNote ? View.GONE : View.VISIBLE }"
+
+                >
+
+            <ImageView
+                    android:id="@+id/reportImg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/remove_note"
+                    app:srcCompat="@drawable/ic_baseline_report_problem_24"
+                    app:tint="?attr/colorNoteActionButtonTint" />
+
+            <Button
+                    android:id="@+id/reportButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/report"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+
         </LinearLayout>
 
     </LinearLayout>
