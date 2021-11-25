@@ -57,7 +57,7 @@ object GetUrlPreview {
         @Throws(IOException::class, JsonSyntaxException::class)
         override fun execute(): Response<UrlPreview> {
             val res = call.execute()
-            val body = res.body()
+            val body = res.body
             val data = body?.string()?.let{
                 try{
                     gson.fromJson(it, UrlPreview::class.java)
@@ -81,7 +81,7 @@ object GetUrlPreview {
             call.enqueue(object : okhttp3.Callback{
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
                     try{
-                        val data =  gson.fromJson(response.body()?.string(), UrlPreview::class.java)
+                        val data =  gson.fromJson(response.body?.string(), UrlPreview::class.java)
                         callback.onResponse(this@PreviewUrlCall,Response.success(data))
                     }catch (e: JsonSyntaxException){
                         callback.onFailure(this@PreviewUrlCall, e)
@@ -103,9 +103,9 @@ object GetUrlPreview {
 
         override fun request(): Request = request
 
-        override fun isExecuted(): Boolean = call.isExecuted
+        override fun isExecuted(): Boolean = call.isExecuted()
 
-        override fun isCanceled(): Boolean = call.isCanceled
+        override fun isCanceled(): Boolean = call.isCanceled()
 
         override fun clone(): Call<UrlPreview> {
             return PreviewUrlCall(request, call.clone())

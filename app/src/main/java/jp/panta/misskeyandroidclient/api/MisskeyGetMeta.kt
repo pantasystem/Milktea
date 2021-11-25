@@ -5,9 +5,11 @@ import jp.panta.misskeyandroidclient.GsonFactory
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.RequestMeta
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okio.Timeout
 import retrofit2.Call
 import retrofit2.Callback
@@ -19,7 +21,7 @@ object MisskeyGetMeta {
     val gson = GsonFactory.create()
     fun getMeta(baseUrl: String): Call<Meta>{
         val client = OkHttpClient()
-        val requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(RequestMeta()))
+        val requestBody = gson.toJson(RequestMeta()).toRequestBody("application/json; charset=utf-8".toMediaType())
         val request = Request.Builder().url("$baseUrl/api/meta").post(requestBody).build()
         val call = client.newCall(request)
         return MetaCall(request, call)
@@ -35,7 +37,7 @@ object MisskeyGetMeta {
             call.enqueue(object : okhttp3.Callback{
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
                     try{
-                        val meta = response.body()?.let{
+                        val meta = response.body?.let{
                             gson.fromJson<Meta>(it.string(), Meta::class.java)
                         }
                         callback.onResponse(this@MetaCall, Response.success(meta))
@@ -53,18 +55,18 @@ object MisskeyGetMeta {
         }
 
         override fun execute(): Response<Meta> {
-            val res =  call.execute().body()?.string()?.let{
+            val res =  call.execute().body?.string()?.let{
                 gson.fromJson(it, Meta::class.java)
             }
             return Response.success(res)
         }
 
         override fun isCanceled(): Boolean {
-            return call.isCanceled
+            return call.isCanceled()
         }
 
         override fun isExecuted(): Boolean {
-            return call.isExecuted
+            return call.isExecuted()
         }
         override fun cancel() {
             return call.cancel()
