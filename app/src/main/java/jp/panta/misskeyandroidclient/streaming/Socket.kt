@@ -53,6 +53,8 @@ interface Socket {
      */
     fun disconnect(): Boolean
 
+    fun reconnect()
+
     /**
      * 現在の状態を取得する
      */

@@ -16,6 +16,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.report.Report
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionSelectionDialog
@@ -23,6 +24,7 @@ import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionInputDi
 import jp.panta.misskeyandroidclient.view.notes.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.view.notes.reaction.picker.ReactionPickerDialog
 import jp.panta.misskeyandroidclient.view.notes.renote.RenotesBottomSheetDialog
+import jp.panta.misskeyandroidclient.view.users.ReportDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
@@ -165,6 +167,11 @@ class ActionNoteHandler(
     }
 
 
+    private val reportDialogObserver: (Report?) -> Unit = { report ->
+        report?.let {
+            ReportDialog.newInstance(report.userId, report.comment).show(activity.supportFragmentManager, "")
+        }
+    }
 
     fun initViewModelListener(){
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
@@ -220,5 +227,8 @@ class ActionNoteHandler(
 
         mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
         mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
+
+        mNotesViewModel.confirmReportEvent.removeObserver(reportDialogObserver)
+        mNotesViewModel.confirmReportEvent.observe(activity, reportDialogObserver)
     }
 }

@@ -3,10 +3,12 @@ package jp.panta.misskeyandroidclient.model.users.impl
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.users.*
+import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.report.Report
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Response
 
@@ -184,6 +186,18 @@ class UserRepositoryImpl(
             val updated = reducer.invoke(find(userId, true) as User.Detail)
             miCore.getUserDataSource().add(updated)
         }
+        return res.isSuccessful
+    }
+
+    override suspend fun report(report: Report): Boolean {
+        val account = miCore.getAccountRepository().get(report.userId.accountId)
+        val api = report.userId.getMisskeyAPI()
+        val res = api.report(ReportDTO(
+            i = account.getI(miCore.getEncryption()),
+            comment = report.comment,
+            userId = report.userId.id
+        ))
+        res.throwIfHasError()
         return res.isSuccessful
     }
 

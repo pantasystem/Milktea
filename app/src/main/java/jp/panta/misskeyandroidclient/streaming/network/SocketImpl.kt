@@ -95,6 +95,18 @@ class SocketImpl(
 
     }
 
+    override fun reconnect() {
+        val ws = mWebSocket
+        synchronized(this) {
+            mWebSocket = null
+        }
+        ws?.cancel()
+        pollingJob.cancel()
+        mState = Socket.State.Closed(code = 1001, reason = "force close")
+        this.connect()
+
+    }
+
     override suspend fun blockingConnect(): Boolean {
         return suspendCoroutine { continuation ->
             var isResumed = false
@@ -131,7 +143,9 @@ class SocketImpl(
             }
             pollingJob.cancel()
 
-            return mWebSocket?.close(1001, "finish")?: false
+            val result = mWebSocket?.close(1001, "finish")?: false
+            mWebSocket = null
+            return result
         }
     }
 
@@ -139,7 +153,6 @@ class SocketImpl(
         logger.debug("メッセージ送信: $msg, state${state()}")
         if(state() != Socket.State.Connected){
             logger.debug("送信をキャンセル state:${state()}")
-            connect()
             return false
         }
 
@@ -157,6 +170,7 @@ class SocketImpl(
 
         synchronized(this){
             mState = Socket.State.Closed(code, reason)
+            pollingJob.cancel()
             mWebSocket = null
         }
     }
@@ -166,6 +180,7 @@ class SocketImpl(
         super.onClosing(webSocket, code, reason)
 
         synchronized(this){
+            pollingJob.cancel()
             mState = Socket.State.Closing(code, reason)
         }
     }
@@ -175,6 +190,7 @@ class SocketImpl(
         logger.error("onFailure, res=$response", e = t)
 
         synchronized(this) {
+            pollingJob.cancel()
             mState = Socket.State.Failure(
                 t, response
             )
@@ -189,8 +205,8 @@ class SocketImpl(
         runCatching {
             val r = json.decodeFromString<PongRes>(text)
             r.id.isNotBlank()
+            pollingJob.onReceive(r)
         }.onSuccess {
-            logger.debug("polling成功")
             return
         }
         val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
@@ -226,7 +242,7 @@ class SocketImpl(
         synchronized(this){
             pollingJob.cancel()
             pollingJob = PollingJob(this).also {
-                it.ping(4000, 900)
+                it.ping(4000, 900, 12000)
             }
             mState = Socket.State.Connected
         }

@@ -24,11 +24,11 @@ import jp.panta.misskeyandroidclient.api.notes.reaction.ReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
 import jp.panta.misskeyandroidclient.api.notes.translation.Translate
 import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
+import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
-import jp.panta.misskeyandroidclient.model.notes.draft.db.UserIdDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -230,4 +230,7 @@ interface MisskeyAPI {
 
     @POST("api/notes/translate")
     suspend fun translate(@Body req: Translate) : Response<TranslationResult>
+
+    @POST("api/users/report-abuse")
+    suspend fun report(@Body req: ReportDTO) : Response<Unit>
 }

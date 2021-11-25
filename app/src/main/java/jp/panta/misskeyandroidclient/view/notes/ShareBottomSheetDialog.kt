@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentShareBottomSheetBinding
+import jp.panta.misskeyandroidclient.model.users.report.Report
+import jp.panta.misskeyandroidclient.model.users.report.toReport
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 
 class ShareBottomSheetDialog : BottomSheetDialogFragment(){
@@ -97,6 +99,16 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
         dataBinding.deleteAndEditNoteButton.setOnClickListener {
             note?.let{ n ->
                 viewModel.confirmDeleteAndEditEvent.event = n
+            }
+            dismiss()
+        }
+
+        dataBinding.reportButton.setOnClickListener {
+            val baseUrl = viewModel.getAccount()?.instanceDomain
+
+            note?.let {
+                val report = it.toShowNote.toReport(baseUrl!!)
+                viewModel.confirmReportEvent.event = report
             }
             dismiss()
         }
