@@ -358,5 +358,7 @@
     <string name="translated_from_s">翻译自 %s： \n</string>
     <string name="error_s">错误 %s</string>
     <string name="translate">翻译</string>
+    <string name="report">报告</string>
+    <string name="send">发送</string>
 
 </resources>

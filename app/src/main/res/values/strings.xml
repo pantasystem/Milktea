@@ -361,5 +361,7 @@
     <string name="translated_from_s">Translated from %s: \n</string>
     <string name="error_s">Error %s</string>
     <string name="translate">Translate</string>
+    <string name="report">Report</string>
+    <string name="send">Send</string>
 
 </resources>

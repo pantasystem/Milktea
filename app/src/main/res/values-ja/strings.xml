@@ -362,6 +362,8 @@
     <string name="translated_from_s">%sから翻訳:\n</string>
     <string name="error_s">エラー %s</string>
     <string name="translate">翻訳</string>
+    <string name="report">報告</string>
+    <string name="send">送信</string>
 
 
 
