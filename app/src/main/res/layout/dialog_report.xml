@@ -55,6 +55,8 @@
                 android:layout_below="@id/inputReportDetailLayout"
                 android:layout_alignParentEnd="true"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:text="@string/send"/>
+                android:text="@string/send"
+                android:enabled="@{reportViewModel.canSend}"
+                />
     </RelativeLayout>
 </layout>

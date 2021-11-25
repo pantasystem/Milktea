@@ -16,7 +16,10 @@ sealed interface ReportState {
     data class Specify(
         val userId: User.Id,
         val comment: String
-    ) : ReportState
+    ) : ReportState {
+        val canSend: Boolean
+            get() = this.comment.isNotBlank()
+    }
     object None : ReportState
 
 
@@ -61,6 +64,10 @@ class ReportViewModel(private val miCore: MiCore) : ViewModel(){
     val userId = state.map {
         (it as? ReportState.Specify)?.userId
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    val canSend = state.map {
+        it is ReportState.Specify && it.canSend
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
 
     fun changeComment(text: String?) {
