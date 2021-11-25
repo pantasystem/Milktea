@@ -1,11 +1,16 @@
 package jp.panta.misskeyandroidclient.streaming
 
+import android.util.Log
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @Serializable
 data class Pong(val pong: Long)
@@ -58,15 +63,39 @@ internal class PollingJob(
     }
     private val job = SupervisorJob()
     private val scope = CoroutineScope(job + dispatcher)
+    private val pongs = MutableSharedFlow<PongRes>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 1024)
+
+
     val isPolling: Boolean get() = job.isActive
-    fun ping(interval: Long, count: Long) {
+    fun ping(interval: Long, count: Long, timeout: Long) {
         scope.launch {
             (0 until count).asSequence().asFlow().onEach {
                 delay(interval)
             }.collect {
-                socket.send(json.encodeToString(createPingRequest()))
+                scope.launch {
+                    val ping = createPingRequest()
+                    if(!socket.send(json.encodeToString(ping))) {
+                        Log.d("PollingJob", "sendしたらfalse帰ってきた")
+                    }
+                    try {
+                        withTimeout(timeout) {
+                            pongs.first {
+                                it.id == ping.body.id
+                            }
+                        }
+                        Log.d("PollingJob", "polling成功")
+                    } catch(e: TimeoutCancellationException) {
+                        Log.d("PollingJob", "polling失敗")
+                        socket.reconnect()
+                    }
+                }
             }
         }
+    }
+
+
+    fun onReceive(res: PongRes) {
+        pongs.tryEmit(res)
     }
 
     fun cancel() {
