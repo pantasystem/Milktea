@@ -29,6 +29,7 @@
 
         <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.Toolbar</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
+        <item name="tabStyle">@style/TabLayout4Light</item>
 
 
 
@@ -44,26 +45,18 @@
     </style>
 
     <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!--
-        <item name="colorPrimary">@color/colorDarkPrimary</item>
-        <item name="colorOnPrimary">?android:textColorPrimary</item>
 
-        <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
-        <item name="colorAccent">@color/colorDarkAccent</item>
-        -->
         <item name="colorPrimary">#9FA8DA</item>
         <item name="colorSecondary">#6D7FE1</item>
-        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Surface</item>
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
-        <item name="tabStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
-        <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.PrimarySurface</item>
+        <item name="bottomNavigationStyle">@style/BottomNavigationView4Dark</item>
 
         <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
-        <!--<item name="colorSurface">@color/colorDarkSurface</item>
-        <item name="android:textColor">@color/colorDarkTextColor</item>
--->
-        <item name="colorBottomNavigationSelected">@color/colorDarkBottomNavSelected</item>
-        <item name="colorBottomNavigationNotSelect">@color/colorDarkBottomNavNormal</item>
+
+        <item name="colorSurface">#1E1E1E</item>
+
         <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
         <item name="actionBarSize">53dp</item>
 
@@ -73,17 +66,14 @@
         <item name="colorMessageSelf">@color/colorMessageSelfDark</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipientDark</item>
         <item name="colorSeparator">@color/colorSeparatorDark</item>
-        <item name="android:textColorPrimary">@color/colorTextColorPrimaryColorDarkDark</item>
-        <item name="android:textColorSecondary">@color/colorTextColorSecondary</item>
 
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/navigationDarkColor</item>
-
-
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
         <item name="materialAlertDialogTheme">@style/DialogStyle</item>
         <item name="colorDotTabSelected">@color/colorDarkAccent</item>
         <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
 
     </style>
+
 </resources>
