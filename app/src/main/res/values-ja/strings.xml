@@ -365,6 +365,7 @@
     <string name="report">報告</string>
     <string name="send">送信</string>
 
-
+    <string name="successful_report">報告成功</string>
+    <string name="report_failed">報告失敗</string>
 
 </resources>

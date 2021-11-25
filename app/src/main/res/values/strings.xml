@@ -363,5 +363,7 @@
     <string name="translate">Translate</string>
     <string name="report">Report</string>
     <string name="send">Send</string>
+    <string name="successful_report">Successful report</string>
+    <string name="report_failed">Report Failed</string>
 
 </resources>

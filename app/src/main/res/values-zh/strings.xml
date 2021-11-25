@@ -360,5 +360,7 @@
     <string name="translate">翻译</string>
     <string name="report">报告</string>
     <string name="send">发送</string>
+    <string name="successful_report">成功报告</string>
+    <string name="report_failed">报告失败</string>
 
 </resources>
