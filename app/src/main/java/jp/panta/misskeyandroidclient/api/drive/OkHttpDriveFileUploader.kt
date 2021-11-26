@@ -70,9 +70,8 @@ class OkHttpDriveFileUploader(
     private fun createRequestBody(uri: Uri): RequestBody{
         return object : RequestBody(){
             override fun contentType(): MediaType? {
-                val map = MimeTypeMap.getSingleton()
-                return map.getExtensionFromMimeType(context.contentResolver.getType(uri))
-                    ?.toMediaType()
+                val type = context.contentResolver.getType(uri)
+                return type?.toMediaType()
             }
 
             override fun contentLength(): Long {
