@@ -203,6 +203,15 @@ class MiApplication : Application(), MiCore {
         )
     }
 
+    private val noteTranslationStore: NoteTranslationStore by lazy {
+        NoteTranslationStore(
+            getNoteRepository(),
+            getAccountRepository(),
+            getMisskeyAPIProvider(),
+            getEncryption(),
+        )
+    }
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     override fun onCreate() {
@@ -649,6 +658,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getSubscriptionRegistration(): SubscriptionRegistration {
         return _subscribeRegistration
+    }
+
+    override fun getTranslationStore(): NoteTranslationStore {
+        return noteTranslationStore
     }
 
     private suspend fun loadAndInitializeAccounts(){

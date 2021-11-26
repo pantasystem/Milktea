@@ -19,6 +19,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistor
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.report.Report
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.view.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -56,6 +57,8 @@ class NotesViewModel(
 
     val confirmDeleteAndEditEvent = EventBus<PlaneNoteViewData>()
 
+    val confirmReportEvent = EventBus<Report>()
+
     val shareNoteState = MutableLiveData<State>()
 
     val targetUser = EventBus<User>()
@@ -71,6 +74,8 @@ class NotesViewModel(
     val openNoteEditor = EventBus<DraftNote?>()
 
     val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
+
+    val showRenotesEvent = EventBus<Note.Id?>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
@@ -106,6 +111,10 @@ class NotesViewModel(
         noteId?.let {
             showReactionHistoryEvent.event = ReactionHistoryRequest(noteId, type)
         }
+    }
+
+    fun showRenotes(noteId: Note.Id?) {
+        showRenotesEvent.event = noteId
     }
 
     fun postRenote(){
@@ -181,7 +190,7 @@ class NotesViewModel(
             }
             Log.d("NotesViewModel", "postReaction(n, n)")
             runCatching {
-                val result = miCore.getNoteRepository().reaction(
+                val result = miCore.getNoteRepository().toggleReaction(
                     CreateReaction(
                         noteId = planeNoteViewData.toShowNote.note.id,
                         reaction = reaction
@@ -201,7 +210,9 @@ class NotesViewModel(
      * 既にリアクションが含まれている場合のみ実行される
      */
     private suspend fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
-        planeNoteViewData.myReaction.value?: return
+        if(planeNoteViewData.myReaction.value.isNullOrBlank()) {
+            return
+        }
         miCore.getNoteRepository().unreaction(planeNoteViewData.toShowNote.note.id)
     }
 
@@ -305,7 +316,7 @@ class NotesViewModel(
                     miCore.getNoteRepository().delete(planeNoteViewData.note.note.id)
                 }.onSuccess {
                     if(it) {
-                        withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.Main) {
                             statusMessage.event = "削除に成功しました"
                         }
                     }
@@ -354,6 +365,13 @@ class NotesViewModel(
                     Log.d(TAG, "投票に失敗しました")
                 }
             }
+        }
+    }
+
+    fun translate(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            miCore.getTranslationStore().translate(noteId)
         }
     }
     

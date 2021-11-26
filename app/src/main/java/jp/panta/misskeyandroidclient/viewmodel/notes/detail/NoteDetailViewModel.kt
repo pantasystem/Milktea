@@ -49,7 +49,8 @@ class NoteDetailViewModel(
                     noteDetail,
                     getAccount(),
                     DetermineTextLengthSettingStore(miCore.getSettingStore()),
-                    miCore.getNoteCaptureAdapter()
+                    miCore.getNoteCaptureAdapter(),
+                    miCore.getTranslationStore()
                 )
                 loadUrlPreview(detail)
                 var list: List<PlaneNoteViewData> = listOf(detail)
@@ -113,7 +114,8 @@ class NoteDetailViewModel(
                     miCore.getGetters().noteRelationGetter.get(n),
                     getAccount(),
                     DetermineTextLengthSettingStore(miCore.getSettingStore()),
-                    miCore.getNoteCaptureAdapter()
+                    miCore.getNoteCaptureAdapter(),
+                    miCore.getTranslationStore()
                 ).apply{
                     loadUrlPreview(this)
                 }
@@ -132,7 +134,8 @@ class NoteDetailViewModel(
                 it,
                 getAccount(),
                 DetermineTextLengthSettingStore(miCore.getSettingStore()),
-                miCore.getNoteCaptureAdapter()
+                miCore.getNoteCaptureAdapter(),
+                miCore.getTranslationStore()
             ).apply{
                 loadUrlPreview(this)
             }
@@ -145,10 +148,22 @@ class NoteDetailViewModel(
         }?.map{
             miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it))
         }?.map{
-            val planeNoteViewData = PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+            val planeNoteViewData = PlaneNoteViewData(
+                it,
+                getAccount(),
+                DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                miCore.getNoteCaptureAdapter(),
+                miCore.getTranslationStore(),
+            )
             val childInChild = loadChildren(planeNoteViewData.toShowNote.note.id.noteId)?.map{n ->
 
-                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), n)),getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter()).apply{
+                PlaneNoteViewData(
+                    miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), n)),
+                    getAccount(),
+                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                    miCore.getNoteCaptureAdapter(),
+                    miCore.getTranslationStore()
+                ).apply{
                     loadUrlPreview(this)
                 }
             }
@@ -157,7 +172,8 @@ class NoteDetailViewModel(
                 childInChild,
                 getAccount(),
                 DetermineTextLengthSettingStore(miCore.getSettingStore()),
-                miCore.getNoteCaptureAdapter()
+                miCore.getNoteCaptureAdapter(),
+                miCore.getTranslationStore()
             ).apply{
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }

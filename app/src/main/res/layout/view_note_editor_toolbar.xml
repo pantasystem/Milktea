@@ -26,11 +26,10 @@
                 style="@style/Widget.AppCompat.Button.Borderless"
                 app:srcCompat="@drawable/ic_arrow_back_black_24dp"
                 tools:ignore="ContentDescription"
-                android:tint="?attr/colorNoteActionButtonTint"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                />
+                app:tint="?attr/colorNoteActionButtonTint" />
 
 
 
@@ -70,7 +69,6 @@
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:tint="?attr/colorNoteActionButtonTint"
                 tools:src="@drawable/ic_language_black_24dp"
                 tools:ignore="ContentDescription"
                 app:noteVisibility="@{viewModel.visibility}"
@@ -81,7 +79,7 @@
                 app:layout_constraintEnd_toStartOf="@id/textCounter"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                />
+                app:tint="?attr/colorNoteActionButtonTint" />
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textCounter"
                 android:layout_width="wrap_content"
@@ -108,7 +106,6 @@
                 android:text="@string/post"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-
 
                 />
 

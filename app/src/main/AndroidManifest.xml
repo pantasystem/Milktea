@@ -34,7 +34,8 @@
         <activity android:name=".GalleryPostsActivity" />
         <activity
                 android:name=".AuthorizationActivity"
-                android:launchMode="singleInstance">
+                android:launchMode="singleInstance"
+                android:exported="true">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -68,7 +69,10 @@
         <activity android:name=".FavoriteActivity" />
         <activity android:name=".FollowFollowerActivity" />
         <activity android:name=".SearchActivity" />
-        <activity android:name=".SearchResultActivity">
+        <activity
+                android:name=".SearchResultActivity"
+                android:exported="true"
+                >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -91,7 +95,9 @@
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings" />
-        <activity android:name=".UserDetailActivity">
+        <activity
+                android:name=".UserDetailActivity"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -113,7 +119,9 @@
                         android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity android:name=".NoteDetailActivity">
+        <activity
+            android:name=".NoteDetailActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -134,6 +142,7 @@
         <activity android:name=".MessageActivity" />
         <activity android:name=".DriveActivity" />
         <activity
+                android:exported="true"
                 android:name=".NoteEditorActivity"
                 android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -145,6 +154,7 @@
             </intent-filter>
         </activity>
         <activity
+                android:exported="true"
                 android:name=".MainActivity"
                 android:label="@string/app_name"
                 android:windowSoftInputMode="adjustPan">

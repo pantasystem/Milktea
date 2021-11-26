@@ -120,15 +120,26 @@
 
                     />
             <include
+                    android:layout_below="@id/text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/translationView"
+                    layout="@layout/view_translation"
+                    android:layout_marginTop="8dp"
+                    emojis="@{note.toShowNote.note.emojis}"
+                    translationState="@{note.translateState}"
+                    />
+            <include
                     android:id="@+id/mediaPreview"
 
                     layout="@layout/media_preview"
                     app:media="@{note.media}"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_below="@id/text"
+                    android:layout_below="@id/translationView"
                     android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                     tools:visibility="visible"
+                    tools:layout_height="20dp"
                     />
 
 
@@ -240,7 +251,7 @@
                         android:layout_height="200dp"
                         android:layout_below="@id/subNoteText"
                         android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
-                        tools:layout_height="100dp"
+                        tools:layout_height="20dp"
                         />
 
 
@@ -293,9 +304,11 @@
                     style="?android:attr/borderlessButtonStyle"
                     android:padding="8dp"
                     android:scaleType="centerCrop"
-                    android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
                     android:contentDescription="@string/renote"
-                    app:tint="?attr/colorNoteActionButtonTint"/>
+                    app:tint="?attr/colorNoteActionButtonTint"
+                    app:clickTargetNote="@{note}"
+                    app:notesViewModelForClickRenote="@{notesViewModel}"
+                    />
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
                     android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'

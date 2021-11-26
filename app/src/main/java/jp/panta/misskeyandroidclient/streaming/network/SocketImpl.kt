@@ -81,6 +81,9 @@ class SocketImpl(
                 logger.debug("接続済みのためキャンセル")
                 return false
             }
+            if(!(mState is Socket.State.NeverConnected || mState is Socket.State.Failure || mState is Socket.State.Closed)) {
+                return false
+            }
             mState = Socket.State.Connecting
             val request = Request.Builder()
                 .url(url)
@@ -89,6 +92,18 @@ class SocketImpl(
             mWebSocket = okHttpClient.newWebSocket(request, this)
             return mWebSocket != null
         }
+
+    }
+
+    override fun reconnect() {
+        val ws = mWebSocket
+        synchronized(this) {
+            mWebSocket = null
+        }
+        ws?.cancel()
+        pollingJob.cancel()
+        mState = Socket.State.Closed(code = 1001, reason = "force close")
+        this.connect()
 
     }
 
@@ -128,7 +143,9 @@ class SocketImpl(
             }
             pollingJob.cancel()
 
-            return mWebSocket?.close(1001, "finish")?: false
+            val result = mWebSocket?.close(1001, "finish")?: false
+            mWebSocket = null
+            return result
         }
     }
 
@@ -153,6 +170,7 @@ class SocketImpl(
 
         synchronized(this){
             mState = Socket.State.Closed(code, reason)
+            pollingJob.cancel()
             mWebSocket = null
         }
     }
@@ -162,6 +180,7 @@ class SocketImpl(
         super.onClosing(webSocket, code, reason)
 
         synchronized(this){
+            pollingJob.cancel()
             mState = Socket.State.Closing(code, reason)
         }
     }
@@ -171,6 +190,7 @@ class SocketImpl(
         logger.error("onFailure, res=$response", e = t)
 
         synchronized(this) {
+            pollingJob.cancel()
             mState = Socket.State.Failure(
                 t, response
             )
@@ -185,8 +205,8 @@ class SocketImpl(
         runCatching {
             val r = json.decodeFromString<PongRes>(text)
             r.id.isNotBlank()
+            pollingJob.onReceive(r)
         }.onSuccess {
-            logger.debug("polling成功")
             return
         }
         val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
@@ -222,7 +242,7 @@ class SocketImpl(
         synchronized(this){
             pollingJob.cancel()
             pollingJob = PollingJob(this).also {
-                it.ping(4000, 900)
+                it.ping(4000, 900, 12000)
             }
             mState = Socket.State.Connected
         }

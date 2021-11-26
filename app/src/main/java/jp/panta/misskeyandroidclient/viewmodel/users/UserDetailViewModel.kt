@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -26,7 +27,8 @@ class UserDetailViewModel(
     val fqdnUserName: String?,
     val miCore: MiCore,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val encryption: Encryption = miCore.getEncryption()
+    private val encryption: Encryption = miCore.getEncryption(),
+    private val translationStore: NoteTranslationStore
 ) : ViewModel(){
     private val logger = miCore.loggerFactory.create("UserDetailViewModel")
 
@@ -48,7 +50,7 @@ class UserDetailViewModel(
 
         pinNotesState.map{ notes ->
             notes.map { note ->
-                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(note), getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter())
+                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(note), getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), translationStore)
             }
         }.onEach {
             this.postValue(it)
@@ -75,15 +77,7 @@ class UserDetailViewModel(
         }
     }
 
-    val followButtonStatus = MediatorLiveData<String>().apply{
-        addSource(isFollowing){
-            if(it == true){
-                this.value = "フォロー中"
-            }else{
-                this.value = "フォロー"
-            }
-        }
-    }
+
 
     val userName = MediatorLiveData<String>().apply{
         addSource(user){user ->
@@ -157,7 +151,7 @@ class UserDetailViewModel(
             userState.value?.let{
                 runCatching {
                     val user = miCore.getUserRepository().find(it.id) as User.Detail
-                    if(user.isFollowing) {
+                    if(user.isFollowing || user.hasPendingFollowRequestFromYou) {
                         miCore.getUserRepository().unfollow(user.id)
                     }else{
                         miCore.getUserRepository().follow(user.id)

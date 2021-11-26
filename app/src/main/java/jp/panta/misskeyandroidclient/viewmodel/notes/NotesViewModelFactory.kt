@@ -8,7 +8,7 @@ import java.lang.ClassCastException
 
 @Suppress("UNCHECKED_CAST")
 class NotesViewModelFactory(private val miApplication: MiApplication) : ViewModelProvider.Factory{
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == NotesViewModel::class.java){
             return NotesViewModel(miApplication, miApplication.reactionHistoryDao) as T
         }

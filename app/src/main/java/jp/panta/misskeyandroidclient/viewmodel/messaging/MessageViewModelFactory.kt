@@ -20,12 +20,10 @@ class MessageViewModelFactory(
     private val miCore: MiCore
 ): ViewModelProvider.Factory{
 
-    constructor(userId: User.Id, miCore: MiCore) : this(MessagingId.Direct(userId), miCore)
-    constructor(groupId: Group.Id, miCore: MiCore) : this(MessagingId.Group(groupId), miCore)
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == MessageViewModel::class.java){
             return MessageViewModel(miCore, messagingId) as T
         }

@@ -56,6 +56,8 @@ import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.users.ReportState
+import jp.panta.misskeyandroidclient.viewmodel.users.ReportViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -205,6 +207,30 @@ class MainActivity : AppCompatActivity(){
                 getString(R.string.successfully_created_note).showSnackBar()
             }
         }
+
+        ViewModelProvider(this, ReportViewModel.Factory(miApplication))[ReportViewModel::class.java].also { viewModel ->
+            lifecycleScope.launchWhenResumed {
+                viewModel.state.distinctUntilChangedBy {
+                    it is ReportState.Sending.Success
+                            || it is ReportState.Sending.Failed
+                }.collect { state ->
+                    if(state is ReportState.Sending.Success) {
+                        Snackbar.make(
+                            binding.appBarMain.simpleNotification,
+                            R.string.successful_report,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }else if(state is ReportState.Sending.Failed) {
+                        Snackbar.make(
+                            binding.appBarMain.simpleNotification,
+                            R.string.report_failed,
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState, binding.appBarMain.bottomNavigation)
@@ -373,7 +399,7 @@ class MainActivity : AppCompatActivity(){
             it.isVisible = getSettingStore().isClassicUI
         }
 
-        setMenuTint(menu)
+        //setMenuTint(menu)
         return true
     }
 

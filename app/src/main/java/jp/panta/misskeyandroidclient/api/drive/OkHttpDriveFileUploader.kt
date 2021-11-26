@@ -11,12 +11,12 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileUploadFailedException
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.File
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
 import okio.BufferedSink
-import okio.Okio
+import okio.source
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -30,7 +30,11 @@ class OkHttpDriveFileUploader(
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
-            val client = OkHttpClient()
+            val client = OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(114514, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build()
 
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -49,11 +53,11 @@ class OkHttpDriveFileUploader(
 
             val request = Request.Builder().url(URL("${account.instanceDomain}/api/drive/files/create")).post(requestBody).build()
             val response = client.newCall(request).execute()
-            val code = response.code()
+            val code = response.code
             if(code in 200 until 300){
-                gson.fromJson(response.body()?.string(), FilePropertyDTO::class.java)
+                gson.fromJson(response.body?.string(), FilePropertyDTO::class.java)
             }else{
-                Log.d("OkHttpConnection", "code: $code, error${response.body()?.string()}")
+                Log.d("OkHttpConnection", "code: $code, error${response.body?.string()}")
                 throw FileUploadFailedException(file, null, code)
             }
         }catch(e: Exception){
@@ -66,13 +70,8 @@ class OkHttpDriveFileUploader(
     private fun createRequestBody(uri: Uri): RequestBody{
         return object : RequestBody(){
             override fun contentType(): MediaType? {
-                val map = MimeTypeMap.getSingleton()
-                val mime = map.getExtensionFromMimeType(context.contentResolver.getType(uri))
-                return if(mime != null){
-                    MediaType.parse(mime)
-                }else{
-                    null
-                }
+                val type = context.contentResolver.getType(uri)
+                return type?.toMediaType()
             }
 
             override fun contentLength(): Long {
@@ -87,12 +86,10 @@ class OkHttpDriveFileUploader(
 
             override fun writeTo(sink: BufferedSink) {
                 val inputStream = context.contentResolver.openInputStream(uri)
-                if(inputStream != null){
-                    Okio.source(inputStream)
-                        .use{
-                            sink.writeAll(it)
-                        }
-                }
+                inputStream?.source()
+                    ?.use{
+                        sink.writeAll(it)
+                    }
 
             }
         }

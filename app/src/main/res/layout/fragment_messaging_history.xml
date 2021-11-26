@@ -5,14 +5,6 @@
             android:orientation="vertical" android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <View
-                android:id="@+id/elevationView"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-
-                android:background="?attr/colorPrimary"
-                android:elevation="4dp"
-                />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/refresh"

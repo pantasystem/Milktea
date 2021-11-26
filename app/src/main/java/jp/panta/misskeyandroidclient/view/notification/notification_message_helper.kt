@@ -28,6 +28,7 @@ class NotificationMessageScope(val context: Context) {
             is PollVoteNotification -> context.getString(R.string.voted_by, this.user.getDisplayUserName())
             is ReceiveFollowRequestNotification -> context.getString(R.string.follow_requested_by, this.user.getDisplayUserName())
             is FollowRequestAcceptedNotification -> context.getString(R.string.follow_request_accepted_by, this.user.getDisplayUserName())
+            is UnknownNotification -> context.getString(R.string.unknown_notification)
         }
     }
 }

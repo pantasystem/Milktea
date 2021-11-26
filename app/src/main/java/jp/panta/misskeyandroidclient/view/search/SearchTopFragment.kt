@@ -13,7 +13,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.view.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
 import java.lang.IllegalArgumentException
@@ -32,7 +31,7 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top){
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.search_top_menu, menu)
-        context?.setMenuTint(menu)
+        //context?.setMenuTint(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

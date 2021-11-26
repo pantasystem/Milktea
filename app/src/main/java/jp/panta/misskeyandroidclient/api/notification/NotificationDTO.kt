@@ -86,7 +86,11 @@ data class NotificationDTO(
                     id, Note.Id(account.accountId, noteId?: note?.id!!), createdAt, User.Id(account.accountId, this.userId), choice, isRead ?: true
                 )
             }
-            else -> throw IllegalStateException("対応していないタイプの通知です。:$this")
+            else -> {
+                return UnknownNotification(
+                    id, createdAt, isRead?: false, User.Id(account.accountId, this.userId), this.type
+                )
+            }
         }
     }
 }

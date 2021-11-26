@@ -4,6 +4,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import java.lang.IllegalArgumentException
@@ -13,7 +14,8 @@ class HasReplyToNoteViewData(
     account: Account,
     determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-)  : PlaneNoteViewData(noteRelation, account, determineTextLength, noteCaptureAPIAdapter){
+    noteTranslationStore: NoteTranslationStore,
+)  : PlaneNoteViewData(noteRelation, account, determineTextLength, noteCaptureAPIAdapter, noteTranslationStore){
     val reply = noteRelation.reply
 
     /*val replyToAvatarUrl = reply?.user?.avatarUrl
@@ -33,7 +35,7 @@ class HasReplyToNoteViewData(
     val replyTo = if(reply == null){
         throw IllegalArgumentException("replyがnullですPlaneNoteViewDataを利用してください")
     }else{
-        PlaneNoteViewData(reply, account, determineTextLength.clone(), noteCaptureAPIAdapter)
+        PlaneNoteViewData(reply, account, determineTextLength.clone(), noteCaptureAPIAdapter, noteTranslationStore)
     }
 
 

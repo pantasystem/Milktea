@@ -18,8 +18,10 @@ interface FilePropertyDataSource {
     suspend fun find(filePropertyId: FileProperty.Id) : FileProperty
 
     suspend fun findIn(ids: List<FileProperty.Id>) : List<FileProperty> {
-        return ids.map {
-            find(it)
+        return ids.mapNotNull {
+            runCatching {
+                find(it)
+            }.getOrNull()
         }
     }
 }

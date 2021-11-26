@@ -125,13 +125,12 @@ class MediaActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menu?.let{ m ->
-            menuInflater.inflate(R.menu.menu_media, m)
-        }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        menuInflater.inflate(R.menu.menu_media, menu)
         val media = mCurrentMedia
         if(media is Media.FileMedia){
-            menu?.findItem(R.id.download_file)?.isVisible = media.file.path.startsWith("http")
+            menu.findItem(R.id.download_file)?.isVisible = media.file.path.startsWith("http")
         }
         return super.onCreateOptionsMenu(menu)
     }

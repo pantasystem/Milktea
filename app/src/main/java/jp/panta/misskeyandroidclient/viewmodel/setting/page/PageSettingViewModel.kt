@@ -37,7 +37,7 @@ class PageSettingViewModel(
     class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
 
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return PageSettingViewModel(miApplication, miApplication.getSettingStore(), PageTypeNameMap(miApplication)) as T
         }
     }

@@ -33,7 +33,7 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return UserListPullPushUserViewModel(miCore) as T
         }
     }

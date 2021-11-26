@@ -15,8 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
@@ -48,6 +50,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelF
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
@@ -181,7 +185,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
         if(!text.isNullOrBlank()){
-            viewModel.text.value = text
+            viewModel.changeText(text)
         }
         binding.viewModel = viewModel
         noteEditorToolbar.viewModel = viewModel
@@ -193,16 +197,31 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         viewModel.files.observe(this) { list ->
             simpleImagePreviewAdapter.submitList(list)
         }
-        viewModel.poll.observe(this) { poll ->
-            if (poll == null) {
-                removePollFragment()
-            } else {
-                setPollFragment()
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.poll.distinctUntilChangedBy {
+                it == null
+            }.collect { poll ->
+                if(poll == null) {
+                    removePollFragment()
+                }else{
+                    setPollFragment()
+                }
             }
         }
 
+        mBinding.cw.addTextChangedListener { e ->
+            viewModel.setCw(e?.toString())
+        }
+
+        mBinding.inputMain.addTextChangedListener { e ->
+            viewModel.setText((e?.toString()?: ""))
+        }
+
+
         viewModel.isPost.observe(this) {
             if(it) {
+                noteEditorToolbar.postButton.isEnabled = false
                 finish()
             }
         }
@@ -213,8 +232,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             dialog.show(supportFragmentManager, "NoteEditor")
         }
 
-        viewModel.address.observe(this) {
-            userChipAdapter.submitList(it)
+        lifecycleScope.launchWhenResumed {
+            viewModel.address.collect {
+                userChipAdapter.submitList(it)
+            }
         }
 
         viewModel.showPollTimePicker.observe(this) {
@@ -490,6 +511,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             if(changed != null){
                 val pos = mBinding.inputMain.selectionEnd
                 mViewModel?.addMentionUsers(changed.selectedUsers, pos)?.let { newPos ->
+                    Log.d("NoteEditorActivity", "text:${mViewModel?.text?.value}, stateText:${mViewModel?.state?.value?.text}")
                     mBinding.inputMain.setText(mViewModel?.text?.value?: "")
                     mBinding.inputMain.setSelection(newPos)
                 }

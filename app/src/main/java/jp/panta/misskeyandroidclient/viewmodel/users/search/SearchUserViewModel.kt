@@ -32,7 +32,7 @@ class SearchUserViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(val miCore: MiCore, val hasDetail: Boolean?) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SearchUserViewModel(miCore, hasDetail) as T
         }
     }

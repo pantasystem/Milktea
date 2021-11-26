@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.model.users
 
+import jp.panta.misskeyandroidclient.model.users.report.Report
+
 interface UserRepository {
 
     suspend fun find(userId: User.Id, detail: Boolean = true): User
@@ -22,4 +24,5 @@ interface UserRepository {
 
     suspend fun rejectFollowRequest(userId: User.Id) : Boolean
 
+    suspend fun report(report: Report) : Boolean
 }

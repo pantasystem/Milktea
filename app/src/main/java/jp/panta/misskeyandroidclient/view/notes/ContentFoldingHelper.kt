@@ -30,17 +30,20 @@ object ContentFoldingHelper {
 
         val isFoldContent = isFolding?: false
 
-        val isNeedFold = foldingNote.cw?.isNotBlank() == true || foldingNote.determineTextLength.isLong()
-        if(foldingNote.cw.isNullOrBlank()){
-            if(isNeedFold){
+        val isNeedFold = foldingNote.cw != null || foldingNote.determineTextLength.isLong()
+
+        if(foldingNote.cw == null) {
+            if(isNeedFold) {
                 cw?.visibility = View.VISIBLE
                 cw?.text = String.format(context.getString(R.string.long_text, foldingNote.text?.codePointCount(0, foldingNote.text.length)?:0))
+
             }else{
                 cw?.visibility = View.GONE
             }
+        }else if(foldingNote.cw.isEmpty()){
+            cw?.visibility = View.GONE
         }else{
             cw?.visibility = View.VISIBLE
-
         }
 
         if(isNeedFold){

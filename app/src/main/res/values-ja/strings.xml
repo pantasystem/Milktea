@@ -353,4 +353,19 @@
     <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする
     </string>
     <string name="copied_to_clipboard">クリップボードにコピーしました</string>
+    <string name="follow_approval_pending">フォロー承認待ち</string>
+    <string name="request_follow_from_u">フォロー申請</string>
+    <string name="unfollow">フォロー解除</string>
+
+    <string name="unknown_notification">不明な通知</string>
+    <string name="unknown_notification_msg">不明な通知。未対応な通知を受信しました、開発者にスクリーンショットを報告してください。 notificationId:%s, type:%s, senderID: %s, </string>
+    <string name="translated_from_s">%sから翻訳:\n</string>
+    <string name="error_s">エラー %s</string>
+    <string name="translate">翻訳</string>
+    <string name="report">報告</string>
+    <string name="send">送信</string>
+
+    <string name="successful_report">報告成功</string>
+    <string name="report_failed">報告失敗</string>
+
 </resources>

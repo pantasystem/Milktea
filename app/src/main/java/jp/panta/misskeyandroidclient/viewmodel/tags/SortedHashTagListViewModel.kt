@@ -28,7 +28,7 @@ class SortedHashTagListViewModel(
         val miCore: MiCore,
         val conditions: Conditions
     ) : ViewModelProvider.Factory{
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SortedHashTagListViewModel(
                 miCore,
                 conditions

@@ -95,7 +95,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="bottom"
                                 tools:text="フォロー"
-                                android:text="@{userViewModel.followButtonStatus}"
+                                followState="@{userViewModel.user.followState}"
                                 android:visibility="@{userViewModel.mine ? View.GONE : View.VISIBLE}"
                                 android:onClick="@{()-> userViewModel.changeFollow()}"
                                 />
@@ -192,7 +192,6 @@
                         android:id="@+id/userDetailToolbar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/colorPrimary"
                         android:minHeight="?attr/actionBarSize"
                         app:layout_collapseMode="pin"
                         />

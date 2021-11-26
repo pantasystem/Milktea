@@ -15,7 +15,7 @@ class NoteEditorViewModelFactory(
     private val quoteToNoteId: Note.Id? = null,
     private val draftNote: DraftNote? = null
 ) : ViewModelProvider.Factory{
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == NoteEditorViewModel::class.java){
             return NoteEditorViewModel(
                 miApplication,
