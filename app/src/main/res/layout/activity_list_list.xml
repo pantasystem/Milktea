@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".ListListActivity">
@@ -15,9 +15,7 @@
                     android:id="@+id/listListToolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorPrimary"
                     android:minHeight="?attr/actionBarSize"
-                    android:theme="?attr/actionBarTheme"
                     app:title="@string/nav_list"
                     app:layout_scrollFlags="scroll|enterAlways"/>
         </com.google.android.material.appbar.AppBarLayout>
@@ -37,7 +35,7 @@
                 app:srcCompat="@drawable/ic_list_add_black_24dp"
                 android:layout_gravity="bottom|end"
                 android:contentDescription="@string/add_user_list"
-                />
+                tools:ignore="ImageContrastCheck" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

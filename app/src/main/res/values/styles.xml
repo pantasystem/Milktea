@@ -27,115 +27,6 @@
 
     </declare-styleable>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorOnPrimary">?android:textColorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorDarkAccent</item>
-        <item name="colorSurface">@color/colorLightSurface</item>
-
-        <item name="actionBarSize">53dp</item>
-
-        <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
-        <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
-        <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
-        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
-
-        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
-
-        <item name="colorMessageSelf">@color/colorMessageSelf</item>
-        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
-        <item name="colorSeparator">@color/colorSeparator</item>
-        <item name="tabStyle">@style/TabStyle</item>
-        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
-        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
-        <item name="checkboxStyle">@style/Widget.AppCompat.CompoundButton.CheckBox</item>
-        <item name="radioButtonStyle">@style/Widget.AppCompat.CompoundButton.RadioButton</item>
-
-        <item name="snackbarTextViewStyle">@style/NotificationSnackBarTextView</item>
-        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
-        <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
-
-    </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-
-
-    <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorDarkPrimary</item>
-        <item name="colorOnPrimary">?android:textColorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorDarkPrimaryDark</item>
-        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.Colored</item>
-        <item name="colorAccent">@color/colorDarkAccent</item>
-
-        <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
-        <item name="colorSurface">@color/colorDarkSurface</item>
-        <item name="android:textColor">@color/colorDarkTextColor</item>
-
-        <item name="colorBottomNavigationSelected">@color/colorDarkBottomNavSelected</item>
-        <item name="colorBottomNavigationNotSelect">@color/colorDarkBottomNavNormal</item>
-        <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
-        <item name="actionBarSize">53dp</item>
-
-        <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
-        <item name="colorSelectedReactionCounterBackground">@color/colorSelectedReaction</item>
-
-        <item name="colorMessageSelf">@color/colorMessageSelfDark</item>
-        <item name="colorMessageRecipient">@color/colorMessageRecipientDark</item>
-        <item name="colorSeparator">@color/colorSeparatorDark</item>
-        <item name="android:textColorPrimary">@color/colorTextColorPrimaryColorDarkDark</item>
-        <item name="android:textColorSecondary">@color/colorTextColorSecondary</item>
-
-        <item name="android:navigationBarColor">@color/navigationDarkColor</item>
-        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
-        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
-        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
-        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
-        <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
-
-    </style>
-
-    <style name="AppThemeBlack" parent="AppThemeDark">
-        <item name="colorPrimary">@color/colorBlackPrimary</item>
-        <item name="colorPrimaryDark">@color/colorBlackPrimary</item>
-        <item name="colorAccent">@color/colorDarkAccent</item>
-        <item name="android:windowBackground">@color/colorBlackPrimary</item>
-        <item name="colorSurface">@color/colorBlackPrimary</item>
-        <item name="android:textColor">@color/colorBlackTextColor</item>
-
-        <item name="colorBottomNavigationSelected">@color/colorBlackTextColor</item>
-        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
-        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
-        <item name="actionBarSize">53dp</item>
-
-        <item name="colorMessageSelf">@color/colorMessageSelf</item>
-        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
-        <item name="colorSeparator">@color/colorSeparator</item>
-        <item name="android:navigationBarColor">@color/colorBlackPrimary</item>
-        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
-
-
-    </style>
-
-    <style name="AppThemeBread" parent="AppTheme">
-        <item name="colorPrimary">@color/colorBreadPrimary</item>
-        <item name="colorPrimaryDark">@color/colorBreadPrimaryDark</item>
-        <item name="colorSurface">@color/colorBreadSurface</item>
-        <item name="colorAccent">@color/colorBreadAccent</item>
-        <item name="colorBottomNavigationSelected">@color/colorBreadBottomNavSelected</item>
-        <item name="colorDotTabSelected">@color/colorBreadAccent</item>
-
-    </style>
-
 
     <style name="ReactionTabStyle" parent="Widget.Design.TabLayout">
         <item name="android:textColor">?android:attr/textColor</item>
@@ -174,5 +65,14 @@
 
     <style name="NotificationSnackBarTextView" parent="Widget.MaterialComponents.Snackbar.TextView">
         <item name="android:textColor">@color/colorTextColorPrimary</item>
+    </style>
+
+    <style name="BottomNavigationView4Dark" parent="Widget.MaterialComponents.BottomNavigationView.PrimarySurface">
+        <item name="elevation">0dp</item>
+    </style>
+    <style name="TabLayout4Light" parent="Widget.MaterialComponents.TabLayout">
+        <item name="elevation">4dp</item>
+        <item name="android:elevation">4dp</item>
+
     </style>
 </resources>

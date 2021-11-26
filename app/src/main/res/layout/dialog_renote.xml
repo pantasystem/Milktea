@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,18 +20,18 @@
 
             <ImageButton
                     android:id="@+id/unRenoteIcon"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:scaleType="centerCrop"
                     app:srcCompat="@drawable/ic_delete_black_24dp"
-                    android:tint="?attr/colorNoteActionButtonTint"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
             <Button
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -50,18 +49,18 @@
 
             <ImageButton
                     android:id="@+id/imageButton5"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:scaleType="centerCrop"
                     app:srcCompat="@drawable/ic_re_note"
-                    android:tint="?attr/colorNoteActionButtonTint"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
             <Button
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -80,18 +79,18 @@
 
             <ImageButton
                     android:id="@+id/imageButton6"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:scaleType="centerCrop"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     app:srcCompat="@drawable/ic_format_quote_black_24dp"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
             <Button
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

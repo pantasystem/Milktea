@@ -399,7 +399,7 @@ class MainActivity : AppCompatActivity(){
             it.isVisible = getSettingStore().isClassicUI
         }
 
-        setMenuTint(menu)
+        //setMenuTint(menu)
         return true
     }
 

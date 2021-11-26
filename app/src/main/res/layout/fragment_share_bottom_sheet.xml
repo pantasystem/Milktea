@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/show_detail"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     />
         </LinearLayout>
         <LinearLayout
@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/copy_content"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     />
         </LinearLayout>
         <LinearLayout
@@ -81,7 +81,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:text="@string/copy_url" />
         </LinearLayout>
         <LinearLayout
@@ -101,7 +101,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:text="@string/share" />
         </LinearLayout>
         <View
@@ -128,7 +128,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:text="@string/translate" />
         </LinearLayout>
         <View
@@ -156,7 +156,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:text="@string/favorite" />
         </LinearLayout>
         <LinearLayout
@@ -180,7 +180,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:text="@string/remove_favorite" />
         </LinearLayout>
         <View
@@ -212,7 +212,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/delete_and_edit"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     />
         </LinearLayout>
         <LinearLayout
@@ -237,7 +237,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/remove_note"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     />
 
         </LinearLayout>
@@ -270,7 +270,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/report"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     />
 
         </LinearLayout>

@@ -36,9 +36,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
         val activity = activity
         val miApplication = context?.applicationContext as MiApplication
         val ar  = miApplication.getCurrentAccount().value
-        /*val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.map{
-            ":${it.name}:"
-        }*/
+
         activity?: return
         ar?: return
         val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
@@ -49,17 +47,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
             dismiss()
         })
 
-        /*val columns = view.context.resources.getInteger(R.integer.reaction_choices_columns)
-        val adapter = ReactionChoicesAdapter(notesViewModel)
-        val layoutManager = GridLayoutManager(view.context, columns)*/
-
-        //val ft = activity.supportFragmentManager.beginTransaction()
-        /*val ft = childFragmentManager.beginTransaction()
-        ft.replace(R.id.reactionChoicesContainer, ReactionChoicesFragment())
-        ft.commit()*/
-        /*miApplication.getCurrentInstanceMeta()?.emojis?.groupBy {
-
-        }*/
         val category = miApplication.getCurrentInstanceMeta()?.emojis?.filter {
             it.category != null
         }?.groupBy {
@@ -73,8 +60,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         binding.reactionInputKeyboard.setOnClickListener {
 
-            /*val dialog = ReactionInputDialog()
-            dialog.show(childFragmentManager, "ReactionSelectionDialog")*/
             dismiss()
             notesViewModel.showInputReactionEvent.event = Unit
         }

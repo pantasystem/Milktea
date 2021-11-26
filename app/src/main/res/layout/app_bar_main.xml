@@ -58,7 +58,6 @@
                         android:layout_gravity="bottom|end"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="16dp"
-                        android:tint="#FFFFFF"
                         app:srcCompat="@drawable/ic_mode_edit_black_24dp"
                         android:contentDescription="@string/edit_note"/>
             </LinearLayout>
@@ -73,10 +72,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:layout_gravity="bottom"
-                    android:background="?attr/colorPrimary"
-                    app:itemBackground="?attr/colorPrimary"
-                    app:itemIconTint="@drawable/bottom_navigation_colors"
-                    app:itemTextColor="@drawable/bottom_navigation_colors"
                     app:labelVisibilityMode="unlabeled"
                     app:menu="@menu/bottom_menu"
                     app:itemIconSize="28dp"
