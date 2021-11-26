@@ -23,7 +23,7 @@ class NoteEditorViewModel(
     private val miCore: MiCore,
     private val draftNoteDao: DraftNoteDao,
     replyId: Note.Id? = null,
-    private val quoteToNoteId: Note.Id? = null,
+    quoteToNoteId: Note.Id? = null,
     loggerFactory: Logger.Factory,
     dn: DraftNote? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -216,7 +216,7 @@ class NoteEditorViewModel(
             // FIXME 本来はreplyToNoteIdの時点でNote.Idを使うべきだが現状は厳しい
             val replyId = _state.value.replyId
 
-            val renoteId = renoteId.value
+            val renoteId = _state.value.renoteId
             // FIXME viaMobileを設定できるようにする
             val createNote = CreateNote(
                 author = account,
@@ -387,7 +387,7 @@ class NoteEditorViewModel(
             draftPoll = poll.value?.toDraftPoll(),
             visibility = visibility.value.type(),
             localOnly = visibility.value.isLocalOnly(),
-            renoteId = quoteToNoteId?.noteId,
+            renoteId = _state.value.renoteId?.noteId,
             replyId = _state.value.replyId?.noteId,
             files = files.value
         ).apply{
