@@ -26,7 +26,7 @@
     <string name="quote_renote">Quote renote</string>
     <string name="discovery">Discovery</string>
     <string name="renote_was">Renote</string>
-    <string name="input_custom_emoji">Emoji / custom emoji</string>
+    <string name="input_custom_emoji">Emoji / Custom emoji</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->
@@ -50,7 +50,7 @@
     <string name="nav_setting_tab">Set tab</string>
     <string name="add_search">Add search</string>
     <string name="save_setting">Save settings</string>
-    <string name="tab_selected">added</string>
+    <string name="tab_selected">Added</string>
     <string name="tab_selectable">Add from below</string>
     <string name="title_featured">Highlights</string>
     <string name="drive">Drive</string>
@@ -69,8 +69,8 @@
     <string name="show_conversation">View conversation</string>
     <string name="copy_url">Copy url</string>
     <string name="copy_content">Copy content</string>
-    <string name="show_detail">detail</string>
-    <string name="favorite">favorite</string>
+    <string name="show_detail">Detail</string>
+    <string name="favorite">Favorite</string>
     <string name="remove_favorite">Remove favorites</string>
     <string name="remove">Remove</string>
 
@@ -146,7 +146,7 @@
     <string name="custom_app_name">App name</string>
     <string name="custom_app_description">Application overview</string>
 
-    <string name="your_app_name">custom app name</string>
+    <string name="your_app_name">Custom app name</string>
     <string name="description_of_app_description">Displayed during authentication</string>
     <string name="create">Create</string>
 
@@ -286,14 +286,14 @@
     <string name="incomplete_information_for_remote_user">Incomplete information for remote user</string>
     <string name="local_only">Local only</string>
     <string name="post_button_at_the_bottom">Place the post button at the bottom of the screen.</string>
-    <string name="please_again_to_finish">もう一度押して終了</string>
+    <string name="please_again_to_finish">Press again to finish</string>
 
     <string name="url_preview">URL preview</string>
     <string name="summaly_server_url">Summaly server url</string>
     <string name="displayed_url_preview">Displayed url preview</string>
     <string name="preview_display_test">preview display test</string>
     <string name="test_url">Test URL</string>
-    <string name="from_misskey_api">From misskey API</string>
+    <string name="from_misskey_api">From Misskey API</string>
     <string name="specify_summaly_server">Specify Summaly server</string>
     <string name="use_app_implementation_deprecated">Use app implementation (Deprecated)</string>
 
@@ -324,10 +324,10 @@
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
     <string name="follow_requested_by">Receive follow requested by %s</string>
-    <string name="local">local</string>
+    <string name="local">Local</string>
     <string name="add_user_list">Add user list</string>
     <string name="edit_note">Edit note</string>
-    <string name="gallery_favorite_button">gallery favorite button</string>
+    <string name="gallery_favorite_button">Gallery favorite button</string>
     <string name="popular_posts">Popular posts</string>
     <string name="gallery">Gallery</string>
     <string name="my_posts">My Posts</string>
