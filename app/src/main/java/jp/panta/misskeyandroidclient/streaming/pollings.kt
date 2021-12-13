@@ -55,8 +55,8 @@ data class PongRes(
 
 
 internal class PollingJob(
-    val socket: Socket,
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val socket: Socket,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     private val json = Json {
         ignoreUnknownKeys = true
@@ -67,27 +67,25 @@ internal class PollingJob(
 
 
     val isPolling: Boolean get() = job.isActive
-    fun ping(interval: Long, count: Long, timeout: Long) {
+    fun startPolling(interval: Long, count: Long, timeout: Long) {
         scope.launch {
             (0 until count).asSequence().asFlow().onEach {
                 delay(interval)
             }.collect {
-                scope.launch {
-                    val ping = createPingRequest()
-                    if(!socket.send(json.encodeToString(ping))) {
-                        Log.d("PollingJob", "sendしたらfalse帰ってきた")
-                    }
-                    try {
-                        withTimeout(timeout) {
-                            pongs.first {
-                                it.id == ping.body.id
-                            }
+                val ping = createPingRequest()
+                if(!socket.send(json.encodeToString(ping))) {
+                    Log.d("PollingJob", "sendしたらfalse帰ってきた")
+                }
+                try {
+                    withTimeout(timeout) {
+                        pongs.first {
+                            it.id == ping.body.id
                         }
-                        Log.d("PollingJob", "polling成功")
-                    } catch(e: TimeoutCancellationException) {
-                        Log.d("PollingJob", "polling失敗")
-                        socket.reconnect()
                     }
+                    Log.d("PollingJob", "polling成功")
+                } catch(e: TimeoutCancellationException) {
+                    Log.d("PollingJob", "polling失敗")
+                    socket.reconnect()
                 }
             }
         }

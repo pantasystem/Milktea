@@ -5,7 +5,6 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.streaming.BeforeConnectListener
 import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.network.SocketImpl
 import okhttp3.OkHttpClient
@@ -18,8 +17,6 @@ class SocketWithAccountProviderImpl(
     val encryption: Encryption,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
-    val instanceCreatedListener: (account: Account, socket: Socket)-> Unit,
-    val beforeConnectListener:(account: Account, socket: Socket)-> Boolean,
     val okHttpClient: OkHttpClient = OkHttpClient()
 ) : ISocketWithAccountProvider{
 
@@ -58,18 +55,9 @@ class SocketWithAccountProviderImpl(
             socket = SocketImpl(
                 url = uri,
                 okHttpClient,
-                {
-                    beforeConnectListener.invoke(account, it)
-                },
                 loggerFactory,
             )
             accountIdWithSocket[account.accountId] = socket
-
-            runCatching {
-                instanceCreatedListener.invoke(account, socket)
-            }.onFailure {
-                logger.error("instanceCreatedListener.invoke error", e = it)
-            }
 
             return socket
         }

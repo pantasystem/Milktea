@@ -132,7 +132,6 @@ class MiApplication : Application(), MiCore {
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
-    private lateinit var mSocketConnectionQueue: SocketConnectionQueue
 
     private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
@@ -183,8 +182,7 @@ class MiApplication : Application(), MiCore {
     override var loggerFactory: Logger.Factory = AndroidDefaultLogger.Factory
     private val logger = loggerFactory.create("MiApplication")
 
-    private lateinit var mActiveNetworkState: Flow<Boolean>
-    private var mIsActiveNetwork: Boolean = false
+    private lateinit var _networkState: Flow<Boolean>
 
     private val _taskExecutor: TaskExecutor by lazy {
         AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
@@ -221,7 +219,7 @@ class MiApplication : Application(), MiCore {
             .setReplaceAll(true)
         EmojiCompat.init(config)
 
-        mActiveNetworkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
+        _networkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
@@ -273,20 +271,7 @@ class MiApplication : Application(), MiCore {
             getEncryption(),
             mAccountRepository,
             loggerFactory,
-            { account, socket ->
-                socket.connect()
-
-                socket.addStateEventListener { e ->
-                    applicationScope.launch {
-                        handleSocketStateEvent(account, e)
-                    }
-                }
-            },
-            { _, _ ->
-                mIsActiveNetwork
-            }
         )
-        mSocketConnectionQueue = SocketConnectionQueue(mSocketWithAccountProvider, applicationScope, Dispatchers.IO, loggerFactory)
 
         mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(mSocketWithAccountProvider, loggerFactory)
 
@@ -374,17 +359,16 @@ class MiApplication : Application(), MiCore {
         }
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
 
-        mActiveNetworkState.distinctUntilChanged().onEach {
+        _networkState.distinctUntilChanged().onEach {
             logger.debug("接続状態が変化:${if(it) "接続" else "未接続"}")
-            mIsActiveNetwork = it
-            if(it) {
-                // NOTE: ネットワークの接続状態が非アクティブからアクティブに変化したのでSocketの再接続処理を行う
-                mSocketWithAccountProvider.all().filterNot { socket ->
-                    socket.state() == Socket.State.Connected
-                }.forEach { socket ->
-                    mSocketConnectionQueue.connect(socket)
+            mSocketWithAccountProvider.all().forEach { socket ->
+                if(it) {
+                    socket.onNetworkActive()
+                }else{
+                    socket.onNetworkInActive()
                 }
             }
+
         }.catch { e ->
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
@@ -732,23 +716,7 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    /**
-     * Socketの通信状態をhandleする。
-     */
-    private suspend fun handleSocketStateEvent(account: Account,  state: Socket.State) {
-        if(state is Socket.State.Failure
-            && mIsActiveNetwork
-            && !(mNoteCaptureAPIWithAccountProvider.get(account).isEmpty()
-                    && mChannelAPIWithAccountProvider.get(account).isEmpty())
-        ) {
-            logger.debug("ネットワークアクティブ、WebSocket未接続なので再接続を試みる")
-            runCatching {
-                mSocketConnectionQueue.connect(account, false)
-            }.onFailure {
-                logger.error("接続試行中にエラー発生", e = it)
-            }
-        }
-    }
+
 
 
     override fun getCurrentInstanceMeta(): Meta?{
@@ -844,14 +812,6 @@ class MiApplication : Application(), MiCore {
         return _taskExecutor
     }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    fun MiCore.connectChannel(account: Account, channelType: ChannelAPI.Type): Flow<ChannelBody> {
-        return suspend {
-            getChannelAPI(account)
-        }.asFlow().flatMapLatest {
-            it.connect(channelType)
-        }
-    }
+
 
 }

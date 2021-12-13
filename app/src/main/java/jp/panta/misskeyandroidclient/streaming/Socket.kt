@@ -18,6 +18,8 @@ interface Socket {
          */
         object Connecting: State()
 
+        object Reconnecting : State()
+
         data class Closing(
             val code: Int,
             val reason: String
@@ -65,6 +67,9 @@ interface Socket {
      * @return Queueに追加された場合はtrueそうでない場合はfalseが返されます。
      */
     fun send(msg: String): Boolean
+
+    fun onNetworkActive()
+    fun onNetworkInActive()
 
 
     fun addStateEventListener(listener: SocketStateEventListener)
