@@ -72,22 +72,20 @@ internal class PollingJob(
             (0 until count).asSequence().asFlow().onEach {
                 delay(interval)
             }.collect {
-                scope.launch {
-                    val ping = createPingRequest()
-                    if(!socket.send(json.encodeToString(ping))) {
-                        Log.d("PollingJob", "sendしたらfalse帰ってきた")
-                    }
-                    try {
-                        withTimeout(timeout) {
-                            pongs.first {
-                                it.id == ping.body.id
-                            }
+                val ping = createPingRequest()
+                if(!socket.send(json.encodeToString(ping))) {
+                    Log.d("PollingJob", "sendしたらfalse帰ってきた")
+                }
+                try {
+                    withTimeout(timeout) {
+                        pongs.first {
+                            it.id == ping.body.id
                         }
-                        Log.d("PollingJob", "polling成功")
-                    } catch(e: TimeoutCancellationException) {
-                        Log.d("PollingJob", "polling失敗")
-                        socket.reconnect()
                     }
+                    Log.d("PollingJob", "polling成功")
+                } catch(e: TimeoutCancellationException) {
+                    Log.d("PollingJob", "polling失敗")
+                    socket.reconnect()
                 }
             }
         }
