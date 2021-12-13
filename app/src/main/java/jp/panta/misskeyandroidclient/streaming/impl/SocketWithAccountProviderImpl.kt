@@ -18,8 +18,7 @@ class SocketWithAccountProviderImpl(
     val encryption: Encryption,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
-    val instanceCreatedListener: (account: Account, socket: Socket)-> Unit,
-    val beforeConnectListener:(account: Account, socket: Socket)-> Boolean,
+    private val instanceCreatedListener: (account: Account, socket: Socket)-> Unit,
     val okHttpClient: OkHttpClient = OkHttpClient()
 ) : ISocketWithAccountProvider{
 
@@ -58,9 +57,6 @@ class SocketWithAccountProviderImpl(
             socket = SocketImpl(
                 url = uri,
                 okHttpClient,
-                {
-                    beforeConnectListener.invoke(account, it)
-                },
                 loggerFactory,
             )
             accountIdWithSocket[account.accountId] = socket

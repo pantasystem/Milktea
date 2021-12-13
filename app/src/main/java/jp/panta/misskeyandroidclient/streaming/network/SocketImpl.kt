@@ -2,16 +2,20 @@ package jp.panta.misskeyandroidclient.streaming.network
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.streaming.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.*
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class SocketImpl(
     val url: String,
     val okHttpClient: OkHttpClient = OkHttpClient(),
-    val onBeforeConnectListener: BeforeConnectListener,
     loggerFactory: Logger.Factory,
 ) : Socket, WebSocketListener() {
     val logger = loggerFactory.create("SocketImpl")
@@ -19,6 +23,7 @@ class SocketImpl(
 
     private var pollingJob: PollingJob = PollingJob(this)
 
+    private val lock = Mutex()
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -28,7 +33,7 @@ class SocketImpl(
     private var mState: Socket.State = Socket.State.NeverConnected
         set(value) {
             field = value
-            logger.debug("SocketImpl状態変化: ${value.javaClass}, $value")
+            logger.debug("SocketImpl状態変化: ${value.javaClass.simpleName}, $value}")
             stateListeners.forEach {
                 it.onStateChanged(value)
             }
@@ -38,6 +43,7 @@ class SocketImpl(
     private var stateListeners = setOf<SocketStateEventListener>()
 
     private var messageListeners = setOf<SocketMessageEventListener>()
+    private var isNetworkActive = true
 
 
 
@@ -76,13 +82,13 @@ class SocketImpl(
     }
 
     override fun connect(): Boolean {
-        synchronized(this){
-            if(mWebSocket != null && onBeforeConnectListener.onBeforeConnect(this)){
+        return lock.blockingWithLockWithCheckTimeout {
+            if(mWebSocket != null && isNetworkActive){
                 logger.debug("接続済みのためキャンセル")
-                return false
+                return@blockingWithLockWithCheckTimeout false
             }
             if(!(mState is Socket.State.NeverConnected || mState is Socket.State.Failure || mState is Socket.State.Closed)) {
-                return false
+                return@blockingWithLockWithCheckTimeout false
             }
             mState = Socket.State.Connecting
             val request = Request.Builder()
@@ -90,19 +96,19 @@ class SocketImpl(
                 .build()
 
             mWebSocket = okHttpClient.newWebSocket(request, this)
-            return mWebSocket != null
+            return@blockingWithLockWithCheckTimeout mWebSocket != null
         }
 
     }
 
     override fun reconnect() {
         val ws = mWebSocket
-        synchronized(this) {
+        lock.blockingWithLockWithCheckTimeout {
             mWebSocket = null
         }
+        mState = Socket.State.Reconnecting
         ws?.cancel()
         pollingJob.cancel()
-        mState = Socket.State.Closed(code = 1001, reason = "force close")
         this.connect()
 
     }
@@ -137,15 +143,15 @@ class SocketImpl(
     }
 
     override fun disconnect(): Boolean {
-        synchronized(this){
+        return lock.blockingWithLockWithCheckTimeout  {
             if(mWebSocket == null){
-                return false
+                return@blockingWithLockWithCheckTimeout false
             }
             pollingJob.cancel()
 
             val result = mWebSocket?.close(1001, "finish")?: false
             mWebSocket = null
-            return result
+            return@blockingWithLockWithCheckTimeout result
         }
     }
 
@@ -168,7 +174,7 @@ class SocketImpl(
         super.onClosed(webSocket, code, reason)
         logger.debug("WebSocketをClose: $code")
 
-        synchronized(this){
+        lock.blockingWithLockWithCheckTimeout{
             mState = Socket.State.Closed(code, reason)
             pollingJob.cancel()
             mWebSocket = null
@@ -179,7 +185,7 @@ class SocketImpl(
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosing(webSocket, code, reason)
 
-        synchronized(this){
+        lock.blockingWithLockWithCheckTimeout {
             pollingJob.cancel()
             mState = Socket.State.Closing(code, reason)
         }
@@ -189,13 +195,22 @@ class SocketImpl(
         super.onFailure(webSocket, t, response)
         logger.error("onFailure, res=$response", e = t)
 
-        synchronized(this) {
+
+        val state = mState
+        lock.blockingWithLockWithCheckTimeout {
             pollingJob.cancel()
+
+            mWebSocket = null
             mState = Socket.State.Failure(
                 t, response
             )
-            mWebSocket = null
         }
+
+        // NOTE: 再接続以外の時はレートリミットを入れる
+        if(state !is Socket.State.Reconnecting) {
+            Thread.sleep(2000)
+        }
+        connect()
     }
 
 
@@ -239,7 +254,7 @@ class SocketImpl(
 
 
         logger.debug("onOpen webSocket 接続")
-        synchronized(this){
+        lock.blockingWithLockWithCheckTimeout {
             pollingJob.cancel()
             pollingJob = PollingJob(this).also {
                 it.ping(4000, 900, 12000)
@@ -248,5 +263,21 @@ class SocketImpl(
         }
     }
 
+    override fun onNetworkActive() {
+        isNetworkActive = true
+        connect()
+    }
 
+    override fun onNetworkInActive() {
+        isNetworkActive = false
+    }
+
+}
+
+fun<T> Mutex.blockingWithLockWithCheckTimeout(owner: Any? = null, action: () -> T): T {
+    return runBlocking {
+        withTimeout(1000) {
+            withLock(owner = owner, action = action)
+        }
+    }
 }

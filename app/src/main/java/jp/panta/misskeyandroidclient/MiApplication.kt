@@ -132,7 +132,6 @@ class MiApplication : Application(), MiCore {
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
-    private lateinit var mSocketConnectionQueue: SocketConnectionQueue
 
     private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
@@ -273,20 +272,11 @@ class MiApplication : Application(), MiCore {
             getEncryption(),
             mAccountRepository,
             loggerFactory,
-            { account, socket ->
+            { _, socket ->
                 socket.connect()
-
-                socket.addStateEventListener { e ->
-                    applicationScope.launch {
-                        handleSocketStateEvent(account, e)
-                    }
-                }
             },
-            { _, _ ->
-                mIsActiveNetwork
-            }
+
         )
-        mSocketConnectionQueue = SocketConnectionQueue(mSocketWithAccountProvider, applicationScope, Dispatchers.IO, loggerFactory)
 
         mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(mSocketWithAccountProvider, loggerFactory)
 
@@ -378,12 +368,9 @@ class MiApplication : Application(), MiCore {
             logger.debug("接続状態が変化:${if(it) "接続" else "未接続"}")
             mIsActiveNetwork = it
             if(it) {
-                // NOTE: ネットワークの接続状態が非アクティブからアクティブに変化したのでSocketの再接続処理を行う
-                mSocketWithAccountProvider.all().filterNot { socket ->
-                    socket.state() == Socket.State.Connected
-                }.forEach { socket ->
-                    mSocketConnectionQueue.connect(socket)
-                }
+
+            }else{
+
             }
         }.catch { e ->
             logger.error("致命的なエラー", e)
@@ -732,23 +719,7 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    /**
-     * Socketの通信状態をhandleする。
-     */
-    private suspend fun handleSocketStateEvent(account: Account,  state: Socket.State) {
-        if(state is Socket.State.Failure
-            && mIsActiveNetwork
-            && !(mNoteCaptureAPIWithAccountProvider.get(account).isEmpty()
-                    && mChannelAPIWithAccountProvider.get(account).isEmpty())
-        ) {
-            logger.debug("ネットワークアクティブ、WebSocket未接続なので再接続を試みる")
-            runCatching {
-                mSocketConnectionQueue.connect(account, false)
-            }.onFailure {
-                logger.error("接続試行中にエラー発生", e = it)
-            }
-        }
-    }
+
 
 
     override fun getCurrentInstanceMeta(): Meta?{
@@ -844,14 +815,6 @@ class MiApplication : Application(), MiCore {
         return _taskExecutor
     }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    fun MiCore.connectChannel(account: Account, channelType: ChannelAPI.Type): Flow<ChannelBody> {
-        return suspend {
-            getChannelAPI(account)
-        }.asFlow().flatMapLatest {
-            it.connect(channelType)
-        }
-    }
+
 
 }
