@@ -55,8 +55,8 @@ data class PongRes(
 
 
 internal class PollingJob(
-    val socket: Socket,
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val socket: Socket,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     private val json = Json {
         ignoreUnknownKeys = true
@@ -67,7 +67,7 @@ internal class PollingJob(
 
 
     val isPolling: Boolean get() = job.isActive
-    fun ping(interval: Long, count: Long, timeout: Long) {
+    fun startPolling(interval: Long, count: Long, timeout: Long) {
         scope.launch {
             (0 until count).asSequence().asFlow().onEach {
                 delay(interval)

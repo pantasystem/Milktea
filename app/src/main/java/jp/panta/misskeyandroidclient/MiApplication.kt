@@ -182,8 +182,7 @@ class MiApplication : Application(), MiCore {
     override var loggerFactory: Logger.Factory = AndroidDefaultLogger.Factory
     private val logger = loggerFactory.create("MiApplication")
 
-    private lateinit var mActiveNetworkState: Flow<Boolean>
-    private var mIsActiveNetwork: Boolean = false
+    private lateinit var _networkState: Flow<Boolean>
 
     private val _taskExecutor: TaskExecutor by lazy {
         AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
@@ -220,7 +219,7 @@ class MiApplication : Application(), MiCore {
             .setReplaceAll(true)
         EmojiCompat.init(config)
 
-        mActiveNetworkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
+        _networkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
@@ -272,10 +271,6 @@ class MiApplication : Application(), MiCore {
             getEncryption(),
             mAccountRepository,
             loggerFactory,
-            { _, socket ->
-                socket.connect()
-            },
-
         )
 
         mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(mSocketWithAccountProvider, loggerFactory)
@@ -364,14 +359,16 @@ class MiApplication : Application(), MiCore {
         }
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
 
-        mActiveNetworkState.distinctUntilChanged().onEach {
+        _networkState.distinctUntilChanged().onEach {
             logger.debug("接続状態が変化:${if(it) "接続" else "未接続"}")
-            mIsActiveNetwork = it
-            if(it) {
-
-            }else{
-
+            mSocketWithAccountProvider.all().forEach { socket ->
+                if(it) {
+                    socket.onNetworkActive()
+                }else{
+                    socket.onNetworkInActive()
+                }
             }
+
         }.catch { e ->
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)

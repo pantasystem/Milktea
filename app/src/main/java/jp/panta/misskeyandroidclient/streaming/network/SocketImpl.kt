@@ -9,7 +9,6 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.*
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -83,10 +82,15 @@ class SocketImpl(
 
     override fun connect(): Boolean {
         return lock.blockingWithLockWithCheckTimeout {
-            if(mWebSocket != null && isNetworkActive){
+            if(mWebSocket != null) {
                 logger.debug("接続済みのためキャンセル")
                 return@blockingWithLockWithCheckTimeout false
             }
+            if(!isNetworkActive) {
+                logger.debug("ネットワークがアクティブではないのでキャンセル")
+                return@blockingWithLockWithCheckTimeout false
+            }
+
             if(!(mState is Socket.State.NeverConnected || mState is Socket.State.Failure || mState is Socket.State.Closed)) {
                 return@blockingWithLockWithCheckTimeout false
             }
@@ -257,7 +261,7 @@ class SocketImpl(
         lock.blockingWithLockWithCheckTimeout {
             pollingJob.cancel()
             pollingJob = PollingJob(this).also {
-                it.ping(4000, 900, 12000)
+                it.startPolling(4000, 900, 12000)
             }
             mState = Socket.State.Connected
         }
