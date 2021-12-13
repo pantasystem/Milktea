@@ -48,5 +48,16 @@ class TestSocketImpl : Socket {
     }
 
 
+    override fun onNetworkActive() {
+        throw Exception("未実装")
+    }
+
+    override fun onNetworkInActive() {
+        throw Exception("未実装")
+    }
+
+    override fun reconnect() {
+        throw Exception("未実装")
+    }
 
 }

@@ -17,12 +17,13 @@ class WebSocketStateMessageScope(val context: Context) {
     }
 
     fun Socket.State.getStateMessage(): String {
-        return when(this){
+        return  when(this){
             is Socket.State.Connected -> context.getString(R.string.connected)
             is Socket.State.Connecting -> context.getString(R.string.connecting)
             is Socket.State.Closing -> context.getString(R.string.closing)
             is Socket.State.Failure -> context.getString(R.string.websocket_error) + this.throwable
             is Socket.State.Closed -> context.getString(R.string.closed)
+            is Socket.State.Reconnecting -> context.getString(R.string.connecting)
             is Socket.State.NeverConnected -> ""
         }
     }
