@@ -31,6 +31,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
             val target = notesViewModel.reNoteTarget.event
             if(target?.isRenotedByMe == true){
                 binding.unRenoteBase.visibility = View.VISIBLE
+
             }else{
                 binding.unRenoteBase.visibility = View.GONE
             }

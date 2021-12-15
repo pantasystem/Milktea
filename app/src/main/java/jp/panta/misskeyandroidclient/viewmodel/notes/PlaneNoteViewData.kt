@@ -49,7 +49,7 @@ open class PlaneNoteViewData (
 
     val isMyNote = account.remoteId == toShowNote.user.id.id
 
-    val isRenotedByMe = note.note.hasContent() && note.user.id.id == account.remoteId
+    val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
     val statusMessage: String?
         get(){
