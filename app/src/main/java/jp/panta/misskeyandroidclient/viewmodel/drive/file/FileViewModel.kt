@@ -1,9 +1,11 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive.file
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.api.drive.DeleteFileDTO
+import jp.panta.misskeyandroidclient.api.drive.UpdateFileDTO
+import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.file.File
@@ -20,6 +22,7 @@ class FileViewModel(
     private val miCore: MiCore,
     private val driveStore: DriveStore,
 ) : ViewModel(){
+    val logger = miCore.loggerFactory.create("FileViewModel")
 
     private val filePropertiesPagingStore = miCore.filePropertyPagingStore({ currentAccountWatcher.getAccount()}, driveStore.state.value.path.path.lastOrNull()?.id)
     private val _error = MutableStateFlow<Throwable?>(null)
@@ -38,12 +41,10 @@ class FileViewModel(
     @ExperimentalCoroutinesApi
     private val account = currentAccountWatcher.account.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
-    val state = filePropertiesPagingStore.state.map { state ->
-        state.convert {
-            runBlocking {
-                it.map { id ->
-                    miCore.getFilePropertyDataSource().find(id)
-                }
+    val state = miCore.getFilePropertyDataSource().state.flatMapLatest { state ->
+        filePropertiesPagingStore.state.map { pageable ->
+            pageable.convert {
+                state.findIn(it)
             }
         }
     }.combine(driveStore.state) { p, driveState ->
@@ -131,10 +132,51 @@ class FileViewModel(
                     miCore.getFilePropertyDataSource().add(it.toFileProperty(account))
                 }
             }catch(e: Exception){
-                Log.d("DriveViewModel", "ファイルアップロードに失敗した")
+                logger.info("ファイルアップロードに失敗した")
             }
         }
     }
+
+    fun toggleNsfw(id: FileProperty.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val account = currentAccountWatcher.getAccount()
+                val api = miCore.getMisskeyAPI(account)
+                val fileProperty = miCore.getFilePropertyDataSource().find(id)
+                val result = api.updateFile(UpdateFileDTO(
+                    account.getI(miCore.getEncryption()),
+                    fileId = id.fileId,
+                    isSensitive = !fileProperty.isSensitive,
+                    name = fileProperty.name,
+                    folderId = fileProperty.folderId,
+                    comment = fileProperty.comment
+                )).throwIfHasError()
+                miCore.getFilePropertyDataSource().add(result.body()!!.toFileProperty(account))
+
+            }catch(e: Exception) {
+                logger.info("nsfwの更新に失敗しました", e = e)
+            }
+        }
+    }
+
+
+
+    fun deleteFile(id: FileProperty.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val account = currentAccountWatcher.getAccount()
+                val api = miCore.getMisskeyAPI(account)
+                val fileProperty = miCore.getFilePropertyDataSource().find(id)
+                api.deleteFile(DeleteFileDTO(i = account.getI(miCore.getEncryption()), fileId = id.fileId))
+                    .throwIfHasError()
+                miCore.getFilePropertyDataSource().remove(fileProperty)
+
+            }catch(e: Exception) {
+                logger.info("ファイルの削除に失敗しました", e = e)
+            }
+        }
+    }
+
 
 
 

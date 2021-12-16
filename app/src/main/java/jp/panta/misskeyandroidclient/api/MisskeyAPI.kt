@@ -182,6 +182,12 @@ interface MisskeyAPI {
     @POST("api/drive/files")
     suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FilePropertyDTO>>
 
+    @POST("api/drive/files/update")
+    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO>
+
+    @POST("api/drive/files/delete")
+    suspend fun deleteFile(@Body req: DeleteFileDTO): Response<Unit>
+
     @POST("api/drive/folders")
     suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
 

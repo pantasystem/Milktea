@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
@@ -54,6 +55,7 @@ class DriveActivity : AppCompatActivity() {
 
     @ExperimentalPagerApi
     @ExperimentalCoroutinesApi
+    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

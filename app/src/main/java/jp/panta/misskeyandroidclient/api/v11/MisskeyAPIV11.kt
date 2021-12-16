@@ -109,4 +109,10 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun swRegister(subscription: Subscription): Response<SubscriptionState> = misskeyAPI.swRegister(subscription)
     override suspend fun translate(req: Translate): Response<TranslationResult> = misskeyAPI.translate(req)
     override suspend fun report(req: ReportDTO): Response<Unit> = misskeyAPI.report(req)
+    override suspend fun acceptFollowRequest(followRequest: AcceptFollowRequest): Response<Unit> = misskeyAPI.acceptFollowRequest(followRequest)
+    override suspend fun cancelFollowRequest(req: CancelFollow): Response<UserDTO> = misskeyAPI.cancelFollowRequest(req)
+    override suspend fun renotes(req: FindRenotes): Response<List<NoteDTO>> = misskeyAPI.renotes(req)
+    override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskeyAPI.updateFile(updateFileRequest)
+    override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskeyAPI.deleteFile(req)
+
 }
