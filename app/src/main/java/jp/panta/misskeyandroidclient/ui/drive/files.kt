@@ -60,14 +60,11 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             },
             state = listViewState,
             onToggleNsfwMenuItemClicked = {
-
+                fileViewModel.toggleNsfw(it)
             },
             onDeleteMenuItemClicked = {
-
+                fileViewModel.deleteFile(it)
             },
-            onUpdateFilename = { id, text ->
-
-            }
         )
     }
 }
@@ -79,7 +76,6 @@ fun FileViewDataListView(
     onCheckedChanged: (FileProperty.Id, Boolean) -> Unit,
     onDeleteMenuItemClicked: (FileProperty.Id) -> Unit,
     onToggleNsfwMenuItemClicked: (FileProperty.Id) -> Unit,
-    onUpdateFilename: (FileProperty.Id, String) -> Unit,
     state: LazyListState = rememberLazyListState(),
 ) {
     LazyColumn(
@@ -100,9 +96,6 @@ fun FileViewDataListView(
                 },
                 onDeleteMenuItemClicked = { onDeleteMenuItemClicked(item.fileProperty.id) },
                 onToggleNsfwMenuItemClicked = { onToggleNsfwMenuItemClicked(item.fileProperty.id) },
-                onUpdateFileName = {
-                    onUpdateFilename(item.fileProperty.id, it)
-                }
             )
         }
     }
@@ -116,7 +109,6 @@ fun FilePropertySimpleCard(
     onCheckedChanged: (Boolean)->Unit,
     onDeleteMenuItemClicked: () -> Unit,
     onToggleNsfwMenuItemClicked: () -> Unit,
-    onUpdateFileName: (String) -> Unit,
 ) {
     var actionMenuExpandedState by remember {
         mutableStateOf(false)
@@ -126,9 +118,6 @@ fun FilePropertySimpleCard(
         mutableStateOf<FileProperty.Id?>(null)
     }
 
-    var changeFileNameTargetId by remember {
-        mutableStateOf<FileProperty.Id?>(null)
-    }
 
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -199,10 +188,6 @@ fun FilePropertySimpleCard(
                         actionMenuExpandedState = false
                     },
                     onNsfwMenuItemClicked = onToggleNsfwMenuItemClicked,
-                    onUpdateNameMenuItemClicked = {
-                        actionMenuExpandedState = false
-                        changeFileNameTargetId = file.fileProperty.id
-                    },
                     onDeleteMenuItemClicked = {
                         actionMenuExpandedState = false
                         confirmDeleteTargetId = file.fileProperty.id
@@ -227,17 +212,6 @@ fun FilePropertySimpleCard(
             }
         )
     }
-    if(changeFileNameTargetId != null) {
-        ChangeFilenameDialog(
-            file = file.fileProperty,
-            onSave = { /*TODO*/ },
-            onCancel = {
-                changeFileNameTargetId = null
-            }
-        )
-    }
+
 }
 
-@Composable
-fun ConfirmDeleteFileDialog(openDialog: Boolean) {
-}

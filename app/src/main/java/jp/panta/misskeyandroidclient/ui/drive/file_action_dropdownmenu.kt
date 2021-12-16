@@ -17,7 +17,6 @@ fun FileActionDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onNsfwMenuItemClicked: () -> Unit,
-    onUpdateNameMenuItemClicked: ()-> Unit,
     onDeleteMenuItemClicked: ()-> Unit,
 ) {
 
@@ -49,7 +48,7 @@ fun FileActionDropdownMenu(
                 Text(text = "nsfwにする")
             }
         }
-        DropdownMenuItem(
+        /*DropdownMenuItem(
             onClick = onUpdateNameMenuItemClicked
         ) {
             Icon(
@@ -58,7 +57,7 @@ fun FileActionDropdownMenu(
                 contentDescription = stringResource(R.string.rename)
             )
             Text(text = stringResource(R.string.rename))
-        }
+        }*/
         Divider()
         DropdownMenuItem(
             onClick = onDeleteMenuItemClicked,
