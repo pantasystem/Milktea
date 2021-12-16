@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive.file
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -23,6 +22,7 @@ class FileViewModel(
     private val miCore: MiCore,
     private val driveStore: DriveStore,
 ) : ViewModel(){
+    val logger = miCore.loggerFactory.create("FileViewModel")
 
     private val filePropertiesPagingStore = miCore.filePropertyPagingStore({ currentAccountWatcher.getAccount()}, driveStore.state.value.path.path.lastOrNull()?.id)
     private val _error = MutableStateFlow<Throwable?>(null)
@@ -132,7 +132,7 @@ class FileViewModel(
                     miCore.getFilePropertyDataSource().add(it.toFileProperty(account))
                 }
             }catch(e: Exception){
-                Log.d("DriveViewModel", "ファイルアップロードに失敗した")
+                logger.info("ファイルアップロードに失敗した")
             }
         }
     }
@@ -154,32 +154,12 @@ class FileViewModel(
                 miCore.getFilePropertyDataSource().add(result.body()!!.toFileProperty(account))
 
             }catch(e: Exception) {
-
+                logger.info("nsfwの更新に失敗しました", e = e)
             }
         }
     }
 
-    fun changeFileName(id: FileProperty.Id, filename: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val account = currentAccountWatcher.getAccount()
-                val api = miCore.getMisskeyAPI(account)
-                val fileProperty = miCore.getFilePropertyDataSource().find(id)
-                val result = api.updateFile(UpdateFileDTO(
-                    account.getI(miCore.getEncryption()),
-                    fileId = id.fileId,
-                    isSensitive = !fileProperty.isSensitive,
-                    name = filename,
-                    folderId = fileProperty.folderId,
-                    comment = fileProperty.comment
-                )).throwIfHasError()
-                miCore.getFilePropertyDataSource().add(result.body()!!.toFileProperty(account))
 
-            }catch(e: Exception) {
-
-            }
-        }
-    }
 
     fun deleteFile(id: FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -192,7 +172,7 @@ class FileViewModel(
                 miCore.getFilePropertyDataSource().remove(fileProperty)
 
             }catch(e: Exception) {
-
+                logger.info("ファイルの削除に失敗しました", e = e)
             }
         }
     }
