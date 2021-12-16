@@ -48,16 +48,7 @@ fun FileActionDropdownMenu(
                 Text(text = "nsfwにする")
             }
         }
-        /*DropdownMenuItem(
-            onClick = onUpdateNameMenuItemClicked
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_edit_black_24dp),
-                modifier = Modifier.size(24.dp),
-                contentDescription = stringResource(R.string.rename)
-            )
-            Text(text = stringResource(R.string.rename))
-        }*/
+
         Divider()
         DropdownMenuItem(
             onClick = onDeleteMenuItemClicked,

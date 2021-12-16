@@ -1,20 +1,22 @@
 package jp.panta.misskeyandroidclient.ui.drive
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import com.google.android.material.chip.Chip
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 
@@ -62,21 +64,36 @@ fun FilePropertySimpleCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = rememberImagePainter(
-                        file.fileProperty.thumbnailUrl
-                            ?: file.fileProperty.url
-                    ),
-                    contentDescription = null,
+                Box(
+                    contentAlignment = Alignment.TopEnd,
                     modifier = Modifier
                         .height(64.dp)
                         .width(64.dp)
-                        .padding(end = 4.dp),
-                    contentScale = ContentScale.Crop
-                )
+                        .padding(end = 4.dp)
+                ){
+                    Image(
+                        painter = rememberImagePainter(
+                            file.fileProperty.thumbnailUrl
+                                ?: file.fileProperty.url
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(64.dp)
+                            .width(64.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    if(file.fileProperty.isSensitive) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_baseline_hide_image_24),
+                            contentDescription = stringResource(R.string.sensitive),
+                            modifier = Modifier.background(MaterialTheme.colors.secondary)
+                        )
+                    }
+                }
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
+
                     Text(
                         file.fileProperty.name,
                         fontSize = 20.sp,
