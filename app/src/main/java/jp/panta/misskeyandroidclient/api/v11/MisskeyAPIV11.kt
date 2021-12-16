@@ -113,4 +113,6 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun cancelFollowRequest(req: CancelFollow): Response<UserDTO> = misskeyAPI.cancelFollowRequest(req)
     override suspend fun renotes(req: FindRenotes): Response<List<NoteDTO>> = misskeyAPI.renotes(req)
     override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskeyAPI.updateFile(updateFileRequest)
+    override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskeyAPI.deleteFile(req)
+
 }

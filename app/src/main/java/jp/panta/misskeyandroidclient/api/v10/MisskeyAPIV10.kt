@@ -162,4 +162,5 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
     override suspend fun translate(req: Translate): Response<TranslationResult> = misskey.translate(req)
     override suspend fun report(req: ReportDTO): Response<Unit> = misskey.report(req)
     override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskey.updateFile(updateFileRequest)
+    override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskey.deleteFile(req)
 }
