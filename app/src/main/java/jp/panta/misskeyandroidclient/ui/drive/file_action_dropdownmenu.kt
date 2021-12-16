@@ -33,19 +33,19 @@ fun FileActionDropdownMenu(
                 Icon(
                     painter = painterResource(
                         id = R.drawable.ic_baseline_image_24),
-                    contentDescription = "nsfwを解除",
+                    contentDescription = stringResource(R.string.undo_nsfw),
                     modifier = Modifier.size(24.dp)
 
                 )
-                Text(text = "nsfwを解除")
+                Text(stringResource(R.string.undo_nsfw))
             }else{
                 Icon(
                     painter = painterResource(
                         id = R.drawable.ic_baseline_hide_image_24),
-                    contentDescription = "nsfwにする",
+                    contentDescription = stringResource(R.string.mark_as_nsfw),
                     modifier = Modifier.size(24.dp)
                 )
-                Text(text = "nsfwにする")
+                Text(stringResource(R.string.mark_as_nsfw))
             }
         }
 
@@ -75,19 +75,19 @@ fun ConfirmDeleteFilePropertyDialog(
         onDismissRequest = onDismissRequest,
 
         title = {
-            Text("ファイル削除の確認")
+            Text(stringResource(R.string.file_deletion_confirmation))
         },
         confirmButton = {
             TextButton(onClick = onConfirmed) {
-                Text("削除")
+                Text(stringResource(R.string.delete))
             }
         },
         text = {
-            Text("${filename}を削除しますか？")
+            Text(stringResource(R.string.do_u_want_2_delete_s, filename))
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text("やめる")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

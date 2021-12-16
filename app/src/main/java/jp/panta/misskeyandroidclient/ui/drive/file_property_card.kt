@@ -122,7 +122,10 @@ fun FilePropertySimpleCard(
                     onDismissRequest = {
                         actionMenuExpandedState = false
                     },
-                    onNsfwMenuItemClicked = onToggleNsfwMenuItemClicked,
+                    onNsfwMenuItemClicked = {
+                        actionMenuExpandedState = false
+                        onToggleNsfwMenuItemClicked()
+                    },
                     onDeleteMenuItemClicked = {
                         actionMenuExpandedState = false
                         confirmDeleteTargetId = file.fileProperty.id
