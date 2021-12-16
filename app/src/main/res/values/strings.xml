@@ -365,5 +365,10 @@
     <string name="send">Send</string>
     <string name="successful_report">Successful report</string>
     <string name="report_failed">Report Failed</string>
+    <string name="mark_as_nsfw">Mark as NSFW</string>
+    <string name="undo_nsfw">Undo NSFW</string>
+    <string name="file_deletion_confirmation">File deletion confirmation</string>
+    <string name="cancel">Cancel</string>
+    <string name="do_u_want_2_delete_s">Do you want to delete %s?</string>
 
 </resources>
