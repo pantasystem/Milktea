@@ -1,15 +1,15 @@
 package jp.panta.misskeyandroidclient.ui.drive
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asLiveData
+import coil.compose.rememberImagePainter
 import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -34,6 +35,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 @ExperimentalCoroutinesApi
+@ExperimentalMaterialApi
 @Composable
 fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveViewModel) {
     val filesState: PageableState<List<FileViewData>> by fileViewModel.state.asLiveData().observeAsState(
@@ -64,6 +66,7 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
         )
     }
 }
+@ExperimentalMaterialApi
 @Composable
 fun FileViewDataListView(
     list: List<FileViewData>,
@@ -88,11 +91,21 @@ fun FileViewDataListView(
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun FilePropertySimpleCard(file: FileViewData, isSelectMode: Boolean = false, onCheckedChanged: (Boolean)->Unit ) {
     Card(
         shape = RoundedCornerShape(0.dp),
-        modifier = Modifier.padding(0.5.dp)
+        modifier = Modifier.padding(0.5.dp),
+        backgroundColor = if(file.isSelected) {
+            MaterialTheme.colors.primary
+        } else {
+            MaterialTheme.colors.surface
+        },
+        onClick = {
+            onCheckedChanged.invoke(!file.isSelected)
+
+        }
     ) {
         Row(
             modifier = Modifier
@@ -101,8 +114,9 @@ fun FilePropertySimpleCard(file: FileViewData, isSelectMode: Boolean = false, on
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = rememberGlidePainter(
-                    request = file.fileProperty.url,
+                painter = rememberImagePainter(
+                    file.fileProperty.thumbnailUrl
+                        ?: file.fileProperty.url
                 ),
                 contentDescription = null,
                 modifier = Modifier
@@ -119,7 +133,6 @@ fun FilePropertySimpleCard(file: FileViewData, isSelectMode: Boolean = false, on
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-
                 )
                 Row {
                     Text(
@@ -131,9 +144,7 @@ fun FilePropertySimpleCard(file: FileViewData, isSelectMode: Boolean = false, on
                     )
                 }
             }
-            if(isSelectMode) {
-                Checkbox(checked = file.isSelected, enabled = file.isEnabled, onCheckedChange = onCheckedChanged)
-            }
+
 
         }
     }
