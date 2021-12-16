@@ -76,7 +76,7 @@ class InMemoryFilePropertyDataSource : FilePropertyDataSource{
     override suspend fun remove(fileProperty: FileProperty): Boolean {
         val result: Boolean
         lock.withLock {
-            map.toMutableMap().also {
+            map = map.toMutableMap().also {
                 result = it.remove(fileProperty.id) != null
             }
         }
