@@ -362,5 +362,10 @@
     <string name="send">发送</string>
     <string name="successful_report">成功报告</string>
     <string name="report_failed">报告失败</string>
+    <string name="mark_as_nsfw">浏览时要小心</string>
+    <string name="undo_nsfw">浏览注意力取消</string>
+    <string name="file_deletion_confirmation">删除后的确认</string>
+    <string name="cancel">取消</string>
+    <string name="do_u_want_2_delete_s">你想删除%s吗？</string>
 
 </resources>

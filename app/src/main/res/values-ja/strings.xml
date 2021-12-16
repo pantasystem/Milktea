@@ -367,5 +367,10 @@
 
     <string name="successful_report">報告成功</string>
     <string name="report_failed">報告失敗</string>
+    <string name="mark_as_nsfw">閲覧注意にする</string>
+    <string name="undo_nsfw">閲覧注意解除</string>
+    <string name="file_deletion_confirmation">ファイル削除の確認</string>
+    <string name="cancel">やめる</string>
+    <string name="do_u_want_2_delete_s">%sを削除しますか？</string>
 
 </resources>
