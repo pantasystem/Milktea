@@ -11,6 +11,7 @@ sealed interface AppFile {
         val type: String,
         val thumbnailUrl: String?,
         val isSensitive: Boolean,
+        val folderId: String?,
         val id: Long = 0,
         ) : AppFile
     data class Remote(
