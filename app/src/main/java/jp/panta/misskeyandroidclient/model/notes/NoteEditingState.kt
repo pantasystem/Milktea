@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
@@ -16,7 +17,7 @@ data class NoteEditingState(
     val cw: String? = null,
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
-    val files: List<File> = emptyList(),
+    val files: List<AppFile> = emptyList(),
     val poll: PollEditingState? = null,
     val viaMobile: Boolean = true,
     val draftNoteId: Long? = null,
@@ -56,7 +57,7 @@ data class NoteEditingState(
         )
     }
 
-    fun addFile(file: File) : NoteEditingState {
+    fun addFile(file: AppFile) : NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 add(file)
@@ -64,7 +65,7 @@ data class NoteEditingState(
         )
     }
 
-    fun removeFile(file: File) : NoteEditingState {
+    fun removeFile(file: AppFile) : NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 remove(file)
@@ -87,7 +88,7 @@ data class NoteEditingState(
         if(account == null) {
             throw IllegalArgumentException("現在の状態に未指定のAccountを指定することはできません")
         }
-        if(files.any { it.remoteFileId != null }) {
+        if(files.any { it is AppFile.Remote }) {
             throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
         }
         if(!(replyId == null || author.instanceDomain == account.instanceDomain)) {
@@ -256,7 +257,21 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
         renoteId = this.renoteId?.let {
             Note.Id(accountId = accountId, noteId = it)
         },
-        files = this.files ?: emptyList()
+        files = this.files?.map {
+            if(it.isRemoteFile) {
+                AppFile.Remote(
+                    it.remoteFileId!!
+                )
+            }else{
+                AppFile.Local(
+                    name = it.name,
+                    isSensitive = it.isSensitive ?: false,
+                    path = it.path ?: "",
+                    thumbnailUrl = it.thumbnailUrl,
+                    type = it.type ?: ""
+                )
+            }
+        } ?: emptyList()
     )
 }
 
