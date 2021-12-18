@@ -34,3 +34,32 @@ data class File(
         get() = remoteFileId != null
 }
 
+
+fun AppFile.toFile(): File {
+    return when(this) {
+        is AppFile.Remote -> {
+           File(
+               name = "remote file",
+               path = null,
+               type = null,
+               remoteFileId = id,
+               thumbnailUrl = null,
+               isSensitive = null,
+               folderId = null,
+               localFileId = null
+           )
+        }
+        is AppFile.Local -> {
+            File(
+                name = name,
+                path = path,
+                type = type,
+                remoteFileId = null,
+                thumbnailUrl = thumbnailUrl,
+                isSensitive = isSensitive,
+                folderId = folderId,
+                localFileId = id
+            )
+        }
+    }
+}
