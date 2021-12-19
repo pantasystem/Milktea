@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
@@ -21,15 +20,11 @@ import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.gallery.PickedImagePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
-import jp.panta.misskeyandroidclient.util.file.toFile
-import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.gallery.EditType
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel
 import kotlinx.coroutines.Dispatchers
