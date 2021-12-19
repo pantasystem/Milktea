@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.api.notes.CreateNote as CreateNoteDTO
@@ -17,34 +18,17 @@ import java.io.Serializable
 import java.util.*
 
 class PostNoteTask(
-    //connectionInstance: ConnectionInstance,
-    //connectionInformation: EncryptedConnectionInformation,
     val encryption: Encryption,
     val createNote: CreateNote,
     val account: Account,
     loggerFactory: Logger.Factory,
     val filePropertyDataSource: FilePropertyDataSource
-    //private val fileUploader: FileUploader
 ): Serializable{
 
 
 
     private val logger = loggerFactory.create("PostNoteTask")
     private var filesIds: List<String>? = null
-
-    /*private val i: String = account.getI(encryption)
-    private var visibleUserIds: List<String>? = null
-    var visibility: Visibility = Visibility.Public(true)
-    var files: List<File>? = null
-    var text: String? = null
-    var cw: String? = null
-    var viaMobile: Boolean? = null
-    var noExtractMentions: Boolean? = null
-    var noExtractHashtags: Boolean? = null
-    var noExtractEmojis: Boolean? = null
-    var replyId: String? = null
-    var renoteId: String? = null
-    var poll: CreatePoll? = null*/
 
 
     
@@ -85,12 +69,17 @@ class PostNoteTask(
             runCatching {
                 tmpFiles?.map {
                     async(Dispatchers.IO) {
-                        it.remoteFileId?.fileId ?: fileUploader.upload(it, true).also {
-                            filePropertyDataSource.add(it.toFileProperty(account))
-                        }.id
+                        when(it) {
+                            is AppFile.Remote -> it.id.fileId
+                            is AppFile.Local -> {
+                                val result = fileUploader.upload(it, true)
+                                filePropertyDataSource.add(result.toFileProperty(account))
+                                result.id
+                            }
+                        }
                     }
                 }?.awaitAll()
-            }.getOrNull()?.filterNotNull()
+            }.getOrNull()
 
         }
         return tmpFiles != null && tmpFiles.size == filesIds?.size

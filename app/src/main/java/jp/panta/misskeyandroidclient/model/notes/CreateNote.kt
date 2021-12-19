@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.ITask
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 
@@ -20,7 +21,7 @@ data class CreateNote(
     val noExtractMentions: Boolean? = null,
     val noExtractHashtags: Boolean? = null,
     val noExtractEmojis: Boolean? = null,
-    var files: List<File>? = null,
+    var files: List<AppFile>? = null,
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
     val poll: CreatePoll? = null,

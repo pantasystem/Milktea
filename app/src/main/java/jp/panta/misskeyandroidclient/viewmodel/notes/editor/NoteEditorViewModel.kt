@@ -5,7 +5,9 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
@@ -239,24 +241,47 @@ class NoteEditorViewModel(
 
     }
 
-    fun add(file: File){
-        val files = files.value.toArrayList()
+    fun toggleNsfw(appFile: AppFile) {
+        when(appFile) {
+            is AppFile.Local -> {
+                _state.value = state.value.copy(
+                    files = _state.value.files.map {
+                        if(appFile === appFile) {
+                            appFile.copy(
+                                isSensitive = !appFile.isSensitive
+                            )
+                        }else{
+                            appFile
+                        }
+                    }
+                )
+            }
+            is AppFile.Remote -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        miCore.getDriveFileRepository().toggleNsfw(appFile.id)
+                    }
+                }
+            }
+        }
+
+    }
+
+    fun add(file: AppFile){
+        val files = files.value?.toMutableList()
+            ?: mutableListOf()
         files.add(
             file
         )
         _state.value = _state.value.addFile(file)
     }
 
-    fun add(fp: FileProperty){
-        add(fp.toFile())
-    }
-
-
 
     private fun addAllFileProperty(fpList: List<FileProperty>){
-        val files = files.value.toArrayList()
+        val files = files.value?.toMutableList()
+            ?: mutableListOf()
         files.addAll(fpList.map{
-            it.toFile()
+            AppFile.Remote(it.id)
         })
         _state.value = _state.value.copy(
             files = files
@@ -273,10 +298,13 @@ class NoteEditorViewModel(
         }
     }
 
-    fun removeFileNoteEditorData(file: File){
+    fun removeFileNoteEditorData(file: AppFile){
         _state.value = _state.value.removeFile(file)
     }
 
+    fun toggleSensitive(file: AppFile) {
+
+    }
 
 
     fun fileTotal(): Int{
@@ -389,7 +417,9 @@ class NoteEditorViewModel(
             localOnly = visibility.value.isLocalOnly(),
             renoteId = _state.value.renoteId?.noteId,
             replyId = _state.value.replyId?.noteId,
-            files = files.value
+            files = files.value?.map {
+                it.toFile()
+            }
         ).apply{
             this.draftNoteId = draftNote.value?.draftNoteId
         }
