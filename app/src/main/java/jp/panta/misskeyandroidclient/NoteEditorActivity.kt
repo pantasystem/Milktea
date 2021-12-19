@@ -31,6 +31,7 @@ import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -53,7 +54,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 
-class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
+class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     companion object{
         private const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
@@ -191,11 +192,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
         noteEditorToolbar.viewModel = viewModel
         noteEditorToolbar.lifecycleOwner = this
 
-        val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
-        binding.imageListPreview.adapter = simpleImagePreviewAdapter
+        //val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
+        //binding.imageListPreview.adapter = simpleImagePreviewAdapter
 
         viewModel.files.observe(this) { list ->
-            simpleImagePreviewAdapter.submitList(list)
+            //simpleImagePreviewAdapter.submitList(list)
         }
 
         lifecycleScope.launchWhenResumed {
@@ -474,7 +475,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
             val size = mViewModel?.fileTotal()
 
             if(size != null && size < 4){
-                mViewModel?.add(uri.toFile(this))
+                mViewModel?.add(uri.toAppFile(this))
                 Log.d("NoteEditorActivity", "成功しました")
             }else{
                 Log.d("NoteEditorActivity", "失敗しました")
@@ -522,18 +523,18 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
 
 
-    override fun onSelect(file: File?) {
-        file?.let{
-            startActivity(MediaActivity.newIntent(this, file))
-        }
+//    override fun onSelect(file: File?) {
+//        file?.let{
+//            startActivity(MediaActivity.newIntent(this, file))
+//        }
+//
+//    }
 
-    }
-
-    override fun onDetach(file: File?) {
-        file?.let{
-            mViewModel?.removeFileNoteEditorData(file)
-        }
-    }
+//    override fun onDetach(file: File?) {
+//        file?.let{
+//            mViewModel?.removeFileNoteEditorData(file)
+//        }
+//    }
 
 
 

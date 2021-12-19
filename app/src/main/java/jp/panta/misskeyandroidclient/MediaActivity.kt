@@ -130,7 +130,7 @@ class MediaActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_media, menu)
         val media = mCurrentMedia
         if(media is Media.FileMedia){
-            menu.findItem(R.id.download_file)?.isVisible = media.file.path.startsWith("http")
+            menu.findItem(R.id.download_file)?.isVisible = media.file.path?.startsWith("http") == true
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -199,7 +199,7 @@ class MediaActivity : AppCompatActivity() {
             return if(file.type?.contains("image") == true){
                 ImageFragment.newInstance(index, file)
             }else{
-                PlayerFragment.newInstance(index, file.path)
+                PlayerFragment.newInstance(index, file.path!!)
             }
         }
         throw NullPointerException("fileProperty xor uri must not null")

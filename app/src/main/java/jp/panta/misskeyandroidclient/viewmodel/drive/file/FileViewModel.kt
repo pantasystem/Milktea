@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.api.drive.UpdateFileDTO
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
 import jp.panta.misskeyandroidclient.model.drive.*
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -121,7 +122,7 @@ class FileViewModel(
     }
 
 
-    fun uploadFile(file: File){
+    fun uploadFile(file: AppFile.Local){
         val uploadFile = file.copy(folderId = driveStore.state.value.path.path.lastOrNull()?.id)
 
         viewModelScope.launch(Dispatchers.IO) {

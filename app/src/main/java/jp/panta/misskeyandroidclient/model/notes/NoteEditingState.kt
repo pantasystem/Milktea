@@ -268,7 +268,8 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
                     isSensitive = it.isSensitive ?: false,
                     path = it.path ?: "",
                     thumbnailUrl = it.thumbnailUrl,
-                    type = it.type ?: ""
+                    type = it.type ?: "",
+                    folderId = null
                 )
             }
         } ?: emptyList()

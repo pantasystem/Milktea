@@ -1,21 +1,18 @@
 package jp.panta.misskeyandroidclient.viewmodel.gallery
 
-import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.gallery.CreateGalleryPost
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
 import jp.panta.misskeyandroidclient.model.gallery.toTask
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -62,8 +59,8 @@ class GalleryEditorViewModel(
     private val _description = MutableLiveData<String>()
     val description = _description
 
-    private val _pickedImages = MutableLiveData<List<File>>()
-    val pickedImages: LiveData<List<File>> = _pickedImages
+    private val _pickedImages = MutableLiveData<List<AppFile>>()
+    val pickedImages: LiveData<List<AppFile>> = _pickedImages
 
     val isSensitive = MutableLiveData(false)
 
@@ -89,12 +86,12 @@ class GalleryEditorViewModel(
 
         _pickedImages.postValue(
             files.map {
-                it.toFile()
+                AppFile.Remote(it.id)
             }
         )
     }
 
-    fun detach(file: File) {
+    fun detach(file: AppFile) {
         _pickedImages.value = (_pickedImages.value?: emptyList()).filterNot {
             it == file
         }
@@ -108,7 +105,7 @@ class GalleryEditorViewModel(
             val list = (_pickedImages.value?: emptyList()).toMutableList().also { list ->
                 list.addAll(
                     files.map {
-                        it.toFile()
+                        AppFile.Remote(it.id)
                     }
                 )
             }
@@ -116,7 +113,7 @@ class GalleryEditorViewModel(
         }
     }
 
-    fun addFile(file: File) {
+    fun addFile(file: AppFile) {
         _pickedImages.value = (_pickedImages.value?: emptyList()).toMutableList().also { mutable ->
             mutable.add(file)
         }

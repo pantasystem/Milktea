@@ -27,6 +27,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -54,7 +55,7 @@ interface SimpleEditor{
     fun openMenu()
 }
 
-class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileListener, SimpleEditor {
+class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEditor {
 
 
 
@@ -116,12 +117,12 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
 
         mBinding.noteEditorViewModel = viewModel
 
-        val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
-        mBinding.imageListPreview.adapter = simpleImagePreviewAdapter
-        mBinding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        //val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
+        //mBinding.imageListPreview.adapter = simpleImagePreviewAdapter
+        //mBinding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         viewModel.files.observe(viewLifecycleOwner) { list ->
-            simpleImagePreviewAdapter.submitList(list)
+            //simpleImagePreviewAdapter.submitList(list)
         }
 
         lifecycleScope.launchWhenResumed {
@@ -288,20 +289,20 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
         selectMentionToUserResult.launch(intent)
     }
 
-    override fun onSelect(file: File?) {
-        file?.let{
-            val intent = Intent(requireContext(), MediaActivity::class.java)
-            intent.putExtra(MediaActivity.EXTRA_FILE, file)
-            startActivity(intent)
-        }
-
-    }
-
-    override fun onDetach(file: File?) {
-        file?.let{
-            mViewModel?.removeFileNoteEditorData(file)
-        }
-    }
+//    override fun onSelect(file: File?) {
+//        file?.let{
+//            val intent = Intent(requireContext(), MediaActivity::class.java)
+//            intent.putExtra(MediaActivity.EXTRA_FILE, file)
+//            startActivity(intent)
+//        }
+//
+//    }
+//
+//    override fun onDetach(file: File?) {
+//        file?.let{
+//            mViewModel?.removeFileNoteEditorData(file)
+//        }
+//    }
 
     override fun closeMenu() {
         isShowEditorMenu.value = false
@@ -338,7 +339,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), FileList
             val size = mViewModel?.fileTotal()
 
             if(size != null && size < 4){
-                mViewModel?.add(uri.toFile(requireContext()))
+                mViewModel?.add(uri.toAppFile(requireContext()))
                 Log.d("NoteEditorActivity", "成功しました")
             }else{
                 Log.d("NoteEditorActivity", "失敗しました")
