@@ -10,7 +10,6 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
-import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.gallery.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -47,16 +46,12 @@ class GalleryRepositoryImpl(
         val files = coroutineScope {
             createGalleryPost.files.map {
                 async {
-                    when(it) {
-                        is AppFile.Remote -> it.id
-                        is AppFile.Local -> {
-                            fileUploaderProvider.get(createGalleryPost.author).upload(it, true).let {
-                                it.toFileProperty(createGalleryPost.author).also { entity ->
-                                    filePropertyDataSource.add(entity)
-                                }
-                            }.id
+                    it.remoteFileId?:
+                    fileUploaderProvider.get(createGalleryPost.author).upload(it, true).let {
+                        it.toFileProperty(createGalleryPost.author).also { entity ->
+                            filePropertyDataSource.add(entity)
                         }
-                    }
+                    }.id
                 }
             }.awaitAll()
         }
@@ -122,14 +117,7 @@ class GalleryRepositoryImpl(
         val files = coroutineScope {
             updateGalleryPost.files.map {
                 async {
-                    when(it) {
-                        is AppFile.Remote -> it.id.fileId
-                        is AppFile.Local -> {
-                            fileUploaderProvider.get(account).upload(it, true).also {
-                                filePropertyDataSource.add(it.toFileProperty(account))
-                            }.id
-                        }
-                    }
+                    fileUploaderProvider.get(account).upload(it, true)
                 }
             }.awaitAll()
         }
@@ -139,7 +127,9 @@ class GalleryRepositoryImpl(
                 postId = updateGalleryPost.id.galleryId,
                 description = updateGalleryPost.description,
                 title = updateGalleryPost.title,
-                fileIds = files,
+                fileIds = files.map {
+                    it.id
+                },
                 isSensitive = updateGalleryPost.isSensitive
             )
         ).throwIfHasError().body()

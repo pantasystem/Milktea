@@ -21,7 +21,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
-import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -188,7 +187,7 @@ class DriveActivity : AppCompatActivity() {
 
     @ExperimentalCoroutinesApi
     private fun uploadFile(uri: Uri){
-        _fileViewModel.uploadFile(uri.toAppFile(this))
+        _fileViewModel.uploadFile(uri.toFile(this))
     }
 
     override fun onBackPressed() {

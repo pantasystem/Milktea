@@ -20,7 +20,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
@@ -28,15 +27,10 @@ import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
-import jp.panta.misskeyandroidclient.ui.notes.editor.NoteFilePreview
-import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
@@ -59,7 +53,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 
-class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
+class NoteEditorActivity : AppCompatActivity(), EmojiSelection, FileListener {
 
     companion object{
         private const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
@@ -141,6 +135,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
+        binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         noteEditorToolbar.actionUpButton.setOnClickListener {
             finishOrConfirmSaveAsDraftOrDelete()
@@ -196,33 +191,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         noteEditorToolbar.viewModel = viewModel
         noteEditorToolbar.lifecycleOwner = this
 
-        binding.filePreview.apply {
-            setContent {
-                MdcTheme {
-                    NoteFilePreview(
-                        noteEditorViewModel = viewModel,
-                        fileRepository = miApplication.getDriveFileRepository(),
-                        dataSource = miApplication.getFilePropertyDataSource(),
-                        onShow = {
-                            val file = when(it) {
-                                is FilePreviewTarget.Remote -> {
-                                    it.fileProperty.toFile()
-                                }
-                                is FilePreviewTarget.Local -> {
-                                    it.file.toFile()
-                                }
-                            }
-                            val intent = MediaActivity.newInstance(
-                                this@NoteEditorActivity,
-                                listOf(file),
-                                0
-                            )
-                            this@NoteEditorActivity.startActivity(intent)
-                        }
-                    )
-                }
+        val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
+        binding.imageListPreview.adapter = simpleImagePreviewAdapter
 
-            }
+        viewModel.files.observe(this) { list ->
+            simpleImagePreviewAdapter.submitList(list)
         }
 
         lifecycleScope.launchWhenResumed {
@@ -501,7 +474,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             val size = mViewModel?.fileTotal()
 
             if(size != null && size < 4){
-                mViewModel?.add(uri.toAppFile(this))
+                mViewModel?.add(uri.toFile(this))
                 Log.d("NoteEditorActivity", "成功しました")
             }else{
                 Log.d("NoteEditorActivity", "失敗しました")
@@ -549,18 +522,18 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
 
 
-//    override fun onSelect(file: File?) {
-//        file?.let{
-//            startActivity(MediaActivity.newIntent(this, file))
-//        }
-//
-//    }
+    override fun onSelect(file: File?) {
+        file?.let{
+            startActivity(MediaActivity.newIntent(this, file))
+        }
 
-//    override fun onDetach(file: File?) {
-//        file?.let{
-//            mViewModel?.removeFileNoteEditorData(file)
-//        }
-//    }
+    }
+
+    override fun onDetach(file: File?) {
+        file?.let{
+            mViewModel?.removeFileNoteEditorData(file)
+        }
+    }
 
 
 

@@ -39,7 +39,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
         }
 
         fun newInstance(index: Int, file: File): ImageFragment{
-            return newInstance(index, file.path!!)
+            return newInstance(index, file.path)
         }
     }
 
