@@ -102,6 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
+                android:enabled="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
                 android:onClick="@{()-> viewModel.post()}"
                 android:text="@string/post"
                 app:layout_constraintEnd_toEndOf="parent"

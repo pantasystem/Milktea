@@ -1,38 +1,31 @@
 package jp.panta.misskeyandroidclient
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.recyclerview.widget.DiffUtil
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
 import jp.panta.misskeyandroidclient.util.file.toAppFile
-import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveSelectableMode
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
+import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class DriveActivity : AppCompatActivity() {
@@ -71,13 +64,13 @@ class DriveActivity : AppCompatActivity() {
         val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
             if(it == -1L) null else it
         }
-        val accountIds = selectedFileIds?.map { it.accountId }?.toSet()
-        require(selectedFileIds == null || accountIds!!.size == 1) {
-            "選択したFilePropertyの所有者は全て同一のアカウントである必要があります。"
+        val accountIds = selectedFileIds?.map { it.accountId }?.distinct()?: emptyList()
+        require(selectedFileIds == null || accountIds.size <= 1) {
+            "選択したFilePropertyの所有者は全て同一のアカウントである必要があります。ids:${accountIds}"
         }
         val miCore = applicationContext as MiCore
         val driveSelectableMode: DriveSelectableMode? = if(intent.action == Intent.ACTION_OPEN_DOCUMENT) {
-            val aId = accountId?: accountIds?.lastOrNull()?:  miCore.getCurrentAccount().value?.accountId
+            val aId = accountId?: accountIds.lastOrNull()?:  miCore.getCurrentAccount().value?.accountId
             requireNotNull(aId)
             DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
         }else{
@@ -86,23 +79,23 @@ class DriveActivity : AppCompatActivity() {
 
         _driveViewModel = ViewModelProvider(this, DriveViewModelFactory(driveSelectableMode))[DriveViewModel::class.java]
         _fileViewModel = ViewModelProvider(this, FileViewModelFactory(
-            accountId?: accountIds?.lastOrNull(),
+            accountId?: accountIds.lastOrNull(),
             miCore,
             _driveViewModel.driveStore
         ))[FileViewModel::class.java]
         _directoryViewModel = ViewModelProvider(this, DirectoryViewModelFactory(
-            accountId?: accountIds?.lastOrNull(), miCore, _driveViewModel.driveStore
+            accountId?: accountIds.lastOrNull(), miCore, _driveViewModel.driveStore
         )
         )[DirectoryViewModel::class.java]
 
         _fileViewModel = ViewModelProvider(this, FileViewModelFactory(
-            accountId?: accountIds?.lastOrNull(),
+            accountId?: accountIds.lastOrNull(),
             miCore,
             _driveViewModel.driveStore
         ))[FileViewModel::class.java]
 
         _directoryViewModel = ViewModelProvider(this, DirectoryViewModelFactory(
-            accountId?: accountIds?.lastOrNull(), miCore, _driveViewModel.driveStore
+            accountId?: accountIds.lastOrNull(), miCore, _driveViewModel.driveStore
         )
         )[DirectoryViewModel::class.java]
 

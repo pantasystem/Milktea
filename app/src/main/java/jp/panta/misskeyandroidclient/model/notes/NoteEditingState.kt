@@ -37,12 +37,26 @@ data class NoteEditingState(
 
 
     fun checkValidate(textMaxLength: Int = 3000) : Boolean {
-        return !(this.files.isEmpty()
-                && this.files.size > 4
-                && this.renoteId == null
-                && this.text.isNullOrBlank()
-                && (this.text?.codePointCount(0, this.text.length) ?: 0) > textMaxLength
-                && this.poll?.checkValidate() == true)
+        if(this.files.size > 4) {
+            return false
+        }
+
+        if((this.text?.codePointCount(0, this.text.length) ?: 0) > textMaxLength) {
+            return false
+        }
+
+        if(this.renoteId != null) {
+            return true
+        }
+
+        if(this.poll != null && this.poll.checkValidate()) {
+            return true
+        }
+
+        return !(
+                this.text.isNullOrBlank()
+                        && this.files.isNullOrEmpty()
+                )
     }
 
     fun changeText(text: String) : NoteEditingState {
@@ -214,7 +228,7 @@ data class PollEditingState(
     fun checkValidate() : Boolean {
         return choices.all {
             it.text.isNotBlank()
-        }
+        } && this.choices.size >= 2
     }
 
     fun toggleMultiple() : PollEditingState{
