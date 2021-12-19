@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.file.AppFile
@@ -36,6 +37,7 @@ class GalleryEditorViewModel(
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
     val taskExecutor: TaskExecutor,
+    val driveFileRepository: DriveFileRepository,
     val logger: Logger,
 ) : ViewModel(){
 
@@ -48,6 +50,7 @@ class GalleryEditorViewModel(
                 miCore.getFilePropertyDataSource(),
                 miCore.getAccountRepository(),
                 miCore.getTaskExecutor(),
+                miCore.getDriveFileRepository(),
                 miCore.loggerFactory.create("GalleryEditorVM")
             ) as T
         }
@@ -94,6 +97,29 @@ class GalleryEditorViewModel(
     fun detach(file: AppFile) {
         _pickedImages.value = (_pickedImages.value?: emptyList()).filterNot {
             it == file
+        }
+    }
+
+    fun toggleSensitive(file: AppFile) {
+        when(file) {
+            is AppFile.Local -> {
+                _pickedImages.value = _pickedImages.value?.map {
+                    if(it === file) {
+                        it.copy(isSensitive = !file.isSensitive)
+                    }else{
+                        it
+                    }
+                }
+            }
+            is AppFile.Remote -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        driveFileRepository.toggleNsfw(file.id)
+                    }.onFailure {
+                        logger.info("sensitiveの切り替えに失敗しました。", e = it)
+                    }
+                }
+            }
         }
     }
 

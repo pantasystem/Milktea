@@ -11,7 +11,6 @@ import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewActionType
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.components.HorizontalFilePreviewList
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -21,12 +20,12 @@ fun NoteFilePreview(
     noteEditorViewModel: NoteEditorViewModel,
     fileRepository: DriveFileRepository,
     dataSource: FilePropertyDataSource,
+    onShow: (FilePreviewTarget)->Unit
 ) {
     val files = noteEditorViewModel.files.observeAsState()
 
     Row (
         verticalAlignment = Alignment.CenterVertically,
-
     ){
         HorizontalFilePreviewList(
             files = files.value ?: emptyList(),
@@ -42,7 +41,7 @@ fun NoteFilePreview(
                         noteEditorViewModel.removeFileNoteEditorData(it.target.file)
                     }
                     is FilePreviewActionType.Show -> {
-
+                        onShow(it.target)
                     }
                 }
             }

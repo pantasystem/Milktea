@@ -28,10 +28,13 @@ import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.notes.editor.NoteFilePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
@@ -193,19 +196,29 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         noteEditorToolbar.viewModel = viewModel
         noteEditorToolbar.lifecycleOwner = this
 
-        //val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
-        //binding.imageListPreview.adapter = simpleImagePreviewAdapter
-
-        viewModel.files.observe(this) { list ->
-            //simpleImagePreviewAdapter.submitList(list)
-        }
         binding.filePreview.apply {
             setContent {
                 MdcTheme {
                     NoteFilePreview(
                         noteEditorViewModel = viewModel,
                         fileRepository = miApplication.getDriveFileRepository(),
-                        dataSource = miApplication.getFilePropertyDataSource()
+                        dataSource = miApplication.getFilePropertyDataSource(),
+                        onShow = {
+                            val file = when(it) {
+                                is FilePreviewTarget.Remote -> {
+                                    it.fileProperty.toFile()
+                                }
+                                is FilePreviewTarget.Local -> {
+                                    it.file.toFile()
+                                }
+                            }
+                            val intent = MediaActivity.newInstance(
+                                this@NoteEditorActivity,
+                                listOf(file),
+                                0
+                            )
+                            this@NoteEditorActivity.startActivity(intent)
+                        }
                     )
                 }
 

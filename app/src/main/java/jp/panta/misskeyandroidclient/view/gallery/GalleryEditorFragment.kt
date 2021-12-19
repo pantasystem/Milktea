@@ -22,6 +22,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.file.toFile
+import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.gallery.PickedImagePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
@@ -70,7 +72,23 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
                     PickedImagePreview(
                         viewModel = viewModel,
                         repository = miCore.getDriveFileRepository(),
-                        dataSource = miCore.getFilePropertyDataSource()
+                        dataSource = miCore.getFilePropertyDataSource(),
+                        onShow = {
+                            val file = when(it) {
+                                is FilePreviewTarget.Remote -> {
+                                    it.fileProperty.toFile()
+                                }
+                                is FilePreviewTarget.Local -> {
+                                    it.file.toFile()
+                                }
+                            }
+                            val intent = MediaActivity.newInstance(
+                                requireActivity(),
+                                listOf(file),
+                                0
+                            )
+                            requireActivity().startActivity(intent)
+                        }
                     )
                 }
             }

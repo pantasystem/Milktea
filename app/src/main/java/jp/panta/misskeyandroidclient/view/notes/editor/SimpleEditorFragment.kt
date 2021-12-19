@@ -27,7 +27,9 @@ import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.notes.editor.NoteFilePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
@@ -124,7 +126,23 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                     NoteFilePreview(
                         noteEditorViewModel = viewModel,
                         fileRepository = miApplication.getDriveFileRepository(),
-                        dataSource = miApplication.getFilePropertyDataSource()
+                        dataSource = miApplication.getFilePropertyDataSource(),
+                        onShow = {
+                            val file = when(it) {
+                                is FilePreviewTarget.Remote -> {
+                                    it.fileProperty.toFile()
+                                }
+                                is FilePreviewTarget.Local -> {
+                                    it.file.toFile()
+                                }
+                            }
+                            val intent = MediaActivity.newInstance(
+                                requireActivity(),
+                                listOf(file),
+                                0
+                            )
+                            requireActivity().startActivity(intent)
+                        }
                     )
                 }
             }

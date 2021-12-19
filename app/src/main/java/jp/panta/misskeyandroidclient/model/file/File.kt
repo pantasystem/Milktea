@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.model.file
 
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import java.io.Serializable
+import java.io.Serializable as JSerializable
 
-sealed interface AppFile {
+sealed interface AppFile : JSerializable {
 
     data class Local(
         val name: String,
@@ -29,7 +29,7 @@ data class File(
     val thumbnailUrl: String?,
     val isSensitive: Boolean?,
     val folderId: String? = null
-): Serializable {
+): JSerializable {
     val isRemoteFile: Boolean
         get() = remoteFileId != null
 }
