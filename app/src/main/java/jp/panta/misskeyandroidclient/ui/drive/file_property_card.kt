@@ -18,6 +18,7 @@ import coil.compose.rememberImagePainter
 import com.google.android.material.chip.Chip
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.ui.components.SensitiveIcon
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
 
 
@@ -83,11 +84,7 @@ fun FilePropertySimpleCard(
                         contentScale = ContentScale.Crop
                     )
                     if(file.fileProperty.isSensitive) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_baseline_hide_image_24),
-                            contentDescription = stringResource(R.string.sensitive),
-                            modifier = Modifier.background(MaterialTheme.colors.secondary)
-                        )
+                        SensitiveIcon()
                     }
                 }
                 Column(

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -148,12 +149,18 @@ fun LocalFilePreview(
                 onClick(file)
             }
     ){
-        Image(
-            painter = rememberImagePainter(uri),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        Box (contentAlignment = Alignment.TopEnd) {
+            Image(
+                painter = rememberImagePainter(uri),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            if(file.isSensitive) {
+                SensitiveIcon()
+            }
+        }
+
     }
 }
 
@@ -200,15 +207,20 @@ fun RemoteFilePreview(
         when(filePropertyState.content) {
             is StateContent.Exist -> {
                 val content = (filePropertyState.content as StateContent.Exist).rawContent
-                Image(
-                    painter = rememberImagePainter(
-                        fileProperty.value?.thumbnailUrl
-                            ?: content.thumbnailUrl
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                )
+                Box (contentAlignment = Alignment.TopEnd){
+                    Image(
+                        painter = rememberImagePainter(
+                            fileProperty.value?.thumbnailUrl
+                                ?: content.thumbnailUrl
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                    if(fileProperty.value?.isSensitive?: content.isSensitive){
+                        SensitiveIcon()
+                    }
+                }
             }
             is StateContent.NotExist -> {
                 CircularProgressIndicator()
