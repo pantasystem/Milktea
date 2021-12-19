@@ -1,19 +1,21 @@
 package jp.panta.misskeyandroidclient.viewmodel.gallery
 
+import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.file.AppFile
+import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.gallery.CreateGalleryPost
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
 import jp.panta.misskeyandroidclient.model.gallery.toTask
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -37,7 +39,6 @@ class GalleryEditorViewModel(
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
     val taskExecutor: TaskExecutor,
-    val driveFileRepository: DriveFileRepository,
     val logger: Logger,
 ) : ViewModel(){
 
@@ -50,7 +51,6 @@ class GalleryEditorViewModel(
                 miCore.getFilePropertyDataSource(),
                 miCore.getAccountRepository(),
                 miCore.getTaskExecutor(),
-                miCore.getDriveFileRepository(),
                 miCore.loggerFactory.create("GalleryEditorVM")
             ) as T
         }
@@ -62,8 +62,8 @@ class GalleryEditorViewModel(
     private val _description = MutableLiveData<String>()
     val description = _description
 
-    private val _pickedImages = MutableLiveData<List<AppFile>>()
-    val pickedImages: LiveData<List<AppFile>> = _pickedImages
+    private val _pickedImages = MutableLiveData<List<File>>()
+    val pickedImages: LiveData<List<File>> = _pickedImages
 
     val isSensitive = MutableLiveData(false)
 
@@ -89,37 +89,14 @@ class GalleryEditorViewModel(
 
         _pickedImages.postValue(
             files.map {
-                AppFile.Remote(it.id)
+                it.toFile()
             }
         )
     }
 
-    fun detach(file: AppFile) {
+    fun detach(file: File) {
         _pickedImages.value = (_pickedImages.value?: emptyList()).filterNot {
             it == file
-        }
-    }
-
-    fun toggleSensitive(file: AppFile) {
-        when(file) {
-            is AppFile.Local -> {
-                _pickedImages.value = _pickedImages.value?.map {
-                    if(it === file) {
-                        it.copy(isSensitive = !file.isSensitive)
-                    }else{
-                        it
-                    }
-                }
-            }
-            is AppFile.Remote -> {
-                viewModelScope.launch(Dispatchers.IO) {
-                    runCatching {
-                        driveFileRepository.toggleNsfw(file.id)
-                    }.onFailure {
-                        logger.info("sensitiveの切り替えに失敗しました。", e = it)
-                    }
-                }
-            }
         }
     }
 
@@ -131,7 +108,7 @@ class GalleryEditorViewModel(
             val list = (_pickedImages.value?: emptyList()).toMutableList().also { list ->
                 list.addAll(
                     files.map {
-                        AppFile.Remote(it.id)
+                        it.toFile()
                     }
                 )
             }
@@ -139,7 +116,7 @@ class GalleryEditorViewModel(
         }
     }
 
-    fun addFile(file: AppFile) {
+    fun addFile(file: File) {
         _pickedImages.value = (_pickedImages.value?: emptyList()).toMutableList().also { mutable ->
             mutable.add(file)
         }

@@ -10,7 +10,6 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileUploadFailedException
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
-import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -27,7 +26,7 @@ class OkHttpDriveFileUploader(
     val gson: Gson,
     val encryption: Encryption
 ) : FileUploader {
-    override suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO {
+    override suspend fun upload(file: File, isForce: Boolean): FilePropertyDTO {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
@@ -45,7 +44,7 @@ class OkHttpDriveFileUploader(
                 .addFormDataPart("file", file.name, createRequestBody(Uri.parse(file.path)))
 
             val isSensitive = file.isSensitive
-            requestBodyBuilder.addFormDataPart("isSensitive", isSensitive.toString())
+            if( isSensitive != null ) requestBodyBuilder.addFormDataPart("isSensitive", isSensitive.toString())
 
             val folderId = file.folderId
             if( folderId != null ) requestBodyBuilder.addFormDataPart("folderId", folderId)

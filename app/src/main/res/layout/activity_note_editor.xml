@@ -40,7 +40,7 @@
                 android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/filePreview"
+                app:layout_constraintBottom_toTopOf="@+id/image_preview"
                 app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar">
 
             <ScrollView
@@ -201,17 +201,42 @@
 
         </LinearLayout>
 
-        <androidx.compose.ui.platform.ComposeView
+        <LinearLayout
+                android:id="@+id/image_preview"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:id="@+id/filePreview"
+                tools:layout_height="50dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginBottom="1dp"
+                android:orientation="horizontal"
                 app:layout_constraintBottom_toTopOf="@+id/bottomToolbarBase"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/frameLayout"
-                />
+                android:padding="5dp"
+                android:visibility="@{SafeUnbox.unboxInt(viewModel.totalImageCount) == 0 ? View.GONE : View.VISIBLE}"
+                >
 
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/image_list_preview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="5dp"
+                    />
+
+
+            <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text='@{String.valueOf(SafeUnbox.unboxInt(viewModel.totalImageCount)) + "/" + "4"}'
+
+                    tools:text="3/4"/>
+        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

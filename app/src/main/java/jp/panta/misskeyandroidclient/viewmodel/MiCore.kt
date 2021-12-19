@@ -14,7 +14,6 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
@@ -85,8 +84,6 @@ interface MiCore{
     fun getGroupRepository(): GroupRepository
 
     fun getFilePropertyDataSource() : FilePropertyDataSource
-
-    fun getDriveFileRepository() : DriveFileRepository
 
     fun getSubscriptionRegistration() : SubscriptionRegistration
 

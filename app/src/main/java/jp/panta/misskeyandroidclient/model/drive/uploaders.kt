@@ -6,7 +6,6 @@ import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -16,10 +15,10 @@ import java.lang.IllegalStateException
 
 interface FileUploader {
     @Throws(FileUploadFailedException::class)
-    suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO
+    suspend fun upload(file: File, isForce: Boolean): FilePropertyDTO
 }
 
-class FileUploadFailedException(val file: AppFile.Local, val throwable: Throwable?, val statusCode: Int?) : IllegalStateException()
+class FileUploadFailedException(val file: File, val throwable: Throwable?, val statusCode: Int?) : IllegalStateException()
 
 interface FileUploaderProvider {
     fun create(account: Account): FileUploader

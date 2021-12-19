@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.GalleryPostsActivity
@@ -22,10 +21,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.file.toFile
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
-import jp.panta.misskeyandroidclient.ui.gallery.PickedImagePreview
-import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.view.notes.editor.SimpleImagePreviewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -66,35 +61,34 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
             appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
 
-        binding.pickedImages.apply {
-            setContent {
-                MdcTheme {
-                    PickedImagePreview(
-                        viewModel = viewModel,
-                        repository = miCore.getDriveFileRepository(),
-                        dataSource = miCore.getFilePropertyDataSource(),
-                        onShow = {
-                            val file = when(it) {
-                                is FilePreviewTarget.Remote -> {
-                                    it.fileProperty.toFile()
-                                }
-                                is FilePreviewTarget.Local -> {
-                                    it.file.toFile()
-                                }
-                            }
-                            val intent = MediaActivity.newInstance(
-                                requireActivity(),
-                                listOf(file),
-                                0
-                            )
-                            requireActivity().startActivity(intent)
-                        }
-                    )
+        val fileListener = object : FileListener {
+            override fun onDetach(file: File?) {
+                file?.let {
+                    viewModel.detach(file)
                 }
+
+            }
+
+            override fun onSelect(file: File?) {
+                val intent = Intent(requireContext(), MediaActivity::class.java)
+                intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(viewModel.pickedImages.value))
+                val index = viewModel.pickedImages.value?.indexOfFirst {
+                    it.path == file?.path
+                }
+                intent.putExtra(MediaActivity.EXTRA_FILE_CURRENT_INDEX, index)
+                startActivity(intent)
             }
         }
 
+        val pickedImageAdapter = SimpleImagePreviewAdapter(
+            fileListener
+        )
+        binding.pickedImages.adapter = pickedImageAdapter
+        binding.pickedImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
+        viewModel.pickedImages.observe(viewLifecycleOwner) {
+            pickedImageAdapter.submitList(it)
+        }
 
         binding.pickedImageFromLocalButton.setOnClickListener {
             if(!checkPermission()) {
@@ -150,7 +144,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
     private val pickFileResultListener = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val uri = it.data?.data
         if(uri != null) {
-            viewModel.addFile(uri.toAppFile(requireContext()))
+            viewModel.addFile(uri.toFile(requireContext()))
         }
     }
 

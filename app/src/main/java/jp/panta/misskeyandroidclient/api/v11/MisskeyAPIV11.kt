@@ -31,7 +31,6 @@ import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import retrofit2.Response
 
 open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI by misskeyAPI{
@@ -115,5 +114,5 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun renotes(req: FindRenotes): Response<List<NoteDTO>> = misskeyAPI.renotes(req)
     override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskeyAPI.updateFile(updateFileRequest)
     override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskeyAPI.deleteFile(req)
-    override suspend fun showFile(req: ShowFile): Response<FilePropertyDTO> = misskeyAPI.showFile(req)
+
 }

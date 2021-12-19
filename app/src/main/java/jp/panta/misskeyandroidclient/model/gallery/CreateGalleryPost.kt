@@ -2,13 +2,12 @@ package jp.panta.misskeyandroidclient.model.gallery
 
 import jp.panta.misskeyandroidclient.model.ITask
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 
 class CreateGalleryPost (
     val title: String,
     val author: Account,
-    val files: List<AppFile>,
+    val files: List<File>,
     val description: String?,
     val isSensitive: Boolean,
 )
