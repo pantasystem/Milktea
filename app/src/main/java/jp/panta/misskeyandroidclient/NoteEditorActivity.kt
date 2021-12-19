@@ -20,6 +20,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
@@ -31,6 +32,7 @@ import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.ui.notes.editor.NoteFilePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
@@ -136,7 +138,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
-        binding.imageListPreview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         noteEditorToolbar.actionUpButton.setOnClickListener {
             finishOrConfirmSaveAsDraftOrDelete()
@@ -197,6 +198,17 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         viewModel.files.observe(this) { list ->
             //simpleImagePreviewAdapter.submitList(list)
+        }
+        binding.filePreview.apply {
+            setContent {
+                MdcTheme {
+                    NoteFilePreview(
+                        noteEditorViewModel = viewModel,
+                        fileRepository = miApplication.getDriveFileRepository()
+                    )
+                }
+
+            }
         }
 
         lifecycleScope.launchWhenResumed {
