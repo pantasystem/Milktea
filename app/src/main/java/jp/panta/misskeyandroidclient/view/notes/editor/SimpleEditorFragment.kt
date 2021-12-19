@@ -18,6 +18,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.R
@@ -27,6 +28,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.ui.notes.editor.NoteFilePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
@@ -116,14 +118,15 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         mViewModel = viewModel
 
         mBinding.noteEditorViewModel = viewModel
-
-        //val simpleImagePreviewAdapter = SimpleImagePreviewAdapter(this)
-        //mBinding.imageListPreview.adapter = simpleImagePreviewAdapter
-        //mBinding.imageListPreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
-        viewModel.files.observe(viewLifecycleOwner) { list ->
-            //simpleImagePreviewAdapter.submitList(list)
+        mBinding.filePreview.apply {
+            setContent {
+                MdcTheme {
+                    NoteFilePreview(noteEditorViewModel = viewModel, fileRepository = miApplication.getDriveFileRepository())
+                }
+            }
         }
+
+
 
         lifecycleScope.launchWhenResumed {
             viewModel.poll.collect { poll ->
