@@ -12,14 +12,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
@@ -28,8 +26,6 @@ import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
@@ -37,7 +33,6 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.notes.editor.NoteFilePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
-import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.confirm.ConfirmDialog
@@ -50,7 +45,6 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
-import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
@@ -89,7 +83,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             }
         }
     }
-    private var mViewModel: NoteEditorViewModel? = null
+    private lateinit var mViewModel: NoteEditorViewModel
 
     private lateinit var mBinding: ActivityNoteEditorBinding
 
@@ -313,7 +307,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             when (it.eventType) {
                 CONFIRM_SAVE_AS_DRAFT_OR_DELETE -> {
                     if (it.resultType == ResultType.POSITIVE) {
-                        mViewModel?.saveDraft()
+                        mViewModel.saveDraft()
                     } else {
                         finish()
                     }
@@ -325,7 +319,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             ConfirmDialog().show(supportFragmentManager, "confirm")
         }
 
-        mViewModel?.isSaveNoteAsDraft?.observe(this) {
+        mViewModel.isSaveNoteAsDraft.observe(this) {
             runOnUiThread {
                 if (it == null) {
                     Toast.makeText(this, "下書きに失敗しました", Toast.LENGTH_LONG).show()
@@ -340,8 +334,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     override fun onSelect(emoji: Emoji) {
         val pos = mBinding.inputMain.selectionEnd
-        mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
-            mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+        mViewModel.addEmoji(emoji, pos).let{ newPos ->
+            mBinding.inputMain.setText(mViewModel.text.value?: "")
             mBinding.inputMain.setSelection(newPos)
             Log.d("NoteEditorActivity", "入力されたデータ:${mBinding.inputMain.text}")
         }
@@ -349,8 +343,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     override fun onSelect(emoji: String) {
         val pos = mBinding.inputMain.selectionEnd
-        mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
-            mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+        mViewModel.addEmoji(emoji, pos).let{ newPos ->
+            mBinding.inputMain.setText(mViewModel.text.value?: "")
             mBinding.inputMain.setSelection(newPos)
         }
     }
@@ -399,7 +393,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     }
 
     private fun showDriveFileSelector(){
-        val selectedSize = mViewModel?.totalImageCount?.value?: 0
+        val selectedSize = mViewModel.state.value.totalFilesCount
 
         val miCore = applicationContext as MiCore
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
@@ -426,9 +420,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     @FlowPreview
     @ExperimentalCoroutinesApi
     private fun startSearchAndSelectUser(){
-        val selectedUserIds = mViewModel?.address?.value?.mapNotNull{
+        val selectedUserIds = mViewModel.address.value.mapNotNull{
             it.userId
-        }?: emptyList()
+        }
 
         val intent  = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selectedUserIds)
 
@@ -445,7 +439,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     @FlowPreview
     @ExperimentalCoroutinesApi
     private fun finishOrConfirmSaveAsDraftOrDelete(){
-        if(mViewModel?.canSaveDraft() == true){
+        if(mViewModel.canSaveDraft()){
             mConfirmViewModel.confirmEvent.event = ConfirmCommand(
                 getString(R.string.save_draft),
                 getString(R.string.save_the_note_as_a_draft),
@@ -489,8 +483,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             it as? FileProperty.Id
         }
         Log.d("NoteEditorActivity", "result:${ids}")
-        if(ids != null && ids.isNotEmpty()) {
-            mViewModel?.addFilePropertyFromIds(ids)
+        val size = mViewModel.fileTotal()
+
+        if(ids != null && ids.isNotEmpty() && size + ids.size <= 4) {
+            mViewModel.addFilePropertyFromIds(ids)
         }
     }
 
@@ -498,13 +494,13 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         val uri = result?.data?.data
         if(uri != null){
-            val size = mViewModel?.fileTotal()
+            val size = mViewModel.fileTotal()
 
-            if(size != null && size < 4){
-                mViewModel?.add(uri.toAppFile(this))
-                Log.d("NoteEditorActivity", "成功しました")
-            }else{
+            if(size > 4){
                 Log.d("NoteEditorActivity", "失敗しました")
+            }else{
+                mViewModel.add(uri.toAppFile(this))
+                Log.d("NoteEditorActivity", "成功しました")
             }
 
         }
@@ -524,7 +520,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         if(result.resultCode == RESULT_OK && result.data != null){
             val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
             if(changed != null) {
-                mViewModel?.setAddress(changed.added, changed.removed)
+                mViewModel.setAddress(changed.added, changed.removed)
             }
         }
     }
@@ -537,9 +533,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
             if(changed != null){
                 val pos = mBinding.inputMain.selectionEnd
-                mViewModel?.addMentionUsers(changed.selectedUsers, pos)?.let { newPos ->
-                    Log.d("NoteEditorActivity", "text:${mViewModel?.text?.value}, stateText:${mViewModel?.state?.value?.text}")
-                    mBinding.inputMain.setText(mViewModel?.text?.value?: "")
+                mViewModel.addMentionUsers(changed.selectedUsers, pos).let { newPos ->
+                    Log.d("NoteEditorActivity", "text:${mViewModel.text.value}, stateText:${mViewModel.state.value.text}")
+                    mBinding.inputMain.setText(mViewModel.text.value?: "")
                     mBinding.inputMain.setSelection(newPos)
                 }
             }
@@ -548,19 +544,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     }
 
 
-
-//    override fun onSelect(file: File?) {
-//        file?.let{
-//            startActivity(MediaActivity.newIntent(this, file))
-//        }
-//
-//    }
-
-//    override fun onDetach(file: File?) {
-//        file?.let{
-//            mViewModel?.removeFileNoteEditorData(file)
-//        }
-//    }
 
 
 
