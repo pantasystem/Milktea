@@ -29,6 +29,7 @@ import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -187,6 +188,9 @@ interface MisskeyAPI {
 
     @POST("api/drive/files/delete")
     suspend fun deleteFile(@Body req: DeleteFileDTO): Response<Unit>
+
+    @POST("api/drive/files/show")
+    suspend fun showFile(@Body req: ShowFile) : Response<FilePropertyDTO>
 
     @POST("api/drive/folders")
     suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>

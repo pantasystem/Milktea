@@ -30,38 +30,10 @@
                 android:max="@{noteEditorViewModel.maxTextLength}"
                 android:progress="@{noteEditorViewModel.maxTextLength - noteEditorViewModel.textRemaining}"
                 />
-        <LinearLayout
+        <androidx.compose.ui.platform.ComposeView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-            >
-            <ImageButton
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:onClick="@{ ()-> simpleEditor.closeMenu() }"
-                    android:src="@drawable/ic_expand_more_black_24dp"
-                    android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE }"
-                    tools:ignore="ContentDescription"
-                    />
-            <ImageButton
-                    android:id="@+id/goToNormalEditorButton"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="4dp"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/ic_zoom_out_map_black_24dp"
-                    tools:ignore="ContentDescription"
-                    android:onClick="@{ ()-> simpleEditor.goToNormalEditor() }"
-
-                    android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE }"
-
-                    app:tint="?attr/colorNoteActionButtonTint" />
-
-        </LinearLayout>
+                android:id="@+id/filePreview"/>
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/addressUsersView"
@@ -78,38 +50,6 @@
                 android:text="@string/add_address"
                 android:visibility="@{SafeUnbox.unboxBool(noteEditorViewModel.isSpecified()) &amp;&amp; SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE}"
                 />
-
-        <LinearLayout
-                android:id="@+id/image_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-
-                android:padding="5dp"
-
-                android:visibility="@{SafeUnbox.unboxInt(noteEditorViewModel.totalImageCount) == 0 || !SafeUnbox.unbox(simpleEditor.isShowEditorMenu)? View.GONE : View.VISIBLE}"
-                tools:layout_height="50dp"
-                >
-
-            <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/image_list_preview"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    />
-
-
-            <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text='@{String.valueOf(SafeUnbox.unboxInt(noteEditorViewModel.totalImageCount)) + "/" + "4"}'
-
-                    tools:text="3/4"/>
-        </LinearLayout>
-
 
 
 
