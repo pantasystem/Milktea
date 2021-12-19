@@ -241,6 +241,32 @@ class NoteEditorViewModel(
 
     }
 
+    fun toggleNsfw(appFile: AppFile) {
+        when(appFile) {
+            is AppFile.Local -> {
+                _state.value = state.value.copy(
+                    files = _state.value.files.map {
+                        if(appFile === appFile) {
+                            appFile.copy(
+                                isSensitive = !appFile.isSensitive
+                            )
+                        }else{
+                            appFile
+                        }
+                    }
+                )
+            }
+            is AppFile.Remote -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        miCore.getDriveFileRepository().toggleNsfw(appFile.id)
+                    }
+                }
+            }
+        }
+
+    }
+
     fun add(file: AppFile){
         val files = files.value?.toMutableList()
             ?: mutableListOf()
@@ -276,6 +302,9 @@ class NoteEditorViewModel(
         _state.value = _state.value.removeFile(file)
     }
 
+    fun toggleSensitive(file: AppFile) {
+
+    }
 
 
     fun fileTotal(): Int{

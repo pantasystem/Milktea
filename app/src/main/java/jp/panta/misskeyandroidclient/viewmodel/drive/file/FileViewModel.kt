@@ -141,19 +141,7 @@ class FileViewModel(
     fun toggleNsfw(id: FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val account = currentAccountWatcher.getAccount()
-                val api = miCore.getMisskeyAPI(account)
-                val fileProperty = miCore.getFilePropertyDataSource().find(id)
-                val result = api.updateFile(UpdateFileDTO(
-                    account.getI(miCore.getEncryption()),
-                    fileId = id.fileId,
-                    isSensitive = !fileProperty.isSensitive,
-                    name = fileProperty.name,
-                    folderId = fileProperty.folderId,
-                    comment = fileProperty.comment
-                )).throwIfHasError()
-                miCore.getFilePropertyDataSource().add(result.body()!!.toFileProperty(account))
-
+                miCore.getDriveFileRepository().toggleNsfw(id)
             }catch(e: Exception) {
                 logger.info("nsfwの更新に失敗しました", e = e)
             }
