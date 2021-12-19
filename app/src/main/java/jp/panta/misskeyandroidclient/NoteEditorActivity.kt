@@ -204,7 +204,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                 MdcTheme {
                     NoteFilePreview(
                         noteEditorViewModel = viewModel,
-                        fileRepository = miApplication.getDriveFileRepository()
+                        fileRepository = miApplication.getDriveFileRepository(),
+                        dataSource = miApplication.getFilePropertyDataSource()
                     )
                 }
 

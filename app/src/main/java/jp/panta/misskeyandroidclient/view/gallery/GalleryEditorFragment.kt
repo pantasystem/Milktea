@@ -69,7 +69,8 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
                 MdcTheme {
                     PickedImagePreview(
                         viewModel = viewModel,
-                        repository = miCore.getDriveFileRepository()
+                        repository = miCore.getDriveFileRepository(),
+                        dataSource = miCore.getFilePropertyDataSource()
                     )
                 }
             }

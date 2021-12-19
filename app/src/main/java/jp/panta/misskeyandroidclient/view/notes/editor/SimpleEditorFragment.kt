@@ -121,7 +121,11 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         mBinding.filePreview.apply {
             setContent {
                 MdcTheme {
-                    NoteFilePreview(noteEditorViewModel = viewModel, fileRepository = miApplication.getDriveFileRepository())
+                    NoteFilePreview(
+                        noteEditorViewModel = viewModel,
+                        fileRepository = miApplication.getDriveFileRepository(),
+                        dataSource = miApplication.getFilePropertyDataSource()
+                    )
                 }
             }
         }
