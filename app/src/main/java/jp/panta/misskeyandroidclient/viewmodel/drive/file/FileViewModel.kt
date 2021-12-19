@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.api.drive.UpdateFileDTO
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
 import jp.panta.misskeyandroidclient.model.drive.*
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -121,7 +122,7 @@ class FileViewModel(
     }
 
 
-    fun uploadFile(file: File){
+    fun uploadFile(file: AppFile.Local){
         val uploadFile = file.copy(folderId = driveStore.state.value.path.path.lastOrNull()?.id)
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -140,19 +141,7 @@ class FileViewModel(
     fun toggleNsfw(id: FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val account = currentAccountWatcher.getAccount()
-                val api = miCore.getMisskeyAPI(account)
-                val fileProperty = miCore.getFilePropertyDataSource().find(id)
-                val result = api.updateFile(UpdateFileDTO(
-                    account.getI(miCore.getEncryption()),
-                    fileId = id.fileId,
-                    isSensitive = !fileProperty.isSensitive,
-                    name = fileProperty.name,
-                    folderId = fileProperty.folderId,
-                    comment = fileProperty.comment
-                )).throwIfHasError()
-                miCore.getFilePropertyDataSource().add(result.body()!!.toFileProperty(account))
-
+                miCore.getDriveFileRepository().toggleNsfw(id)
             }catch(e: Exception) {
                 logger.info("nsfwの更新に失敗しました", e = e)
             }

@@ -171,6 +171,14 @@ class MiApplication : Application(), MiCore {
         OkHttpFileUploaderProvider(OkHttpClient(), this, GsonFactory.create(), getEncryption())
     }
 
+    private val mDriveFileRepository: DriveFileRepository by lazy {
+        DriveFileRepositoryImpl(
+            getAccountRepository(),
+            getMisskeyAPIProvider(),
+            getFilePropertyDataSource(),
+            getEncryption()
+        )
+    }
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -447,6 +455,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getGetters(): Getters {
         return mGetters
+    }
+
+    override fun getDriveFileRepository(): DriveFileRepository {
+        return mDriveFileRepository
     }
 
     override fun getUnreadNotificationDAO() = _unreadNotificationDAO
