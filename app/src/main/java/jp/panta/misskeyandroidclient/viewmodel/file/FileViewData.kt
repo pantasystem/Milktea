@@ -20,16 +20,10 @@ class FileViewData(val file: File) {
     val url = file.path
     val thumbnailUrl = file.thumbnailUrl?: url
 
-    val isHiding = MutableLiveData<Boolean>(isSensitive)
+    val isHiding = MutableLiveData(isSensitive)
 
     val isImage = type == Type.IMAGE
 
-    fun changeContentHiding(){
-        if(isSensitive){
-            val now = isHiding.value?: false
-            isHiding.value = !now
-        }
-    }
 
     fun show(){
         val now = isHiding.value?: false
@@ -38,4 +32,7 @@ class FileViewData(val file: File) {
         }
     }
 
+    fun toggleVisibility() {
+        isHiding.value = !(isHiding.value ?: false)
+    }
 }
