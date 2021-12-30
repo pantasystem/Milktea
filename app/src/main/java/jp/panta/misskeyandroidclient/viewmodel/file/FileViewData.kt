@@ -27,7 +27,7 @@ class FileViewData(val file: File) {
 
     fun show(){
         val now = isHiding.value?: false
-        if(isSensitive && now){
+        if(now){
             isHiding.value = false
         }
     }
