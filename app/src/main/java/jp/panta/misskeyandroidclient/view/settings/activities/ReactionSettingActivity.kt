@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -24,9 +23,8 @@ import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.setting.reaction.ReactionPickerSettingViewModel
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import java.lang.IllegalArgumentException
 
 class ReactionSettingActivity : AppCompatActivity() {
@@ -35,6 +33,7 @@ class ReactionSettingActivity : AppCompatActivity() {
     private var mEmojis: List<Emoji> = emptyList()
     private var mReactionPickerSettingViewModel: ReactionPickerSettingViewModel? = null
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -78,14 +77,20 @@ class ReactionSettingActivity : AppCompatActivity() {
 
         }.launchIn(lifecycleScope)
 
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
-        val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(emojis, this)
-        binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
-        binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
-            val emoji = reactionAutoCompleteArrayAdapter.suggestions[position]
-            mReactionPickerSettingViewModel?.addReaction(emoji)
-            binding.reactionSettingField.setText("")
-        }
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getMetaRepository().observe(it.instanceDomain)
+        }.distinctUntilChanged().mapNotNull {
+            it?.emojis
+        }.onEach { emojis ->
+            val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(emojis, this)
+            binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
+            binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
+                val emoji = reactionAutoCompleteArrayAdapter.suggestions[position]
+                mReactionPickerSettingViewModel?.addReaction(emoji)
+                binding.reactionSettingField.setText("")
+            }
+        }.launchIn(lifecycleScope)
+
         binding.reactionSettingField.setOnEditorActionListener { textView, _, keyEvent ->
             val text = textView.text
             if(keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER && text != null){

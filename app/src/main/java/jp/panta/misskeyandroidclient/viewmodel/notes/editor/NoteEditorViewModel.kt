@@ -165,10 +165,6 @@ class NoteEditorViewModel(
 
     val isSaveNoteAsDraft = EventBus<Long?>()
     init{
-        currentAccount.observeForever {
-            miCore.getCurrentInstanceMeta()
-        }
-
         miCore.getCurrentAccount().filterNotNull().onEach {
             _state.value = runCatching {
                 _state.value.setAccount(it)

@@ -9,6 +9,7 @@ import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -19,6 +20,7 @@ import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
 import jp.panta.misskeyandroidclient.view.messaging.MessageFragment
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.view.TitleSettable
+import kotlinx.coroutines.flow.*
 
 class MessageActivity : AppCompatActivity(), TitleSettable {
 
@@ -71,15 +73,19 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
         }
 
         val miCore = application as MiCore
-        miCore.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
-            mBinding.inputMessage.setTokenizer(CustomEmojiTokenizer())
-            mBinding.inputMessage.setAdapter(
-                CustomEmojiCompleteAdapter(
-                    emojis,
-                    this
+
+        miCore.getMetaRepository().observe(account.instanceDomain)
+            .mapNotNull { it?.emojis }
+            .distinctUntilChanged()
+            .onEach { emojis ->
+                mBinding.inputMessage.setTokenizer(CustomEmojiTokenizer())
+                mBinding.inputMessage.setAdapter(
+                    CustomEmojiCompleteAdapter(
+                        emojis,
+                        this
+                    )
                 )
-            )
-        }
+            }.launchIn(lifecycleScope)
     }
 
     override fun setTitle(text: String) {
