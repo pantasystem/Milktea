@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.viewmodel.auth.app
 
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.lifecycle.map
 import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.api.app.CreateApp
 import jp.panta.misskeyandroidclient.api.throwIfHasError
@@ -20,11 +19,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import java.lang.IllegalStateException
+import java.net.UnknownHostException
 import java.util.*
 import java.util.regex.Pattern
 
+
+sealed interface AuthErrors {
+    val throwable: Throwable
+    data class GetMetaError(
+        override val throwable: Throwable,
+    ) : AuthErrors
+
+    data class GenerateTokenError(
+        override val throwable: Throwable
+    ) : AuthErrors
+}
 
 @ExperimentalCoroutinesApi
 @Suppress("UNCHECKED_CAST")
@@ -49,7 +59,8 @@ class AppAuthViewModel(
     //private val metaState: StateFlow<State<Meta>> = _metaState
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(StateContent.NotExist()))
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(StateContent.NotExist()))
+
     private val _generatingTokenState = MutableStateFlow<State<Session>>(State.Fixed(StateContent.NotExist()))
     private val generatingTokenState: StateFlow<State<Session>> = _generatingTokenState
     val generateTokenError = generatingTokenState.map {
@@ -61,6 +72,10 @@ class AppAuthViewModel(
     private val isFetchingMeta = metaState.map {
         it is State.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    private val fetchingMetaError = metaState.map {
+        (it as? State.Error)?.throwable
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val isGeneratingToken = generatingTokenState.map {
         it is State.Loading
@@ -84,6 +99,20 @@ class AppAuthViewModel(
     private val metaStore = miCore.getMetaStore()
     private val misskeyAPIProvider = miCore.getMisskeyAPIProvider()
 
+    val errors = combine(generateTokenError, fetchingMetaError) { generateTokenError, fetchingMetaError ->
+        when {
+            generateTokenError != null -> {
+                AuthErrors.GenerateTokenError(generateTokenError)
+            }
+            fetchingMetaError != null -> {
+                AuthErrors.GetMetaError(fetchingMetaError)
+            }
+            else -> {
+                null
+            }
+        }
+    }
+
     private fun getMeta(instanceDomain: String): Flow<State<Meta>> {
         return flow {
             val url = toEnableUrl(instanceDomain)
@@ -97,7 +126,7 @@ class AppAuthViewModel(
                 }.onSuccess {
                     Log.d("AppAuthVM", "meta:$it")
                     emit(State.Fixed(
-                        if(it == null) StateContent.NotExist() else StateContent.Exist(it)
+                        StateContent.Exist(it)
                     ))
                 }
             }

@@ -261,7 +261,7 @@ class MiApplication : Application(), MiCore {
 
         metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
 
-        metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true)
+        metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true, loggerFactory)
 
         mNoteDataSource = InMemoryNoteDataSource(loggerFactory)
         mNoteRepository = NoteRepositoryImpl(this)
@@ -754,11 +754,6 @@ class MiApplication : Application(), MiCore {
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
             val meta = metaStore.get(instanceDomain)
-
-
-            logger.debug("load meta result ${meta?.let{"成功"}?: "失敗"} ")
-
-            meta?: return null
 
             synchronized(mMetaInstanceUrlMap){
                 mMetaInstanceUrlMap[instanceDomain] = meta

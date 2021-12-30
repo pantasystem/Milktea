@@ -13,14 +13,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAppAuthBinding
-import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
 import jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel
+import jp.panta.misskeyandroidclient.viewmodel.auth.app.AuthErrors
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class AuthFragment : Fragment(){
 
@@ -63,10 +65,17 @@ class AuthFragment : Fragment(){
             }
         }
         lifecycleScope.launchWhenResumed {
-            appAuthViewModel.generateTokenError.collect {
+            appAuthViewModel.errors.collect {
                 binding.errorMsgView.visibility = if(it == null) View.GONE else View.VISIBLE
                 if(it != null) {
-                    binding.errorMsgView.text = getString(R.string.error_s, it.toString())
+                    binding.errorMsgView.text = when(it) {
+                        is AuthErrors.GetMetaError -> {
+                            getString(R.string.warning_s, it.throwable.toString())
+                        }
+                        is AuthErrors.GenerateTokenError -> {
+                            getString(R.string.error_s, it.throwable.toString())
+                        }
+                    }
                 }
             }
         }

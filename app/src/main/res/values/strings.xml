@@ -371,6 +371,7 @@
     <string name="cancel">Cancel</string>
     <string name="do_u_want_2_delete_s">Do you want to delete %s?</string>
     <string name="remove_attachment">Remove attachment</string>
+    <string name="warning_s">Warning:%s</string>
 
 
 </resources>
