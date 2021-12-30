@@ -10,13 +10,19 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAppAuthBinding
-import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
 import jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel
+import jp.panta.misskeyandroidclient.viewmodel.auth.app.AuthErrors
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class AuthFragment : Fragment(){
 
@@ -30,6 +36,7 @@ class AuthFragment : Fragment(){
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_app_auth, container, false)
         return binding.root
     }
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -57,5 +64,21 @@ class AuthFragment : Fragment(){
                 ).show()
             }
         }
+        lifecycleScope.launchWhenResumed {
+            appAuthViewModel.errors.collect {
+                binding.errorMsgView.visibility = if(it == null) View.GONE else View.VISIBLE
+                if(it != null) {
+                    binding.errorMsgView.text = when(it) {
+                        is AuthErrors.GetMetaError -> {
+                            getString(R.string.warning_s, it.throwable.toString())
+                        }
+                        is AuthErrors.GenerateTokenError -> {
+                            getString(R.string.error_s, it.throwable.toString())
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

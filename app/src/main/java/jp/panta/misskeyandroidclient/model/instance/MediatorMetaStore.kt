@@ -1,35 +1,46 @@
 package jp.panta.misskeyandroidclient.model.instance
 
-import android.util.Log
-import java.util.concurrent.ConcurrentHashMap
+import jp.panta.misskeyandroidclient.Logger
+import java.lang.IllegalStateException
 
 class MediatorMetaStore(
-    val metaRepository : MetaRepository,
-    val metaStore: MetaStore,
-    val isUpdateRepository: Boolean
-) : MetaStore{
+    private val metaRepository : MetaRepository,
+    private val metaStore: MetaStore,
+    private val isUpdateRepository: Boolean,
+    val loggerFactory: Logger.Factory,
+    ) : MetaStore{
 
-    override suspend fun get(instanceDomain: String): Meta? {
+    val logger: Logger by lazy {
+        loggerFactory.create("MediatorMetaStore")
+    }
+
+    override suspend fun get(instanceDomain: String): Meta {
         try{
             val local = metaRepository.get(instanceDomain)
+            var remoteError: Throwable? = null
             if(local == null || isUpdateRepository){
                 val remote = try{
                     metaStore.get(instanceDomain)
                 }catch(e: Exception){
+                    remoteError = e
                     null
                 }
                 if(remote != null){
                     return try{
                         metaRepository.add(remote)
                     }catch(e: Exception){
-                        Log.e("MediatorMetaStore", "データベースエラー", e)
-                        remote
+                        throw e
                     }
                 }
             }
-            return local
+            if(local != null) {
+                return local
+            }else if(remoteError != null) {
+                throw remoteError
+            }
+            throw IllegalStateException("Metaの取得に失敗")
         }catch(e: Exception){
-            return null
+            throw e
         }
 
 
