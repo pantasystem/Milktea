@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -52,6 +53,7 @@ data class PongRes(
     val id: String get() = type.split(":")[1]
 }
 
+const val TTL_COUNT = 3
 
 
 internal class PollingJob(
@@ -68,24 +70,35 @@ internal class PollingJob(
 
     val isPolling: Boolean get() = job.isActive
     fun startPolling(interval: Long, count: Long, timeout: Long) {
+
+        // NOTE: pingに一定回数以上失敗すると再接続するそのためのカウント
+        var ttl = TTL_COUNT
         scope.launch {
             (0 until count).asSequence().asFlow().onEach {
                 delay(interval)
             }.collect {
                 val ping = createPingRequest()
+                val sendTime = Clock.System.now()
                 if(!socket.send(json.encodeToString(ping))) {
                     Log.d("PollingJob", "sendしたらfalse帰ってきた")
                 }
                 try {
-                    withTimeout(timeout) {
+                    val pong = withTimeout(timeout) {
                         pongs.first {
                             it.id == ping.body.id
                         }
                     }
-                    Log.d("PollingJob", "polling成功")
+                    val resTime = Clock.System.now()
+                    val diff = resTime.toEpochMilliseconds() - sendTime.toEpochMilliseconds()
+
+                    Log.d("PollingJob", "polling成功 id:${pong.id}, かかった時間(ミリ秒):${diff}")
+                    // NOTE: pingに成功したらTTLのカウントを初期値に戻す
+                    ttl = TTL_COUNT
                 } catch(e: TimeoutCancellationException) {
                     Log.d("PollingJob", "polling失敗")
-                    socket.reconnect()
+                    if(--ttl <= 0) {
+                        socket.reconnect()
+                    }
                 }
             }
         }
