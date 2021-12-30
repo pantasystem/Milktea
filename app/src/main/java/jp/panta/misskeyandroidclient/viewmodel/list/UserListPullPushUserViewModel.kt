@@ -50,7 +50,7 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
             Log.w(this.javaClass.simpleName, "Accountを見つけることができなかった処理を中断する")
             return
         }
-        val misskeyAPI = miCore.getMisskeyAPI(account)
+        val misskeyAPI = miCore.getMisskeyAPIProvider().get(account)
 
         val hasUserInUserList = userList.userIds.contains(userId)
         val api = if(hasUserInUserList){

@@ -108,7 +108,7 @@ class NoteDetailViewModel(
             noteConversationViewData
         }else{
             conversation.add(next)
-            val children = miCore.getMisskeyAPI(getAccount()).children(NoteRequest(getAccount().getI(encryption), limit = 100,noteId =  next.toShowNote.note.id.noteId)).body()?.map{
+            val children = miCore.getMisskeyAPIProvider().get(getAccount()).children(NoteRequest(getAccount().getI(encryption), limit = 100,noteId =  next.toShowNote.note.id.noteId)).body()?.map{
                 val n = noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it)
                 PlaneNoteViewData(
                     miCore.getGetters().noteRelationGetter.get(n),
@@ -127,7 +127,7 @@ class NoteDetailViewModel(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun loadConversation(): List<PlaneNoteViewData>?{
-        return miCore.getMisskeyAPI(getAccount()).conversation(makeRequest()).body()?.map{
+        return miCore.getMisskeyAPIProvider().get(getAccount()).conversation(makeRequest()).body()?.map{
             miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it))
         }?.map{
             PlaneNoteViewData(
@@ -182,7 +182,9 @@ class NoteDetailViewModel(
     }
 
     private suspend fun loadChildren(id: String): List<NoteDTO>?{
-        return miCore.getMisskeyAPI(getAccount()).children(NoteRequest(i = getAccount().getI(encryption), limit = 100, noteId = id)).body()
+        return miCore.getMisskeyAPIProvider().get(getAccount())
+            .children(NoteRequest(i = getAccount().getI(encryption), limit = 100, noteId = id))
+            .body()
     }
 
     private suspend fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData){

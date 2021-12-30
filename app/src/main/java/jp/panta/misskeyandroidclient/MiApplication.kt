@@ -774,13 +774,6 @@ class MiApplication : Application(), MiCore {
 
     }
 
-    override fun getMisskeyAPI(account: Account): MisskeyAPI {
-        return getMisskeyAPI(account.instanceDomain)
-    }
-
-    override fun getMisskeyAPI(instanceDomain: String): MisskeyAPI {
-        return mMisskeyAPIProvider.get(instanceDomain, mMetaInstanceUrlMap[instanceDomain]?.getVersion())
-    }
 
     override fun getMisskeyAPIProvider(): MisskeyAPIProvider {
         return mMisskeyAPIProvider

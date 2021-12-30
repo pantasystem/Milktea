@@ -73,7 +73,7 @@ class UserListDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                val res = miCore.getMisskeyAPI(account).showList(
+                val res = miCore.getMisskeyAPIProvider().get(account).showList(
                     ListId(
                         i = account.getI(miCore.getEncryption()),
                         listId = listId.userListId
@@ -95,7 +95,7 @@ class UserListDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                val res = miCore.getMisskeyAPI(account).updateList(
+                val res = miCore.getMisskeyAPIProvider().get(account).updateList(
                     UpdateList(
                         i = account.getI(miCore.getEncryption()),
                         listId = listId.userListId,
@@ -121,7 +121,7 @@ class UserListDetailViewModel(
         viewModelScope.launch(Dispatchers.IO){
             runCatching {
                 val account = getAccount()
-                val res = miCore.getMisskeyAPI(account).pushUserToList(
+                val res = miCore.getMisskeyAPIProvider().get(account).pushUserToList(
                     ListUserOperation(
                         i = account.getI(miCore.getEncryption()),
                         listId = listId.userListId,
@@ -144,7 +144,7 @@ class UserListDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().getCurrentAccount()
-                val result = miCore.getMisskeyAPI(account).pullUserFromList(
+                val result = miCore.getMisskeyAPIProvider().get(account).pullUserFromList(
                     ListUserOperation(
                         i = account.getI(miCore.getEncryption()),
                         listId = listId.userListId,

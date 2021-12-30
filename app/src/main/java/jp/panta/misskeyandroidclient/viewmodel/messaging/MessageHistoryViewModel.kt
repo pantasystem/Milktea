@@ -150,7 +150,7 @@ class MessageHistoryViewModel(
     }
 
     private fun getMisskeyAPI(): MisskeyAPI {
-        return miCore.getMisskeyAPI(account)
+        return miCore.getMisskeyAPIProvider().get(account)
     }
 
     private fun updateLiveData(liveData: MutableLiveData<List<HistoryViewData>>, message: MessageHistoryRelation){

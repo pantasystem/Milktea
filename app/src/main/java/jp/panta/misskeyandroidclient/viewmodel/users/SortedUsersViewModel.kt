@@ -120,7 +120,7 @@ class SortedUsersViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { miCore.getMisskeyAPI(account).getUsers(orderBy.toRequestUser(i)).body() }
+            runCatching { miCore.getMisskeyAPIProvider().get(account).getUsers(orderBy.toRequestUser(i)).body() }
                 .map {
                     it?.map{ dto ->
                         dto.pinnedNotes?.map { noteDTO ->

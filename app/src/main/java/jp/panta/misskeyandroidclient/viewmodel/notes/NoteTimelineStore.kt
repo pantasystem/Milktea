@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import retrofit2.Call
+
 import retrofit2.Response
 import java.lang.Exception
 import java.lang.IllegalArgumentException
@@ -17,8 +17,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
+
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class NoteTimelineStore(
@@ -38,19 +37,19 @@ class NoteTimelineStore(
     private fun getStore(): (suspend (NoteRequest)-> Response<List<NoteDTO>?>)? {
         return try{
             when(pageableTimeline){
-                is Pageable.GlobalTimeline -> miCore.getMisskeyAPI(account)::globalTimeline
-                is Pageable.LocalTimeline -> miCore.getMisskeyAPI(account)::localTimeline
-                is Pageable.HybridTimeline -> miCore.getMisskeyAPI(account)::hybridTimeline
-                is Pageable.HomeTimeline -> miCore.getMisskeyAPI(account)::homeTimeline
-                is Pageable.Search -> miCore.getMisskeyAPI(account)::searchNote
+                is Pageable.GlobalTimeline -> miCore.getMisskeyAPIProvider().get(account)::globalTimeline
+                is Pageable.LocalTimeline -> miCore.getMisskeyAPIProvider().get(account)::localTimeline
+                is Pageable.HybridTimeline -> miCore.getMisskeyAPIProvider().get(account)::hybridTimeline
+                is Pageable.HomeTimeline -> miCore.getMisskeyAPIProvider().get(account)::homeTimeline
+                is Pageable.Search -> miCore.getMisskeyAPIProvider().get(account)::searchNote
                 is Pageable.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
-                is Pageable.UserTimeline -> miCore.getMisskeyAPI(account)::userNotes
-                is Pageable.UserListTimeline -> miCore.getMisskeyAPI(account)::userListTimeline
-                is Pageable.SearchByTag -> miCore.getMisskeyAPI(account)::searchByTag
-                is Pageable.Featured -> miCore.getMisskeyAPI(account)::featured
-                is Pageable.Mention -> miCore.getMisskeyAPI(account)::mentions
+                is Pageable.UserTimeline -> miCore.getMisskeyAPIProvider().get(account)::userNotes
+                is Pageable.UserListTimeline -> miCore.getMisskeyAPIProvider().get(account)::userListTimeline
+                is Pageable.SearchByTag -> miCore.getMisskeyAPIProvider().get(account)::searchByTag
+                is Pageable.Featured -> miCore.getMisskeyAPIProvider().get(account)::featured
+                is Pageable.Mention -> miCore.getMisskeyAPIProvider().get(account)::mentions
                 is Pageable.Antenna -> {
-                    val api = miCore.getMisskeyAPI(account)
+                    val api = miCore.getMisskeyAPIProvider().get(account)
                     if(api is MisskeyAPIV12){
                         (api)::antennasNotes
                     }else{

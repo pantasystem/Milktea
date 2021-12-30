@@ -154,7 +154,7 @@ class FileViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = currentAccountWatcher.getAccount()
-                val api = miCore.getMisskeyAPI(account)
+                val api = miCore.getMisskeyAPIProvider().get(account)
                 val fileProperty = miCore.getFilePropertyDataSource().find(id)
                 api.deleteFile(DeleteFileDTO(i = account.getI(miCore.getEncryption()), fileId = id.fileId))
                     .throwIfHasError()

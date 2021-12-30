@@ -82,7 +82,7 @@ class AntennaListViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().getCurrentAccount()
-                val res = (miCore.getMisskeyAPI(account) as MisskeyAPIV12).getAntennas(
+                val res = (miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12).getAntennas(
                     AntennaQuery(
                         i = account.getI(miCore.getEncryption()),
                         limit = null,
@@ -151,6 +151,6 @@ class AntennaListViewModel (
     }
 
     private fun getMisskeyAPI(): MisskeyAPIV12?{
-        return miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!) as? MisskeyAPIV12
+        return miCore.getMisskeyAPIProvider().get(miCore.getCurrentAccount().value!!) as? MisskeyAPIV12
     }
 }

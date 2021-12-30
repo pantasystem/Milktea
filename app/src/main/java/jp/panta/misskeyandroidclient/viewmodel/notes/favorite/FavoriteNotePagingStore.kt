@@ -24,7 +24,7 @@ class FavoriteNotePagingStore(
 
 ) : NotePagedStore{
 
-    val favorites = miCore.getMisskeyAPI(account)::favorites
+    val favorites = miCore.getMisskeyAPIProvider().get(account)::favorites
 
     //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 

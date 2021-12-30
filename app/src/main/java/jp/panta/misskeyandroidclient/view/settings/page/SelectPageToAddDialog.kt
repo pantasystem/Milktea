@@ -35,7 +35,7 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
         })
 
         var pageTypeList = PageType.values().toList().toMutableList()
-        val api = miCore.getMisskeyAPI(miCore.getCurrentAccount().value!!)
+        val api = miCore.getMisskeyAPIProvider().get(miCore.getCurrentAccount().value!!)
         if(api !is MisskeyAPIV12){
             pageTypeList.remove(PageType.ANTENNA)
         }

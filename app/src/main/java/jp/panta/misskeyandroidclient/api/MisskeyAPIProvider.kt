@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.api
 
 
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.Version
 
 /**
@@ -25,5 +26,9 @@ class MisskeyAPIProvider {
             baseURLAndMisskeyAPI[baseURL] = api
             return api
         }
+    }
+
+    fun get(account: Account): MisskeyAPI {
+        return get(account.instanceDomain)
     }
 }

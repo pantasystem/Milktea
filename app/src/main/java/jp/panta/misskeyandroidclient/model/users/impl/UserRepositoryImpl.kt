@@ -35,7 +35,7 @@ class UserRepositoryImpl(
 
         val account = miCore.getAccount(userId.accountId)
         if(localResult.getOrNull() == null) {
-            val res = miCore.getMisskeyAPI(account).showUser(RequestUser(
+            val res = miCore.getMisskeyAPIProvider().get(account).showUser(RequestUser(
                 i = account.getI(miCore.getEncryption()),
                 userId = userId.id,
                 detail = true
@@ -115,7 +115,7 @@ class UserRepositoryImpl(
         val user = find(userId, true) as User.Detail
         val req = RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))
         logger.debug("follow req:$req")
-        val res = miCore.getMisskeyAPI(account).followUser(req)
+        val res = miCore.getMisskeyAPIProvider().get(account).followUser(req)
         res.throwIfHasError()
         if(res.isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(
@@ -133,9 +133,11 @@ class UserRepositoryImpl(
 
 
         val res = if(user.isLocked) {
-            miCore.getMisskeyAPI(account).cancelFollowRequest(CancelFollow(userId = userId.id, i = account.getI(miCore.getEncryption())))
+            miCore.getMisskeyAPIProvider().get(account)
+                .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.getI(miCore.getEncryption())))
         }else{
-            miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
+            miCore.getMisskeyAPIProvider().get(account)
+                .unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
         }
         res.throwIfHasError()
         if(res.isSuccessful) {
@@ -154,7 +156,8 @@ class UserRepositoryImpl(
         if(!user.hasPendingFollowRequestToYou) {
             return false
         }
-        val res = miCore.getMisskeyAPI(account).acceptFollowRequest(AcceptFollowRequest(i = account.getI(miCore.getEncryption()), userId = userId.id))
+        val res = miCore.getMisskeyAPIProvider().get(account)
+            .acceptFollowRequest(AcceptFollowRequest(i = account.getI(miCore.getEncryption()), userId = userId.id))
             .throwIfHasError()
         if(res.isSuccessful) {
             miCore.getUserDataSource().add(user.copy(hasPendingFollowRequestToYou = false, isFollower = true))
@@ -169,7 +172,7 @@ class UserRepositoryImpl(
         if(!user.hasPendingFollowRequestToYou) {
             return false
         }
-        val res = miCore.getMisskeyAPI(account).rejectFollowRequest(RejectFollowRequest(i = account.getI(miCore.getEncryption()), userId = userId.id))
+        val res = miCore.getMisskeyAPIProvider().get(account).rejectFollowRequest(RejectFollowRequest(i = account.getI(miCore.getEncryption()), userId = userId.id))
             .throwIfHasError()
         if(res.isSuccessful) {
             miCore.getUserDataSource().add(user.copy(hasPendingFollowRequestToYou = false, isFollower = false))
@@ -202,6 +205,6 @@ class UserRepositoryImpl(
     }
 
     private suspend fun User.Id.getMisskeyAPI(): MisskeyAPI {
-        return miCore.getMisskeyAPI(miCore.getAccountRepository().get(accountId))
+        return miCore.getMisskeyAPIProvider().get(miCore.getAccountRepository().get(accountId))
     }
 }

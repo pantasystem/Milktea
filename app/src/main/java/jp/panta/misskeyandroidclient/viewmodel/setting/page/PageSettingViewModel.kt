@@ -113,7 +113,7 @@ class PageSettingViewModel(
     fun addUserPageById(userId: String){
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getMisskeyAPI(account!!).showUser(
+                miCore.getMisskeyAPIProvider().get(account!!).showUser(
                     RequestUser(userId = userId, i = account?.getI(encryption))
                 ).throwIfHasError().body()?: throw IllegalStateException()
             }.onSuccess {

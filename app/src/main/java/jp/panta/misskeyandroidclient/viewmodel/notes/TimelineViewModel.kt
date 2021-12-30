@@ -428,7 +428,7 @@ class TimelineViewModel(
 
 
     private fun Account.getMisskeyAPI(): MisskeyAPI {
-        return miCore.getMisskeyAPI(this)
+        return miCore.getMisskeyAPIProvider().get(this)
     }
 
     private fun Account.getPagedStore(): NotePagedStore {
