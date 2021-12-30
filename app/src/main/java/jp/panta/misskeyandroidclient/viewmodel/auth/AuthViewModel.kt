@@ -10,16 +10,16 @@ import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.newAccount
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.State
+import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.map
 import java.lang.Exception
 import java.lang.IllegalStateException
 
+@ExperimentalCoroutinesApi
 class AuthViewModel(
     private val miCore: MiCore
 ) : ViewModel(){
@@ -37,6 +37,37 @@ class AuthViewModel(
     private val mAuthorization = MutableStateFlow<Authorization>(Authorization.BeforeAuthentication)
     val authorization: StateFlow<Authorization> = mAuthorization
 
+    init {
+        authorization.flatMapLatest { a ->
+            (0..Int.MAX_VALUE).asFlow().map {
+                delay(4000)
+                if(a is Authorization.Waiting4UserAuthorization) {
+                    try {
+                        val token = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
+                            .getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
+                            .throwIfHasError()
+                            .body()
+                                ?: throw IllegalStateException("response bodyがありません。")
+
+                        val authenticated = Authorization.Approved(
+                            a.instanceBaseURL,
+                            appSecret = a.appSecret,
+                            token
+                        )
+                        State.Fixed(StateContent.Exist(authenticated))
+                    }catch (e: Throwable) {
+                        State.Error(StateContent.NotExist(), e)
+                    }
+                }else{
+                    State.Fixed(StateContent.NotExist())
+                }
+            }
+        }.mapNotNull {
+            it.content as? StateContent.Exist
+        }.onEach {
+            setState(it.rawContent)
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
 
     /**
      * 認可されていることを前提にAuthTokenを取得しに行く
