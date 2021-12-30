@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -137,10 +138,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
     private fun showFileManager(){
         if(checkPermission()){
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.type = "*/*"
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            startActivityForResult(intent, SELECT_LOCAL_FILE_REQUEST_CODE)
+            requestSelectFileResult.launch(arrayOf("*/*"))
         }else{
             requestPermission()
         }
@@ -153,9 +151,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
     private fun requestPermission(){
         if(! checkPermission()){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                READ_STORAGE_PERMISSION_REQUEST_CODE
-            )
+            requestReadExternalStorageLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -165,29 +161,19 @@ class SettingAppearanceActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        when(requestCode){
-            SELECT_LOCAL_FILE_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK){
-                    Log.d("NoteEditorActivity", "選択した")
 
-                    val uri = data?.data
-                    uri?.let{
-                        setBackgroundImagePath(uri.toString())
-                    }
+    private val requestSelectFileResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let{
+            setBackgroundImagePath(uri.toString())
+        }
+    }
 
-                }
-            }
-            READ_STORAGE_PERMISSION_REQUEST_CODE ->{
-                if(resultCode == RESULT_OK){
-                    showFileManager()
-                }else{
-                    Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
-                }
-            }
-
+    private val requestReadExternalStorageLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if(it){
+            showFileManager()
+        }else{
+            Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
         }
     }
 

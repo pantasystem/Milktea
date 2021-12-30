@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,8 +29,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     companion object{
 
         private const val EXTRA_ADD_USER_ID = "jp.panta.misskeyandroidclient.extra.ADD_USER_ID"
-
-        private const val USER_LIST_ACTIVITY_RESULT_CODE = 12
 
         fun newInstance(context: Context, addUserId: User.Id?): Intent {
             return Intent(context, ListListActivity::class.java).apply {
@@ -113,19 +112,21 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
     }
 
+    @ExperimentalCoroutinesApi
     private val showUserListDetail = Observer<UserList>{ ul ->
         val intent = UserListDetailActivity.newIntent(this, ul.id)
-        startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
+        requestUserListActivityResult.launch(intent)
     }
 
 
 
+    @ExperimentalCoroutinesApi
     override fun onEdit(userList: UserList?) {
         userList?: return
 
         val intent = UserListDetailActivity.newIntent(this, userList.id)
         intent.action = UserListDetailActivity.ACTION_EDIT_NAME
-        startActivityForResult(intent, USER_LIST_ACTIVITY_RESULT_CODE)
+        requestUserListActivityResult.launch(intent)
     }
 
 
@@ -135,20 +136,14 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     }
 
     @ExperimentalCoroutinesApi
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            USER_LIST_ACTIVITY_RESULT_CODE ->{
-                if(resultCode == RESULT_OK){
-                    val updated = data?.getSerializableExtra(UserListDetailActivity.EXTRA_UPDATED_USER_LIST) as? UserList
-                    if(updated != null){
-                        mListListViewModel?.onUserListUpdated(updated)
-                    }
-
-                }
+    val requestUserListActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if(it.resultCode == RESULT_OK){
+            val updated = it.data?.getSerializableExtra(UserListDetailActivity.EXTRA_UPDATED_USER_LIST) as? UserList
+            if(updated != null){
+                mListListViewModel?.onUserListUpdated(updated)
             }
-        }
 
+        }
     }
 
     override fun onDestroy() {
