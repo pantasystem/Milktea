@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.auth.Permissions
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -25,6 +26,7 @@ import java.util.*
 import java.util.regex.Pattern
 
 
+@ExperimentalCoroutinesApi
 @Suppress("UNCHECKED_CAST")
 class AppAuthViewModel(
     val customAuthStore: CustomAuthStore,
@@ -43,10 +45,18 @@ class AppAuthViewModel(
     private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
     val instanceDomain = MutableStateFlow<String>("")
-    private val _metaState = MutableStateFlow<State<Meta>>(State.Fixed(StateContent.NotExist()))
-    private val metaState: StateFlow<State<Meta>> = _metaState
+    //private val _metaState = MutableStateFlow<State<Meta>>(State.Fixed(StateContent.NotExist()))
+    //private val metaState: StateFlow<State<Meta>> = _metaState
+    private val metaState = instanceDomain.flatMapLatest {
+        getMeta(it)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(StateContent.NotExist()))
     private val _generatingTokenState = MutableStateFlow<State<Session>>(State.Fixed(StateContent.NotExist()))
     private val generatingTokenState: StateFlow<State<Session>> = _generatingTokenState
+    val generateTokenError = generatingTokenState.map {
+        it as? State.Error
+    }.map {
+        it?.throwable
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val isFetchingMeta = metaState.map {
         it is State.Loading
@@ -62,7 +72,7 @@ class AppAuthViewModel(
 
     val validatedInstanceDomain = metaState.map {
         it is State.Fixed && it.content is StateContent.Exist
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val appName = MutableLiveData<String>()
 
@@ -74,25 +84,27 @@ class AppAuthViewModel(
     private val metaStore = miCore.getMetaStore()
     private val misskeyAPIProvider = miCore.getMisskeyAPIProvider()
 
-    init{
-        instanceDomain.onEach { base ->
-            val url = toEnableUrl(base)
+    private fun getMeta(instanceDomain: String): Flow<State<Meta>> {
+        return flow {
+            val url = toEnableUrl(instanceDomain)
+            emit(State.Fixed(StateContent.NotExist()))
             if(urlPattern.matcher(url).find()){
-                _metaState.value = State.Loading(_metaState.value.content)
+                emit(State.Loading(StateContent.NotExist()))
                 runCatching {
                     metaStore.get(url)
                 }.onFailure {
-                    _metaState.value = State.Error(_metaState.value.content, it)
+                    emit(State.Error<Meta>(StateContent.NotExist(), it))
                 }.onSuccess {
-                    _metaState.value = State.Fixed(
+                    Log.d("AppAuthVM", "meta:$it")
+                    emit(State.Fixed(
                         if(it == null) StateContent.NotExist() else StateContent.Exist(it)
-                    )
+                    ))
                 }
             }
-        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        }
 
     }
-
 
     fun auth(){
         val url = this.instanceDomain.value
