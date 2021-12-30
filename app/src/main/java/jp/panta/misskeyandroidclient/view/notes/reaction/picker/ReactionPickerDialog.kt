@@ -21,11 +21,13 @@ import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ReactionPickerDialog : AppCompatDialogFragment(){
 
+    @ExperimentalCoroutinesApi
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_reaction_picker, null)
@@ -67,20 +69,28 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             }
 
         }
+
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getMetaRepository().observe(it.instanceDomain)
+        }.mapNotNull {
+            it?.emojis
+        }.onEach { emojis ->
+            val autoCompleteAdapter =
+                ReactionAutoCompleteArrayAdapter(
+                    emojis,
+                    view.context
+                )
+            binding.reactionField.setAdapter(autoCompleteAdapter)
+            binding.reactionField.setOnItemClickListener { _, _, i, _ ->
+                val reaction = autoCompleteAdapter.suggestions[i]
+                notesViewModel.postReaction(reaction)
+                dismiss()
+            }
+        }.launchIn(lifecycleScope)
         
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
-        
-        val autoCompleteAdapter =
-            ReactionAutoCompleteArrayAdapter(
-                emojis,
-                view.context
-            )
-        binding.reactionField.setAdapter(autoCompleteAdapter)
-        binding.reactionField.setOnItemClickListener { _, _, i, _ ->
-            val reaction = autoCompleteAdapter.suggestions[i]
-            notesViewModel.postReaction(reaction)
-            dismiss()
-        }
+
+
+
         binding.reactionField.setOnEditorActionListener { v, _, event ->
             if(event != null && event.keyCode == KeyEvent.KEYCODE_ENTER){
                 if(event.action == KeyEvent.ACTION_UP){
@@ -95,11 +105,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         binding.reactionField
         return dialog
     }
-    
-    private fun showReactionUserSettings(){
-        
-    }
-    
+
     private fun getFlexBoxLayoutManager(context: Context): FlexboxLayoutManager{
         val flexBoxLayoutManager = FlexboxLayoutManager(context)
         flexBoxLayoutManager.flexDirection = FlexDirection.ROW

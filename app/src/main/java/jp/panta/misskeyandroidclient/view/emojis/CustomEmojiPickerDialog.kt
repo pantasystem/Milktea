@@ -30,8 +30,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
 
 
 
-        val miCore = dialog.context as MiCore
-        //val emojis = (dialog.context.applicationContext as MiCore).getCurrentInstanceMeta()?.emojis
+        val miCore = requireContext().applicationContext as MiCore
         val binding = View.inflate(dialog.context, R.layout.dialog_custom_emoji_picker, null).let {
             dialog.setContentView(it)
             DialogCustomEmojiPickerBinding.bind(it)
@@ -60,28 +59,6 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
             }.onEach {
                 mEmojisAdapter?.submitList(Emojis.categoryBy(it))
             }.launchIn(lifecycleScope)
-
-            /*view.inputEmoji.addTextChangedListener(object : TextWatcher{
-                override fun afterTextChanged(s: Editable?) = Unit
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    val text = (s?: "").toString()
-                    if(text.isBlank()){
-                        emojis?.let{
-                            mEmojisAdapter?.submitList(Emojis.categoryBy(it))
-                        }
-                    }else{
-                        emojis?.filter{
-                            it.name.contains(text)
-                        }?.let{
-                            mEmojisAdapter?.submitList(it.map{ emoji ->
-                                Emojis.CustomEmoji(emoji)
-                            })
-                        }
-                    }
-                }
-            })*/
 
 
         }

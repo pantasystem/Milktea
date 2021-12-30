@@ -16,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
@@ -30,14 +29,12 @@ import java.lang.IllegalArgumentException
 class ReactionSettingActivity : AppCompatActivity() {
 
     private lateinit var mCustomEmojiDecorator: CustomEmojiDecorator
-    private var mEmojis: List<Emoji> = emptyList()
     private var mReactionPickerSettingViewModel: ReactionPickerSettingViewModel? = null
 
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        //setContentView(R.layout.activity_reaction_setting)
         val binding = DataBindingUtil.setContentView<ActivityReactionSettingBinding>(this, R.layout.activity_reaction_setting)
         binding.lifecycleOwner = this
         setSupportActionBar(binding.reactionSettingToolbar)
@@ -56,7 +53,6 @@ class ReactionSettingActivity : AppCompatActivity() {
         touchHelper.attachToRecyclerView(binding.reactionSettingListView)
         binding.reactionSettingListView.addItemDecoration(touchHelper)
         miApplication.getCurrentAccount().filterNotNull().onEach {
-            mEmojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
             mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
             binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel!!
             val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel!!)
