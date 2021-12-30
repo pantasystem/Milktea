@@ -147,7 +147,7 @@ fun DriveScreen(
 fun PathHorizontalView(path: List<PathViewData>, onSelected: (PathViewData)->Unit) {
     LazyRow(
         Modifier
-            .background(MaterialTheme.colors.primary)
+            .background(MaterialTheme.colors.primarySurface,)
             .fillMaxWidth(),
 
     ){
