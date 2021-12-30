@@ -735,6 +735,7 @@ class MiApplication : Application(), MiCore {
 
 
 
+    @Deprecated("将来的に廃止")
     override fun getCurrentInstanceMeta(): Meta?{
         return synchronized(mMetaInstanceUrlMap){
             mCurrentAccountState.value?.instanceDomain?.let{ url ->

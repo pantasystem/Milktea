@@ -28,7 +28,7 @@ class MisskeyAPIProvider {
         }
     }
 
-    fun get(account: Account): MisskeyAPI {
-        return get(account.instanceDomain)
+    fun get(account: Account, version: Version? = null): MisskeyAPI {
+        return get(account.instanceDomain, version)
     }
 }

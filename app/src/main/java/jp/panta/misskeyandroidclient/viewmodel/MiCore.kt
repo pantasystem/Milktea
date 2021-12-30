@@ -106,11 +106,6 @@ interface MiCore{
     fun removeAllPagesInCurrentAccount(pages: List<Page>)
 
 
-    // fun getMisskeyAPI(instanceDomain: String): MisskeyAPI
-
-
-    // fun getMisskeyAPI(account: Account): MisskeyAPI
-
     fun getEncryption(): Encryption
 
 
@@ -122,6 +117,7 @@ interface MiCore{
 
     fun getNoteCaptureAPI(account: Account) : NoteCaptureAPI
 
+    @Deprecated("将来的に廃止")
     fun getCurrentInstanceMeta(): Meta?
 
 
