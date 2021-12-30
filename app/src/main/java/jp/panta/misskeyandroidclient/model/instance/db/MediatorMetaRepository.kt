@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.model.instance.db
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -44,6 +46,10 @@ class MediatorMetaRepository(
     }
 
     override fun observe(instanceDomain: String): Flow<Meta?> {
-        return inMemoryMetaRepository.observe(instanceDomain)
+        val inMemoryFlow = inMemoryMetaRepository.observe(instanceDomain)
+        val dbFlow = roomMetaRepository.observe(instanceDomain)
+        return combine(inMemoryFlow, dbFlow) { mem, db ->
+            db ?: mem
+        }.distinctUntilChanged()
     }
 }
