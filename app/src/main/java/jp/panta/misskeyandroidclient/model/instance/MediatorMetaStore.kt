@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.instance
 
 import jp.panta.misskeyandroidclient.Logger
-import kotlinx.coroutines.flow.Flow
 import java.lang.IllegalStateException
 
 class MediatorMetaStore(
@@ -15,13 +14,13 @@ class MediatorMetaStore(
         loggerFactory.create("MediatorMetaStore")
     }
 
-    override suspend fun get(instanceDomain: String): Meta {
+    override suspend fun fetch(instanceDomain: String): Meta {
         try{
             val local = metaRepository.get(instanceDomain)
             var remoteError: Throwable? = null
             if(local == null || isUpdateRepository){
                 val remote = try{
-                    metaStore.get(instanceDomain)
+                    metaStore.fetch(instanceDomain)
                 }catch(e: Exception){
                     remoteError = e
                     null

@@ -117,7 +117,6 @@ interface MiCore{
 
     fun getNoteCaptureAPI(account: Account) : NoteCaptureAPI
 
-    @Deprecated("将来的に廃止")
     fun getCurrentInstanceMeta(): Meta?
 
 

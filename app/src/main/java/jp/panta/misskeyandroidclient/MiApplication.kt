@@ -18,7 +18,6 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.*
@@ -735,7 +734,6 @@ class MiApplication : Application(), MiCore {
 
 
 
-    @Deprecated("将来的に廃止")
     override fun getCurrentInstanceMeta(): Meta?{
         return synchronized(mMetaInstanceUrlMap){
             mCurrentAccountState.value?.instanceDomain?.let{ url ->
@@ -758,7 +756,7 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
-            val meta = metaStore.get(instanceDomain)
+            val meta = metaStore.fetch(instanceDomain)
 
             synchronized(mMetaInstanceUrlMap){
                 mMetaInstanceUrlMap[instanceDomain] = meta
