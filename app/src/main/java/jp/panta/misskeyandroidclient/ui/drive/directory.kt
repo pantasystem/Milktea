@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.ui.drive
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -89,7 +87,7 @@ fun DirectoryListView(
 ) {
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.fillMaxSize()
     ) {
         this.itemsIndexed(directories, { index, _ ->
             directories[index].id
