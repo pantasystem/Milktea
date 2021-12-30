@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -19,10 +20,10 @@ import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA_ID"
-        private const val REQUEST_SEARCH_AND_SELECT_USER = 110
 
         fun newIntent(context: Context, antennaId: Antenna.Id?) : Intent{
             return Intent(context, AntennaEditorActivity::class.java).apply {
@@ -77,9 +78,10 @@ class AntennaEditorActivity : AppCompatActivity() {
         })
     }
 
+    @FlowPreview
     private fun showSearchAndSelectUserActivity(userIds: List<User.Id>){
         val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = userIds)
-        startActivityForResult(intent, REQUEST_SEARCH_AND_SELECT_USER)
+        requestSearchAndUserResult.launch(intent)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -97,21 +99,18 @@ class AntennaEditorActivity : AppCompatActivity() {
         finish()
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        when(requestCode){
-            REQUEST_SEARCH_AND_SELECT_USER ->{
-                if(resultCode == Activity.RESULT_OK && data != null){
-                    (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult)?.let {
-                        val userNames = it.selectedUsers.map { user ->
-                            user.getDisplayUserName()
-                        }
-                        mViewModel?.setUserNames(userNames)
-                    }
+
+    @FlowPreview
+    val requestSearchAndUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data
+        val resultCode = result.resultCode
+        if(resultCode == Activity.RESULT_OK && data != null){
+            (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult)?.let {
+                val userNames = it.selectedUsers.map { user ->
+                    user.getDisplayUserName()
                 }
+                mViewModel?.setUserNames(userNames)
             }
         }
     }

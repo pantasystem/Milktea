@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
@@ -145,7 +146,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                     it.userId
                 }?.filterNotNull()?: return false
                 val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selected)
-                startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
+                requestSelectUserResult.launch(intent)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -156,24 +157,21 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         updatedResultFinish()
     }
 
-    @FlowPreview
     @ExperimentalCoroutinesApi
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        Log.d(TAG, "onActivityResult: reqCode:$requestCode, resultCode:$resultCode")
-        if(requestCode == SELECT_USER_REQUEST_CODE){
-            if(resultCode == RESULT_OK){
-                val changedDiff = data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-                val added = changedDiff?.added
-                val removed = changedDiff?.removed
-                Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
-                added?.forEach{
-                    mUserListDetailViewModel?.pushUser(it)
-                }
-                removed?.forEach{
-                    mUserListDetailViewModel?.pullUser(it)
-                }
+    @FlowPreview
+    val requestSelectUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val resultCode = result.resultCode
+        val data = result.data
+        if(resultCode == RESULT_OK){
+            val changedDiff = data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+            val added = changedDiff?.added
+            val removed = changedDiff?.removed
+            Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
+            added?.forEach{
+                mUserListDetailViewModel?.pushUser(it)
+            }
+            removed?.forEach{
+                mUserListDetailViewModel?.pullUser(it)
             }
         }
     }

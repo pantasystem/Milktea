@@ -302,9 +302,6 @@ class NoteEditorViewModel(
         _state.value = _state.value.removeFile(file)
     }
 
-    fun toggleSensitive(file: AppFile) {
-
-    }
 
 
     fun fileTotal(): Int{
@@ -347,13 +344,6 @@ class NoteEditorViewModel(
     }
 
 
-    private fun List<File>?.toArrayList(): ArrayList<File>{
-        return if(this == null){
-            ArrayList<File>()
-        }else{
-            ArrayList<File>(this)
-        }
-    }
 
 
     @FlowPreview

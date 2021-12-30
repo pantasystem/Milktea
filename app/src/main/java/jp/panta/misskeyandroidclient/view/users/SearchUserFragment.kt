@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.view.users
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,8 +39,8 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val hasDetail = arguments?.getBoolean(EXTRA_HAS_DETAIL)
         val userName = arguments?.getString(EXTRA_USER_NAME)?: ""
