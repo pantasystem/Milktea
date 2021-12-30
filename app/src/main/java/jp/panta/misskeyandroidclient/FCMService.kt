@@ -63,17 +63,20 @@ class FCMService : FirebaseMessagingService() {
             .setGroupSummary(true)
 
         runCatching {
-            val pendingIntent = TaskStackBuilder.create(this)
+            val pendingIntentBuilder = TaskStackBuilder.create(this)
                 .addNextIntentWithParentStack(pushNotification.makeIntent())
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                pendingIntentBuilder
+                    .getPendingIntent(0, PendingIntent.FLAG_MUTABLE)
+            }else{
+                pendingIntentBuilder
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
 
             builder.setContentIntent(pendingIntent)
         }.onFailure { e ->
             Log.e("FCMService", "Intent作成に失敗", e)
-            if(BuildConfig.DEBUG) {
-                Toast.makeText(this, "Intent作成処理に失敗:${pushNotification}, e:${e}", Toast.LENGTH_LONG).show()
-                throw e
-            }
+            throw e
         }
 
         with(makeNotificationManager(NOTIFICATION_CHANNEL_ID)){
