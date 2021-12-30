@@ -50,8 +50,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelF
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.*
 
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
@@ -162,7 +161,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             startActivity(intent)
         }
 
-        miApplication.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getMetaRepository().observe(it.instanceDomain)
+        }.mapNotNull {
+            it?.emojis
+        }.distinctUntilChanged().onEach { emojis ->
             binding.inputMain.setAdapter(
                 CustomEmojiCompleteAdapter(
                     emojis,
@@ -178,7 +181,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                 )
             )
             binding.cw.setTokenizer(CustomEmojiTokenizer())
-        }
+        }.launchIn(lifecycleScope)
 
         val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, draftNote = draftNote)
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]

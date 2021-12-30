@@ -90,7 +90,7 @@ class MessageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val account = messagingId.getAccount()
             val viewDataList = runCatching {
-                miCore.getMisskeyAPI(account).getMessages(
+                miCore.getMisskeyAPIProvider().get(account).getMessages(
                     RequestMessage(
                         i = account.getI(miCore.getEncryption()),
                         groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
@@ -120,7 +120,7 @@ class MessageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val account = messagingId.getAccount()
             val viewData = runCatching {
-                miCore.getMisskeyAPI(messagingId.getAccount()).getMessages(RequestMessage(
+                miCore.getMisskeyAPIProvider().get(messagingId.getAccount()).getMessages(RequestMessage(
                     i = account.getI(miCore.getEncryption()),
                     untilId = untilId.messageId,
                     groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,

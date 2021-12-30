@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
@@ -15,6 +16,7 @@ import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import kotlinx.coroutines.flow.*
 
 class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
@@ -46,17 +48,22 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
             Log.d("ReactionSelectionDialog", "終了が呼び出された")
             dismiss()
         })
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getMetaRepository().observe(it.instanceDomain)
+        }.mapNotNull {
+            it?.emojis
+        }.map { emojis ->
+            emojis.filter {
+                it.category != null
+            }.groupBy {
+                it.category?: ""
+            }.keys
+        }.onEach { category ->
+            val pagerAdapter = ReactionChoicesPagerAdapter(category)
+            binding.reactionChoicesViewPager.adapter = pagerAdapter
+            binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
+        }.launchIn(lifecycleScope)
 
-        val category = miApplication.getCurrentInstanceMeta()?.emojis?.filter {
-            it.category != null
-        }?.groupBy {
-            it.category?: ""
-        }?.keys?: emptySet()
-
-        val pagerAdapter = ReactionChoicesPagerAdapter(category)
-
-        binding.reactionChoicesViewPager.adapter = pagerAdapter
-        binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
 
         binding.reactionInputKeyboard.setOnClickListener {
 

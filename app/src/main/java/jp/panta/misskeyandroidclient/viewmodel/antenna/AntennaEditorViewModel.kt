@@ -131,7 +131,7 @@ class AntennaEditorViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                miCore.getMisskeyAPI(account).userList(I(account.getI(miCore.getEncryption()))).body()
+                miCore.getMisskeyAPIProvider().get(account).userList(I(account.getI(miCore.getEncryption()))).body()
             }.onSuccess {
                 postValue(it)
             }
@@ -211,7 +211,7 @@ class AntennaEditorViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                val api = miCore.getMisskeyAPI(account) as MisskeyAPIV12
+                val api = miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12
                 val antenna = mAntenna.value
                 val request = AntennaToAdd(
                     account.getI(miCore.getEncryption()),
@@ -260,7 +260,7 @@ class AntennaEditorViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                (miCore.getMisskeyAPI(account) as MisskeyAPIV12).deleteAntenna(
+                (miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12).deleteAntenna(
                     AntennaQuery(antennaId = antennaId.antennaId, i = account.getI(miCore.getEncryption()), limit = null)
                 )
             }.onSuccess {
@@ -309,7 +309,7 @@ class AntennaEditorViewModel (
     private suspend fun fetch(): Antenna? {
         return antennaId?.let{ antennaId ->
             val account = miCore.getAccount(antennaId.accountId)
-            val api = miCore.getMisskeyAPI(account) as? MisskeyAPIV12
+            val api = miCore.getMisskeyAPIProvider().get(account) as? MisskeyAPIV12
                 ?: return null
             val res = api.showAntenna(AntennaQuery(i = account.getI(miCore.getEncryption()), antennaId = antennaId.antennaId, limit = null))
             res.throwIfHasError()

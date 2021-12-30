@@ -17,15 +17,12 @@ import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class ReactionChoicesFragment : Fragment(){
 
     companion object{
-        private const val TAG = "ReactionChoicesFragment"
         private const val EXTRA_TYPE = "jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesFragment.EXTRA_TYPE"
         private const val EXTRA_CATEGORY = "jp.panta.misskeyandroidclient.vaie.notes.reaction.choices.ReactionChoicesFragment.EXTRA_CATEGORY"
         fun newInstance(type: Type, category: String? = null): ReactionChoicesFragment{
@@ -56,6 +53,7 @@ class ReactionChoicesFragment : Fragment(){
         return inflater.inflate(R.layout.fragment_reaction_choices, container, false)
     }
 
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentReactionChoicesBinding.bind(view)
@@ -90,36 +88,35 @@ class ReactionChoicesFragment : Fragment(){
 
     }
 
+    @ExperimentalCoroutinesApi
     private fun showDefault(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis
-        if(emojis == null){
-            Log.d(TAG, "emojiの取得に失敗しましたインスタンスの初期化に失敗しているのかな？ emojis is null")
-            return
-        }
-
         val defaultReaction = ReactionResourceMap.reactionDrawableMap.map{
             it.key
         }
-
-        val reactions = ArrayList<String>(defaultReaction).apply{
-            addAll(emojis.map{
-                ":${it.name}:"
-            })
+        val emojiFlow = miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getMetaRepository().observe(it.instanceDomain)
+        }.mapNotNull {
+            it?.emojis
+        }.map { emojis ->
+            ArrayList<String>(defaultReaction).apply{
+                addAll(emojis.map{
+                    ":${it.name}:"
+                })
+            }
         }
-        adapter.submitList(reactions)
+        lifecycleScope.launchWhenResumed {
+            emojiFlow.flowOn(Dispatchers.IO).collect {
+                adapter.submitList(it)
+            }
+        }
     }
 
     private fun showFrequency(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
         val ac = miApplication.getCurrentAccount().value?: return
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis
-        if(emojis == null){
-            Log.d(TAG, "emojiの取得に失敗しました")
-            return
-        }
         lifecycleScope.launch(Dispatchers.IO){
-            val meta = miApplication.getCurrentInstanceMeta()
+            val meta = miApplication.getMetaRepository().get(ac.instanceDomain)
             val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map{
                 it.reaction
             }.map { reaction ->
@@ -146,14 +143,30 @@ class ReactionChoicesFragment : Fragment(){
         }
     }
 
+    @ExperimentalCoroutinesApi
     private fun showCategoryBy(category: String, adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?.filter{
-            it.category == category
-        }?.map{
-            ":${it.name}:"
+        val emojiFlow = miApplication.getCurrentAccount().filterNotNull()
+            .flatMapLatest {
+                miApplication.getMetaRepository().observe(it.instanceDomain)
+            }.mapNotNull {
+                it?.emojis
+            }.map { emojis ->
+                emojis.filter {
+                    it.category == category
+
+                }.map {
+                    ":${it.name}:"
+                }
+            }
+        lifecycleScope.launchWhenResumed {
+            emojiFlow
+                .flowOn(Dispatchers.IO)
+                .collect { emojis ->
+                    adapter.submitList(emojis)
+                }
         }
-        adapter.submitList(emojis)
+
     }
 
     private fun showUserSettings(adapter: ReactionChoicesAdapter){

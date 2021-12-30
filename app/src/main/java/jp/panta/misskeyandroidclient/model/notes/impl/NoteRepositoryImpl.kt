@@ -26,7 +26,7 @@ class NoteRepositoryImpl(
         )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.runCatching {
             getOrThrow().let {
-                miCore.getMisskeyAPI(createNote.author).create(it).body()?.createdNote
+                miCore.getMisskeyAPIProvider().get(createNote.author).create(it).body()?.createdNote
             }
         }
 
@@ -47,7 +47,7 @@ class NoteRepositoryImpl(
 
     override suspend fun delete(noteId: Note.Id): Boolean {
         val account = miCore.getAccountRepository().get(noteId.accountId)
-        return miCore.getMisskeyAPI(account).delete(
+        return miCore.getMisskeyAPIProvider().get(account).delete(
             DeleteNote(i = account.getI(miCore.getEncryption()), noteId = noteId.noteId)
         ).isSuccessful
     }
@@ -64,7 +64,7 @@ class NoteRepositoryImpl(
 
         logger.debug("request notes/show=$noteId")
         note = runCatching {
-            miCore.getMisskeyAPI(account).showNote(NoteRequest(
+            miCore.getMisskeyAPIProvider().get(account).showNote(NoteRequest(
                 i = account.getI(miCore.getEncryption()),
                 noteId = noteId.noteId
             ))
@@ -113,7 +113,7 @@ class NoteRepositoryImpl(
 
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
         val account = miCore.getAccount(createReaction.noteId.accountId)
-        val res = miCore.getMisskeyAPI(account).createReaction(
+        val res = miCore.getMisskeyAPIProvider().get(account).createReaction(
             jp.panta.misskeyandroidclient.api.notes.CreateReaction(
                 i = account.getI(miCore.getEncryption()),
                 noteId = createReaction.noteId.noteId,
@@ -127,7 +127,7 @@ class NoteRepositoryImpl(
     private suspend fun postUnReaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
         val account  = miCore.getAccount(noteId.accountId)
-        val res = miCore.getMisskeyAPI(account).deleteReaction(DeleteNote(
+        val res = miCore.getMisskeyAPIProvider().get(account).deleteReaction(DeleteNote(
             noteId = note.id.noteId,
             i = account.getI(miCore.getEncryption())
         ))

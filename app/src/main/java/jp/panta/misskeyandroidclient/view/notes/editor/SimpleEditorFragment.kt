@@ -48,7 +48,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelF
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 
 interface SimpleEditor{
 
@@ -97,7 +97,11 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             startActivity(intent)
         }
 
-        miApplication.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getMetaRepository().observe(it.instanceDomain)
+        }.mapNotNull {
+            it?.emojis
+        }.distinctUntilChanged().onEach { emojis ->
             mBinding.inputMainText.setAdapter(
                 CustomEmojiCompleteAdapter(
                     emojis,
@@ -113,7 +117,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                 )
             )
             mBinding.inputCw.setTokenizer(CustomEmojiTokenizer())
-        }
+        }.launchIn(lifecycleScope)
 
         val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = null, quoteToNoteId = null, draftNote = null)
         val viewModel = ViewModelProvider(requireActivity(), factory)[NoteEditorViewModel::class.java]

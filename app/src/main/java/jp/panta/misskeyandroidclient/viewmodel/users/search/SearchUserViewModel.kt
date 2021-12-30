@@ -121,7 +121,7 @@ class SearchUserViewModel(
                 return null
             }
             if(mNowInstanceBase != account.instanceDomain){
-                miCore.getMisskeyAPI(account).let{ api ->
+                miCore.getMisskeyAPIProvider().get(account).let{ api ->
                     mNowInstanceBase = account.instanceDomain
                     mSearchByUserAndHost = SearchByUserAndHost(api)
                 }

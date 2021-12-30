@@ -100,7 +100,7 @@ class ListListViewModel(
     private suspend fun loadListList(accountId: Long): List<UserList>{
         val account = miCore.getAccountRepository().get(accountId)
         val i = account.getI(encryption)
-        val res = miCore.getMisskeyAPI(account).userList(I(i))
+        val res = miCore.getMisskeyAPIProvider().get(account).userList(I(i))
         res.throwIfHasError()
 
         val userListMap = res.body()?.map {
@@ -168,7 +168,7 @@ class ListListViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().get(userList.id.accountId)
-                val misskeyAPI = miCore.getMisskeyAPI(account)
+                val misskeyAPI = miCore.getMisskeyAPIProvider().get(account)
                 val res = misskeyAPI.deleteList(
                     ListId(
                         i = account.getI(miCore.getEncryption()),
@@ -190,7 +190,7 @@ class ListListViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().getCurrentAccount()
-                val res = miCore.getMisskeyAPI(account).createList(CreateList(i = account.getI(miCore.getEncryption()), name))
+                val res = miCore.getMisskeyAPIProvider().get(account).createList(CreateList(i = account.getI(miCore.getEncryption()), name))
                 res.throwIfHasError()
                 res.body()?.toEntity(account)
                     ?: throw IllegalStateException()

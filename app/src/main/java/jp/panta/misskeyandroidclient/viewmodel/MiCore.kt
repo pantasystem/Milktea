@@ -106,11 +106,6 @@ interface MiCore{
     fun removeAllPagesInCurrentAccount(pages: List<Page>)
 
 
-    fun getMisskeyAPI(instanceDomain: String): MisskeyAPI
-
-
-    fun getMisskeyAPI(account: Account): MisskeyAPI
-
     fun getEncryption(): Encryption
 
 

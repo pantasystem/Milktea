@@ -19,7 +19,7 @@ class MessageRepositoryImpl(
     @Throws(IOException::class)
     override suspend fun read(messageId: Message.Id): Boolean {
         val account = accountRepository.get(messageId.accountId)
-        val result = miCore.getMisskeyAPI(account).readMessage(
+        val result = miCore.getMisskeyAPIProvider().get(account).readMessage(
             MessageAction(
                 account.getI(miCore.getEncryption()),
                 null,
@@ -66,7 +66,7 @@ class MessageRepositoryImpl(
             }
         }
 
-        val body: MessageDTO = miCore.getMisskeyAPI(account).createMessage(action).body()
+        val body: MessageDTO = miCore.getMisskeyAPIProvider().get(account).createMessage(action).body()
             ?: throw IllegalStateException("メッセージの作成に失敗しました")
 
         return miCore.getGetters().messageRelationGetter.get(account, body).message
@@ -76,7 +76,7 @@ class MessageRepositoryImpl(
     @Throws(IOException::class)
     override suspend fun delete(messageId: Message.Id): Boolean {
         val account = accountRepository.get(messageId.accountId)
-        val result = miCore.getMisskeyAPI(account).deleteMessage(
+        val result = miCore.getMisskeyAPIProvider().get(account).deleteMessage(
             MessageAction(
                 account.getI(miCore.getEncryption()),
                 null,

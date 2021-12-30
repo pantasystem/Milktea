@@ -10,7 +10,7 @@ import kotlinx.coroutines.sync.withLock
 
 class InMemoryMetaRepository : MetaRepository{
 
-    private val instanceDomainAndMeta = MutableStateFlow<Map<String, Meta>>(emptyMap<String, Meta>())
+    private val instanceDomainAndMeta = MutableStateFlow(emptyMap<String, Meta>())
     private val lock = Mutex()
 
     override suspend fun add(meta: Meta): Meta {

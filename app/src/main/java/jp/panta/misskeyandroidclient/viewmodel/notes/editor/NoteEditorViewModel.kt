@@ -87,8 +87,8 @@ class NoteEditorViewModel(
     }.asLiveData()
 
 
-    var maxTextLength = miCore.getCurrentAccount().map {
-        miCore.getCurrentInstanceMeta()?.maxNoteTextLength?: 1500
+    val maxTextLength = miCore.getCurrentAccount().filterNotNull().map {
+        miCore.getMetaRepository().get(it.instanceDomain)?.maxNoteTextLength ?: 1500
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val textRemaining = combine(maxTextLength, text) { max, t ->
@@ -165,10 +165,6 @@ class NoteEditorViewModel(
 
     val isSaveNoteAsDraft = EventBus<Long?>()
     init{
-        currentAccount.observeForever {
-            miCore.getCurrentInstanceMeta()
-        }
-
         miCore.getCurrentAccount().filterNotNull().onEach {
             _state.value = runCatching {
                 _state.value.setAccount(it)

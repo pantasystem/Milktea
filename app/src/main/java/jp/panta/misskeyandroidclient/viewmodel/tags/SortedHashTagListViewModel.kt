@@ -74,7 +74,7 @@ class SortedHashTagListViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getMisskeyAPI(account).getHashTagList(
+                miCore.getMisskeyAPIProvider().get(account).getHashTagList(
                     RequestHashTagList(
                         i = i,
                         sort = conditions.sort,

@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,28 +16,25 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.setting.reaction.ReactionPickerSettingViewModel
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import java.lang.IllegalArgumentException
 
 class ReactionSettingActivity : AppCompatActivity() {
 
     private lateinit var mCustomEmojiDecorator: CustomEmojiDecorator
-    private var mEmojis: List<Emoji> = emptyList()
     private var mReactionPickerSettingViewModel: ReactionPickerSettingViewModel? = null
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        //setContentView(R.layout.activity_reaction_setting)
         val binding = DataBindingUtil.setContentView<ActivityReactionSettingBinding>(this, R.layout.activity_reaction_setting)
         binding.lifecycleOwner = this
         setSupportActionBar(binding.reactionSettingToolbar)
@@ -57,7 +53,6 @@ class ReactionSettingActivity : AppCompatActivity() {
         touchHelper.attachToRecyclerView(binding.reactionSettingListView)
         binding.reactionSettingListView.addItemDecoration(touchHelper)
         miApplication.getCurrentAccount().filterNotNull().onEach {
-            mEmojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
             mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
             binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel!!
             val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel!!)
@@ -78,14 +73,20 @@ class ReactionSettingActivity : AppCompatActivity() {
 
         }.launchIn(lifecycleScope)
 
-        val emojis = miApplication.getCurrentInstanceMeta()?.emojis?: emptyList()
-        val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(emojis, this)
-        binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
-        binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
-            val emoji = reactionAutoCompleteArrayAdapter.suggestions[position]
-            mReactionPickerSettingViewModel?.addReaction(emoji)
-            binding.reactionSettingField.setText("")
-        }
+        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+            miApplication.getMetaRepository().observe(it.instanceDomain)
+        }.distinctUntilChanged().mapNotNull {
+            it?.emojis
+        }.onEach { emojis ->
+            val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(emojis, this)
+            binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
+            binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
+                val emoji = reactionAutoCompleteArrayAdapter.suggestions[position]
+                mReactionPickerSettingViewModel?.addReaction(emoji)
+                binding.reactionSettingField.setText("")
+            }
+        }.launchIn(lifecycleScope)
+
         binding.reactionSettingField.setOnEditorActionListener { textView, _, keyEvent ->
             val text = textView.text
             if(keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER && text != null){

@@ -20,7 +20,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
-import java.net.UnknownHostException
 import java.util.*
 import java.util.regex.Pattern
 
@@ -120,7 +119,7 @@ class AppAuthViewModel(
             if(urlPattern.matcher(url).find()){
                 emit(State.Loading(StateContent.NotExist()))
                 runCatching {
-                    metaStore.get(url)
+                    metaStore.fetch(url)
                 }.onFailure {
                     emit(State.Error<Meta>(StateContent.NotExist(), it))
                 }.onSuccess {

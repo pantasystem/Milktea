@@ -377,7 +377,7 @@ class NotesViewModel(
     
     private fun getMisskeyAPI(): MisskeyAPI?{
         return miCore.getCurrentAccount().value?.let{
-            miCore.getMisskeyAPI(it)
+            miCore.getMisskeyAPIProvider().get(it)
         }
     }
 
