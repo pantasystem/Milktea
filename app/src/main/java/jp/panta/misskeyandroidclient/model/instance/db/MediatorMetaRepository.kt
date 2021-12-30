@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.instance.db
 
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -26,9 +27,23 @@ class MediatorMetaRepository(
     }
 
     override suspend fun get(instanceDomain: String): Meta? {
-        lock.withLock {
-            return inMemoryMetaRepository.get(instanceDomain)?: roomMetaRepository.get(instanceDomain)
+
+        val inMem = inMemoryMetaRepository.get(instanceDomain)
+        if(inMem != null) {
+            return inMem
         }
+        val dbMeta = roomMetaRepository.get(instanceDomain)
+
+        if(dbMeta != null) {
+            lock.withLock {
+                inMemoryMetaRepository.add(dbMeta)
+            }
+        }
+
+        return inMemoryMetaRepository.get(instanceDomain)
     }
 
+    override fun observe(instanceDomain: String): Flow<Meta?> {
+        return inMemoryMetaRepository.observe(instanceDomain)
+    }
 }

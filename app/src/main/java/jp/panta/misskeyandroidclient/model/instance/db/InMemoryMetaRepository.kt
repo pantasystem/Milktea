@@ -2,18 +2,22 @@ package jp.panta.misskeyandroidclient.model.instance.db
 
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryMetaRepository : MetaRepository{
 
-    private val instanceDomainAndMeta = ConcurrentHashMap<String, Meta>()
+    private val instanceDomainAndMeta = MutableStateFlow<Map<String, Meta>>(emptyMap<String, Meta>())
     private val lock = Mutex()
 
     override suspend fun add(meta: Meta): Meta {
         lock.withLock {
-            instanceDomainAndMeta[meta.uri] = meta
+            instanceDomainAndMeta.value = instanceDomainAndMeta.value.toMutableMap().also {
+                it[meta.uri] = meta
+            }
             return meta
         }
 
@@ -22,13 +26,21 @@ class InMemoryMetaRepository : MetaRepository{
 
     override suspend fun delete(meta: Meta) {
         lock.withLock {
-            instanceDomainAndMeta.remove(meta.uri)
+            instanceDomainAndMeta.value = instanceDomainAndMeta.value.toMutableMap().also {
+                it.remove(meta.uri)
+            }
         }
     }
 
     override suspend fun get(instanceDomain: String): Meta? {
         lock.withLock {
-            return instanceDomainAndMeta[instanceDomain]
+            return instanceDomainAndMeta.value[instanceDomain]
+        }
+    }
+
+    override fun observe(instanceDomain: String): Flow<Meta?> {
+        return instanceDomainAndMeta.map {
+            it[instanceDomain]
         }
     }
 }

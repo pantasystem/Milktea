@@ -5,6 +5,8 @@ import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class RoomMetaRepository(
     val metaDAO: MetaDAO,
@@ -45,5 +47,11 @@ class RoomMetaRepository(
 
     override suspend fun get(instanceDomain: String): Meta? {
         return metaDAO.findByInstanceDomain(instanceDomain)?.toMeta()
+    }
+
+    override fun observe(instanceDomain: String): Flow<Meta?> {
+        return metaDAO.observeByInstanceDomain(instanceDomain).map {
+            it?.toMeta()
+        }
     }
 }
