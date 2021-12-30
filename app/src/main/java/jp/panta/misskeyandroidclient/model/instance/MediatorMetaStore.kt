@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.instance
 
 import jp.panta.misskeyandroidclient.Logger
+import kotlinx.coroutines.flow.Flow
 import java.lang.IllegalStateException
 
 class MediatorMetaStore(

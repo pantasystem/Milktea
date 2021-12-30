@@ -465,10 +465,13 @@ class MainActivity : AppCompatActivity(){
 
 }
 
+@ExperimentalCoroutinesApi
 fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?>{
-    return this.getCurrentAccount().map {
-        it?.instanceDomain?.let { baseURL ->
-            this.getMisskeyAPIProvider().get(baseURL)
+    return getCurrentAccount().filterNotNull().flatMapLatest {
+        getMetaRepository().observe(it.instanceDomain)
+    }.map {
+        it?.let {
+            this.getMisskeyAPIProvider().get(it.uri, it.getVersion())
         }
     }
 }

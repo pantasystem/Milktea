@@ -96,15 +96,15 @@ class MiApplication : Application(), MiCore {
 
     lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
-    lateinit var mSettingStore: SettingStore
+    private lateinit var mSettingStore: SettingStore
 
     lateinit var draftNoteDao: DraftNoteDao
 
     lateinit var urlPreviewDAO: UrlPreviewDAO
 
-    lateinit var mAccountRepository: AccountRepository
+    private lateinit var mAccountRepository: AccountRepository
 
-    lateinit var metaRepository: MetaRepository
+    private lateinit var metaRepository: MetaRepository
 
     private lateinit var metaStore: MetaStore
 
@@ -658,6 +658,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getTranslationStore(): NoteTranslationStore {
         return noteTranslationStore
+    }
+
+    override fun getMetaRepository(): MetaRepository {
+        return metaRepository
     }
 
     private suspend fun loadAndInitializeAccounts(){
