@@ -20,7 +20,6 @@ class SubscriptionRegistration(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val lang: String,
     loggerFactory: Logger.Factory,
-    val endpointBase: String = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
     val auth: String = BuildConfig.PUSH_TO_FCM_AUTH,
     val publicKey: String = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY
 ) {
@@ -33,7 +32,11 @@ class SubscriptionRegistration(
 
         logger.debug("call register(accountId:$accountId)")
         val account = accountRepository.get(accountId)
-        val endpoint = "$endpointBase/webpushcallback?deviceToken=${deviceToken}&accountId=${account.accountId}&lang=${lang}"
+        val endpoint = EndpointBuilder(
+            deviceToken = deviceToken,
+            accountId = accountId,
+            lang = lang
+        ).build()
         logger.debug("endpoint:${endpoint}")
 
         val api = misskeyAPIProvider.get(account.instanceDomain)

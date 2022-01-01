@@ -37,6 +37,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSou
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
+import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionUnRegistration
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
@@ -91,9 +92,9 @@ interface MiCore{
 
     fun getSubscriptionRegistration() : SubscriptionRegistration
 
-    suspend fun setCurrentAccount(account: Account)
+    fun getSubscriptionUnRegstration() : SubscriptionUnRegistration
 
-    fun logoutAccount(account: Account)
+    suspend fun setCurrentAccount(account: Account)
 
     suspend fun addAccount(account: Account)
 

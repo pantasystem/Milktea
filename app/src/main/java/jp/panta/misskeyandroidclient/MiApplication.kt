@@ -64,6 +64,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.streaming.MediatorMainEventDispatcher
 import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
+import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionUnRegistration
 import jp.panta.misskeyandroidclient.model.url.*
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -205,6 +206,15 @@ class MiApplication : Application(), MiCore {
             getMisskeyAPIProvider(),
             lang = Locale.getDefault().language,
             loggerFactory
+        )
+    }
+
+    private val _subscriptionUnRegistration: SubscriptionUnRegistration by lazy {
+        SubscriptionUnRegistration(
+            getAccountRepository(),
+            getEncryption(),
+            lang = Locale.getDefault().language,
+            misskeyAPIProvider = getMisskeyAPIProvider()
         )
     }
 
@@ -489,26 +499,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-
-    override fun logoutAccount(account: Account) {
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                mAccountRepository.delete(account)
-            }catch(e: Exception){
-
-            }
-
-            try{
-                loadAndInitializeAccounts()
-            }catch(e: Exception){
-
-            }
-
-        }
-    }
-
-
-
     override suspend fun addAccount(account: Account) {
         try{
             mAccountRepository.add(account, true)
@@ -653,6 +643,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getSubscriptionRegistration(): SubscriptionRegistration {
         return _subscribeRegistration
+    }
+
+    override fun getSubscriptionUnRegstration(): SubscriptionUnRegistration {
+        return _subscriptionUnRegistration
     }
 
     override fun getTranslationStore(): NoteTranslationStore {
