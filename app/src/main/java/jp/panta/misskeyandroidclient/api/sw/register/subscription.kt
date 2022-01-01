@@ -14,3 +14,8 @@ data class SubscriptionState(
     val state: String,
     val key: String
 )
+
+data class UnSubscription(
+    val i: String,
+    val endpoint: String
+) : JSerializable

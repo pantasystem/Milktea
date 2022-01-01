@@ -27,6 +27,7 @@ import jp.panta.misskeyandroidclient.api.notes.translation.Translate
 import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
+import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
@@ -165,5 +166,6 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
     override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskey.updateFile(updateFileRequest)
     override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskey.deleteFile(req)
     override suspend fun showFile(req: ShowFile) : Response<FilePropertyDTO> = misskey.showFile(req)
+    override suspend fun swUnRegister(unSub: UnSubscription): Response<Unit> = misskey.swUnRegister(unSub)
 
 }

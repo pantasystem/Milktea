@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.account
 
 import androidx.lifecycle.*
+import com.google.firebase.messaging.FirebaseMessaging
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.toUser
@@ -8,6 +9,7 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.util.task.asSuspend
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -96,7 +98,7 @@ class AccountViewModel(
     }
 
     fun showSwitchDialog(){
-        switchAccount.event = switchAccount.event?: 0 + 1
+        switchAccount.event = switchAccount.event
     }
 
     fun showFollowers(userId: User.Id?){
@@ -119,8 +121,19 @@ class AccountViewModel(
     @FlowPreview
     fun signOut(accountViewData: AccountViewData){
         viewModelScope.launch(Dispatchers.IO){
-            miCore.logoutAccount(accountViewData.account)
-            switchTargetConnectionInstanceEvent.event = Unit
+            try{
+                val token = FirebaseMessaging.getInstance().token.asSuspend()
+                miCore.getSubscriptionUnRegstration().unregister(token, accountViewData.account.accountId)
+            }catch(e: Throwable) {
+                logger.warning("token解除処理失敗", e = e)
+            }
+            try {
+                miCore.getAccountRepository().delete(accountViewData.account)
+            }catch(e: Throwable) {
+                logger.error("ログアウト処理失敗", e)
+            }
+            logger.info("ログアウト処理成功")
+
         }
     }
 
