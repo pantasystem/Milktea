@@ -27,6 +27,7 @@ import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
+import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -231,6 +232,9 @@ interface MisskeyAPI {
 
     @POST("api/sw/register")
     suspend fun swRegister(@Body subscription: Subscription) : Response<SubscriptionState>
+
+    @POST("api/sw/unregister")
+    suspend fun swUnRegister(@Body unSub: UnSubscription) : Response<Unit>
 
     @POST("api/following/requests/cancel")
     suspend fun cancelFollowRequest(@Body req: CancelFollow) : Response<UserDTO>
