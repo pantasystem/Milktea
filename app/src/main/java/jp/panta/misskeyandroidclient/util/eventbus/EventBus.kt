@@ -1,17 +1,13 @@
 package jp.panta.misskeyandroidclient.util.eventbus
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import androidx.arch.core.internal.SafeIterableMap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 
-class EventBus <T>(val limitMilliTime: Long = 500){
+class EventBus <T> {
 
-    private var isLimiting: Boolean = false
 
     private val mObservers = HashMap<Observer<T>, ObserverWrapper>()
 
@@ -39,10 +35,7 @@ class EventBus <T>(val limitMilliTime: Long = 500){
         removed?.onStateChanged(removed.lifecycleOwner, Lifecycle.Event.ON_DESTROY)
     }
 
-    /*fun postEvent(e: T?){
-        event = e
-        //handleEvent(e)
-    }*/
+
 
     private fun handleEvent(e: T?){
         Log.d("EventBus", "handleEventが呼び出された")
@@ -53,21 +46,9 @@ class EventBus <T>(val limitMilliTime: Long = 500){
                 val next = iterator.next().value
                 when {
                     next.isActive() -> {
-                        /*if(!isLimiting){
-                            isLimiting = true
-                            next.observer.onChanged(e)
-                            //mHandler.removeCallbacks(limiterRelease)
-                            //mHandler.postDelayed(limiterRelease, limitMilliTime)
-                        }else{
-                            Log.d("EventBus", "リミッター制限中")
-                        }*/
                         next.observer.onChanged(e)
 
                     }
-                    /*next.lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.DESTROYED) -> {
-
-                        iterator.remove()
-                    }*/
                     else -> {
 
                     }
@@ -94,7 +75,5 @@ class EventBus <T>(val limitMilliTime: Long = 500){
         }
     }
 
-    private val limiterRelease = Runnable{
-        isLimiting = false
-    }
+
 }

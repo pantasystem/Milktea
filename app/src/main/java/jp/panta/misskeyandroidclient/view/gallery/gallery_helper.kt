@@ -21,11 +21,3 @@ fun ImageButton.setLikeButtonState(isLiked: Boolean?, isSendingFavorite: Boolean
     }
 }
 
-@BindingAdapter("galleryPostImageSrc")
-fun ImageView.setGalleryFirstImage(galleryPostState: GalleryPostState?) {
-    galleryPostState?: return
-    Glide.with(this)
-        .load(galleryPostState.files[0].thumbnailUrl)
-        .centerCrop()
-        .into(this)
-}

@@ -2,34 +2,29 @@ package jp.panta.misskeyandroidclient.view.settings.activities
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.KeyStore
+import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBinding
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
 import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
 
 class SettingAppearanceActivity : AppCompatActivity() {
-
-    companion object{
-        const val SELECT_LOCAL_FILE_REQUEST_CODE = 514
-        const val READ_STORAGE_PERMISSION_REQUEST_CODE = 1919
-    }
 
     private  lateinit var mSettingStore: SettingStore
     private val mBinding: ActivitySettingAppearanceBinding by dataBinding()

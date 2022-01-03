@@ -15,16 +15,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class NotificationRepositoryImpl(
-    val notificationDataSource: NotificationDataSource,
-    val coroutineScope: CoroutineScope,
-    val socketProvider: SocketWithAccountProvider,
-    val accountRepository: AccountRepository,
-    val notificationRelationGetter: NotificationRelationGetter,
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    val unreadNotificationDAO: UnreadNotificationDAO
+    private val notificationDataSource: NotificationDataSource,
+    private val socketProvider: SocketWithAccountProvider,
+    private val accountRepository: AccountRepository,
+    private val notificationRelationGetter: NotificationRelationGetter,
+    private val unreadNotificationDAO: UnreadNotificationDAO
 ) : NotificationRepository{
 
-    private val lock = Mutex()
 
 
 

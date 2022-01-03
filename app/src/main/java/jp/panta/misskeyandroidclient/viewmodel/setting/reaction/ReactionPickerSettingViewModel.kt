@@ -46,10 +46,6 @@ class ReactionPickerSettingViewModel(
     private var mExistingSettingList: List<ReactionUserSetting>? = null
     private val mReactionSettingReactionNameMap = LinkedHashMap<String, ReactionUserSetting>()
 
-
-    private val mEmojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
-    private val mDefaultReactionPattern = Pattern.compile("""([a-z^\S]+)""")
-
     init{
         loadSetReactions()
     }

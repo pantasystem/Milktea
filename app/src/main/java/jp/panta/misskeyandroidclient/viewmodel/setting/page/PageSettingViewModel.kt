@@ -197,7 +197,4 @@ class PageSettingViewModel(
         pageOnActionEvent.event = page
     }
 
-    private fun writeTheNumberOfPages(index: Int, page: Page){
-        page.weight = index + 1
-    }
 }

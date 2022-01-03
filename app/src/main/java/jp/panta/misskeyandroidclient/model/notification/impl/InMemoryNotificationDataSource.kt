@@ -1,11 +1,9 @@
 package jp.panta.misskeyandroidclient.model.notification.impl
 
 import jp.panta.misskeyandroidclient.model.AddResult
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notification.AccountNotificationCount
 import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.NotificationNotFoundException
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.NotificationNotFoundException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -60,29 +58,6 @@ class InMemoryNotificationDataSource : NotificationDataSource{
 
 
 
-
-
-
-    private suspend fun countUnreadNotificationByAccount(accountId: Long): Int {
-        notificationsMapLock.withLock {
-            return notificationIdAndNotification.values.filter {
-                it.id.accountId == accountId
-            }.filterNot {
-                it.isRead
-            }.count()
-        }
-    }
-
-    private suspend fun countUnreadNotification(): List<AccountNotificationCount> {
-        notificationsMapLock.withLock {
-            return notificationIdAndNotification.values.groupBy {
-                it.id.accountId
-            }.map {
-                AccountNotificationCount(it.key, it.value.count())
-            }
-        }
-    }
-
     private suspend fun find(id: Notification.Id): Notification? {
         notificationsMapLock.withLock {
             return notificationIdAndNotification[id]
@@ -105,13 +80,7 @@ class InMemoryNotificationDataSource : NotificationDataSource{
         }
     }
 
-    private suspend fun findAllByAccountId(accountId: Long): List<Notification> {
-        return notificationsMapLock.withLock {
-            notificationIdAndNotification.values.filter {
-                it.id.accountId == accountId
-            }
-        }
-    }
+
 
     private fun publish(event: NotificationDataSource.Event) = runBlocking{
         listenersLock.withLock {

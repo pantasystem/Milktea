@@ -122,10 +122,6 @@ fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account{
     )
 }
 
-fun UserDTO.newAccount(instanceDomain: String, encryption: Encryption, token: String): Account{
-    return newAccount(instanceDomain, encryption.encrypt(this.id, token))
-}
-
 fun AccountRelation.newAccount(user: UserDTO?): Account?{
     val ci = getCurrentConnectionInformation()
         ?: return null

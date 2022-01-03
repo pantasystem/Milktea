@@ -315,11 +315,9 @@ class MiApplication : Application(), MiCore {
 
         mNotificationRepository = NotificationRepositoryImpl(
             mNotificationDataSource,
-            applicationScope,
             mSocketWithAccountProvider,
             mAccountRepository,
             getGetters().notificationRelationGetter,
-            Dispatchers.IO,
             database.unreadNotificationDAO()
         )
 

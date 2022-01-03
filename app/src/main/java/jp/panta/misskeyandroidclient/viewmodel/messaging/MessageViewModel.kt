@@ -27,7 +27,7 @@ class MessageViewModel(
         val type: Type
     ){
         enum class Type{
-            LOAD_INIT, LOAD_OLD, LOAD_NEW, RECEIVED
+            LOAD_INIT, LOAD_OLD, RECEIVED
         }
     }
 
@@ -57,10 +57,6 @@ class MessageViewModel(
     val title: LiveData<String> = mTitle
 
     private val logger = miCore.loggerFactory.create("MessageViewModel")
-
-    constructor(groupId: Group.Id, miCore: MiCore) : this(miCore, MessagingId.Group(groupId))
-
-    constructor(userId: User.Id, miCore: MiCore) : this(miCore, MessagingId.Direct(userId))
 
     init{
         miCore.messageStreamFilter.getObservable(messagingId).map {

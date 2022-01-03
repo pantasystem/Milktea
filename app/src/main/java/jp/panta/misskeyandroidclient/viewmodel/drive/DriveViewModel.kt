@@ -1,9 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.drive
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.panta.misskeyandroidclient.model.drive.*
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.Serializable
@@ -30,13 +28,7 @@ class DriveViewModel(
         )
     )
 
-    val currentDirectory = this.driveStore.state.map {
-        if(it.path.path.isEmpty()) {
-            PathViewData(null)
-        }else{
-            it.path.path.last()
-        }
-    }
+
 
     val path: Flow<List<PathViewData>> = driveStore.state.map { state ->
         mutableListOf(
@@ -50,23 +42,18 @@ class DriveViewModel(
         }
     }
 
-    val openFileEvent = EventBus<FileProperty>()
-    //val selectedFilesMap = HashMap<String, FileViewData>()
 
     val isSelectMode = driveStore.state.map {
         it.isSelectMode
     }
 
 
-    private val _selectedFileIds = MutableLiveData<Set<FileProperty.Id>>()
 
     fun getSelectedFileIds(): Set<FileProperty.Id>?{
         return this.driveStore.state.value.selectedFilePropertyIds?.selectedIds
     }
 
-    fun setSelectedFileIds(fileIds: List<FileProperty.Id>) {
-        _selectedFileIds.postValue(fileIds.toSet())
-    }
+
 
     fun push(directory: Directory) {
         this.driveStore.push(directory)
@@ -84,12 +71,6 @@ class DriveViewModel(
 
     fun popUntil(directory: Directory?) {
         driveStore.popUntil(directory)
-    }
-
-
-
-    fun openFile(fileProperty: FileProperty?){
-        openFileEvent.event = fileProperty
     }
 
 

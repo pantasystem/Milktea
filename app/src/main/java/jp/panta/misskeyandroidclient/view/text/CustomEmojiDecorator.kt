@@ -1,19 +1,13 @@
 package jp.panta.misskeyandroidclient.view.text
 
 import android.graphics.Bitmap
-import android.graphics.drawable.PictureDrawable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.style.ImageSpan
 import android.view.View
-import android.widget.ImageView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
-import jp.panta.misskeyandroidclient.util.svg.SvgSoftwareLayerSetter
 import java.util.regex.Pattern
-import  com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-import com.bumptech.glide.load.resource.gif.GifDrawable
 
 class CustomEmojiDecorator{
 

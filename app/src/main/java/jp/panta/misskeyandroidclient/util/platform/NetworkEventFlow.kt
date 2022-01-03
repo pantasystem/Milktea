@@ -14,14 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 
-sealed class DefaultNetworkEvent {
-
-    abstract val network: Network
-    data class Available(override val network: Network) : DefaultNetworkEvent()
-
-    data class Lost(override val network: Network) : DefaultNetworkEvent()
-}
-
 @RequiresApi(Build.VERSION_CODES.N)
 @ExperimentalCoroutinesApi
 fun ConnectivityManager.activeNetworkFlow(): Flow<Boolean> {

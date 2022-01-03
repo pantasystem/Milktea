@@ -37,7 +37,7 @@ class AntennaListViewModel (
 
     val confirmDeletionAntennaEvent = EventBus<Antenna>()
 
-    val openAntennasTimelineEvent = EventBus<Antenna>()
+    private val openAntennasTimelineEvent = EventBus<Antenna>()
 
     val isLoading = MutableLiveData(false)
     private var mIsLoading: Boolean = false

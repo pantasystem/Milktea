@@ -49,7 +49,7 @@ class NotesViewModel(
 
     val reactionTarget = EventBus<PlaneNoteViewData>()
 
-    val submittedNotesOnReaction = EventBus<PlaneNoteViewData>(0)
+    val submittedNotesOnReaction = EventBus<PlaneNoteViewData>()
 
     val shareTarget = EventBus<PlaneNoteViewData>()
 

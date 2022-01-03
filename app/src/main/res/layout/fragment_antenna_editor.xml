@@ -109,7 +109,7 @@
                         android:onClick="@{ ()-> antennaEditorViewModel.selectUser() }"
                         />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/includeRepliesSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -149,19 +149,19 @@
                         android:layout_height="wrap_content"
                         android:text="@string/keyword_input_method"
                         android:layout_marginBottom="8dp"/>
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/case_sensitive"
                         android:checked="@={ SafeUnbox.unbox(antennaEditorViewModel.caseSensitive) }"/>
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/with_files"
                         android:checked="@={ SafeUnbox.unbox(antennaEditorViewModel.withFile) }"/>
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/notify_notes"

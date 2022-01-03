@@ -41,7 +41,6 @@ class MessageActionViewModel(
     val file = MutableLiveData<FileProperty?>()
 
     private val mErrors = MutableStateFlow<Throwable?>(null)
-    val errors = mErrors.asStateFlow()
 
     fun setFilePropertyFromId(filePropertyId: FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {

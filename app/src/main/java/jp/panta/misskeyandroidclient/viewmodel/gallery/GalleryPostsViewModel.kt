@@ -26,9 +26,8 @@ class GalleryPostsViewModel(
     galleryDataSource: GalleryDataSource,
     galleryRepository: GalleryRepository,
     private val accountRepository: AccountRepository,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
     miCore: MiCore
-) : ViewModel(), GalleryToggleLikeOrUnlike{
+) : ViewModel(), GalleryToggleLikeOrUnlike {
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
@@ -43,7 +42,6 @@ class GalleryPostsViewModel(
                 miCore.getGalleryDataSource(),
                 miCore.getGalleryRepository(),
                 miCore.getAccountRepository(),
-                miCore.getMisskeyAPIProvider(),
                 miCore
             ) as T
         }
@@ -51,13 +49,17 @@ class GalleryPostsViewModel(
 
     private val galleryPostsStore = miCore.createGalleryPostsStore(pageable, this::getAccount)
 
-    private val _galleryPosts = MutableStateFlow<PageableState<List<GalleryPostState>>>(PageableState.Fixed(StateContent.NotExist()))
+    private val _galleryPosts =
+        MutableStateFlow<PageableState<List<GalleryPostState>>>(PageableState.Fixed(StateContent.NotExist()))
     val galleryPosts: StateFlow<PageableState<List<GalleryPostState>>> = _galleryPosts
     val lock = Mutex()
 
     private val galleryPostSendFavoriteStore = GalleryPostSendFavoriteStore(galleryRepository)
 
-    private val _error = MutableSharedFlow<Throwable>(extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _error = MutableSharedFlow<Throwable>(
+        extraBufferCapacity = 100,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val error: Flow<Throwable> = _error
 
     private val currentIndexes = MutableStateFlow<Map<GalleryPost.Id, Int>>(emptyMap())
@@ -70,7 +72,7 @@ class GalleryPostsViewModel(
             lock.withLock {
                 val state = _galleryPosts.value
                 val content = state.content
-                if(content is StateContent.Exist) {
+                if (content is StateContent.Exist) {
                     _galleryPosts.value = PageableState.Fixed(
                         content.copy(
                             content.rawContent.filterNot {
@@ -88,7 +90,7 @@ class GalleryPostsViewModel(
 
         // FIXME: 毎回Stateオブジェクトを生成してしまうのでユーザーの捜査情報が初期化されてしまうので何とかする
         val relations = galleryPostsStore.state.combine(galleryDataSource.state) { it, _ ->
-          
+
             it.convert {
                 runBlocking {
                     it.map { id ->
@@ -113,7 +115,11 @@ class GalleryPostsViewModel(
             }
         }
 
-        combine(relations, currentIndexes, galleryPostSendFavoriteStore.state) { posts, indexes, sends ->
+        combine(
+            relations,
+            currentIndexes,
+            galleryPostSendFavoriteStore.state
+        ) { posts, indexes, sends ->
             posts.convert {
                 it.map { relation ->
                     GalleryPostState(
@@ -127,7 +133,7 @@ class GalleryPostsViewModel(
             }
         }.onEach {
             this._galleryPosts.value = it
-            if(it is PageableState.Error) {
+            if (it is PageableState.Error) {
                 _error.emit(it.throwable)
             }
         }.launchIn(viewModelScope + Dispatchers.IO)
@@ -136,9 +142,9 @@ class GalleryPostsViewModel(
     }
 
     fun loadInit() {
-       if(galleryPostsStore.mutex.isLocked) {
-           return
-       }
+        if (galleryPostsStore.mutex.isLocked) {
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             galleryPostsStore.clear()
             galleryPostsStore.loadPrevious()
@@ -146,7 +152,7 @@ class GalleryPostsViewModel(
     }
 
     fun loadFuture() {
-        if(galleryPostsStore.mutex.isLocked) {
+        if (galleryPostsStore.mutex.isLocked) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -155,19 +161,11 @@ class GalleryPostsViewModel(
     }
 
     fun loadPrevious() {
-        if(galleryPostsStore.mutex.isLocked) {
+        if (galleryPostsStore.mutex.isLocked) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
             galleryPostsStore.loadPrevious()
-        }
-    }
-
-
-
-    fun changeIndex(id: GalleryPost.Id, index: Int) {
-        currentIndexes.value = currentIndexes.value.toMutableMap().also {
-            it[id] = index
         }
     }
 
@@ -188,19 +186,10 @@ class GalleryPostsViewModel(
     suspend fun getAccount(): Account {
         return accountId?.let {
             accountRepository.get(it)
-        }?: accountRepository.getCurrentAccount().also {
+        } ?: accountRepository.getCurrentAccount().also {
             accountId = it.accountId
         }
     }
-
-    private fun Account.getMisskeyAPI(): MisskeyAPIV1275 {
-        return misskeyAPIProvider.get(this.instanceDomain) as? MisskeyAPIV1275
-            ?: throw IllegalVersionException()
-    }
-
-
-
-
 
 
 }

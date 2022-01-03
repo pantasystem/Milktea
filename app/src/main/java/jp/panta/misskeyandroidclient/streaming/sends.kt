@@ -99,6 +99,3 @@ fun Send.toJson(): String {
     return Json.encodeToString(this)
 }
 
-fun String.fromJson(): Send {
-    return Json.decodeFromString(this)
-}
