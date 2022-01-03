@@ -119,7 +119,7 @@ class TimelineViewModel(
             if(timelineState.value.notes.size > removeSize && position == 0 && timelineState.subscriptionCount.value > 0) {
                 val removed = list.subList(removeSize, list.size - 1)
 
-                mNoteIds.removeAll(removed.map { it.id })
+                mNoteIds.removeAll(removed.map { it.id }.toSet())
                 removed.forEach {
                     it.job?.cancel()
                 }
@@ -177,7 +177,7 @@ class TimelineViewModel(
                     if(position == 0 && newList.size > removeSize  && timelineState.subscriptionCount.value > 0) {
                         val removed = newList.subList(removeSize, newList.size - 1)
                         removed.forEach { it.job?.cancel() }
-                        mNoteIds.removeAll(removed.map(::mapId))
+                        mNoteIds.removeAll(removed.map(::mapId).toSet())
                         removed.clear()
                     }
                     mNoteIds.addAll(list.map(::mapId))

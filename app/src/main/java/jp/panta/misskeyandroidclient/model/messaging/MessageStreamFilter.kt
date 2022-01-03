@@ -23,7 +23,7 @@ class MessageStreamFilter(val miCore: MiCore){
     }
 
     fun getObservable(messagingId: MessagingId): Flow<Message>{
-        return flow<Account> {
+        return flow {
             val accountId = when(messagingId) {
                 is MessagingId.Direct -> messagingId.userId.accountId
                 is MessagingId.Group -> messagingId.groupId.accountId

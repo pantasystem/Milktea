@@ -26,11 +26,13 @@ import jp.panta.misskeyandroidclient.view.PageableView
 import jp.panta.misskeyandroidclient.view.ScrollableTop
 import jp.panta.misskeyandroidclient.viewmodel.notes.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import java.io.IOException
 import java.net.SocketTimeoutException
 
 @ExperimentalCoroutinesApi
+@FlowPreview
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop,
     PageableView {
 
@@ -38,9 +40,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
-
-        //private const val EXTRA_FIRST_VISIBLE_NOTE_DATE = "jp.panta.misskeyandroidclient.view.notes.TimelineFragment.EXTRA_FIRST_VISIBLE_NOTE_DATE"
-
 
         fun newInstance(page: Page): TimelineFragment {
             return TimelineFragment().apply {

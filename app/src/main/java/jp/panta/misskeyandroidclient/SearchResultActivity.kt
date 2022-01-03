@@ -28,8 +28,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 class SearchResultActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_SEARCH_WORLD = "jp.panta.misskeyandroidclient.SearchResultActivity.EXTRA_SEARCH_WORLD"
@@ -93,6 +92,7 @@ class SearchResultActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> finish()
@@ -164,6 +164,7 @@ class SearchResultActivity : AppCompatActivity() {
             return pages.size
         }
 
+        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun getItem(position: Int): Fragment {
             val isTag = keyword.startsWith("#")
 

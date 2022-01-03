@@ -38,7 +38,6 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
             is Visibility.Home -> 1
             is Visibility.Followers -> 2
             is Visibility.Specified -> 3
-            else -> 0
         }
         if(nowSelectedVisibility !in visibilities.indices){
             nowSelectedVisibility = 0
@@ -61,14 +60,14 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
                         getString(R.string.visibility_specified) -> "specified"
                         else -> "public"
                     }
-                val localOnly = viewModel.isLocalOnly.value?:false
+                val localOnly = viewModel.isLocalOnly.value
                 viewModel.setVisibility(Visibility(type, localOnly))
 
             }
             .setView(view)
 
         binding?.isLocalOnlySwitch?.setOnCheckedChangeListener { _, isChecked ->
-            val visibility = (viewModel.visibility.value ?: Visibility.Public(isChecked)) as? CanLocalOnly
+            val visibility = (viewModel.visibility.value) as? CanLocalOnly
                 ?: return@setOnCheckedChangeListener
             viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as Visibility)
         }

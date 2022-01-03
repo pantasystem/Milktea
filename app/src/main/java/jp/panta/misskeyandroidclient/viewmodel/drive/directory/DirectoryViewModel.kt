@@ -28,7 +28,7 @@ class DirectoryViewModel(
 
     val foldersLiveData = MutableLiveData<List<DirectoryViewData>>()
 
-    val isRefreshing = MutableLiveData<Boolean>(false)
+    val isRefreshing = MutableLiveData(false)
 
 
 

@@ -16,7 +16,7 @@ class SvgDrawableTranscoder : ResourceTranscoder<SVG, PictureDrawable>{
     override fun transcode(
         toTranscode: Resource<SVG>,
         options: Options
-    ): Resource<PictureDrawable>? {
+    ): Resource<PictureDrawable> {
 
         val svg = toTranscode.get()
         val picture: Picture = svg.renderToPicture()
@@ -30,7 +30,7 @@ class SvgDrawableTranscoder : ResourceTranscoder<SVG, PictureDrawable>{
 }
 
 class SvgBitmapTransCoder : ResourceTranscoder<SVG, Bitmap>{
-    override fun transcode(toTranscode: Resource<SVG>, options: Options): Resource<Bitmap>? {
+    override fun transcode(toTranscode: Resource<SVG>, options: Options): Resource<Bitmap> {
         val svg = toTranscode.get()
         val picture: Picture = svg.renderToPicture()
         val drawable = PictureDrawable(picture)

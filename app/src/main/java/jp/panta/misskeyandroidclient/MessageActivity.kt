@@ -39,7 +39,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        mBinding = DataBindingUtil.setContentView<ActivityMessageBinding>(this, R.layout.activity_message)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_message)
         mBinding.lifecycleOwner = this
         setSupportActionBar(mBinding.messageToolbar)
 

@@ -124,10 +124,7 @@ class NotificationService : Service() {
 
 
 
-    inner class NotificationBinder : Binder() {
-
-
-    }
+    inner class NotificationBinder : Binder()
 
 
 }

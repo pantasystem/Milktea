@@ -41,9 +41,7 @@ class SimpleElapsedTimeTest {
     @Test
     fun nowTest(){
 
-        val nowTest = Clock.System.now().let {
-            it.plus(Duration.seconds( - 9))
-        }
+        val nowTest = Clock.System.now().plus(Duration.seconds( - 9))
         assert(simple.format(nowTest) == "今")
 
     }

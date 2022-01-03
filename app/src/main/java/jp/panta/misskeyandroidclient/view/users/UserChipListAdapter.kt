@@ -37,7 +37,7 @@ class UserChipListAdapter(val lifecycleOwner: LifecycleOwner) : ListAdapter<User
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return VH(
-            DataBindingUtil.inflate<ItemUserChipBinding>(
+            DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
                 R.layout.item_user_chip,
                 parent,

@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account.db
 
-import androidx.room.Dao
-
 import androidx.room.*
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
 
 @Dao
 abstract class AccountDAO{

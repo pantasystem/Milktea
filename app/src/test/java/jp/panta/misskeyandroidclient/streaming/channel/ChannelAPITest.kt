@@ -24,7 +24,7 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val socket = SocketImpl(wssURL, okHttpClient,logger)
         socket.blockingConnect()
 
         var count = 0
@@ -48,7 +48,7 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val socket = SocketImpl(wssURL, okHttpClient, logger)
         val channelAPI = ChannelAPI(socket, logger)
         runBlocking {
 
@@ -64,7 +64,7 @@ class ChannelAPITest {
                 channelAPI.connect(ChannelAPI.Type.GLOBAL).collect ()
             }
 
-            val closedRes: Socket.State = suspendCoroutine<Socket.State> { continuation ->
+            val closedRes: Socket.State = suspendCoroutine { continuation ->
                 var flag = true
                 socket.addStateEventListener { ev ->
                     if(flag) {

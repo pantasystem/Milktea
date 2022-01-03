@@ -29,7 +29,6 @@ class SelectableUsersAdapter(
             return oldItem.user.value == newItem.user.value
         }
 
-        @ExperimentalCoroutinesApi
         override fun areItemsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
             return oldItem.userId == newItem.userId
         }
@@ -44,7 +43,7 @@ class SelectableUsersAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return VH(
-            DataBindingUtil.inflate<ItemSelectableSimpleUserBinding>(
+            DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
                 R.layout.item_selectable_simple_user,
                 parent,

@@ -18,7 +18,7 @@ class BooleanSharedItem(
         SWITCH
     }
 
-    val enabled = MutableLiveData<Boolean>(true)
+    val enabled = MutableLiveData(true)
     val title = context.getString(titleStringRes)
     val choice = BooleanSharedPreferenceLiveData(
         sharedPreferences = context.getSharedPreferences(context.getPreferenceName(), Context.MODE_PRIVATE),

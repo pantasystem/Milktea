@@ -16,9 +16,8 @@ object DrawableTintCompat {
     @BindingAdapter("drawableTintCompat")
     fun TextView.setDrawableTintCompat(c: Int?){
 
-        val color: Int? = c?: this.currentTextColor
+        val color: Int = c?: this.currentTextColor
 
-        color?: return
         val drawables = this.compoundDrawables
         drawables.forEachIndexed { i, d ->
             val drawable: Drawable? = DrawableCompat.wrap(d)

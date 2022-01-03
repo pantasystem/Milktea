@@ -1,8 +1,5 @@
 package jp.panta.misskeyandroidclient.model.account
 
-import kotlinx.coroutines.flow.Flow
-import kotlin.jvm.Throws
-
 interface AccountModel {
 
     @Throws(AccountNotFoundException::class)

@@ -92,10 +92,10 @@ class FCMService : FirebaseMessagingService() {
 
     }
 
-    override fun onDeletedMessages() {
-        super.onDeletedMessages()
-
-    }
+//    override fun onDeletedMessages() {
+//        super.onDeletedMessages()
+//
+//    }
 
     private fun PushNotification.makeIntent() : Intent {
         return when(this.type) {

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.collect
 
 class HistoryViewData (account: Account, message: MessageHistoryRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope, coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO){
     val messagingId = message.message.messagingId(account)
-    val message = MutableLiveData<MessageHistoryRelation>(message)
+    val message = MutableLiveData(message)
     //val id = message.message.id
     val isGroup = message is MessageHistoryRelation.Group
     val group = (message as? MessageHistoryRelation.Group)?.group

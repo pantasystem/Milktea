@@ -42,7 +42,7 @@ class AntennaEditorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_antenna_editor)
-        mBinding = DataBindingUtil.setContentView<ActivityAntennaEditorBinding>(this, R.layout.activity_antenna_editor)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_antenna_editor)
         setSupportActionBar(mBinding.antennaEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

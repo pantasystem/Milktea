@@ -35,7 +35,7 @@ fun ItemRenoteUser(
     isUserNameDefault: Boolean = false
 ) {
 
-    val stringResourceMap = mapOf<SimpleElapsedTime.TimeUnit, String>(
+    val stringResourceMap = mapOf(
         SimpleElapsedTime.TimeUnit.YEAR to stringResource(R.string.year_ago),
         SimpleElapsedTime.TimeUnit.MONTH to stringResource(R.string.month_ago),
         SimpleElapsedTime.TimeUnit.DATE to stringResource(R.string.date_ago),

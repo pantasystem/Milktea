@@ -66,7 +66,7 @@ class SelectionSharedItem (
     }
 
 
-    val isSelecting = MutableLiveData<Boolean>(false)
+    val isSelecting = MutableLiveData(false)
 
     fun changeSelectingState(){
         val now = isSelecting.value?: false

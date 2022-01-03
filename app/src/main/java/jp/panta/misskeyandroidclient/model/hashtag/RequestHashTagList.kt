@@ -12,7 +12,7 @@ class RequestHashTagList (
     val attachedToRemoteUserOnly: Boolean? = null
 ){
 
-    class Sort(){
+    class Sort {
         fun mentionedUsers() = OrderBy("mentionedUsers")
         fun mentionedLocalUsers() = OrderBy("mentionedLocalUsers")
         fun mentionedRemoteUsers() = OrderBy("mentionedRemoteUsers")

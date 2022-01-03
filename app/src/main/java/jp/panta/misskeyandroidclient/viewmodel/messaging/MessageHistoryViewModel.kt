@@ -74,7 +74,7 @@ class MessageHistoryViewModel(
 
     }
 
-    val isRefreshing = MutableLiveData<Boolean>(false)
+    val isRefreshing = MutableLiveData(false)
 
     val messageHistorySelected = EventBus<HistoryViewData>()
 

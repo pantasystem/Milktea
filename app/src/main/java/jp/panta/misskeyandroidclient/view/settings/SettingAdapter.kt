@@ -179,6 +179,6 @@ class SettingAdapter(
     }
 
     private fun <T : ViewDataBinding> makeBinding(parent: ViewGroup, @LayoutRes res: Int): T{
-        return DataBindingUtil.inflate<T>(LayoutInflater.from(parent.context), res, parent, false)
+        return DataBindingUtil.inflate(LayoutInflater.from(parent.context), res, parent, false)
     }
 }

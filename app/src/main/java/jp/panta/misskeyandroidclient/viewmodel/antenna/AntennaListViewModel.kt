@@ -39,7 +39,7 @@ class AntennaListViewModel (
 
     val openAntennasTimelineEvent = EventBus<Antenna>()
 
-    val isLoading = MutableLiveData<Boolean>(false)
+    val isLoading = MutableLiveData(false)
     private var mIsLoading: Boolean = false
         set(value) {
             field = value

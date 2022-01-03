@@ -14,7 +14,7 @@ import javax.security.auth.Subject
 
 class EmojiAdapter (view: View){
 
-    val weakReference = WeakReference<View>(view)
+    val weakReference = WeakReference(view)
 
     private val subject = PublishSubject.create<Boolean>()
 

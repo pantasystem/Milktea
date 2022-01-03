@@ -147,10 +147,9 @@ class FollowFollowerViewModel(
     val userRepository = miCore.getUserRepository()
     private val misskeyAPIProvider = miCore.getMisskeyAPIProvider()
     private val encryption = miCore.getEncryption()
-    private val noteRelationGetter = miCore.getGetters().noteRelationGetter
     private val userDataSource: UserDataSource = miCore.getUserDataSource()
 
-    val isInitializing = MutableLiveData<Boolean>(false)
+    val isInitializing = MutableLiveData(false)
 
 
 

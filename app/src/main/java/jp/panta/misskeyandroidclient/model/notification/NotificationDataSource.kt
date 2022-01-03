@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notification
 
 import jp.panta.misskeyandroidclient.model.AddResult
-import jp.panta.misskeyandroidclient.model.account.Account
 
 interface NotificationDataSource {
 

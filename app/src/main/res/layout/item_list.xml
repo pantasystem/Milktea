@@ -52,7 +52,6 @@
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_add_black_24dp"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:layout_toStartOf="@id/editListButton"
                     android:contentDescription="@string/add_to_tab"
                     android:layout_marginEnd="8dp"
@@ -60,7 +59,7 @@
                     android:onClick="@{ ()-> listListViewModel.toggleTab(list) }"
                     app:list="@{list}"
                     app:pagedList="@{listListViewModel.pagedUserList}"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
             <ImageButton
                     android:id="@+id/editListButton"
@@ -69,11 +68,10 @@
                     app:srcCompat="@drawable/ic_edit_black_24dp"
                     tools:ignore="ContentDescription,PrivateResource"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:onClick="@{ ()->tryToEditCallback.onEdit(list) }"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
 
         </RelativeLayout>

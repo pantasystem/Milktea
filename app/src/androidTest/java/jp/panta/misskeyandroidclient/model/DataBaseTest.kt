@@ -6,7 +6,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.*
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Before
@@ -53,7 +52,7 @@ class DataBaseTest{
 
         val read = accountDao.findAllSetting()
         assert(read[0].connectionInformationList.isNotEmpty())
-        Assert.assertThat(read[0].connectionInformationList, not(`is`(empty<EncryptedConnectionInformation>())))
+        Assert.assertThat(read[0].connectionInformationList, not(`is`(empty())))
         pageDao.insert(
             Page("114514", "Global", 1, globalTimeline = Page.GlobalTimeline()).apply{
 

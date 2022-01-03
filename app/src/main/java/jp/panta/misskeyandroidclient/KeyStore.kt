@@ -19,9 +19,7 @@ object KeyStore {
         return IntKey.THEME_BLACK == key
                 || IntKey.THEME_DARK == key
     }
-    enum class StringKey{
-
-    }
+    enum class StringKey
 
     enum class BooleanKey(val default: Boolean){
         INCLUDE_MY_RENOTES(true),

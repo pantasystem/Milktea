@@ -29,7 +29,7 @@ sealed class PageableState<T>(val content: StateContent<T>) {
         }
     }
     sealed class Loading<T>(content: StateContent<T>) : PageableState<T>(content) {
-        class Init<T>() : Loading<T>(StateContent.NotExist())
+        class Init<T> : Loading<T>(StateContent.NotExist())
         class Previous<T>(content: StateContent<T>) : Loading<T>(content)
         class Future<T>(content: StateContent<T>) : Loading<T>(content)
 

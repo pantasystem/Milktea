@@ -97,7 +97,7 @@ object MFMDecorator {
 
         }
 
-        private fun decorateEmoji(emojiElement: EmojiElement): Spanned?{
+        private fun decorateEmoji(emojiElement: EmojiElement): Spanned{
             val spanned = SpannableString(emojiElement.text)
             textView.get()?.let{ textView ->
                 //val emojiSpan = EmojiSpan(textView)
@@ -122,18 +122,18 @@ object MFMDecorator {
             return spanned
         }
 
-        private fun decorateText(text: Text): Spanned?{
+        private fun decorateText(text: Text): Spanned{
             return SpannedString(text.text)
         }
 
-        private fun decorateSearch(search: Search): Spanned?{
+        private fun decorateSearch(search: Search): Spanned{
             val intent = Intent(Intent.ACTION_SEARCH)
             //intent.setClassName("com.google.android.googlequicksearchbox",  "com.google.android.googlequicksearchbox.SearchActivity")
             intent.putExtra(SearchManager.QUERY, search.text)
             return makeClickableSpan("${search.text}  ${(textView.get()?.context?.getString(R.string.search)?: "Search")}", intent)
         }
 
-        private fun decorateMention(mention: Mention): Spanned?{
+        private fun decorateMention(mention: Mention): Spanned{
             return textView.get()?.let{ textView ->
                 val intent = UserDetailActivity.newInstance(textView.context, userName = mention.text)
                 intent.putActivity(Activities.ACTIVITY_IN_APP)
@@ -144,12 +144,12 @@ object MFMDecorator {
 
         }
 
-        private fun decorateLink(link: Link): Spanned?{
+        private fun decorateLink(link: Link): Spanned{
             return makeClickableSpan(link.text, Intent(Intent.ACTION_VIEW, Uri.parse(link.url)))
         }
 
 
-        private fun decorateHashTag(hashTag: HashTag): Spanned?{
+        private fun decorateHashTag(hashTag: HashTag): Spanned{
             return textView.get()?.let{ textView ->
                 val intent = Intent(textView.context, SearchResultActivity::class.java)
                 intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, hashTag.text)

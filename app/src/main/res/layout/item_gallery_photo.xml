@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -47,8 +48,7 @@
                 tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                 android:scaleType="fitCenter"
                 android:visibility="@{SafeUnbox.unbox(fileViewData.isHiding) || SafeUnbox.unbox(fileViewData.image) ? View.GONE : View.VISIBLE }"
-                android:tint="?attr/colorAccent"
-                />
+                app:tint="?attr/colorAccent" />
 
         <TextView
                 android:id="@+id/nsfwMessageTop"

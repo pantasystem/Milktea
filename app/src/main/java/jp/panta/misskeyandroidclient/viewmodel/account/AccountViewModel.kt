@@ -1,9 +1,11 @@
 package jp.panta.misskeyandroidclient.viewmodel.account
 
-import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.account.Account
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
@@ -11,7 +13,6 @@ import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.lang.IllegalArgumentException
 
 @ExperimentalCoroutinesApi
 @Suppress("UNCHECKED_CAST")

@@ -21,7 +21,7 @@ class PollChoicesAdapter(
     private val onChoiceTextChangedListener: (UUID, String)-> Unit,
     private val onChoiceDeleteButtonClickListener: (UUID) -> Unit
 ) : ListAdapter<PollChoiceState, PollChoicesAdapter.ChoiceHolder>(ItemCallback()){
-    class ItemCallback() : DiffUtil.ItemCallback<PollChoiceState>(){
+    class ItemCallback : DiffUtil.ItemCallback<PollChoiceState>(){
         override fun areContentsTheSame(oldItem: PollChoiceState, newItem: PollChoiceState): Boolean {
             return oldItem == newItem
         }
