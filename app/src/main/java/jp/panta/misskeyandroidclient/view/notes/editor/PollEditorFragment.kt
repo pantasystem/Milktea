@@ -15,6 +15,8 @@ import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
 import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
@@ -29,7 +31,8 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
     private var mNoteEditorViewModel: NoteEditorViewModel? = null
 
 
-    @ExperimentalTime
+
+    @OptIn(ExperimentalTime::class, FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

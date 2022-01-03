@@ -20,7 +20,6 @@ class UserChipListAdapter(val lifecycleOwner: LifecycleOwner) : ListAdapter<User
     @FlowPreview
     @ExperimentalCoroutinesApi
     class Diff : DiffUtil.ItemCallback<UserViewData>(){
-        @FlowPreview
         override fun areContentsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
             return oldItem.userId == newItem.userId && oldItem.user.value == newItem.user.value
         }

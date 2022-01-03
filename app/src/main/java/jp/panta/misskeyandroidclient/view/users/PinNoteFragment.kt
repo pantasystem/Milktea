@@ -20,7 +20,10 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
 
     val mBinding: FragmentPinNoteBinding by dataBinding()
@@ -47,7 +50,7 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
         }
     }
 
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val userId = arguments?.getString("USER_ID")

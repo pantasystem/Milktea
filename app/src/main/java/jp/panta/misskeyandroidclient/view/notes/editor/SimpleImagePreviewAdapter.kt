@@ -10,7 +10,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteEditorFilePreviewBinding
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 
 class SimpleImagePreviewAdapter(private val fileListener: FileListener) : ListAdapter<File,SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(ItemCallback()){
     private class ItemCallback: DiffUtil.ItemCallback<File>(){

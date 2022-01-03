@@ -11,7 +11,11 @@ import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragme
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class NotificationsActivity : AppCompatActivity() {
 
     val binding: ActivityNotificationsBinding by dataBinding()

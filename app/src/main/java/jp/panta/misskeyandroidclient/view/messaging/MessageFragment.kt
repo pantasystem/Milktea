@@ -21,6 +21,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalArgumentException
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class MessageFragment : Fragment(R.layout.fragment_message){
 
     companion object{
@@ -42,8 +44,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
 
     private val mBinding: FragmentMessageBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

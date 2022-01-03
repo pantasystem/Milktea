@@ -19,6 +19,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
     companion object{
@@ -39,8 +41,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
     private lateinit var mLinearLayoutManager: LinearLayoutManager
     private val mBinding: FragmentFollowFollwerBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val typeOrdinal = arguments?.getInt(EXTRA_TYPE)?: 0

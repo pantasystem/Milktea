@@ -1,13 +1,10 @@
 package jp.panta.misskeyandroidclient.view.confirm
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel

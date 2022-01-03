@@ -17,10 +17,11 @@ import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class AccountSwitchingDialog : BottomSheetDialogFragment(){
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.dialog_switch_account,null)

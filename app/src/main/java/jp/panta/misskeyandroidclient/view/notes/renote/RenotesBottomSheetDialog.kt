@@ -15,7 +15,10 @@ import jp.panta.misskeyandroidclient.ui.notes.RenoteUsersScreen
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.notes.renote.RenotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
 
     companion object {
@@ -45,7 +48,6 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
         val miCore = requireContext().applicationContext as MiCore
         viewModel = ViewModelProvider(this, RenotesViewModel.Factory(noteId, miCore))[RenotesViewModel::class.java]
     }
-    @ExperimentalCoroutinesApi
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.view.notes.editor
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
@@ -13,7 +12,6 @@ import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBindin
 import jp.panta.misskeyandroidclient.model.notes.CanLocalOnly
 import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
 import java.util.*
 
 class VisibilitySelectionDialog : AppCompatDialogFragment(){

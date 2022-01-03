@@ -22,12 +22,14 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class ReactionPickerDialog : AppCompatDialogFragment(){
 
-    @ExperimentalCoroutinesApi
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_reaction_picker, null)

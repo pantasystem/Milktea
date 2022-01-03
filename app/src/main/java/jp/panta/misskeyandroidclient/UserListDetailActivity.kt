@@ -30,14 +30,14 @@ import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmittedListener {
 
     companion object {
         private const val TAG = "UserListDetailActivity"
         private const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_LIST_ID"
-        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.extra.ACCOUNT_ID"
 
-        private const val SELECT_USER_REQUEST_CODE = 252
 
         const val ACTION_SHOW = "ACTION_SHOW"
         const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
@@ -62,8 +62,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     private var mUserListName: String = ""
     private val binding: ActivityUserListDetailBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -105,8 +103,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onSubmit(name: String) {
         mUserListDetailViewModel?.updateName(name)
     }
@@ -126,8 +122,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         return super.onCreateOptionsMenu(menu)
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_add_to_tab ->{
@@ -151,8 +145,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }
         return super.onOptionsItemSelected(item)
     }
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onBackPressed() {
         updatedResultFinish()
     }
@@ -203,7 +195,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     }
 
     @FlowPreview
-    @ExperimentalCoroutinesApi
     private fun updatedResultFinish(){
         val updatedEvent = mUserListDetailViewModel?.updateEvents?.toList()?: emptyList()
 

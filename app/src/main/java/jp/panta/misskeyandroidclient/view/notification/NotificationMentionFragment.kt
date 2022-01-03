@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.view.notification
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.lifecycleScope
@@ -17,10 +14,14 @@ import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.view.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.view.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class NotificationMentionFragment : Fragment(R.layout.fragment_notification_mention){
 
     private val mBinding: FragmentNotificationMentionBinding by dataBinding()

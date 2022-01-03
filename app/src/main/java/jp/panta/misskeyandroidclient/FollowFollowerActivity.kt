@@ -17,7 +17,10 @@ import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     companion object{
@@ -36,7 +39,6 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     lateinit var mBinding: ActivityFollowFollowerBinding
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

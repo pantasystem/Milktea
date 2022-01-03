@@ -12,7 +12,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryPostTabBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostActionViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
     val binding: FragmentGalleryPostTabBinding by dataBinding()
@@ -50,6 +54,8 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
 }
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class GalleryPostTabPagerAdapter(
     val tabs: List<Pageable.Gallery>,
     val pageTitles: List<String>,

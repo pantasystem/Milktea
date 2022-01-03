@@ -16,8 +16,12 @@ import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.view.notes.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
     private var mNoteViewModel: NotesViewModel? = null

@@ -28,15 +28,15 @@ import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
 import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class DriveActivity : AppCompatActivity() {
     companion object{
-        //const val EXTRA_IS_FILE_SELECTABLE = "jp.panta.misskeyandroidclient.EXTRA_IS_FILE_SELECTABLE"
         const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
         const val EXTRA_SELECTED_FILE_PROPERTY_IDS = "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
         const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
     }
     enum class Type{
-        FOLDER, FILE
+        FILE
     }
 
     private lateinit var _driveViewModel: DriveViewModel
@@ -46,10 +46,7 @@ class DriveActivity : AppCompatActivity() {
 
 
 
-
-    @ExperimentalPagerApi
-    @ExperimentalCoroutinesApi
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

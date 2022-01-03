@@ -24,14 +24,15 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
 
     private var mLinearLayoutManager: LinearLayoutManager? = null
 
     private val binding: FragmentMessagingHistoryBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -80,7 +81,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
     }
 
 
-    val diffUtilItemCallback = object : DiffUtil.ItemCallback<HistoryViewData>(){
+    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<HistoryViewData>(){
         override fun areContentsTheSame(
             oldItem: HistoryViewData,
             newItem: HistoryViewData

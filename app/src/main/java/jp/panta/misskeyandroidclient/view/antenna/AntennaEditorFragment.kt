@@ -21,6 +21,8 @@ import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     companion object {
@@ -36,8 +38,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         }
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DataBindingUtil.bind<FragmentAntennaEditorBinding>(view)

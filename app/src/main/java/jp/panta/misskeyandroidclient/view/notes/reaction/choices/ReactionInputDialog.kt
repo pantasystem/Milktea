@@ -14,7 +14,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionInputBinding
 import jp.panta.misskeyandroidclient.view.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class ReactionInputDialog : AppCompatDialogFragment(){
 
 

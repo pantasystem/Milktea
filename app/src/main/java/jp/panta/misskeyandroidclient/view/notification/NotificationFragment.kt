@@ -22,18 +22,19 @@ import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
 
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
-    @ExperimentalCoroutinesApi
     lateinit var mViewModel: NotificationViewModel
 
     private val mBinding: FragmentNotificationBinding by dataBinding()
 
 
-    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

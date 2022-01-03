@@ -17,6 +17,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDetails{
 
     companion object{
@@ -37,8 +39,6 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
     val mBinding: FragmentSearchUserBinding by dataBinding()
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

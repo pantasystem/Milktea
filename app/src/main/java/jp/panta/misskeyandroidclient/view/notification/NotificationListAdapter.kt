@@ -21,8 +21,11 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
 import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class NotificationListAdapter @ExperimentalCoroutinesApi constructor(
     diffUtilCallBack: DiffUtil.ItemCallback<NotificationViewData>,
     val notesViewModel: NotesViewModel,

@@ -89,6 +89,8 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 //基本的な情報はここを返して扱われる
+@FlowPreview
+@ExperimentalCoroutinesApi
 class MiApplication : Application(), MiCore {
 
     lateinit var reactionHistoryDao: ReactionHistoryDao
@@ -217,8 +219,7 @@ class MiApplication : Application(), MiCore {
         )
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreate() {
         super.onCreate()
 

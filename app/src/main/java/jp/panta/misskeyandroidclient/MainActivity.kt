@@ -61,6 +61,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.ReportViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity(){
 
     lateinit var mNotesViewModel: NotesViewModel
@@ -79,8 +81,7 @@ class MainActivity : AppCompatActivity(){
 
     private val binding: ActivityMainBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

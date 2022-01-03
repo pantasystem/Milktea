@@ -21,6 +21,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @ExperimentalCoroutinesApi
+@FlowPreview
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA_ID"
@@ -37,7 +38,6 @@ class AntennaEditorActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityAntennaEditorBinding
 
-    @FlowPreview
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

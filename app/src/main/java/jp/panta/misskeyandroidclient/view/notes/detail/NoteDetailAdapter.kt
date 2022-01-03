@@ -163,7 +163,5 @@ class NoteDetailAdapter(
 
     }
 
-    private fun createReactionAdapter(note: PlaneNoteViewData): ReactionCountAdapter{
-        return ReactionCountAdapter(note, notesViewModel)
-    }
+
 }

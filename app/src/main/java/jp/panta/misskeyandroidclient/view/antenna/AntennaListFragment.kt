@@ -11,7 +11,11 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaListBinding
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class AntennaListFragment : Fragment(R.layout.fragment_antenna_list){
 
     val binding: FragmentAntennaListBinding by dataBinding()

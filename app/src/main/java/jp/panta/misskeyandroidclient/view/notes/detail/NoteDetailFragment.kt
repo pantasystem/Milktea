@@ -19,6 +19,8 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
     companion object{
@@ -54,8 +56,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
     private val binding: FragmentNoteDetailBinding by dataBinding()
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
