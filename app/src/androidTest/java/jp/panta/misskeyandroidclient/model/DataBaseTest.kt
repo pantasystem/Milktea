@@ -16,12 +16,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DataBaseTest{
 
-    lateinit var db: DataBase
-    lateinit var accountDao: AccountDao
-    lateinit var connectionInformationDao: ConnectionInformationDao
-    lateinit var pageDao: PageDao
+    private lateinit var db: DataBase
+    private lateinit var accountDao: AccountDao
+    private lateinit var connectionInformationDao: ConnectionInformationDao
+    private lateinit var pageDao: PageDao
 
-    lateinit var encryption: Encryption
+    private lateinit var encryption: Encryption
 
     @Before
     fun init(){

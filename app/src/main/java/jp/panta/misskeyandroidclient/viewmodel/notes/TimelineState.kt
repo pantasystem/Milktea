@@ -11,14 +11,6 @@ sealed class TimelineState{
     data class Deleted(override val notes: List<PlaneNoteViewData>) : TimelineState()
 
 
-    fun getSinceId(): String?{
-        return notes.firstOrNull()?.getRequestId()
-    }
-
-    fun getUntilId(): String?{
-        return notes.lastOrNull()?.getRequestId()
-    }
-
     /**
      * sinceIdを複数取得します。
      * @param size 取得数をここに指定します。ノート数がこれにみたいない場合このサイズの用件を満たさない場合があります。

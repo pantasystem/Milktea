@@ -6,8 +6,6 @@ import jp.panta.misskeyandroidclient.api.drive.RequestFile
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -21,7 +19,6 @@ import retrofit2.Response
 class FilePropertyPagingStore(
     private var currentDirectoryId: String?,
     private val getAccount: suspend () -> Account,
-    private val accountRepository: AccountRepository,
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
     encryption: Encryption,
@@ -72,7 +69,6 @@ fun MiCore.filePropertyPagingStore(getAccount: suspend () -> Account, currentDir
     return FilePropertyPagingStore(
         currentDirectoryId,
         getAccount,
-        this.getAccountRepository(),
         this.getMisskeyAPIProvider(),
         this.getFilePropertyDataSource(),
         this.getEncryption()

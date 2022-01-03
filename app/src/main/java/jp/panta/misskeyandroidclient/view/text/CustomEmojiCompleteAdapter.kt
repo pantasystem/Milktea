@@ -28,7 +28,6 @@ class CustomEmojiCompleteAdapter(
         private set
 
 
-    private var mInputtingLatestStart: Int? = null
 
     override fun getCount(): Int {
         return suggestions.size

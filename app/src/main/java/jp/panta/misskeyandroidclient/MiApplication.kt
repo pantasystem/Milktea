@@ -200,7 +200,6 @@ class MiApplication : Application(), MiCore {
     private val _subscribeRegistration: SubscriptionRegistration by lazy {
         SubscriptionRegistration(
             getAccountRepository(),
-            getMetaStore(),
             getEncryption(),
             getMisskeyAPIProvider(),
             lang = Locale.getDefault().language,

@@ -31,7 +31,7 @@ object NotificationStatusIconHelper {
         }
     }
 
-    fun setStatusView(statusView: ImageView, type: String){
+    private fun setStatusView(statusView: ImageView, type: String){
         statusView.visibility = View.VISIBLE
         when(type){
             "follow" -> statusView.setImageResource(R.drawable.ic_follow)

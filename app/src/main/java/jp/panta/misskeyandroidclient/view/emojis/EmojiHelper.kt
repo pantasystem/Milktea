@@ -12,26 +12,6 @@ import jp.panta.misskeyandroidclient.util.svg.GlideApp
 import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 
 object EmojiHelper{
-    @JvmStatic
-    @BindingAdapter("selectableEmojiList", "reactionSelection")
-    fun RecyclerView.setEmojiList(emojiList: List<Emoji>?, reactionSelection: ReactionSelection){
-        emojiList?: return
-
-        if(layoutManager !is FlexboxLayoutManager){
-            val flexBoxLayoutManager = FlexboxLayoutManager(this.context)
-            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-            layoutManager = flexBoxLayoutManager
-        }
-
-        val adapter = ReactionChoicesAdapter(reactionSelection)
-        this.adapter = adapter
-        adapter.submitList(emojiList.map{
-            ":${it.name}:"
-        })
-    }
 
     @JvmStatic
     @BindingAdapter("customEmoji")

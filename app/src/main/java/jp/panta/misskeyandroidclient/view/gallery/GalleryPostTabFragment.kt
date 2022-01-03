@@ -58,7 +58,7 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 @ExperimentalCoroutinesApi
 class GalleryPostTabPagerAdapter(
     val tabs: List<Pageable.Gallery>,
-    val pageTitles: List<String>,
+    private val pageTitles: List<String>,
     fragmentManager: FragmentManager
 ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 

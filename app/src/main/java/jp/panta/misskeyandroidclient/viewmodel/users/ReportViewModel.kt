@@ -79,15 +79,6 @@ class ReportViewModel(private val miCore: MiCore) : ViewModel(){
         ) ?: ReportState.None
     }
 
-    fun setTargetUser(userId: User.Id) {
-        if(state.value is ReportState.Sending) {
-            return
-        }
-        _state.value = ReportState.Specify(
-            userId = userId,
-            comment = ""
-        )
-    }
 
     fun clear() {
         _state.value = ReportState.None

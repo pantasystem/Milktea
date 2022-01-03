@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(){
         initAccountViewModelListener()
         binding.setupHeaderProfile()
 
-        mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
+        mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
         // NOTE: メッセージの既読数をバッジに表示する

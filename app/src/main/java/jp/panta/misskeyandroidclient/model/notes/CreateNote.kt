@@ -31,7 +31,7 @@ data class CreateNote(
 )
 
 class CreateNoteTask(
-    val noteRepository: NoteRepository,
+    private val noteRepository: NoteRepository,
     val createNote: CreateNote
 ) : ITask<Note> {
     override suspend fun execute(): Note {

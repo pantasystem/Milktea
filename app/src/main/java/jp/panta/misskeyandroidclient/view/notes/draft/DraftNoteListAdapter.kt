@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.draft.DraftNoteViewData
 
 class DraftNoteListAdapter(
-    val draftNoteActionCallback: DraftNoteActionCallback,
+    private val draftNoteActionCallback: DraftNoteActionCallback,
     val fileListener: FileListener,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<DraftNoteViewData, DraftNoteListAdapter.VH>(DFUtilItemCallback()){

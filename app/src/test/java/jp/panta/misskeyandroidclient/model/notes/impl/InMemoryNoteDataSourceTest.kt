@@ -17,8 +17,8 @@ import java.util.*
 
 class InMemoryNoteDataSourceTest {
 
-    lateinit var loggerFactory: Logger.Factory
-    lateinit var account: Account
+    private lateinit var loggerFactory: Logger.Factory
+    private lateinit var account: Account
     @Before
     fun setUp() {
         loggerFactory = TestLogger.Factory()

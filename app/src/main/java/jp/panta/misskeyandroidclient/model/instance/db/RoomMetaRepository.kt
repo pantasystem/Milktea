@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class RoomMetaRepository(
-    val metaDAO: MetaDAO,
-    val emojiAliasDAO: EmojiAliasDAO,
+    private val metaDAO: MetaDAO,
+    private val emojiAliasDAO: EmojiAliasDAO,
     val database: DataBase
 ) : MetaRepository {
 

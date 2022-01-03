@@ -32,9 +32,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class NoteCaptureAPIAdapterTest {
 
-    lateinit var loggerFactory: Logger.Factory
-    lateinit var accountRepository: AccountRepository
-    lateinit var noteDataSource: NoteDataSource
+    private lateinit var loggerFactory: Logger.Factory
+    private lateinit var accountRepository: AccountRepository
+    private lateinit var noteDataSource: NoteDataSource
 
     @Before
     fun setUp() {

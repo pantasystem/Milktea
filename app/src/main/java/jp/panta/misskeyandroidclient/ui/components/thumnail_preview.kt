@@ -15,7 +15,12 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.R
 
 @Composable
-fun ThumbnailPreview(file: FileProperty, modifier: Modifier = Modifier, isHidden: Boolean = false ,  onClick: ()->Unit, ) {
+fun ThumbnailPreview(
+    file: FileProperty,
+    modifier: Modifier = Modifier,
+    isHidden: Boolean = false,
+    onClick: () -> Unit,
+) {
     Box(
         modifier = modifier.clickable(onClick = onClick)
     ) {

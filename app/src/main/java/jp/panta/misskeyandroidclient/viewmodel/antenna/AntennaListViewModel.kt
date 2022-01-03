@@ -76,7 +76,7 @@ class AntennaListViewModel (
 
     }
 
-    val deleteResultEvent = EventBus<Boolean>()
+    private val deleteResultEvent = EventBus<Boolean>()
 
     fun loadInit(){
         viewModelScope.launch(Dispatchers.IO) {

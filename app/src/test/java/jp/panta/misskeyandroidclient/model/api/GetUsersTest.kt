@@ -9,7 +9,7 @@ import org.junit.Test
 
 class GetUsersTest {
 
-    lateinit var misskeyAPI: MisskeyAPI
+    private lateinit var misskeyAPI: MisskeyAPI
     @Before
     fun setup(){
         misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.m544.net", Version("v10"))

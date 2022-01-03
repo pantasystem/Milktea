@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.notes
 
 import java.util.regex.Pattern
 
-class DetermineTextLengthImpl(val length: Int, val lineBreaks: Int) : DetermineTextLength{
+class DetermineTextLengthImpl(val length: Int, private val lineBreaks: Int) : DetermineTextLength{
 
      private var mText: String? = null
 

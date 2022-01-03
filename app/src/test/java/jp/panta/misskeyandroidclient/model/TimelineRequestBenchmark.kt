@@ -9,7 +9,7 @@ import java.util.*
 
 class TimelineRequestBenchmark {
 
-    lateinit var misskeyAPI: MisskeyAPI
+    private lateinit var misskeyAPI: MisskeyAPI
 
     @Before
     fun setup(){

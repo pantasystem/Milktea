@@ -50,7 +50,7 @@ fun ItemRenoteUser(
         stringResourceMap[it] ?: throw IllegalStateException("対応する文字列リソースを発見することができませんでした")
     }.format(note.note.createdAt)
 
-    LaunchedEffect(key1 = true,){
+    LaunchedEffect(key1 = true){
         withContext(Dispatchers.IO) {
             noteCaptureAPIAdapter?.capture(note.note.id)?.launchIn(this)
         }

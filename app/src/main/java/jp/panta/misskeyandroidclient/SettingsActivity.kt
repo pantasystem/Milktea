@@ -12,7 +12,11 @@ import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.view.settings.activities.*
 import jp.panta.misskeyandroidclient.viewmodel.setting.Group
 import jp.panta.misskeyandroidclient.viewmodel.setting.MoveSettingActivityPanel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SettingsActivity : AppCompatActivity() {
 
     private val binding: ActivitySettingsBinding by dataBinding()
@@ -25,7 +29,7 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(binding.settingToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val movementSetting = MoveSettingActivityPanel<SettingMovementActivity>(
+        val movementSetting = MoveSettingActivityPanel(
             titleStringRes = R.string.movement,
             activity = SettingMovementActivity::class.java,
             context = this

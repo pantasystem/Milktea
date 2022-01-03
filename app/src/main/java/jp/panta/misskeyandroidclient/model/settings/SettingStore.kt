@@ -11,27 +11,11 @@ import jp.panta.misskeyandroidclient.model.notes.Visibility
 class SettingStore(private val sharedPreferences: SharedPreferences) {
 
 
-
-    val isUpdateTimelineInBackground: Boolean
-        get(){
-            return fromBooleanEnum(KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND)
-        }
-
-    val isAutoLoadTimeline: Boolean
-    get() {
-        return fromBooleanEnum(KeyStore.BooleanKey.AUTO_LOAD_TIMELINE)
-    }
-
     val isSimpleEditorEnabled: Boolean
         get(){
             return fromBooleanEnum(KeyStore.BooleanKey.IS_SIMPLE_EDITOR_ENABLED)
         }
 
-
-    val isHideRemovedNote: Boolean
-        get(){
-            return fromBooleanEnum(KeyStore.BooleanKey.HIDE_REMOVED_NOTE)
-        }
 
     var reactionPickerType: ReactionPickerType
         get(){
@@ -98,7 +82,7 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             return sharedPreferences.getInt(KeyStore.AutoTextFoldingCount.RETURNS.name, KeyStore.AutoTextFoldingCount.RETURNS.default)
         }
 
-    var isLearnVisibility: Boolean
+    private var isLearnVisibility: Boolean
         set(value) {
             sharedPreferences.edit {
                 putBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, value)

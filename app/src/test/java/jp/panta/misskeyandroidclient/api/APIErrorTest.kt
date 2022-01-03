@@ -9,10 +9,7 @@ import org.junit.Test
 
 class APIErrorTest {
 
-    lateinit var misskeyAPI: MisskeyAPI
-    val formatter = Json {
-
-    }
+    private lateinit var misskeyAPI: MisskeyAPI
 
     @Before
     fun setup(){

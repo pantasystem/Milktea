@@ -23,7 +23,7 @@ class GalleryPostsActivity : AppCompatActivity() {
 
 
     val binding: ActivityGalleryPostsBinding by dataBinding()
-    val actionViewModel: GalleryPostActionViewModel by viewModels()
+    private val actionViewModel: GalleryPostActionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

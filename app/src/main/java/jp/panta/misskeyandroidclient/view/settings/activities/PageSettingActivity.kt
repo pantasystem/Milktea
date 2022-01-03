@@ -27,6 +27,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class PageSettingActivity : AppCompatActivity() {
 
     companion object{
@@ -126,8 +128,7 @@ class PageSettingActivity : AppCompatActivity() {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE || requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE){

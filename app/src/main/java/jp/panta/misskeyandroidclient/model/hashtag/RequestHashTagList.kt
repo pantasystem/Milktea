@@ -3,20 +3,17 @@ package jp.panta.misskeyandroidclient.model.hashtag
 import kotlinx.serialization.Serializable
 
 @Serializable
-class RequestHashTagList (
+class RequestHashTagList(
     val i: String?,
     val sort: String,
-    val limit: Int = 30,
-    val attachedToUserOnly: Boolean? = null,
-    val attachedToLocalUserOnly: Boolean? = null,
-    val attachedToRemoteUserOnly: Boolean? = null
+    val limit: Int = 30
 ){
 
     class Sort {
-        fun mentionedUsers() = OrderBy("mentionedUsers")
-        fun mentionedLocalUsers() = OrderBy("mentionedLocalUsers")
-        fun mentionedRemoteUsers() = OrderBy("mentionedRemoteUsers")
-        fun attachedUsers() = OrderBy("attachedUsers")
+//        fun mentionedUsers() = OrderBy("mentionedUsers")
+//        fun mentionedLocalUsers() = OrderBy("mentionedLocalUsers")
+//        fun mentionedRemoteUsers() = OrderBy("mentionedRemoteUsers")
+//        fun attachedUsers() = OrderBy("attachedUsers")
         fun attachedLocalUsers() = OrderBy("attachedLocalUsers")
         fun attachedRemoteUsers() = OrderBy("attachedRemoteUsers")
     }

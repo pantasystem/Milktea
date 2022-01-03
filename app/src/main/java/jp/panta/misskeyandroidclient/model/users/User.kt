@@ -112,8 +112,6 @@ enum class FollowState {
 
 sealed class UserState {
     data class Removed(val id: User.Id) : UserState()
-    data class Success(val note: User) : UserState()
     data class Error(val exception: Exception) : UserState()
-    object None : UserState()
     object Loading : UserState()
 }

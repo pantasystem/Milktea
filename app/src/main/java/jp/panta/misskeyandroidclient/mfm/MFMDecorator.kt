@@ -21,7 +21,6 @@ import jp.panta.misskeyandroidclient.view.text.EmojiSpan
 import java.lang.ref.WeakReference
 
 object MFMDecorator {
-    private val br = System.getProperty("line.separator")
 
 
     fun decorate(textView: TextView, node: Root): Spanned{
@@ -38,10 +37,9 @@ object MFMDecorator {
         val textView: WeakReference<TextView>,
         val root: Root,
         val parent: Element,
-        val emojiAdapter: EmojiAdapter
+        private val emojiAdapter: EmojiAdapter
     ){
         private var position = 0
-        private val start = position
         private val spannableStringBuilder = SpannableStringBuilder()
 
 

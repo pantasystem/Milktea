@@ -18,8 +18,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class DirectoryViewModel(
-    val accountWatcher: CurrentAccountWatcher,
-    val driveStore: DriveStore,
+    private val accountWatcher: CurrentAccountWatcher,
+    private val driveStore: DriveStore,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
     val loggerFactory: Logger.Factory

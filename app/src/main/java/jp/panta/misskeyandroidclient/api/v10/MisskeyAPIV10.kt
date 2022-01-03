@@ -34,7 +34,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import retrofit2.Response
 import retrofit2.http.Body
 
-open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI {
+open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV10Diff) : MisskeyAPI {
     override suspend fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
 
     override suspend fun children(noteRequest: NoteRequest) = misskey.children(noteRequest)

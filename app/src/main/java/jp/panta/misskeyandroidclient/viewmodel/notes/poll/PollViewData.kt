@@ -26,7 +26,6 @@ class PollViewData(private val poll: Poll, val noteId: String){
         it.votes
     })
 
-    val isMultiple = poll.multiple
 
     val canVote = MutableLiveData(poll.multiple || poll.choices.all {
         !it.isVoted

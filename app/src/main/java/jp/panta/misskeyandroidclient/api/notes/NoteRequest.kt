@@ -234,12 +234,6 @@ data class NoteRequest(
         val includeMyRenotes: Boolean? = null,
         val includeRenotedMyNotes: Boolean? = null
     )
-    fun makeSinceId(id: String): NoteRequest {
-        return this.copy(sinceId = id, untilId = null, untilDate = null, sinceDate = null)
-    }
-    fun makeUntilId(id: String): NoteRequest {
-        return this.copy(sinceId = null, untilId = id, untilDate = null, sinceDate = null)
-    }
 
 
 

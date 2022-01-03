@@ -392,7 +392,7 @@ class TimelineViewModel(
         return now
     }
 
-    fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): Request?{
+    private fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): Request?{
         logger.debug("makeSinceIdRequest")
         return (this?.getSinceIds(substituteSize)?: emptyList()).makeSinceIdRequest()
     }

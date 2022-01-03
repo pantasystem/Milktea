@@ -15,21 +15,20 @@ import kotlinx.coroutines.coroutineScope
 
 class SubscriptionRegistration(
     val accountRepository: AccountRepository,
-    val metaStore: MetaStore,
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val lang: String,
     loggerFactory: Logger.Factory,
-    val endpointBase: String = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
+    private val endpointBase: String = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
     val auth: String = BuildConfig.PUSH_TO_FCM_AUTH,
-    val publicKey: String = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY
+    private val publicKey: String = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY
 ) {
     val logger = loggerFactory.create("sw/register")
 
     /**
      * 特定のアカウントをsw/registerに登録します。
      */
-    suspend fun register(deviceToken: String, accountId: Long) : SubscriptionState?{
+    private suspend fun register(deviceToken: String, accountId: Long) : SubscriptionState?{
 
         logger.debug("call register(accountId:$accountId)")
         val account = accountRepository.get(accountId)

@@ -42,7 +42,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
         val miApplication = context?.applicationContext as MiApplication
 
-        val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
+        val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
 
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
         val factory = NotificationViewModelFactory(miApplication)

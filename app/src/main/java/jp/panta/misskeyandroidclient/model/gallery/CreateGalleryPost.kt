@@ -15,7 +15,7 @@ class CreateGalleryPost (
 
 
 class CreateGalleryPostTask(
-    val createGalleryPost: CreateGalleryPost,
+    private val createGalleryPost: CreateGalleryPost,
     private val galleryPostRepository: GalleryRepository
 ) : ITask<GalleryPost> {
     override suspend fun execute(): GalleryPost {

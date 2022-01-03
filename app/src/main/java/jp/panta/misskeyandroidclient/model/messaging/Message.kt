@@ -147,15 +147,7 @@ sealed class MessageRelation {
     data class Direct(
         override val message: Message.Direct,
         override val user: User,
-    ) : MessageRelation() {
-        fun opponentUser(account: Account) : User.Id{
-            return if(message.recipientId == User.Id(account.accountId, account.remoteId)){
-                message.userId
-            }else{
-                message.recipientId
-            }
-        }
-    }
+    ) : MessageRelation()
 
     fun isMime(account: Account): Boolean {
         return message.userId == User.Id(account.accountId, account.remoteId)

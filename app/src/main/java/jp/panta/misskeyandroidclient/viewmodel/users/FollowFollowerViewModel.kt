@@ -100,7 +100,7 @@ class FollowFollowerViewModel(
     @Suppress("BlockingMethodInNonBlockingContext")
     class V10Paginator(
         val account: Account,
-        val misskeyAPIV10: MisskeyAPIV10,
+        private val misskeyAPIV10: MisskeyAPIV10,
         val userId: User.Id,
         val type: Type,
         val encryption: Encryption,
@@ -211,7 +211,6 @@ class FollowFollowerViewModel(
 
 
     private var mAccount: Account? = null
-    private val accountLock = Mutex()
     private var mPaginator: Paginator? = null
 
     private suspend fun getPaginator(): Paginator {

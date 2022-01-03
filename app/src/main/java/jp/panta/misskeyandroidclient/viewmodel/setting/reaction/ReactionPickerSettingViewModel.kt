@@ -25,16 +25,15 @@ class ReactionPickerSettingViewModel(
     private val account: Account,
     private val reactionUserSettingDao: ReactionUserSettingDao,
     private val settingStore: SettingStore,
-    private val miCore: MiCore
 ) : ViewModel(), ReactionSelection{
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val ar: Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
+    class Factory(private val ar: Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val settingStore = SettingStore(
                 miApplication.getSharedPreferences(miApplication.getPreferenceName(), Context.MODE_PRIVATE)
             )
-            return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, settingStore, miApplication) as T
+            return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, settingStore) as T
         }
     }
 

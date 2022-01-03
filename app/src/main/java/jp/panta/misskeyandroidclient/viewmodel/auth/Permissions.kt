@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.viewmodel.auth
 import jp.panta.misskeyandroidclient.model.api.Version
 
 object Permissions{
-    val defaultPermission = listOf(
+    private val defaultPermission = listOf(
         "write:user-groups",
         "read:user-groups",
         "read:page-likes",
@@ -32,11 +32,11 @@ object Permissions{
         "write:messaging"
     )
 
-    val V_12_47_0: List<String> = defaultPermission.toMutableList().apply {
+    private val V_12_47_0: List<String> = defaultPermission.toMutableList().apply {
         addAll(listOf("read:channels", "write:channels"))
     }
 
-    val V_12_75_0: List<String> = V_12_47_0.toMutableList().apply {
+    private val V_12_75_0: List<String> = V_12_47_0.toMutableList().apply {
         addAll(
             listOf(
                 "read:gallery",

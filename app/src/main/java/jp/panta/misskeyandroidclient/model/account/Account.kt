@@ -88,9 +88,6 @@ data class Account (
         }
     }
 
-    fun getHost(): String {
-        return URL(this.instanceDomain).host
-    }
 }
 
 

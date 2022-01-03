@@ -15,7 +15,7 @@ fun Context.receive(filter: IntentFilter): Flow<Intent?> {
     return channelFlow {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                offer(intent)
+                this@channelFlow.trySend(intent).isSuccess
             }
         }
 

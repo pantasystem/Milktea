@@ -81,7 +81,7 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
         loadPreview()
     }
 
-    fun loadPreview(){
+    private fun loadPreview(){
         if(urlPreviewLoadCounter ++ > 0){
             releaseUrlPreviewLoadQueue.removeCallbacks(releaseUrlPreviewLoadCounter)
             releaseUrlPreviewLoadQueue.postDelayed(releaseUrlPreviewLoadCounter, 1000)

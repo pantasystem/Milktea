@@ -149,11 +149,11 @@ class SearchResultActivity : AppCompatActivity() {
 
     class PagerAdapter(
         private val context: Context,
-        val keyword: String,
+        private val keyword: String,
         fragmentManager: FragmentManager
     ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
-        val isTag = keyword.startsWith("#")
+        private val isTag = keyword.startsWith("#")
 
         val pages = ArrayList(listOf(SEARCH_NOTES, SEARCH_USERS)).apply{
             if(isTag){

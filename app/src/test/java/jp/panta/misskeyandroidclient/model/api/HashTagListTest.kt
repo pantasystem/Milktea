@@ -13,8 +13,7 @@ class HashTagListTest {
         val res = api.getHashTagList(
             RequestHashTagList(
                 null,
-                sort = RequestHashTagList.Sort().attachedLocalUsers().asc(),
-                attachedToLocalUserOnly = true
+                sort = RequestHashTagList.Sort().attachedLocalUsers().asc()
             )
         )
 
@@ -33,8 +32,7 @@ class HashTagListTest {
         val res = api.getHashTagList(
             RequestHashTagList(
                 null,
-                sort = RequestHashTagList.Sort().attachedLocalUsers().asc(),
-                attachedToLocalUserOnly = true
+                sort = RequestHashTagList.Sort().attachedLocalUsers().asc()
             )
         )
 
@@ -52,8 +50,7 @@ class HashTagListTest {
         val res = api.getHashTagList(
             RequestHashTagList(
                 null,
-                sort = RequestHashTagList.Sort().attachedLocalUsers().asc(),
-                attachedToLocalUserOnly = true
+                sort = RequestHashTagList.Sort().attachedLocalUsers().asc()
             )
         )
 

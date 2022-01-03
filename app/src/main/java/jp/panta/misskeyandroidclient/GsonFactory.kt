@@ -30,8 +30,4 @@ object GsonFactory {
         return gson
     }
 
-    fun createSimpleDateFormat(): SimpleDateFormat{
-        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
-
-    }
 }

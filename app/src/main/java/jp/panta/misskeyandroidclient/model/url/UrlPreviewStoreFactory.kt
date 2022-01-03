@@ -10,9 +10,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 
 class UrlPreviewStoreFactory (
-    val urlPreviewDAO: UrlPreviewDAO,
+    private val urlPreviewDAO: UrlPreviewDAO,
     sourceType: Int? = null,
-    var summalyUrl: String? = null,
+    private var summalyUrl: String? = null,
     var account: Account? = null
 ){
 

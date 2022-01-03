@@ -18,10 +18,4 @@ class AccountNotFoundException(msg: String = "") : NoSuchElementException(msg), 
 
 }
 
-/**
- * ローカルにアカウントが一切存在しない場合に呼び出されます
- */
-class AccountNothingException(msg: String = "") : NoSuchElementException(msg), AccountException
-
-
 class AccountRegistrationFailedException(msg: String = "アカウントの登録に失敗しました") : IllegalStateException(msg)

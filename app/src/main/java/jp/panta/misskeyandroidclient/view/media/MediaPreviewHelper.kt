@@ -21,40 +21,6 @@ import java.lang.NullPointerException
 object MediaPreviewHelper{
 
 
-
-    fun setPreview(thumbnail: ImageView, actionButton: ImageButton, frame: FrameLayout, file: File){
-        //VISIBLEにしかしない
-        frame.visibility =View.VISIBLE
-        thumbnail.visibility = View.VISIBLE
-        if(file.type?.contains("audio") == true){
-            Glide.with(thumbnail)
-                .load(R.drawable.ic_music_note_black_24dp)
-                .centerCrop()
-                .error(R.drawable.ic_cloud_off_black_24dp)
-                .into(thumbnail)
-        }else{
-            Glide.with(thumbnail)
-                .load(file.thumbnailUrl)
-                .centerCrop()
-                .error(R.drawable.ic_cloud_off_black_24dp)
-                .into(thumbnail)
-        }
-
-        if(file.type?.contains("video") == true){
-            actionButton.visibility = View.VISIBLE
-            Glide.with(actionButton)
-                .load(R.drawable.ic_play_circle_outline_black_24dp)
-                .centerCrop()
-                .into(actionButton)
-        }else{
-            actionButton.visibility = View.INVISIBLE
-
-        }
-
-
-
-    }
-
     @BindingAdapter("thumbnailView", "playButton", "fileViewData", "fileViewDataList")
     @JvmStatic
     fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?, fileViewDataList: List<FileViewData>?) {
@@ -99,7 +65,7 @@ object MediaPreviewHelper{
         }
     }
 
-    fun setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData){
+    private fun setPreview(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData){
         when(fileViewData.type){
             FileViewData.Type.IMAGE, FileViewData.Type.VIDEO -> {
                 Glide.with(thumbnailView)

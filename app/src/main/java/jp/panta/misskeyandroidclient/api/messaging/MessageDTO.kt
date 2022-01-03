@@ -36,10 +36,6 @@ data class MessageDTO(
     val isRead: Boolean,
     val emojis: List<Emoji>? = null
 ): JavaSerializable{
-    fun isGroup(): Boolean{
-        return group != null
-    }
-
 
 
     val textNode: Root?

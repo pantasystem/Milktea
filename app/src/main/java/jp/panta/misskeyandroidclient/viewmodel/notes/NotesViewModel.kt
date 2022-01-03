@@ -39,7 +39,7 @@ class NotesViewModel(
 
     val statusMessage = EventBus<String>()
 
-    val errorStatusMessage = EventBus<String>()
+    private val errorStatusMessage = EventBus<String>()
 
     val reNoteTarget = EventBus<PlaneNoteViewData>()
 

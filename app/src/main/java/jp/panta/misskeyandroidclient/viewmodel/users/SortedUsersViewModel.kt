@@ -18,7 +18,7 @@ class SortedUsersViewModel(
     type: Type?,
     orderBy: UserRequestConditions?
 ) : ViewModel(){
-    val orderBy: UserRequestConditions = type?.conditions?: orderBy!!
+    private val orderBy: UserRequestConditions = type?.conditions?: orderBy!!
 
     val logger = miCore.loggerFactory.create("SortedUsersViewModel")
 

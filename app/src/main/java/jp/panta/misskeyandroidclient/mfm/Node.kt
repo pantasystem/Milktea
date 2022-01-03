@@ -5,8 +5,7 @@ open class Node(
     override val end: Int,
     override val insideStart: Int,
     override val insideEnd: Int,
-    override val elementType: ElementType,
-    val parentNode: Node?
+    override val elementType: ElementType
 
 ): Element {
 

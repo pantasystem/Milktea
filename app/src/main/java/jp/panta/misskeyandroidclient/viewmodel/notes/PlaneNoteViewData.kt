@@ -161,7 +161,7 @@ open class PlaneNoteViewData (
     val subNote: NoteRelation? = toShowNote.renote
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
-    val subNoteText = subNote?.note?.text
+    private val subNoteText = subNote?.note?.text
     val subNoteTextNode = MFMParser.parse(subNote?.note?.text, subNote?.note?.emojis)
 
     val subCw = subNote?.note?.cw

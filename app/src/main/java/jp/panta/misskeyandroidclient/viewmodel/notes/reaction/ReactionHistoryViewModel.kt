@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class ReactionHistoryViewModel(
-    val reactionHistoryDataSource: ReactionHistoryDataSource,
-    val paginator: ReactionHistoryPaginator,
+    private val reactionHistoryDataSource: ReactionHistoryDataSource,
+    private val paginator: ReactionHistoryPaginator,
     val logger: Logger?
 ) : ViewModel(){
 

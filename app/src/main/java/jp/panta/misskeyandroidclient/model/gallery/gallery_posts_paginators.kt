@@ -98,7 +98,12 @@ class GalleryPostsLoader (
         when(pageable) {
             is Pageable.Gallery.MyPosts -> {
                 return {
-                    api.myGalleryPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20,))
+                    api.myGalleryPosts(GetPosts(
+                        i,
+                        sinceId = sinceId,
+                        untilId = untilId,
+                        limit = 20,
+                    ))
                 }
             }
             is Pageable.Gallery.ILikedPosts -> {

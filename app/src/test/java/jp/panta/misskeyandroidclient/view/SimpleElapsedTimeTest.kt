@@ -10,7 +10,7 @@ import kotlin.time.ExperimentalTime
 
 class SimpleElapsedTimeTest {
 
-    lateinit var simple: SimpleElapsedTime
+    private lateinit var simple: SimpleElapsedTime
 
     @Before
     fun init(){
