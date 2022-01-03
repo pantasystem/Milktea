@@ -7,7 +7,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
@@ -55,7 +54,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
             return
         }
 
-        val simpleExoPlayer = SimpleExoPlayer.Builder(requireContext()).build()
+        val simpleExoPlayer = ExoPlayer.Builder(requireContext()).build()
         view.findViewById<PlayerView>(R.id.player_view).player = simpleExoPlayer
 
         simpleExoPlayer.setMediaItem(MediaItem.fromUri(uri))

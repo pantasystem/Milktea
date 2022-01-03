@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package jp.panta.misskeyandroidclient
 
 import android.content.Context
@@ -19,8 +20,7 @@ import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+
 class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     companion object{
@@ -39,6 +39,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     lateinit var mBinding: ActivityFollowFollowerBinding
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -85,6 +86,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
             return titleList[position]
         }
 
+        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun getItem(position: Int): Fragment {
             return if(position == 0){
                 FollowFollowerFragment.newInstance(FollowFollowerViewModel.Type.FOLLOWING, userId)

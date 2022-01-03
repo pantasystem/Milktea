@@ -12,14 +12,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
@@ -54,8 +52,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     companion object{
@@ -93,7 +90,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     private lateinit var mConfirmViewModel: ConfirmViewModel
 
 
-
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -399,6 +396,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun showDriveFileSelector(){
         val selectedSize = mViewModel.state.value.totalFilesCount
 
@@ -461,6 +459,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun upTo(){
         if(intent.getStringExtra(Intent.EXTRA_TEXT).isNullOrEmpty()){
             finish()
@@ -478,11 +477,13 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onBackPressed() {
 
         finishOrConfirmSaveAsDraftOrDelete()
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val openDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val ids = (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS)  as List<*>? )?.mapNotNull {
             it as? FileProperty.Id

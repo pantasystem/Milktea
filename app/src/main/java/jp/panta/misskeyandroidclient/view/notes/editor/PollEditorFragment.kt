@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
 
 class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
@@ -88,7 +89,7 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
                             .value
                             .changePollExpiresAt(
                                 PollExpiresAt.DateAndTime(
-                                    Clock.System.now().plus(Duration.days(1))
+                                    Clock.System.now().plus(1.days)
                                 )
                             )
                     )

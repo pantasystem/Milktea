@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.SelectedFilePropertyIds
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 
 @Suppress("UNCHECKED_CAST")
@@ -24,7 +25,7 @@ class FileViewModelFactory(
     private val driveStore: DriveStore,
 ) : ViewModelProvider.Factory{
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == FileViewModel::class.java){
             return FileViewModel(

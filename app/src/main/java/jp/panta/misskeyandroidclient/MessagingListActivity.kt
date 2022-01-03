@@ -6,11 +6,14 @@ import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.databinding.ActivityMessagingListBinding
 import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class MessagingListActivity : AppCompatActivity() {
 
     lateinit var mBinding: ActivityMessagingListBinding
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

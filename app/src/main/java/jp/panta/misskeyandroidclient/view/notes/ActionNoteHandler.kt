@@ -30,6 +30,8 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class ActionNoteHandler(
     val activity: AppCompatActivity,
@@ -38,6 +40,7 @@ class ActionNoteHandler(
 ) {
     private val settingStore = SettingStore(activity.getSharedPreferences(activity.getPreferenceName(), Context.MODE_PRIVATE))
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
         activity.startActivity(NoteEditorActivity.newBundle(activity, replyTo = it.toShowNote.note.id))
     }

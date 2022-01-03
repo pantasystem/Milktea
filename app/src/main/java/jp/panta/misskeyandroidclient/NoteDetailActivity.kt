@@ -22,8 +22,7 @@ import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+
 class NoteDetailActivity : AppCompatActivity() {
     companion object{
         private const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_NOTE_ID"
@@ -49,6 +48,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
     private val binding: ActivityNoteDetailBinding by dataBinding()
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -121,6 +121,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 finish()
             }
 
+            else -> {}
         }
         if(!mIsMainActive){
             startActivity(Intent(this, MainActivity::class.java))

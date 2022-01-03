@@ -26,10 +26,10 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 class ReactionPickerDialog : AppCompatDialogFragment(){
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_reaction_picker, null)

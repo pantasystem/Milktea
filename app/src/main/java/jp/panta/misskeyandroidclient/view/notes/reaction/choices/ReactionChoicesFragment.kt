@@ -54,7 +54,7 @@ class ReactionChoicesFragment : Fragment(){
         return inflater.inflate(R.layout.fragment_reaction_choices, container, false)
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentReactionChoicesBinding.bind(view)

@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package jp.panta.misskeyandroidclient.view.notes.reaction
 
 import android.os.Bundle
@@ -20,8 +21,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
     private var mNoteViewModel: NotesViewModel? = null
@@ -35,6 +35,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
         return inflater.inflate(R.layout.dialog_select_reaction, container, false)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DialogSelectReactionBinding.bind(view)
@@ -104,6 +105,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
                 }
             }
         }
+        @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
         override fun getItem(position: Int): Fragment {
             return when(position){
                 0 ->{

@@ -23,12 +23,12 @@ fun ConnectivityManager.activeNetworkFlow(): Flow<Boolean> {
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                offer(true)
+                trySend(true)
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                offer(false)
+                trySend(false)
             }
 
 

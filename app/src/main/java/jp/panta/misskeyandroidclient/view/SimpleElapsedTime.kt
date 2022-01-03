@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.view
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import java.util.*
 
 class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
 
@@ -14,7 +13,6 @@ class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
     // 送られてくる時間はUS
     fun format(date: Instant): String{
 
-        val nowDate = Date()
         val epoch = date.toEpochMilliseconds()
         val nowEpoch = Clock.System.now().toEpochMilliseconds()
 

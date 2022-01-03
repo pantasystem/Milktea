@@ -119,9 +119,6 @@ class ChannelAPI(
 
     override fun onMessage(e: StreamingEvent): Boolean {
         if(e is ChannelEvent) {
-            val st = e.toString()
-            //logger.debug("ChannelEvent: ${if(st.length > 100) st.substring(0,100) else st}..., callbacks main:${listenersMap[Type.MAIN]?.size}, global: ${listenersMap[Type.GLOBAL]?.size}, hybrid: ${listenersMap[Type.GLOBAL]?.size}, home:${listenersMap[Type.HOME]?.size}, type=${typeIdMap.filter { it.value == e.body.id }}")
-
             typeIdMap.filter {
                 it.value == e.body.id
             }.keys.forEach {

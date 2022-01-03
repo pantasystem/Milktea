@@ -13,14 +13,17 @@ import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
-@ExperimentalCoroutinesApi
+
 class AntennaListActivity : AppCompatActivity() {
 
 
     private lateinit var mAntennaListViewModel: AntennaListViewModel
 
     private lateinit var mBinding: ActivityAntennaListBinding
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
