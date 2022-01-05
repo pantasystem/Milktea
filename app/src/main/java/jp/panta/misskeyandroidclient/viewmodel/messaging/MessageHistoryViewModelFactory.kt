@@ -10,14 +10,13 @@ import kotlinx.coroutines.FlowPreview
 
 @Suppress("UNCHECKED_CAST")
 class MessageHistoryViewModelFactory(
-    private val account: Account,
     private val miApplication: MiApplication
 
 ) : ViewModelProvider.Factory{
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == MessageHistoryViewModel::class.java){
-            return MessageHistoryViewModel(account, miApplication) as T
+            return MessageHistoryViewModel(miApplication) as T
         }
         throw IllegalArgumentException("error")
     }

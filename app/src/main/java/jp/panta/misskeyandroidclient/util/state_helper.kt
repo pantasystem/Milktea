@@ -1,8 +1,5 @@
 package jp.panta.misskeyandroidclient.util
 
-import jp.panta.misskeyandroidclient.model.Pageable
-import kotlinx.coroutines.coroutineScope
-
 
 sealed class State<out T>(val content: StateContent<T>) {
     class Fixed<out T>(content: StateContent<T>) : State<T>(content)
