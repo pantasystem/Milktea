@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MessageActivity
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessagingHistoryBinding
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel
 import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModelFactory
@@ -39,7 +39,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
         binding.historyListView.layoutManager = layoutManager
         mLinearLayoutManager = layoutManager
 
-        val miApplication = context?.applicationContext as MiApplication
+        val miApplication = context?.applicationContext as MiCore
         val historyViewModel = ViewModelProvider(
             this,
             MessageHistoryViewModelFactory(miApplication)

@@ -1,14 +1,12 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import android.util.Log
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.groups.toGroup
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.messaging.MessageHistoryRelation
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
 import jp.panta.misskeyandroidclient.model.messaging.toHistory
 import jp.panta.misskeyandroidclient.util.State
@@ -26,7 +24,6 @@ import kotlinx.datetime.Clock
 class MessageHistoryViewModel(
     private val miCore: MiCore,
     private val encryption: Encryption = miCore.getEncryption(),
-    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
 
@@ -84,11 +81,20 @@ class MessageHistoryViewModel(
                 ev,
                 miCore.getUnreadMessages(),
                 viewModelScope,
-                coroutineDispatcher
             )
         } else {
-            anyMsg.message.postValue(ev)
-            list
+            list.map {
+                if(it.messagingId == anyMsg.messagingId) {
+                    HistoryViewData(
+                        a,
+                        ev,
+                        miCore.getUnreadMessages(),
+                        viewModelScope,
+                    )
+                }else{
+                    it
+                }
+            }
         }
         logger.debug("newList:$newList")
         newList

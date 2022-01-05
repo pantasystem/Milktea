@@ -1,19 +1,17 @@
 package jp.panta.misskeyandroidclient.viewmodel.messaging
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageHistoryRelation
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
-class HistoryViewData (account: Account, message: MessageHistoryRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope, coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO){
+class HistoryViewData (account: Account, val message: MessageHistoryRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope){
     val messagingId = message.message.messagingId(account)
-    val message = MutableLiveData(message)
-    //val id = message.message.id
     val isGroup = message is MessageHistoryRelation.Group
     val group = (message as? MessageHistoryRelation.Group)?.group
     val partner = (message as? MessageHistoryRelation.Direct)?.let {
@@ -34,23 +32,14 @@ class HistoryViewData (account: Account, message: MessageHistoryRelation, unRead
     val title = if(isGroup){
         "${group?.name}"
     }else{
-        val host = partner?.host
-        "@${partner?.userName}" + if(host != null) "@$host" else ""
+        partner?.getDisplayUserName()
     }
-    private val mUnreadMessages = MutableLiveData<List<Message>>()
-    val unreadMessages: LiveData<List<Message>> = mUnreadMessages
-    val unreadMessageCount = Transformations.map(mUnreadMessages){
-        it?.size?: 0
-    }
+    private val mUnreadMessages = unReadMessages.findByMessagingId(messagingId)
+    val unreadMessages = mUnreadMessages.stateIn(coroutineScope, SharingStarted.Lazily, emptyList())
+    val unreadMessageCount = mUnreadMessages.map {
+        it.size
+    }.stateIn(coroutineScope, SharingStarted.Lazily, 0)
 
-    private val scope = coroutineScope + coroutineDispatcher
-    init {
-        scope.launch {
-            unReadMessages.findByMessagingId(messagingId).collect {
-                mUnreadMessages.postValue(it)
-            }
-        }
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -68,7 +57,6 @@ class HistoryViewData (account: Account, message: MessageHistoryRelation, unRead
         if (mUnreadMessages != other.mUnreadMessages) return false
         if (unreadMessages != other.unreadMessages) return false
         if (unreadMessageCount != other.unreadMessageCount) return false
-        if (scope != other.scope) return false
 
         return true
     }
@@ -84,7 +72,6 @@ class HistoryViewData (account: Account, message: MessageHistoryRelation, unRead
         result = 31 * result + mUnreadMessages.hashCode()
         result = 31 * result + unreadMessages.hashCode()
         result = 31 * result + unreadMessageCount.hashCode()
-        result = 31 * result + scope.hashCode()
         return result
     }
 
