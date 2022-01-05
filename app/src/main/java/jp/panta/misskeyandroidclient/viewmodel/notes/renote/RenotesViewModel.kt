@@ -43,14 +43,8 @@ class RenotesViewModel(
         }
     }.asNoteRelation()
 
-    val quotes = renotesPagingService.state.map {
-        it.convert { list ->
-            list.filterIsInstance<Renote.Quote>()
-        }
-    }.asNoteRelation()
 
     private val _errors = MutableStateFlow<Throwable?>(null)
-    val errors: Flow<Throwable?> = _errors
 
     fun next() {
         viewModelScope.launch(Dispatchers.IO) {

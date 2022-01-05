@@ -5,44 +5,35 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.notes.editor.NoteFilePreview
 import jp.panta.misskeyandroidclient.util.file.toAppFile
-import jp.panta.misskeyandroidclient.util.file.toFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.view.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.view.users.UserChipListAdapter
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
-import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
@@ -59,6 +50,8 @@ interface SimpleEditor{
     fun openMenu()
 }
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEditor {
 
 
@@ -68,9 +61,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     override val isShowEditorMenu: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    
-    @ExperimentalCoroutinesApi
-    @FlowPreview
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -340,8 +331,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         isShowEditorMenu.value = true
     }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
+
     override fun goToNormalEditor() {
         mViewModel?.toDraftNote()?.let{
             val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = it)

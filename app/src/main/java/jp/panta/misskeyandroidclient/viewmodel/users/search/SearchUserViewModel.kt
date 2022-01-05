@@ -24,14 +24,14 @@ import java.util.concurrent.TimeUnit
 @ExperimentalCoroutinesApi
 class SearchUserViewModel(
     val miCore: MiCore,
-    val hasDetail: Boolean?,
+    private val hasDetail: Boolean?,
     private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
 ) : ViewModel(){
 
     private val logger = miCore.loggerFactory.create("SearchUserViewModel")
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore, val hasDetail: Boolean?) : ViewModelProvider.Factory{
+    class Factory(val miCore: MiCore, private val hasDetail: Boolean?) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SearchUserViewModel(miCore, hasDetail) as T
         }

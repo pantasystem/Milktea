@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.databinding.ItemPageSettingBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
 
-class PagesAdapter(val pageSettingViewModel: PageSettingViewModel) : ListAdapter<Page, PagesAdapter.VH>(ItemDiffUtil()){
+class PagesAdapter(private val pageSettingViewModel: PageSettingViewModel) : ListAdapter<Page, PagesAdapter.VH>(ItemDiffUtil()){
 
     class ItemDiffUtil : DiffUtil.ItemCallback<Page>(){
         override fun areContentsTheSame(oldItem: Page, newItem: Page): Boolean {

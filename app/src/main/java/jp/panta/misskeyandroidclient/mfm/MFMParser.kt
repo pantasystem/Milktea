@@ -29,9 +29,9 @@ object MFMParser{
      *         ↑start       ↑end
      */
     class NodeParser(
-        val sourceText: String,
+        private val sourceText: String,
         val parent: Node,
-        val emojiNameMap: Map<String, Emoji>,
+        private val emojiNameMap: Map<String, Emoji>,
         val start: Int = parent.insideStart,
         val end: Int = parent.insideEnd
     ){
@@ -158,10 +158,9 @@ object MFMParser{
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                elementType = ElementType.BOLD,
                 insideStart = position + 2,
                 insideEnd = position + matcher.end() - 2,
-                parentNode = parent
+                elementType = ElementType.BOLD
             )
         }
 
@@ -183,10 +182,9 @@ object MFMParser{
                 return Node(
                     start = position,
                     end = position + matcher.end(),
-                    elementType = tag,
                     insideStart = position + tagName.length + 2,
                     insideEnd = position + matcher.end(2),
-                    parentNode = parent
+                    elementType = tag
                 )
 
 
@@ -207,10 +205,9 @@ object MFMParser{
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                elementType = ElementType.STRIKE,
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.start(1) + child.length,
-                parentNode = parent
+                elementType = ElementType.STRIKE
             )
         }
 
@@ -228,10 +225,9 @@ object MFMParser{
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                elementType = ElementType.CODE,
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.end(1),
-                parentNode = parent
+                elementType = ElementType.CODE
             )
         }
 
@@ -269,10 +265,9 @@ object MFMParser{
             return Node(
                 start = position,
                 end = nodeEnd + position,
-                elementType = ElementType.QUOTE,
-                insideStart = position + 1, // >を排除する
-                insideEnd = position + nodeEnd,
-                parentNode = parent
+                insideStart = position + 1,
+                insideEnd = position + nodeEnd, // >を排除する
+                elementType = ElementType.QUOTE
             )
         }
 
@@ -302,10 +297,9 @@ object MFMParser{
             return Node(
                 start = position,
                 end = position + matcher.end(),
-                elementType = ElementType.TITLE,
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.end(1),
-                parentNode = parent
+                elementType = ElementType.TITLE
             )
         }
 

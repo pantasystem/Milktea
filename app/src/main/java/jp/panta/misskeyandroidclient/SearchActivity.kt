@@ -16,6 +16,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SearchActivity : AppCompatActivity() {
 
     companion object{
@@ -32,8 +34,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val binding: ActivitySearchBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -55,8 +56,6 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         menuInflater.inflate(R.menu.menu_search, menu)
@@ -91,6 +90,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     fun showSearchResult(searchWord: String){
         val intent = Intent(this, SearchResultActivity::class.java)
         intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)

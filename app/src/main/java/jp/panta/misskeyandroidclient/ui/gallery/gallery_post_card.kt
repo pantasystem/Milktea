@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
+import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
 
 
@@ -53,8 +54,8 @@ fun GalleryPostCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = rememberGlidePainter(
-                        request = galleryState.user.avatarUrl,
+                    painter = rememberImagePainter(
+                        galleryState.user.avatarUrl,
                     ),
                     contentDescription = null,
                     modifier = Modifier

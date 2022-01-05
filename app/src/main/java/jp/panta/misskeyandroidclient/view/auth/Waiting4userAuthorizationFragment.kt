@@ -16,10 +16,14 @@ import jp.panta.misskeyandroidclient.databinding.FragmentWaiting4UserAuthorizati
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_user_authorization) {
 
     private val binding: FragmentWaiting4UserAuthorizationBinding by dataBinding()

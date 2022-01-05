@@ -14,12 +14,13 @@ import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class ExploreFragment : Fragment(R.layout.fragment_explore){
 
     val binding: FragmentExploreBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

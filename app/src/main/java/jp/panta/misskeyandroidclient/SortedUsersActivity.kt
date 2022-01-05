@@ -11,6 +11,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SortedUsersActivity : AppCompatActivity() {
 
     companion object{
@@ -26,8 +28,7 @@ class SortedUsersActivity : AppCompatActivity() {
 
     val binding: ActivitySortedUsesBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

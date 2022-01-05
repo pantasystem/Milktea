@@ -16,12 +16,15 @@ import jp.panta.misskeyandroidclient.api.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostsViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view){
 
     companion object {

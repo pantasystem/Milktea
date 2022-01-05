@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.api.v12_75_0
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 import java.util.*
 
 
@@ -27,7 +27,7 @@ data class GetPosts(
 )
 
 @Serializable
-data class GalleryPost(
+data class GalleryPost @OptIn(ExperimentalSerializationApi::class) constructor(
     val id: String,
     @Serializable(with = DateSerializer::class) val createdAt: Date,
     @Serializable(with = DateSerializer::class) val updatedAt: Date,

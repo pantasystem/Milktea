@@ -13,6 +13,6 @@ class MisskeyGetMetaTest{
 
         // テスト段階ではV12だった
         assert(version?.isInRange(Version.Major.V_12) == true)
-        assert(response?.body() != null)
+        assert(response.body() != null)
     }
 }

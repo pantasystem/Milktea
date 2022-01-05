@@ -10,8 +10,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaListBinding
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+
 
 class AntennaListActivity : AppCompatActivity() {
 
@@ -19,7 +22,8 @@ class AntennaListActivity : AppCompatActivity() {
     private lateinit var mAntennaListViewModel: AntennaListViewModel
 
     private lateinit var mBinding: ActivityAntennaListBinding
-    @ExperimentalCoroutinesApi
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -29,7 +33,7 @@ class AntennaListActivity : AppCompatActivity() {
 
         mAntennaListViewModel = ViewModelProvider(
             this,
-            AntennaListViewModel.Factory(this.applicationContext as MiApplication)
+            AntennaListViewModel.Factory(this.applicationContext as MiCore)
         )[AntennaListViewModel::class.java]
 
 

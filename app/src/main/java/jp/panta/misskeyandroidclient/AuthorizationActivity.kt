@@ -15,10 +15,14 @@ import jp.panta.misskeyandroidclient.view.auth.AuthResultFragment
 import jp.panta.misskeyandroidclient.view.auth.Waiting4userAuthorizationFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import java.lang.IllegalStateException
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class AuthorizationActivity : AppCompatActivity() {
 
     lateinit var mViewModel: AuthViewModel

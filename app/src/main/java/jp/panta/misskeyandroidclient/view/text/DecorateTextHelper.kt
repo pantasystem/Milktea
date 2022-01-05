@@ -18,7 +18,7 @@ object DecorateTextHelper {
     private const val MENSTION_PETTERN = """@\w([\w-]*\w)?(?:@[\w.\-]+\w)?"""
     private const val WEB_URL_PATTERN = """(https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)"""
 
-    const val SCHEME = "misskey:"
+    private const val SCHEME = "misskey:"
 
     private val hashTagPattern = Pattern.compile(HASH_TAG_PETTERN)
     private val mentionPattern = Pattern.compile(MENSTION_PETTERN, Pattern.MULTILINE)
@@ -37,21 +37,21 @@ object DecorateTextHelper {
     }
 
     private fun decorateLink(textView: TextView){
-        Linkify.addLinks(textView, mentionPattern, SCHEME, null, Linkify.TransformFilter { _, url ->
+        Linkify.addLinks(textView, mentionPattern, SCHEME, null, { _, url ->
             val builder = Uri.Builder()
             builder.authority("user")
             builder.appendQueryParameter("userName", url)
             builder.build().toString()
         })
 
-        Linkify.addLinks(textView, hashTagPattern, SCHEME, null, Linkify.TransformFilter { _, url ->
+        Linkify.addLinks(textView, hashTagPattern, SCHEME, null, { _, url ->
             val builder = Uri.Builder()
                 .authority("search")
                 .appendQueryParameter("keyword", url)
             builder.path(url).toString()
         })
 
-        Linkify.addLinks(textView, webUrlPattern, null, null, Linkify.TransformFilter { _, url ->
+        Linkify.addLinks(textView, webUrlPattern, null, null, { _, url ->
             url
         })
         textView.linksClickable = true

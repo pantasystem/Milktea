@@ -21,7 +21,7 @@ abstract class MessageViewData (val message: MessageRelation, account: Account){
         FileViewData(it)
     }
     //val isRead = message.message.isRead
-    private val mIsReadLiveData = MutableLiveData<Boolean>(message.message.isRead)
+    private val mIsReadLiveData = MutableLiveData(message.message.isRead)
     private var mIsRead: Boolean = message.message.isRead
         set(value) {
             mIsReadLiveData.postValue(value)

@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
@@ -21,6 +20,8 @@ import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     companion object {
@@ -36,8 +37,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         }
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DataBindingUtil.bind<FragmentAntennaEditorBinding>(view)

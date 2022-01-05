@@ -128,7 +128,7 @@ class NoteEditorViewModel(
 
 
     val showVisibilitySelectionEvent = EventBus<Unit>()
-    val visibilitySelectedEvent = EventBus<Unit>()
+    private val visibilitySelectedEvent = EventBus<Unit>()
 
 
     @FlowPreview
@@ -447,10 +447,6 @@ class NoteEditorViewModel(
                 && address.value.isNullOrEmpty())
     }
 
-    private fun <T, S>MediatorLiveData<T>.addSourceChain(liveData: LiveData<S>, observer: (out: S)-> Unit): MediatorLiveData<T>{
-        this.addSource(liveData, observer)
-        return this
-    }
 
     @FlowPreview
     @ExperimentalCoroutinesApi

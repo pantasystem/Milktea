@@ -15,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
+@ExperimentalCoroutinesApi
 class HistoryListAdapter @ExperimentalCoroutinesApi constructor(
     itemCallback: DiffUtil.ItemCallback<HistoryViewData>,
     private val historyViewModel: MessageHistoryViewModel,

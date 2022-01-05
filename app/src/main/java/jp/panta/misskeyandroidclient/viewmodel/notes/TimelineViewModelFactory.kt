@@ -13,8 +13,10 @@ import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 @Suppress("UNCHECKED_CAST")
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class TimelineViewModelFactory(
     private val account: Account?,
     private val accountId: Long? = account?.accountId,
@@ -22,7 +24,6 @@ class TimelineViewModelFactory(
     private val miApplication: MiApplication
 ) : ViewModelProvider.Factory{
 
-    @ExperimentalCoroutinesApi
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == TimelineViewModel::class.java){
 

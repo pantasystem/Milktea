@@ -46,7 +46,7 @@ class DraftNotesViewModel(
 
     val isLoading = MutableLiveData<Boolean>()
 
-    fun loadDraftNotes(ac: Account){
+    private fun loadDraftNotes(ac: Account){
         logger.debug("読み込み開始")
         viewModelScope.launch(Dispatchers.IO){
             try{

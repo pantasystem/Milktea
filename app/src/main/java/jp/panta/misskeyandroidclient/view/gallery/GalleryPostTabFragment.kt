@@ -5,19 +5,21 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.fragment.app.activityViewModels
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryPostTabBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostActionViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
     val binding: FragmentGalleryPostTabBinding by dataBinding()
     private val actionViewModel: GalleryPostActionViewModel by activityViewModels()
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val appCompatActivity = (requireActivity() as AppCompatActivity)
@@ -50,11 +52,14 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
 }
 
+@FlowPreview
+@ExperimentalCoroutinesApi
+@Suppress("DEPRECATION")
 class GalleryPostTabPagerAdapter(
     val tabs: List<Pageable.Gallery>,
-    val pageTitles: List<String>,
+    private val pageTitles: List<String>,
     fragmentManager: FragmentManager
-) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+) : androidx.fragment.app.FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     init {
         assert(tabs.size == pageTitles.size) {

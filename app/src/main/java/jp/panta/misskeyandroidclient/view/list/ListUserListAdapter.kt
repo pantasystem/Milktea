@@ -23,8 +23,8 @@ class ListUserListAdapter(
     class VH(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)
     @FlowPreview
     class ItemCallback : DiffUtil.ItemCallback<UserViewData>(){
-        @FlowPreview
-        @ExperimentalCoroutinesApi
+
+        @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
         override fun areContentsTheSame(
             oldItem: UserViewData,
             newItem: UserViewData
@@ -33,8 +33,7 @@ class ListUserListAdapter(
                     && oldItem.user.value == newItem.user.value
         }
 
-        @FlowPreview
-        @ExperimentalCoroutinesApi
+        @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
         override fun areItemsTheSame(
             oldItem: UserViewData,
             newItem: UserViewData

@@ -14,7 +14,7 @@ class UserDetailViewModelFactory(
     val userId: User.Id?,
     val fqcnUserName: String?
 ) : ViewModelProvider.Factory{
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == UserDetailViewModel::class.java){
             return UserDetailViewModel(userId, fqcnUserName, miApplication, translationStore = miApplication.getTranslationStore()) as T

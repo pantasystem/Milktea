@@ -10,9 +10,9 @@ import java.lang.IndexOutOfBoundsException
 
 class PollViewData(private val poll: Poll, val noteId: String){
     inner class Choice(val choice: Poll.Choice, val number: Int){
-        val isVoted = MutableLiveData<Boolean>(choice.isVoted)
+        val isVoted = MutableLiveData(choice.isVoted)
 
-        val voteCount = MutableLiveData<Int>(choice.votes)
+        val voteCount = MutableLiveData(choice.votes)
 
         /*val percentage = MediatorLiveData<Float>().apply{
             addSource(totalVote){
@@ -22,13 +22,12 @@ class PollViewData(private val poll: Poll, val noteId: String){
         }*/
         val text = choice.text
     }
-    val totalVoteCount = MutableLiveData<Int>(poll.choices.sumOf {
+    val totalVoteCount = MutableLiveData(poll.choices.sumOf {
         it.votes
     })
 
-    val isMultiple = poll.multiple
 
-    val canVote = MutableLiveData<Boolean>(poll.multiple || poll.choices.all {
+    val canVote = MutableLiveData(poll.multiple || poll.choices.all {
         !it.isVoted
     })
 

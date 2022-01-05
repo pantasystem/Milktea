@@ -2,29 +2,28 @@ package jp.panta.misskeyandroidclient
 
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.appcompat.app.AppCompatActivity
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityGalleryPostsBinding
-import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.view.gallery.GalleryEditorFragment
 import jp.panta.misskeyandroidclient.view.gallery.GalleryPostTabFragment
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.gallery.Action
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostActionViewModel
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class GalleryPostsActivity : AppCompatActivity() {
 
 
 
     val binding: ActivityGalleryPostsBinding by dataBinding()
-    val actionViewModel: GalleryPostActionViewModel by viewModels()
+    private val actionViewModel: GalleryPostActionViewModel by viewModels()
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

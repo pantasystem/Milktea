@@ -2,8 +2,6 @@ package jp.panta.misskeyandroidclient.viewmodel.drive
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")

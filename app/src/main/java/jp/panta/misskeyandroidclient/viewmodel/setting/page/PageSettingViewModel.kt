@@ -31,7 +31,7 @@ import java.lang.IllegalStateException
 class PageSettingViewModel(
     val miCore: MiCore,
     val settingStore: SettingStore,
-    val pageTypeNameMap: PageTypeNameMap
+    private val pageTypeNameMap: PageTypeNameMap
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction{
 
     class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
@@ -103,7 +103,7 @@ class PageSettingViewModel(
         setList(pages)
 
     }
-    fun addPage(page: Page){
+    private fun addPage(page: Page){
         val list = ArrayList<Page>(selectedPages.value?: emptyList())
         page.weight = list.size
         list.add(page)
@@ -124,7 +124,7 @@ class PageSettingViewModel(
 
         }
     }
-    fun addUserPage(user: UserDTO){
+    private fun addUserPage(user: UserDTO){
         val page = if(settingStore.isUserNameDefault){
             PageableTemplate(account!!).user(user.id, title = user.getShortDisplayName())
         }else{
@@ -197,7 +197,4 @@ class PageSettingViewModel(
         pageOnActionEvent.event = page
     }
 
-    private fun writeTheNumberOfPages(index: Int, page: Page){
-        page.weight = index + 1
-    }
 }

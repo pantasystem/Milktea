@@ -7,7 +7,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class ChannelAPIWithAccountProvider(
-    val socketWithAccountProvider: SocketWithAccountProvider,
+    private val socketWithAccountProvider: SocketWithAccountProvider,
     private val loggerFactory: Logger.Factory
 ) {
 

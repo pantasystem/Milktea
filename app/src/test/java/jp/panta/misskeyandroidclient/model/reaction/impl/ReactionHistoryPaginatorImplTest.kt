@@ -20,11 +20,11 @@ import org.junit.Test
 
 class ReactionHistoryPaginatorImplTest {
 
-    lateinit var accountRepository: TestAccountRepository
-    val misskeyAPIProvider = MisskeyAPIProvider()
-    lateinit var reactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
+    private lateinit var accountRepository: TestAccountRepository
+    private val misskeyAPIProvider = MisskeyAPIProvider()
+    private lateinit var reactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
-    lateinit var dataSource: DataSource
+    private lateinit var dataSource: DataSource
 
 
     class DataSource(

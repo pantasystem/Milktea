@@ -19,8 +19,7 @@ import kotlinx.coroutines.FlowPreview
 
 class AccountSwitchingDialog : BottomSheetDialogFragment(){
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.dialog_switch_account,null)

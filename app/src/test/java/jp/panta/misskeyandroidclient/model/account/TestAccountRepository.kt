@@ -8,7 +8,7 @@ class TestAccountRepository : AccountRepository {
         3L to Account("remote3", "test.misskey.jp", "test1", "token", emptyList(), 3)
     )
 
-    var currentAccountId = 1L
+    private var currentAccountId = 1L
 
     override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
         val ac = account.copy(

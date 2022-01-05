@@ -38,14 +38,14 @@ sealed interface AuthErrors {
 @ExperimentalCoroutinesApi
 @Suppress("UNCHECKED_CAST")
 class AppAuthViewModel(
-    val customAuthStore: CustomAuthStore,
+    private val customAuthStore: CustomAuthStore,
     miCore: MiCore
 ) : ViewModel(){
     companion object{
         const val CALL_BACK_URL = "misskey://app_auth_callback"
     }
 
-    class Factory(val customAuthStore: CustomAuthStore, private val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(private val customAuthStore: CustomAuthStore, private val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AppAuthViewModel(customAuthStore, miCore) as T
         }
@@ -53,7 +53,7 @@ class AppAuthViewModel(
 
     private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
-    val instanceDomain = MutableStateFlow<String>("")
+    val instanceDomain = MutableStateFlow("")
     //private val _metaState = MutableStateFlow<State<Meta>>(State.Fixed(StateContent.NotExist()))
     //private val metaState: StateFlow<State<Meta>> = _metaState
     private val metaState = instanceDomain.flatMapLatest {
@@ -62,7 +62,7 @@ class AppAuthViewModel(
 
     private val _generatingTokenState = MutableStateFlow<State<Session>>(State.Fixed(StateContent.NotExist()))
     private val generatingTokenState: StateFlow<State<Session>> = _generatingTokenState
-    val generateTokenError = generatingTokenState.map {
+    private val generateTokenError = generatingTokenState.map {
         it as? State.Error
     }.map {
         it?.throwable
@@ -113,7 +113,7 @@ class AppAuthViewModel(
     }
 
     private fun getMeta(instanceDomain: String): Flow<State<Meta>> {
-        return flow {
+        return flow<State<Meta>> {
             val url = toEnableUrl(instanceDomain)
             emit(State.Fixed(StateContent.NotExist()))
             if(urlPattern.matcher(url).find()){
@@ -121,7 +121,7 @@ class AppAuthViewModel(
                 runCatching {
                     metaStore.fetch(url)
                 }.onFailure {
-                    emit(State.Error<Meta>(StateContent.NotExist(), it))
+                    emit(State.Error(StateContent.NotExist(), it))
                 }.onSuccess {
                     Log.d("AppAuthVM", "meta:$it")
                     emit(State.Fixed(

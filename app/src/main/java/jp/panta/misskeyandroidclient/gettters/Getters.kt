@@ -21,7 +21,7 @@ class Getters(
     groupDataSource: GroupDataSource,
     loggerFactory: Logger.Factory
 ) {
-    val noteRelationGetter = NoteRelationGetter(noteDataSource, noteRepository, userDataSource, filePropertyDataSource, loggerFactory.create("NoteRelationGetter"))
+    val noteRelationGetter = NoteRelationGetter(noteRepository, userDataSource, filePropertyDataSource, loggerFactory.create("NoteRelationGetter"))
 
     val notificationRelationGetter = NotificationRelationGetter(userDataSource, notificationDataSource, noteRelationGetter, noteDataSourceAdder = NoteDataSourceAdder(
         userDataSource, noteDataSource, filePropertyDataSource

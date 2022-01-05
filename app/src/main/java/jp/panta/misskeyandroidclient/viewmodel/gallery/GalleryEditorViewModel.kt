@@ -32,17 +32,17 @@ sealed class EditType : Serializable{
 }
 
 class GalleryEditorViewModel(
-    val editType: EditType,
-    val galleryRepository: GalleryRepository,
+    private val editType: EditType,
+    private val galleryRepository: GalleryRepository,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
-    val taskExecutor: TaskExecutor,
-    val driveFileRepository: DriveFileRepository,
+    private val taskExecutor: TaskExecutor,
+    private val driveFileRepository: DriveFileRepository,
     val logger: Logger,
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val editType: EditType, val miCore: MiCore) : ViewModelProvider.Factory {
+    class Factory(private val editType: EditType, val miCore: MiCore) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GalleryEditorViewModel(
                 editType,

@@ -1,14 +1,10 @@
 package jp.panta.misskeyandroidclient.model.account
 
-import io.reactivex.Completable
-import io.reactivex.Single
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 
 interface AccountRepository{
 

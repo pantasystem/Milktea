@@ -4,7 +4,6 @@ import jp.panta.misskeyandroidclient.model.Entity
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Instant
-import java.util.*
 
 data class UserList(
     val id: Id,

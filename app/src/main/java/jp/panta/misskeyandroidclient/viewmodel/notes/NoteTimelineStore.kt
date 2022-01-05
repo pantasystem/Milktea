@@ -99,7 +99,7 @@ class NoteTimelineStore(
             Log.e("NoteTimelineStore", "異常ステータス受信:${response?.code()}, :${response?.errorBody()?.string()}")
             Log.e("NoteTMStore", "pageable:$pageableTimeline, params: ${pageableTimeline.toParams()}")
         }
-        return Pair<BodyLessResponse, List<PlaneNoteViewData>?>(BodyLessResponse(response),
+        return Pair(BodyLessResponse(response),
             list?.mapNotNull {
                 try {
                     val related = adder.addNoteDtoToDataSource(account, it).let { note ->

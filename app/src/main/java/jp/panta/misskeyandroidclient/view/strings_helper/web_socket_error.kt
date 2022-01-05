@@ -16,7 +16,7 @@ class WebSocketStateMessageScope(val context: Context) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun Socket.State.getStateMessage(): String {
+    private fun Socket.State.getStateMessage(): String {
         return  when(this){
             is Socket.State.Connected -> context.getString(R.string.connected)
             is Socket.State.Connecting -> context.getString(R.string.connecting)

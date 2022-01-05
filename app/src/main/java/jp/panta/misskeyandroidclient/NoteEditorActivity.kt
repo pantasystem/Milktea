@@ -52,6 +52,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
+
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     companion object{
@@ -88,8 +89,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     private lateinit var mConfirmViewModel: ConfirmViewModel
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -395,6 +396,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun showDriveFileSelector(){
         val selectedSize = mViewModel.state.value.totalFilesCount
 
@@ -457,6 +459,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun upTo(){
         if(intent.getStringExtra(Intent.EXTRA_TEXT).isNullOrEmpty()){
             finish()
@@ -474,13 +477,13 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
     }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onBackPressed() {
 
         finishOrConfirmSaveAsDraftOrDelete()
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val openDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val ids = (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS)  as List<*>? )?.mapNotNull {
             it as? FileProperty.Id

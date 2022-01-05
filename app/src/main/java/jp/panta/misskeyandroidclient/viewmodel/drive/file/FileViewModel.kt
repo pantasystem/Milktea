@@ -31,10 +31,6 @@ class FileViewModel(
 
 
 
-    val isAddable = this.driveStore.state.map {
-        it.selectedFilePropertyIds?.isAddable == true
-    }.asLiveData()
-
     val selectedFileIds = this.driveStore.state.map {
         it.selectedFilePropertyIds?.selectedIds
     }
@@ -116,10 +112,6 @@ class FileViewModel(
         }
     }
 
-
-    fun toggleSelect(id: FileProperty.Id) {
-        driveStore.toggleSelect(id)
-    }
 
 
     fun uploadFile(file: AppFile.Local){

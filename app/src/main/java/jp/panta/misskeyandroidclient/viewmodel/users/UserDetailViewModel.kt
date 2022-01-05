@@ -24,10 +24,9 @@ import kotlinx.coroutines.flow.*
 @ExperimentalCoroutinesApi
 class UserDetailViewModel(
     val userId: User.Id?,
-    val fqdnUserName: String?,
+    private val fqdnUserName: String?,
     val miCore: MiCore,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val encryption: Encryption = miCore.getEncryption(),
     private val translationStore: NoteTranslationStore
 ) : ViewModel(){
     private val logger = miCore.loggerFactory.create("UserDetailViewModel")
@@ -65,11 +64,6 @@ class UserDetailViewModel(
     }
 
     val isMine = MutableLiveData<Boolean>()
-    private val isMeState = userState.filterNotNull().map {
-        miCore.getAccountRepository().get(it.id.accountId).remoteId == it.id.id
-    }.onEach {
-        isMine.postValue(it)
-    }.launchIn(viewModelScope + Dispatchers.IO)
 
     val isFollowing = MediatorLiveData<Boolean>().apply{
         addSource(user){
@@ -232,7 +226,7 @@ class UserDetailViewModel(
     }
 
 
-    var mAc: Account? = null
+    private var mAc: Account? = null
     private suspend fun getAccount(): Account {
         if(mAc != null) {
             return mAc!!

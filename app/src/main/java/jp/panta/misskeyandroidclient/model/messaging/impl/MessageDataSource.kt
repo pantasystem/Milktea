@@ -27,7 +27,7 @@ class InMemoryMessageDataSource(
 ) : MessageDataSource, UnReadMessages {
 
     private val messageIdAndMessage = mutableMapOf<Message.Id, Message>()
-    private val messagesState = MutableStateFlow<List<Message>>(
+    private val messagesState = MutableStateFlow(
         synchronized(messageIdAndMessage){
             messageIdAndMessage.values.toList()
         }

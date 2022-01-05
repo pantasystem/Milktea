@@ -13,7 +13,7 @@ import java.util.*
 @ExperimentalSerializationApi
 @Serializer(forClass = Date::class)
 object DateSerializer : KSerializer<Date>{
-    const val DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    private const val DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 
     override val descriptor: SerialDescriptor
         get() = PrimitiveSerialDescriptor("DateSerializer", PrimitiveKind.STRING)

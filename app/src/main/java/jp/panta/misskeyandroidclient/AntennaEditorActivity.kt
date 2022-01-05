@@ -21,6 +21,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @ExperimentalCoroutinesApi
+@FlowPreview
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA_ID"
@@ -37,12 +38,11 @@ class AntennaEditorActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityAntennaEditorBinding
 
-    @FlowPreview
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_antenna_editor)
-        mBinding = DataBindingUtil.setContentView<ActivityAntennaEditorBinding>(this, R.layout.activity_antenna_editor)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_antenna_editor)
         setSupportActionBar(mBinding.antennaEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

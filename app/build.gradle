@@ -58,12 +58,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
 
 
     composeOptions {
-        kotlinCompilerVersion '1.5.10'
-        kotlinCompilerExtensionVersion '1.0.0-beta08'
+        kotlinCompilerExtensionVersion = '1.1.0-rc02'
     }
 }
 
@@ -71,7 +71,7 @@ android {
 ext {
     retrofit = '2.9.0'
     room_version = "2.4.0"
-    coroutines_version = '1.5.2'
+    coroutines_version = '1.6.0'
 }
 
 dependencies {

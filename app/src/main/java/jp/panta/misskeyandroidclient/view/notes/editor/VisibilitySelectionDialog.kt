@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.view.notes.editor
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
@@ -13,7 +12,6 @@ import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBindin
 import jp.panta.misskeyandroidclient.model.notes.CanLocalOnly
 import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
 import java.util.*
 
 class VisibilitySelectionDialog : AppCompatDialogFragment(){
@@ -40,7 +38,6 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
             is Visibility.Home -> 1
             is Visibility.Followers -> 2
             is Visibility.Specified -> 3
-            else -> 0
         }
         if(nowSelectedVisibility !in visibilities.indices){
             nowSelectedVisibility = 0
@@ -63,14 +60,14 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
                         getString(R.string.visibility_specified) -> "specified"
                         else -> "public"
                     }
-                val localOnly = viewModel.isLocalOnly.value?:false
+                val localOnly = viewModel.isLocalOnly.value
                 viewModel.setVisibility(Visibility(type, localOnly))
 
             }
             .setView(view)
 
         binding?.isLocalOnlySwitch?.setOnCheckedChangeListener { _, isChecked ->
-            val visibility = (viewModel.visibility.value ?: Visibility.Public(isChecked)) as? CanLocalOnly
+            val visibility = (viewModel.visibility.value) as? CanLocalOnly
                 ?: return@setOnCheckedChangeListener
             viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as Visibility)
         }

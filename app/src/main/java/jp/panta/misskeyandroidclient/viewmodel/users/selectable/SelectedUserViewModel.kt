@@ -18,15 +18,15 @@ import java.io.Serializable
 class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,
-    val exSelectedUserIds: List<User.Id> = emptyList(),
-    val exSelectedUsers: List<User> = emptyList()
+    private val exSelectedUserIds: List<User.Id> = emptyList(),
+    private val exSelectedUsers: List<User> = emptyList()
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
         val miCore: MiCore,
-        val selectableSize: Int,
-        val selectedUserIds: List<User.Id>?,
+        private val selectableSize: Int,
+        private val selectedUserIds: List<User.Id>?,
         val selectedUsers: List<User>?
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -59,12 +59,6 @@ class SelectedUserViewModel(
         }
     }
 
-    val isSelectable = MediatorLiveData<Boolean>().apply{
-        addSource(selectedUserIds){
-            value = it.size <= selectableSize
-        }
-    }
-
 
     init{
         val usersMap = HashMap<User.Id, UserViewData>()
@@ -91,7 +85,7 @@ class SelectedUserViewModel(
         selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
     }
 
-    fun selectUser(user: User?){
+    private fun selectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap[user.id] = UserViewData(user, miCore, viewModelScope)
@@ -99,7 +93,7 @@ class SelectedUserViewModel(
         }
     }
 
-    fun unSelectUser(user: User?){
+    private fun unSelectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.remove(user.id)

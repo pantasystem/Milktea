@@ -19,7 +19,8 @@ import jp.panta.misskeyandroidclient.view.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-
+@ExperimentalCoroutinesApi
+@FlowPreview
 class ReactionChoicesFragment : Fragment(){
 
     companion object{
@@ -53,7 +54,7 @@ class ReactionChoicesFragment : Fragment(){
         return inflater.inflate(R.layout.fragment_reaction_choices, container, false)
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentReactionChoicesBinding.bind(view)
@@ -88,7 +89,7 @@ class ReactionChoicesFragment : Fragment(){
 
     }
 
-    @ExperimentalCoroutinesApi
+
     private fun showDefault(adapter: ReactionChoicesAdapter){
         val miApplication = context?.applicationContext as MiApplication
         val defaultReaction = ReactionResourceMap.reactionDrawableMap.map{

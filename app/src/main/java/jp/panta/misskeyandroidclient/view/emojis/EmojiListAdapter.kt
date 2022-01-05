@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.view.emojis
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import jp.panta.misskeyandroidclient.databinding.ItemEmojisCategoryBinding
 import jp.panta.misskeyandroidclient.databinding.ItemTextEmojiChoiceBinding
 import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
 import jp.panta.misskeyandroidclient.viewmodel.emojis.Emojis
-import java.lang.IllegalArgumentException
 
 class EmojiListAdapter(
     private val emojiSelection: EmojiSelection,

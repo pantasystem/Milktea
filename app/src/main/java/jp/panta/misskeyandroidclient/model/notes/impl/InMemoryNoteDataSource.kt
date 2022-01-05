@@ -110,7 +110,7 @@ class InMemoryNoteDataSource(
         }
     }
 
-    private fun publish(ev: NoteDataSource.Event) = runBlocking<Unit> {
+    private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {
             listeners.forEach {
                 it.on(ev)

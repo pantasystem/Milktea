@@ -40,7 +40,7 @@ object ReactionViewHelper {
         Looper.loop()
     }.run()*/
 
-    fun setReaction(context: Context, reactionImageView: ImageView, reactionStringView: TextView, reaction: String) {
+    private fun setReaction(context: Context, reactionImageView: ImageView, reactionStringView: TextView, reaction: String) {
         //Log.d("ReactionViewHelper", "reaction $reaction")
         if(reaction.startsWith(":") && reaction.endsWith(":")){
             val miApplication = context.applicationContext as MiApplication

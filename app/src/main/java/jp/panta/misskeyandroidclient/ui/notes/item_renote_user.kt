@@ -35,7 +35,7 @@ fun ItemRenoteUser(
     isUserNameDefault: Boolean = false
 ) {
 
-    val stringResourceMap = mapOf<SimpleElapsedTime.TimeUnit, String>(
+    val stringResourceMap = mapOf(
         SimpleElapsedTime.TimeUnit.YEAR to stringResource(R.string.year_ago),
         SimpleElapsedTime.TimeUnit.MONTH to stringResource(R.string.month_ago),
         SimpleElapsedTime.TimeUnit.DATE to stringResource(R.string.date_ago),
@@ -50,7 +50,7 @@ fun ItemRenoteUser(
         stringResourceMap[it] ?: throw IllegalStateException("対応する文字列リソースを発見することができませんでした")
     }.format(note.note.createdAt)
 
-    LaunchedEffect(key1 = true,){
+    LaunchedEffect(key1 = true){
         withContext(Dispatchers.IO) {
             noteCaptureAPIAdapter?.capture(note.note.id)?.launchIn(this)
         }

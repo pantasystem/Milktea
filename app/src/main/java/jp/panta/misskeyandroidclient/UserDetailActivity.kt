@@ -35,9 +35,11 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.view.users.ReportDialog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
 
 class UserDetailActivity : AppCompatActivity() {
     companion object{
@@ -72,7 +74,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     private var mParentActivity: Activities? = null
 
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -194,6 +196,7 @@ class UserDetailActivity : AppCompatActivity() {
             return titles[position]
         }
 
+        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun getItem(position: Int): Fragment {
             return when(position){
                 0 -> TimelineFragment.newInstance(requestTimeline)
@@ -205,7 +208,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
@@ -246,7 +249,7 @@ class UserDetailActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d("UserDetail", "mParentActivity: $mParentActivity")
 
@@ -290,6 +293,7 @@ class UserDetailActivity : AppCompatActivity() {
         finish()
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun finishAndGoToMainActivity(){
         if(mParentActivity == null || mParentActivity == Activities.ACTIVITY_OUT_APP) {
             val upIntent = Intent(this, MainActivity::class.java)

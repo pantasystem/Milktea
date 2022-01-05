@@ -37,9 +37,9 @@ class AntennaListViewModel (
 
     val confirmDeletionAntennaEvent = EventBus<Antenna>()
 
-    val openAntennasTimelineEvent = EventBus<Antenna>()
+    private val openAntennasTimelineEvent = EventBus<Antenna>()
 
-    val isLoading = MutableLiveData<Boolean>(false)
+    val isLoading = MutableLiveData(false)
     private var mIsLoading: Boolean = false
         set(value) {
             field = value
@@ -76,7 +76,7 @@ class AntennaListViewModel (
 
     }
 
-    val deleteResultEvent = EventBus<Boolean>()
+    private val deleteResultEvent = EventBus<Boolean>()
 
     fun loadInit(){
         viewModelScope.launch(Dispatchers.IO) {

@@ -35,7 +35,7 @@ class AppTaskExecutor(
     override val tasks: Flow<TaskState> = _tasks
 
     override fun <T> dispatch(task: ITask<T>, isLazy: Boolean) : Flow<TaskState>{
-        return flow {
+        return flow<TaskState> {
             runCatching {
                 emit(TaskState.Executing)
                 task.execute()

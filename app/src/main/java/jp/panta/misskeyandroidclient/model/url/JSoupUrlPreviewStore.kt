@@ -64,7 +64,6 @@ class JSoupUrlPreviewStore : UrlPreviewStore{
             }
             title = title?: urlMatcher.group(3)
 
-            //println("title:$title, \nsiteName:$siteName, \ndescription:$description, \nicon:$iconUrl, \ndescription:$description\n thumbnail:$thumbnailImage")
 
             if(title.isNullOrEmpty() || description.isNullOrEmpty()){
                 return null

@@ -1,12 +1,9 @@
 package jp.panta.misskeyandroidclient.view.gallery
 
 import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.util.ImageButtonResourceHelper.srcCompat
-import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostState
 
 @BindingAdapter("isLiked", "isSendingLiked")
 fun ImageButton.setLikeButtonState(isLiked: Boolean?, isSendingFavorite: Boolean?) {
@@ -21,11 +18,3 @@ fun ImageButton.setLikeButtonState(isLiked: Boolean?, isSendingFavorite: Boolean
     }
 }
 
-@BindingAdapter("galleryPostImageSrc")
-fun ImageView.setGalleryFirstImage(galleryPostState: GalleryPostState?) {
-    galleryPostState?: return
-    Glide.with(this)
-        .load(galleryPostState.files[0].thumbnailUrl)
-        .centerCrop()
-        .into(this)
-}

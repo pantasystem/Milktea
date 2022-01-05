@@ -1,14 +1,11 @@
 package jp.panta.misskeyandroidclient.view.text
 
-import android.util.Log
-import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.util.date.toCurrentLocaleDate
 import jp.panta.misskeyandroidclient.view.SimpleElapsedTime
-import kotlinx.datetime.*
-import kotlinx.datetime.TimeZone
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.text.SimpleDateFormat
 import java.util.*
 

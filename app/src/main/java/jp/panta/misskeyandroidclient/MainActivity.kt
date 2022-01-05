@@ -61,6 +61,7 @@ import jp.panta.misskeyandroidclient.viewmodel.users.ReportViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+
 class MainActivity : AppCompatActivity(){
 
     lateinit var mNotesViewModel: NotesViewModel
@@ -79,8 +80,8 @@ class MainActivity : AppCompatActivity(){
 
     private val binding: ActivityMainBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -120,7 +121,7 @@ class MainActivity : AppCompatActivity(){
         initAccountViewModelListener()
         binding.setupHeaderProfile()
 
-        mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
+        mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
         // NOTE: メッセージの既読数をバッジに表示する
@@ -238,6 +239,7 @@ class MainActivity : AppCompatActivity(){
     }
 
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     inner class MainBottomNavigationAdapter(savedInstanceState: Bundle?, bottomNavigation: BottomNavigationView)
         : BottomNavigationAdapter(bottomNavigation, supportFragmentManager, R.id.navigation_home, R.id.content_main, savedInstanceState){
 
@@ -277,6 +279,7 @@ class MainActivity : AppCompatActivity(){
     /**
      * シンプルエディターの表示・非表示を行う
      */
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun ActivityMainBinding.setSimpleEditor() {
         val miCore = applicationContext as MiCore
         val ft = supportFragmentManager.beginTransaction()
@@ -306,6 +309,7 @@ class MainActivity : AppCompatActivity(){
         snackBar.show()
     }
 
+
     private val switchAccountButtonObserver = Observer<Int>{
         runOnUiThread{
             binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -334,7 +338,7 @@ class MainActivity : AppCompatActivity(){
         intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun initAccountViewModelListener(){
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
@@ -409,6 +413,7 @@ class MainActivity : AppCompatActivity(){
         return store
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val idAndActivityMap = mapOf(
             R.id.action_settings to SettingsActivity::class.java,

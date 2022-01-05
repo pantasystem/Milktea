@@ -88,9 +88,6 @@ data class Account (
         }
     }
 
-    fun getHost(): String {
-        return URL(this.instanceDomain).host
-    }
 }
 
 
@@ -120,10 +117,6 @@ fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account{
         //emojis = this.emojis?: emptyList(),
         pages = emptyList()
     )
-}
-
-fun UserDTO.newAccount(instanceDomain: String, encryption: Encryption, token: String): Account{
-    return newAccount(instanceDomain, encryption.encrypt(this.id, token))
 }
 
 fun AccountRelation.newAccount(user: UserDTO?): Account?{

@@ -86,7 +86,7 @@ open class PlaneNoteViewData (
         determineTextLength.setText(this)
     }
 
-    val contentFolding = MutableLiveData<Boolean>(cw != null || determineTextLength.isLong())
+    val contentFolding = MutableLiveData(cw != null || determineTextLength.isLong())
     val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding){
         if(it) "もっと見る: ${text?.length}文字" else "隠す"
     }
@@ -135,13 +135,13 @@ open class PlaneNoteViewData (
     }
 
     //var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
-    val replyCount = MutableLiveData<Int>(toShowNote.note.repliesCount)
+    val replyCount = MutableLiveData(toShowNote.note.repliesCount)
 
     val reNoteCount: String?
         get() = if(toShowNote.note.renoteCount > 0) toShowNote.note.renoteCount.toString() else null
-    val renoteCount = MutableLiveData<Int>(toShowNote.note.renoteCount)
+    val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
 
-    val reactionCounts = MutableLiveData<List<ReactionCount>>(toShowNote.note.reactionCounts)
+    val reactionCounts = MutableLiveData(toShowNote.note.reactionCounts)
 
     val reactionCount = Transformations.map(reactionCounts){
         var sum = 0
@@ -161,13 +161,13 @@ open class PlaneNoteViewData (
     val subNote: NoteRelation? = toShowNote.renote
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
-    val subNoteText = subNote?.note?.text
+    private val subNoteText = subNote?.note?.text
     val subNoteTextNode = MFMParser.parse(subNote?.note?.text, subNote?.note?.emojis)
 
     val subCw = subNote?.note?.cw
     val subCwNode = MFMParser.parse(subNote?.note?.cw, subNote?.note?.emojis)
     //true　折り畳み
-    val subContentFolding = MutableLiveData<Boolean>( subCw != null )
+    val subContentFolding = MutableLiveData( subCw != null )
     val subContentFoldingStatusMessage = Transformations.map(subContentFolding){
         if(it) "もっと見る: ${subNoteText?.length}" else "閉じる"
     }

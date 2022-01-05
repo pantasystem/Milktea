@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -15,8 +14,13 @@ import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.view.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalArgumentException
 
+
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SearchTopFragment : Fragment(R.layout.fragment_search_top){
 
     private val mBinding: FragmentSearchTopBinding by dataBinding()

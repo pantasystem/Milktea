@@ -27,10 +27,10 @@ import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.gallery.EditType
 import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
     companion object {

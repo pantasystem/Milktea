@@ -17,7 +17,7 @@ class NotificationMessageScope(val context: Context) {
         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
     }
 
-    fun NotificationRelation.getMessage() : String{
+    private fun NotificationRelation.getMessage() : String{
         return when(this.notification) {
             is FollowNotification -> context.getString(R.string.followed_by, this.user.getDisplayUserName())
             is MentionNotification -> context.getString(R.string.mention_by, this.user.getDisplayUserName())

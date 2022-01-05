@@ -75,7 +75,7 @@ class NoteRepositoryImpl(
         return note
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun toggleReaction(createReaction: CreateReaction): Boolean {
         val account = miCore.getAccount(createReaction.noteId.accountId)
         var note = find(createReaction.noteId)

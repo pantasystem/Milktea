@@ -125,7 +125,7 @@ class ListListViewModel(
     /**
      * 他Activity等でUserListを正常に作成できた場合onActivityResultで呼び出し変更を適応する
      */
-    fun onUserListCreated(userList: UserList){
+    private fun onUserListCreated(userList: UserList){
 
         mUserListIdMap[userList.id] = userList
         mUserListListFlow.value = mUserListIdMap.values.toList()

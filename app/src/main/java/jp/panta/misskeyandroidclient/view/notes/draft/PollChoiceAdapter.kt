@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemDraftNotePollChoiceBinding
-import jp.panta.misskeyandroidclient.view.notes.editor.PollChoicesAdapter
 
 
 class PollChoiceAdapter : ListAdapter<String, PollChoiceAdapter.VH>(ChoiceItemCallback()){

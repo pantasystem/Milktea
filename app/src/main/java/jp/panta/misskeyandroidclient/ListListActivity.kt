@@ -20,10 +20,13 @@ import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
 import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback, UserListEditorDialog.OnSubmittedListener{
 
     companion object{
@@ -46,7 +49,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
     private lateinit var mBinding: ActivityListListBinding
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -120,7 +122,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
 
 
-    @ExperimentalCoroutinesApi
     override fun onEdit(userList: UserList?) {
         userList?: return
 
@@ -130,7 +131,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     }
 
 
-    @ExperimentalCoroutinesApi
     override fun onSubmit(name: String) {
         mListListViewModel?.createUserList(name)
     }

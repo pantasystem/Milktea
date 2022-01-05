@@ -110,20 +110,18 @@
                         android:layout_height="40dp"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:src="@drawable/ic_edit_black_24dp"
-                        android:tint="?attr/colorNoteActionButtonTint"
                         android:layout_marginEnd="8dp"
                         tools:ignore="ContentDescription"
                         android:onClick="@{ ()-> draftNoteAction.onSelect(note.note) }"
-                        />
+                        app:tint="?attr/colorNoteActionButtonTint" />
                 <ImageButton
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:src="@drawable/ic_delete_black_24dp"
-                        android:tint="?attr/colorNoteActionButtonTint"
                         tools:ignore="ContentDescription"
                         android:onClick="@{ ()-> draftNoteAction.onDelete(note.note) }"
-                        />
+                        app:tint="?attr/colorNoteActionButtonTint" />
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

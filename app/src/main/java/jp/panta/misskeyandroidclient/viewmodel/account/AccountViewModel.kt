@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.viewmodel.account
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
-import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.users.User
@@ -13,7 +15,6 @@ import jp.panta.misskeyandroidclient.util.task.asSuspend
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.lang.IllegalArgumentException
 
 @ExperimentalCoroutinesApi
 @Suppress("UNCHECKED_CAST")

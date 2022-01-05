@@ -37,7 +37,7 @@ class ReactionAutoCompleteArrayAdapter(
         val binding: ItemReactionPreviewBinding
         if(view == null){
             val inflater = LayoutInflater.from(context)
-            binding = DataBindingUtil.inflate<ItemReactionPreviewBinding>(inflater, R.layout.item_reaction_preview, parent, false)
+            binding = DataBindingUtil.inflate(inflater, R.layout.item_reaction_preview, parent, false)
             view = binding.root
             view.tag = binding
         }else{

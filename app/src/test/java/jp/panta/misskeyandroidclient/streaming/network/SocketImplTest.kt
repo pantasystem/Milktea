@@ -17,7 +17,7 @@ class SocketImplTest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val socket = SocketImpl(wssURL, okHttpClient, logger)
         runBlocking {
             socket.blockingConnect()
             assertEquals(socket.state(), Socket.State.Connected)
@@ -30,14 +30,14 @@ class SocketImplTest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val socket = SocketImpl(wssURL, okHttpClient, logger)
 
         runBlocking {
 
             socket.addMessageEventListener {
                 false
             }
-            val res: Socket.State = suspendCoroutine<Socket.State> { continuation ->
+            val res: Socket.State = suspendCoroutine { continuation ->
                 var flag = true
                 socket.addStateEventListener { ev ->
                     if(ev == Socket.State.Connected && flag) {
@@ -57,7 +57,7 @@ class SocketImplTest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val socket = SocketImpl(wssURL, okHttpClient, logger)
 
         runBlocking {
 
@@ -65,7 +65,7 @@ class SocketImplTest {
                 false
             }
             socket.addMessageEventListener(listener)
-            val res: Socket.State = suspendCoroutine<Socket.State> { continuation ->
+            val res: Socket.State = suspendCoroutine { continuation ->
                 var flag = true
                 socket.addStateEventListener { ev ->
                     if(ev is Socket.State.Connected && flag) {
@@ -78,7 +78,7 @@ class SocketImplTest {
             assertTrue(res is Socket.State.Connected)
 
             socket.removeMessageEventListener(listener)
-            val closedRes: Socket.State = suspendCoroutine<Socket.State> { continuation ->
+            val closedRes: Socket.State = suspendCoroutine { continuation ->
                 var flag = true
                 socket.addStateEventListener { ev ->
                     if(ev is Socket.State.Closed && flag) {

@@ -89,7 +89,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop{
 
 
     class TimelinePagerAdapter( fragmentManager: FragmentManager, list: List<Page>) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
-        var requestBaseList: List<Page> = list
+        private var requestBaseList: List<Page> = list
             private set
         private var oldRequestBaseSetting = requestBaseList
 

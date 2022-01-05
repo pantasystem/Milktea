@@ -18,7 +18,7 @@ class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
      * invalidateSelfが呼び出されたときに自信のview.invalidateを呼び出し再描画をする
      * (GifDrawableはdrawを呼び出すと自動的にcurrentのGifが読み込まれる)
      */
-    inner class Animated() : Drawable.Callback{
+    inner class Animated : Drawable.Callback{
         override fun invalidateDrawable(p0: Drawable) {
             //weakReference.get()?.invalidate()
             adapter.update()

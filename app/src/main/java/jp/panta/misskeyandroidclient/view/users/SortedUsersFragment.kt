@@ -24,6 +24,8 @@ import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails{
 
     companion object{
@@ -65,8 +67,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
     val mBinding: FragmentExploreUsersBinding by dataBinding()
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

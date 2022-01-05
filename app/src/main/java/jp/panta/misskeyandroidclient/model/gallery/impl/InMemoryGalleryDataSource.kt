@@ -84,10 +84,3 @@ class InMemoryGalleryDataSource(
     }
 }
 
-fun GalleryDataSource.watchIn(ids: List<GalleryPost.Id>) : Flow<List<GalleryPost>>{
-    return this.state.map {
-        ids.map { id ->
-            find(id)
-        }
-    }
-}

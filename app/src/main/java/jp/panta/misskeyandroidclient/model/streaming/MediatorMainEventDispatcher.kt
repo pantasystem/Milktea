@@ -28,14 +28,6 @@ class MediatorMainEventDispatcher(val logger: Logger) {
         return this
     }
 
-    fun detach(dispatcher: StreamingMainEventDispatcher): MediatorMainEventDispatcher {
-        synchronized(dispatchers) {
-            dispatchers = dispatchers.toMutableSet().also {
-                it.remove(dispatcher)
-            }
-        }
-        return this
-    }
 
     suspend fun dispatch(account: Account, mainEvent: ChannelBody.Main) {
         val iterator = dispatchers.iterator()

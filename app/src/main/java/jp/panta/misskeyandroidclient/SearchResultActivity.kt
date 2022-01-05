@@ -23,8 +23,11 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
 
 class SearchResultActivity : AppCompatActivity() {
     companion object{
@@ -89,6 +92,7 @@ class SearchResultActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> finish()
@@ -145,11 +149,11 @@ class SearchResultActivity : AppCompatActivity() {
 
     class PagerAdapter(
         private val context: Context,
-        val keyword: String,
+        private val keyword: String,
         fragmentManager: FragmentManager
     ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
-        val isTag = keyword.startsWith("#")
+        private val isTag = keyword.startsWith("#")
 
         val pages = ArrayList(listOf(SEARCH_NOTES, SEARCH_USERS)).apply{
             if(isTag){
@@ -160,6 +164,7 @@ class SearchResultActivity : AppCompatActivity() {
             return pages.size
         }
 
+        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun getItem(position: Int): Fragment {
             val isTag = keyword.startsWith("#")
 

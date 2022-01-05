@@ -31,7 +31,7 @@ class ReactionSettingActivity : AppCompatActivity() {
     private lateinit var mCustomEmojiDecorator: CustomEmojiDecorator
     private var mReactionPickerSettingViewModel: ReactionPickerSettingViewModel? = null
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()

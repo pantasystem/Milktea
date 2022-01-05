@@ -48,6 +48,7 @@ sealed interface ReportState {
 }
 class ReportViewModel(private val miCore: MiCore) : ViewModel(){
 
+    @Suppress("UNCHECKED_CAST")
     class Factory(val miCore: MiCore) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ReportViewModel(miCore) as T
@@ -79,15 +80,6 @@ class ReportViewModel(private val miCore: MiCore) : ViewModel(){
         ) ?: ReportState.None
     }
 
-    fun setTargetUser(userId: User.Id) {
-        if(state.value is ReportState.Sending) {
-            return
-        }
-        _state.value = ReportState.Specify(
-            userId = userId,
-            comment = ""
-        )
-    }
 
     fun clear() {
         _state.value = ReportState.None

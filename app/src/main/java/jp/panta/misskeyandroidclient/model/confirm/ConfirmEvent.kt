@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.confirm
 
 import java.io.Serializable
-import java.util.*
 
 /**
  * @param resultType ユーザーが選択した結果

@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryUserDataSource(
@@ -35,7 +34,7 @@ class InMemoryUserDataSource(
         }
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun add(user: User): AddResult {
         return createOrUpdate(user).also {
             if(it == AddResult.CREATED) {
@@ -48,7 +47,7 @@ class InMemoryUserDataSource(
 
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun addAll(users: List<User>): List<AddResult> {
         return users.map {
             add(it)
@@ -73,7 +72,7 @@ class InMemoryUserDataSource(
         }
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun remove(user: User): Boolean {
         return usersLock.withLock {
             userMap.remove(user.id)

@@ -27,7 +27,7 @@ class NoteCaptureAPIImpl(
 
 
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun capture(noteId: String): Flow<NoteUpdated.Body> {
 
         return channelFlow {

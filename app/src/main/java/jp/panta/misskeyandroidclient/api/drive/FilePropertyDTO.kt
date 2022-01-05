@@ -36,11 +36,11 @@ data class FilePropertyDTO(
         val height: Int? = null
     ) : Serializable
 
-    fun getThumbnailUrl(instanceBaseUrl: String): String{
+    private fun getThumbnailUrl(instanceBaseUrl: String): String{
         return getUrl(instanceBaseUrl, thumbnailUrl?: url)
     }
 
-    fun getUrl(instanceBaseUrl: String): String{
+    private fun getUrl(instanceBaseUrl: String): String{
         return getUrl(instanceBaseUrl, url)
     }
 

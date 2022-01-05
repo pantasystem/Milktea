@@ -56,11 +56,6 @@ abstract class DraftNoteDao {
         }
     }
 
-    fun searchDraftNotes(accountId: Long, word: String): List<DraftNote>{
-        return searchByWordDraftNotesRelation(accountId, word).map{
-            it.toDraftNote(accountId)
-        }
-    }
 
     fun getDraftNote(accountId: Long, draftNoteId: Long): DraftNote?{
         return getDraftNoteRelation(accountId, draftNoteId)?.toDraftNote(accountId)

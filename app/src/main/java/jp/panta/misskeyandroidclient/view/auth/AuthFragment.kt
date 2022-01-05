@@ -19,11 +19,11 @@ import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
 import jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel
 import jp.panta.misskeyandroidclient.viewmodel.auth.app.AuthErrors
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class AuthFragment : Fragment(){
 
     lateinit var binding: FragmentAppAuthBinding
@@ -36,7 +36,7 @@ class AuthFragment : Fragment(){
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_app_auth, container, false)
         return binding.root
     }
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

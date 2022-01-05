@@ -12,7 +12,7 @@ import java.lang.ClassCastException
 class NotificationViewModelFactory(
     private val miApplication: MiApplication
     ) : ViewModelProvider.Factory{
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass == NotificationViewModel::class.java){
             //val noteCapture = miApplication.noteCapture

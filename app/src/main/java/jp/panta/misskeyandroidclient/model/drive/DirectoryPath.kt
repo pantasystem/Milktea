@@ -46,8 +46,5 @@ data class DirectoryPath(
         )
     }
 
-    fun isCurrentRoot() : Boolean{
-        return this.path.isEmpty()
-    }
 
 }

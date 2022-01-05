@@ -21,6 +21,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.io.Serializable
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SearchAndSelectUserActivity : AppCompatActivity() {
 
     companion object{
@@ -43,8 +45,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     private var mSelectedUserViewModel: SelectedUserViewModel? = null
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -96,22 +97,19 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         mSelectedUserViewModel = selectedUserViewModel
 
     }
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> setResultFinish()
         }
         return super.onOptionsItemSelected(item)
     }
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onBackPressed() {
         setResultFinish()
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     private fun setResultFinish(){
         val selectedDiff = mSelectedUserViewModel?.getSelectedUserIdsChangedDiff()
 

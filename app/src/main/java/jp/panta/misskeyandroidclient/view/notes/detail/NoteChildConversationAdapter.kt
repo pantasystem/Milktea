@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.view.notes.detail
 
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,14 +7,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSimpleNoteBinding
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
-import jp.panta.misskeyandroidclient.view.notes.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.view.notes.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData

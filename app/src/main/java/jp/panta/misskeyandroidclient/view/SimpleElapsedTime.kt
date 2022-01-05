@@ -1,13 +1,7 @@
 package jp.panta.misskeyandroidclient.view
 
-import android.content.Context
-import android.util.Log
-import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.util.date.toCurrentLocaleDate
-import kotlinx.datetime.*
-import kotlinx.datetime.TimeZone
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
 
@@ -19,7 +13,6 @@ class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
     // 送られてくる時間はUS
     fun format(date: Instant): String{
 
-        val nowDate = Date()
         val epoch = date.toEpochMilliseconds()
         val nowEpoch = Clock.System.now().toEpochMilliseconds()
 
