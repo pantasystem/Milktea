@@ -1,39 +1,46 @@
 package jp.panta.misskeyandroidclient.model.messaging
 
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
-@FlowPreview
-@ExperimentalCoroutinesApi
-class MessageStreamFilter(val miCore: MiCore){
+class MessageObserver(
+    private val accountRepository: AccountRepository,
+    private val channelAPIProvider: ChannelAPIWithAccountProvider,
+    private val getters: Getters
+){
 
 
-    fun getAllMergedAccountMessages(): Flow<Message>{
-        return miCore.getAccounts().flatMapMerge {
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    fun observeAllAccountsMessages(): Flow<Message>{
+        return suspend {
+            accountRepository.findAll()
+        }.asFlow().flatMapMerge {
             it.map{ ac ->
-                getAccountMessageObservable(ac)
+                observeAccountMessages(ac)
             }.merge()
         }
     }
 
-    fun getObservable(messagingId: MessagingId): Flow<Message>{
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    fun observeByMessagingId(messagingId: MessagingId): Flow<Message>{
         return flow {
             val accountId = when(messagingId) {
                 is MessagingId.Direct -> messagingId.userId.accountId
                 is MessagingId.Group -> messagingId.groupId.accountId
             }
-            emit(miCore.getAccountRepository().get(accountId))
+            emit(accountRepository.get(accountId))
         }.flatMapLatest { ac ->
-            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map{
+            channelAPIProvider.get(ac).connect(ChannelAPI.Type.MAIN).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {
-                miCore.getGetters().messageRelationGetter.get(ac, it)
+                getters.messageRelationGetter.get(ac, it)
             }.map {
                 it.message
             }.filter {
@@ -42,15 +49,16 @@ class MessageStreamFilter(val miCore: MiCore){
         }
     }
 
-    fun getAccountMessageObservable(ac: Account): Flow<Message>{
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    fun observeAccountMessages(ac: Account): Flow<Message>{
         return suspend {
-            miCore.getChannelAPI(ac)
+            channelAPIProvider.get(ac)
         }.asFlow().flatMapLatest {
             it.connect(ChannelAPI.Type.MAIN)
         }.map{
             (it as? ChannelBody.Main.MessagingMessage)?.body
         }.filterNotNull().map {
-            miCore.getGetters().messageRelationGetter.get(ac, it)
+            getters.messageRelationGetter.get(ac, it)
         }.map {
             it.message
         }

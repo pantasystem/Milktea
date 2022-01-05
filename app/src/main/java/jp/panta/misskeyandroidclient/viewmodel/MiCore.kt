@@ -6,7 +6,7 @@ import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
+import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -52,7 +52,7 @@ interface MiCore{
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    var messageStreamFilter: MessageStreamFilter
+    val messageObserver: MessageObserver
 
     val loggerFactory: Logger.Factory
 

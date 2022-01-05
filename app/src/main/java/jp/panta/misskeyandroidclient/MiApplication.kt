@@ -38,7 +38,7 @@ import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
-import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
+import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
@@ -182,7 +182,13 @@ class MiApplication : Application(), MiCore {
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    override lateinit var messageStreamFilter: MessageStreamFilter
+    override val messageObserver: MessageObserver by lazy {
+        MessageObserver(
+            accountRepository = getAccountRepository(),
+            channelAPIProvider = mChannelAPIWithAccountProvider,
+            getters = getGetters()
+        )
+    }
 
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -319,8 +325,6 @@ class MiApplication : Application(), MiCore {
         mMessageRepository = MessageRepositoryImpl(this)
 
         mGetters = Getters(mNoteDataSource, mNoteRepository,mUserDataSource,mFilePropertyDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource, loggerFactory)
-
-        messageStreamFilter = MessageStreamFilter(this)
 
         mNotificationRepository = NotificationRepositoryImpl(
             mNotificationDataSource,

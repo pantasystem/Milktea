@@ -60,7 +60,7 @@ class MessageHistoryViewModel(
     }
 
     init {
-        miCore.messageStreamFilter.getAccountMessageObservable(account).map {
+        miCore.messageObserver.observeAccountMessages(account).map {
             miCore.getGetters().messageRelationGetter.get(it)
         }.map {
             it.toHistory(miCore.getGroupRepository(), miCore.getUserRepository())

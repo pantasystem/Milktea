@@ -6,16 +6,8 @@ import android.content.Intent
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
-import jp.panta.misskeyandroidclient.model.notification.*
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.view.SafeUnbox
-import jp.panta.misskeyandroidclient.view.notification.notificationMessageScope
-import java.util.*
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData.Type.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -78,7 +70,7 @@ class NotificationService : Service() {
             }.launchIn(coroutineScope + Dispatchers.IO)
             */
 
-            miApplication.messageStreamFilter.getAllMergedAccountMessages().onEach {
+            miApplication.messageObserver.observeAllAccountsMessages().onEach {
                 val msgRelation = miApplication.getGetters().messageRelationGetter.get(it)
                 showMessageNotification(msgRelation)
             }.launchIn(coroutineScope + Dispatchers.IO)

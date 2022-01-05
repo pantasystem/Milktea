@@ -5,9 +5,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.messaging.RequestMessage
 import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
-import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
@@ -59,7 +57,7 @@ class MessageViewModel(
     private val logger = miCore.loggerFactory.create("MessageViewModel")
 
     init{
-        miCore.messageStreamFilter.getObservable(messagingId).map {
+        miCore.messageObserver.observeByMessagingId(messagingId).map {
             miCore.getGetters().messageRelationGetter.get(it)
         }.onEach { msg ->
             val messages = messagesLiveData.value?.messages.toArrayList()
