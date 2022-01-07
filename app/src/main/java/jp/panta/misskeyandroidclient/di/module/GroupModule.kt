@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.di.module.group
+package jp.panta.misskeyandroidclient.di.module
 
 import dagger.Binds
 import dagger.Module

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.di.module.account
+package jp.panta.misskeyandroidclient.di.module
 
 import android.content.Context
 import dagger.Module

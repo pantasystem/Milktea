@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.di.module.logger
+package jp.panta.misskeyandroidclient.di.module
 
 import dagger.Module
 import dagger.Provides

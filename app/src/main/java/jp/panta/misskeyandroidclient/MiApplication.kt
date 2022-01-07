@@ -46,7 +46,6 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUse
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting

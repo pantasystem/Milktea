@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.di.module.setting
+package jp.panta.misskeyandroidclient.di.module
 
 import android.content.Context
 import android.content.SharedPreferences
