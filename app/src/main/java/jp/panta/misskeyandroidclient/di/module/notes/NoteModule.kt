@@ -19,8 +19,10 @@ import javax.inject.Singleton
 abstract class NoteModule{
 
     @Binds
+    @Singleton
     abstract fun noteDataSource(inMem: InMemoryNoteDataSource): NoteDataSource
 
     @Binds
+    @Singleton
     abstract fun noteRepository(impl: NoteRepositoryImpl): NoteRepository
 }

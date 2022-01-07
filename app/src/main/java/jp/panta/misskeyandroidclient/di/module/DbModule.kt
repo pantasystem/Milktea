@@ -35,23 +35,28 @@ object DbModule {
     }
 
     @Provides
+    @Singleton
     fun accountDAO(db: DataBase): AccountDAO {
         return db.accountDAO()
     }
 
     @Provides
+    @Singleton
     fun reactionUserSettingDAO(db: DataBase): ReactionUserSettingDao {
         return db.reactionUserSettingDao()
     }
 
     @Provides
+    @Singleton
     fun reactionHistoryDao(db: DataBase): ReactionHistoryDao {
         return db.reactionHistoryDao()
     }
 
     @Provides
+    @Singleton
     fun unreadNotificationDAO(db: DataBase): UnreadNotificationDAO = db.unreadNotificationDAO()
 
     @Provides
+    @Singleton
     fun draftNoteDAO(db: DataBase): DraftNoteDao = db.draftNoteDao()
 }

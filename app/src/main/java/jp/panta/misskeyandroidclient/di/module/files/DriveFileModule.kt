@@ -17,9 +17,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class DriveFileBindModule {
     @Binds
+    @Singleton
     abstract fun filePropertyDataSource(inMem: InMemoryFilePropertyDataSource): FilePropertyDataSource
 
     @Binds
+    @Singleton
     abstract fun driveFileRepository(repo: DriveFileRepositoryImpl): DriveFileRepository
 }
 

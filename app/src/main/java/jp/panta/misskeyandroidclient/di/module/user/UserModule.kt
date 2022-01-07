@@ -15,5 +15,6 @@ import javax.inject.Singleton
 abstract class UserModule {
 
     @Binds
+    @Singleton
     abstract fun userDataSource(dataSource: InMemoryUserDataSource): UserDataSource
 }

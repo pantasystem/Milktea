@@ -17,6 +17,7 @@ import javax.inject.Singleton
 abstract class NotificationModule {
 
     @Binds
+    @Singleton
     abstract fun notificationDataSource(
         ds: MediatorNotificationDataSource,
     ): NotificationDataSource
