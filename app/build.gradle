@@ -12,6 +12,8 @@ apply plugin: 'com.google.gms.google-services'
 
 apply plugin: "com.google.android.gms.oss-licenses-plugin"
 
+apply plugin: 'dagger.hilt.android.plugin'
+
 android {
     compileSdkVersion 31
     defaultConfig {
@@ -206,4 +208,20 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
     implementation "io.coil-kt:coil-compose:1.4.0"
 
+    // hilt
+    implementation 'com.google.dagger:hilt-android:2.40.5'
+    kapt 'com.google.dagger:hilt-compiler:2.40.5'
+
+    // For instrumentation tests
+    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.40.5'
+    kaptAndroidTest 'com.google.dagger:hilt-compiler:2.40.5'
+
+    // For local unit tests
+    testImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
+    kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
+
+}
+
+kapt {
+    correctErrorTypes true
 }

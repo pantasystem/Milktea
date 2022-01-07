@@ -8,6 +8,7 @@ import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.gettters.Getters
@@ -86,15 +87,18 @@ import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 //基本的な情報はここを返して扱われる
+@HiltAndroidApp
 class MiApplication : Application(), MiCore {
 
-    lateinit var reactionHistoryDao: ReactionHistoryDao
+    @Inject lateinit var database: DataBase
+    @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
 
-    lateinit var reactionUserSettingDao: ReactionUserSettingDao
+    @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
     private lateinit var mSettingStore: SettingStore
 
@@ -102,7 +106,7 @@ class MiApplication : Application(), MiCore {
 
     lateinit var urlPreviewDAO: UrlPreviewDAO
 
-    private lateinit var mAccountRepository: AccountRepository
+    @Inject lateinit var mAccountRepository: AccountRepository
 
     private lateinit var metaRepository: MetaRepository
 
@@ -116,7 +120,7 @@ class MiApplication : Application(), MiCore {
 
     var connectionStatus = MutableLiveData<ConnectionStatus>()
 
-    private lateinit var mEncryption: Encryption
+    @Inject lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIProvider: MisskeyAPIProvider = MisskeyAPIProvider()
@@ -141,27 +145,27 @@ class MiApplication : Application(), MiCore {
     private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
     private lateinit var mMessageDataSource: MessageDataSource
-    private lateinit var mUnreadMessages: UnReadMessages
-    private lateinit var mMessageRepository: MessageRepository
-
+    private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
     private lateinit var mGroupDataSource: GroupDataSource
+    private val mFilePropertyDataSource: FilePropertyDataSource = InMemoryFilePropertyDataSource()
+    private val mGalleryDataSource: GalleryDataSource by lazy {
+        InMemoryGalleryDataSource()
+    }
+
+
+    private lateinit var mUnreadMessages: UnReadMessages
+
+    private lateinit var mMessageRepository: MessageRepository
     private lateinit var mGroupRepository: GroupRepository
 
     private lateinit var mGetters: Getters
 
-    private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
-
-    private val mFilePropertyDataSource: FilePropertyDataSource = InMemoryFilePropertyDataSource()
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
     lateinit var colorSettingStore: ColorSettingStore
         private set
-
-    private val mGalleryDataSource: GalleryDataSource by lazy {
-        InMemoryGalleryDataSource()
-    }
 
     private val mGalleryRepository: GalleryRepository by lazy {
         createGalleryRepository()
@@ -247,27 +251,8 @@ class MiApplication : Application(), MiCore {
         colorSettingStore = ColorSettingStore(sharedPreferences)
         mSettingStore = SettingStore(sharedPreferences)
 
-        val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
-            .addMigrations(MIGRATION_1_2)
-            .addMigrations(MIGRATION_2_3)
-            .addMigrations(MIGRATION_3_4)
-            .addMigrations(MIGRATION_4_5)
-            .addMigrations(MIGRATION_5_6)
-            .addMigrations(MIGRATION_6_7)
-            .addMigrations(MIGRATION_7_8)
-            .build()
-        //connectionInstanceDao = database.connectionInstanceDao()
-        val roomAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
-        mAccountRepository = MediatorAccountRepository(roomAccountRepository)
-
-
-        reactionHistoryDao = database.reactionHistoryDao()
-
-        reactionUserSettingDao = database.reactionUserSettingDao()
 
         draftNoteDao = database.draftNoteDao()
-
-        mEncryption = KeyStoreSystemEncryption(this)
 
         urlPreviewDAO = database.urlPreviewDAO()
 
