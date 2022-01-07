@@ -13,8 +13,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
-class NotificationRepositoryImpl(
+class NotificationRepositoryImpl @Inject constructor(
     private val notificationDataSource: NotificationDataSource,
     private val socketProvider: SocketWithAccountProvider,
     private val accountRepository: AccountRepository,

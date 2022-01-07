@@ -7,9 +7,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.impl.MediatorNotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -23,4 +25,9 @@ abstract class NotificationModule {
     ): NotificationDataSource
 
 
+    @Binds
+    @Singleton
+    abstract fun notificationRepository(
+        impl: NotificationRepositoryImpl
+    ): NotificationRepository
 }

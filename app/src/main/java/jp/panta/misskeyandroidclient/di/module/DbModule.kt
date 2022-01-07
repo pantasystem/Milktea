@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
+import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import javax.inject.Singleton
 
 @Module
@@ -59,4 +60,8 @@ object DbModule {
     @Provides
     @Singleton
     fun draftNoteDAO(db: DataBase): DraftNoteDao = db.draftNoteDao()
+
+    @Provides
+    @Singleton
+    fun urlPreviewDAO(db: DataBase): UrlPreviewDAO = db.urlPreviewDAO()
 }

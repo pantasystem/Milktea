@@ -86,9 +86,9 @@ class MiApplication : Application(), MiCore {
 
     @Inject lateinit var mSettingStore: SettingStore
 
-    lateinit var draftNoteDao: DraftNoteDao
+    @Inject lateinit var draftNoteDao: DraftNoteDao
 
-    lateinit var urlPreviewDAO: UrlPreviewDAO
+    @Inject lateinit var urlPreviewDAO: UrlPreviewDAO
 
     @Inject lateinit var mAccountRepository: AccountRepository
 
@@ -121,7 +121,7 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mNoteRepository: NoteRepository
     @Inject lateinit var mUserRepository: UserRepository
 
-    private lateinit var mNotificationRepository: NotificationRepository
+    @Inject lateinit var mNotificationRepository: NotificationRepository
 
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
@@ -138,7 +138,7 @@ class MiApplication : Application(), MiCore {
     private lateinit var mMessageRepository: MessageRepository
     private lateinit var mGroupRepository: GroupRepository
 
-    private lateinit var mGetters: Getters
+    @Inject lateinit var mGetters: Getters
 
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
@@ -183,7 +183,7 @@ class MiApplication : Application(), MiCore {
         AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
     }
 
-    private lateinit var _unreadNotificationDAO: UnreadNotificationDAO
+    @Inject lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
 
     private val _subscribeRegistration: SubscriptionRegistration by lazy {
         SubscriptionRegistration(
@@ -228,11 +228,6 @@ class MiApplication : Application(), MiCore {
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
 
-        draftNoteDao = database.draftNoteDao()
-
-        urlPreviewDAO = database.urlPreviewDAO()
-
-        _unreadNotificationDAO = database.unreadNotificationDAO()
 
         metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
 
@@ -253,16 +248,6 @@ class MiApplication : Application(), MiCore {
 
 
         mMessageRepository = MessageRepositoryImpl(this)
-
-        mGetters = Getters(mNoteDataSource, mNoteRepository,mUserDataSource,mFilePropertyDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource, loggerFactory)
-
-        mNotificationRepository = NotificationRepositoryImpl(
-            mNotificationDataSource,
-            mSocketWithAccountProvider,
-            mAccountRepository,
-            getGetters().notificationRelationGetter,
-            database.unreadNotificationDAO()
-        )
 
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
 
@@ -400,7 +385,7 @@ class MiApplication : Application(), MiCore {
         return mDriveFileRepository
     }
 
-    override fun getUnreadNotificationDAO() = _unreadNotificationDAO
+    override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->
