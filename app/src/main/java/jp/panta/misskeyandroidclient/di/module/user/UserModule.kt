@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.di.module.user
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,11 +12,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object UserModule {
+abstract class UserModule {
 
-    @Singleton
-    @Provides
-    fun userDataSource(loggerFactory: Logger.Factory): UserDataSource {
-        return InMemoryUserDataSource(loggerFactory)
-    }
+    @Binds
+    abstract fun userDataSource(dataSource: InMemoryUserDataSource): UserDataSource
 }

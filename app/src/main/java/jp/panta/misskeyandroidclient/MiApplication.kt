@@ -129,8 +129,8 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mUserDataSource: UserDataSource
     @Inject lateinit var mNotificationDataSource: NotificationDataSource
     @Inject lateinit var mMessageDataSource: MessageDataSource
-    private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
-    private lateinit var mGroupDataSource: GroupDataSource
+    @Inject lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
+    @Inject lateinit var mGroupDataSource: GroupDataSource
     private val mFilePropertyDataSource: FilePropertyDataSource = InMemoryFilePropertyDataSource()
     private val mGalleryDataSource: GalleryDataSource by lazy {
         InMemoryGalleryDataSource()
@@ -293,7 +293,6 @@ class MiApplication : Application(), MiCore {
 
         mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
 
-        mGroupDataSource = InMemoryGroupDataSource()
         mGroupRepository = GroupRepositoryImpl(
             misskeyAPIProvider = mMisskeyAPIProvider,
             accountRepository = mAccountRepository,
@@ -315,7 +314,6 @@ class MiApplication : Application(), MiCore {
             database.unreadNotificationDAO()
         )
 
-        mReactionHistoryDataSource = InMemoryReactionHistoryDataSource()
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
 
         val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
