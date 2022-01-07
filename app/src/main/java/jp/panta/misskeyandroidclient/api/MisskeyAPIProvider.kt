@@ -3,11 +3,12 @@ package jp.panta.misskeyandroidclient.api
 
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.Version
+import javax.inject.Inject
 
 /**
  * MisskeyAPIとBaseURLとVersionをいい感じに管理する
  */
-class MisskeyAPIProvider {
+class MisskeyAPIProvider @Inject constructor(){
 
 
     private val baseURLAndMisskeyAPI = mutableMapOf<String, MisskeyAPI>()

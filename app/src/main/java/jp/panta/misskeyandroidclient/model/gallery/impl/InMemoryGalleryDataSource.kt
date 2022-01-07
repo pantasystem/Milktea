@@ -7,12 +7,11 @@ import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
-class InMemoryGalleryDataSource(
-    buffer: Int = 1000
-) : GalleryDataSource{
+class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource{
 
-    private val galleryEvents = MutableSharedFlow<GalleryDataSource.Event>(extraBufferCapacity = buffer)
+    private val galleryEvents = MutableSharedFlow<GalleryDataSource.Event>(extraBufferCapacity = 1000)
     override fun events(): Flow<GalleryDataSource.Event> {
         return galleryEvents
     }

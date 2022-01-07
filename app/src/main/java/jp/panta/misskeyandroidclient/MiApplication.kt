@@ -123,7 +123,7 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
-    private val mMisskeyAPIProvider: MisskeyAPIProvider = MisskeyAPIProvider()
+    @Inject lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
 
     @Inject lateinit var mNoteDataSource: NoteDataSource
     @Inject lateinit var mUserDataSource: UserDataSource
@@ -131,10 +131,8 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mMessageDataSource: MessageDataSource
     @Inject lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
     @Inject lateinit var mGroupDataSource: GroupDataSource
-    private val mFilePropertyDataSource: FilePropertyDataSource = InMemoryFilePropertyDataSource()
-    private val mGalleryDataSource: GalleryDataSource by lazy {
-        InMemoryGalleryDataSource()
-    }
+    @Inject lateinit var mFilePropertyDataSource: FilePropertyDataSource
+    @Inject lateinit var mGalleryDataSource: GalleryDataSource
 
     private lateinit var mNoteRepository: NoteRepository
     private lateinit var mUserRepository: UserRepository
@@ -175,14 +173,7 @@ class MiApplication : Application(), MiCore {
         OkHttpFileUploaderProvider(OkHttpClient(), this, GsonFactory.create(), getEncryption())
     }
 
-    private val mDriveFileRepository: DriveFileRepository by lazy {
-        DriveFileRepositoryImpl(
-            getAccountRepository(),
-            getMisskeyAPIProvider(),
-            getFilePropertyDataSource(),
-            getEncryption()
-        )
-    }
+    @Inject lateinit var mDriveFileRepository: DriveFileRepository
 
     @ExperimentalCoroutinesApi
     @FlowPreview

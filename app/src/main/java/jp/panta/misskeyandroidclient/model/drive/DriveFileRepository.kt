@@ -9,13 +9,14 @@ import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 interface DriveFileRepository {
     suspend fun find(id: FileProperty.Id) : FileProperty
     suspend fun toggleNsfw(id: FileProperty.Id)
 }
 
-class DriveFileRepositoryImpl(
+class DriveFileRepositoryImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val driveFileDataSource: FilePropertyDataSource,
