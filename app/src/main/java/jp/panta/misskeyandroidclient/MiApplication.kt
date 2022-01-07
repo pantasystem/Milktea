@@ -38,7 +38,6 @@ import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
@@ -59,11 +58,9 @@ import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
-import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
 import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
@@ -122,7 +119,7 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mGalleryDataSource: GalleryDataSource
 
     @Inject lateinit var mNoteRepository: NoteRepository
-    private lateinit var mUserRepository: UserRepository
+    @Inject lateinit var mUserRepository: UserRepository
 
     private lateinit var mNotificationRepository: NotificationRepository
 
@@ -131,9 +128,9 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
     @Inject lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
-    private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
+    @Inject lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
-    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+    @Inject lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
 
     @Inject lateinit var mUnreadMessages: UnReadMessages
@@ -241,31 +238,10 @@ class MiApplication : Application(), MiCore {
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true, loggerFactory)
 
-        mUserRepository = UserRepositoryImpl(this)
-
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 
 
 
-        mSocketWithAccountProvider = SocketWithAccountProviderImpl(
-            getEncryption(),
-            mAccountRepository,
-            loggerFactory,
-        )
-
-        mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(mSocketWithAccountProvider, loggerFactory)
-
-        mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
-            mAccountRepository,
-            mNoteDataSource,
-            mNoteCaptureAPIWithAccountProvider,
-            loggerFactory,
-            applicationScope,
-            Dispatchers.IO
-        )
-
-
-        mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
 
         mGroupRepository = GroupRepositoryImpl(
             misskeyAPIProvider = mMisskeyAPIProvider,
