@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12_75_0.*
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.IllegalVersionException
+import jp.panta.misskeyandroidclient.model.api.IllegalVersionException
 import jp.panta.misskeyandroidclient.model.account.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
