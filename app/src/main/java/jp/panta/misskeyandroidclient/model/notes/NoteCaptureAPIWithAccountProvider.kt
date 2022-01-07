@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPIImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
 interface NoteCaptureAPIWithAccountProvider {
     fun get(account: Account): NoteCaptureAPI
@@ -15,9 +16,9 @@ interface NoteCaptureAPIWithAccountProvider {
 /**
  * NoteCaptureAPIのインスタンスをAccountに基づきいい感じに取得や生成をできるようにする。
  */
-class NoteCaptureAPIWithAccountProviderImpl(
+class NoteCaptureAPIWithAccountProviderImpl @Inject constructor(
     private val socketWithAccountProvider: SocketWithAccountProvider,
-    private val loggerFactory: Logger.Factory? = null
+    private val loggerFactory: Logger.Factory?
 ) : NoteCaptureAPIWithAccountProvider{
 
     private val accountIdWithNoteCaptureAPI = mutableMapOf<Long, NoteCaptureAPI>()

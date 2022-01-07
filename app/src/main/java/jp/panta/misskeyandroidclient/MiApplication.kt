@@ -6,30 +6,23 @@ import android.content.SharedPreferences
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.room.Room
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
-import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.gallery.impl.InMemoryGalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.impl.createGalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.group.impl.GroupRepositoryImpl
-import jp.panta.misskeyandroidclient.model.group.impl.InMemoryGroupDataSource
 import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
@@ -38,28 +31,23 @@ import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
-import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
+import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
-import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
-import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
-import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.model.notification.impl.MediatorNotificationDataSource
+import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
@@ -71,7 +59,6 @@ import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
-import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
 import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
@@ -134,17 +121,15 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mFilePropertyDataSource: FilePropertyDataSource
     @Inject lateinit var mGalleryDataSource: GalleryDataSource
 
-    private lateinit var mNoteRepository: NoteRepository
+    @Inject lateinit var mNoteRepository: NoteRepository
     private lateinit var mUserRepository: UserRepository
 
     private lateinit var mNotificationRepository: NotificationRepository
 
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
-    private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
-
-
-    private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
+    @Inject lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+    @Inject lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
     private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
@@ -186,7 +171,7 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    @Inject lateinit var applicationScope: CoroutineScope
 
     @Inject lateinit var lf: Logger.Factory
     override val loggerFactory: Logger.Factory
@@ -255,8 +240,6 @@ class MiApplication : Application(), MiCore {
         metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true, loggerFactory)
-
-        mNoteRepository = NoteRepositoryImpl(this)
 
         mUserRepository = UserRepositoryImpl(this)
 
