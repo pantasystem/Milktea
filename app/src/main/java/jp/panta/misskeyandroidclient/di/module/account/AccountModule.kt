@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.util.getPreferenceName
+import jp.panta.misskeyandroidclient.util.getPreferences
 import javax.inject.Singleton
 
 @Module
@@ -23,7 +24,7 @@ object AccountModule {
         @ApplicationContext context: Context,
         database: DataBase,
     ): AccountRepository {
-        val preferences = context.getSharedPreferences(context.getPreferenceName(), Context.MODE_PRIVATE)
+        val preferences = context.getPreferences()
         val roomAccountRepository = RoomAccountRepository(database, preferences, database.accountDAO(), database.pageDAO())
         return MediatorAccountRepository(roomAccountRepository)
     }

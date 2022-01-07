@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import javax.inject.Singleton
 
 @Module
@@ -32,21 +33,21 @@ object DbModule {
             .build()
     }
 
-    @Singleton
     @Provides
     fun accountDAO(db: DataBase): AccountDAO {
         return db.accountDAO()
     }
 
-    @Singleton
     @Provides
     fun reactionUserSettingDAO(db: DataBase): ReactionUserSettingDao {
         return db.reactionUserSettingDao()
     }
 
-    @Singleton
     @Provides
     fun reactionHistoryDao(db: DataBase): ReactionHistoryDao {
         return db.reactionHistoryDao()
     }
+
+    @Provides
+    fun unreadNotificationDAO(db: DataBase): UnreadNotificationDAO = db.unreadNotificationDAO()
 }

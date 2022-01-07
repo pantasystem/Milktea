@@ -9,9 +9,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
-class InMemoryUserDataSource(
-    loggerFactory: Logger.Factory? = null
+class InMemoryUserDataSource @Inject constructor(
+    loggerFactory: Logger.Factory?
 ) : UserDataSource{
     private val logger = loggerFactory?.create("InMemoryUserDataSource")
 

@@ -7,8 +7,9 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationNotFoundExce
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
-class InMemoryNotificationDataSource : NotificationDataSource{
+class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSource{
 
     private val listeners = mutableSetOf<NotificationDataSource.Listener>()
     private val notificationIdAndNotification = mutableMapOf<Notification.Id, Notification>()

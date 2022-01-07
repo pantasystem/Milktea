@@ -100,7 +100,7 @@ class MiApplication : Application(), MiCore {
 
     @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
-    private lateinit var mSettingStore: SettingStore
+    @Inject lateinit var mSettingStore: SettingStore
 
     lateinit var draftNoteDao: DraftNoteDao
 
@@ -125,26 +125,10 @@ class MiApplication : Application(), MiCore {
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     private val mMisskeyAPIProvider: MisskeyAPIProvider = MisskeyAPIProvider()
 
-    private lateinit var mNoteDataSource: NoteDataSource
-    private lateinit var mUserDataSource: UserDataSource
-    private lateinit var mNotificationDataSource: NotificationDataSource
-
-    private lateinit var mNoteRepository: NoteRepository
-    private lateinit var mUserRepository: UserRepository
-    private lateinit var mNotificationRepository: NotificationRepository
-
-    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
-
-    private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
-
-    private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
-
-
-    private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
-
-    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
-
-    private lateinit var mMessageDataSource: MessageDataSource
+    @Inject lateinit var mNoteDataSource: NoteDataSource
+    @Inject lateinit var mUserDataSource: UserDataSource
+    @Inject lateinit var mNotificationDataSource: NotificationDataSource
+    @Inject lateinit var mMessageDataSource: MessageDataSource
     private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
     private lateinit var mGroupDataSource: GroupDataSource
     private val mFilePropertyDataSource: FilePropertyDataSource = InMemoryFilePropertyDataSource()
@@ -152,8 +136,24 @@ class MiApplication : Application(), MiCore {
         InMemoryGalleryDataSource()
     }
 
+    private lateinit var mNoteRepository: NoteRepository
+    private lateinit var mUserRepository: UserRepository
 
-    private lateinit var mUnreadMessages: UnReadMessages
+    private lateinit var mNotificationRepository: NotificationRepository
+
+    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
+
+    private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+
+
+    private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
+
+    private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
+
+    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+
+
+    @Inject lateinit var mUnreadMessages: UnReadMessages
 
     private lateinit var mMessageRepository: MessageRepository
     private lateinit var mGroupRepository: GroupRepository
@@ -197,8 +197,12 @@ class MiApplication : Application(), MiCore {
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    override var loggerFactory: Logger.Factory = AndroidDefaultLogger.Factory
-    private val logger = loggerFactory.create("MiApplication")
+    @Inject lateinit var lf: Logger.Factory
+    override val loggerFactory: Logger.Factory
+        get() = lf
+    private val logger: Logger by lazy {
+        loggerFactory.create("MiApplication")
+    }
 
     private lateinit var _networkState: Flow<Boolean>
 
@@ -249,7 +253,6 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
-        mSettingStore = SettingStore(sharedPreferences)
 
 
         draftNoteDao = database.draftNoteDao()
@@ -262,13 +265,9 @@ class MiApplication : Application(), MiCore {
 
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true, loggerFactory)
 
-        mNoteDataSource = InMemoryNoteDataSource(loggerFactory)
         mNoteRepository = NoteRepositoryImpl(this)
 
-        mUserDataSource = InMemoryUserDataSource(loggerFactory)
         mUserRepository = UserRepositoryImpl(this)
-
-        mNotificationDataSource = MediatorNotificationDataSource(InMemoryNotificationDataSource(), database.unreadNotificationDAO())
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 
@@ -303,10 +302,7 @@ class MiApplication : Application(), MiCore {
             loggerFactory.create("GroupRepositoryImpl")
         )
 
-        InMemoryMessageDataSource(mAccountRepository).also {
-            mMessageDataSource = it
-            mUnreadMessages = it
-        }
+
         mMessageRepository = MessageRepositoryImpl(this)
 
         mGetters = Getters(mNoteDataSource, mNoteRepository,mUserDataSource,mFilePropertyDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource, loggerFactory)
