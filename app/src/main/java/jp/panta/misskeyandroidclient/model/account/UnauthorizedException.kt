@@ -1,3 +1,3 @@
-package jp.panta.misskeyandroidclient.model
+package jp.panta.misskeyandroidclient.model.account
 
 class UnauthorizedException : IllegalAccessException()

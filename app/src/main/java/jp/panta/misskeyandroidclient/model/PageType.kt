@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model
 
 import androidx.room.TypeConverter
 
+@Deprecated("model.account.pages.Pageへ移行")
 enum class PageType(val defaultName: String){
     HOME("Home"),
     LOCAL("Local"),
@@ -20,6 +21,7 @@ enum class PageType(val defaultName: String){
     //USER_PINは別
 }
 
+@Deprecated("model.account.pages.Pageへ移行")
 class PageTypeConverter{
 
     @TypeConverter

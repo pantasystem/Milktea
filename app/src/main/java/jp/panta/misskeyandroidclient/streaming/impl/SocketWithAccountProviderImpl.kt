@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.streaming.impl
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.UnauthorizedException
+import jp.panta.misskeyandroidclient.model.account.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.streaming.Socket

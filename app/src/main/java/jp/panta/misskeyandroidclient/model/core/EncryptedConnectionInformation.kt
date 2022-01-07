@@ -19,6 +19,7 @@ import java.util.*
     foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = CASCADE, onUpdate = NO_ACTION)],
     primaryKeys = ["accountId", "encryptedI", "instanceBaseUrl"]
 )
+@Deprecated("model.accountへ移行")
 data class EncryptedConnectionInformation(
     val accountId: String,
     val instanceBaseUrl: String,

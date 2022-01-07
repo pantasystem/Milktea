@@ -7,6 +7,7 @@ import androidx.room.Query
 import java.util.*
 
 @Dao
+@Deprecated("model.accountへ移行")
 abstract class ConnectionInformationDao{
 
     @Query("select * from connection_information")
