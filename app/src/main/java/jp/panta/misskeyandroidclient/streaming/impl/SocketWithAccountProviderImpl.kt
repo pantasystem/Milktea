@@ -2,23 +2,24 @@ package jp.panta.misskeyandroidclient.streaming.impl
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.UnauthorizedException
+import jp.panta.misskeyandroidclient.model.account.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.network.SocketImpl
 import okhttp3.OkHttpClient
+import javax.inject.Inject
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider as ISocketWithAccountProvider
 
 /**
  * SocketをAccountに基づきいい感じにリソースを取得できるようにする
  */
-class SocketWithAccountProviderImpl(
+class SocketWithAccountProviderImpl @Inject constructor(
     val encryption: Encryption,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
-    val okHttpClient: OkHttpClient = OkHttpClient()
 ) : ISocketWithAccountProvider{
+    val okHttpClient: OkHttpClient = OkHttpClient()
 
     private val logger = loggerFactory.create("SocketProvider")
 

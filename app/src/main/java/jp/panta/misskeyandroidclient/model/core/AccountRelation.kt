@@ -7,6 +7,7 @@ import androidx.room.Ignore
 import androidx.room.Relation
 import jp.panta.misskeyandroidclient.model.Page
 
+@Deprecated("model.account.Accountへ移行")
 @Entity
 class AccountRelation{
     @Embedded

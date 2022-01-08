@@ -6,12 +6,12 @@ import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotification
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
+import javax.inject.Inject
 
-class MediatorNotificationDataSource(
-    private val inMemoryNotificationDataSource: InMemoryNotificationDataSource,
+class MediatorNotificationDataSource @Inject constructor(
     private val unreadNotificationDAO: UnreadNotificationDAO
 ) : NotificationDataSource{
-
+    @Inject lateinit var inMemoryNotificationDataSource: InMemoryNotificationDataSource
     override suspend fun add(notification: Notification): AddResult {
         unreadNotificationDAO.delete(notification.id.accountId, notification.id.notificationId)
         if(!notification.isRead) {

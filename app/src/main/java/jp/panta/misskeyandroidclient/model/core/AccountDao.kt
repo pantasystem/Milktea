@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.core
 import androidx.room.*
 
 @Dao
+@Deprecated("model.accountへ移行")
 abstract class AccountDao{
 
     //@Query("select * from account left join connection_information on account.id = connection_information.accountId left join setting on account.id = setting.accountId")

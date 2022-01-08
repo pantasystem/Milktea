@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.model
+package jp.panta.misskeyandroidclient.model.api
 
 import java.lang.IllegalStateException
 

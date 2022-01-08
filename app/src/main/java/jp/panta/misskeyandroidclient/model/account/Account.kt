@@ -10,10 +10,8 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.api.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.api.users.UserDTO
-import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.util.Hash
 import java.io.Serializable
-import java.net.URL
 
 @Entity(
     tableName = "account_table",

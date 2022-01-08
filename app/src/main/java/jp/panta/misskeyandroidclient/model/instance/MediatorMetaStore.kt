@@ -6,7 +6,6 @@ import java.lang.IllegalStateException
 class MediatorMetaStore(
     private val metaRepository : MetaRepository,
     private val metaStore: MetaStore,
-    private val isUpdateRepository: Boolean,
     val loggerFactory: Logger.Factory,
     ) : MetaStore{
 
@@ -14,11 +13,11 @@ class MediatorMetaStore(
         loggerFactory.create("MediatorMetaStore")
     }
 
-    override suspend fun fetch(instanceDomain: String): Meta {
+    override suspend fun fetch(instanceDomain: String, isForceFetch: Boolean): Meta {
         try{
             val local = metaRepository.get(instanceDomain)
             var remoteError: Throwable? = null
-            if(local == null || isUpdateRepository){
+            if(local == null || isForceFetch){
                 val remote = try{
                     metaStore.fetch(instanceDomain)
                 }catch(e: Exception){

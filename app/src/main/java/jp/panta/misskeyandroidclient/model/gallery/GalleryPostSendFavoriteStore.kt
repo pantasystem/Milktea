@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
-import jp.panta.misskeyandroidclient.model.UnauthorizedException
+import jp.panta.misskeyandroidclient.model.account.UnauthorizedException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex

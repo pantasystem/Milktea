@@ -6,59 +6,38 @@ import android.content.SharedPreferences
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.room.Room
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
-import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.gallery.impl.InMemoryGalleryDataSource
-import jp.panta.misskeyandroidclient.model.gallery.impl.createGalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
-import jp.panta.misskeyandroidclient.model.group.impl.GroupRepositoryImpl
-import jp.panta.misskeyandroidclient.model.group.impl.InMemoryGroupDataSource
-import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
-import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
-import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
+import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
-import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
-import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
-import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.model.notification.impl.MediatorNotificationDataSource
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
@@ -70,12 +49,9 @@ import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
-import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
-import jp.panta.misskeyandroidclient.model.users.impl.UserRepositoryImpl
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
 import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
@@ -83,30 +59,32 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import okhttp3.OkHttpClient
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 //基本的な情報はここを返して扱われる
+@HiltAndroidApp
 class MiApplication : Application(), MiCore {
 
-    lateinit var reactionHistoryDao: ReactionHistoryDao
+    @Inject lateinit var database: DataBase
+    @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
 
-    lateinit var reactionUserSettingDao: ReactionUserSettingDao
+    @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
-    private lateinit var mSettingStore: SettingStore
+    @Inject lateinit var mSettingStore: SettingStore
 
-    lateinit var draftNoteDao: DraftNoteDao
+    @Inject lateinit var draftNoteDao: DraftNoteDao
 
-    lateinit var urlPreviewDAO: UrlPreviewDAO
+    @Inject lateinit var urlPreviewDAO: UrlPreviewDAO
 
-    private lateinit var mAccountRepository: AccountRepository
+    @Inject lateinit var mAccountRepository: AccountRepository
 
-    private lateinit var metaRepository: MetaRepository
+    @Inject lateinit var mMetaRepository: MetaRepository
 
-    private lateinit var metaStore: MetaStore
+    @Inject lateinit var mMetaStore: MetaStore
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -116,69 +94,54 @@ class MiApplication : Application(), MiCore {
 
     var connectionStatus = MutableLiveData<ConnectionStatus>()
 
-    private lateinit var mEncryption: Encryption
+    @Inject lateinit var mEncryption: Encryption
 
     private val mMetaInstanceUrlMap = HashMap<String, Meta>()
-    private val mMisskeyAPIProvider: MisskeyAPIProvider = MisskeyAPIProvider()
+    @Inject lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
 
-    private lateinit var mNoteDataSource: NoteDataSource
-    private lateinit var mUserDataSource: UserDataSource
-    private lateinit var mNotificationDataSource: NotificationDataSource
+    @Inject lateinit var mNoteDataSource: NoteDataSource
+    @Inject lateinit var mUserDataSource: UserDataSource
+    @Inject lateinit var mNotificationDataSource: NotificationDataSource
+    @Inject lateinit var mMessageDataSource: MessageDataSource
+    @Inject lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
+    @Inject lateinit var mGroupDataSource: GroupDataSource
+    @Inject lateinit var mFilePropertyDataSource: FilePropertyDataSource
+    @Inject lateinit var mGalleryDataSource: GalleryDataSource
 
-    private lateinit var mNoteRepository: NoteRepository
-    private lateinit var mUserRepository: UserRepository
-    private lateinit var mNotificationRepository: NotificationRepository
+    @Inject lateinit var mNoteRepository: NoteRepository
+    @Inject lateinit var mUserRepository: UserRepository
+
+    @Inject lateinit var mNotificationRepository: NotificationRepository
 
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
-    private lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+    @Inject lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+    @Inject lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
-    private lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
+    @Inject lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
+
+    @Inject lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
 
-    private lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
+    @Inject lateinit var mUnreadMessages: UnReadMessages
 
-    private lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+    @Inject lateinit var mMessageRepository: MessageRepository
+    @Inject lateinit var mGroupRepository: GroupRepository
 
-    private lateinit var mMessageDataSource: MessageDataSource
-    private lateinit var mUnreadMessages: UnReadMessages
-    private lateinit var mMessageRepository: MessageRepository
+    @Inject lateinit var mGetters: Getters
 
-    private lateinit var mGroupDataSource: GroupDataSource
-    private lateinit var mGroupRepository: GroupRepository
-
-    private lateinit var mGetters: Getters
-
-    private lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
-
-    private val mFilePropertyDataSource: FilePropertyDataSource = InMemoryFilePropertyDataSource()
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-    private val mGalleryDataSource: GalleryDataSource by lazy {
-        InMemoryGalleryDataSource()
-    }
+    @Inject lateinit var mGalleryRepository: GalleryRepository
 
-    private val mGalleryRepository: GalleryRepository by lazy {
-        createGalleryRepository()
-    }
+    @Inject lateinit var mFileUploaderProvider: FileUploaderProvider
 
-    private val mFileUploaderProvider: FileUploaderProvider by lazy {
-        OkHttpFileUploaderProvider(OkHttpClient(), this, GsonFactory.create(), getEncryption())
-    }
-
-    private val mDriveFileRepository: DriveFileRepository by lazy {
-        DriveFileRepositoryImpl(
-            getAccountRepository(),
-            getMisskeyAPIProvider(),
-            getFilePropertyDataSource(),
-            getEncryption()
-        )
-    }
+    @Inject lateinit var mDriveFileRepository: DriveFileRepository
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -191,10 +154,14 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    @Inject lateinit var applicationScope: CoroutineScope
 
-    override var loggerFactory: Logger.Factory = AndroidDefaultLogger.Factory
-    private val logger = loggerFactory.create("MiApplication")
+    @Inject lateinit var lf: Logger.Factory
+    override val loggerFactory: Logger.Factory
+        get() = lf
+    private val logger: Logger by lazy {
+        loggerFactory.create("MiApplication")
+    }
 
     private lateinit var _networkState: Flow<Boolean>
 
@@ -202,7 +169,7 @@ class MiApplication : Application(), MiCore {
         AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
     }
 
-    private lateinit var _unreadNotificationDAO: UnreadNotificationDAO
+    @Inject lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
 
     private val _subscribeRegistration: SubscriptionRegistration by lazy {
         SubscriptionRegistration(
@@ -245,96 +212,14 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
-        mSettingStore = SettingStore(sharedPreferences)
-
-        val database = Room.databaseBuilder(this, DataBase::class.java, "milk_database")
-            .addMigrations(MIGRATION_1_2)
-            .addMigrations(MIGRATION_2_3)
-            .addMigrations(MIGRATION_3_4)
-            .addMigrations(MIGRATION_4_5)
-            .addMigrations(MIGRATION_5_6)
-            .addMigrations(MIGRATION_6_7)
-            .addMigrations(MIGRATION_7_8)
-            .build()
-        //connectionInstanceDao = database.connectionInstanceDao()
-        val roomAccountRepository = RoomAccountRepository(database, sharedPreferences, database.accountDAO(), database.pageDAO())
-        mAccountRepository = MediatorAccountRepository(roomAccountRepository)
 
 
-        reactionHistoryDao = database.reactionHistoryDao()
 
-        reactionUserSettingDao = database.reactionUserSettingDao()
 
-        draftNoteDao = database.draftNoteDao()
-
-        mEncryption = KeyStoreSystemEncryption(this)
-
-        urlPreviewDAO = database.urlPreviewDAO()
-
-        _unreadNotificationDAO = database.unreadNotificationDAO()
-
-        metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
-
-        metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true, loggerFactory)
-
-        mNoteDataSource = InMemoryNoteDataSource(loggerFactory)
-        mNoteRepository = NoteRepositoryImpl(this)
-
-        mUserDataSource = InMemoryUserDataSource(loggerFactory)
-        mUserRepository = UserRepositoryImpl(this)
-
-        mNotificationDataSource = MediatorNotificationDataSource(InMemoryNotificationDataSource(), database.unreadNotificationDAO())
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 
 
-
-        mSocketWithAccountProvider = SocketWithAccountProviderImpl(
-            getEncryption(),
-            mAccountRepository,
-            loggerFactory,
-        )
-
-        mNoteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(mSocketWithAccountProvider, loggerFactory)
-
-        mNoteCaptureAPIAdapter = NoteCaptureAPIAdapter(
-            mAccountRepository,
-            mNoteDataSource,
-            mNoteCaptureAPIWithAccountProvider,
-            loggerFactory,
-            applicationScope,
-            Dispatchers.IO
-        )
-
-
-        mChannelAPIWithAccountProvider = ChannelAPIWithAccountProvider(mSocketWithAccountProvider, loggerFactory)
-
-        mGroupDataSource = InMemoryGroupDataSource()
-        mGroupRepository = GroupRepositoryImpl(
-            misskeyAPIProvider = mMisskeyAPIProvider,
-            accountRepository = mAccountRepository,
-            groupDataSource = mGroupDataSource,
-            encryption = mEncryption,
-            loggerFactory.create("GroupRepositoryImpl")
-        )
-
-        InMemoryMessageDataSource(mAccountRepository).also {
-            mMessageDataSource = it
-            mUnreadMessages = it
-        }
-        mMessageRepository = MessageRepositoryImpl(this)
-
-        mGetters = Getters(mNoteDataSource, mNoteRepository,mUserDataSource,mFilePropertyDataSource, mNotificationDataSource, mMessageDataSource, mGroupDataSource, loggerFactory)
-
-        mNotificationRepository = NotificationRepositoryImpl(
-            mNotificationDataSource,
-            mSocketWithAccountProvider,
-            mAccountRepository,
-            getGetters().notificationRelationGetter,
-            database.unreadNotificationDAO()
-        )
-
-        mReactionHistoryDataSource = InMemoryReactionHistoryDataSource()
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
 
         val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
@@ -471,7 +356,7 @@ class MiApplication : Application(), MiCore {
         return mDriveFileRepository
     }
 
-    override fun getUnreadNotificationDAO() = _unreadNotificationDAO
+    override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
     private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
         return account.instanceDomain.let{ accountUrl ->
@@ -623,7 +508,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMetaStore(): MetaStore {
-        return metaStore
+        return mMetaStore
     }
 
     override fun getFilePropertyDataSource(): FilePropertyDataSource {
@@ -655,7 +540,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMetaRepository(): MetaRepository {
-        return metaRepository
+        return mMetaRepository
     }
 
     private suspend fun loadAndInitializeAccounts(){
@@ -751,7 +636,7 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
-            val meta = metaStore.fetch(instanceDomain)
+            val meta = mMetaStore.fetch(instanceDomain)
 
             synchronized(mMetaInstanceUrlMap){
                 mMetaInstanceUrlMap[instanceDomain] = meta

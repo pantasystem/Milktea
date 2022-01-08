@@ -3,9 +3,6 @@ package jp.panta.misskeyandroidclient.viewmodel.gallery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
-import jp.panta.misskeyandroidclient.model.IllegalVersionException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
@@ -13,7 +10,6 @@ import jp.panta.misskeyandroidclient.model.gallery.*
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*

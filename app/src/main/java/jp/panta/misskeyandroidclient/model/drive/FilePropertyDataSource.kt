@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.FileNotFoundException
+import javax.inject.Inject
 
 class FilePropertyNotFoundException(filePropertyId: FileProperty.Id) : NoSuchElementException("id:$filePropertyId　は存在しません")
 
@@ -50,7 +51,7 @@ interface FilePropertyDataSource {
 
 }
 
-class InMemoryFilePropertyDataSource : FilePropertyDataSource{
+class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSource{
     private var map = mapOf<FileProperty.Id, FileProperty>()
     private var _state = MutableStateFlow(FilePropertyDataSourceState(map))
     override val state: StateFlow<FilePropertyDataSourceState> = _state

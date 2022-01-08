@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
-class InMemoryReactionHistoryDataSource : ReactionHistoryDataSource {
+class InMemoryReactionHistoryDataSource @Inject constructor(): ReactionHistoryDataSource {
 
     private val lock = Mutex()
     private val stateFlow = MutableStateFlow(mapOf<ReactionHistory.Id, ReactionHistory>())

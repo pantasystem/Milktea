@@ -50,10 +50,15 @@ import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 @TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class)
 abstract class DataBase : RoomDatabase(){
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
+    @Deprecated("pageDaoへ移行")
     abstract fun connectionInformationDao(): ConnectionInformationDao
+
+    @Deprecated("accountDAOへ移行")
     abstract fun accountDao(): AccountDao
     abstract fun reactionHistoryDao(): ReactionHistoryDao
     abstract fun reactionUserSettingDao(): ReactionUserSettingDao
+
+    @Deprecated("pageDaoへ移行")
     abstract fun pageDao(): PageDao
     abstract fun draftNoteDao(): DraftNoteDao
 
