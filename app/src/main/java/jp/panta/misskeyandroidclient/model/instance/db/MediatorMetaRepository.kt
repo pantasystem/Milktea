@@ -5,27 +5,22 @@ import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MediatorMetaRepository(
+@Singleton
+class MediatorMetaRepository @Inject constructor(
     private val roomMetaRepository: RoomMetaRepository,
     private val inMemoryMetaRepository: InMemoryMetaRepository,
 ) : MetaRepository{
 
-    private val lock = Mutex()
-
     override suspend fun add(meta: Meta): Meta {
-        lock.withLock {
-            return inMemoryMetaRepository.add(roomMetaRepository.add(meta))
-        }
+        return inMemoryMetaRepository.add(roomMetaRepository.add(meta))
     }
 
     override suspend fun delete(meta: Meta) {
-        lock.withLock {
-            inMemoryMetaRepository.delete(meta)
-            roomMetaRepository.delete(meta)
-        }
+        inMemoryMetaRepository.delete(meta)
+        roomMetaRepository.delete(meta)
     }
 
     override suspend fun get(instanceDomain: String): Meta? {
@@ -37,9 +32,7 @@ class MediatorMetaRepository(
         val dbMeta = roomMetaRepository.get(instanceDomain)
 
         if(dbMeta != null) {
-            lock.withLock {
-                inMemoryMetaRepository.add(dbMeta)
-            }
+            inMemoryMetaRepository.add(dbMeta)
         }
 
         return inMemoryMetaRepository.get(instanceDomain)

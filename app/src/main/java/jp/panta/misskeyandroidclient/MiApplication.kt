@@ -19,23 +19,15 @@ import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.gallery.impl.createGalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
-import jp.panta.misskeyandroidclient.model.group.impl.GroupRepositoryImpl
-import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
-import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
 import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
@@ -67,7 +59,6 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import okhttp3.OkHttpClient
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -91,9 +82,9 @@ class MiApplication : Application(), MiCore {
 
     @Inject lateinit var mAccountRepository: AccountRepository
 
-    private lateinit var metaRepository: MetaRepository
+    @Inject lateinit var mMetaRepository: MetaRepository
 
-    private lateinit var metaStore: MetaStore
+    @Inject lateinit var mMetaStore: MetaStore
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -224,9 +215,7 @@ class MiApplication : Application(), MiCore {
 
 
 
-        metaRepository = MediatorMetaRepository(RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database), InMemoryMetaRepository())
 
-        metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true, loggerFactory)
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 
@@ -519,7 +508,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMetaStore(): MetaStore {
-        return metaStore
+        return mMetaStore
     }
 
     override fun getFilePropertyDataSource(): FilePropertyDataSource {
@@ -551,7 +540,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getMetaRepository(): MetaRepository {
-        return metaRepository
+        return mMetaRepository
     }
 
     private suspend fun loadAndInitializeAccounts(){
@@ -647,7 +636,7 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
-            val meta = metaStore.fetch(instanceDomain)
+            val meta = mMetaStore.fetch(instanceDomain)
 
             synchronized(mMetaInstanceUrlMap){
                 mMetaInstanceUrlMap[instanceDomain] = meta

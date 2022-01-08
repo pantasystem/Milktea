@@ -1,7 +1,5 @@
 package jp.panta.misskeyandroidclient.model.instance.db
 
-import androidx.room.Database
-import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository

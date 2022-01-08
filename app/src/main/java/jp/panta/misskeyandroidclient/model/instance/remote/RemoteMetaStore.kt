@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.instance.MetaStore
 class RemoteMetaStore : MetaStore{
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun fetch(instanceDomain: String): Meta {
+    override suspend fun fetch(instanceDomain: String, isForceFetch: Boolean): Meta {
         return MisskeyGetMeta.getMeta(instanceDomain)
             .execute()
             .throwIfHasError()
