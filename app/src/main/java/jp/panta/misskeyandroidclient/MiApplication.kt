@@ -134,7 +134,7 @@ class MiApplication : Application(), MiCore {
 
     @Inject lateinit var mUnreadMessages: UnReadMessages
 
-    private lateinit var mMessageRepository: MessageRepository
+    @Inject lateinit var mMessageRepository: MessageRepository
     private lateinit var mGroupRepository: GroupRepository
 
     @Inject lateinit var mGetters: Getters
@@ -246,7 +246,6 @@ class MiApplication : Application(), MiCore {
         )
 
 
-        mMessageRepository = MessageRepositoryImpl(this)
 
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
 

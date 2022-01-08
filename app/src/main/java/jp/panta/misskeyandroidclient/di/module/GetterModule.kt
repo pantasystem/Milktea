@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.gettters.Getters
+import jp.panta.misskeyandroidclient.gettters.MessageRelationGetter
 import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
 import jp.panta.misskeyandroidclient.gettters.NotificationRelationGetter
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -55,5 +56,11 @@ object GetterModule {
     @Provides
     fun notificationRelationGetter(getters: Getters): NotificationRelationGetter {
         return getters.notificationRelationGetter
+    }
+
+    @Singleton
+    @Provides
+    fun messageRelationGetter(getters: Getters): MessageRelationGetter {
+        return getters.messageRelationGetter
     }
 }
