@@ -4,10 +4,12 @@ package jp.panta.misskeyandroidclient.api
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.Version
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * MisskeyAPIとBaseURLとVersionをいい感じに管理する
  */
+@Singleton
 class MisskeyAPIProvider @Inject constructor(){
 
 

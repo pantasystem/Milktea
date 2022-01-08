@@ -11,14 +11,19 @@ import jp.panta.misskeyandroidclient.model.api.IllegalVersionException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.group.*
+import javax.inject.Inject
 
-class GroupRepositoryImpl(
+class GroupRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val accountRepository: AccountRepository,
     private val groupDataSource: GroupDataSource,
     private val encryption: Encryption,
-    private val logger: Logger?
+    private val loggerFactory: Logger.Factory
 ) : GroupRepository{
+
+    private val logger: Logger by lazy {
+        loggerFactory.create("GroupRepositoryImpl")
+    }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun create(createGroup: CreateGroup): Group {
@@ -37,7 +42,7 @@ class GroupRepositoryImpl(
         var group = runCatching {
             groupDataSource.find(groupId)
         }.onFailure {
-            logger?.debug("ローカルには存在しません。:${groupId}")
+            logger.debug("ローカルには存在しません。:${groupId}")
         }.getOrNull()
 
         if(group != null) {

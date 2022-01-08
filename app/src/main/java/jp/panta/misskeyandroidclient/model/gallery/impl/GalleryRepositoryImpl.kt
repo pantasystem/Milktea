@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import javax.inject.Inject
 import jp.panta.misskeyandroidclient.api.v12_75_0.CreateGallery as CreateGalleryDTO
 
 fun MiCore.createGalleryRepository() : GalleryRepository{
@@ -32,7 +33,7 @@ fun MiCore.createGalleryRepository() : GalleryRepository{
     )
 }
 
-class GalleryRepositoryImpl(
+class GalleryRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val galleryDataSource: GalleryDataSource,
     private val encryption: Encryption,

@@ -135,7 +135,7 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mUnreadMessages: UnReadMessages
 
     @Inject lateinit var mMessageRepository: MessageRepository
-    private lateinit var mGroupRepository: GroupRepository
+    @Inject lateinit var mGroupRepository: GroupRepository
 
     @Inject lateinit var mGetters: Getters
 
@@ -146,13 +146,9 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-    private val mGalleryRepository: GalleryRepository by lazy {
-        createGalleryRepository()
-    }
+    @Inject lateinit var mGalleryRepository: GalleryRepository
 
-    private val mFileUploaderProvider: FileUploaderProvider by lazy {
-        OkHttpFileUploaderProvider(OkHttpClient(), this, GsonFactory.create(), getEncryption())
-    }
+    @Inject lateinit var mFileUploaderProvider: FileUploaderProvider
 
     @Inject lateinit var mDriveFileRepository: DriveFileRepository
 
@@ -233,18 +229,6 @@ class MiApplication : Application(), MiCore {
         metaStore = MediatorMetaStore(metaRepository, RemoteMetaStore(), true, loggerFactory)
 
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
-
-
-
-
-        mGroupRepository = GroupRepositoryImpl(
-            misskeyAPIProvider = mMisskeyAPIProvider,
-            accountRepository = mAccountRepository,
-            groupDataSource = mGroupDataSource,
-            encryption = mEncryption,
-            loggerFactory.create("GroupRepositoryImpl")
-        )
-
 
 
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
