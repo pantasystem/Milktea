@@ -221,7 +221,8 @@ class NoteEditorViewModel(
         currentAccount.value?.let { account ->
             viewModelScope.launch(Dispatchers.IO) {
 
-                if (_state.value.reservationPostingAt == null) {
+                val reservationPostingAt = _state.value.reservationPostingAt
+                if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                     val createNote = _state.value.toCreateNote(account)
                     miCore.getTaskExecutor().dispatch(createNote.task(miCore.getNoteRepository()))
                 } else {
