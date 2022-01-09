@@ -42,3 +42,18 @@ class CreateNoteTask(
 fun CreateNote.task(noteRepository: NoteRepository) : CreateNoteTask{
     return CreateNoteTask(noteRepository, this)
 }
+
+fun NoteEditingState.toCreateNote(account: Account): CreateNote {
+    return CreateNote(
+        author = account,
+        visibility = visibility,
+        text = text,
+        cw = cw,
+        viaMobile = false,
+        files = files,
+        replyId = replyId,
+        renoteId = renoteId,
+        poll = poll?.toCreatePoll(),
+        draftNoteId = draftNoteId
+    )
+}
