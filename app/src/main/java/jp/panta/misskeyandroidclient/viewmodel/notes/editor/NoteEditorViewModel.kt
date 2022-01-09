@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Clock
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -124,6 +125,14 @@ class NoteEditorViewModel(
     val isLocalOnlyEnabled = _state.map {
         it.visibility is CanLocalOnly
     }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
+    val reservationPostingAt = _state.map {
+        it.reservationPostingAt
+    }.map { instant ->
+        instant?.toEpochMilliseconds()?.let {
+            Date(it)
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 
 
@@ -322,6 +331,11 @@ class NoteEditorViewModel(
     }
 
 
+    fun toggleReservationAt() {
+        _state.value = _state.value.copy(
+            reservationPostingAt = if (_state.value.reservationPostingAt == null) Clock.System.now() else null
+        )
+    }
 
 
     @FlowPreview

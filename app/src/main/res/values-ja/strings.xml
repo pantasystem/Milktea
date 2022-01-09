@@ -375,4 +375,5 @@
 
     <string name="remove_attachment">添付取りやめ</string>
     <string name="warning_s">警告:%s</string>
+    <string name="reservation_at">投稿日時</string>
 </resources>

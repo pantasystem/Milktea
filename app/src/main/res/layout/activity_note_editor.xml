@@ -52,6 +52,46 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="16dp"
+                            android:visibility="@{ viewModel.reservationPostingAt == null ? View.GONE : View.VISIBLE }">
+                        <TextView
+                                android:id="@+id/reservationLabelTextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/reservation_at"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"/>
+                        <Button
+                                android:id="@+id/reservationAtPickDateButton"
+                                app:layout_constraintTop_toBottomOf="@id/reservationLabelTextView"
+                                app:layout_constraintStart_toStartOf="parent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                dateOnly="@{viewModel.reservationPostingAt}"/>
+                        <Button
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintStart_toEndOf="@id/reservationAtPickDateButton"
+                                app:layout_constraintTop_toBottomOf="@id/reservationLabelTextView"
+                                android:layout_marginStart="4dp"
+                                timeOnly="@{viewModel.reservationPostingAt}" />
+                        <ImageButton
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:src="@drawable/ic_close_black_24dp"
+                                app:tint="?attr/colorNoteActionButtonTint"
+                                android:onClick="@{()-> viewModel.toggleReservationAt() }"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                     <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/addressUsersView"
                             android:layout_width="match_parent"
