@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Clock
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -29,7 +30,7 @@ class NoteEditorViewModel(
     loggerFactory: Logger.Factory,
     dn: DraftNote? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) : ViewModel(){
+) : ViewModel() {
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
@@ -49,7 +50,7 @@ class NoteEditorViewModel(
         it.cw
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
-    private val currentAccount = MutableLiveData<Account>().apply{
+    private val currentAccount = MutableLiveData<Account>().apply {
         miCore.getCurrentAccount().onEach {
             this.postValue(it)
         }.launchIn(viewModelScope + dispatcher)
@@ -92,10 +93,8 @@ class NoteEditorViewModel(
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val textRemaining = combine(maxTextLength, text) { max, t ->
-        max - (t?.codePointCount(0, t.length)?:0)
+        max - (t?.codePointCount(0, t.length) ?: 0)
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
-
-
 
 
     val files = _state.map {
@@ -125,6 +124,13 @@ class NoteEditorViewModel(
         it.visibility is CanLocalOnly
     }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
+    val reservationPostingAt = _state.map {
+        it.reservationPostingAt
+    }.map { instant ->
+        instant?.toEpochMilliseconds()?.let {
+            Date(it)
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 
     val showVisibilitySelectionEvent = EventBus<Unit>()
@@ -138,13 +144,13 @@ class NoteEditorViewModel(
     }.map {
         it?.visibleUserIds?.map { uId ->
             setUpUserViewData(uId)
-        }?: emptyList()
+        } ?: emptyList()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun setUpUserViewData(userId: User.Id) : UserViewData{
+    private fun setUpUserViewData(userId: User.Id): UserViewData {
         return UserViewData(userId, miCore, viewModelScope, dispatcher)
     }
 
@@ -154,7 +160,9 @@ class NoteEditorViewModel(
 
     val poll = _state.map {
         it.poll
-    }.distinctUntilChanged().stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
+    }.distinctUntilChanged()
+        .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
+
     //val noteTask = MutableLiveData<PostNoteTask>()
     val isPost = EventBus<Boolean>()
 
@@ -162,9 +170,9 @@ class NoteEditorViewModel(
     val showPollTimePicker = EventBus<Unit>()
 
 
-
     val isSaveNoteAsDraft = EventBus<Long?>()
-    init{
+
+    init {
         miCore.getCurrentAccount().filterNotNull().onEach {
             _state.value = runCatching {
                 _state.value.setAccount(it)
@@ -189,11 +197,11 @@ class NoteEditorViewModel(
     fun addPollChoice() {
         _state.value = _state.value.addPollChoice()
     }
-    
+
     fun changePollChoice(id: UUID, text: String) {
         _state.value = _state.value.updatePollChoice(id, text)
     }
-    
+
     fun removePollChoice(id: UUID) {
         _state.value = _state.value.removePollChoice(id)
     }
@@ -208,45 +216,44 @@ class NoteEditorViewModel(
         )
     }
 
-    fun post(){
-        currentAccount.value?.let{ account ->
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun post() {
+        currentAccount.value?.let { account ->
+            viewModelScope.launch(Dispatchers.IO) {
 
-            // FIXME 本来はreplyToNoteIdの時点でNote.Idを使うべきだが現状は厳しい
-            val replyId = _state.value.replyId
+                if (_state.value.reservationPostingAt == null) {
+                    val createNote = _state.value.toCreateNote(account)
+                    miCore.getTaskExecutor().dispatch(createNote.task(miCore.getNoteRepository()))
+                } else {
+                    runCatching {
+                        val dfNote = toDraftNote()
 
-            val renoteId = _state.value.renoteId
-            // FIXME viaMobileを設定できるようにする
-            val createNote = CreateNote(
-                author = account,
-                visibility = _state.value.visibility,
-                text = text.value,
-                cw = cw.value,
-                viaMobile = false,
-                files = files.value,
-                replyId = replyId,
-                renoteId = renoteId,
-                poll = poll.value?.toCreatePoll(),
-                draftNoteId = draftNote.value?.draftNoteId
-            )
+                        val result = miCore.getDraftNoteDAO().fullInsert(dfNote)
+                        dfNote.draftNoteId = result
+                        miCore.getNoteReservationPostExecutor().register(dfNote)
+                    }.onFailure {
+                        logger.error("登録失敗", it)
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    isPost.event = true
+                }
+            }
 
-            miCore.getTaskExecutor().dispatch(createNote.task(miCore.getNoteRepository()))
-
-
-            this.isPost.event = true
         }
 
     }
 
     fun toggleNsfw(appFile: AppFile) {
-        when(appFile) {
+        when (appFile) {
             is AppFile.Local -> {
                 _state.value = state.value.copy(
                     files = _state.value.files.map {
-                        if(appFile === appFile) {
+                        if (appFile === appFile) {
                             appFile.copy(
                                 isSensitive = !appFile.isSensitive
                             )
-                        }else{
+                        } else {
                             appFile
                         }
                     }
@@ -263,7 +270,7 @@ class NoteEditorViewModel(
 
     }
 
-    fun add(file: AppFile){
+    fun add(file: AppFile) {
         val files = files.value?.toMutableList()
             ?: mutableListOf()
         files.add(
@@ -273,10 +280,10 @@ class NoteEditorViewModel(
     }
 
 
-    private fun addAllFileProperty(fpList: List<FileProperty>){
+    private fun addAllFileProperty(fpList: List<FileProperty>) {
         val files = files.value?.toMutableList()
             ?: mutableListOf()
-        files.addAll(fpList.map{
+        files.addAll(fpList.map {
             AppFile.Remote(it.id)
         })
         _state.value = _state.value.copy(
@@ -294,32 +301,31 @@ class NoteEditorViewModel(
         }
     }
 
-    fun removeFileNoteEditorData(file: AppFile){
+    fun removeFileNoteEditorData(file: AppFile) {
         _state.value = _state.value.removeFile(file)
     }
 
 
-
-    fun fileTotal(): Int{
-        return files.value?.size?: 0
+    fun fileTotal(): Int {
+        return files.value?.size ?: 0
     }
 
 
-    fun changeCwEnabled(){
+    fun changeCwEnabled() {
         _state.value = _state.value.toggleCw()
         logger.debug("cw:${cw.value}")
     }
 
-    fun enablePoll(){
+    fun enablePoll() {
         _state.value = _state.value.togglePoll()
 
     }
 
-    fun disablePoll(){
+    fun disablePoll() {
         _state.value = _state.value.togglePoll()
     }
 
-    fun showVisibilitySelection(){
+    fun showVisibilitySelection() {
         showVisibilitySelectionEvent.event = Unit
     }
 
@@ -331,7 +337,7 @@ class NoteEditorViewModel(
         _state.value = _state.value.changeCw(text)
     }
 
-    fun setVisibility(visibility: Visibility){
+    fun setVisibility(visibility: Visibility) {
         logger.debug("公開範囲がセットされた:$visibility")
         _state.value = _state.value.copy(
             visibility = visibility
@@ -340,12 +346,18 @@ class NoteEditorViewModel(
     }
 
 
+    fun toggleReservationAt() {
+        _state.value = _state.value.copy(
+            reservationPostingAt = if (_state.value.reservationPostingAt == null) Clock.System.now() else null
+        )
+    }
 
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    fun setAddress(added: List<User.Id>, removed: List<User.Id>){
-        val list = ((visibility.value as? Visibility.Specified)?.visibleUserIds?: emptyList()).toMutableList()
+    fun setAddress(added: List<User.Id>, removed: List<User.Id>) {
+        val list = ((visibility.value as? Visibility.Specified)?.visibleUserIds
+            ?: emptyList()).toMutableList()
         list.addAll(
             added
         )
@@ -360,37 +372,37 @@ class NoteEditorViewModel(
     }
 
 
-    fun addMentionUsers(users: List<User>, pos: Int): Int{
+    fun addMentionUsers(users: List<User>, pos: Int): Int {
         val mentionBuilder = StringBuilder()
         users.forEachIndexed { index, it ->
             val userName = it.getDisplayUserName()
-            if(index < users.size - 1){
+            if (index < users.size - 1) {
                 mentionBuilder.appendLine(userName)
-            }else{
+            } else {
                 mentionBuilder.append(userName)
             }
         }
-        val builder = StringBuilder(text.value?: "")
+        val builder = StringBuilder(text.value ?: "")
         builder.insert(pos, mentionBuilder.toString())
         _state.value = _state.value.changeText(builder.toString())
         return pos + mentionBuilder.length
     }
 
-    fun addEmoji(emoji: Emoji, pos: Int): Int{
+    fun addEmoji(emoji: Emoji, pos: Int): Int {
         return addEmoji(":${emoji.name}:", pos)
     }
 
-    fun addEmoji(emoji: String, pos: Int): Int{
-        val builder = StringBuilder(_state.value.text?: "")
+    fun addEmoji(emoji: String, pos: Int): Int {
+        val builder = StringBuilder(_state.value.text ?: "")
         builder.insert(pos, emoji)
         _state.value = _state.value.changeText(builder.toString())
-        logger.debug( "position:${pos + emoji.length - 1}")
+        logger.debug("position:${pos + emoji.length - 1}")
         return pos + emoji.length
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    fun toDraftNote(): DraftNote{
+    fun toDraftNote(): DraftNote {
         return DraftNote(
             accountId = currentAccount.value?.accountId!!,
             text = _state.value.text,
@@ -405,33 +417,37 @@ class NoteEditorViewModel(
             replyId = _state.value.replyId?.noteId,
             files = files.value?.map {
                 it.toFile()
+            },
+            reservationPostingAt = _state.value.reservationPostingAt?.toEpochMilliseconds()?.let{
+                Date(it)
             }
-        ).apply{
+        ).apply {
             this.draftNoteId = draftNote.value?.draftNoteId
         }
     }
+
     @ExperimentalCoroutinesApi
     @FlowPreview
-    fun saveDraft(){
-        if(!canSaveDraft()){
+    fun saveDraft() {
+        if (!canSaveDraft()) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            try{
+            try {
                 val dfNote = toDraftNote()
 
-                try{
+                try {
                     isSaveNoteAsDraft.event = draftNoteDao.fullInsert(dfNote)
-                }catch(e: Exception){
-                    logger.error( "下書き書き込み中にエラー発生：失敗してしまった", e)
+                } catch (e: Exception) {
+                    logger.error("下書き書き込み中にエラー発生：失敗してしまった", e)
                 }
-            }catch(e: IOException){
+            } catch (e: IOException) {
 
-            }catch(e: NullPointerException){
-                logger.error( "下書き保存に失敗した", e)
+            } catch (e: NullPointerException) {
+                logger.error("下書き保存に失敗した", e)
 
-            }catch (e: Throwable){
-                logger.error( "下書き保存に失敗した", e)
+            } catch (e: Throwable) {
+                logger.error("下書き保存に失敗した", e)
 
             }
 
@@ -440,7 +456,7 @@ class NoteEditorViewModel(
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    fun canSaveDraft(): Boolean{
+    fun canSaveDraft(): Boolean {
         return !(_state.value.text.isNullOrBlank()
                 && files.value.isNullOrEmpty()
                 && poll.value?.choices.isNullOrEmpty()
@@ -450,11 +466,9 @@ class NoteEditorViewModel(
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    fun clear(){
+    fun clear() {
         _state.value = _state.value.clear()
     }
-
-
 
 
 }

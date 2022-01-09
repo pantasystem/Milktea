@@ -369,5 +369,7 @@
     <string name="do_u_want_2_delete_s">你想删除%s吗？</string>
     <string name="remove_attachment">删除附件</string>
     <string name="warning_s">警告:%s</string>
+    <string name="reservation_at">发布日期和时间</string>
+    <string name="warning_reservation_msg">可能会在不同时间发布</string>
 
 </resources>

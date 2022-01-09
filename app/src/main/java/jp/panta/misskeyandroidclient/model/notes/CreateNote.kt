@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
+import kotlinx.datetime.Instant
 
 /**
  * @param noExtractEmojis 本文からカスタム絵文字を展開しないか否か
@@ -41,4 +42,19 @@ class CreateNoteTask(
 
 fun CreateNote.task(noteRepository: NoteRepository) : CreateNoteTask{
     return CreateNoteTask(noteRepository, this)
+}
+
+fun NoteEditingState.toCreateNote(account: Account): CreateNote {
+    return CreateNote(
+        author = account,
+        visibility = visibility,
+        text = text,
+        cw = cw,
+        viaMobile = false,
+        files = files,
+        replyId = replyId,
+        renoteId = renoteId,
+        poll = poll?.toCreatePoll(),
+        draftNoteId = draftNoteId
+    )
 }

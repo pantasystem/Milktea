@@ -21,6 +21,7 @@ data class NoteEditingState(
     val poll: PollEditingState? = null,
     val viaMobile: Boolean = true,
     val draftNoteId: Long? = null,
+    val reservationPostingAt: Instant? = null,
 ) {
 
     val hasCw: Boolean
@@ -286,7 +287,10 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
                     folderId = null
                 )
             }
-        } ?: emptyList()
+        } ?: emptyList(),
+        reservationPostingAt = reservationPostingAt?.let {
+            Instant.fromEpochMilliseconds(it.time)
+        }
     )
 }
 

@@ -293,6 +293,14 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             CustomEmojiPickerDialog().show(supportFragmentManager, "Editor")
         }
 
+        binding.reservationAtPickDateButton.setOnClickListener {
+            ReservationPostDatePickerDialog().show(supportFragmentManager, "Pick date")
+        }
+
+        binding.reservationAtPickTimeButton.setOnClickListener {
+            ReservationPostTimePickerDialog().show(supportFragmentManager, "Pick time")
+        }
+
         (applicationContext as? MiApplication)?.connectionStatus?.observe(this) { status ->
             when (status) {
                 ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")

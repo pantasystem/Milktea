@@ -372,6 +372,7 @@
     <string name="do_u_want_2_delete_s">Do you want to delete %s?</string>
     <string name="remove_attachment">Remove attachment</string>
     <string name="warning_s">Warning:%s</string>
-
+    <string name="reservation_at">Post date and time</string>
+    <string name="warning_reservation_msg">May be posted at different times</string>
 
 </resources>
