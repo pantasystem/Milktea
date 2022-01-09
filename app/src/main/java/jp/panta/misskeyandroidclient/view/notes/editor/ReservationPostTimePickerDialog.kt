@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
 import kotlinx.datetime.Instant
 import java.util.*
@@ -28,7 +27,7 @@ class ReservationPostTimePickerDialog : AppCompatDialogFragment(), TimePickerDia
     }
 
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-        val date = mViewModel?.poll?.value?.expiresAt?.asDate() ?: Date()
+        val date = mViewModel?.reservationPostingAt?.value ?: Date()
         val c = Calendar.getInstance()
         c.time = date
         c[Calendar.HOUR] = p1

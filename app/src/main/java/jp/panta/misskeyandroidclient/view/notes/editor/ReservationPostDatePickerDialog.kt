@@ -6,10 +6,7 @@ import android.os.Bundle
 import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
-import jp.panta.misskeyandroidclient.model.notes.expiresAt
 import jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.util.*
 
@@ -31,10 +28,10 @@ class ReservationPostDatePickerDialog : AppCompatDialogFragment(), DatePickerDia
     }
 
     override fun onDateSet(p0: DatePicker?, p1: Int, p2: Int, p3: Int) {
-        val date = mViewModel?.poll?.value?.expiresAt?.expiresAt()?: Clock.System.now()
+        val date = mViewModel?.reservationPostingAt?.value ?: Date()
 
         val c = Calendar.getInstance()
-        c.time = Date(date.toEpochMilliseconds())
+        c.time = date
 
         c.set(Calendar.YEAR, p1)
         c.set(Calendar.MONTH, p2)

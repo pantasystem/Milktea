@@ -417,6 +417,9 @@ class NoteEditorViewModel(
             replyId = _state.value.replyId?.noteId,
             files = files.value?.map {
                 it.toFile()
+            },
+            reservationPostingAt = _state.value.reservationPostingAt?.toEpochMilliseconds()?.let{
+                Date(it)
             }
         ).apply {
             this.draftNoteId = draftNote.value?.draftNoteId
