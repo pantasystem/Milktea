@@ -16,6 +16,7 @@ class AndroidNoteReservationPostExecutor (
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmNotePostReceiver::class.java)
         intent.putExtra("DRAFT_NOTE_ID", draftNote.draftNoteId!!)
+        intent.putExtra("ACCOUNT_ID", draftNote.accountId)
 
         val flag = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {

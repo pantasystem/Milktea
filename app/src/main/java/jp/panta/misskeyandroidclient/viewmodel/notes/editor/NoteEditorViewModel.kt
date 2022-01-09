@@ -211,26 +211,8 @@ class NoteEditorViewModel(
     fun post(){
         currentAccount.value?.let{ account ->
 
-            // FIXME 本来はreplyToNoteIdの時点でNote.Idを使うべきだが現状は厳しい
-            val replyId = _state.value.replyId
-
-            val renoteId = _state.value.renoteId
-            // FIXME viaMobileを設定できるようにする
-            val createNote = CreateNote(
-                author = account,
-                visibility = _state.value.visibility,
-                text = text.value,
-                cw = cw.value,
-                viaMobile = false,
-                files = files.value,
-                replyId = replyId,
-                renoteId = renoteId,
-                poll = poll.value?.toCreatePoll(),
-                draftNoteId = draftNote.value?.draftNoteId
-            )
-
+            val createNote = _state.value.toCreateNote(account)
             miCore.getTaskExecutor().dispatch(createNote.task(miCore.getNoteRepository()))
-
 
             this.isPost.event = true
         }

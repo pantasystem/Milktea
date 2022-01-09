@@ -34,6 +34,7 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.notes.reservation.NoteReservationPostExecutor
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
 import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionUnRegistration
@@ -156,4 +157,5 @@ interface MiCore{
 
     fun getTranslationStore(): NoteTranslationStore
 
+    fun getNoteReservationPostExecutor(): NoteReservationPostExecutor
 }

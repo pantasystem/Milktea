@@ -35,6 +35,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginat
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
+import jp.panta.misskeyandroidclient.model.notes.reservation.NoteReservationPostExecutor
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
@@ -142,6 +143,9 @@ class MiApplication : Application(), MiCore {
     @Inject lateinit var mFileUploaderProvider: FileUploaderProvider
 
     @Inject lateinit var mDriveFileRepository: DriveFileRepository
+
+    @Inject
+    lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -541,6 +545,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getMetaRepository(): MetaRepository {
         return mMetaRepository
+    }
+
+    override fun getNoteReservationPostExecutor(): NoteReservationPostExecutor {
+        return mNoteReservationPostExecutor
     }
 
     private suspend fun loadAndInitializeAccounts(){
