@@ -65,10 +65,20 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/reservation_at"
                                 app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"/>
+                                app:layout_constraintStart_toStartOf="parent"
+                                android:textSize="18sp"/>
+                        <TextView
+                                android:id="@+id/reservationWarningMsgTextView"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintTop_toBottomOf="@id/reservationLabelTextView"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/closeReservationButton"
+                                android:text="@string/warning_reservation_msg"
+                                android:textColor="#FF0000"/>
                         <Button
                                 android:id="@+id/reservationAtPickDateButton"
-                                app:layout_constraintTop_toBottomOf="@id/reservationLabelTextView"
+                                app:layout_constraintTop_toBottomOf="@id/reservationWarningMsgTextView"
                                 app:layout_constraintStart_toStartOf="parent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -78,10 +88,11 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:layout_constraintStart_toEndOf="@id/reservationAtPickDateButton"
-                                app:layout_constraintTop_toBottomOf="@id/reservationLabelTextView"
+                                app:layout_constraintTop_toBottomOf="@id/reservationWarningMsgTextView"
                                 android:layout_marginStart="4dp"
                                 timeOnly="@{viewModel.reservationPostingAt}" />
                         <ImageButton
+                                android:id="@+id/closeReservationButton"
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
                                 app:layout_constraintEnd_toEndOf="parent"
