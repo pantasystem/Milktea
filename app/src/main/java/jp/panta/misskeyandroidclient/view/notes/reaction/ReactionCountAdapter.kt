@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.view.notes.reaction
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -12,7 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
-class ReactionCountAdapter(val note: PlaneNoteViewData, private val notesViewModel: NotesViewModel) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
+class ReactionCountAdapter(val notesViewModel: NotesViewModel) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
     reactionDiffUtilItemCallback){
     class ReactionHolder(val binding: ItemReactionBinding): RecyclerView.ViewHolder(binding.root)
 
@@ -34,13 +35,21 @@ class ReactionCountAdapter(val note: PlaneNoteViewData, private val notesViewMod
         }
     }
 
+    var note: PlaneNoteViewData? = null
+
     override fun onBindViewHolder(holder: ReactionHolder, position: Int) {
         val item =  getItem(position)
+        if (note == null) {
+            Log.w("ReactionCountAdapter", "noteがNullです。正常に処理が行われない可能性があります。")
+        }
         holder.binding.reaction = item//Pair(java.lang.String(item.first), Integer.valueOf(item.second))
         holder.binding.note = note
         holder.binding.notesViewModel = notesViewModel
         holder.binding.root.setOnLongClickListener {
-            notesViewModel.setShowReactionHistoryDialog(note.toShowNote.note.id, item.reaction)
+            val id = note?.toShowNote?.note?.id
+            if (id != null) {
+                notesViewModel.setShowReactionHistoryDialog(id, item.reaction)
+            }
             false
         }
         holder.binding.executePendingBindings()
