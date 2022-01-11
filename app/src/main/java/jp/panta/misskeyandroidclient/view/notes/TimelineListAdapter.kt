@@ -99,7 +99,11 @@ class TimelineListAdapter(
         private fun bindReactionCounter() {
             val note = mCurrentNote!!
             val reactionList = note.reactionCounts.value?.toList()?: emptyList()
-            reactionCountAdapter = ReactionCountAdapter(notesViewModel)
+            reactionCountAdapter = if(reactionCountAdapter != null && reactionCountAdapter?.note?.id == note.id){
+                reactionCountAdapter!!
+            }else{
+                ReactionCountAdapter(notesViewModel)
+            }
             reactionCountAdapter?.note = note
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.itemAnimator = if(reactionList.isEmpty()) DefaultItemAnimator() else null
