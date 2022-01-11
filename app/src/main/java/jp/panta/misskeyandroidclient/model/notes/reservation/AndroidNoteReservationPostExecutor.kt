@@ -27,7 +27,7 @@ class AndroidNoteReservationPostExecutor (
             }
             else -> PendingIntent.FLAG_UPDATE_CURRENT
         }
-        val pendingIntent = PendingIntent.getBroadcast(context, 123, intent, flag)
+        val pendingIntent = PendingIntent.getBroadcast(context, (draftNote.draftNoteId!! % 1000).toInt(), intent, flag)
 
         // NOTE: 参考にした https://qiita.com/upft_rkoshida/items/8149605f751137b4c21c
         when {
