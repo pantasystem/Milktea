@@ -34,9 +34,10 @@ class TimelineListAdapter(
         abstract val lifecycleOwner: LifecycleOwner
         abstract val reactionCountsView: RecyclerView
         abstract val notesViewModel: NotesViewModel
-        private val reactionCountAdapter: ReactionCountAdapter by lazy {
-            ReactionCountAdapter(notesViewModel)
-        }
+        //private var reactionCountAdapter: ReactionCountAdapter =             ReactionCountAdapter(notesViewModel)
+
+        private var reactionCountAdapter: ReactionCountAdapter? = null
+
         private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
             val flexBoxLayoutManager = FlexboxLayoutManager(reactionCountsView.context)
             flexBoxLayoutManager.alignItems = AlignItems.STRETCH
@@ -45,10 +46,10 @@ class TimelineListAdapter(
         }
 
         private val reactionCountsObserver = Observer<List<ReactionCount>> { counts ->
-            if(reactionCountAdapter.note?.id == mCurrentNote?.id) {
+            if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
                 bindReactionCountVisibility()
 
-                reactionCountAdapter.submitList(counts) {
+                reactionCountAdapter?.submitList(counts) {
                     reactionCountsView.itemAnimator = if(reactionCountsView.itemAnimator == null) {
                         DefaultItemAnimator()
                     }else{
@@ -98,10 +99,11 @@ class TimelineListAdapter(
         private fun bindReactionCounter() {
             val note = mCurrentNote!!
             val reactionList = note.reactionCounts.value?.toList()?: emptyList()
-            reactionCountAdapter.note = note
+            reactionCountAdapter = ReactionCountAdapter(notesViewModel)
+            reactionCountAdapter?.note = note
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.itemAnimator = if(reactionList.isEmpty()) DefaultItemAnimator() else null
-            reactionCountAdapter.submitList(reactionList) {
+            reactionCountAdapter?.submitList(reactionList) {
                 reactionCountsView.itemAnimator = DefaultItemAnimator()
             }
             note.reactionCounts.observe(lifecycleOwner, reactionCountsObserver)
