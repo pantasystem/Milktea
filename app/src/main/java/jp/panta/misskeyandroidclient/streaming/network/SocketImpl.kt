@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.streaming.network
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.streaming.*
+import jp.panta.misskeyandroidclient.util.blockingWithLockWithCheckTimeout
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -278,10 +279,3 @@ class SocketImpl(
 
 }
 
-fun<T> Mutex.blockingWithLockWithCheckTimeout(owner: Any? = null, action: () -> T): T {
-    return runBlocking {
-        withTimeout(1000) {
-            withLock(owner = owner, action = action)
-        }
-    }
-}

@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.api
 
 import jp.panta.misskeyandroidclient.api.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.I
-import kotlinx.serialization.json.Json
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -13,7 +12,7 @@ class APIErrorTest {
 
     @Before
     fun setup(){
-        misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
+        misskeyAPI = MisskeyAPIServiceBuilder.create("https://misskey.io")
     }
 
     @Test(expected = APIError.ForbiddenException::class)

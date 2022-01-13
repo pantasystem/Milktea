@@ -12,7 +12,7 @@ class GetUsersTest {
     private lateinit var misskeyAPI: MisskeyAPI
     @Before
     fun setup(){
-        misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.m544.net", Version("v10"))
+        misskeyAPI = MisskeyAPIServiceBuilder.create("https://misskey.m544.net", Version("v10"))
     }
 
     @Test

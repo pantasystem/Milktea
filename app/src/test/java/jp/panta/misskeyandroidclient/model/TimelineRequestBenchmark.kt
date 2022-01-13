@@ -13,7 +13,7 @@ class TimelineRequestBenchmark {
 
     @Before
     fun setup(){
-        misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
+        misskeyAPI = MisskeyAPIServiceBuilder.create("https://misskey.io")
     }
     @Test
     suspend fun beforeShowNoteTest(){

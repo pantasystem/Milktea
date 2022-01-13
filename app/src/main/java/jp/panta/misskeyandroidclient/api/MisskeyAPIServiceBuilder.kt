@@ -14,8 +14,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-object MisskeyAPIServiceBuilder {
+object MisskeyAPIServiceBuilder : MisskeyAPIServiceFactory {
     private const val READ_TIMEOUT_S = 30L
     private const val WRITE_TIMEOUT_S = 30L
     private const val CONNECTION_TIMEOUT_S = 30L
@@ -25,7 +26,7 @@ object MisskeyAPIServiceBuilder {
         .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS)
         .build()
 
-    fun build(baseUrl: String): MisskeyAPI =
+    override fun create(baseUrl: String): MisskeyAPI =
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
@@ -41,7 +42,7 @@ object MisskeyAPIServiceBuilder {
             .build()
             .create(MisskeyAuthAPI::class.java)
 
-    fun build(baseUrl: String, version: Version): MisskeyAPI {
+    override fun create(baseUrl: String, version: Version): MisskeyAPI {
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(GsonFactory.create()))
@@ -49,11 +50,11 @@ object MisskeyAPIServiceBuilder {
         return when{
             version.isInRange(Version.Major.V_10) ->{
                 val diff = retrofit.create(MisskeyAPIV10Diff::class.java)
-                return MisskeyAPIV10(build(baseUrl), diff)
+                return MisskeyAPIV10(create(baseUrl), diff)
             }
             version.isInRange(Version.Major.V_11)
                     || version.isInRange(Version.Major.V_12) ->{
-                val baseAPI = build(baseUrl)
+                val baseAPI = create(baseUrl)
                 val misskeyAPIV11Diff = retrofit.create(MisskeyAPIV11Diff::class.java)
                 if(version.isInRange(Version.Major.V_12)){
                     val misskeyAPI12DiffImpl = retrofit.create(MisskeyAPIV12Diff::class.java)
@@ -69,7 +70,7 @@ object MisskeyAPIServiceBuilder {
                 }
             }
             else ->{
-                build(baseUrl)
+                create(baseUrl)
             }
         }
     }
