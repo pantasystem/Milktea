@@ -10,4 +10,18 @@ data class ReactionCount(
     fun isLocal(): Boolean {
         return !reaction.contains("@") || reaction.replace(":", "").split("@").getOrNull(1) == "."
     }
+
+    fun increment(): ReactionCount {
+        return copy(
+            count = (count + 1)
+        )
+    }
+    fun decrement(): ReactionCount {
+        if(count <= 0) {
+            return this
+        }
+        return copy(
+            count = (count - 1)
+        )
+    }
 }
