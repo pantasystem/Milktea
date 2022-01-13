@@ -8,9 +8,7 @@ import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.api.app.CreateApp
-import jp.panta.misskeyandroidclient.api.app.ShowApp
 import jp.panta.misskeyandroidclient.api.drive.*
-import jp.panta.misskeyandroidclient.model.auth.signin.SignIn
 import jp.panta.misskeyandroidclient.model.fevorite.Favorite
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
@@ -32,7 +30,6 @@ import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import retrofit2.Response
 
 open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI by misskeyAPI{
@@ -69,7 +66,6 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun mentions(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.mentions(noteRequest)
     override suspend fun muteUser(requestUser: RequestUser): Response<Unit> = misskeyAPI.muteUser(requestUser)
     override suspend fun followUser(requestUser: RequestUser): Response<UserDTO> = misskeyAPI.followUser(requestUser)
-    override suspend fun myApps(i: I): Response<List<App>> = misskeyAPI.myApps(i)
     override suspend fun noteState(noteRequest: NoteRequest): Response<State> = misskeyAPI.noteState(noteRequest)
     override suspend fun notification(notificationRequest: NotificationRequest): Response<List<NotificationDTO>?> = misskeyAPI.notification(notificationRequest)
     override suspend fun pullUserFromList(listUserOperation: ListUserOperation): Response<Unit> = misskeyAPI.pullUserFromList(listUserOperation)
@@ -78,11 +74,9 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun searchByTag(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.searchByTag(noteRequest)
     override suspend fun searchNote(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.searchNote(noteRequest)
     override suspend fun searchUser(requestUser: RequestUser): Response<List<UserDTO>> = misskeyAPI.searchUser(requestUser)
-    override suspend fun showApp(showApp: ShowApp): Response<App> = misskeyAPI.showApp(showApp)
     override suspend fun showList(listId: ListId): Response<UserListDTO> = misskeyAPI.showList(listId)
     override suspend fun showNote(requestNote: NoteRequest) = misskeyAPI.showNote(requestNote)
     override suspend fun showUser(requestUser: RequestUser): Response<UserDTO> = misskeyAPI.showUser(requestUser)
-    override suspend fun signIn(signIn: SignIn): Response<I> = misskeyAPI.signIn(signIn)
     override suspend fun unFollowUser(requestUser: RequestUser): Response<UserDTO> = misskeyAPI.unFollowUser(requestUser)
     override suspend fun unblockUser(requestUser: RequestUser): Response<Unit> = misskeyAPI.unblockUser(requestUser)
     override suspend fun unmuteUser(requestUser: RequestUser): Response<Unit> = misskeyAPI.unmuteUser(requestUser)

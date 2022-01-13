@@ -37,17 +37,9 @@ import retrofit2.http.POST
 
 interface MisskeyAPI {
 
-    @POST("api/signin")
-    suspend fun signIn(@Body signIn: SignIn): Response<I>
 
     @POST("api/app/create")
     suspend fun createApp(@Body createApp: CreateApp): Response<App>
-
-    @POST("api/my/apps")
-    suspend fun myApps(@Body i: I) : Response<List<App>>
-
-    @POST("api/app/show")
-    suspend fun showApp(@Body showApp: ShowApp) : Response<App>
 
     @POST("api/blocking/create")
     suspend fun blockUser(@Body requestUser: RequestUser): Response<Unit>
