@@ -127,6 +127,7 @@ dependencies {
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation "com.squareup.retrofit2:retrofit-mock:$retrofit"
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
 
     implementation 'com.google.code.gson:gson:2.8.6'
