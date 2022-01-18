@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes
 
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import junit.framework.TestCase
@@ -131,8 +132,12 @@ class NoteEditingStateTest : TestCase() {
 
 
     fun testSetAccount() {
-
+        val account = Account("", "", "", "", emptyList(), 1)
+        val state = NoteEditingState()
+            .setAccount(account)
+        assertEquals(account, state.author)
     }
+
 
 
     fun testRemovePollChoice() {
