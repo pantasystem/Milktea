@@ -81,9 +81,53 @@ class NoteEditingStateTest : TestCase() {
         assertEquals("cw", state.cw)
     }
 
-    fun testAddFile() {}
+    fun testAddFileWhenAddRemoteFile() {
+        var state = NoteEditingState()
+        val file = AppFile.Remote(FileProperty.Id(0L, "rFile"))
+        state = state.addFile(file)
+        assertEquals(1, state.files.size)
+        assertEquals(file, state.files[0])
+    }
 
-    fun testRemoveFile() {}
+    fun testAddFileWhenAddLocalFile() {
+        var state = NoteEditingState()
+        val file = AppFile.Local(
+            "local", "path", "", "", false, "",
+        )
+        state = state.addFile(file)
+        assertEquals(1, state.files.size)
+        assertEquals(file, state.files.first())
+    }
+
+    fun testAddFileWhenAddLocalAndRemoteFile() {
+        var state = NoteEditingState()
+        val local = AppFile.Local(
+            "local", "path", "", "", false, "",
+        )
+        val remote = AppFile.Remote(FileProperty.Id(0L, "rFile"))
+
+        state = state.addFile(local)
+        state = state.addFile(remote)
+        assertEquals(2, state.files.size)
+        assertEquals(local, state.files.first())
+        assertEquals(remote, state.files.last())
+    }
+
+    fun testRemoveFile() {
+        val local = AppFile.Local(
+            "local", "path", "", "", false, "",
+        )
+        val remote = AppFile.Remote(FileProperty.Id(0L, "rFile"))
+        var state = NoteEditingState(
+            files = listOf(local, remote)
+        )
+
+        state = state.removeFile(local)
+        assertEquals(1, state.files.size)
+        assertEquals(remote, state.files.first())
+
+
+    }
 
     fun testChangePollExpiresAt() {}
 
