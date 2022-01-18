@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.drive
 
 import junit.framework.TestCase
-import org.junit.Assert
 
 class DriveStoreTest : TestCase() {
 
