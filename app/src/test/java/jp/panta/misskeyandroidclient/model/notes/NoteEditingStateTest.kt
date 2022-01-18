@@ -193,5 +193,14 @@ class NoteEditingStateTest : TestCase() {
         assertNull(state.poll)
     }
 
-    fun testClear() {}
+    fun testClear() {
+        val initialState = NoteEditingState()
+        assertEquals(initialState, initialState
+            .changeText("ほげ")
+            .changeCw("ぴよ")
+            .togglePoll()
+            .addFile(AppFile.Remote(FileProperty.Id(0, "")))
+            .clear()
+        )
+    }
 }
