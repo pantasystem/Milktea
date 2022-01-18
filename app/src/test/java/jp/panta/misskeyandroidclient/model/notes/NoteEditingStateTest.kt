@@ -129,19 +129,64 @@ class NoteEditingStateTest : TestCase() {
 
     }
 
-    fun testChangePollExpiresAt() {}
 
-    fun testSetAccount() {}
+    fun testSetAccount() {
 
-    fun testRemovePollChoice() {}
+    }
 
-    fun testAddPollChoice() {}
 
-    fun testUpdatePollChoice() {}
+    fun testRemovePollChoice() {
+        var state = NoteEditingState()
+        state = state.togglePoll()
+        state = state.addPollChoice()
+            .addPollChoice()
+            .addPollChoice()
+            .addPollChoice()
+        val id = state.poll!!.choices.first().id
+        state = state.removePollChoice(id)
+        assertFalse(state.poll!!.choices.any{ it.id == id })
+        assertEquals(3, state.poll?.choices?.size)
+    }
 
-    fun testToggleCw() {}
+    fun testAddPollChoice() {
+        var state = NoteEditingState()
+        state = state.togglePoll()
+        state = state.addPollChoice()
+        assertEquals(1, state.poll?.choices?.size)
+    }
 
-    fun testTogglePoll() {}
+    fun testUpdatePollChoice() {
+        var state = NoteEditingState()
+            .togglePoll()
+            .addPollChoice()
+            .addPollChoice()
+        val targetChoice = state.poll?.choices?.first()!!
+        state = state.updatePollChoice(targetChoice.id, "ほげ")
+        assertEquals("ほげ", state.poll!!.choices.first().text)
+    }
+
+    fun testToggleCw() {
+        var state = NoteEditingState(
+            cw = "ほげ"
+        )
+        assertEquals("ほげ", state.cw)
+
+        state = state.toggleCw()
+        assertNull(state.cw)
+
+        state = state.toggleCw()
+        assertNotNull(state.cw)
+    }
+
+    fun testTogglePoll() {
+        var state = NoteEditingState()
+        assertNull(state.poll)
+        state = state.togglePoll()
+        assertNotNull(state.poll)
+
+        state = state.togglePoll()
+        assertNull(state.poll)
+    }
 
     fun testClear() {}
 }
