@@ -4,7 +4,6 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import junit.framework.TestCase
-import org.junit.Test
 
 class NoteEditingStateTest : TestCase() {
 
