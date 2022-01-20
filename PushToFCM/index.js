@@ -12,6 +12,7 @@ const PUBLIC_KEY = fs.readFileSync('./key/public_key.txt', 'utf8');
 const PRIVATE_KEY = fs.readFileSync('./key/private_key.txt', 'utf8');
 
 const admin = require('firebase-admin');
+const { resourceUsage } = require('process');
 admin.initializeApp({
     credential: admin.credential.applicationDefault(),
 });
@@ -69,7 +70,7 @@ const parseJsonMiddleware = (req, res, next) => {
     }
 }
 
-app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,(req, res, next)=>{
+app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMiddleware, switchLangMiddleware ,async (req, res, next)=>{
     let deviceToken = req.query.deviceToken;
     let accountId = req.query.accountId;
     console.log('call webpushcallback');
@@ -105,14 +106,26 @@ app.post('/webpushcallback', rawBodyMiddlware, decodeBodyMiddleware, parseJsonMi
         message.data.userId = req.decodeJson.body.userId;
     }
     console.log(message);
-    
-    messaging.send(message).then((res)=>{
-        console.log(`send:${res}`);
-        res.status(200).end();
-    }).catch((e)=>{
-        console.error('message送信失敗', e);
-        next(e);
-    });
+    try {
+        await messaging.send(message);
+        res.status(204).end();
+        return;
+    } catch (e) {
+        if (
+            [
+              'The registration token is not a valid FCM registration token',
+              'Requested entity was not found.',
+              'NotRegistered.'
+            ].includes(e.message)
+        ) {
+            console.log('トークン切れ');
+            res.status(410).end();
+        } else {
+            console.error("未知のエラー", e);
+            res.status(500).end();
+        }
+        return;
+    }
 
 });
 
