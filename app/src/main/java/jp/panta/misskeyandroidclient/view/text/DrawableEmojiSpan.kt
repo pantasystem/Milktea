@@ -1,12 +1,11 @@
 package jp.panta.misskeyandroidclient.view.text
 
 
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.github.penfeizhou.animation.apng.APNGDrawable
 
 class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
     //val weakReference: WeakReference<View> = WeakReference(view)
@@ -39,10 +38,16 @@ class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
         ) {
             imageDrawable = resource
             imageDrawable?.callback = Animated()
-            if(resource is GifDrawable){
-                resource.start()
-            }else{
-                adapter.throttleUpdate()
+            when (resource) {
+                is GifDrawable -> {
+                    resource.start()
+                }
+                is APNGDrawable -> {
+                    resource.start()
+                }
+                else -> {
+                    adapter.throttleUpdate()
+                }
             }
         }
         override fun onLoadCleared(placeholder: Drawable?) {
