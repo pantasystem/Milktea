@@ -45,6 +45,9 @@ class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
                 is APNGDrawable -> {
                     resource.start()
                 }
+                is com.github.penfeizhou.animation.gif.GifDrawable -> {
+                    resource.start()
+                }
                 else -> {
                     adapter.throttleUpdate()
                 }
