@@ -23,15 +23,6 @@ class CustomEmojiDecorator{
             while(matcher.find()){
                 val span: EmojiSpan<*>
 
-                /*
-                GlideApp.with(this.context)
-                        .`as`(PictureDrawable::class.java)
-                        .listener(SvgSoftwareLayerSetter())
-                        .load(emoji.url?: emoji.uri)
-                        .centerCrop()
-                        .transition(withCrossFade())
-                        .into(reactionImageView)
-                 */
                 if(emoji.isSvg()){
                     span = BitmapEmojiSpan(emojiAdapter)
                     GlideApp.with(view.context)
