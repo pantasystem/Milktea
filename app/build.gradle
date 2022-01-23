@@ -220,10 +220,7 @@ dependencies {
     kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
 
     // https://github.com/penfeizhou/APNG4Android
-    implementation 'com.github.penfeizhou.android.animation:awebp:2.17.2'
-    implementation 'com.github.penfeizhou.android.animation:apng:2.17.2'
-    implementation 'com.github.penfeizhou.android.animation:gif:2.17.2'
-    implementation 'com.github.penfeizhou.android.animation:glide-plugin:2.17.2'
+    // implementation 'com.github.penfeizhou.android.animation:glide-plugin:2.17.2'
 }
 
 kapt {

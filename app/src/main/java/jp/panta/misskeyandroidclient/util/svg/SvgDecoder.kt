@@ -8,11 +8,22 @@ import com.bumptech.glide.load.resource.SimpleResource
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
 import java.io.InputStream
+import java.nio.ByteBuffer
 
+private const val SVG_HEADER: Int = 0x3C737667
+private const val SVG_HEADER_STARTS_WITH_XML = 0x3c3f786d
 class SvgDecoder : ResourceDecoder<InputStream, SVG>{
 
+
     override fun handles(source: InputStream, options: Options): Boolean {
-        return true
+        val buffer = ByteArray(8)
+        val cnt = source.read(buffer)
+        if (cnt < 8) {
+            return false
+        }
+
+        val header = ByteBuffer.wrap(buffer).int
+        return header == SVG_HEADER || header == SVG_HEADER_STARTS_WITH_XML
     }
 
     override fun decode(
@@ -21,13 +32,12 @@ class SvgDecoder : ResourceDecoder<InputStream, SVG>{
         height: Int,
         options: Options
     ): Resource<SVG>? {
-        try {
+        return try {
             val svg = SVG.getFromInputStream(source)
-            return SimpleResource(svg)
+            SimpleResource(svg)
         }catch(e: SVGParseException){
-
             Log.e("SvgDecoder", "error", e)
-            return null
+            null
         }
 
     }
