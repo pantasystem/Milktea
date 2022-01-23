@@ -219,11 +219,12 @@ dependencies {
     testImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
     kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
 
+    // apng
+    //implementation 'com.linecorp:apng:1.11.0'
+
     // https://github.com/penfeizhou/APNG4Android
-    implementation 'com.github.penfeizhou.android.animation:awebp:2.17.2'
     implementation 'com.github.penfeizhou.android.animation:apng:2.17.2'
-    implementation 'com.github.penfeizhou.android.animation:gif:2.17.2'
-    implementation 'com.github.penfeizhou.android.animation:glide-plugin:2.17.2'
+    // implementation 'com.github.penfeizhou.android.animation:glide-plugin:2.17.2'
 }
 
 kapt {
