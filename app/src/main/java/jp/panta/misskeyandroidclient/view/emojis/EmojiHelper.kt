@@ -4,7 +4,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.util.svg.GlideApp
+import jp.panta.misskeyandroidclient.util.glide.GlideApp
 
 object EmojiHelper{
 

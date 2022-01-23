@@ -1,66 +1,21 @@
-package jp.panta.misskeyandroidclient.util.svg
+package jp.panta.misskeyandroidclient.util.glide.apng
 
 import android.util.Log
 import com.bumptech.glide.load.Options
 import com.bumptech.glide.load.ResourceDecoder
 import com.bumptech.glide.load.engine.Resource
-import com.bumptech.glide.load.resource.SimpleResource
-import com.github.penfeizhou.animation.apng.APNGDrawable
 import com.github.penfeizhou.animation.apng.decode.APNGDecoder
 import com.github.penfeizhou.animation.apng.decode.APNGParser
-import com.github.penfeizhou.animation.apng.io.APNGReader
+import com.github.penfeizhou.animation.decode.FrameSeqDecoder
 import com.github.penfeizhou.animation.io.ByteBufferReader
-import com.github.penfeizhou.animation.io.StreamReader
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.lang.IndexOutOfBoundsException
-import java.lang.NullPointerException
-import java.nio.ByteBuffer
-
 import com.github.penfeizhou.animation.loader.ByteBufferLoader
 import com.github.penfeizhou.animation.loader.Loader
 import okhttp3.internal.toHexString
-import com.github.penfeizhou.animation.decode.FrameSeqDecoder
-
-
-
+import java.nio.ByteBuffer
 
 
 const val PNG: Long = 0x89504E47
 
-//class ApngDecoder : ResourceDecoder<InputStream, APNGDrawable> {
-//
-//    override fun decode(
-//        source: InputStream,
-//        width: Int,
-//        height: Int,
-//        options: Options
-//    ): Resource<APNGDrawable> {
-//
-//        Log.d("ApngDecoder", "apng decoder on decode")
-//        return APNGDecoder()
-//    }
-//
-//    override fun handles(source: InputStream, options: Options): Boolean {
-//        val byteBuffer = ByteArray(8)
-//        val len = source.read(byteBuffer)
-//        if (len < 8) {
-//            Log.d("ApngDecoder", "pngではない")
-//            return false
-//        }
-//        val header = ByteBuffer.wrap(byteBuffer).long
-//        if(header != PNG) {
-//            Log.d("ApngDecoder", "pngではない")
-//            return false
-//        }
-//        Log.d("ApngDecoder", "png確定")
-//
-//        val result = APNGParser.isAPNG(APNGReader(StreamReader(source)))
-//        Log.d("ApngDecoder", "handlers isApng:$result")
-//        return result
-//    }
-//}
 
 class ByteBufferApngDecoder : ResourceDecoder<ByteBuffer, FrameSeqDecoder<*, *>> {
 

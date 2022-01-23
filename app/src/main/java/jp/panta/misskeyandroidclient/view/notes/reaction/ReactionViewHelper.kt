@@ -8,11 +8,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.util.svg.GlideApp
+import jp.panta.misskeyandroidclient.util.glide.GlideApp
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import java.io.InputStream
 
 object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")

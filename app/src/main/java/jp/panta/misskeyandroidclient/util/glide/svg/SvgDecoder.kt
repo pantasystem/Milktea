@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.svg
+package jp.panta.misskeyandroidclient.util.glide.svg
 
 import android.util.Log
 import com.bumptech.glide.load.Options

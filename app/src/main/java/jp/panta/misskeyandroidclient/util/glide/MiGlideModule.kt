@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.svg
+package jp.panta.misskeyandroidclient.util.glide
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -17,6 +17,9 @@ import com.bumptech.glide.load.resource.transcode.ResourceTranscoder
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import com.github.penfeizhou.animation.apng.decode.APNGDecoder
 import com.github.penfeizhou.animation.decode.FrameSeqDecoder
+import jp.panta.misskeyandroidclient.util.glide.apng.ByteBufferApngDecoder
+import jp.panta.misskeyandroidclient.util.glide.svg.SvgBitmapTransCoder
+import jp.panta.misskeyandroidclient.util.glide.svg.SvgDecoder
 import java.io.IOException
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -26,7 +29,7 @@ import java.nio.ByteBuffer
 
 
 @GlideModule(glideName = "GlideApp")
-class SvgModule : AppGlideModule(){
+class MiGlideModule : AppGlideModule(){
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
         registry

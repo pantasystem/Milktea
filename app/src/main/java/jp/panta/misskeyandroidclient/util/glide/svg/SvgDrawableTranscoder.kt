@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.svg
+package jp.panta.misskeyandroidclient.util.glide.svg
 
 import android.content.Context
 import android.graphics.Bitmap

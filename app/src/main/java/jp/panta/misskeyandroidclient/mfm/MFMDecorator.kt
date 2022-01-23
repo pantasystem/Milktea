@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.mfm
 
 import android.app.SearchManager
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
@@ -13,7 +12,7 @@ import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.util.svg.GlideApp
+import jp.panta.misskeyandroidclient.util.glide.GlideApp
 import jp.panta.misskeyandroidclient.view.text.DrawableEmojiSpan
 import jp.panta.misskeyandroidclient.view.text.EmojiAdapter
 import jp.panta.misskeyandroidclient.view.text.EmojiSpan
