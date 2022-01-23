@@ -19,9 +19,11 @@ class SvgDecoder : ResourceDecoder<InputStream, SVG>{
         val buffer = ByteArray(8)
         val cnt = source.read(buffer)
         if (cnt < 8) {
+            Log.d("SvgDecoder", "svgではない")
             return false
         }
 
+        Log.d("SvgDecoder", "svgだった")
         val header = ByteBuffer.wrap(buffer).int
         return header == SVG_HEADER || header == SVG_HEADER_STARTS_WITH_XML
     }

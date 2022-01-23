@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
+import java.io.InputStream
 
 object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")
@@ -45,19 +46,10 @@ object ReactionViewHelper {
 
             if(emoji != null){
                 //Log.d("ReactionViewHelper", "カスタム絵文字を発見した: ${emoji}")
-                if(emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true|| emoji.uri?.contains("svg") == true){
-
-                    GlideApp.with(context)
-                        .load(emoji.url?: emoji.url)
-                        .into(reactionImageView)
-
-                }else{
-                    Glide.with(reactionImageView.context)
-                        .load(emoji.url?: emoji.uri)
-                        .centerCrop()
-                        .into(reactionImageView)
-
-                }
+                GlideApp.with(reactionImageView.context)
+                    .load(emoji.url?: emoji.uri)
+                    .centerCrop()
+                    .into(reactionImageView)
                 reactionImageView.visibility = View.VISIBLE
                 reactionStringView.visibility = View.GONE
                 return
@@ -112,7 +104,7 @@ object ReactionViewHelper {
                     .load(emoji.url?: emoji.url)
                     .into(reactionImageTypeView)
             }else{
-                Glide.with(reactionImageTypeView.context)
+                GlideApp.with(reactionImageTypeView.context)
                     .load(emoji.url?: emoji.uri)
                     .centerCrop()
                     .into(reactionImageTypeView)
