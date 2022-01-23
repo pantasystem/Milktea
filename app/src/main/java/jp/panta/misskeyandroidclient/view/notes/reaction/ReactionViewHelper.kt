@@ -1,9 +1,6 @@
 package jp.panta.misskeyandroidclient.view.notes.reaction
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
@@ -13,9 +10,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
-import jp.panta.misskeyandroidclient.view.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 
 object ReactionViewHelper {
@@ -53,7 +48,6 @@ object ReactionViewHelper {
                 if(emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true|| emoji.uri?.contains("svg") == true){
 
                     GlideApp.with(context)
-                        .`as`(Bitmap::class.java)
                         .load(emoji.url?: emoji.url)
                         .into(reactionImageView)
 
@@ -115,7 +109,6 @@ object ReactionViewHelper {
             if(emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true|| emoji.uri?.contains("svg") == true){
 
                 GlideApp.with(context)
-                    .`as`(Bitmap::class.java)
                     .load(emoji.url?: emoji.url)
                     .into(reactionImageTypeView)
             }else{

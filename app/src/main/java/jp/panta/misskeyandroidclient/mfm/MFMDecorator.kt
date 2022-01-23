@@ -14,7 +14,6 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.util.svg.GlideApp
-import jp.panta.misskeyandroidclient.view.text.BitmapEmojiSpan
 import jp.panta.misskeyandroidclient.view.text.DrawableEmojiSpan
 import jp.panta.misskeyandroidclient.view.text.EmojiAdapter
 import jp.panta.misskeyandroidclient.view.text.EmojiSpan
@@ -101,9 +100,10 @@ object MFMDecorator {
                 //val emojiSpan = EmojiSpan(textView)
                 val emojiSpan: EmojiSpan<*>
                 if(emojiElement.emoji.isSvg()){
-                    emojiSpan = BitmapEmojiSpan(emojiAdapter)
+                    //emojiSpan = BitmapEmojiSpan(emojiAdapter)
+                    emojiSpan = DrawableEmojiSpan(emojiAdapter)
+
                     GlideApp.with(textView.context)
-                        .`as`(Bitmap::class.java)
                         .load(emojiElement.emoji.url?: emojiElement.emoji.url)
                         .into(emojiSpan.target)
                 }else{

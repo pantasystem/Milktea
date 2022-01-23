@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.util.svg
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Registry
 import com.bumptech.glide.module.AppGlideModule
@@ -11,12 +12,11 @@ import com.bumptech.glide.annotation.GlideModule
 import java.io.InputStream
 
 @GlideModule(glideName = "GlideApp")
-class SvgMoudule : AppGlideModule(){
+class SvgModule : AppGlideModule(){
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
         registry
-            //.register(SVG::class.java, PictureDrawable::class.java, SvgDrawableTranscoder())
-            .register(SVG::class.java, Bitmap::class.java, SvgBitmapTransCoder())
+            .register(SVG::class.java, BitmapDrawable::class.java, SvgBitmapTransCoder(context))
             .append(InputStream::class.java, SVG::class.java, SvgDecoder())
     }
 

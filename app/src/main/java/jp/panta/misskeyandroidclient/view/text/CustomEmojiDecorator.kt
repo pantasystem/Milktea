@@ -24,9 +24,9 @@ class CustomEmojiDecorator{
                 val span: EmojiSpan<*>
 
                 if(emoji.isSvg()){
-                    span = BitmapEmojiSpan(emojiAdapter)
+                    span = DrawableEmojiSpan(emojiAdapter)
+
                     GlideApp.with(view.context)
-                        .`as`(Bitmap::class.java)
                         //.listener(SvgSoftwareLayerSetter())
                         //.transition(withCrossFade())
                         .load(emoji.url?: emoji.url)
