@@ -139,7 +139,6 @@
                             android:gravity="top"
                             android:hint="@string/please_speak"
                             android:inputType="textMultiLine"
-                            android:text="@{viewModel.text}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar"

@@ -28,7 +28,7 @@ class UserDetailViewModel(
     val miCore: MiCore,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val translationStore: NoteTranslationStore
-) : ViewModel(){
+) : ViewModel() {
     private val logger = miCore.loggerFactory.create("UserDetailViewModel")
 
     val user = MutableLiveData<User.Detail>()
@@ -42,20 +42,26 @@ class UserDetailViewModel(
     private val pinNotesState = userState.filterNotNull().map {
         it.pinnedNoteIds?.map { id ->
             miCore.getNoteDataSource().get(id)
-        }?: emptyList()
+        } ?: emptyList()
     }
 
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
 
-        pinNotesState.map{ notes ->
+        pinNotesState.map { notes ->
             notes.map { note ->
-                PlaneNoteViewData(miCore.getGetters().noteRelationGetter.get(note), getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), translationStore)
+                PlaneNoteViewData(
+                    miCore.getGetters().noteRelationGetter.get(note),
+                    getAccount(),
+                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
+                    miCore.getNoteCaptureAdapter(),
+                    translationStore
+                )
             }
         }.onEach {
             this.postValue(it)
 
         }.flatMapLatest {
-            it.map {  n ->
+            it.map { n ->
                 n.eventFlow
             }.merge()
         }.catch { e ->
@@ -65,40 +71,35 @@ class UserDetailViewModel(
 
     val isMine = MutableLiveData<Boolean>()
 
-    val isFollowing = MediatorLiveData<Boolean>().apply{
-        addSource(user){
+    val isFollowing = MediatorLiveData<Boolean>().apply {
+        addSource(user) {
             this.value = it.isFollowing
         }
     }
 
 
-
-    val userName = MediatorLiveData<String>().apply{
-        addSource(user){user ->
-            this.value = "@" + user.userName + if(user.host != null){
-                "@${user.host}"
-            }else{
-                ""
-            }
+    val userName = MediatorLiveData<String>().apply {
+        addSource(user) { user ->
+            user.getDisplayUserName()
         }
     }
 
-    val isBlocking = MediatorLiveData<Boolean>().apply{
-        value = user.value?.isBlocking?: false
-        addSource(user){
+    val isBlocking = MediatorLiveData<Boolean>().apply {
+        value = user.value?.isBlocking ?: false
+        addSource(user) {
             value = it.isBlocking
         }
     }
 
-    val isMuted = MediatorLiveData<Boolean>().apply{
-        value = user.value?.isMuting?: false
-        addSource(user){
+    val isMuted = MediatorLiveData<Boolean>().apply {
+        value = user.value?.isMuting ?: false
+        addSource(user) {
             value = it.isMuting
         }
     }
 
-    val isRemoteUser = MediatorLiveData<Boolean>().apply{
-        addSource(user){
+    val isRemoteUser = MediatorLiveData<Boolean>().apply {
+        addSource(user) {
             value = it.url != null
         }
     }
@@ -106,18 +107,17 @@ class UserDetailViewModel(
     val showFollows = EventBus<User?>()
 
 
-
-    fun load(){
+    fun load() {
         viewModelScope.launch(dispatcher) {
             var user = userId?.let {
                 runCatching {
                     miCore.getUserRepository().find(userId, true)
                 }.getOrNull()
             }
-            if(user == null){
+            if (user == null) {
                 user = fqdnUserName?.let {
                     val account = getAccount()
-                    val userNameAndHost = fqdnUserName.split("@").filter{ it.isNotBlank() }
+                    val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
                     val userName = userNameAndHost[0]
                     val host = userNameAndHost.getOrNull(1)
                     miCore.getUserRepository().findByUserName(account.accountId, userName, host)
@@ -127,8 +127,9 @@ class UserDetailViewModel(
 
             userState.value = user as? User.Detail
             user?.let {
-                miCore.getUserRepositoryEventToFlow().from(user.id).mapNotNull{
-                    (it as? UserDataSource.Event.Updated)?.user?: (it as? UserDataSource.Event.Created)?.user
+                miCore.getUserRepositoryEventToFlow().from(user.id).mapNotNull {
+                    (it as? UserDataSource.Event.Updated)?.user
+                        ?: (it as? UserDataSource.Event.Created)?.user
                 }.mapNotNull {
                     it as? User.Detail
                 }.onEach {
@@ -140,14 +141,14 @@ class UserDetailViewModel(
 
     }
 
-    fun changeFollow(){
+    fun changeFollow() {
         viewModelScope.launch(Dispatchers.IO) {
-            userState.value?.let{
+            userState.value?.let {
                 runCatching {
                     val user = miCore.getUserRepository().find(it.id) as User.Detail
-                    if(user.isFollowing || user.hasPendingFollowRequestFromYou) {
+                    if (user.isFollowing || user.hasPendingFollowRequestFromYou) {
                         miCore.getUserRepository().unfollow(user.id)
-                    }else{
+                    } else {
                         miCore.getUserRepository().follow(user.id)
                     }
                     miCore.getUserRepository().find(user.id) as User.Detail
@@ -161,17 +162,17 @@ class UserDetailViewModel(
         }
     }
 
-    fun showFollows(){
+    fun showFollows() {
         showFollows.event = user.value
     }
 
-    fun showFollowers(){
+    fun showFollowers() {
         showFollowers.event = user.value
     }
 
-    fun mute(){
+    fun mute() {
         viewModelScope.launch(Dispatchers.IO) {
-            userState.value?.let{
+            userState.value?.let {
                 runCatching {
                     miCore.getUserRepository().mute(it.id)
                     miCore.getUserRepository().find(it.id, true) as User.Detail
@@ -184,9 +185,9 @@ class UserDetailViewModel(
         }
     }
 
-    fun unmute(){
+    fun unmute() {
         viewModelScope.launch(Dispatchers.IO) {
-            userState.value?.let{
+            userState.value?.let {
                 runCatching {
                     miCore.getUserRepository().unmute(it.id)
                     miCore.getUserRepository().find(it.id, true) as User.Detail
@@ -199,9 +200,9 @@ class UserDetailViewModel(
         }
     }
 
-    fun block(){
+    fun block() {
         viewModelScope.launch(Dispatchers.IO) {
-            userState.value?.let{
+            userState.value?.let {
                 runCatching {
                     miCore.getUserRepository().block(it.id)
                     (miCore.getUserRepository().find(it.id, true) as User.Detail)
@@ -212,9 +213,9 @@ class UserDetailViewModel(
         }
     }
 
-    fun unblock(){
+    fun unblock() {
         viewModelScope.launch(Dispatchers.IO) {
-            userState.value?.let{
+            userState.value?.let {
                 runCatching {
                     miCore.getUserRepository().unblock(it.id)
                     (miCore.getUserRepository().find(it.id, true) as User.Detail)
@@ -225,13 +226,17 @@ class UserDetailViewModel(
         }
     }
 
+    fun getProfileUrl(): String? {
+        return user.value?.getProfileUrl()
+    }
+
 
     private var mAc: Account? = null
     private suspend fun getAccount(): Account {
-        if(mAc != null) {
+        if (mAc != null) {
             return mAc!!
         }
-        if(userId != null) {
+        if (userId != null) {
             mAc = miCore.getAccountRepository().get(userId.accountId)
             return mAc!!
         }

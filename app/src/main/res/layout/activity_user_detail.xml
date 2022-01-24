@@ -220,11 +220,20 @@
 
                 >
 
-            <androidx.viewpager.widget.ViewPager
+            <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/userTimelinePager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
         </FrameLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:id="@+id/create_mention"
+                app:srcCompat="@drawable/ic_mention"
+                android:contentDescription="@string/create_mention" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
