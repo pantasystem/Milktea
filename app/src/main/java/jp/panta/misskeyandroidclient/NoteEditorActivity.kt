@@ -55,17 +55,26 @@ import kotlinx.coroutines.flow.*
 
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
-    companion object{
-        private const val EXTRA_REPLY_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
-        private const val EXTRA_QUOTE_TO_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
+    companion object {
+        private const val EXTRA_REPLY_TO_NOTE_ID =
+            "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
+        private const val EXTRA_QUOTE_TO_NOTE_ID =
+            "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
         private const val EXTRA_DRAFT_NOTE = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
+        private const val EXTRA_MENTIONS = "EXTRA_MENTIONS"
 
-        fun newBundle(context: Context, replyTo: Note.Id? = null, quoteTo: Note.Id? = null, draftNote: DraftNote? = null): Intent {
+        fun newBundle(
+            context: Context,
+            replyTo: Note.Id? = null,
+            quoteTo: Note.Id? = null,
+            draftNote: DraftNote? = null,
+            mentions: List<String>? = null
+        ): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
-                replyTo?.let{
+                replyTo?.let {
                     putExtra(EXTRA_REPLY_TO_NOTE_ID, replyTo.noteId)
                     putExtra(EXTRA_ACCOUNT_ID, replyTo.accountId)
                 }
@@ -80,9 +89,14 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                     putExtra(EXTRA_DRAFT_NOTE, it)
                 }
 
+                mentions?.let {
+                    putExtra(EXTRA_MENTIONS, it.toTypedArray())
+                }
+
             }
         }
     }
+
     private lateinit var mViewModel: NoteEditorViewModel
 
     private lateinit var mBinding: ActivityNoteEditorBinding
@@ -95,14 +109,17 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_note_editor)
-        val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(this, R.layout.activity_note_editor)
+        val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(
+            this,
+            R.layout.activity_note_editor
+        )
         mBinding = binding
 
         setSupportActionBar(mBinding.noteEditorToolbar)
 
 
         var text: String? = null
-        if(intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true){
+        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true) {
             text = intent.getStringExtra(Intent.EXTRA_TEXT)
         }
 
@@ -120,17 +137,23 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         //binding.viewModel
         binding.lifecycleOwner = this
 
-        val accountId: Long? = if(intent.getLongExtra(EXTRA_ACCOUNT_ID, - 1) == - 1L) null else intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
-        val replyToNoteId = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)?.let{
+        val accountId: Long? =
+            if (intent.getLongExtra(EXTRA_ACCOUNT_ID, -1) == -1L) null else intent.getLongExtra(
+                EXTRA_ACCOUNT_ID,
+                -1
+            )
+        val replyToNoteId = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)?.let {
             requireNotNull(accountId)
             Note.Id(accountId, it)
         }
-        val quoteToNoteId = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)?.let{
+        val quoteToNoteId = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)?.let {
             requireNotNull(accountId)
             Note.Id(accountId, it)
         }
 
-
+        intent.getStringArrayExtra(EXTRA_MENTIONS)?.let {
+            addMentionUserNames(it.toList())
+        }
 
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
@@ -147,14 +170,18 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         binding.addressUsersView.applyFlexBoxLayout(this)
 
 
-        val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
+        val accountViewModel = ViewModelProvider(
+            this,
+            AccountViewModel.Factory(miApplication)
+        )[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
         accountViewModel.switchAccount.observe(this) {
             AccountSwitchingDialog().show(supportFragmentManager, "tag")
         }
         accountViewModel.showProfile.observe(this) {
-            val intent = UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
+            val intent =
+                UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
 
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
@@ -184,10 +211,15 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             binding.cw.setTokenizer(CustomEmojiTokenizer())
         }.launchIn(lifecycleScope)
 
-        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = replyToNoteId, quoteToNoteId = quoteToNoteId, draftNote = draftNote)
+        val factory = NoteEditorViewModelFactory(
+            miApplication,
+            replyToNoteId = replyToNoteId,
+            quoteToNoteId = quoteToNoteId,
+            draftNote = draftNote
+        )
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
-        if(!text.isNullOrBlank()){
+        if (!text.isNullOrBlank()) {
             viewModel.changeText(text)
         }
         binding.viewModel = viewModel
@@ -202,7 +234,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                         fileRepository = miApplication.getDriveFileRepository(),
                         dataSource = miApplication.getFilePropertyDataSource(),
                         onShow = {
-                            val file = when(it) {
+                            val file = when (it) {
                                 is FilePreviewTarget.Remote -> {
                                     it.fileProperty.toFile()
                                 }
@@ -227,9 +259,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             viewModel.poll.distinctUntilChangedBy {
                 it == null
             }.collect { poll ->
-                if(poll == null) {
+                if (poll == null) {
                     removePollFragment()
-                }else{
+                } else {
                     setPollFragment()
                 }
             }
@@ -240,12 +272,12 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
 
         mBinding.inputMain.addTextChangedListener { e ->
-            viewModel.setText((e?.toString()?: ""))
+            viewModel.setText((e?.toString() ?: ""))
         }
 
 
         viewModel.isPost.observe(this) {
-            if(it) {
+            if (it) {
                 noteEditorToolbar.postButton.isEnabled = false
                 finish()
             }
@@ -309,7 +341,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                     startActivity(Intent(this, AuthorizationActivity::class.java))
                 }
                 ConnectionStatus.NETWORK_ERROR -> {
-                    Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT)
+                        .show()
                 }
                 else -> Log.d("MainActivity", "not initialized")
             }
@@ -327,7 +360,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             }
         }
 
-        mConfirmViewModel.confirmEvent.observe( this) {
+        mConfirmViewModel.confirmEvent.observe(this) {
             ConfirmDialog().show(supportFragmentManager, "confirm")
         }
 
@@ -346,8 +379,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     override fun onSelect(emoji: Emoji) {
         val pos = mBinding.inputMain.selectionEnd
-        mViewModel.addEmoji(emoji, pos).let{ newPos ->
-            mBinding.inputMain.setText(mViewModel.text.value?: "")
+        mViewModel.addEmoji(emoji, pos).let { newPos ->
+            mBinding.inputMain.setText(mViewModel.text.value ?: "")
             mBinding.inputMain.setSelection(newPos)
             Log.d("NoteEditorActivity", "入力されたデータ:${mBinding.inputMain.text}")
         }
@@ -355,21 +388,21 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     override fun onSelect(emoji: String) {
         val pos = mBinding.inputMain.selectionEnd
-        mViewModel.addEmoji(emoji, pos).let{ newPos ->
-            mBinding.inputMain.setText(mViewModel.text.value?: "")
+        mViewModel.addEmoji(emoji, pos).let { newPos ->
+            mBinding.inputMain.setText(mViewModel.text.value ?: "")
             mBinding.inputMain.setSelection(newPos)
         }
     }
 
-    private fun setPollFragment(){
+    private fun setPollFragment() {
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.edit_poll, PollEditorFragment(), "pollFragment")
         ft.commit()
     }
 
-    private fun removePollFragment(){
+    private fun removePollFragment() {
         val fragment = supportFragmentManager.findFragmentByTag("pollFragment")
-        if(fragment != null){
+        if (fragment != null) {
             val ft = supportFragmentManager.beginTransaction()
             ft.remove(fragment)
             ft.commit()
@@ -379,33 +412,33 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     /**
      * 設定をもとにToolbarを表示するベースとなるViewGroupを非表示・表示＆取得をしている
      */
-    private fun getToolbarBase() : ViewGroup {
+    private fun getToolbarBase(): ViewGroup {
         val miCore = applicationContext as MiCore
-        return if(miCore.getSettingStore().isPostButtonAtTheBottom){
+        return if (miCore.getSettingStore().isPostButtonAtTheBottom) {
             mBinding.noteEditorToolbar.visibility = View.GONE
             mBinding.bottomToolbarBase.visibility = View.VISIBLE
             mBinding.bottomToolbarBase
-        }else{
+        } else {
             mBinding.bottomToolbarBase.visibility = View.GONE
             mBinding.bottomToolbarBase.visibility = View.VISIBLE
             mBinding.noteEditorToolbar
         }
     }
 
-    private fun showFileManager(){
-        if(checkPermission()){
+    private fun showFileManager() {
+        if (checkPermission()) {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             openLocalStorageResult.launch(intent)
-        }else{
+        } else {
             requestPermission()
         }
 
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun showDriveFileSelector(){
+    private fun showDriveFileSelector() {
         val selectedSize = mViewModel.state.value.totalFilesCount
 
         val miCore = applicationContext as MiCore
@@ -419,67 +452,69 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         openDriveActivityResult.launch(intent)
     }
 
-    private fun checkPermission(): Boolean{
-        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun checkPermission(): Boolean {
+        val permissionCheck =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
         return permissionCheck == PackageManager.PERMISSION_GRANTED
     }
-    private fun requestPermission(){
+
+    private fun requestPermission() {
         //val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-        if(! checkPermission()){
+        if (!checkPermission()) {
             requestReadStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun startSearchAndSelectUser(){
-        val selectedUserIds = mViewModel.address.value.mapNotNull{
+    private fun startSearchAndSelectUser() {
+        val selectedUserIds = mViewModel.address.value.mapNotNull {
             it.userId
         }
 
-        val intent  = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selectedUserIds)
+        val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selectedUserIds)
 
         selectUserResult.launch(intent)
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun startMentionToSearchAndSelectUser(){
+    private fun startMentionToSearchAndSelectUser() {
         val intent = Intent(this, SearchAndSelectUserActivity::class.java)
         selectMentionToUserResult.launch(intent)
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun finishOrConfirmSaveAsDraftOrDelete(){
-        if(mViewModel.canSaveDraft()){
+    private fun finishOrConfirmSaveAsDraftOrDelete() {
+        if (mViewModel.canSaveDraft()) {
             mConfirmViewModel.confirmEvent.event = ConfirmCommand(
                 getString(R.string.save_draft),
                 getString(R.string.save_the_note_as_a_draft),
-                eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE ,
+                eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE,
                 args = "",
                 positiveButtonText = getString(R.string.save),
                 negativeButtonText = getString(R.string.delete)
 
             )
-        }else{
+        } else {
             upTo()
         }
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun upTo(){
-        if(intent.getStringExtra(Intent.EXTRA_TEXT).isNullOrEmpty()){
+    private fun upTo() {
+        if (intent.getStringExtra(Intent.EXTRA_TEXT).isNullOrEmpty()) {
             finish()
-        }else{
+        } else {
             val upIntent = Intent(this, MainActivity::class.java)
             upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            if(shouldUpRecreateTask(upIntent)){
+            if (shouldUpRecreateTask(upIntent)) {
                 TaskStackBuilder.create(this)
                     .addNextIntentWithParentStack(upIntent)
                     .startActivities()
                 finish()
-            }else{
+            } else {
                 navigateUpTo(upIntent)
             }
         }
@@ -492,73 +527,85 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private val openDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val ids = (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS)  as List<*>? )?.mapNotNull {
-            it as? FileProperty.Id
-        }
-        Log.d("NoteEditorActivity", "result:${ids}")
-        val size = mViewModel.fileTotal()
-
-        if(ids != null && ids.isNotEmpty() && size + ids.size <= 4) {
-            mViewModel.addFilePropertyFromIds(ids)
-        }
-    }
-
-    private val openLocalStorageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
-        val uri = result?.data?.data
-        if(uri != null){
+    private val openDriveActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val ids =
+                (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
+                    it as? FileProperty.Id
+                }
+            Log.d("NoteEditorActivity", "result:${ids}")
             val size = mViewModel.fileTotal()
 
-            if(size > 4){
-                Log.d("NoteEditorActivity", "失敗しました")
-            }else{
-                mViewModel.add(uri.toAppFile(this))
-                Log.d("NoteEditorActivity", "成功しました")
+            if (ids != null && ids.isNotEmpty() && size + ids.size <= 4) {
+                mViewModel.addFilePropertyFromIds(ids)
             }
-
         }
-    }
 
-    private val requestReadStoragePermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if(it){
-            showFileManager()
-        }else{
-            Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
+    private val openLocalStorageResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+            val uri = result?.data?.data
+            if (uri != null) {
+                val size = mViewModel.fileTotal()
+
+                if (size > 4) {
+                    Log.d("NoteEditorActivity", "失敗しました")
+                } else {
+                    mViewModel.add(uri.toAppFile(this))
+                    Log.d("NoteEditorActivity", "成功しました")
+                }
+
+            }
         }
-    }
+
+    private val requestReadStoragePermissionResult =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                showFileManager()
+            } else {
+                Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
+            }
+        }
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    private val selectUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if(result.resultCode == RESULT_OK && result.data != null){
-            val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-            if(changed != null) {
-                mViewModel.setAddress(changed.added, changed.removed)
-            }
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    private val selectMentionToUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if(result.resultCode == RESULT_OK && result.data != null){
-            val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-
-            if(changed != null){
-                val pos = mBinding.inputMain.selectionEnd
-                mViewModel.addMentionUsers(changed.selectedUsers, pos).let { newPos ->
-                    Log.d("NoteEditorActivity", "text:${mViewModel.text.value}, stateText:${mViewModel.state.value.text}")
-                    mBinding.inputMain.setText(mViewModel.text.value?: "")
-                    mBinding.inputMain.setSelection(newPos)
+    private val selectUserResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val changed =
+                    result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                if (changed != null) {
+                    mViewModel.setAddress(changed.added, changed.removed)
                 }
             }
+        }
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    private val selectMentionToUserResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val changed =
+                    result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+
+                if (changed != null) {
+                    addMentionUserNames(changed.selectedUsers.map { it.getDisplayUserName() })
+                }
+
+            }
+        }
+
+    private fun addMentionUserNames(userNames: List<String>) {
+        val pos = mBinding.inputMain.selectionEnd
+        mViewModel.addMentionUserNames(userNames, pos).let { newPos ->
+            Log.d(
+                "NoteEditorActivity",
+                "text:${mViewModel.text.value}, stateText:${mViewModel.state.value.text}"
+            )
+            mBinding.inputMain.setText(mViewModel.text.value ?: "")
+            mBinding.inputMain.setSelection(newPos)
         }
     }
-
-
-
 
 
 }
