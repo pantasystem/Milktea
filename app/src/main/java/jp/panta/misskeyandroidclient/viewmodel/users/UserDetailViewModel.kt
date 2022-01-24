@@ -39,6 +39,11 @@ class UserDetailViewModel(
         } ?: emptyList()
     }
 
+    val profileUrl = userState.filterNotNull().map {
+        val ac = miCore.getAccountRepository().get(it.id.accountId)
+        it.getProfileUrl(ac)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
 
         pinNotesState.map { notes ->
@@ -217,12 +222,6 @@ class UserDetailViewModel(
                     userState.value = it
                 }
             }
-        }
-    }
-
-    fun getProfileUrl(): String? {
-        return mAc?.let {
-            return user.value?.getProfileUrl(it)
         }
     }
 

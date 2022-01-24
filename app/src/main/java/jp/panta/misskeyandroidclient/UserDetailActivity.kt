@@ -34,8 +34,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.view.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.view.users.ReportDialog
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -313,13 +312,13 @@ class UserDetailActivity : AppCompatActivity() {
                 }
             }
             R.id.share -> {
-                val url = mViewModel?.getProfileUrl()
+                val url = mViewModel?.profileUrl?.value
                     ?: return false
+
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     type = "text/plain"
                     putExtra(Intent.EXTRA_TEXT, url)
-
                 }
                 startActivity(Intent.createChooser(intent, getString(R.string.share)))
             }
