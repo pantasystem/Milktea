@@ -25,18 +25,7 @@ data class Account (
     val remoteId: String,
     val instanceDomain: String,
     val userName: String,
-    /*val name: String?,
-    val description: String?,
-    val followersCount: Int,
-    val followingCount: Int,
-    val notesCount: Int,
-    val isBot: Boolean,
-    val isCat: Boolean,
-    val avatarUrl: String?,
-    val bannerUrl: String?,*/
     val encryptedToken: String,
-    //@Ignore val emojis: List<Emoji>,
-
     @Ignore val pages: List<Page>,
     @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
@@ -47,31 +36,12 @@ data class Account (
     constructor(remoteId: String,
                 instanceDomain: String,
                 userName: String,
-                /*name: String?,
-                description: String?,
-                followersCount: Int,
-                followingCount: Int,
-                notesCount: Int,
-                isBot: Boolean,
-                isCat: Boolean,
-                avatarUrl: String?,
-                bannerUrl: String?,*/
                 encryptedToken: String) :
             this(
                 remoteId,
                 instanceDomain,
                 userName,
-                /*name,
-                description,
-                followersCount,
-                followingCount,
-                notesCount,
-                isBot,
-                isCat,
-                avatarUrl,
-                bannerUrl,*/
                 encryptedToken,
-                //emptyList(),
                 emptyList()
             )
 
@@ -84,6 +54,15 @@ data class Account (
         }catch(e: Exception){
             throw UnauthorizedException()
         }
+    }
+
+    fun getHost(): String {
+        if (instanceDomain.startsWith("https://")) {
+            return instanceDomain.substring("https://".length, instanceDomain.length)
+        } else if (instanceDomain.startsWith("http://")) {
+            return instanceDomain.substring("http://".length, instanceDomain.length)
+        }
+        return instanceDomain
     }
 
 }
@@ -116,7 +95,6 @@ fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account{
         pages = emptyList()
     )
 }
-
 fun AccountRelation.newAccount(user: UserDTO?): Account?{
     val ci = getCurrentConnectionInformation()
         ?: return null

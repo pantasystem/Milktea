@@ -106,8 +106,8 @@ sealed class User : Entity{
         return "@" + this.userName
     }
 
-    fun getProfileUrl(): String {
-        return "https://$host/${getDisplayUserName()}"
+    fun getProfileUrl(account: Account): String {
+        return "https://${account.instanceDomain}/${getDisplayUserName()}"
     }
 }
 

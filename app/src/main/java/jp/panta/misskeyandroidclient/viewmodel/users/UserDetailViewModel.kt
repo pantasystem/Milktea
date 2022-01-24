@@ -227,7 +227,9 @@ class UserDetailViewModel(
     }
 
     fun getProfileUrl(): String? {
-        return user.value?.getProfileUrl()
+        return mAc?.let {
+            return user.value?.getProfileUrl(it)
+        }
     }
 
 
