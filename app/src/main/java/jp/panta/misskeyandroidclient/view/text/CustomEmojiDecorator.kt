@@ -1,12 +1,11 @@
 package jp.panta.misskeyandroidclient.view.text
 
-import android.graphics.Bitmap
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.view.View
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.util.svg.GlideApp
+import jp.panta.misskeyandroidclient.util.glide.GlideApp
 import java.util.regex.Pattern
 
 class CustomEmojiDecorator{
@@ -23,19 +22,10 @@ class CustomEmojiDecorator{
             while(matcher.find()){
                 val span: EmojiSpan<*>
 
-                /*
-                GlideApp.with(this.context)
-                        .`as`(PictureDrawable::class.java)
-                        .listener(SvgSoftwareLayerSetter())
-                        .load(emoji.url?: emoji.uri)
-                        .centerCrop()
-                        .transition(withCrossFade())
-                        .into(reactionImageView)
-                 */
                 if(emoji.isSvg()){
-                    span = BitmapEmojiSpan(emojiAdapter)
+                    span = DrawableEmojiSpan(emojiAdapter)
+
                     GlideApp.with(view.context)
-                        .`as`(Bitmap::class.java)
                         //.listener(SvgSoftwareLayerSetter())
                         //.transition(withCrossFade())
                         .load(emoji.url?: emoji.url)

@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemHasReplyToNoteBinding
@@ -28,15 +26,61 @@ class TimelineListAdapter(
     diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>,
     private val lifecycleOwner: LifecycleOwner,
     private val notesViewModel: NotesViewModel
-) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolderBase>(diffUtilCallBack){
+) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolderBase<ViewDataBinding>>(diffUtilCallBack){
 
-    abstract class NoteViewHolderBase(view: View) : RecyclerView.ViewHolder(view){
-        var reactionCountsObserver: Observer<List<ReactionCount>>? = null
-        abstract var reactionCountAdapter: ReactionCountAdapter?
+    abstract class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : RecyclerView.ViewHolder(view){
+        abstract val binding: T
         private var mNoteIdAndPollListAdapter: Pair<Note.Id, PollListAdapter>? = null
+        abstract val lifecycleOwner: LifecycleOwner
+        abstract val reactionCountsView: RecyclerView
+        abstract val notesViewModel: NotesViewModel
+        //private var reactionCountAdapter: ReactionCountAdapter =             ReactionCountAdapter(notesViewModel)
 
+        private var reactionCountAdapter: ReactionCountAdapter? = null
 
-        abstract fun bind(note: PlaneNoteViewData)
+        private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
+            val flexBoxLayoutManager = FlexboxLayoutManager(reactionCountsView.context)
+            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+            reactionCountsView.layoutManager = flexBoxLayoutManager
+            flexBoxLayoutManager
+        }
+
+        private val reactionCountsObserver = Observer<List<ReactionCount>> { counts ->
+            if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
+                bindReactionCountVisibility()
+
+                reactionCountAdapter?.submitList(counts) {
+                    reactionCountsView.itemAnimator = if(reactionCountsView.itemAnimator == null) {
+                        DefaultItemAnimator()
+                    }else{
+                        reactionCountsView.itemAnimator
+                    }
+                }
+            }
+        }
+
+        abstract fun onBind(note: PlaneNoteViewData)
+
+        private var mCurrentNote: PlaneNoteViewData? = null
+
+        fun bind(note: PlaneNoteViewData) {
+
+            unbind()
+
+            mCurrentNote = note
+            bindReactionCounter()
+
+            onBind(mCurrentNote!!)
+            binding.lifecycleOwner = lifecycleOwner
+
+            binding.executePendingBindings()
+        }
+
+        private fun unbind() {
+            mCurrentNote?.reactionCounts?.removeObserver(reactionCountsObserver)
+            mCurrentNote = null
+        }
+
 
         protected fun getPollAdapter(notesViewModel: NotesViewModel, note: PlaneNoteViewData, lifecycleOwner: LifecycleOwner): PollListAdapter?{
             val noteAndPoll = mNoteIdAndPollListAdapter
@@ -51,6 +95,34 @@ class TimelineListAdapter(
             }
             return null
         }
+
+        private fun bindReactionCounter() {
+            val note = mCurrentNote!!
+            val reactionList = note.reactionCounts.value?.toList()?: emptyList()
+            reactionCountAdapter = if(reactionCountAdapter != null && reactionCountAdapter?.note?.id == note.id){
+                reactionCountAdapter!!
+            }else{
+                ReactionCountAdapter(notesViewModel)
+            }
+            reactionCountAdapter?.note = note
+            reactionCountsView.adapter = reactionCountAdapter
+            reactionCountsView.itemAnimator = if(reactionList.isEmpty()) DefaultItemAnimator() else null
+            reactionCountAdapter?.submitList(reactionList) {
+                reactionCountsView.itemAnimator = DefaultItemAnimator()
+            }
+            note.reactionCounts.observe(lifecycleOwner, reactionCountsObserver)
+            reactionCountsView.layoutManager = flexBoxLayoutManager
+        }
+        
+        private fun bindReactionCountVisibility() {
+            val note = mCurrentNote!!
+            val reactionList = note.reactionCounts.value?.toList()?: emptyList()
+            reactionCountsView.visibility = if(reactionList.isNotEmpty()){
+                View.VISIBLE
+            }else{
+                View.GONE
+            }
+        }
     }
 
     companion object{
@@ -58,14 +130,18 @@ class TimelineListAdapter(
         private const val HAS_REPLY_TO_NOTE = 1
     }
 
-    inner class NoteViewHolder(val binding: ItemNoteBinding): NoteViewHolderBase(binding.root){
+    inner class NoteViewHolder(override val binding: ItemNoteBinding): NoteViewHolderBase<ItemNoteBinding>(binding.root){
 
-        override var reactionCountAdapter: ReactionCountAdapter? = null
+        override val lifecycleOwner: LifecycleOwner
+            get() = this@TimelineListAdapter.lifecycleOwner
+        override val reactionCountsView: RecyclerView
+            get() = binding.simpleNote.reactionView
+        override val notesViewModel: NotesViewModel
+            get() = this@TimelineListAdapter.notesViewModel
 
-        override fun bind(note: PlaneNoteViewData) {
+
+        override fun onBind(note: PlaneNoteViewData) {
             binding.note = note
-            reactionCountAdapter = setReactionCounter(this, binding.simpleNote.reactionView, note)
-            binding.lifecycleOwner = lifecycleOwner
             binding.notesViewModel = notesViewModel
 
             if(note.poll != null){
@@ -76,19 +152,22 @@ class TimelineListAdapter(
                 }
 
             }
-            binding.executePendingBindings()
         }
     }
 
-    inner class HasReplyToNoteViewHolder(val binding: ItemHasReplyToNoteBinding): NoteViewHolderBase(binding.root){
-        override var reactionCountAdapter: ReactionCountAdapter? = null
+    inner class HasReplyToNoteViewHolder(override val binding: ItemHasReplyToNoteBinding): NoteViewHolderBase<ItemHasReplyToNoteBinding>(binding.root){
+        override val lifecycleOwner: LifecycleOwner
+            get() = this@TimelineListAdapter.lifecycleOwner
 
-        override fun bind(note: PlaneNoteViewData) {
+        override val reactionCountsView: RecyclerView
+            get() = binding.simpleNote.reactionView
+        override val notesViewModel: NotesViewModel
+            get() = this@TimelineListAdapter.notesViewModel
+
+        override fun onBind(note: PlaneNoteViewData) {
             if(note is HasReplyToNoteViewData){
                 binding.hasReplyToNote = note
-                setReactionCounter(this, binding.simpleNote.reactionView, note)
 
-                binding.lifecycleOwner = lifecycleOwner
                 binding.notesViewModel = notesViewModel
                 if(note.poll != null){
                     val pollAdapter = getPollAdapter(notesViewModel,note, lifecycleOwner)
@@ -99,7 +178,6 @@ class TimelineListAdapter(
 
                 }
 
-                binding.executePendingBindings()
 
             }
         }
@@ -115,20 +193,14 @@ class TimelineListAdapter(
         }
     }
 
-    override fun onBindViewHolder(p0: NoteViewHolderBase, position: Int) {
+    override fun onBindViewHolder(p0: NoteViewHolderBase<ViewDataBinding>, position: Int) {
 
         val item = getItem(position)
-        if(p0 is NoteViewHolder){
-            p0.bind(item)
-
-        }else if(p0 is HasReplyToNoteViewHolder){
-            p0.bind(item)
-        }
-
+        p0.bind(item)
 
     }
 
-    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): NoteViewHolderBase {
+    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): NoteViewHolderBase<ViewDataBinding> {
         return when(p1){
             HAS_REPLY_TO_NOTE ->{
                 val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_has_reply_to_note, p0, false)
@@ -143,43 +215,7 @@ class TimelineListAdapter(
 
     }
 
-    private fun setReactionCounter(holder: NoteViewHolderBase, reactionView: RecyclerView, note: PlaneNoteViewData) : ReactionCountAdapter{
-        val reactionList = note.reactionCounts.value?.toList()?: emptyList()
 
-        val adapter = holder.reactionCountAdapter
-
-        val reactionCountAdapter = if(adapter?.note?.id == note.id){
-            adapter
-        }else{
-            ReactionCountAdapter(note, notesViewModel)
-        }
-
-        reactionView.adapter = reactionCountAdapter
-
-        reactionCountAdapter.submitList(reactionList)
-
-        val observer = Observer<List<ReactionCount>> {
-            reactionCountAdapter.submitList(it?.toList())
-        }
-        holder.reactionCountsObserver = observer
-        note.reactionCounts.observe(lifecycleOwner, observer)
-
-        val exLayoutManager = reactionView.layoutManager
-        if(exLayoutManager !is FlexboxLayoutManager){
-            val flexBoxLayoutManager = FlexboxLayoutManager(reactionView.context)
-            flexBoxLayoutManager.flexDirection = FlexDirection.ROW
-            flexBoxLayoutManager.flexWrap = FlexWrap.WRAP
-            flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
-            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-            reactionView.layoutManager = flexBoxLayoutManager
-        }
-
-        if(reactionList.isNotEmpty()){
-            reactionView.visibility = View.VISIBLE
-        }
-
-        return reactionCountAdapter
-    }
 
 
 
