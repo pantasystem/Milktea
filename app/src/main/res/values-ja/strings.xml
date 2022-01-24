@@ -377,4 +377,5 @@
     <string name="warning_s">警告:%s</string>
     <string name="reservation_at">投稿日時</string>
     <string name="warning_reservation_msg">異なる時間に投稿される恐れがあります。</string>
+    <string name="create_mention">Create mention</string>
 </resources>
