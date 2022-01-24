@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.reaction.impl
 
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import jp.panta.misskeyandroidclient.model.notes.Note
@@ -63,7 +64,7 @@ class ReactionHistoryPaginatorImplTest {
             misskeyAPIProvider,
             accountRepository,
             EncryptionStub(),
-            InMemoryUserDataSource()
+            InMemoryUserDataSource(TestLogger.Factory())
         )
         // TODO テスト後必ずTokenを削除すること
         val account = Account(

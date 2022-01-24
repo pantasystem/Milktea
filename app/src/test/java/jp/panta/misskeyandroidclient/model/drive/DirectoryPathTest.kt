@@ -1,0 +1,107 @@
+package jp.panta.misskeyandroidclient.model.drive
+
+import junit.framework.TestCase
+
+class DirectoryPathTest : TestCase() {
+
+    fun testPush() {
+        val root = Directory(
+            "root",
+            "",
+            "",
+            0,
+            0,
+            null,
+            null
+        )
+        var directoryPath = DirectoryPath(
+            path = listOf(
+                root
+            )
+        )
+        directoryPath = directoryPath.push(root.copy(
+            parent = root,
+            parentId = root.id,
+            id = "sub1"
+        ))
+        assertEquals("sub1", directoryPath.path.last().id)
+
+    }
+
+    fun testPop() {
+        val root = Directory(
+            "root",
+            "",
+            "",
+            0,
+            0,
+            null,
+            null
+        )
+        var directoryPath = DirectoryPath(
+            path = listOf(
+                root
+            )
+        )
+        val dirs = listOf("sub1", "sub2", "sub3", "sub4")
+        directoryPath = dirs.fold(directoryPath) { acc, s ->
+            acc.push(root.copy(id = s, parent = acc.path.last(), parentId = acc.path.last().id))
+        }
+        directoryPath = directoryPath.pop()
+        assertEquals("sub3", directoryPath.path.last().id)
+
+        directoryPath = directoryPath.pop()
+        assertEquals("sub2", directoryPath.path.last().id)
+
+        directoryPath = directoryPath.pop()
+        assertEquals("sub1", directoryPath.path.last().id)
+    }
+
+    fun testPopUntil() {
+        val root = Directory(
+            "root",
+            "",
+            "",
+            0,
+            0,
+            null,
+            null
+        )
+        var directoryPath = DirectoryPath(
+            path = listOf(
+                root
+            )
+        )
+        val dirs = listOf("sub1", "sub2", "sub3", "sub4")
+        directoryPath = dirs.fold(directoryPath) { acc, s ->
+            acc.push(root.copy(id = s, parent = acc.path.last(), parentId = acc.path.last().id))
+        }
+
+        val dir = directoryPath.path[1]
+        directoryPath = directoryPath.popUntil(dir)
+        assertEquals(dir.id, directoryPath.path.last().id)
+    }
+
+    fun testClear() {
+        val root = Directory(
+            "root",
+            "",
+            "",
+            0,
+            0,
+            null,
+            null
+        )
+        var directoryPath = DirectoryPath(
+            path = listOf(
+                root
+            )
+        )
+        val dirs = listOf("sub1", "sub2", "sub3", "sub4")
+        directoryPath = dirs.fold(directoryPath) { acc, s ->
+            acc.push(root.copy(id = s, parent = acc.path.last(), parentId = acc.path.last().id))
+        }
+        directoryPath = directoryPath.clear()
+        assertEquals(0, directoryPath.path.size)
+    }
+}
