@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.users
 
 import jp.panta.misskeyandroidclient.model.Entity
 import jp.panta.misskeyandroidclient.model.EntityId
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
 import java.io.Serializable
@@ -103,6 +104,10 @@ sealed class User : Entity{
 
     fun getShortDisplayName(): String{
         return "@" + this.userName
+    }
+
+    fun getProfileUrl(): String {
+        return "https://$host/${getDisplayUserName()}"
     }
 }
 
