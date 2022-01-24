@@ -6,7 +6,6 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 
 class NoteEditorViewModel(
     private val miCore: MiCore,
@@ -381,20 +379,9 @@ class NoteEditorViewModel(
     }
 
     fun addMentionUserNames(userNames: List<String>, pos: Int): Int {
-        val mentionBuilder = StringBuilder()
-        userNames.forEachIndexed { index, userName ->
-            if (index < userNames.size - 1) {
-                // NOTE: 次の文字がつながらないようにする
-                mentionBuilder.appendLine("$userName ")
-            } else {
-                // NOTE: 次の文字がつながらないようにする
-                mentionBuilder.append("$userName ")
-            }
-        }
-        val builder = StringBuilder(text.value ?: "")
-        builder.insert(pos, mentionBuilder.toString())
-        _state.value = _state.value.changeText(builder.toString())
-        return pos + mentionBuilder.length
+        val result = _state.value.addMentionUserNames(userNames, pos)
+        _state.value = result.state
+        return result.cursorPos
     }
 
     fun addEmoji(emoji: Emoji, pos: Int): Int {
