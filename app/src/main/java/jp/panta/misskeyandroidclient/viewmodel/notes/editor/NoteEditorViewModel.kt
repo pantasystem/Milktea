@@ -374,10 +374,16 @@ class NoteEditorViewModel(
 
 
     fun addMentionUsers(users: List<User>, pos: Int): Int {
+        val userNames = users.map {
+            it.getDisplayUserName()
+        }
+        return addMentionUserNames(userNames, pos)
+    }
+
+    fun addMentionUserNames(userNames: List<String>, pos: Int): Int {
         val mentionBuilder = StringBuilder()
-        users.forEachIndexed { index, it ->
-            val userName = it.getDisplayUserName()
-            if (index < users.size - 1) {
+        userNames.forEachIndexed { index, userName ->
+            if (index < userNames.size - 1) {
                 mentionBuilder.appendLine(userName)
             } else {
                 mentionBuilder.append(userName)
