@@ -4,12 +4,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.notes.toEntities
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.UserDTO
-import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.users.User
