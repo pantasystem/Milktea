@@ -8,9 +8,9 @@ import android.os.Build
 import jp.panta.misskeyandroidclient.AlarmNotePostReceiver
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
-class AndroidNoteReservationPostExecutor (
+class AndroidNoteReservationPostExecutor(
     val context: Context
-): NoteReservationPostExecutor{
+) : NoteReservationPostExecutor {
 
     override fun register(draftNote: DraftNote) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -21,13 +21,20 @@ class AndroidNoteReservationPostExecutor (
         val flag = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
                 PendingIntent.FLAG_MUTABLE
+                    .or(PendingIntent.FLAG_UPDATE_CURRENT)
+
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                 PendingIntent.FLAG_UPDATE_CURRENT
             }
             else -> PendingIntent.FLAG_UPDATE_CURRENT
         }
-        val pendingIntent = PendingIntent.getBroadcast(context, (draftNote.draftNoteId!! % 1000).toInt(), intent, flag)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            (draftNote.draftNoteId!! % 1000).toInt(),
+            intent,
+            flag
+        )
 
         // NOTE: 参考にした https://qiita.com/upft_rkoshida/items/8149605f751137b4c21c
         when {
