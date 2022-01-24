@@ -151,9 +151,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             Note.Id(accountId, it)
         }
 
-        intent.getStringArrayExtra(EXTRA_MENTIONS)?.let {
-            addMentionUserNames(it.toList())
-        }
+
 
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
@@ -374,6 +372,12 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             }
 
         }
+
+        intent.getStringArrayExtra(EXTRA_MENTIONS)?.let {
+            Log.d("NoteEditorActivity", "mentions:${it.toList()}")
+            addMentionUserNames(it.toList())
+        }
+
         binding.inputMain.requestFocus()
     }
 
@@ -600,9 +604,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         mViewModel.addMentionUserNames(userNames, pos).let { newPos ->
             Log.d(
                 "NoteEditorActivity",
-                "text:${mViewModel.text.value}, stateText:${mViewModel.state.value.text}"
+                "text:${mViewModel.state.value.text}, stateText:${mViewModel.state.value.text}"
             )
-            mBinding.inputMain.setText(mViewModel.text.value ?: "")
+            mBinding.inputMain.setText(mViewModel.state.value.text ?: "")
             mBinding.inputMain.setSelection(newPos)
         }
     }

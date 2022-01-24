@@ -191,7 +191,11 @@ class UserDetailActivity : AppCompatActivity() {
             }
 
             binding.createMention.setOnClickListener {
-                NoteEditorActivity.newBundle(this, )
+                mViewModel?.user?.value?.getDisplayUserName()?.let {
+                    val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
+                    startActivity(intent)
+                }
+
             }
 
         }.launchIn(lifecycleScope)

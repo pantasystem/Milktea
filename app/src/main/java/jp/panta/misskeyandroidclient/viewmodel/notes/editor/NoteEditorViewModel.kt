@@ -384,9 +384,11 @@ class NoteEditorViewModel(
         val mentionBuilder = StringBuilder()
         userNames.forEachIndexed { index, userName ->
             if (index < userNames.size - 1) {
-                mentionBuilder.appendLine(userName)
+                // NOTE: 次の文字がつながらないようにする
+                mentionBuilder.appendLine("$userName ")
             } else {
-                mentionBuilder.append(userName)
+                // NOTE: 次の文字がつながらないようにする
+                mentionBuilder.append("$userName ")
             }
         }
         val builder = StringBuilder(text.value ?: "")
