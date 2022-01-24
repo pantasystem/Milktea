@@ -107,7 +107,7 @@ sealed class User : Entity{
     }
 
     fun getProfileUrl(account: Account): String {
-        return "https://${account.instanceDomain}/${getDisplayUserName()}"
+        return "https://${account.getHost()}/${getDisplayUserName()}"
     }
 }
 
