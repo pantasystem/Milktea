@@ -203,4 +203,28 @@ class NoteEditingStateTest : TestCase() {
             .clear()
         )
     }
+
+    fun testAddMentionWhenOneUserName() {
+        val initialState = NoteEditingState()
+        val userNames = listOf("@Panta")
+        val result: AddMentionResult = initialState.addMentionUserNames(userNames, 0)
+        assertEquals((userNames[0]).length + 1, result.cursorPos)
+        assertEquals("@Panta ", result.state.text)
+    }
+
+    fun testAddMentionWhenTwoUserNames() {
+        val initialState = NoteEditingState()
+        val userNames = listOf("@Panta", "@Panta@example.com")
+        val result: AddMentionResult = initialState.addMentionUserNames(userNames, 0)
+        assertEquals((userNames[0] + userNames[1]).length + 2 + 1, result.cursorPos)
+        assertEquals("@Panta \n@Panta@example.com ", result.state.text)
+    }
+
+    fun testAddMentionWhenInsertOneUserName() {
+        val initialState = NoteEditingState(text = "Hello")
+        val userNames = listOf("@Panta")
+        val result: AddMentionResult = initialState.addMentionUserNames(userNames, 0)
+        assertEquals(userNames[0].length + 1 + 0, result.cursorPos)
+    }
+
 }

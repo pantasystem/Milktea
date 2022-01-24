@@ -2,13 +2,17 @@ package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Instant
 import java.util.*
+
+data class AddMentionResult(
+    val cursorPos: Int,
+    val state: NoteEditingState
+)
 
 data class NoteEditingState(
     val author: Account? = null,
@@ -64,6 +68,22 @@ data class NoteEditingState(
         return this.copy(
             text = text
         )
+    }
+
+    fun addMentionUserNames(userNames: List<String>, pos: Int) : AddMentionResult {
+        val mentionBuilder = StringBuilder()
+        userNames.forEachIndexed { index, userName ->
+            if (index < userNames.size - 1) {
+                // NOTE: 次の文字がつながらないようにする
+                mentionBuilder.appendLine("$userName ")
+            } else {
+                // NOTE: 次の文字がつながらないようにする
+                mentionBuilder.append("$userName ")
+            }
+        }
+        val builder = StringBuilder(text ?: "")
+        builder.insert(pos, mentionBuilder.toString())
+        return AddMentionResult(pos + mentionBuilder.length, copy(text = builder.toString()))
     }
 
     fun changeCw(text: String?) : NoteEditingState {
