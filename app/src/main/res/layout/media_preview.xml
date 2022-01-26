@@ -8,7 +8,7 @@
         <import type="android.view.View" />
         <variable
                 name="media"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData" />
 
 
     </data>

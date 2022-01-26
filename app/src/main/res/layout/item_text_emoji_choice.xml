@@ -8,7 +8,7 @@
                 type="String" />
         <variable
                 name="emojiSelection"
-                type="jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection" />
+                type="jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection" />
     </data>
     <Button
             android:layout_width="40dp"

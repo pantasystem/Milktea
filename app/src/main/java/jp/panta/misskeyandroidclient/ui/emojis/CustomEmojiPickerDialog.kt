@@ -12,9 +12,9 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogCustomEmojiPickerBinding
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
-import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelectionViewModel
-import jp.panta.misskeyandroidclient.viewmodel.emojis.Emojis
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.Emojis
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -67,7 +67,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
         return dialog
     }
 
-    inner class EmojiSelectionListener : EmojiSelection{
+    inner class EmojiSelectionListener : EmojiSelection {
 
         val activity = requireActivity()
 

@@ -9,7 +9,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaListBinding
-import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
+import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

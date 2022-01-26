@@ -6,11 +6,11 @@
 
         <variable
                 name="user"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.UserViewData" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData" />
 
         <variable
                 name="selectedUserViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel" />
 
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>

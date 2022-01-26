@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSharedSelectionRadioBinding
-import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem
 
 class SelectionListAdapter(
     val viewLifecycleOwner: LifecycleOwner,

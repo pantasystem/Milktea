@@ -17,9 +17,9 @@ import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
-import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 

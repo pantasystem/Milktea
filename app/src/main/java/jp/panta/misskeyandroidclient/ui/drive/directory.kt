@@ -12,7 +12,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import jp.panta.misskeyandroidclient.model.drive.Directory
-import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
 import androidx.compose.runtime.getValue
 
 
@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
-import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewData
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewData
 
 @Composable
 fun DirectoryListScreen(viewModel: DirectoryViewModel, driveViewModel: DriveViewModel) {

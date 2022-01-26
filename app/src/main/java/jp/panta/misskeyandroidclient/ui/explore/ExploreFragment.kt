@@ -10,7 +10,7 @@ import jp.panta.misskeyandroidclient.databinding.FragmentExploreBinding
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.explore.Explore
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

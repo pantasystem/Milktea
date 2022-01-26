@@ -7,7 +7,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.databinding.ActivitySortedUsesBinding
 import jp.panta.misskeyandroidclient.ui.users.SortedUsersFragment
-import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

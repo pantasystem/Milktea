@@ -11,11 +11,11 @@
                 type="jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount" />
         <variable
                 name="note"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData" />
 
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout

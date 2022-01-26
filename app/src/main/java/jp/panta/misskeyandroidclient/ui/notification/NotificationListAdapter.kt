@@ -13,11 +13,11 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNotificationBinding
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
-import jp.panta.misskeyandroidclient.ui.notes.reaction.ReactionCountAdapter
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
+import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
+import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemMessagingHistoryBinding
-import jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.HistoryViewData
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

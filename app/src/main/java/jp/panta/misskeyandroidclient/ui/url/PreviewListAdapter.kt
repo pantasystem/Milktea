@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFilePreviewBinding
 import jp.panta.misskeyandroidclient.databinding.ItemUrlPreviewBinding
-import jp.panta.misskeyandroidclient.viewmodel.notes.Preview
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.Preview
 
 class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCallback()){
     class ItemCallback : DiffUtil.ItemCallback<Preview>(){

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSelectPageToAddBinding
 import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.SelectPageTypeToAdd
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.SelectPageTypeToAdd
 
 /**
  * タブに追加する候補を表示するリストアダプター

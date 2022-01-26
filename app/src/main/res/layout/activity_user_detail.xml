@@ -6,7 +6,7 @@
         <import type="android.view.View"/>
         <variable
                 name="userViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel" />
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
 

@@ -14,9 +14,9 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessageBinding
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.ui.TitleSettable
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageViewData
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageViewModel
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageViewModelFactory
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewData
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalArgumentException

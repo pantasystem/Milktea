@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemAccountBinding
-import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData
-import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewData
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

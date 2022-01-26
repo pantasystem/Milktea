@@ -5,7 +5,7 @@
         <import type="android.view.View"/>
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
     </data>
     <LinearLayout
             android:orientation="vertical" android:layout_width="match_parent"

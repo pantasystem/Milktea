@@ -17,7 +17,7 @@ import jp.panta.misskeyandroidclient.ui.messaging.MessageFragment
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -3,7 +3,7 @@
     <data>
         <variable
                 name="reportViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.ReportViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel" />
     </data>
 
     <RelativeLayout

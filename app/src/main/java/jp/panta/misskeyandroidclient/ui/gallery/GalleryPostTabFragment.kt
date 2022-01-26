@@ -10,7 +10,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryPostTabBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostActionViewModel
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

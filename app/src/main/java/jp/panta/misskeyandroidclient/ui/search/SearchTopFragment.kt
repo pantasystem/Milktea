@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
-import jp.panta.misskeyandroidclient.ui.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalArgumentException

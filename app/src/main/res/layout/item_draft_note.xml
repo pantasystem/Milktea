@@ -6,10 +6,10 @@
         <import type="android.view.View" />
         <variable
                 name="note"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.draft.DraftNoteViewData" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNoteViewData" />
         <variable
                 name="draftNoteAction"
-                type="jp.panta.misskeyandroidclient.ui.notes.draft.DraftNoteActionCallback" />
+                type="jp.panta.misskeyandroidclient.ui.notes.view.draft.DraftNoteActionCallback" />
         <variable
                 name="fileListener"
                 type="jp.panta.misskeyandroidclient.viewmodel.file.FileListener" />

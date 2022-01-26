@@ -5,10 +5,10 @@
     <data>
         <variable
                 name="historyViewData"
-                type="jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData" />
+                type="jp.panta.misskeyandroidclient.ui.messaging.viewmodel.HistoryViewData" />
         <variable
                 name="historyViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel" />
         <import type="android.view.View" />
     </data>
     <androidx.cardview.widget.CardView

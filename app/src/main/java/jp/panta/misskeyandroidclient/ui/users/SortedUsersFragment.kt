@@ -15,15 +15,15 @@ import jp.panta.misskeyandroidclient.databinding.FragmentExploreUsersBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
-import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails{
+class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails {
 
     companion object{
         const val EXTRA_EXPLORE_USERS_TYPE = "jp.panta.misskeyandroidclient.viewmodel.users.ExploreUsersViewModel.Type"

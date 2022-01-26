@@ -21,8 +21,8 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
-import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
-import jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem
 
 class SettingAppearanceActivity : AppCompatActivity() {
 

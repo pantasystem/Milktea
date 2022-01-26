@@ -14,8 +14,8 @@ import jp.panta.misskeyandroidclient.databinding.ItemListBinding
 
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
+import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
+import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ListListAdapter @ExperimentalCoroutinesApi constructor(
@@ -74,7 +74,8 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
         lifecycleOwner: LifecycleOwner,
         onTryToEditCallback: OnTryToEditCallback?,
         addUserId: User.Id,
-        pullPushUserViewModel: UserListPullPushUserViewModel)
+        pullPushUserViewModel: UserListPullPushUserViewModel
+    )
     :this(listListViewModel, lifecycleOwner, onTryToEditCallback){
         this.addUserId = addUserId
         this.pullPushUserViewModel = pullPushUserViewModel

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.*
-import jp.panta.misskeyandroidclient.viewmodel.setting.*
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.*
 
 
 class SettingAdapter(

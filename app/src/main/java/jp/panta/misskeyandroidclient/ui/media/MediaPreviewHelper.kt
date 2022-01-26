@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
-import jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import java.lang.IllegalArgumentException
 
 object MediaPreviewHelper{

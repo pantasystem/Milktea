@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewActionType
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.components.HorizontalFilePreviewList
-import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 
 @Composable
 fun PickedImagePreview(

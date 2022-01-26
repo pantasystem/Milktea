@@ -11,15 +11,15 @@ import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
-import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDetails{
+class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDetails {
 
     companion object{
         const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.ui.users.SearchUserFragment"

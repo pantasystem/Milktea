@@ -17,8 +17,8 @@ import jp.panta.misskeyandroidclient.ui.settings.page.EditTabNameDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PagesAdapter
 import jp.panta.misskeyandroidclient.ui.settings.page.SelectPageToAddDialog
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

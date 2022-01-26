@@ -6,13 +6,13 @@
         <import type="android.view.View"/>
         <variable
                 name="childrenViewData"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteConversationViewData" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteConversationViewData" />
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
         <variable
                 name="noteDetailViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel" />
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView

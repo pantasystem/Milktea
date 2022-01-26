@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.ui.auth.AuthFragment
 import jp.panta.misskeyandroidclient.ui.auth.AuthResultFragment
 import jp.panta.misskeyandroidclient.ui.auth.Waiting4userAuthorizationFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
+import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalStateException

@@ -12,8 +12,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemCustomEmojiChoiceBinding
 import jp.panta.misskeyandroidclient.databinding.ItemEmojisCategoryBinding
 import jp.panta.misskeyandroidclient.databinding.ItemTextEmojiChoiceBinding
-import jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection
-import jp.panta.misskeyandroidclient.viewmodel.emojis.Emojis
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.Emojis
 
 class EmojiListAdapter(
     private val emojiSelection: EmojiSelection,

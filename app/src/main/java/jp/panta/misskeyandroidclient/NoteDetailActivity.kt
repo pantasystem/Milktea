@@ -14,11 +14,11 @@ import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.ui.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.detail.NoteDetailFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

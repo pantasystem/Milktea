@@ -15,8 +15,8 @@ import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

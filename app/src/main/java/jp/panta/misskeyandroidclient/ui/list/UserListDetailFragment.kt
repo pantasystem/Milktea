@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentListUserListBinding
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
+import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

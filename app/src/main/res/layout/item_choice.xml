@@ -5,13 +5,13 @@
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
         <variable
                 name="poll"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll.PollViewData" />
         <variable
                 name="choice"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.poll.PollViewData.Choice" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll.PollViewData.Choice" />
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
     </data>
     <FrameLayout
             android:layout_width="match_parent"

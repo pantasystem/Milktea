@@ -14,9 +14,9 @@ import jp.panta.misskeyandroidclient.databinding.ActivityFollowFollowerBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment
-import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

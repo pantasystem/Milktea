@@ -7,10 +7,10 @@
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable
                 name="accountViewData"
-                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewData" />
+                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewData" />
         <variable
                 name="accountViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
 
 
 

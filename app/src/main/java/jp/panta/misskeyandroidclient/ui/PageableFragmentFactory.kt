@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
-import jp.panta.misskeyandroidclient.ui.notes.TimelineFragment
-import jp.panta.misskeyandroidclient.ui.notes.detail.NoteDetailFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.ui.notification.NotificationFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

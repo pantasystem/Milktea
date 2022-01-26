@@ -14,7 +14,7 @@ import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
 import jp.panta.misskeyandroidclient.model.account.page.galleryTypes
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 
 /**
  * タブに追加する要素の候補を表示するダイアログ

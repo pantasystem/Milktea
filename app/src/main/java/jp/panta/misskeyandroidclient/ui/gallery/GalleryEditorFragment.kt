@@ -24,8 +24,8 @@ import jp.panta.misskeyandroidclient.model.file.toFile
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.gallery.EditType
-import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 import kotlinx.coroutines.*
 
 @FlowPreview

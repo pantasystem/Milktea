@@ -12,7 +12,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
 import jp.panta.misskeyandroidclient.ui.users.ClickableUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

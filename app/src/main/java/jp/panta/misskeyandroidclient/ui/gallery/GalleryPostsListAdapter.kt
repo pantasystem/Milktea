@@ -13,8 +13,8 @@ import jp.panta.misskeyandroidclient.databinding.ItemGalleryPhotoBinding
 import jp.panta.misskeyandroidclient.databinding.ItemGalleryPostBinding
 import jp.panta.misskeyandroidclient.ui.ViewDataBindingSimpleRecyclerViewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
-import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostState
-import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostsViewModel
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 
 class GalleryPostsListAdapter(
     val lifecycleOwner: LifecycleOwner,

@@ -16,9 +16,9 @@ import jp.panta.misskeyandroidclient.MessageActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessagingHistoryBinding
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.messaging.HistoryViewData
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModel
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageHistoryViewModelFactory
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.HistoryViewData
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

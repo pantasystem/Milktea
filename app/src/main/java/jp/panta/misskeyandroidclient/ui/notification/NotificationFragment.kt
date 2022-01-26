@@ -13,11 +13,11 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModelFactory
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
+import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
+import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
+import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

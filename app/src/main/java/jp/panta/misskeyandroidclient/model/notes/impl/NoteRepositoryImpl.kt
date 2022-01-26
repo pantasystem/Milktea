@@ -15,7 +15,7 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.PostNoteTask
 import kotlinx.coroutines.*
 import javax.inject.Inject
 

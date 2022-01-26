@@ -7,7 +7,7 @@
 
         <variable
                 name="customEmojiSelection"
-                type="jp.panta.misskeyandroidclient.viewmodel.emojis.EmojiSelection" />
+                type="jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection" />
 
         <variable
                 name="emoji"

@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
-import jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails
-import jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

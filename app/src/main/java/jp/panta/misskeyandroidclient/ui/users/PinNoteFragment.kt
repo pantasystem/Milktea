@@ -11,11 +11,11 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.ui.notes.TimelineListAdapter
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
+import jp.panta.misskeyandroidclient.ui.notes.view.TimelineListAdapter
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

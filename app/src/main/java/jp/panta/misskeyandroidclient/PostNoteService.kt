@@ -5,9 +5,8 @@ package jp.panta.misskeyandroidclient
 import android.app.IntentService
 import android.content.Intent
 import android.util.Log
-import jp.panta.misskeyandroidclient.model.notes.CreateNoteTask
 import jp.panta.misskeyandroidclient.model.notes.task
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.PostNoteTask
 
 @Suppress("DEPRECATION")
 @Deprecated("MiApplicationへ移植したため非推奨")

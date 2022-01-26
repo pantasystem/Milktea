@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityUrlPreviewSourceSettingBinding
 import jp.panta.misskeyandroidclient.setTheme
-import jp.panta.misskeyandroidclient.viewmodel.setting.url.UrlPreviewSourceSettingViewModel
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.url.UrlPreviewSourceSettingViewModel
 
 class UrlPreviewSourceSettingActivity : AppCompatActivity() {
 

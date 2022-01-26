@@ -11,10 +11,10 @@
                 type="jp.panta.misskeyandroidclient.model.users.User.Detail" />
         <variable
                 name="showUserDetails"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails" />
         <variable
                 name="toggleFollowViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView

@@ -15,9 +15,9 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAppAuthBinding
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
-import jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel
-import jp.panta.misskeyandroidclient.viewmodel.auth.app.AuthErrors
+import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
+import jp.panta.misskeyandroidclient.ui.auth.viewmodel.app.AppAuthViewModel
+import jp.panta.misskeyandroidclient.ui.auth.viewmodel.app.AuthErrors
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

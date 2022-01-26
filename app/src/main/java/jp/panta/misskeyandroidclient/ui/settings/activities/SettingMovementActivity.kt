@@ -10,9 +10,9 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
-import jp.panta.misskeyandroidclient.viewmodel.setting.BooleanSharedItem
-import jp.panta.misskeyandroidclient.viewmodel.setting.Group
-import jp.panta.misskeyandroidclient.viewmodel.setting.TextSharedItem
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.Group
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.TextSharedItem
 
 class SettingMovementActivity : AppCompatActivity() {
 

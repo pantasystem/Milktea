@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="note" type="jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewData"/>
+        <variable name="note" type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewData"/>
         <import type="android.view.View"/>
 
 
@@ -13,7 +13,7 @@
 
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReportBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.ReportViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 
 class ReportDialog : AppCompatDialogFragment(){
 

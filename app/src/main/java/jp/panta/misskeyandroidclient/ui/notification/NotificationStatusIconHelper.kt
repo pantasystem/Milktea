@@ -6,8 +6,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.notes.reaction.ReactionViewHelper
-import jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData
+import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionViewHelper
+import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 
 object NotificationStatusIconHelper {
 

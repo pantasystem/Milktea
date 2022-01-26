@@ -5,7 +5,7 @@
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
         <variable
                 name="actionViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 

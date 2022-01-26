@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogPageSettingActionBinding
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 
 class PageSettingActionDialog : BottomSheetDialogFragment(){
 

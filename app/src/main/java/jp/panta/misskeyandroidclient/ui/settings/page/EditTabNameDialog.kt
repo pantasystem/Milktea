@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogEditTabNameBinding
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageSettingViewModel
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 
 class EditTabNameDialog : AppCompatDialogFragment(){
 

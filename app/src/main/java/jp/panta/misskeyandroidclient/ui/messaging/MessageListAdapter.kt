@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemMessageRecipientBinding
 import jp.panta.misskeyandroidclient.databinding.ItemMessageSelfBinding
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageViewData
-import jp.panta.misskeyandroidclient.viewmodel.messaging.SelfMessageViewData
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewData
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.SelfMessageViewData
 import java.lang.IllegalArgumentException
 
 
