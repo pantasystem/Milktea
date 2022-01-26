@@ -15,8 +15,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
 import jp.panta.misskeyandroidclient.databinding.ActivityMediaBinding
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.view.media.ImageFragment
-import jp.panta.misskeyandroidclient.view.media.PlayerFragment
+import jp.panta.misskeyandroidclient.ui.media.ImageFragment
+import jp.panta.misskeyandroidclient.ui.media.PlayerFragment
 import java.io.Serializable
 
 class MediaActivity : AppCompatActivity() {

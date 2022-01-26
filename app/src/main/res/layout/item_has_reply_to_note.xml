@@ -4,11 +4,11 @@
     <data>
         <import type="android.view.View"/>
         <import type="jp.panta.misskeyandroidclient.R"/>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
-        <variable name="hasReplyToNote" type="jp.panta.misskeyandroidclient.viewmodel.notes.HasReplyToNoteViewData"/>
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
+        <variable name="hasReplyToNote" type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.HasReplyToNoteViewData"/>
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

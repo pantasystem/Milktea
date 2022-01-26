@@ -4,8 +4,8 @@
     <data>
         <variable
                 name="item"
-                type="jp.panta.misskeyandroidclient.viewmodel.setting.TextSharedItem" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+                type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.TextSharedItem" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:orientation="vertical"

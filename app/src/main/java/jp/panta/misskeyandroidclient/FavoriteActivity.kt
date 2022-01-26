@@ -7,11 +7,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

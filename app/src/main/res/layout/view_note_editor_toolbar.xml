@@ -3,14 +3,14 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <import type="android.view.View" />
         <variable
                 name="viewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel" />
         <variable
                 name="accountViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

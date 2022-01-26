@@ -5,15 +5,15 @@
     <data>
         <variable
                 name="noteEditorViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel" />
         <import type="android.view.View"/>
         <variable
                 name="accountViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
         <variable
                 name="simpleEditor"
-                type="jp.panta.misskeyandroidclient.view.notes.editor.SimpleEditor" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+                type="jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditor" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:layout_width="match_parent"

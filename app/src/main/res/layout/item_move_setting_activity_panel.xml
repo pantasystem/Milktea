@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="item"
-                type="jp.panta.misskeyandroidclient.viewmodel.setting.MoveSettingActivityPanel" />
+                type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.MoveSettingActivityPanel" />
     </data>
     <LinearLayout
             android:orientation="horizontal"

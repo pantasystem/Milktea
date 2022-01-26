@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.databinding.ActivityMessagingListBinding
-import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
+import jp.panta.misskeyandroidclient.ui.messaging.MessagingHistoryFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

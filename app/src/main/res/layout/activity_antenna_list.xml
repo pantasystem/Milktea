@@ -22,7 +22,7 @@
 
         <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragment2"
-                android:name="jp.panta.misskeyandroidclient.view.antenna.AntennaListFragment"
+                android:name="jp.panta.misskeyandroidclient.ui.antenna.AntennaListFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"

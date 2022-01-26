@@ -15,10 +15,10 @@ import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.view.list.ListListAdapter
-import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
-import jp.panta.misskeyandroidclient.viewmodel.list.ListListViewModel
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel
+import jp.panta.misskeyandroidclient.ui.list.ListListAdapter
+import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
+import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
+import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull

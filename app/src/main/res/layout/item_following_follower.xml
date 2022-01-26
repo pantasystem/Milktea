@@ -4,17 +4,17 @@
         xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View"/>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
 
         <variable
                 name="user"
                 type="jp.panta.misskeyandroidclient.model.users.User.Detail" />
         <variable
                 name="showUserDetails"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.ShowUserDetails" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails" />
         <variable
                 name="toggleFollowViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.ToggleFollowViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView

@@ -7,7 +7,7 @@
         <variable
                 name="fileViewData"
                 type="jp.panta.misskeyandroidclient.viewmodel.file.FileViewData" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <import type="android.view.View" />
 
         <variable

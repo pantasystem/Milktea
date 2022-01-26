@@ -12,12 +12,12 @@ import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
-import jp.panta.misskeyandroidclient.view.TitleSettable
-import jp.panta.misskeyandroidclient.view.messaging.MessageFragment
-import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
-import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
+import jp.panta.misskeyandroidclient.ui.TitleSettable
+import jp.panta.misskeyandroidclient.ui.messaging.MessageFragment
+import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
+import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -6,11 +6,11 @@
 
         <variable
                 name="galleryPostState"
-                type="jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostState" />
+                type="jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState" />
         <import type="android.view.View" />
         <variable
                 name="galleryPostsViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostsViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView

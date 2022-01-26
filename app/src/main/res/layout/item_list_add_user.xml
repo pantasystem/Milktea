@@ -8,7 +8,7 @@
                 type="jp.panta.misskeyandroidclient.model.list.UserList" />
         <variable
                 name="pullPushViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.list.UserListPullPushUserViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel" />
         <variable
                 name="addUserId"
                 type="jp.panta.misskeyandroidclient.model.users.User.Id" />

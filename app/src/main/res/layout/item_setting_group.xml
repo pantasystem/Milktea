@@ -5,7 +5,7 @@
         <import type="android.view.View"/>
         <variable
                 name="item"
-                type="jp.panta.misskeyandroidclient.viewmodel.setting.Group" />
+                type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.Group" />
 
     </data>
     <LinearLayout

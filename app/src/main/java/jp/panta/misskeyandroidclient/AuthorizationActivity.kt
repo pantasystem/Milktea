@@ -3,22 +3,17 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.model.auth.Authorization
-import jp.panta.misskeyandroidclient.model.auth.custom.App
-import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthBridge
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
-import jp.panta.misskeyandroidclient.view.auth.AuthFragment
-import jp.panta.misskeyandroidclient.view.auth.AuthResultFragment
-import jp.panta.misskeyandroidclient.view.auth.Waiting4userAuthorizationFragment
+import jp.panta.misskeyandroidclient.ui.auth.AuthFragment
+import jp.panta.misskeyandroidclient.ui.auth.AuthResultFragment
+import jp.panta.misskeyandroidclient.ui.auth.Waiting4userAuthorizationFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.auth.AuthViewModel
+import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import java.lang.IllegalStateException
 
 @FlowPreview

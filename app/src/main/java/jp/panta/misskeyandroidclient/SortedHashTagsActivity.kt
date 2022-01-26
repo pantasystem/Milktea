@@ -5,15 +5,15 @@ import android.os.Bundle
 import android.view.MenuItem
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivitySortedHashTagsBinding
-import jp.panta.misskeyandroidclient.view.tags.SortedHashTagFragment
+import jp.panta.misskeyandroidclient.ui.tags.SortedHashTagFragment
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 
 class SortedHashTagsActivity : AppCompatActivity() {
 
     companion object{
 
-        const val EXTRA_HASH_TAG_CONDITION = "jp.panta.misskeyandroidclient.view.tags.EXTRA_HASH_TAG_CONDITION"
-        const val EXTRA_TITLE = "jp.panta.misskeyandroidclient.view.tags.EXTRA_TITLE"
+        const val EXTRA_HASH_TAG_CONDITION = "jp.panta.misskeyandroidclient.ui.tags.EXTRA_HASH_TAG_CONDITION"
+        const val EXTRA_TITLE = "jp.panta.misskeyandroidclient.ui.tags.EXTRA_TITLE"
     }
 
     val binding: ActivitySortedHashTagsBinding by dataBinding()

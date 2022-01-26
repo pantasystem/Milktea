@@ -17,16 +17,16 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
 import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
-import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
+import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

@@ -8,7 +8,7 @@
                 type="jp.panta.misskeyandroidclient.model.account.page.PageType" />
         <variable
                 name="selectPageTypeToAdd"
-                type="jp.panta.misskeyandroidclient.viewmodel.setting.page.SelectPageTypeToAdd" />
+                type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.SelectPageTypeToAdd" />
     </data>
     <androidx.emoji.widget.EmojiTextView
             android:padding="8dp"

@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.explore
 
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.SortedUsersViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.io.Serializable

@@ -6,7 +6,7 @@
 
         <variable
                 name="emojiCategory"
-                type="jp.panta.misskeyandroidclient.viewmodel.emojis.Emojis.EmojiCategory" />
+                type="jp.panta.misskeyandroidclient.ui.emojis.viewmodel.Emojis.EmojiCategory" />
     </data>
     <FrameLayout
             android:orientation="vertical"

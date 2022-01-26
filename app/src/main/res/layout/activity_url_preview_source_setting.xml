@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.setting.url.UrlPreviewSourceSettingViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.url.UrlPreviewSourceSettingViewModel" />
         <import type="jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting" />
         <import type="android.view.View" />
     </data>

@@ -9,10 +9,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityGalleryPostsBinding
-import jp.panta.misskeyandroidclient.view.gallery.GalleryEditorFragment
-import jp.panta.misskeyandroidclient.view.gallery.GalleryPostTabFragment
-import jp.panta.misskeyandroidclient.viewmodel.gallery.Action
-import jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryPostActionViewModel
+import jp.panta.misskeyandroidclient.ui.gallery.GalleryEditorFragment
+import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostTabFragment
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.Action
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

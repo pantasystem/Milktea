@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

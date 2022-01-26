@@ -22,7 +22,7 @@
                 android:id="@+id/draftNotesFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:name="jp.panta.misskeyandroidclient.view.notes.draft.DraftNotesFragment"
+                android:name="jp.panta.misskeyandroidclient.ui.notes.view.draft.DraftNotesFragment"
                 tools:layout="@layout/fragment_draft_notes"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 />

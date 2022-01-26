@@ -3,13 +3,13 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable name="userViewData"
-                  type="jp.panta.misskeyandroidclient.viewmodel.users.UserViewData"/>
+                  type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData"/>
 
         <variable
                 name="userListDetailViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel" />
 
 
     </data>

@@ -6,13 +6,13 @@
 
         <variable
                 name="user"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.UserViewData" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData" />
 
         <variable
                 name="selectedUserViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel" />
 
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView android:layout_width="match_parent"
             android:layout_height="wrap_content"

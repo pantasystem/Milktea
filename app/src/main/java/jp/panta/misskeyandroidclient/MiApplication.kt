@@ -57,7 +57,7 @@ import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*

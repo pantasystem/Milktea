@@ -7,7 +7,7 @@ import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
-import jp.panta.misskeyandroidclient.view.SafeUnbox
+import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 

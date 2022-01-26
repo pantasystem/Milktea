@@ -4,7 +4,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable
                 name="fileViewData"
                 type="jp.panta.misskeyandroidclient.viewmodel.file.FileViewData" />
