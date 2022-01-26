@@ -18,9 +18,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
-import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
-import jp.panta.misskeyandroidclient.view.users.PinNoteFragment
+import jp.panta.misskeyandroidclient.ui.notes.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.ui.users.PinNoteFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
@@ -32,8 +32,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.view.gallery.GalleryPostsFragment
-import jp.panta.misskeyandroidclient.view.users.ReportDialog
+import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
+import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn

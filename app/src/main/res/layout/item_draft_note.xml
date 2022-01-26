@@ -9,11 +9,11 @@
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.draft.DraftNoteViewData" />
         <variable
                 name="draftNoteAction"
-                type="jp.panta.misskeyandroidclient.view.notes.draft.DraftNoteActionCallback" />
+                type="jp.panta.misskeyandroidclient.ui.notes.draft.DraftNoteActionCallback" />
         <variable
                 name="fileListener"
                 type="jp.panta.misskeyandroidclient.viewmodel.file.FileListener" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

@@ -6,7 +6,7 @@
         <import type="android.view.View"/>
 
 
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
 
 
         <import type="jp.panta.misskeyandroidclient.R"/>

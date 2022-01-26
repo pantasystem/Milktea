@@ -6,8 +6,8 @@ import android.view.MenuItem
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivityNotificationsBinding
-import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
+import jp.panta.misskeyandroidclient.ui.notes.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory

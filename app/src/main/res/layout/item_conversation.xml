@@ -13,7 +13,7 @@
         <variable
                 name="noteDetailViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.notes.detail.NoteDetailViewModel" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

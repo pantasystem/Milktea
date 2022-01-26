@@ -17,7 +17,7 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
 import jp.panta.misskeyandroidclient.util.file.toAppFile
-import jp.panta.misskeyandroidclient.view.drive.CreateFolderDialog
+import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveSelectableMode
 import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel

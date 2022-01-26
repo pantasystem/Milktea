@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
 
         <variable
                 name="list"
@@ -16,7 +16,7 @@
 
         <variable
                 name="tryToEditCallback"
-                type="jp.panta.misskeyandroidclient.view.list.ListListAdapter.OnTryToEditCallback" />
+                type="jp.panta.misskeyandroidclient.ui.list.ListListAdapter.OnTryToEditCallback" />
     </data>
 
     <androidx.cardview.widget.CardView

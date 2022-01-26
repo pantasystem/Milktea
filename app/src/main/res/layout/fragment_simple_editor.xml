@@ -12,8 +12,8 @@
                 type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
         <variable
                 name="simpleEditor"
-                type="jp.panta.misskeyandroidclient.view.notes.editor.SimpleEditor" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+                type="jp.panta.misskeyandroidclient.ui.notes.editor.SimpleEditor" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:layout_width="match_parent"

@@ -11,7 +11,7 @@
 
 
 
-        <jp.panta.misskeyandroidclient.view.PhotoViewViewPager
+        <jp.panta.misskeyandroidclient.ui.PhotoViewViewPager
                 android:id="@+id/mediaViewPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

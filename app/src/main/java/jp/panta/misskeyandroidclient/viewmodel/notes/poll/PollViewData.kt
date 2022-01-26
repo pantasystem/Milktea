@@ -1,11 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel.notes.poll
 
 import android.util.Log
-import android.widget.TextView
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
-import jp.panta.misskeyandroidclient.view.SafeUnbox
+import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import java.lang.IndexOutOfBoundsException
 
 class PollViewData(private val poll: Poll, val noteId: String){

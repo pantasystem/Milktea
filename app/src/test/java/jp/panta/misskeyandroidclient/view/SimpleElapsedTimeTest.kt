@@ -1,11 +1,10 @@
 package jp.panta.misskeyandroidclient.view
 
+import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
 import kotlinx.datetime.Clock
 import org.junit.Test
 
 import org.junit.Before
-import java.util.*
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
 

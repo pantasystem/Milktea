@@ -53,16 +53,16 @@
                         android:scheme="misskey" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.settings.activities.UrlPreviewSourceSettingActivity" />
+        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.UrlPreviewSourceSettingActivity" />
         <activity android:name=".DraftNotesActivity" />
         <activity android:name=".SortedHashTagsActivity" />
         <activity android:name=".SortedUsersActivity" />
         <activity android:name=".AntennaEditorActivity" />
         <activity android:name=".AntennaListActivity" />
-        <activity android:name=".view.settings.activities.PageSettingActivity" />
+        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity" />
         <activity android:name=".MessagingListActivity" />
         <activity android:name=".NotificationsActivity" />
-        <activity android:name=".view.settings.activities.ReactionSettingActivity" />
+        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.ReactionSettingActivity" />
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
                 android:theme="@style/LicensePageTheme" />
@@ -95,8 +95,8 @@
                 android:exported="false" />
 
         <activity android:name=".MediaActivity" />
-        <activity android:name=".view.settings.activities.SettingAppearanceActivity" />
-        <activity android:name=".view.settings.activities.SettingMovementActivity" />
+        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.SettingAppearanceActivity" />
+        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.SettingMovementActivity" />
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings" />

@@ -10,7 +10,7 @@
                 name="accountViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
         <import type="android.view.View"/>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

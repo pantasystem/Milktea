@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.view.users.selectable.SelectableUsersAdapter
+import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel

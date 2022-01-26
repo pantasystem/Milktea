@@ -7,7 +7,7 @@
 
         <import type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel.Source"/>
         <import type="android.view.View" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable
                 name="antennaEditorViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaEditorViewModel" />

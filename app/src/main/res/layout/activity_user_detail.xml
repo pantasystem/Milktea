@@ -7,7 +7,7 @@
         <variable
                 name="userViewModel"
                 type="jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

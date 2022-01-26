@@ -25,7 +25,7 @@
         </com.google.android.material.tabs.TabLayout>
 
 
-        <jp.panta.misskeyandroidclient.view.BottomSheetViewPager
+        <jp.panta.misskeyandroidclient.ui.BottomSheetViewPager
                 android:id="@+id/reaction_history_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

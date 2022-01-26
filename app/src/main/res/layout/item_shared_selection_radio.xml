@@ -8,7 +8,7 @@
         <variable
                 name="choice"
                 type="jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem.Choice" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:orientation="horizontal"

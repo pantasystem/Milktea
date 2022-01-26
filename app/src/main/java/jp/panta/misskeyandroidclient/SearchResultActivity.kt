@@ -16,9 +16,9 @@ import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
-import jp.panta.misskeyandroidclient.view.users.SearchUserFragment
+import jp.panta.misskeyandroidclient.ui.notes.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.ui.users.SearchUserFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
