@@ -4,10 +4,13 @@ import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.toFile
+import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
@@ -27,6 +30,10 @@ class NoteEditorViewModel @Inject constructor(
     private val draftNoteDao: DraftNoteDao,
     loggerFactory: Logger.Factory,
     private val miCore: MiCore,
+    val noteRepository: NoteRepository,
+    val filePropertyDataSource: FilePropertyDataSource,
+    val metaRepository: MetaRepository,
+    val driveFileRepository: DriveFileRepository
 ) : ViewModel() {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -66,7 +73,7 @@ class NoteEditorViewModel @Inject constructor(
     val reply = _state.map {
         it.replyId?.let { noteId ->
             runCatching {
-                miCore.getNoteRepository().find(noteId)
+                noteRepository.find(noteId)
             }.getOrNull()
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
@@ -81,7 +88,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     val maxTextLength = miCore.getCurrentAccount().filterNotNull().map {
-        miCore.getMetaRepository().get(it.instanceDomain)?.maxNoteTextLength ?: 1500
+        metaRepository.get(it.instanceDomain)?.maxNoteTextLength ?: 1500
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val textRemaining = combine(maxTextLength, text) { max, t ->
@@ -228,12 +235,12 @@ class NoteEditorViewModel @Inject constructor(
                 val reservationPostingAt = _state.value.reservationPostingAt
                 if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                     val createNote = _state.value.toCreateNote(account)
-                    miCore.getTaskExecutor().dispatch(createNote.task(miCore.getNoteRepository()))
+                    miCore.getTaskExecutor().dispatch(createNote.task(noteRepository))
                 } else {
                     runCatching {
                         val dfNote = toDraftNote()
 
-                        val result = miCore.getDraftNoteDAO().fullInsert(dfNote)
+                        val result = draftNoteDao.fullInsert(dfNote)
                         dfNote.draftNoteId = result
                         miCore.getNoteReservationPostExecutor().register(dfNote)
                     }.onFailure {
@@ -267,7 +274,7 @@ class NoteEditorViewModel @Inject constructor(
             is AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     runCatching {
-                        miCore.getDriveFileRepository().toggleNsfw(appFile.id)
+                        driveFileRepository.toggleNsfw(appFile.id)
                     }
                 }
             }
@@ -286,8 +293,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     private fun addAllFileProperty(fpList: List<FileProperty>) {
-        val files = files.value?.toMutableList()
-            ?: mutableListOf()
+        val files = state.value.files.toMutableList()
         files.addAll(fpList.map {
             AppFile.Remote(it.id)
         })
@@ -299,7 +305,7 @@ class NoteEditorViewModel @Inject constructor(
     fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getFilePropertyDataSource().findIn(ids)
+                filePropertyDataSource.findIn(ids)
             }.onSuccess {
                 addAllFileProperty(it)
             }
