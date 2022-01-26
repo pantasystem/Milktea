@@ -109,7 +109,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             mBinding.inputCw.setTokenizer(CustomEmojiTokenizer())
         }.launchIn(lifecycleScope)
 
-        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = null, quoteToNoteId = null, draftNote = null)
+        val factory = NoteEditorViewModelFactory(miApplication)
         val viewModel = ViewModelProvider(requireActivity(), factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
 

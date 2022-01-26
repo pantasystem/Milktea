@@ -210,15 +210,15 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         val factory = NoteEditorViewModelFactory(
             miApplication,
-            replyToNoteId = replyToNoteId,
-            quoteToNoteId = quoteToNoteId,
-            draftNote = draftNote
         )
         val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
         mViewModel = viewModel
         if (!text.isNullOrBlank()) {
             viewModel.changeText(text)
         }
+        viewModel.setReplyTo(replyToNoteId)
+        viewModel.setRenoteTo(quoteToNoteId)
+        viewModel.setDraftNote(draftNote)
         binding.viewModel = viewModel
         noteEditorToolbar.viewModel = viewModel
         noteEditorToolbar.lifecycleOwner = this

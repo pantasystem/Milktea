@@ -23,22 +23,16 @@ import java.util.*
 class NoteEditorViewModel(
     private val miCore: MiCore,
     private val draftNoteDao: DraftNoteDao,
-    replyId: Note.Id? = null,
-    quoteToNoteId: Note.Id? = null,
+//    replyId: Note.Id? = null,
+//    quoteToNoteId: Note.Id? = null,
     loggerFactory: Logger.Factory,
-    dn: DraftNote? = null,
+//    dn: DraftNote? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
-    private val _state = MutableStateFlow(
-        dn?.toNoteEditingState()
-            ?: NoteEditingState(
-                renoteId = quoteToNoteId,
-                replyId = replyId
-            )
-    )
+    private val _state = MutableStateFlow(NoteEditingState())
     val state: StateFlow<NoteEditingState> = _state
 
     val text = _state.map {
@@ -66,7 +60,6 @@ class NoteEditorViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val draftNote = MutableLiveData<DraftNote>(dn)
 
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
     val reply = _state.map {
@@ -169,6 +162,18 @@ class NoteEditorViewModel(
 
 
     val isSaveNoteAsDraft = EventBus<Long?>()
+
+    fun setRenoteTo(noteId: Note.Id?) {
+        _state.value = _state.value.changeRenoteId(noteId)
+    }
+
+    fun setReplyTo(noteId: Note.Id?) {
+        _state.value = _state.value.changeReplyTo(noteId)
+    }
+
+    fun setDraftNote(note: DraftNote?) {
+        _state.value = _state.value.setDraftNote(note)
+    }
 
     init {
         miCore.getCurrentAccount().filterNotNull().onEach {
@@ -418,7 +423,7 @@ class NoteEditorViewModel(
                 Date(it)
             }
         ).apply {
-            this.draftNoteId = draftNote.value?.draftNoteId
+            setDraftNote(this)
         }
     }
 
