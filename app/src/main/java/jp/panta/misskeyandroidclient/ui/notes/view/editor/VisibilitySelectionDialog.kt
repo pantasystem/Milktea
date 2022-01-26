@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBinding
 import jp.panta.misskeyandroidclient.model.notes.CanLocalOnly
@@ -14,16 +16,17 @@ import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import java.util.*
 
+@AndroidEntryPoint
 class VisibilitySelectionDialog : AppCompatDialogFragment(){
 
 
+    private val viewModel: NoteEditorViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val tmpDialog = super.onCreateDialog(savedInstanceState)
 
         val view = View.inflate(tmpDialog.context, R.layout.dialog_visibility_selection,null)
         val binding = DataBindingUtil.bind<DialogVisibilitySelectionBinding>(view)
-        val viewModel = ViewModelProvider(requireActivity())[NoteEditorViewModel::class.java]
 
 
         val visibilities = arrayOf(
