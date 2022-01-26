@@ -41,6 +41,22 @@ data class NoteEditingState(
         get() = this.visibility.isLocalOnly()
 
 
+    fun setDraftNote(draftNote: DraftNote?) : NoteEditingState {
+        return draftNote?.toNoteEditingState()?: this
+    }
+
+    fun changeRenoteId(renoteId: Note.Id?): NoteEditingState {
+        return copy(
+            renoteId = renoteId
+        )
+    }
+
+    fun changeReplyTo(replyId: Note.Id?): NoteEditingState {
+        return copy(
+            replyId = replyId
+        )
+    }
+
     fun checkValidate(textMaxLength: Int = 3000) : Boolean {
         if(this.files.size > 4) {
             return false

@@ -12,11 +12,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -33,7 +35,6 @@ import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,11 +52,12 @@ interface SimpleEditor{
 
 @ExperimentalCoroutinesApi
 @FlowPreview
+@AndroidEntryPoint
 class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEditor {
 
 
 
-    var mViewModel: NoteEditorViewModel? = null
+    val mViewModel: NoteEditorViewModel by activityViewModels()
     private val mBinding: FragmentSimpleEditorBinding by dataBinding()
 
     override val isShowEditorMenu: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -109,10 +111,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             mBinding.inputCw.setTokenizer(CustomEmojiTokenizer())
         }.launchIn(lifecycleScope)
 
-        val factory = NoteEditorViewModelFactory(miApplication, replyToNoteId = null, quoteToNoteId = null, draftNote = null)
-        val viewModel = ViewModelProvider(requireActivity(), factory)[NoteEditorViewModel::class.java]
-        mViewModel = viewModel
 
+        val viewModel = mViewModel
         mBinding.noteEditorViewModel = viewModel
         mBinding.filePreview.apply {
             setContent {
@@ -224,8 +224,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     private fun onSelect(emoji: Emoji) {
         val pos = mBinding.inputMainText.selectionEnd
-        mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
-            mBinding.inputMainText.setText(mViewModel?.text?.value?: "")
+        mViewModel.addEmoji(emoji, pos).let{ newPos ->
+            mBinding.inputMainText.setText(mViewModel.text.value?: "")
             mBinding.inputMainText.setSelection(newPos)
             Log.d("NoteEditorActivity", "入力されたデータ:${mBinding.inputMainText.text}")
         }
@@ -233,8 +233,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     private fun onSelect(emoji: String) {
         val pos = mBinding.inputMainText.selectionEnd
-        mViewModel?.addEmoji(emoji, pos)?.let{ newPos ->
-            mBinding.inputMainText.setText(mViewModel?.text?.value?: "")
+        mViewModel.addEmoji(emoji, pos).let{ newPos ->
+            mBinding.inputMainText.setText(mViewModel.text.value?: "")
             mBinding.inputMainText.setSelection(newPos)
         }
     }
@@ -267,7 +267,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     }
 
     private fun showDriveFileSelector(){
-        val selectedSize = mViewModel?.totalImageCount?.value?: 0
+        val selectedSize = mViewModel.totalImageCount.value?: 0
 
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = 4 - selectedSize
@@ -293,9 +293,9 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     @FlowPreview
     @ExperimentalCoroutinesApi
     private fun startSearchAndSelectUser(){
-        val selectedUserIds = mViewModel?.address?.value?.mapNotNull {
+        val selectedUserIds = mViewModel.address.value.mapNotNull {
             it.userId?: it.user.value?.id
-        } ?: emptyList()
+        }
 
         val intent = SearchAndSelectUserActivity.newIntent(requireContext(), selectedUserIds = selectedUserIds)
         selectUserResult.launch(intent)
@@ -319,7 +319,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 //
 //    override fun onDetach(file: File?) {
 //        file?.let{
-//            mViewModel?.removeFileNoteEditorData(file)
+//            mViewModel.removeFileNoteEditorData(file)
 //        }
 //    }
 
@@ -332,10 +332,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
 
     override fun goToNormalEditor() {
-        mViewModel?.toDraftNote()?.let{
+        mViewModel.toDraftNote().let{
             val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = it)
             startActivity(intent)
-            mViewModel?.clear()
+            mViewModel.clear()
         }
 
     }
@@ -345,7 +345,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             val selectedFilePropertyIds = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
                 it as FileProperty.Id
             }
-            mViewModel?.addFilePropertyFromIds(selectedFilePropertyIds)
+            mViewModel.addFilePropertyFromIds(selectedFilePropertyIds)
         }
 
     }
@@ -354,14 +354,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         val uri = result?.data?.data
         if(uri != null){
-            val size = mViewModel?.fileTotal()
-
-            if(size != null && size < 4){
-                mViewModel?.add(uri.toAppFile(requireContext()))
-                Log.d("NoteEditorActivity", "成功しました")
-            }else{
-                Log.d("NoteEditorActivity", "失敗しました")
-            }
+            mViewModel.add(uri.toAppFile(requireContext()))
+            Log.d("NoteEditorActivity", "成功しました")
 
         }
     }
@@ -380,7 +374,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         if(result.resultCode == RESULT_OK && result.data != null){
             val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
             if(changed != null) {
-                mViewModel?.setAddress(changed.added, changed.removed)
+                mViewModel.setAddress(changed.added, changed.removed)
             }
         }
     }
@@ -393,8 +387,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
             if(changed != null){
                 val pos = mBinding.inputMainText.selectionEnd
-                mViewModel?.addMentionUsers(changed.selectedUsers, pos)?.let { newPos ->
-                    mBinding.inputMainText.setText(mViewModel?.text?.value?: "")
+                mViewModel.addMentionUsers(changed.selectedUsers, pos).let { newPos ->
+                    mBinding.inputMainText.setText(mViewModel.text.value?: "")
                     mBinding.inputMainText.setSelection(newPos)
                 }
             }

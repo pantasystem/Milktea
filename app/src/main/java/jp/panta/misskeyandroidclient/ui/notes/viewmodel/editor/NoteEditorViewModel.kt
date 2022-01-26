@@ -1,12 +1,16 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.file.toFile
+import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
@@ -19,26 +23,24 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import java.io.IOException
 import java.util.*
+import javax.inject.Inject
 
-class NoteEditorViewModel(
-    private val miCore: MiCore,
+@HiltViewModel
+class NoteEditorViewModel @Inject constructor(
     private val draftNoteDao: DraftNoteDao,
-    replyId: Note.Id? = null,
-    quoteToNoteId: Note.Id? = null,
     loggerFactory: Logger.Factory,
-    dn: DraftNote? = null,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val miCore: MiCore,
+    val noteRepository: NoteRepository,
+    val filePropertyDataSource: FilePropertyDataSource,
+    val metaRepository: MetaRepository,
+    val driveFileRepository: DriveFileRepository
 ) : ViewModel() {
+
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
-    private val _state = MutableStateFlow(
-        dn?.toNoteEditingState()
-            ?: NoteEditingState(
-                renoteId = quoteToNoteId,
-                replyId = replyId
-            )
-    )
+    private val _state = MutableStateFlow(NoteEditingState())
     val state: StateFlow<NoteEditingState> = _state
 
     val text = _state.map {
@@ -66,13 +68,12 @@ class NoteEditorViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val draftNote = MutableLiveData<DraftNote>(dn)
 
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
     val reply = _state.map {
         it.replyId?.let { noteId ->
             runCatching {
-                miCore.getNoteRepository().find(noteId)
+                noteRepository.find(noteId)
             }.getOrNull()
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
@@ -87,7 +88,7 @@ class NoteEditorViewModel(
 
 
     val maxTextLength = miCore.getCurrentAccount().filterNotNull().map {
-        miCore.getMetaRepository().get(it.instanceDomain)?.maxNoteTextLength ?: 1500
+        metaRepository.get(it.instanceDomain)?.maxNoteTextLength ?: 1500
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val textRemaining = combine(maxTextLength, text) { max, t ->
@@ -170,6 +171,18 @@ class NoteEditorViewModel(
 
     val isSaveNoteAsDraft = EventBus<Long?>()
 
+    fun setRenoteTo(noteId: Note.Id?) {
+        _state.value = _state.value.changeRenoteId(noteId)
+    }
+
+    fun setReplyTo(noteId: Note.Id?) {
+        _state.value = _state.value.changeReplyTo(noteId)
+    }
+
+    fun setDraftNote(note: DraftNote?) {
+        _state.value = _state.value.setDraftNote(note)
+    }
+
     init {
         miCore.getCurrentAccount().filterNotNull().onEach {
             _state.value = runCatching {
@@ -222,12 +235,12 @@ class NoteEditorViewModel(
                 val reservationPostingAt = _state.value.reservationPostingAt
                 if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                     val createNote = _state.value.toCreateNote(account)
-                    miCore.getTaskExecutor().dispatch(createNote.task(miCore.getNoteRepository()))
+                    miCore.getTaskExecutor().dispatch(createNote.task(noteRepository))
                 } else {
                     runCatching {
                         val dfNote = toDraftNote()
 
-                        val result = miCore.getDraftNoteDAO().fullInsert(dfNote)
+                        val result = draftNoteDao.fullInsert(dfNote)
                         dfNote.draftNoteId = result
                         miCore.getNoteReservationPostExecutor().register(dfNote)
                     }.onFailure {
@@ -261,7 +274,7 @@ class NoteEditorViewModel(
             is AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     runCatching {
-                        miCore.getDriveFileRepository().toggleNsfw(appFile.id)
+                        driveFileRepository.toggleNsfw(appFile.id)
                     }
                 }
             }
@@ -280,8 +293,7 @@ class NoteEditorViewModel(
 
 
     private fun addAllFileProperty(fpList: List<FileProperty>) {
-        val files = files.value?.toMutableList()
-            ?: mutableListOf()
+        val files = state.value.files.toMutableList()
         files.addAll(fpList.map {
             AppFile.Remote(it.id)
         })
@@ -293,7 +305,7 @@ class NoteEditorViewModel(
     fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getFilePropertyDataSource().findIn(ids)
+                filePropertyDataSource.findIn(ids)
             }.onSuccess {
                 addAllFileProperty(it)
             }
@@ -418,7 +430,7 @@ class NoteEditorViewModel(
                 Date(it)
             }
         ).apply {
-            this.draftNoteId = draftNote.value?.draftNoteId
+            setDraftNote(this)
         }
     }
 

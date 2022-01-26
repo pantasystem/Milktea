@@ -5,7 +5,8 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.model.notes.expiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
@@ -13,14 +14,14 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.util.*
 
+@AndroidEntryPoint
 class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateSetListener{
 
-    private var mViewModel: NoteEditorViewModel? = null
+    private val mViewModel: NoteEditorViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val viewModel  = ViewModelProvider(requireActivity())[NoteEditorViewModel::class.java]
-        mViewModel = viewModel
+        val viewModel = mViewModel
         val date = viewModel.poll.value?.expiresAt?.expiresAt()?: Clock.System.now()
 
 
@@ -32,7 +33,7 @@ class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateS
     }
 
     override fun onDateSet(p0: DatePicker?, p1: Int, p2: Int, p3: Int) {
-        val date = mViewModel?.poll?.value?.expiresAt?.expiresAt()?: Clock.System.now()
+        val date = mViewModel.poll.value?.expiresAt?.expiresAt()?: Clock.System.now()
 
         val c = Calendar.getInstance()
         c.time = Date(date.toEpochMilliseconds())
@@ -41,8 +42,8 @@ class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateS
         c.set(Calendar.MONTH, p2)
         c.set(Calendar.DAY_OF_MONTH, p3)
 
-        mViewModel?.state?.value?.let { state ->
-            mViewModel?.updateState(
+        mViewModel.state.value.let { state ->
+            mViewModel.updateState(
                 state.copy(
                     poll = state.poll?.copy(
                         expiresAt = PollExpiresAt.DateAndTime(Instant.fromEpochMilliseconds(c.time.time))

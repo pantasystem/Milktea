@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
@@ -19,6 +20,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
@@ -44,7 +46,6 @@ import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModelFactory
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,6 +53,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
 
+@AndroidEntryPoint
 class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     companion object {
@@ -96,7 +98,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
     }
 
-    private lateinit var mViewModel: NoteEditorViewModel
+    val mViewModel: NoteEditorViewModel by viewModels<NoteEditorViewModel>()
 
     private lateinit var mBinding: ActivityNoteEditorBinding
 
@@ -208,26 +210,21 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             binding.cw.setTokenizer(CustomEmojiTokenizer())
         }.launchIn(lifecycleScope)
 
-        val factory = NoteEditorViewModelFactory(
-            miApplication,
-            replyToNoteId = replyToNoteId,
-            quoteToNoteId = quoteToNoteId,
-            draftNote = draftNote
-        )
-        val viewModel = ViewModelProvider(this, factory)[NoteEditorViewModel::class.java]
-        mViewModel = viewModel
         if (!text.isNullOrBlank()) {
-            viewModel.changeText(text)
+            mViewModel.changeText(text)
         }
-        binding.viewModel = viewModel
-        noteEditorToolbar.viewModel = viewModel
+        mViewModel.setReplyTo(replyToNoteId)
+        mViewModel.setRenoteTo(quoteToNoteId)
+        mViewModel.setDraftNote(draftNote)
+        binding.viewModel = mViewModel
+        noteEditorToolbar.viewModel = mViewModel
         noteEditorToolbar.lifecycleOwner = this
 
         binding.filePreview.apply {
             setContent {
                 MdcTheme {
                     NoteFilePreview(
-                        noteEditorViewModel = viewModel,
+                        noteEditorViewModel = mViewModel,
                         fileRepository = miApplication.getDriveFileRepository(),
                         dataSource = miApplication.getFilePropertyDataSource(),
                         onShow = {
@@ -253,7 +250,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
 
         lifecycleScope.launchWhenResumed {
-            viewModel.poll.distinctUntilChangedBy {
+            mViewModel.poll.distinctUntilChangedBy {
                 it == null
             }.collect { poll ->
                 if (poll == null) {
@@ -265,38 +262,38 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
 
         mBinding.cw.addTextChangedListener { e ->
-            viewModel.setCw(e?.toString())
+            mViewModel.setCw(e?.toString())
         }
 
         mBinding.inputMain.addTextChangedListener { e ->
-            viewModel.setText((e?.toString() ?: ""))
+            mViewModel.setText((e?.toString() ?: ""))
         }
 
 
-        viewModel.isPost.observe(this) {
+        mViewModel.isPost.observe(this) {
             if (it) {
                 noteEditorToolbar.postButton.isEnabled = false
                 finish()
             }
         }
 
-        viewModel.showVisibilitySelectionEvent.observe(this) {
+        mViewModel.showVisibilitySelectionEvent.observe(this) {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(supportFragmentManager, "NoteEditor")
         }
 
         lifecycleScope.launchWhenResumed {
-            viewModel.address.collect {
+            mViewModel.address.collect {
                 userChipAdapter.submitList(it)
             }
         }
 
-        viewModel.showPollTimePicker.observe(this) {
+        mViewModel.showPollTimePicker.observe(this) {
             PollTimePickerDialog().show(supportFragmentManager, "TimePicker")
         }
 
-        viewModel.showPollDatePicker.observe(this) {
+        mViewModel.showPollDatePicker.observe(this) {
             PollDatePickerDialog().show(supportFragmentManager, "DatePicker")
         }
 
