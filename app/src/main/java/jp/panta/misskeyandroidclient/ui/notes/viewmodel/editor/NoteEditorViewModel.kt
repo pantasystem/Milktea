@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -19,16 +20,16 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import java.io.IOException
 import java.util.*
+import javax.inject.Inject
 
-class NoteEditorViewModel(
-    private val miCore: MiCore,
+@HiltViewModel
+class NoteEditorViewModel @Inject constructor(
     private val draftNoteDao: DraftNoteDao,
-//    replyId: Note.Id? = null,
-//    quoteToNoteId: Note.Id? = null,
     loggerFactory: Logger.Factory,
-//    dn: DraftNote? = null,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val miCore: MiCore,
 ) : ViewModel() {
+
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 

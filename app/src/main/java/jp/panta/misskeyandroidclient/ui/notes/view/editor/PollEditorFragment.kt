@@ -5,16 +5,15 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
 import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -24,12 +23,14 @@ import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
 
+@AndroidEntryPoint
 class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
     private val mBinding: FragmentPollEditorBinding by dataBinding()
     private var mNoteEditorViewModel: NoteEditorViewModel? = null
 
 
+    val viewModel: NoteEditorViewModel by activityViewModels()
 
     @OptIn(ExperimentalTime::class, FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,9 +40,6 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
         val layoutManager = LinearLayoutManager(this.context)
         mBinding.choices.layoutManager = layoutManager
-        val miApplication = context?.applicationContext as MiApplication
-        val viewModel = ViewModelProvider(requireActivity(), NoteEditorViewModelFactory(miApplication)).get(
-            NoteEditorViewModel::class.java)
         mNoteEditorViewModel = viewModel
         lifecycleScope.launchWhenResumed {
             viewModel.poll.filterNotNull().collect { poll ->
