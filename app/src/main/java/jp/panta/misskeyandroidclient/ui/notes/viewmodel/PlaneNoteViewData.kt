@@ -223,7 +223,9 @@ open class PlaneNoteViewData (
 
     var job: Job? = null
 
-    val expanded = MutableLiveData<Boolean>(false)
+    // NOTE: (Panta) cwの時点で大半が隠されるので折りたたむ必要はない
+    // NOTE: (Panta) cwを折りたたんでしまうとcw展開後に自動的に折りたたまれてしまって二度手間になる可能性がある。
+    val expanded = MutableLiveData<Boolean>(cw != null)
 
 
     init {
