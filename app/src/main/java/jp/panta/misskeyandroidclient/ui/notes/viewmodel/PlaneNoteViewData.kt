@@ -21,7 +21,6 @@ import kotlin.collections.HashMap
 open class PlaneNoteViewData (
     val note: NoteRelation,
     val account: Account,
-    var determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val noteTranslationStore: NoteTranslationStore
 ) : NoteViewData {
@@ -81,11 +80,9 @@ open class PlaneNoteViewData (
     val cwNode = MFMParser.parse(toShowNote.note.cw, toShowNote.note.emojis)
 
     //true　折り畳み
-    val text = toShowNote.note.text.apply{
-        determineTextLength.setText(this)
-    }
+    val text = toShowNote.note.text
 
-    val contentFolding = MutableLiveData(cw != null || determineTextLength.isLong())
+    val contentFolding = MutableLiveData(cw != null)
     val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding){
         if(it) "もっと見る: ${text?.length}文字" else "隠す"
     }
@@ -225,9 +222,15 @@ open class PlaneNoteViewData (
 
     var job: Job? = null
 
-    init {
+    val expanded = MutableLiveData<Boolean>(false)
 
+
+    init {
         require(toShowNote.note.id != subNote?.note?.id)
+    }
+
+    fun expand() {
+        expanded.value = true
     }
 
 }

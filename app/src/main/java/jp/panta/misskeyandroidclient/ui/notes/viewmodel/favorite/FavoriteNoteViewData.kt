@@ -15,7 +15,7 @@ class FavoriteNoteViewData(
     determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     translationStore: NoteTranslationStore
-) : PlaneNoteViewData(noteRelation, account, determineTextLength, noteCaptureAPIAdapter, translationStore){
+) : PlaneNoteViewData(noteRelation, account,noteCaptureAPIAdapter, translationStore){
     override fun getRequestId(): String {
         return favorite.id
     }

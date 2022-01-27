@@ -23,7 +23,7 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
 
     }
     val id = notification.notification.id
-    val noteViewData: PlaneNoteViewData? = if(notification.notification is HasNote) PlaneNoteViewData(notification.note!!, account,determineTextLength, noteCaptureAPIAdapter, translationStore) else null
+    val noteViewData: PlaneNoteViewData? = if(notification.notification is HasNote) PlaneNoteViewData(notification.note!!, account, noteCaptureAPIAdapter, translationStore) else null
 
     val type: Type = when(notification.notification){
         is FollowNotification -> Type.FOLLOW

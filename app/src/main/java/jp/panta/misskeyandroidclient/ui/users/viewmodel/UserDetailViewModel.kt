@@ -51,7 +51,6 @@ class UserDetailViewModel(
                 PlaneNoteViewData(
                     miCore.getGetters().noteRelationGetter.get(note),
                     getAccount(),
-                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
                     miCore.getNoteCaptureAdapter(),
                     translationStore
                 )

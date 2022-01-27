@@ -107,7 +107,7 @@ class NoteTimelineStore(
                     }
                     val store = DetermineTextLengthSettingStore(miCore.getSettingStore())
                     if (it.reply == null) {
-                        PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter, noteTranslationStore)
+                        PlaneNoteViewData(related, account, noteCaptureAPIAdapter, noteTranslationStore)
                     } else {
                         HasReplyToNoteViewData(related, account, store, noteCaptureAPIAdapter, noteTranslationStore)
                     }

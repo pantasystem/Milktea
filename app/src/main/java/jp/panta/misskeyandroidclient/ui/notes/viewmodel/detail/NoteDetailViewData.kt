@@ -12,4 +12,4 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
  * 基本的にはPlaneNoteViewDataとは変わらないが
  * ListAdapterで詳細ビューの対象か判定する
  */
-class NoteDetailViewData(note: NoteRelation, account: Account, determineTextLength: DetermineTextLength, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) : PlaneNoteViewData(note, account, determineTextLength, noteCaptureAPIAdapter, translationStore)
+class NoteDetailViewData(note: NoteRelation, account: Account, determineTextLength: DetermineTextLength, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) : PlaneNoteViewData(note, account, noteCaptureAPIAdapter, translationStore)

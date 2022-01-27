@@ -113,7 +113,6 @@ class NoteDetailViewModel(
                 PlaneNoteViewData(
                     miCore.getGetters().noteRelationGetter.get(n),
                     getAccount(),
-                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
                 ).apply{
@@ -133,7 +132,6 @@ class NoteDetailViewModel(
             PlaneNoteViewData(
                 it,
                 getAccount(),
-                DetermineTextLengthSettingStore(miCore.getSettingStore()),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore()
             ).apply{
@@ -151,7 +149,6 @@ class NoteDetailViewModel(
             val planeNoteViewData = PlaneNoteViewData(
                 it,
                 getAccount(),
-                DetermineTextLengthSettingStore(miCore.getSettingStore()),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore(),
             )
@@ -160,7 +157,6 @@ class NoteDetailViewModel(
                 PlaneNoteViewData(
                     miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), n)),
                     getAccount(),
-                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
                 ).apply{

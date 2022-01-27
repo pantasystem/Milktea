@@ -12,7 +12,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 class NoteConversationViewData(noteRelation: NoteRelation, var nextChildren: List<PlaneNoteViewData>?, account: Account, determineTextLength: DetermineTextLength,
                                noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
                                translationStore: NoteTranslationStore
-)  : PlaneNoteViewData(noteRelation, account, determineTextLength, noteCaptureAPIAdapter, translationStore){
+)  : PlaneNoteViewData(noteRelation, account,  noteCaptureAPIAdapter, translationStore){
 val conversation = MutableLiveData<List<PlaneNoteViewData>>()
 val hasConversation = MutableLiveData<Boolean>()
 

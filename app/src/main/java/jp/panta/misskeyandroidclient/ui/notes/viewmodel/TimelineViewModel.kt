@@ -106,7 +106,7 @@ class TimelineViewModel(
            !mNoteIds.contains(it.note.id) && !this.mIsLoading
         }.map{
             if(it.reply == null) {
-                PlaneNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+                PlaneNoteViewData(it, getAccount(), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
             }else{
                 HasReplyToNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
             }
