@@ -82,7 +82,7 @@
                 tools:text="16分前"
                 android:id="@+id/elapsedTime"
                 />
-        <jp.panta.misskeyandroidclient.ui.components.AutoExpandableLayout
+        <jp.panta.misskeyandroidclient.ui.components.AutoCollapsingLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/autoExpanded"
@@ -286,7 +286,7 @@
 
             </LinearLayout>
 
-        </jp.panta.misskeyandroidclient.ui.components.AutoExpandableLayout>
+        </jp.panta.misskeyandroidclient.ui.components.AutoCollapsingLayout>
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reaction_view"

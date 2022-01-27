@@ -18,7 +18,7 @@ import java.util.ArrayList
  * ノートのコンテンツのサイズが言って以上超えた時に
  * 折りたたむためのコンポーネント
  */
-class AutoExpandableLayout : FrameLayout {
+class AutoCollapsingLayout : FrameLayout {
 
 
     private var limitedMaxHeight = 300
@@ -124,13 +124,13 @@ class AutoExpandableLayout : FrameLayout {
 
         @InverseBindingAdapter(attribute = "overflowExpanded")
         @JvmStatic
-        fun overflowExpandedAttrChanged(viewGroup: AutoExpandableLayout): Boolean {
+        fun overflowExpandedAttrChanged(viewGroup: AutoCollapsingLayout): Boolean {
             return viewGroup.getExpanded()
         }
 
         @JvmStatic
         @BindingAdapter("overflowExpanded")
-        fun bindExpanded(viewGroup: AutoExpandableLayout, expanded: Boolean?) {
+        fun bindExpanded(viewGroup: AutoCollapsingLayout, expanded: Boolean?) {
             viewGroup.setExpanded(expanded ?: false)
         }
 
@@ -138,7 +138,7 @@ class AutoExpandableLayout : FrameLayout {
         @JvmStatic
         @BindingAdapter("overflowExpandedAttrChanged")
         fun overflowExpandedAttrChanged(
-            viewGroup: AutoExpandableLayout,
+            viewGroup: AutoCollapsingLayout,
             listener: InverseBindingListener?
         ) {
             if (listener != null) {
@@ -150,7 +150,7 @@ class AutoExpandableLayout : FrameLayout {
 
         @JvmStatic
         @BindingAdapter("limitedMaxHeight")
-        fun bindLimitedMaxHeight(viewGroup: AutoExpandableLayout, size: Int?) {
+        fun bindLimitedMaxHeight(viewGroup: AutoCollapsingLayout, size: Int?) {
             size ?: return
             viewGroup.setLimitedMaxHeight(size)
         }
