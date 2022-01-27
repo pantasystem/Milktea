@@ -12,7 +12,6 @@ class FavoriteNoteViewData(
     private val favorite: Favorite,
     noteRelation: NoteRelation,
     account: Account,
-    determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     translationStore: NoteTranslationStore
 ) : PlaneNoteViewData(noteRelation, account,noteCaptureAPIAdapter, translationStore){

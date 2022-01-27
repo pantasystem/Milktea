@@ -48,7 +48,6 @@ class NoteDetailViewModel(
                 val detail = NoteDetailViewData(
                     noteDetail,
                     getAccount(),
-                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
                 )
@@ -167,7 +166,6 @@ class NoteDetailViewModel(
                 it,
                 childInChild,
                 getAccount(),
-                DetermineTextLengthSettingStore(miCore.getSettingStore()),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore()
             ).apply{

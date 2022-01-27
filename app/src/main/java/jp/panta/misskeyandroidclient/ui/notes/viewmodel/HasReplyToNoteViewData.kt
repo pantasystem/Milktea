@@ -9,7 +9,6 @@ import java.lang.IllegalArgumentException
 class HasReplyToNoteViewData(
     noteRelation: NoteRelation,
     account: Account,
-    determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     noteTranslationStore: NoteTranslationStore,
 )  : PlaneNoteViewData(noteRelation, account, noteCaptureAPIAdapter, noteTranslationStore){

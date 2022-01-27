@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.DetermineTextLength
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
-class NotificationViewData(val notification: NotificationRelation, account: Account, determineTextLength: DetermineTextLength, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) {
+class NotificationViewData(val notification: NotificationRelation, account: Account, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) {
     enum class Type(val default: String){
         FOLLOW("follow"),
         MENTION("mention"),

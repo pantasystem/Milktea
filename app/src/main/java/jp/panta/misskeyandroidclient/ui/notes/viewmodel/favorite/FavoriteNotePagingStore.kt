@@ -56,7 +56,7 @@ class FavoriteNotePagingStore(
                 adder.addNoteDtoToDataSource(account, it.note).let { note ->
                     miCore.getGetters().noteRelationGetter.get(note)
                 },
-                account, DetermineTextLengthSettingStore(miCore.getSettingStore()), noteCaptureAPIAdapter, miCore.getTranslationStore())
+                account,  noteCaptureAPIAdapter, miCore.getTranslationStore())
         }
         return Pair(BodyLessResponse(res), list)
     }

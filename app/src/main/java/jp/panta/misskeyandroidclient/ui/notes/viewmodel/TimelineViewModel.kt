@@ -108,7 +108,7 @@ class TimelineViewModel(
             if(it.reply == null) {
                 PlaneNoteViewData(it, getAccount(), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
             }else{
-                HasReplyToNoteViewData(it, getAccount(), DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+                HasReplyToNoteViewData(it, getAccount(), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
             }
         }.onEach { note ->
             this.mNoteIds.add(note.id)
