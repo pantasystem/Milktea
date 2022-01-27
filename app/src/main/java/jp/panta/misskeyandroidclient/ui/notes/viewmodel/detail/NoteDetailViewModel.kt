@@ -12,7 +12,6 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +47,6 @@ class NoteDetailViewModel(
                 val detail = NoteDetailViewData(
                     noteDetail,
                     getAccount(),
-                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
                 )
@@ -113,7 +111,6 @@ class NoteDetailViewModel(
                 PlaneNoteViewData(
                     miCore.getGetters().noteRelationGetter.get(n),
                     getAccount(),
-                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
                 ).apply{
@@ -133,7 +130,6 @@ class NoteDetailViewModel(
             PlaneNoteViewData(
                 it,
                 getAccount(),
-                DetermineTextLengthSettingStore(miCore.getSettingStore()),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore()
             ).apply{
@@ -151,7 +147,6 @@ class NoteDetailViewModel(
             val planeNoteViewData = PlaneNoteViewData(
                 it,
                 getAccount(),
-                DetermineTextLengthSettingStore(miCore.getSettingStore()),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore(),
             )
@@ -160,7 +155,6 @@ class NoteDetailViewModel(
                 PlaneNoteViewData(
                     miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), n)),
                     getAccount(),
-                    DetermineTextLengthSettingStore(miCore.getSettingStore()),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
                 ).apply{
@@ -171,7 +165,6 @@ class NoteDetailViewModel(
                 it,
                 childInChild,
                 getAccount(),
-                DetermineTextLengthSettingStore(miCore.getSettingStore()),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore()
             ).apply{

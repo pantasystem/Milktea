@@ -82,19 +82,12 @@ class SettingMovementActivity : AppCompatActivity() {
             context = this,
             items = listOf(
                 TextSharedItem(
-                    KeyStore.AutoTextFoldingCount.LENGTH.name,
-                    R.string.text_length_limit,
+                    KeyStore.AutoNoteExpandedContentSize.HEIGHT.name,
+                    R.string.height_limit,
                     type = TextSharedItem.InputType.NUMBER,
                     context = this,
-                    default = KeyStore.AutoTextFoldingCount.LENGTH.default.toString()
+                    default = KeyStore.AutoNoteExpandedContentSize.HEIGHT.default.toString()
                 ),
-                TextSharedItem(
-                    KeyStore.AutoTextFoldingCount.RETURNS.name,
-                    R.string.returns_limit,
-                    type = TextSharedItem.InputType.NUMBER,
-                    context = this,
-                    default = KeyStore.AutoTextFoldingCount.RETURNS.default.toString()
-                )
             )
         )
 

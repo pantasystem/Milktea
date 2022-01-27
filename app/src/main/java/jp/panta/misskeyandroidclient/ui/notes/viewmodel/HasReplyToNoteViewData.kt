@@ -9,10 +9,9 @@ import java.lang.IllegalArgumentException
 class HasReplyToNoteViewData(
     noteRelation: NoteRelation,
     account: Account,
-    determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     noteTranslationStore: NoteTranslationStore,
-)  : PlaneNoteViewData(noteRelation, account, determineTextLength, noteCaptureAPIAdapter, noteTranslationStore){
+)  : PlaneNoteViewData(noteRelation, account, noteCaptureAPIAdapter, noteTranslationStore){
     val reply = noteRelation.reply
 
     /*val replyToAvatarUrl = reply?.user?.avatarUrl
@@ -32,7 +31,7 @@ class HasReplyToNoteViewData(
     val replyTo = if(reply == null){
         throw IllegalArgumentException("replyがnullですPlaneNoteViewDataを利用してください")
     }else{
-        PlaneNoteViewData(reply, account, determineTextLength.clone(), noteCaptureAPIAdapter, noteTranslationStore)
+        PlaneNoteViewData(reply, account, noteCaptureAPIAdapter, noteTranslationStore)
     }
 
 

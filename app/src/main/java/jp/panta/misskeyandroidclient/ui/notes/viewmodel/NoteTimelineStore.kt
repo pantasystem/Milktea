@@ -105,11 +105,10 @@ class NoteTimelineStore(
                     val related = adder.addNoteDtoToDataSource(account, it).let { note ->
                         miCore.getGetters().noteRelationGetter.get(note)
                     }
-                    val store = DetermineTextLengthSettingStore(miCore.getSettingStore())
                     if (it.reply == null) {
-                        PlaneNoteViewData(related, account, store, noteCaptureAPIAdapter, noteTranslationStore)
+                        PlaneNoteViewData(related, account, noteCaptureAPIAdapter, noteTranslationStore)
                     } else {
-                        HasReplyToNoteViewData(related, account, store, noteCaptureAPIAdapter, noteTranslationStore)
+                        HasReplyToNoteViewData(related, account, noteCaptureAPIAdapter, noteTranslationStore)
                     }
                 } catch (e: Exception) {
                     Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)

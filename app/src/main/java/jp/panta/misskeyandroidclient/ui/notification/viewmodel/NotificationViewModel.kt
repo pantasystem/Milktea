@@ -14,7 +14,6 @@ import jp.panta.misskeyandroidclient.model.notification.ReceiveFollowRequestNoti
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.DetermineTextLengthSettingStore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -69,7 +68,7 @@ class NotificationViewModel(
         }.map {  accountAndNotificationRelation ->
             val notificationRelation = accountAndNotificationRelation.second
             val account = accountAndNotificationRelation.first
-            NotificationViewData(notificationRelation, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+            NotificationViewData(notificationRelation, account,  miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
         }.onEach {
 
             it.noteViewData?.eventFlow?.launchIn(viewModelScope + Dispatchers.IO)
@@ -214,7 +213,7 @@ class NotificationViewModel(
 
     private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
         return this.toNotificationRelations(account).map {
-            NotificationViewData(it, account, DetermineTextLengthSettingStore(miCore.getSettingStore()), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+            NotificationViewData(it, account, miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
         }
     }
 

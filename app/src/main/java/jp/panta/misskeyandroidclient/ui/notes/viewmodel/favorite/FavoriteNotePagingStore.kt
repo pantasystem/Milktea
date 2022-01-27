@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.DetermineTextLengthSettingStore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotePagedStore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import retrofit2.Response
@@ -56,7 +55,7 @@ class FavoriteNotePagingStore(
                 adder.addNoteDtoToDataSource(account, it.note).let { note ->
                     miCore.getGetters().noteRelationGetter.get(note)
                 },
-                account, DetermineTextLengthSettingStore(miCore.getSettingStore()), noteCaptureAPIAdapter, miCore.getTranslationStore())
+                account,  noteCaptureAPIAdapter, miCore.getTranslationStore())
         }
         return Pair(BodyLessResponse(res), list)
     }

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 
+import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -21,7 +22,6 @@ import kotlin.collections.HashMap
 open class PlaneNoteViewData (
     val note: NoteRelation,
     val account: Account,
-    var determineTextLength: DetermineTextLength,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val noteTranslationStore: NoteTranslationStore
 ) : NoteViewData {
@@ -81,11 +81,9 @@ open class PlaneNoteViewData (
     val cwNode = MFMParser.parse(toShowNote.note.cw, toShowNote.note.emojis)
 
     //true　折り畳み
-    val text = toShowNote.note.text.apply{
-        determineTextLength.setText(this)
-    }
+    val text = toShowNote.note.text
 
-    val contentFolding = MutableLiveData(cw != null || determineTextLength.isLong())
+    val contentFolding = MutableLiveData(cw != null)
     val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding){
         if(it) "もっと見る: ${text?.length}文字" else "隠す"
     }
@@ -225,9 +223,18 @@ open class PlaneNoteViewData (
 
     var job: Job? = null
 
-    init {
+    // NOTE: (Panta) cwの時点で大半が隠されるので折りたたむ必要はない
+    // NOTE: (Panta) cwを折りたたんでしまうとcw展開後に自動的に折りたたまれてしまって二度手間になる可能性がある。
+    val expanded = MutableLiveData<Boolean>(cw != null)
 
+
+    init {
         require(toShowNote.note.id != subNote?.note?.id)
+    }
+
+    fun expand() {
+        Log.d("PlaneNoteViewData", "expand")
+        expanded.value = true
     }
 
 }

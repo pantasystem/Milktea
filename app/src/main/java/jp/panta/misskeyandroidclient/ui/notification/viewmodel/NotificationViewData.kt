@@ -5,10 +5,9 @@ import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.notification.*
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.DetermineTextLength
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
-class NotificationViewData(val notification: NotificationRelation, account: Account, determineTextLength: DetermineTextLength, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) {
+class NotificationViewData(val notification: NotificationRelation, account: Account, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) {
     enum class Type(val default: String){
         FOLLOW("follow"),
         MENTION("mention"),
@@ -23,7 +22,7 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
 
     }
     val id = notification.notification.id
-    val noteViewData: PlaneNoteViewData? = if(notification.notification is HasNote) PlaneNoteViewData(notification.note!!, account,determineTextLength, noteCaptureAPIAdapter, translationStore) else null
+    val noteViewData: PlaneNoteViewData? = if(notification.notification is HasNote) PlaneNoteViewData(notification.note!!, account, noteCaptureAPIAdapter, translationStore) else null
 
     val type: Type = when(notification.notification){
         is FollowNotification -> Type.FOLLOW
