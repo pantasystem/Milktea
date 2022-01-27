@@ -314,6 +314,7 @@
 
     <string name="long_text">長すぎるため自動的に折りたたまれました(%d文字)</string>
     <string name="show_more">もっと見る(%d文字)</string>
+    <string name="hide">隠す</string>
 
     <string name="auto_note_folding">ノートの自動折り畳み</string>
     <string name="text_length_limit">テキスト数制限(自動的に投稿が折りたたまれます)</string>

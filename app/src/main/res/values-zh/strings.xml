@@ -309,6 +309,7 @@
 
     <string name="long_text">由于太长已为您自动折叠（文本量：%d）</string>
     <string name="show_more">显示更多（数量：%d）</string>
+    <string name="hide">隐藏</string>
     <string name="text_length_limit">文本长度限制</string>
     <string name="returns_limit">返回限制</string>
     <string name="auto_note_folding">自动折叠笔记</string>
