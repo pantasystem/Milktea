@@ -312,6 +312,8 @@
     <string name="hide">隐藏</string>
     <string name="text_length_limit">文本长度限制</string>
     <string name="returns_limit">返回限制</string>
+    <string name="height_limit">Height limit</string>
+    <string name="disable_height_limit">Disable height limit</string>
     <string name="auto_note_folding">自动折叠笔记</string>
     <string name="download">下载</string>
     <string name="start_downloading_placeholder">正在开始下载 %s</string>

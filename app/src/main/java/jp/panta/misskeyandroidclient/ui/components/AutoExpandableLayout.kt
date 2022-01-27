@@ -10,14 +10,25 @@ import androidx.annotation.StyleRes
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
+import jp.panta.misskeyandroidclient.MiApplication
 import java.util.ArrayList
 
+/**
+ * ノートのコンテンツのサイズが言って以上超えた時に
+ * 折りたたむためのコンポーネント
+ */
 class AutoExpandableLayout : FrameLayout {
 
-    private val limitedMaxHeight = 300
+
+    private var limitedMaxHeight = 300
     private var expandedChangedListener: MutableList<(Boolean)->Unit> = mutableListOf()
 
-    private var expanded = false
+    private var expanded = true
+
+    init {
+        limitedMaxHeight = (context.applicationContext as MiApplication).getSettingStore().noteExpandedHeightSize
+    }
+
 
 
 
@@ -90,6 +101,15 @@ class AutoExpandableLayout : FrameLayout {
         expandedChangedListener.add(listener)
     }
 
+    fun setLimitedMaxHeight(size: Int) {
+        limitedMaxHeight = size
+        invalidate()
+    }
+
+
+
+
+
 
     companion object {
 
@@ -115,6 +135,14 @@ class AutoExpandableLayout : FrameLayout {
                 }
             }
         }
+
+        @JvmStatic
+        @BindingAdapter("limitedMaxHeight")
+        fun bindLimitedMaxHeight(viewGroup: AutoExpandableLayout, size: Int?) {
+            size?: return
+            viewGroup.setLimitedMaxHeight(size)
+        }
+
 
     }
 

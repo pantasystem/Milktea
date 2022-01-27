@@ -313,6 +313,8 @@
     <string name="hide">Hide</string>
 
     <string name="text_length_limit">Text length limit</string>
+    <string name="height_limit">Height limit</string>
+    <string name="disable_height_limit">Disable height limit</string>
     <string name="returns_limit">Returns limit</string>
     <string name="auto_note_folding">Automatic note folding</string>
     <string name="download">Download</string>

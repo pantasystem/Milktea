@@ -72,14 +72,9 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
 
     val urlPreviewSetting = UrlPreviewSourceSetting(sharedPreferences)
 
-    val foldingTextLengthLimit: Int
-        get(){
-            return sharedPreferences.getInt(KeyStore.AutoTextFoldingCount.LENGTH.name,  KeyStore.AutoTextFoldingCount.LENGTH.default)
-        }
-
-    val foldingTextReturnsLimit: Int
-        get(){
-            return sharedPreferences.getInt(KeyStore.AutoTextFoldingCount.RETURNS.name, KeyStore.AutoTextFoldingCount.RETURNS.default)
+    val noteExpandedHeightSize: Int
+        get() {
+            return sharedPreferences.getInt(KeyStore.AutoNoteExpandedContentSize.HEIGHT.name, KeyStore.AutoNoteExpandedContentSize.HEIGHT.default)
         }
 
     private var isLearnVisibility: Boolean
