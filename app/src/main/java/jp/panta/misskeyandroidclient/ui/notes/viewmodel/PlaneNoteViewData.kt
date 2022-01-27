@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 
+import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -230,6 +231,7 @@ open class PlaneNoteViewData (
     }
 
     fun expand() {
+        Log.d("PlaneNoteViewData", "expand")
         expanded.value = true
     }
 

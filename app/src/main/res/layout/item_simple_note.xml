@@ -88,15 +88,18 @@
                 android:id="@+id/autoExpanded"
                 android:layout_toEndOf="@+id/avatarIcon"
                 android:layout_below="@+id/mainName"
-                overflowExpanded="@={note.expanded}"
+                overflowExpanded="@{note.expanded}"
+                app:expandableButton="@id/autoExpandableButton"
                 >
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/open"
                     android:layout_gravity="center_horizontal|bottom"
-                    android:visibility="@{ note.expanded ? View.GONE : View.VISIBLE }"
                     android:onClick="@{()-> note.expand()}"
+                    android:id="@+id/autoExpandableButton"
+                    android:visibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
+
                     />
             <LinearLayout
                     android:id="@+id/expandableBase"

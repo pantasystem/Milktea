@@ -11,6 +11,7 @@ import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.R
 import java.util.ArrayList
 
 /**
@@ -21,15 +22,16 @@ class AutoExpandableLayout : FrameLayout {
 
 
     private var limitedMaxHeight = 300
-    private var expandedChangedListener: MutableList<(Boolean)->Unit> = mutableListOf()
+    private var expandedChangedListener: MutableList<(Boolean) -> Unit> = mutableListOf()
 
-    private var expanded = true
+    private var expanded = false
+
+    private var expandableButtonId: Int? = null
 
     init {
-        limitedMaxHeight = (context.applicationContext as MiApplication).getSettingStore().noteExpandedHeightSize
+        limitedMaxHeight =
+            (context.applicationContext as MiApplication).getSettingStore().noteExpandedHeightSize
     }
-
-
 
 
     constructor(context: Context) : super(context)
@@ -44,19 +46,29 @@ class AutoExpandableLayout : FrameLayout {
         attrs: AttributeSet?,
         @AttrRes defStyleAttr: Int,
         @StyleRes defStyleRes: Int
-    ) : super(context, attrs, defStyleAttr, defStyleRes)
+    ) : super(context, attrs, defStyleAttr, defStyleRes) {
+        context.theme.obtainStyledAttributes(attrs, R.styleable.AutoExpandableLayout, 0, 0).use {
+            it.apply {
+                val buttonId = getResourceId(R.styleable.AutoExpandableLayout_expandableButton, -1)
+                expandableButtonId = if (buttonId == -1) null else buttonId
+            }
+        }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
 
         val limitedMaxPxHeight = limitedMaxHeight * resources.displayMetrics.density
 
-
-
         var maxHeight = 0
         var maxWidth = 0
 
+        var expandedButton: View? = null
+
         for (i in 0 until childCount) {
             val child = getChildAt(i)
+            if (child.id == expandableButtonId) {
+                expandedButton = child
+            }
             if (child.visibility != View.GONE) {
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
                 maxHeight = maxHeight.coerceAtLeast(child.measuredHeight)
@@ -64,19 +76,18 @@ class AutoExpandableLayout : FrameLayout {
             }
 
         }
-
-        Log.d("AutoExpandableLayout", "maxHeight:$maxHeight")
-
         if (!expanded && maxHeight > limitedMaxPxHeight) {
             maxHeight = limitedMaxPxHeight.toInt()
+            expandedButton?.visibility = View.VISIBLE
+        } else {
 
-        } else if(!expanded) {
-            setExpanded(true)
+            expandedButton?.visibility = View.GONE
+            //setExpanded(true)
         }
         Log.d("AutoExpandableLayout", "改変後maxHeight:$maxHeight")
 
         setMeasuredDimension(
-            resolveSizeAndState(maxWidth,  widthMeasureSpec, 0),
+            resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
             resolveSizeAndState(maxHeight + paddingTop + paddingBottom, heightMeasureSpec, 0)
         )
     }
@@ -91,13 +102,14 @@ class AutoExpandableLayout : FrameLayout {
         this.expanded = value
         expandedChangedListener.forEach { it.invoke(expanded) }
         invalidate()
+        Log.d("AutoExpandableLayout", "setExpanded:$value")
     }
 
-    fun getExpanded() : Boolean {
+    fun getExpanded(): Boolean {
         return this.expanded
     }
 
-    fun addExpandedChangedListener(listener: (Boolean)->Unit) {
+    fun addExpandedChangedListener(listener: (Boolean) -> Unit) {
         expandedChangedListener.add(listener)
     }
 
@@ -107,15 +119,12 @@ class AutoExpandableLayout : FrameLayout {
     }
 
 
-
-
-
-
     companion object {
 
 
         @InverseBindingAdapter(attribute = "overflowExpanded")
-        @JvmStatic fun overflowExpandedAttrChanged(viewGroup: AutoExpandableLayout): Boolean {
+        @JvmStatic
+        fun overflowExpandedAttrChanged(viewGroup: AutoExpandableLayout): Boolean {
             return viewGroup.getExpanded()
         }
 
@@ -128,7 +137,10 @@ class AutoExpandableLayout : FrameLayout {
 
         @JvmStatic
         @BindingAdapter("overflowExpandedAttrChanged")
-        fun overflowExpandedAttrChanged(viewGroup: AutoExpandableLayout, listener: InverseBindingListener?) {
+        fun overflowExpandedAttrChanged(
+            viewGroup: AutoExpandableLayout,
+            listener: InverseBindingListener?
+        ) {
             if (listener != null) {
                 viewGroup.addExpandedChangedListener {
                     listener.onChange()
@@ -139,7 +151,7 @@ class AutoExpandableLayout : FrameLayout {
         @JvmStatic
         @BindingAdapter("limitedMaxHeight")
         fun bindLimitedMaxHeight(viewGroup: AutoExpandableLayout, size: Int?) {
-            size?: return
+            size ?: return
             viewGroup.setLimitedMaxHeight(size)
         }
 

@@ -8,4 +8,7 @@
         <attr name="metaButtonBarStyle" format="reference" />
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
+    <declare-styleable name="AutoExpandableLayout">
+        <attr name="expandableButton" format="reference" />
+    </declare-styleable>
 </resources>
