@@ -4,7 +4,6 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.DetermineTextLength
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
 /**
