@@ -11,6 +11,7 @@
         <variable
                 name="accountViewModel"
                 type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
+        <import type="jp.panta.misskeyandroidclient.BuildConfig" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -94,7 +95,8 @@
                 android:layout_marginEnd="8dp"
                 android:onClick="@{()-> viewModel.toggleReservationAt()}"
 
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                android:visibility="@{BuildConfig.DEBUG ? View.VISIBLE : View.GONE}"/>
 
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textCounter"
