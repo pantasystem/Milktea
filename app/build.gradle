@@ -21,8 +21,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         multiDexEnabled true
-        versionCode 72
-        versionName "v2.10.1"
+        versionCode 73
+        versionName "v2.11.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
