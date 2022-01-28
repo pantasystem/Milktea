@@ -71,6 +71,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         val miApplication = requireContext().applicationContext as MiApplication
         mBinding.lifecycleOwner = this
+        mBinding.noteEditorViewModel = mViewModel
 
         val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
         mBinding.addressUsersView.adapter = userChipAdapter

@@ -61,6 +61,7 @@
 
                 android:hint="@string/cw_hint"
                 android:inputType="textMultiLine"
+                android:text="@{noteEditorViewModel.text}"
                 android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) &amp;&amp; SafeUnbox.unboxBool(noteEditorViewModel.hasCw) ? View.VISIBLE : View.GONE}"
                 />
         <LinearLayout
@@ -182,7 +183,9 @@
                     android:src="@drawable/ic_expand_less_black_24dp"
                     android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.GONE : View.VISIBLE }"
                     tools:ignore="ContentDescription"
-                    tools:visibility="gone"/>
+                    tools:visibility="gone"
+                    app:tint="?attr/colorNoteActionButtonTint"
+                    />
             <MultiAutoCompleteTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -190,6 +193,7 @@
                     android:layout_weight="1"
                     android:hint="@string/please_speak"
                     android:inputType="textMultiLine"
+                    android:text="@{noteEditorViewModel.text}"
                     />
             <ImageButton
                     android:id="@+id/postButton"

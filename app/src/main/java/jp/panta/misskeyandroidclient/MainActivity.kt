@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
@@ -61,7 +62,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
 
     lateinit var mNotesViewModel: NotesViewModel
