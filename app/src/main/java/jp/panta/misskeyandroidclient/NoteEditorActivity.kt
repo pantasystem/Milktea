@@ -116,6 +116,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         )
         mBinding = binding
 
+        binding.lifecycleOwner = this
+        binding.viewModel = mViewModel
+
         setSupportActionBar(mBinding.noteEditorToolbar)
 
 
@@ -135,8 +138,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             true
         )
 
-        //binding.viewModel
-        binding.lifecycleOwner = this
 
         val accountId: Long? =
             if (intent.getLongExtra(EXTRA_ACCOUNT_ID, -1) == -1L) null else intent.getLongExtra(
@@ -151,8 +152,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             requireNotNull(accountId)
             Note.Id(accountId, it)
         }
-
-
 
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
@@ -215,7 +214,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
         mViewModel.setReplyTo(replyToNoteId)
         mViewModel.setRenoteTo(quoteToNoteId)
-        mViewModel.setDraftNote(draftNote)
+        if (draftNote != null) {
+            mViewModel.setDraftNote(draftNote)
+        }
         binding.viewModel = mViewModel
         noteEditorToolbar.viewModel = mViewModel
         noteEditorToolbar.lifecycleOwner = this
@@ -266,6 +267,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
 
         mBinding.inputMain.addTextChangedListener { e ->
+            Log.d("NoteEditorActivity", "text changed:$e")
             mViewModel.setText((e?.toString() ?: ""))
         }
 

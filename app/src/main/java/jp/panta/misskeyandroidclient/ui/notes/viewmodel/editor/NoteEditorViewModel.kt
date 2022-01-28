@@ -45,10 +45,10 @@ class NoteEditorViewModel @Inject constructor(
 
     val text = _state.map {
         it.text
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+    }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
     val cw = _state.map {
         it.cw
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+    }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
 
     private val currentAccount = MutableLiveData<Account>().apply {
         miCore.getCurrentAccount().onEach {
@@ -91,7 +91,7 @@ class NoteEditorViewModel @Inject constructor(
         metaRepository.get(it.instanceDomain)?.maxNoteTextLength ?: 1500
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
-    val textRemaining = combine(maxTextLength, text) { max, t ->
+    val textRemaining = combine(maxTextLength, state.map { it.text }) { max, t ->
         max - (t?.codePointCount(0, t.length) ?: 0)
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
