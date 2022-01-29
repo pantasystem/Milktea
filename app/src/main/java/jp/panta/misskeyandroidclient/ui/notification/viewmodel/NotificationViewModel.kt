@@ -206,8 +206,10 @@ class NotificationViewModel(
     }
 
     private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
-        return this.map {
-            it.toNotificationRelation(account)
+        return this.mapNotNull {
+            runCatching {
+                it.toNotificationRelation(account)
+            }.getOrNull()
         }
     }
 
