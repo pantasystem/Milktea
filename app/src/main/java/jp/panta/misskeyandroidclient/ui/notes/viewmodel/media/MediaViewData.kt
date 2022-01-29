@@ -44,6 +44,17 @@ class MediaViewData(files: List<File>) {
         }
     }
 
+    fun show(previewAbleFile: PreviewAbleFile) {
+        val list = (_files.value ?: emptyList()).toMutableList()
+        _files.value = list.map {
+            if (it === previewAbleFile) {
+                it.copy(isHiding = false)
+            } else {
+                it
+            }
+        }
+    }
+
     fun toggleVisibility(index: Int) {
         val list = (_files.value ?: emptyList()).toMutableList()
         _files.value = list.mapIndexed { i, previewAbleFile ->
@@ -51,6 +62,17 @@ class MediaViewData(files: List<File>) {
                 previewAbleFile.copy(isHiding = !previewAbleFile.isHiding)
             } else {
                 previewAbleFile
+            }
+        }
+    }
+
+    fun toggleVisibility(previewAbleFile: PreviewAbleFile) {
+        val list = (_files.value ?: emptyList()).toMutableList()
+        _files.value = list.map {
+            if (it === previewAbleFile) {
+                it.copy(isHiding = !it.isHiding)
+            } else {
+                it
             }
         }
     }

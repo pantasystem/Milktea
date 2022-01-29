@@ -20,6 +20,7 @@
             playButton="@{actionButton}"
             previewAbleFile="@{previewAbleFile}"
             previewAbleFileList="@{mediaViewData.files}"
+            android:onClick="@{()-> mediaViewData.show(previewAbleFile)}"
             >
 
         <ImageView
@@ -50,6 +51,18 @@
                 android:layout_gravity="center"
                 android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.VISIBLE : View.GONE }"
                 android:text="@string/nsfw_message"
+                />
+        <ImageButton
+                android:id="@+id/toggleVisibilityButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|end"
+
+                android:src="@{previewAbleFile.isHiding ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+
+                tools:ignore="ContentDescription"
+                android:onClick="@{()-> mediaViewData.toggleVisibility(previewAbleFile)}"
+
                 />
 
     </FrameLayout>

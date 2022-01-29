@@ -7,11 +7,13 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.ui.notes.view.media.PreviewAbleFileListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile
@@ -158,8 +160,23 @@ object MediaPreviewHelper{
     }
     
     @JvmStatic
-    @BindingAdapter("previewAbleList")
-    fun RecyclerView.setPreviewAbleList(previewAbleList: List<PreviewAbleFile>) {
+    @BindingAdapter("previewAbleList", "mediaViewData")
+    fun RecyclerView.setPreviewAbleList(previewAbleList: List<PreviewAbleFile>?, mediaViewData: MediaViewData?) {
+        if (previewAbleList == null || mediaViewData == null) {
+            this.visibility = View.GONE
+            return
+        }
+
+        if (previewAbleList.isEmpty() || previewAbleList.size <= 4) {
+            this.visibility = View.GONE
+            return
+        }
+
+        val adapter = PreviewAbleFileListAdapter(mediaViewData)
+        this.adapter = adapter
+        this.layoutManager = LinearLayoutManager(this.context)
+        adapter.submitList(previewAbleList)
+        this.visibility = View.VISIBLE
         
     }
 
