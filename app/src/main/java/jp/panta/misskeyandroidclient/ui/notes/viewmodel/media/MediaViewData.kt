@@ -37,7 +37,7 @@ class MediaViewData(files: List<File>) {
         val list = (_files.value ?: emptyList()).toMutableList()
         _files.value = list.mapIndexed { i, previewAbleFile ->
             if (i == index) {
-                previewAbleFile.copy(isHiding = true)
+                previewAbleFile.copy(isHiding = false)
             } else {
                 previewAbleFile
             }

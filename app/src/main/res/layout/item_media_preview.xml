@@ -6,8 +6,11 @@
         <import type="android.view.View"/>
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable
-                name="fileViewData"
-                type="jp.panta.misskeyandroidclient.viewmodel.file.FileViewData" />
+                name="previewAbleFile"
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile" />
+        <variable
+                name="mediaViewData"
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData" />
     </data>
     <FrameLayout android:id="@+id/baseFrame"
             android:layout_width="match_parent"
@@ -15,8 +18,8 @@
             tools:ignore="NestedWeights"
             thumbnailView="@{thumbnail}"
             playButton="@{actionButton}"
-            fileViewData="@{fileViewData.file}"
-            android:onClick="@{()-> fileViewData.show()}"
+            previewAbleFile="@{previewAbleFile}"
+            previewAbleFileList="@{mediaViewData.files}"
             >
 
         <ImageView
@@ -26,7 +29,7 @@
                 android:contentDescription="@string/thumbnail"
                 android:scaleType="centerCrop"
                 tools:srcCompat="@drawable/ic_reaction_laugh"
-                android:visibility="@{SafeUnbox.unbox(fileViewData.isHiding) ? View.GONE : View.VISIBLE }"
+                android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.GONE : View.VISIBLE }"
                 />
         <ImageButton
                 android:id="@+id/actionButton"
@@ -36,7 +39,7 @@
                 style="?android:attr/borderlessButtonStyle"
                 tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                 android:scaleType="fitCenter"
-                android:visibility="@{SafeUnbox.unbox(fileViewData.isHiding) || SafeUnbox.unbox(fileViewData.image) ? View.GONE : View.VISIBLE }"
+                android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) || SafeUnbox.unbox(previewAbleFile.image) ? View.GONE : View.VISIBLE }"
                 app:tint="?attr/colorAccent" />
 
         <androidx.emoji.widget.EmojiTextView
@@ -45,7 +48,7 @@
                 android:layout_height="wrap_content"
                 tools:text="クリックで表示"
                 android:layout_gravity="center"
-                android:visibility="@{SafeUnbox.unbox(fileViewData.isHiding) ? View.VISIBLE : View.GONE }"
+                android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.VISIBLE : View.GONE }"
                 android:text="@string/nsfw_message"
                 />
 

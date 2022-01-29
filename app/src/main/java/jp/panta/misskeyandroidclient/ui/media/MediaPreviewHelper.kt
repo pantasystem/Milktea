@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
@@ -154,6 +155,12 @@ object MediaPreviewHelper{
                 rightMediaBase.visibility = View.VISIBLE
             }
         }
+    }
+    
+    @JvmStatic
+    @BindingAdapter("previewAbleList")
+    fun RecyclerView.setPreviewAbleList(previewAbleList: List<PreviewAbleFile>) {
+        
     }
 
 
