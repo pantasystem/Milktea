@@ -1,9 +1,9 @@
-package jp.panta.misskeyandroidclient.viewmodel.file
+package jp.panta.misskeyandroidclient.ui.notes.viewmodel.media
 
-import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.model.file.File
 
-class FileViewData(val file: File) {
+
+data class PreviewAbleFile(val file: File, val isHiding: Boolean) {
     enum class Type{
         VIDEO, IMAGE, SOUND, OTHER
     }
@@ -15,19 +15,7 @@ class FileViewData(val file: File) {
         else -> Type.OTHER
     }
 
-    val isHiding = MutableLiveData(file.isSensitive ?: false)
 
     val isImage = type == Type.IMAGE
 
-
-    fun show(){
-        val now = isHiding.value?: false
-        if(now){
-            isHiding.value = false
-        }
-    }
-
-    fun toggleVisibility() {
-        isHiding.value = !(isHiding.value ?: false)
-    }
 }

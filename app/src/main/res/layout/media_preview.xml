@@ -40,10 +40,10 @@
                     tools:ignore="NestedWeights"
                     thumbnailView="@{thumbnailTopLeft}"
                     playButton="@{actionButtonTopLeft}"
-                    fileViewDataList="@{media.files}"
-                    fileViewData="@{media.fileOne}"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileOne}"
 
-                    android:onClick="@{()-> media.fileOne.show()}"
+                    android:onClick="@{()-> media.show(0) }"
                     >
 
                 <ImageView
@@ -82,7 +82,7 @@
                         android:src="@{media.fileOne.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
                         android:layout_gravity="top|end"
 
-                        android:onClick="@{()-> media.fileOne.toggleVisibility() }"
+                        android:onClick="@{()-> media.toggleVisibility(0) }"
 
                         tools:ignore="ContentDescription" />
 
@@ -94,9 +94,9 @@
                     android:layout_weight="1"
                     thumbnailView="@{thumbnailBottomLeft}"
                     playButton="@{actionButtonBottomLeft}"
-                    fileViewDataList="@{media.files}"
-                    fileViewData="@{media.fileThree}"
-                    android:onClick="@{()-> media.fileThree.show()}"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileThree}"
+                    android:onClick="@{()-> media.show(2)}"
                     android:layout_marginTop="4dp"
                     >
                 <ImageView
@@ -133,7 +133,7 @@
                         android:layout_height="40dp"
                         android:layout_gravity="top|end"
 
-                        android:onClick="@{()-> media.fileThree.toggleVisibility() }"
+                        android:onClick="@{()-> media.toggleVisibility(2) }"
                         android:src="@{media.fileThree.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
 
                         tools:ignore="ContentDescription"
@@ -160,9 +160,9 @@
 
                     playButton="@{actionButtonTopRight}"
 
-                    fileViewData="@{media.fileTwo}"
-                    fileViewDataList="@{media.files}"
-                    android:onClick="@{()-> media.fileTwo.show() }"
+                    previewAbleFile="@{media.fileTwo}"
+                    previewAbleFileList="@{media.files}"
+                    android:onClick="@{()-> media.show(1) }"
 
                     >
                 <ImageView
@@ -198,7 +198,7 @@
                         android:layout_height="40dp"
                         android:layout_gravity="top|end"
 
-                        android:onClick="@{()-> media.fileTwo.toggleVisibility() }"
+                        android:onClick="@{()-> media.toggleVisibility(1) }"
                         android:src="@{media.fileTwo.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
 
                         tools:ignore="ContentDescription"
@@ -214,9 +214,9 @@
 
                     playButton="@{actionButtonBottomRight}"
 
-                    fileViewDataList="@{media.files}"
-                    fileViewData="@{media.fileFour}"
-                    android:onClick="@{()-> media.fileFour.show() }"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileFour}"
+                    android:onClick="@{()-> media.show(3) }"
                     android:layout_marginTop="4dp"
                     >
                 <ImageView
@@ -251,7 +251,7 @@
                         android:layout_height="40dp"
                         android:layout_gravity="top|end"
 
-                        android:onClick="@{()-> media.fileFour.toggleVisibility() }"
+                        android:onClick="@{()-> media.toggleVisibility(3) }"
                         android:src="@{media.fileFour.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
 
                         tools:ignore="ContentDescription"

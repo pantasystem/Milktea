@@ -11,7 +11,7 @@
     </data>
     <FrameLayout android:id="@+id/baseFrame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="100dp"
             tools:ignore="NestedWeights"
             thumbnailView="@{thumbnail}"
             playButton="@{actionButton}"

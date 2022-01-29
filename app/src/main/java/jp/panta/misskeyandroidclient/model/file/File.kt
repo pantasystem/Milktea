@@ -13,12 +13,14 @@ sealed interface AppFile : JSerializable {
         val isSensitive: Boolean,
         val folderId: String?,
         val id: Long = 0,
-        ) : AppFile
+    ) : AppFile
+
     data class Remote(
         val id: FileProperty.Id,
     ) : AppFile
 
 }
+
 
 data class File(
     val name: String,
@@ -29,25 +31,38 @@ data class File(
     val thumbnailUrl: String?,
     val isSensitive: Boolean?,
     val folderId: String? = null
-): JSerializable {
+) : JSerializable {
+    enum class AboutMediaType {
+        VIDEO, IMAGE, SOUND, OTHER
+
+    }
+
     val isRemoteFile: Boolean
         get() = remoteFileId != null
+
+    val aboutMediaType = when {
+        this.type == null -> AboutMediaType.OTHER
+        this.type.startsWith("image") -> AboutMediaType.IMAGE
+        this.type.startsWith("video") -> AboutMediaType.VIDEO
+        this.type.startsWith("audio") -> AboutMediaType.SOUND
+        else -> AboutMediaType.OTHER
+    }
 }
 
 
 fun AppFile.toFile(): File {
-    return when(this) {
+    return when (this) {
         is AppFile.Remote -> {
-           File(
-               name = "remote file",
-               path = null,
-               type = null,
-               remoteFileId = id,
-               thumbnailUrl = null,
-               isSensitive = null,
-               folderId = null,
-               localFileId = null
-           )
+            File(
+                name = "remote file",
+                path = null,
+                type = null,
+                remoteFileId = id,
+                thumbnailUrl = null,
+                isSensitive = null,
+                folderId = null,
+                localFileId = null
+            )
         }
         is AppFile.Local -> {
             File(
