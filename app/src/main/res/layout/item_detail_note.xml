@@ -161,10 +161,20 @@
                         />
 
                 <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/manyFilePreviewListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/mediaPreview"
+                        tools:layout_height="20dp"
+                        android:visibility="gone"
+                        mediaViewData="@{note.media}"
+                        previewAbleList="@{note.media.files}"/>
+
+                <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/poll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/mediaPreview"
+                        android:layout_below="@id/manyFilePreviewListView"
                         android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
                         tools:itemCount="2"
                         tools:listitem="@layout/item_choice"

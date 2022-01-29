@@ -2,11 +2,13 @@ package jp.panta.misskeyandroidclient.ui.media
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -175,15 +177,12 @@ object MediaPreviewHelper{
 
         val adapter = PreviewAbleFileListAdapter(mediaViewData)
         this.adapter = adapter
-        this.layoutManager = LinearLayoutManager(this.context)
+        this.layoutManager = GridLayoutManager(context, 2)
+
         adapter.submitList(previewAbleList)
         this.visibility = View.VISIBLE
         
     }
-
-
-
-
 
 
 }
