@@ -14,19 +14,19 @@
     <string name="share">Share</string>
     <string name="menu_send">Send</string>
     <string name="search">Search</string>
-    <string name="notification">Notification</string>
-    <string name="message">Message</string>
+    <string name="notification">Notifications</string>
+    <string name="message">Messages</string>
     <string name="start_auth">Authenticate</string>
     <string name="selecting_instance">Selected instance</string>
     <string name="welcome">Welcome</string>
-    <string name="san">san</string>
+    <string name="san">-san</string>
     <string name="following">Following</string>
-    <string name="follower">Follower</string>
+    <string name="follower">Followers</string>
     <string name="renote">Renote</string>
     <string name="quote_renote">Quote renote</string>
     <string name="discovery">Discovery</string>
     <string name="renote_was">Renote</string>
-    <string name="input_custom_emoji">Emoji / Custom emoji</string>
+    <string name="input_custom_emoji">Emoji</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->
@@ -38,14 +38,14 @@
     <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
+    <string name="sync_title">Sync periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    <string name="attachment_summary_on">Automatically download attachments for incoming requests
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="setting">Setting</string>
-    <string name="nav_like">Favorite</string>
-    <string name="nav_list">List</string>
+    <string name="setting">Settings</string>
+    <string name="nav_like">Favorites</string>
+    <string name="nav_list">Lists</string>
     <string name="nav_cloud">Drive</string>
     <string name="nav_setting_tab">Set tab</string>
     <string name="add_search">Add search</string>
@@ -60,11 +60,11 @@
     <string name="create_folder">Create folder</string>
     <string name="add_account">Add account</string>
     <string name="post">Post</string>
-    <string name="please_speak">Please express your feelings.</string>
+    <string name="please_speak">What's on your mind?</string>
     <string name="open">Open</string>
     <string name="multiple_answer">Multiple answers</string>
     <string name="add_choice">Add answer</string>
-    <string name="cw_hint">Annotation of content(Option)</string>
+    <string name="cw_hint">Alt text (optional)</string>
     <string name="show_reply">Show replies</string>
     <string name="show_conversation">View conversation</string>
     <string name="copy_url">Copy URL</string>
@@ -78,17 +78,17 @@
     <string name="media">Media</string>
     <string name="follow">Follow</string>
 
-    <string name="include_local_renotes">Display local posts Renote on timeline</string>
-    <string name="include_renoted_my_notes">Display your post"'"s Renote on the timeline</string>
-    <string name="include_my_renotes">Display your Renote on the timeline</string>
+    <string name="include_local_renotes">Show local renotes on the timeline</string>
+    <string name="include_renoted_my_notes">Show renotes of your notes on the timeline</string>
+    <string name="include_my_renotes">Show your renotes on the timeline</string>
     <string name="auto_load_timeline">Load timeline automatically</string>
     <string name="timeline">Timeline</string>
 
-    <string name="capture_note_when_stopped">Capture notes when stopped</string>
-    <string name="auto_load_when_stopped">Automatically read timeline even when stopped</string>
+    <string name="capture_note_when_stopped">Look for notes notes when the instance's server is stopped</string>
+    <string name="auto_load_when_stopped">Automatically look for notes notes when the instance's server is stopped</string>
     <string name="sync">Sync</string>
 
-    <string name="movement">Movement</string>
+    <string name="movement">Syncing</string>
     <string name="remove_note">Delete notes</string>
 
     <string name="hide_removed_note">Hide deleted notes</string>
@@ -96,7 +96,7 @@
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="theme_white">White</string>
-    <string name="theme_black">Black</string>
+    <string name="theme_black">AMOLED</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_bread">Pancake</string>
 
@@ -110,15 +110,15 @@
     <string name="play_media">Play</string>
     <string name="avataricon">avatarIcon</string>
     <string name="reaction">Reaction</string>
-    <string name="followed_by">Followed　by %s</string>
-    <string name="replied_by">Replied by %s</string>
+    <string name="followed_by">Followed by %s</string>
+    <string name="replied_by">Reply from %s</string>
     <string name="quoted_by">Quoted by %s</string>
-    <string name="voted_by">poll voted by %s</string>
+    <string name="voted_by">poll voted in by %s</string>
     <string name="mention_by">mentioned by %s</string>
-    <string name="reacted_by">reacted by %s</string>
+    <string name="reacted_by">reaction sent by %s</string>
     <string name="renoted_by">renoted by %s</string>
 
-    <string name="input_message">Tell the other person what you think</string>
+    <string name="input_message">What's up?</string>
 
     <string name="manifest_user_name_pattern">"@"\w([\w-]*\w)?(?:@[\w.\-]+\w)?</string>
     <string name="followee_state">Followed</string>
@@ -131,9 +131,9 @@
 
     <string name="detail">Detail</string>
 
-    <string name="instance_domain">Instance domain</string>
+    <string name="instance_domain">Instance URL</string>
     <string name="sign_in">Login</string>
-    <string name="user_name">User name</string>
+    <string name="user_name">Username</string>
     <string name="password">Password</string>
     <string name="sign_out">Logout</string>
     <string name="token">Token</string>
@@ -155,7 +155,7 @@
 
     <string name="auth_required">Authentication required</string>
     <string name="invalid_url">Invalid URL</string>
-    <string name="invalid_pw_id">Invalid password / ID</string>
+    <string name="invalid_pw_id">Invalid password/ID</string>
 
     <string name="auth">Authentication</string>
 
@@ -164,11 +164,11 @@
 
     <string name="visibility_public">Public</string>
     <string name="visibility_home">Home</string>
-    <string name="visibility_follower">Follower</string>
+    <string name="visibility_follower">Followers only</string>
     <string name="visibility_specified">Direct</string>
-    <string name="visibility_public_local_only">Public(local only)</string>
-    <string name="visibility_home_local_only">Home(local only)</string>
-    <string name="visibility_follower_local_only">Follower(local only)</string>
+    <string name="visibility_public_local_only">Public (local only)</string>
+    <string name="visibility_home_local_only">Home (local only)</string>
+    <string name="visibility_follower_local_only">Followers only (local only)</string>
 
     <string name="show">Show</string>
     <string name="user_list">User list</string>
@@ -180,15 +180,15 @@
 
     <string name="host">Host</string>
     <string name="select_user">Select user</string>
-    <string name="selecting_users">selecting user</string>
+    <string name="selecting_users">Selecting user</string>
     <string name="https">https://</string>
     <string name="conversation">Conversation</string>
     <string name="add_address">Add address</string>
 
     <string name="indefinite_period">Indefinite period</string>
-    <string name="date_and_time_specification">Date and time specification</string>
+    <string name="date_and_time_specification">Specific date and time</string>
 
-    <string name="future">future</string>
+    <string name="future">Future</string>
     <string name="now">Now</string>
     <string name="year_ago">YR</string>
     <string name="month_ago">MOS</string>
@@ -205,7 +205,7 @@
     <string name="selected">Selected</string>
     <string name="more">More</string>
 
-    <string name="delete_and_edit">Delete and edit</string>
+    <string name="delete_and_edit">Delete and redraft</string>
     <string name="license">License</string>
     <string name="standard_reaction">Standard reaction</string>
     <string name="set_the_reaction_displayed_in_the_reaction_picker">Set the reaction displayed in the reaction picker</string>
@@ -213,16 +213,16 @@
     <string name="list_picker">List picker</string>
     <string name="simple_picker">Simple picker</string>
     <string name="enter_reaction">Enter reaction</string>
-    <string name="click_to_delete_the_reaction">Click to delete the reaction</string>
-    <string name="confirm_delete_reaction">Confirm reaction deletion</string>
-    <string name="delete_reaction">Delete reaction</string>
+    <string name="click_to_delete_the_reaction">Tap to remove the reaction</string>
+    <string name="confirm_delete_reaction">Confirm reaction removal</string>
+    <string name="delete_reaction">Remove reaction</string>
     <string name="user">User</string>
     <string name="note_opacity">Note opacity</string>
     <string name="transparent">Transparent</string>
     <string name="opaque">Opaque</string>
     <string name="background_image">Background image</string>
-    <string name="hide_bottom_navigation">Hide Bottom menu</string>
-    <string name="user_name_as_default_display_name">Make user name as default display name</string>
+    <string name="hide_bottom_navigation">Hide bottom menu</string>
+    <string name="user_name_as_default_display_name">Set username as default display name</string>
     <string name="successfully_created_the_app">Successfully created the app</string>
     <string name="continue_auth">Continue</string>
 
@@ -230,12 +230,12 @@
     <string name="global_timeline">Global</string>
     <string name="local_timeline">Local</string>
     <string name="hybrid_timeline">Social</string>
-    <string name="mention">Mention</string>
+    <string name="mention">Mentions</string>
     <string name="add_tab">Add tab</string>
-    <string name="list">List</string>
-    <string name="tag">Hashtag</string>
+    <string name="list">Lists</string>
+    <string name="tag">Hashtags</string>
     <string name="featured">Featured</string>
-    <string name="antenna">Antenna</string>
+    <string name="antenna">Antennas</string>
     <string name="rename">Rename</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
@@ -250,7 +250,7 @@
     <string name="receiving_source">Receiving source</string>
 
     <string name="all_notes">All notes</string>
-    <string name="notes_from_following_users">Notes from following users</string>
+    <string name="notes_from_following_users">Notes from users you follow</string>
     <string name="notes_from_specific_users">Notes from specific users</string>
     <string name="notes_from_specific_list">Notes from specific list</string>
     <string name="notes_from_users_in_the_specified_group">Notes from users in the specified group</string>
@@ -270,13 +270,13 @@
 
     <string name="success">Success</string>
     <string name="failure">Failure</string>
-    <string name="explore_fediverse">Explore Fediverse</string>
+    <string name="explore_fediverse">Explore the Fediverse</string>
     <string name="explore">Explore</string>
     <string name="trending_users">Trending users</string>
     <string name="users_with_recent_activity">Users with recent activity</string>
-    <string name="newly_joined_users">Newly joined users</string>
+    <string name="newly_joined_users">New users</string>
     <string name="newly_discovered_users">Newly discovered users</string>
-    <string name="trending_tag">Trending Tags</string>
+    <string name="trending_tag">Trending hashtags</string>
     <string name="save_draft">Save draft</string>
     <string name="save_the_note_as_a_draft">Save the note as a draft</string>
     <string name="draft_notes">Draft notes</string>
@@ -289,19 +289,19 @@
     <string name="please_again_to_finish">Press again to finish</string>
 
     <string name="url_preview">URL preview</string>
-    <string name="summaly_server_url">Summaly server url</string>
-    <string name="displayed_url_preview">Displayed url preview</string>
-    <string name="preview_display_test">preview display test</string>
+    <string name="summaly_server_url">Summaly server URL</string>
+    <string name="displayed_url_preview">Displayed URL preview</string>
+    <string name="preview_display_test">Preview display test</string>
     <string name="test_url">Test URL</string>
     <string name="from_misskey_api">From Misskey API</string>
     <string name="specify_summaly_server">Specify Summaly server</string>
-    <string name="use_app_implementation_deprecated">Use app implementation (Deprecated)</string>
+    <string name="use_app_implementation_deprecated">Use app implementation (deprecated)</string>
 
-    <string name="use_simple_editor">Use simple editor.</string>
+    <string name="use_simple_editor">Use simple editor</string>
     <string name="retry">Retry</string>
-    <string name="failed_to_get_the_note">Failed to get the note</string>
+    <string name="failed_to_get_the_note">Failed to get note</string>
 
-    <string name="timeout_error">Timeout </string>
+    <string name="timeout_error">Timeout</string>
     <string name="server_error">Server error</string>
     <string name="bot_error">Are you human?</string>
     <string name="auth_error">Authentication error</string>
@@ -322,7 +322,7 @@
     <string name="add_to_list">Add to list</string>
     <string name="promotion">Promotion</string>
     <string name="waiting_4_approval">Waiting for approval</string>
-    <string name="i_have_approved">I have approved</string>
+    <string name="i_have_approved">Approved</string>
     <string name="waiting_4_u_to_approve">Waiting for you to approve</string>
     <string name="learn_note_visibility">Learn note visibility</string>
     <string name="accept">Accept</string>
@@ -350,10 +350,10 @@
     <string name="successfully_created_note">Successfully created the note</string>
     <string name="sensitive">Sensitive</string>
     <string name="authentication_url">Authentication URL</string>
-    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy the URL of the authentication
-        destination to the clipboard.
+    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy authentication
+        destination URL to clipboard.
     </string>
-    <string name="request_follow">%s request follow to you</string>
+    <string name="request_follow">%s wants to follow to you</string>
 
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="follow_approval_pending">Follow approval pending</string>
