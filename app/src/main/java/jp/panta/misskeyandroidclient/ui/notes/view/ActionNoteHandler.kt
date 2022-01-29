@@ -97,10 +97,10 @@ class ActionNoteHandler(
     }
     private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{
         Log.d("ActionNoteHandler", "${it.first.file}")
-        val list = it.second.files.map{fv ->
+        val list = it.second.files.value!!.map{fv ->
             fv.file
         }
-        val index = it.second.files.indexOfFirst { fv ->
+        val index = it.second.files.value!!.indexOfFirst { fv ->
             fv.file == it.first.file
         }
         val intent = MediaActivity.newInstance(activity, list, index)

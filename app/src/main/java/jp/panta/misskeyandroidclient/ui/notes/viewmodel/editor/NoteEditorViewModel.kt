@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -95,6 +96,16 @@ class NoteEditorViewModel @Inject constructor(
         max - (t?.codePointCount(0, t.length) ?: 0)
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
+    val maxFileCount = miCore.getCurrentAccount().filterNotNull().mapNotNull {
+        metaRepository.get(it.instanceDomain)?.getVersion()
+    }.map {
+        if (it >= Version("12.100.2")) {
+            16
+        } else {
+            4
+        }
+    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
+
 
     val files = _state.map {
         it.files
@@ -106,7 +117,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     val isPostAvailable = _state.map {
-        it.checkValidate(textMaxLength = maxTextLength.value)
+        it.checkValidate(textMaxLength = maxTextLength.value, maxFileCount = maxFileCount.value)
     }.asLiveData()
 
     val visibility = _state.map {

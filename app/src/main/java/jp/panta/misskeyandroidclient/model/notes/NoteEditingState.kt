@@ -57,8 +57,8 @@ data class NoteEditingState(
         )
     }
 
-    fun checkValidate(textMaxLength: Int = 3000) : Boolean {
-        if(this.files.size > 4) {
+    fun checkValidate(textMaxLength: Int = 3000, maxFileCount: Int = 4) : Boolean {
+        if(this.files.size > maxFileCount) {
             return false
         }
 

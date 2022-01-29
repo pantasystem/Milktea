@@ -152,6 +152,7 @@
                             emojis="@{note.toShowNote.note.emojis}"
                             translationState="@{note.translateState}"
                             />
+
                     <include
                             android:id="@+id/mediaPreview"
 
@@ -160,10 +161,19 @@
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
                             android:layout_below="@id/translationView"
-                            android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
+                            android:visibility="@{note.files.empty || note.media.isOver4Files ? View.GONE : View.VISIBLE}"
                             tools:visibility="visible"
+                            tools:layout_height="20dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/manyFilePreviewListView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/mediaPreview"
                             tools:layout_height="20dp"
-                            />
+                            android:visibility="gone"
+                            mediaViewData="@{note.media}"
+                            previewAbleList="@{note.media.files}"/>
 
 
 
@@ -174,7 +184,7 @@
                             android:layout_height="wrap_content"
                             tools:listitem="@layout/item_choice"
                             tools:itemCount="2"
-                            android:layout_below="@id/mediaPreview"
+                            android:layout_below="@id/manyFilePreviewListView"
                             android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
 
 
@@ -268,15 +278,16 @@
                                 app:textNode="@{note.subNoteTextNode}"
                                 android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
                                 />
-                        <include layout="@layout/media_preview"
+
+                        <include
+                                layout="@layout/media_preview"
                                 app:media="@{note.subNoteMedia}"
                                 android:id="@+id/subNoteMediaPreview"
                                 android:layout_width="match_parent"
                                 android:layout_height="200dp"
                                 android:layout_below="@id/subNoteText"
-                                android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
-                                tools:layout_height="20dp"
-                                />
+                                android:visibility="@{note.subNoteFiles.empty || note.subNoteMedia.isOver4Files ? View.GONE : View.VISIBLE}"
+                                tools:layout_height="20dp" />
 
 
 
