@@ -47,12 +47,14 @@ class AutoCollapsingLayout : FrameLayout {
         @AttrRes defStyleAttr: Int,
         @StyleRes defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
-        context.theme.obtainStyledAttributes(attrs, R.styleable.AutoExpandableLayout, 0, 0).use {
-            it.apply {
-                val buttonId = getResourceId(R.styleable.AutoExpandableLayout_expandableButton, -1)
-                expandableButtonId = if (buttonId == -1) null else buttonId
-            }
+        val a = context.obtainStyledAttributes(
+            attrs, R.styleable.AutoCollapsingLayout, defStyleAttr, defStyleRes)
+        a.apply {
+            val buttonId = getResourceId(R.styleable.AutoCollapsingLayout_expandableButton, -1)
+            expandableButtonId = if (buttonId == -1) null else buttonId
         }
+
+        a.recycle()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
