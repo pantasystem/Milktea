@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.asLiveData
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewActionType
@@ -23,6 +24,7 @@ fun NoteFilePreview(
     onShow: (FilePreviewTarget)->Unit
 ) {
     val files = noteEditorViewModel.files.observeAsState()
+    val maxFileCount = noteEditorViewModel.maxFileCount.asLiveData().observeAsState()
 
     Row (
         verticalAlignment = Alignment.CenterVertically,
@@ -47,7 +49,7 @@ fun NoteFilePreview(
             }
         )
         Text(
-            "${files.value?.size ?: 0}/4"
+            "${files.value?.size ?: 0}/${maxFileCount.value}"
         )
     }
 

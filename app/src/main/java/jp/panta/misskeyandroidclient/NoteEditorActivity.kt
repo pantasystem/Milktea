@@ -445,7 +445,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         val miCore = applicationContext as MiCore
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
-        val selectableMaxSize = 4 - selectedSize
+        val selectableMaxSize = mViewModel.maxFileCount.value - selectedSize
         Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
@@ -538,7 +538,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             Log.d("NoteEditorActivity", "result:${ids}")
             val size = mViewModel.fileTotal()
 
-            if (ids != null && ids.isNotEmpty() && size + ids.size <= 4) {
+            if (ids != null && ids.isNotEmpty() && size + ids.size <= mViewModel.maxFileCount.value) {
                 mViewModel.addFilePropertyFromIds(ids)
             }
         }
@@ -550,7 +550,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             if (uri != null) {
                 val size = mViewModel.fileTotal()
 
-                if (size > 4) {
+                if (size > mViewModel.maxFileCount.value) {
                     Log.d("NoteEditorActivity", "失敗しました")
                 } else {
                     mViewModel.add(uri.toAppFile(this))
