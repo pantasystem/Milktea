@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Milktea</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -60,7 +60,7 @@
     <string name="create_folder">Create folder</string>
     <string name="add_account">Add account</string>
     <string name="post">Post</string>
-    <string name="please_speak">What's on your mind?</string>
+    <string name="please_speak">What\'s on your mind?</string>
     <string name="open">Open</string>
     <string name="multiple_answer">Multiple answers</string>
     <string name="add_choice">Add answer</string>
@@ -84,8 +84,8 @@
     <string name="auto_load_timeline">Load timeline automatically</string>
     <string name="timeline">Timeline</string>
 
-    <string name="capture_note_when_stopped">Look for notes notes when the instance's server is stopped</string>
-    <string name="auto_load_when_stopped">Automatically look for notes notes when the instance's server is stopped</string>
+    <string name="capture_note_when_stopped" tools:ignore="Typos">Look for notes notes when the instance\'s server is stopped</string>
+    <string name="auto_load_when_stopped" tools:ignore="Typos">Automatically look for notes notes when the instance\'s server is stopped</string>
     <string name="sync">Sync</string>
 
     <string name="movement">Syncing</string>
@@ -118,7 +118,7 @@
     <string name="reacted_by">reaction sent by %s</string>
     <string name="renoted_by">renoted by %s</string>
 
-    <string name="input_message">What's up?</string>
+    <string name="input_message">What\'s up?</string>
 
     <string name="manifest_user_name_pattern">"@"\w([\w-]*\w)?(?:@[\w.\-]+\w)?</string>
     <string name="followee_state">Followed</string>
