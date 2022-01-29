@@ -171,6 +171,7 @@ object MediaPreviewHelper{
             this.visibility = View.GONE
             return
         }
+        isNestedScrollingEnabled = false
 
         val adapter = PreviewAbleFileListAdapter(mediaViewData)
         this.adapter = adapter
