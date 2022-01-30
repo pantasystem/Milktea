@@ -11,11 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Check dir
-        run: ls -la
-      - name: Decrypt secrets
+      - name: Generate google-services.json
         env:
           GOOGLE_SERVICE: ${{ secrets.GOOGLE_SERVICE_JSON }}
-        run: echo $GOOGLE_SERVICE | base64 --decode --ignore-garbage > ./app/google-services.json
+        run: echo $GOOGLE_SERVICE | base64 --decode --ignore-garbage > $GITHUB_WORKSPACE/app/google-services.json
       - name: build
         run: ./gradlew build
