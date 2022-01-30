@@ -45,3 +45,4 @@ export GOOGLE_APPLICATION_CREDENTIALS=firebase-adminのjsonファイル.json
 ```
 
 index.jsを起動します。<br>
+あとはnginxなどで中継するように設定してください。
