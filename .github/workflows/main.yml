@@ -25,5 +25,8 @@ jobs:
         env:
           GOOGLE_SERVICE: ${{ secrets.GOOGLE_SERVICE_JSON }}
         run: echo $GOOGLE_SERVICE | base64 --decode --ignore-garbage > $GITHUB_WORKSPACE/app/google-services.json
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       - name: build
+
         run: ./gradlew build
