@@ -67,6 +67,9 @@ class MFMParserTest{
         val text = "<i>\n> must error\n </i>"
         println(text)
         val node = MFMParser.parse(text)
+        val italic = node!!.childElements[0] as Node
+        assertEquals(ElementType.ITALIC, italic.elementType)
+        assertEquals("\n> must error\n ", (italic.childElements[0] as Text).text)
         println(node)
     }
 
@@ -74,6 +77,11 @@ class MFMParserTest{
     fun testSameBlockNest(){
         val text = "<i><i>error</i></i>"
         val node = MFMParser.parse(text)
+        val italic = node!!.childElements[0] as Node
+        println(node)
+
+        assertEquals(ElementType.ITALIC, italic.elementType)
+        assertEquals(ElementType.TEXT, italic.childElements[0].elementType)
         println(node)
     }
 
