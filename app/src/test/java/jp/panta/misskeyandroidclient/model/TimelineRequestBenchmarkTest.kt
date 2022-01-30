@@ -4,15 +4,19 @@ import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import java.util.*
 
-class TimelineRequestBenchmark {
+@RunWith(JUnit4::class)
+class TimelineRequestBenchmarkTest {
 
     private lateinit var misskeyAPI: MisskeyAPI
 
     @Before
-    fun setup(){
+    fun setUp(){
         misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
     }
     @Test

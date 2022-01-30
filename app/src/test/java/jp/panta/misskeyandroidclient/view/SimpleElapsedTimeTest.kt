@@ -6,6 +6,7 @@ import org.junit.Test
 
 import org.junit.Before
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 class SimpleElapsedTimeTest {
@@ -41,7 +42,7 @@ class SimpleElapsedTimeTest {
     @Test
     fun nowTest(){
 
-        val nowTest = Clock.System.now().plus((-9).days)
+        val nowTest = Clock.System.now().plus((-9).seconds)
         assert(simple.format(nowTest) == "今")
 
     }
