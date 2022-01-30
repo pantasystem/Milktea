@@ -1,28 +1,28 @@
 package jp.panta.misskeyandroidclient.model.reaction.impl
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
-import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
-import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
-import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
-import jp.panta.misskeyandroidclient.util.EncryptionStub
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
-
-@RunWith(JUnit4::class)
-class ReactionHistoryPaginatorImplTest {
+//import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
+//import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+//import jp.panta.misskeyandroidclient.logger.TestLogger
+//import jp.panta.misskeyandroidclient.model.account.Account
+//import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
+//import jp.panta.misskeyandroidclient.model.notes.Note
+//import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
+//import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
+//import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+//import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
+//import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
+//import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
+//import jp.panta.misskeyandroidclient.util.EncryptionStub
+//import kotlinx.coroutines.flow.Flow
+//import kotlinx.coroutines.runBlocking
+//import org.junit.Assert.*
+//import org.junit.Before
+//import org.junit.Test
+//import org.junit.runner.RunWith
+//import org.junit.runners.JUnit4
+//
+//@RunWith(JUnit4::class)
+//class ReactionHistoryPaginatorImplTest {
 
 //    private lateinit var accountRepository: TestAccountRepository
 //    private val misskeyAPIProvider = MisskeyAPIProvider()
@@ -121,4 +121,4 @@ class ReactionHistoryPaginatorImplTest {
 //        }
 //        assertEquals(except, ids)
 //    }
-}
+//}
