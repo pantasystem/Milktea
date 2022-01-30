@@ -9,12 +9,9 @@ import org.junit.Test
 
 class APIErrorTest {
 
-    private lateinit var misskeyAPI: MisskeyAPI
+    private val  misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
 
-    @Before
-    fun setup(){
-        misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
-    }
+
 
     @Test(expected = APIError.ForbiddenException::class)
     suspend fun testClientError() {
