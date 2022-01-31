@@ -100,6 +100,31 @@ class UserListStateTest {
 
     @Test
     fun prependAll() {
+        val accountId = 0L
+        val userList = UserList(
+            UserList.Id(
+                accountId, "listId"
+            ),
+            name = "",
+            createdAt = Clock.System.now(),
+            userIds = emptyList()
+        )
+
+        val allLists = (0 until 20).map {
+            userList.copy(
+                id = userList.id.copy(
+                    userListId = "listId$it"
+                )
+            )
+        }
+        val pages = allLists.chunked(5)
+
+        var state = UserListState(emptyMap())
+        for(page in pages.reversed()) {
+            state = state.prependAll(accountId, page)
+        }
+        println("allLists:${allLists.map{it.id}}")
+        assertEquals(allLists.map { it.id }, state.pagedIdsAccountMap[accountId])
 
     }
 }

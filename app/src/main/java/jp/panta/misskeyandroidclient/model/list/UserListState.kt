@@ -42,12 +42,23 @@ data class UserListState(
                 list.addAll(lists.map {
                     it.id
                 })
-                map[accountId] = list
+                map[accountId] = list.distinct()
             }
         )
     }
 
     fun prependAll(accountId: Long, lists: List<UserList>): UserListState {
-        return this
+        return copy(
+            userListsMap = userListsMap.toMutableMap().also { map ->
+                map.putAll(lists.map { it.id to it })
+            },
+            pagedIdsAccountMap = pagedIdsAccountMap.toMutableMap().also { map ->
+                val list = map[accountId]?.toMutableList() ?: mutableListOf()
+                list.addAll(0, lists.map {
+                    it.id
+                })
+                map[accountId] = list.distinct()
+            }
+        )
     }
 }
