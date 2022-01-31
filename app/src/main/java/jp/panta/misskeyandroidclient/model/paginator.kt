@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.model
 
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
@@ -43,7 +42,7 @@ interface PreviousPaginator {
 /**
  * DTOをEntityに変換し共通のDataStoreにEntityを追加するためのInterface
  */
-interface EntityAdder<DTO, E> {
+interface EntityConverter<DTO, E> {
     suspend fun addAll(list: List<DTO>) : List<E>
 }
 
@@ -62,7 +61,7 @@ interface FutureLoader<DTO> {
 }
 
 class PreviousPagingController<DTO, E>(
-    private val entityAdder: EntityAdder<DTO, E>,
+    private val entityConverter: EntityConverter<DTO, E>,
     private val locker: StateLocker,
     private val state: PaginationState<E>,
     private val previousLoader: PreviousLoader<DTO>
@@ -77,7 +76,7 @@ class PreviousPagingController<DTO, E>(
             runCatching {
                 val res = previousLoader.loadPrevious().throwIfHasError()
                 res.throwIfHasError()
-                entityAdder.addAll(res.body()!!)
+                entityConverter.addAll(res.body()!!)
             }.onFailure {
                 val errorState = PageableState.Error(
                     state.getState().content,
@@ -111,7 +110,7 @@ class PreviousPagingController<DTO, E>(
 }
 
 class FuturePaginatorController<DTO, E>(
-    private val entityAdder: EntityAdder<DTO, E>,
+    private val entityConverter: EntityConverter<DTO, E>,
     private val locker: StateLocker,
     private val state: PaginationState<E>,
     private val futureLoader: FutureLoader<DTO>
@@ -126,7 +125,7 @@ class FuturePaginatorController<DTO, E>(
             runCatching {
                 val res = futureLoader.loadFuture().throwIfHasError()
                 res.throwIfHasError()
-                entityAdder.addAll(res.body()!!).asReversed()
+                entityConverter.addAll(res.body()!!).asReversed()
             }.onFailure {
                 val errorState = PageableState.Error(
                     state.getState().content,

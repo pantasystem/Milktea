@@ -82,7 +82,7 @@ class FilePropertyPagingImpl(
     private val filePropertyDataSource: FilePropertyDataSource
 ) : PaginationState<FileProperty.Id>,
     IdGetter<String>, PreviousLoader<FilePropertyDTO>,
-    EntityAdder<FilePropertyDTO, FileProperty.Id>,
+    EntityConverter<FilePropertyDTO, FileProperty.Id>,
     StateLocker
 {
 

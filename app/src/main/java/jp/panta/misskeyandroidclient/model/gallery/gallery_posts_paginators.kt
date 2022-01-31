@@ -53,12 +53,12 @@ class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>, Get
     }
 }
 
-class GalleryPostsAdder(
+class GalleryPostsConverter(
     private val getAccount: suspend ()-> Account,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userDataSource: UserDataSource,
     private val galleryDataSource: GalleryDataSource
-) : EntityAdder<GalleryPostDTO, GalleryPost.Id> {
+) : EntityConverter<GalleryPostDTO, GalleryPost.Id> {
 
     override suspend fun addAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
         return list.map {

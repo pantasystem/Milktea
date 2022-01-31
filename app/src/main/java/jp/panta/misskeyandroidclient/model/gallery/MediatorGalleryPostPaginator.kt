@@ -64,7 +64,7 @@ class GalleryPostsStoreImpl(
     override val mutex: Mutex = Mutex()
 
     private val galleryPostState = GalleryPostsState()
-    private val entityAdder = GalleryPostsAdder(getAccount, filePropertyDataSource, userDataSource, galleryDataSource)
+    private val entityAdder = GalleryPostsConverter(getAccount, filePropertyDataSource, userDataSource, galleryDataSource)
     private val loader = GalleryPostsLoader(pageable, galleryPostState, misskeyAPIProvider, getAccount, encryption)
     private val previousPagingController = PreviousPagingController(entityAdder, this, galleryPostState, loader)
     private val futurePaginatorController = FuturePaginatorController(entityAdder, this, galleryPostState, loader)
@@ -96,7 +96,7 @@ class LikedGalleryPostStoreImpl(
     override val mutex: Mutex = Mutex()
 
     private val galleryPostState = LikedGalleryPostsState()
-    private val entityAdder = LikedGalleryPostsAdder(getAccount, filePropertyDataSource, userDataSource, galleryDataSource)
+    private val entityAdder = LikedGalleryPostsConverter(getAccount, filePropertyDataSource, userDataSource, galleryDataSource)
     private val loader = LikedGalleryPostsLoader(galleryPostState, misskeyAPIProvider, getAccount, encryption)
     private val previousPagingController = PreviousPagingController(entityAdder, this, galleryPostState, loader)
     private val futurePaginatorController = FuturePaginatorController(entityAdder, this, galleryPostState, loader)

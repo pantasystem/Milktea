@@ -60,7 +60,7 @@ class RenotesPagingImpl(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val encryption: Encryption,
 ) : PreviousLoader<NoteDTO>,
-    EntityAdder<NoteDTO, Renote>,
+    EntityConverter<NoteDTO, Renote>,
     StateLocker,
     PaginationState<Renote>,
     IdGetter<String>
