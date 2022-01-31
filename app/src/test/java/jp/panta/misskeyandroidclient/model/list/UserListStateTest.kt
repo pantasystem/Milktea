@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.model.list
 
-import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Clock
 import org.junit.Assert.*
 
@@ -18,9 +17,11 @@ class UserListStateTest {
             createdAt = Clock.System.now(),
             userIds = emptyList()
         )
-        val userListState = UserListState(mapOf(
-            userList.id to userList
-        ))
+        val userListState = UserListState(
+            mapOf(
+                userList.id to userList
+            )
+        )
         val deleted = userListState.deleted(userList.id)
         assertEquals(0, deleted.userLists.size)
     }
@@ -90,7 +91,7 @@ class UserListStateTest {
         val pages = allLists.chunked(5)
 
         var state = UserListState(emptyMap())
-        for(page in pages) {
+        for (page in pages) {
             state = state.appendAll(accountId, page)
         }
         assertEquals(allLists.map { it.id }, state.pagedIdsAccountMap[accountId])
@@ -120,10 +121,10 @@ class UserListStateTest {
         val pages = allLists.chunked(5)
 
         var state = UserListState(emptyMap())
-        for(page in pages.reversed()) {
+        for (page in pages.reversed()) {
             state = state.prependAll(accountId, page)
         }
-        println("allLists:${allLists.map{it.id}}")
+        println("allLists:${allLists.map { it.id }}")
         assertEquals(allLists.map { it.id }, state.pagedIdsAccountMap[accountId])
 
     }
@@ -157,5 +158,32 @@ class UserListStateTest {
 
         val replacedState = state.replaceAll(accountId, replacedLists)
         assertEquals(replacedLists.map { it.id }, replacedState.pagedIdsAccountMap[accountId])
+    }
+
+    @Test
+    fun getUserLists() {
+        val accountId = 0L
+        val userList = UserList(
+            UserList.Id(
+                accountId, "listId"
+            ),
+            name = "",
+            createdAt = Clock.System.now(),
+            userIds = emptyList()
+        )
+
+        val allLists = (0 until 20).map {
+            userList.copy(
+                id = userList.id.copy(
+                    userListId = "listId$it"
+                )
+            )
+        }
+        var state = UserListState(emptyMap())
+        state = state.replaceAll(accountId, allLists)
+            .replaceAll(accountId + 1, allLists.map {
+                it.copy(id = it.id.copy(accountId = accountId + 1))
+            })
+        assertEquals(allLists, state.getUserLists(accountId))
     }
 }

@@ -77,4 +77,11 @@ data class UserListState(
             }
         )
     }
+
+    fun getUserLists(accountId: Long): List<UserList> {
+        val page = pagedIdsAccountMap[accountId]?: emptyList()
+        return page.mapNotNull {
+            userListsMap[it]
+        }
+    }
 }
