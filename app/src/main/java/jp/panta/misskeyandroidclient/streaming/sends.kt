@@ -30,13 +30,14 @@ sealed class Send {
             @SerialName("userList") USER_LIST,
         }
 
-        /**
-         * @param listId Send.Connect.Type.USER_LISTを使用する場合必須
-         */
         @Serializable
-        data class Body (val id: String, val channel: Type, val pong: Boolean = false, val listId: String? = null) {
+        data class Body (val id: String, val channel: Type, val pong: Boolean = false, val params: Params? = null) {
+            @Serializable
+            data class Params(
+                val listId: String? = null
+            )
             init {
-                require(channel != Type.USER_LIST && listId == null)
+                require(channel != Type.USER_LIST || params?.listId != null)
             }
         }
     }

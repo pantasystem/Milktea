@@ -78,6 +78,7 @@ class TimelineViewModel(
                     || pageable is Pageable.HybridTimeline
                     || pageable is Pageable.LocalTimeline
                     || pageable is Pageable.HomeTimeline
+                    || pageable is Pageable.UserListTimeline
         }.flatMapLatest { account ->
             when(pageable) {
                 is Pageable.GlobalTimeline -> {
