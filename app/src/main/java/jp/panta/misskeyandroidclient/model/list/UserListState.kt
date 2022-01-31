@@ -19,8 +19,8 @@ data class UserListState(
         return copy(
             userListsMap = userListsMap.toMutableMap().also { map ->
                 map[userList.id] = userList
-            }
-        )
+            },
+        ).appendAll(userList.id.accountId, listOf(userList))
     }
 
     fun updated(userList: UserList): UserListState {
@@ -83,5 +83,9 @@ data class UserListState(
         return page.mapNotNull {
             userListsMap[it]
         }
+    }
+
+    fun get(id: UserList.Id): UserList? {
+        return userListsMap[id]
     }
 }
