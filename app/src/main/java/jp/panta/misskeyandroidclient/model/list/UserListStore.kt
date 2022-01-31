@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.list
 
+import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -7,7 +8,7 @@ import javax.inject.Singleton
 
 @Singleton
 class UserListStore @Inject constructor(
-    val userListRepository: UserListRepository
+    private val userListRepository: UserListRepository
 ) {
     private val _state: MutableStateFlow<UserListState> =
         MutableStateFlow(UserListState(emptyMap()))
@@ -38,5 +39,34 @@ class UserListStore @Inject constructor(
     suspend fun delete(id: UserList.Id) {
         userListRepository.delete(id)
         _state.value = _state.value.deleted(id)
+    }
+
+    suspend fun findOne(id: UserList.Id) {
+        val result = userListRepository.findOne(id)
+        _state.value = _state.value.appendAll(id.accountId, listOf(result))
+    }
+
+    suspend fun appendUser(listId: UserList.Id, userId: User.Id) {
+        userListRepository.appendUser(listId, userId)
+        val list = _state.value.get(listId)
+        if (list == null) {
+            findOne(listId)
+        } else {
+            _state.value = _state.value.updated(list.copy(userIds = list.userIds + userId))
+        }
+    }
+
+    suspend fun removeUser(listId: UserList.Id, userId: User.Id) {
+        userListRepository.removeUser(listId, userId)
+        val list = _state.value.get(listId)
+        if (list == null) {
+            findOne(listId)
+        } else {
+            _state.value = _state.value.updated(
+                list.copy(
+                    userIds = list.userIds.filterNot { uId -> uId == userId }
+                )
+            )
+        }
     }
 }
