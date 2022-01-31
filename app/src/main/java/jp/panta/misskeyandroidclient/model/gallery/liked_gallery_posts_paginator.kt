@@ -60,12 +60,12 @@ class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<Str
     }
 }
 
-class LikedGalleryPostsAdder(
+class LikedGalleryPostsConverter(
     private val getAccount: suspend () -> Account,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userDataSource: UserDataSource,
     private val galleryDataSource: GalleryDataSource
-) : EntityAdder<LikedGalleryPost, LikedGalleryPostId> {
+) : EntityConverter<LikedGalleryPost, LikedGalleryPostId> {
 
     override suspend fun addAll(list: List<LikedGalleryPost>): List<LikedGalleryPostId> {
         val account = getAccount.invoke()
