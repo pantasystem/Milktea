@@ -47,6 +47,22 @@ data class UserListState(
         )
     }
 
+    fun replaceAll(accountId: Long, lists: List<UserList>): UserListState {
+        return copy(
+            userListsMap = userListsMap.toMutableMap().also { map ->
+                map.putAll(lists.map {
+                    it.id to it
+                })
+            },
+            pagedIdsAccountMap = pagedIdsAccountMap.toMutableMap().also { map ->
+                map[accountId] = lists.map {
+                    it.id
+                }
+            }
+
+        )
+    }
+
     fun prependAll(accountId: Long, lists: List<UserList>): UserListState {
         return copy(
             userListsMap = userListsMap.toMutableMap().also { map ->
