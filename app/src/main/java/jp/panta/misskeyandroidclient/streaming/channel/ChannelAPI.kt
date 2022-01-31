@@ -25,6 +25,7 @@ class ChannelAPI(
         data class UserList(
             val userListId: String
         ) : Type
+
         data class Antenna(
             val antennaId: String
         ) : Type
