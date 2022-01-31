@@ -13,7 +13,9 @@ import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.list.UserListRepository
 import jp.panta.misskeyandroidclient.model.users.User
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class UserListRepositoryWebAPIImpl @Inject constructor(
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
