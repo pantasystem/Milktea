@@ -127,4 +127,35 @@ class UserListStateTest {
         assertEquals(allLists.map { it.id }, state.pagedIdsAccountMap[accountId])
 
     }
+
+    @Test
+    fun replaceAll() {
+        val accountId = 0L
+        val userList = UserList(
+            UserList.Id(
+                accountId, "listId"
+            ),
+            name = "",
+            createdAt = Clock.System.now(),
+            userIds = emptyList()
+        )
+
+        val allLists = (0 until 20).map {
+            userList.copy(
+                id = userList.id.copy(
+                    userListId = "listId$it"
+                )
+            )
+        }
+
+        val state = UserListState(emptyMap())
+        state.appendAll(accountId, allLists)
+
+        val replacedLists = allLists.map {
+            it.copy(id = it.id.copy(userListId = it.id.userListId + "+replaced"))
+        }
+
+        val replacedState = state.replaceAll(accountId, replacedLists)
+        assertEquals(replacedLists.map { it.id }, replacedState.pagedIdsAccountMap[accountId])
+    }
 }
