@@ -28,16 +28,19 @@ sealed class Send {
             @SerialName("hybridTimeline") HYBRID_TIMELINE,
             @SerialName("globalTimeline") GLOBAL_TIMELINE,
             @SerialName("userList") USER_LIST,
+            @SerialName("antenna") ANTENNA,
         }
 
         @Serializable
         data class Body (val id: String, val channel: Type, val pong: Boolean = false, val params: Params? = null) {
             @Serializable
             data class Params(
-                val listId: String? = null
+                val listId: String? = null,
+                val antennaId: String? = null,
             )
             init {
                 require(channel != Type.USER_LIST || params?.listId != null)
+                require(channel != Type.ANTENNA || params?.antennaId != null)
             }
         }
     }

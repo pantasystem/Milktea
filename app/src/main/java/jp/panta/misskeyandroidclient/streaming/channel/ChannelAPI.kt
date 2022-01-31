@@ -25,6 +25,10 @@ class ChannelAPI(
         data class UserList(
             val userListId: String
         ) : Type
+
+        data class Antenna(
+            val antennaId: String
+        ) : Type
     }
 
     private val logger = loggerFactory.create("ChannelAPI")
@@ -157,10 +161,8 @@ class ChannelAPI(
             is Type.Local -> Send.Connect.Type.LOCAL_TIMELINE
             is Type.Home -> Send.Connect.Type.HOME_TIMELINE
             is Type.Main -> Send.Connect.Type.MAIN
-            is Type.UserList -> {
-                logger.debug("ユーザーリストなのだわ")
-                Send.Connect.Type.USER_LIST
-            }
+            is Type.UserList -> Send.Connect.Type.USER_LIST
+            is Type.Antenna -> Send.Connect.Type.ANTENNA
         }
 
         val id = typeIdMap[type] ?: UUID.randomUUID().toString()
@@ -173,7 +175,8 @@ class ChannelAPI(
                     channel = body,
                     id = id,
                     params = Send.Connect.Body.Params(
-                        listId = (type as? Type.UserList)?.userListId
+                        listId = (type as? Type.UserList)?.userListId,
+                        antennaId = (type as? Type.Antenna)?.antennaId,
                     )
                 )
             ).toJson()
