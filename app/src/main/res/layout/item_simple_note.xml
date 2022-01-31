@@ -20,8 +20,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
+            android:paddingTop="8dp"
 
             app:transitionDestinationNote="@{note.toShowNote.note}"
             app:clickedView="@{elapsedTime}"
@@ -54,7 +53,7 @@
                 android:textStyle="bold"
                 android:textSize="15sp"
 
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="4dp"
                 tools:text="名前"
                 />
         <androidx.emoji.widget.EmojiTextView
@@ -73,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:layout_toEndOf="@id/subName"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:singleLine="true"
                 android:ellipsize="end"
                 elapsedTime="@{note.toShowNote.note.createdAt}"
@@ -318,11 +317,11 @@
                 >
 
             <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp" app:srcCompat="@drawable/ic_reply_black_24dp"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp" app:srcCompat="@drawable/ic_reply_black_24dp"
                     android:id="@+id/imageButton"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="8dp"
+                    android:padding="6dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                     android:contentDescription="@string/reply_title"
@@ -336,11 +335,11 @@
                     android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
                     />
             <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp" app:srcCompat="@drawable/ic_re_note"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp" app:srcCompat="@drawable/ic_re_note"
                     android:id="@+id/imageButton2"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="8dp"
+                    android:padding="6dp"
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/renote"
                     app:tint="?attr/colorNoteActionButtonTint"
@@ -358,13 +357,13 @@
 
                     />
             <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
                     app:isReacted="@{note.myReaction != null}"
                     tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                     android:id="@+id/imageButton3"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="8dp"
+                    android:padding="6dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
                     android:contentDescription="@string/reaction"
@@ -381,11 +380,11 @@
 
                     />
             <ImageButton
-                    android:layout_width="40dp"
-                    android:layout_height="40dp" app:srcCompat="@drawable/ic_more_horiz_black_24dp"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp" app:srcCompat="@drawable/ic_more_horiz_black_24dp"
                     android:id="@+id/imageButton4"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="8dp"
+                    android:padding="6dp"
                     android:scaleType="centerCrop"
                     android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
                     android:contentDescription="@string/more"
