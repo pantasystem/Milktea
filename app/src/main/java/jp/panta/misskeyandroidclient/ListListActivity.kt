@@ -5,11 +5,13 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
 import jp.panta.misskeyandroidclient.model.list.UserList
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.onEach
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback, UserListEditorDialog.OnSubmittedListener{
 
     companion object{
@@ -43,7 +46,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     }
 
     @ExperimentalCoroutinesApi
-    private var mListListViewModel: ListListViewModel? = null
+    val mListListViewModel: ListListViewModel by viewModels()
 
     private var mPullPushUserViewModelEventDisposable: Disposable? = null
 
@@ -59,12 +62,11 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         val miCore = application as MiCore
 
         val layoutManager = LinearLayoutManager(this)
-        mListListViewModel = ViewModelProvider(this, ListListViewModel.Factory(miCore))[ListListViewModel::class.java]
 
         val listAdapter =
         if(addUserId == null){
             ListListAdapter(
-                mListListViewModel!!,
+                mListListViewModel,
                 this,
                 this
             )
@@ -77,12 +79,12 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
             if(mPullPushUserViewModelEventDisposable?.isDisposed == true){
                 mPullPushUserViewModelEventDisposable = pullPushUserViewModel.pullPushEvent.subscribe {
-                    mListListViewModel?.fetch()
+                    mListListViewModel.fetch()
                 }
             }
 
             ListListAdapter(
-                mListListViewModel!!,
+                mListListViewModel,
                 this,
                 this,
                 addUserId,
@@ -93,7 +95,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
         mBinding.contentListList.listListView.adapter = listAdapter
         mBinding.contentListList.listListView.layoutManager = layoutManager
-        mListListViewModel?.userListList?.observe(this, { userListList ->
+        mListListViewModel.userListList.observe(this, { userListList ->
             listAdapter.submitList(userListList)
         })
 
@@ -109,8 +111,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
     @ExperimentalCoroutinesApi
     private fun setUpObservers(){
-        mListListViewModel?.showUserDetailEvent?.removeObserver(showUserListDetail)
-        mListListViewModel?.showUserDetailEvent?.observe(this, showUserListDetail)
+        mListListViewModel.showUserDetailEvent.removeObserver(showUserListDetail)
+        mListListViewModel.showUserDetailEvent.observe(this, showUserListDetail)
 
     }
 
@@ -132,7 +134,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
 
     override fun onSubmit(name: String) {
-        mListListViewModel?.createUserList(name)
+        mListListViewModel.createUserList(name)
     }
 
     @ExperimentalCoroutinesApi
@@ -140,7 +142,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         if(it.resultCode == RESULT_OK){
             val updated = it.data?.getSerializableExtra(UserListDetailActivity.EXTRA_UPDATED_USER_LIST) as? UserList
             if(updated != null){
-                mListListViewModel?.onUserListUpdated(updated)
+                mListListViewModel.fetch()
             }
 
         }
