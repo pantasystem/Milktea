@@ -171,7 +171,7 @@ class MainActivity : AppCompatActivity(){
 
         // NOTE: 最新の通知をSnackBar等に表示する
         miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
-            miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map { body ->
+            miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
                 body as? ChannelBody.Main.Notification
             }.filterNotNull().map {
                 ac to it
