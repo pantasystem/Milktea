@@ -37,7 +37,7 @@ class MessageObserver(
             }
             emit(accountRepository.get(accountId))
         }.flatMapLatest { ac ->
-            channelAPIProvider.get(ac).connect(ChannelAPI.Type.MAIN).map{
+            channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {
                 getters.messageRelationGetter.get(ac, it)
@@ -54,7 +54,7 @@ class MessageObserver(
         return suspend {
             channelAPIProvider.get(ac)
         }.asFlow().flatMapLatest {
-            it.connect(ChannelAPI.Type.MAIN)
+            it.connect(ChannelAPI.Type.Main)
         }.map{
             (it as? ChannelBody.Main.MessagingMessage)?.body
         }.filterNotNull().map {

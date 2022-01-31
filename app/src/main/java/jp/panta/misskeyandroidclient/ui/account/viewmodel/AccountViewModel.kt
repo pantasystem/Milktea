@@ -75,7 +75,7 @@ class AccountViewModel(
         }.launchIn(viewModelScope + Dispatchers.IO)
 
         miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac->
-            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map {
                 ac to it
             }
         }.map { pair ->

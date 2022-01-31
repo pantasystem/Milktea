@@ -27,12 +27,18 @@ sealed class Send {
             @SerialName("localTimeline") LOCAL_TIMELINE,
             @SerialName("hybridTimeline") HYBRID_TIMELINE,
             @SerialName("globalTimeline") GLOBAL_TIMELINE,
+            @SerialName("userList") USER_LIST,
         }
 
+        /**
+         * @param listId Send.Connect.Type.USER_LISTを使用する場合必須
+         */
         @Serializable
-        data class Body (val id: String, val channel: Type, val pong: Boolean = false)
-
-
+        data class Body (val id: String, val channel: Type, val pong: Boolean = false, val listId: String? = null) {
+            init {
+                require(channel != Type.USER_LIST && listId == null)
+            }
+        }
     }
 
     @SerialName("readNotification")

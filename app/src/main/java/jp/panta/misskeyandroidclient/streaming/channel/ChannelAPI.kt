@@ -15,18 +15,26 @@ class ChannelAPI(
     loggerFactory: Logger.Factory,
 ) : SocketMessageEventListener, SocketStateEventListener {
 
-    enum class Type {
-        MAIN, HOME, LOCAL, HYBRID, GLOBAL
+
+    sealed interface Type {
+        object Main : Type
+        object Home : Type
+        object Local : Type
+        object Hybrid : Type
+        object Global : Type
+        data class UserList(
+            val userListId: String
+        ) : Type
     }
 
     private val logger = loggerFactory.create("ChannelAPI")
 
     private var listenersMap = mapOf<Type, Set<(ChannelBody)->Unit>>(
-        Type.MAIN to hashSetOf(),
-        Type.HOME to hashSetOf(),
-        Type.LOCAL to hashSetOf(),
-        Type.HYBRID to hashSetOf(),
-        Type.GLOBAL to hashSetOf()
+        Type.Main to hashSetOf(),
+        Type.Home to hashSetOf(),
+        Type.Local to hashSetOf(),
+        Type.Hybrid to hashSetOf(),
+        Type.Global to hashSetOf(),
     )
 
     private var typeIdMap = mapOf<Type, String>()
@@ -68,6 +76,7 @@ class ChannelAPI(
         return count() == 0
     }
 
+
     private fun connect(type: Type, listener: (ChannelBody)->Unit): Unit = runBlocking{
         // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
         mutex.withLock {
@@ -76,9 +85,13 @@ class ChannelAPI(
                 return@runBlocking
             }
 
-            val sets = listenersMap[type]?.toMutableSet()?.also {
+            fun getOrNew(type: Type): Set<(ChannelBody)->Unit> {
+                return listenersMap[type]?: emptySet()
+            }
+
+            val sets = getOrNew(type).toMutableSet().also {
                 it.add(listener)
-            } ?: throw IllegalStateException("listenersがNULLです。")
+            }
             listenersMap = listenersMap.toMutableMap().also {
                 it[type] = sets
             }
@@ -139,18 +152,27 @@ class ChannelAPI(
     private fun sendConnect(type: Type): Boolean {
         logger.debug("sendConnect($type)")
         val body = when(type){
-            Type.GLOBAL -> Send.Connect.Type.GLOBAL_TIMELINE
-            Type.HYBRID -> Send.Connect.Type.HYBRID_TIMELINE
-            Type.LOCAL -> Send.Connect.Type.LOCAL_TIMELINE
-            Type.HOME -> Send.Connect.Type.HOME_TIMELINE
-            Type.MAIN -> Send.Connect.Type.MAIN
+            is Type.Global -> Send.Connect.Type.GLOBAL_TIMELINE
+            is Type.Hybrid -> Send.Connect.Type.HYBRID_TIMELINE
+            is Type.Local -> Send.Connect.Type.LOCAL_TIMELINE
+            is Type.Home -> Send.Connect.Type.HOME_TIMELINE
+            is Type.Main -> Send.Connect.Type.MAIN
+            is Type.UserList -> Send.Connect.Type.USER_LIST
         }
 
         val id = typeIdMap[type]?: UUID.randomUUID().toString()
         typeIdMap = typeIdMap.toMutableMap().also {
             it[type] = id
         }
-        return socket.send(Send.Connect(Send.Connect.Body(channel = body, id = id)).toJson()).also {
+        return socket.send(
+            Send.Connect(
+                Send.Connect.Body(
+                    channel = body,
+                    id = id,
+                    listId = (type as? Type.UserList)?.userListId
+                )
+            ).toJson()
+        ).also {
             logger.debug("channel=$body API登録完了 result=$it, typeIdMap=${typeIdMap}, hash=${this.hashCode()}")
         }
     }

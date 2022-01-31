@@ -81,18 +81,21 @@ class TimelineViewModel(
         }.flatMapLatest { account ->
             when(pageable) {
                 is Pageable.GlobalTimeline -> {
-                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.GLOBAL)
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.Global)
                 }
                 is Pageable.HybridTimeline -> {
-                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.HYBRID)
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.Hybrid)
 
                 }
                 is Pageable.LocalTimeline -> {
-                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.LOCAL)
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.Local)
 
                 }
                 is Pageable.HomeTimeline -> {
-                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.HOME)
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.Home)
+                }
+                is Pageable.UserListTimeline -> {
+                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.UserList(userListId = pageable.listId))
                 }
                 else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
             }

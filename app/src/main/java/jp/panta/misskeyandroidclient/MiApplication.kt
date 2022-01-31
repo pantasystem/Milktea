@@ -228,7 +228,7 @@ class MiApplication : Application(), MiCore {
 
         val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
         getCurrentAccount().filterNotNull().flatMapLatest { ac ->
-            getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map { body ->
+            getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
                 ac to body
             }
         }.mapNotNull {

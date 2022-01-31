@@ -58,7 +58,7 @@ class NotificationViewModel(
         }.launchIn(viewModelScope)
 
         miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
-            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map {
+            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map {
                 it as? ChannelBody.Main.Notification
             }.filterNotNull().map {
                 ac to it
