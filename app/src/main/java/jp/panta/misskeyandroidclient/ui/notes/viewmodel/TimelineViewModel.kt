@@ -27,14 +27,13 @@ class TimelineViewModel(
     val miCore: MiCore,
     val settingStore: SettingStore,
     val include: NoteRequest.Include
-) : ViewModel(){
+) : ViewModel() {
 
     data class Request(
         val sinceId: String? = null,
         val untilId: String? = null,
         var substitute: Request? = null
     )
-
 
 
     val tag = "TimelineViewModel"
@@ -51,7 +50,11 @@ class TimelineViewModel(
 
     private val removeSize = 50
 
-    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
+    private val noteDataSourceAdder = NoteDataSourceAdder(
+        miCore.getUserDataSource(),
+        miCore.getNoteDataSource(),
+        miCore.getFilePropertyDataSource()
+    )
 
 
     val isLoading = MutableLiveData<Boolean>()
@@ -81,7 +84,7 @@ class TimelineViewModel(
                     || pageable is Pageable.UserListTimeline
                     || pageable is Pageable.Antenna
         }.flatMapLatest { account ->
-            when(pageable) {
+            when (pageable) {
                 is Pageable.GlobalTimeline -> {
                     miCore.getChannelAPI(account).connect(ChannelAPI.Type.Global)
                 }
@@ -97,26 +100,38 @@ class TimelineViewModel(
                     miCore.getChannelAPI(account).connect(ChannelAPI.Type.Home)
                 }
                 is Pageable.UserListTimeline -> {
-                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.UserList(userListId = pageable.listId))
+                    miCore.getChannelAPI(account)
+                        .connect(ChannelAPI.Type.UserList(userListId = pageable.listId))
                 }
                 is Pageable.Antenna -> {
-                    miCore.getChannelAPI(account).connect(ChannelAPI.Type.Antenna(antennaId = pageable.antennaId))
+                    miCore.getChannelAPI(account)
+                        .connect(ChannelAPI.Type.Antenna(antennaId = pageable.antennaId))
                 }
                 else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
             }
         }.map {
-          it as? ChannelBody.ReceiveNote
-        }.filterNotNull().map{
+            it as? ChannelBody.ReceiveNote
+        }.filterNotNull().map {
             noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it.body)
         }.map {
             miCore.getGetters().noteRelationGetter.get(it)
         }.filter {
-           !mNoteIds.contains(it.note.id) && !this.mIsLoading
-        }.map{
-            if(it.reply == null) {
-                PlaneNoteViewData(it, getAccount(), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
-            }else{
-                HasReplyToNoteViewData(it, getAccount(), miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+            !mNoteIds.contains(it.note.id) && !this.mIsLoading
+        }.map {
+            if (it.reply == null) {
+                PlaneNoteViewData(
+                    it,
+                    getAccount(),
+                    miCore.getNoteCaptureAdapter(),
+                    miCore.getTranslationStore()
+                )
+            } else {
+                HasReplyToNoteViewData(
+                    it,
+                    getAccount(),
+                    miCore.getNoteCaptureAdapter(),
+                    miCore.getTranslationStore()
+                )
             }
         }.onEach { note ->
             this.mNoteIds.add(note.id)
@@ -124,7 +139,7 @@ class TimelineViewModel(
             val list = ArrayList<PlaneNoteViewData>(this.timelineState.value.notes).also {
                 it.add(0, note)
             }
-            if(timelineState.value.notes.size > removeSize && position == 0 && timelineState.subscriptionCount.value > 0) {
+            if (timelineState.value.notes.size > removeSize && position == 0 && timelineState.subscriptionCount.value > 0) {
                 val removed = list.subList(removeSize, list.size - 1)
 
                 mNoteIds.removeAll(removed.map { it.id }.toSet())
@@ -143,23 +158,21 @@ class TimelineViewModel(
     }
 
 
-
-
-    fun getTimelineState() : StateFlow<TimelineState>{
+    fun getTimelineState(): StateFlow<TimelineState> {
         return timelineState
     }
 
-    fun loadNew(){
+    fun loadNew() {
         synchronized(timelineState) {
             logger.debug("loadNew")
-            if( mIsInitLoading || mIsLoading ) {
+            if (mIsInitLoading || mIsLoading) {
                 logger.debug("loadNewキャンセル")
                 return
             }
             mIsLoading = true
             val request = timelineState.value.makeSinceIdRequest()
             logger.debug("makeSinceIdRequest完了:$request")
-            if(request?.sinceId == null){
+            if (request?.sinceId == null) {
                 mIsInitLoading = false
                 mIsLoading = false
                 logger.debug("初期読み込みへ移行")
@@ -171,7 +184,7 @@ class TimelineViewModel(
                 runCatching {
                     logger.debug("読み込みを開始")
                     val res = syncLoad(request)
-                    val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                    val list = res?.second?.filter(::filterDuplicate) ?: emptyList()
                     list.captureNotes()
                     loadUrlPreviews(list)
 
@@ -182,7 +195,7 @@ class TimelineViewModel(
                     }
 
                     // 先頭で購読されていてノート数が一定数以上なら後端のノートをリスト上から削除する
-                    if(position == 0 && newList.size > removeSize  && timelineState.subscriptionCount.value > 0) {
+                    if (position == 0 && newList.size > removeSize && timelineState.subscriptionCount.value > 0) {
                         val removed = newList.subList(removeSize, newList.size - 1)
                         removed.forEach { it.job?.cancel() }
                         mNoteIds.removeAll(removed.map(::mapId).toSet())
@@ -207,25 +220,25 @@ class TimelineViewModel(
 
     }
 
-    fun loadOld(){
+    fun loadOld() {
         synchronized(timelineState) {
             val request = timelineState.value.makeUntilIdRequest()
             request?.untilId
                 ?: return loadInit()
-            if( mIsLoading || mIsInitLoading ){
+            if (mIsLoading || mIsInitLoading) {
                 return
             }
             mIsLoading = true
 
-            viewModelScope.launch(Dispatchers.IO){
+            viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     val res = syncLoad(request)
-                    val list = res?.second?.filter(::filterDuplicate)?: emptyList()
+                    val list = res?.second?.filter(::filterDuplicate) ?: emptyList()
                     list.captureNotes()
                     loadUrlPreviews(list)
                     mNoteIds.addAll(list.map(::mapId))
                     val state = timelineState.value
-                    val newList = ArrayList<PlaneNoteViewData>(state.notes).apply{
+                    val newList = ArrayList<PlaneNoteViewData>(state.notes).apply {
                         addAll(list)
                     }
                     TimelineState.LoadOld(
@@ -244,21 +257,24 @@ class TimelineViewModel(
 
     }
 
-    fun loadInit(){
+    fun loadInit() {
         synchronized(timelineState) {
-            Log.d("TimelineViewModel", "初期読み込みを開始します isLoading:${mIsLoading}, isInitLoading:${isInitLoading}")
+            Log.d(
+                "TimelineViewModel",
+                "初期読み込みを開始します isLoading:${mIsLoading}, isInitLoading:${isInitLoading}"
+            )
 
-            if(  mIsInitLoading || mIsLoading ) {
+            if (mIsInitLoading || mIsLoading) {
                 return
             }
             mIsLoading = true
             mIsInitLoading = true
 
-            viewModelScope.launch(Dispatchers.IO){
+            viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     val account = getAccount()
                     val response = account.getPagedStore().loadInit()
-                    val list = response.second?: emptyList()
+                    val list = response.second ?: emptyList()
                     logger.debug("Networkから受信")
                     val state = TimelineState.Init(
                         list,
@@ -288,9 +304,11 @@ class TimelineViewModel(
     }
 
 
-
-    private suspend fun syncLoad(request: Request?, isRetry: Boolean = false): Pair<BodyLessResponse, List<PlaneNoteViewData>?>?{
-        if(request == null && isRetry){
+    private suspend fun syncLoad(
+        request: Request?,
+        isRetry: Boolean = false
+    ): Pair<BodyLessResponse, List<PlaneNoteViewData>?>? {
+        if (request == null && isRetry) {
             return null
         }
         val account = getAccount()
@@ -307,24 +325,24 @@ class TimelineViewModel(
         }
         val notes = res.second
 
-        if(notes?.isNotEmpty() == true){
+        if (notes?.isNotEmpty() == true) {
             return res
         }
 
-        val targetNoteId = request?.untilId?: request?.sinceId ?: return null
+        val targetNoteId = request?.untilId ?: request?.sinceId ?: return null
 
-        val targetNote = try{
+        val targetNote = try {
             account.getMisskeyAPI().showNote(
                 NoteRequest(
                     i = account.getI(miCore.getEncryption()),
                     noteId = targetNoteId
                 )
             )
-        }catch(e: Throwable){
+        } catch (e: Throwable) {
             null
         }
 
-        if(targetNote != null){
+        if (targetNote != null) {
             return res
         }
 
@@ -334,10 +352,10 @@ class TimelineViewModel(
 
 
     private suspend fun loadUrlPreviews(list: List<PlaneNoteViewData>) {
-        val account  = getAccount()
+        val account = getAccount()
 
-        list.forEach{ note ->
-            note.textNode?.getUrls()?.let{ urls ->
+        list.forEach { note ->
+            note.textNode?.getUrls()?.let { urls ->
                 UrlPreviewLoadTask(
                     miCore.getUrlPreviewStore(account),
                     urls,
@@ -349,16 +367,14 @@ class TimelineViewModel(
     }
 
 
-
-    private fun mapId(planeNoteViewData: PlaneNoteViewData): Note.Id{
+    private fun mapId(planeNoteViewData: PlaneNoteViewData): Note.Id {
         return planeNoteViewData.id
     }
 
-    private fun filterDuplicate(planeNoteViewData: PlaneNoteViewData) : Boolean{
+    private fun filterDuplicate(planeNoteViewData: PlaneNoteViewData): Boolean {
         Log.d("TM-VM-Filter", "重複を発見したため排除しました")
-        return ! mNoteIds.contains(planeNoteViewData.id)
+        return !mNoteIds.contains(planeNoteViewData.id)
     }
-
 
 
     private fun List<PlaneNoteViewData>.captureNotes() {
@@ -367,7 +383,7 @@ class TimelineViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             notes.forEach { note ->
                 note.job = note.eventFlow.onEach {
-                    if(it is NoteDataSource.Event.Deleted) {
+                    if (it is NoteDataSource.Event.Deleted) {
                         timelineState.value =
                             TimelineState.Deleted(
                                 timelineState.value.notes.filterNot { pnvd ->
@@ -382,14 +398,13 @@ class TimelineViewModel(
     }
 
 
-
     private fun TimelineState?.makeUntilIdRequest(substituteSize: Int = 2): Request? {
-        val ids = this?.getUntilIds(substituteSize)?: emptyList()
+        val ids = this?.getUntilIds(substituteSize) ?: emptyList()
         return ids.makeUntilIdRequest()
     }
 
     private fun List<String>.makeUntilIdRequest(index: Int = 0): Request? {
-        if(this.size <= index) {
+        if (this.size <= index) {
             return null
         }
 
@@ -400,13 +415,13 @@ class TimelineViewModel(
         return now
     }
 
-    private fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): Request?{
+    private fun TimelineState?.makeSinceIdRequest(substituteSize: Int = 2): Request? {
         logger.debug("makeSinceIdRequest")
-        return (this?.getSinceIds(substituteSize)?: emptyList()).makeSinceIdRequest()
+        return (this?.getSinceIds(substituteSize) ?: emptyList()).makeSinceIdRequest()
     }
 
-    private fun List<String>.makeSinceIdRequest(index: Int = 0): Request?{
-        if(this.size <= index){
+    private fun List<String>.makeSinceIdRequest(index: Int = 0): Request? {
+        if (this.size <= index) {
             return null
         }
         val now = Request(
@@ -419,20 +434,19 @@ class TimelineViewModel(
     //
     private var mAccountCache: Account? = account
     private suspend fun getAccount(): Account {
-        if(mAccountCache != null) {
+        if (mAccountCache != null) {
             mAccountCache
         }
 
-        if(accountId != null && accountId > 0) {
+        if (accountId != null && accountId > 0) {
             val ac = accountRepository.get(accountId)
             mAccountCache = ac
-            return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
+            return mAccountCache ?: throw IllegalStateException("Accountが取得できませんでした。")
         }
 
         mAccountCache = accountRepository.getCurrentAccount()
-        return mAccountCache?: throw IllegalStateException("Accountが取得できませんでした。")
+        return mAccountCache ?: throw IllegalStateException("Accountが取得できませんでした。")
     }
-
 
 
     private fun Account.getMisskeyAPI(): MisskeyAPI {
@@ -440,7 +454,7 @@ class TimelineViewModel(
     }
 
     private fun Account.getPagedStore(): NotePagedStore {
-        return when(pageable){
+        return when (pageable) {
             is Pageable.Favorite -> FavoriteNotePagingStore(
                 this,
                 pageable,
@@ -459,7 +473,7 @@ class TimelineViewModel(
     }
 
     private fun handleError(t: Throwable) {
-        if(t is Exception) {
+        if (t is Exception) {
             mErrorEvent.tryEmit(t)
         }
 
