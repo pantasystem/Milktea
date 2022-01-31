@@ -70,7 +70,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         UserListDetailViewModel.provideFactory(assistedFactory, listId)
     }
 
-    private var mIsNameUpdated: Boolean = false
     private var mUserListName: String = ""
     private val binding: ActivityUserListDetailBinding by dataBinding()
 
@@ -90,12 +89,14 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
+        binding.userListDetailViewPager.adapter = PagerAdapter(listId)
+        binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
+
         mUserListDetailViewModel.userList.observe(this, { ul ->
             supportActionBar?.title = ul.name
             mUserListName = ul.name
 
-            binding.userListDetailViewPager.adapter = PagerAdapter(ul.id)
-            binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
+
 
             if(intent.action == ACTION_EDIT_NAME){
                 intent.action = ACTION_SHOW
@@ -139,9 +140,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                 showEditUserListDialog()
             }
             android.R.id.home ->{
-                if(mIsNameUpdated){
-                    updatedResultFinish()
-                }
+                finish()
             }
             R.id.action_add_user ->{
                 val selected = mUserListDetailViewModel.listUsers.value?.mapNotNull {
@@ -153,9 +152,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }
         return super.onOptionsItemSelected(item)
     }
-    override fun onBackPressed() {
-        updatedResultFinish()
-    }
+
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -200,23 +197,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }else{
             miCore.removePageInCurrentAccount(page)
         }
-    }
-
-    @FlowPreview
-    private fun updatedResultFinish(){
-        val updatedEvent = mUserListDetailViewModel.updateEvents.toList()?: emptyList()
-
-        val data = Intent().apply{
-            if(updatedEvent.isNotEmpty()){
-                putExtra(EXTRA_UPDATED_USER_LIST, mUserListDetailViewModel.userList.value)
-            }
-        }
-        if(mListId == null || updatedEvent.isEmpty()){
-            setResult(RESULT_CANCELED)
-        }else{
-            setResult(RESULT_OK, data)
-        }
-        finish()
     }
 
 

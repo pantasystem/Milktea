@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -119,7 +118,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     @ExperimentalCoroutinesApi
     private val showUserListDetail = Observer<UserList>{ ul ->
         val intent = UserListDetailActivity.newIntent(this, ul.id)
-        requestUserListActivityResult.launch(intent)
+        startActivity(intent)
     }
 
 
@@ -129,7 +128,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
         val intent = UserListDetailActivity.newIntent(this, userList.id)
         intent.action = UserListDetailActivity.ACTION_EDIT_NAME
-        requestUserListActivityResult.launch(intent)
+        startActivity(intent)
     }
 
 
@@ -137,16 +136,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         mListListViewModel.createUserList(name)
     }
 
-    @ExperimentalCoroutinesApi
-    val requestUserListActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if(it.resultCode == RESULT_OK){
-            val updated = it.data?.getSerializableExtra(UserListDetailActivity.EXTRA_UPDATED_USER_LIST) as? UserList
-            if(updated != null){
-                mListListViewModel.fetch()
-            }
-
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
