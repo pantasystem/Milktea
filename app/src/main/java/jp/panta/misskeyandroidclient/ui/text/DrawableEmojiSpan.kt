@@ -6,6 +6,7 @@ import android.util.Log
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.github.penfeizhou.animation.apng.APNGDrawable
 
 class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
     //val weakReference: WeakReference<View> = WeakReference(view)
@@ -41,6 +42,9 @@ class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
             imageDrawable?.callback = Animated()
             when (resource) {
                 is GifDrawable -> {
+                    resource.start()
+                }
+                is APNGDrawable -> {
                     resource.start()
                 }
                 else -> {
