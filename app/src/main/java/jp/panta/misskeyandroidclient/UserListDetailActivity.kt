@@ -8,10 +8,12 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
@@ -29,9 +31,11 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @FlowPreview
+@AndroidEntryPoint
 class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmittedListener {
 
     companion object {
@@ -54,9 +58,17 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     private var account: Account? = null
     private var mListId: UserList.Id? = null
 
+    @Inject
+    lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
+
+
+
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private var mUserListDetailViewModel: UserListDetailViewModel? = null
+    val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
+        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
+        UserListDetailViewModel.provideFactory(assistedFactory, listId)
+    }
 
     private var mIsNameUpdated: Boolean = false
     private var mUserListName: String = ""
@@ -70,19 +82,15 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         setSupportActionBar(binding.userListToolbar)
 
         val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
-        //val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
 
 
         mListId = listId
-        val miCore = application as MiCore
         val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
 
-        val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(listId, miCore))[UserListDetailViewModel::class.java]
-        mUserListDetailViewModel = userListDetailViewModel
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        userListDetailViewModel.userList.observe(this, { ul ->
+        mUserListDetailViewModel.userList.observe(this, { ul ->
             supportActionBar?.title = ul.name
             mUserListName = ul.name
 
@@ -95,7 +103,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             }
         })
 
-        userListDetailViewModel.userList.observe(this, {
+        mUserListDetailViewModel.userList.observe(this, {
             invalidateOptionsMenu()
         })
 
@@ -104,7 +112,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     }
 
     override fun onSubmit(name: String) {
-        mUserListDetailViewModel?.updateName(name)
+        mUserListDetailViewModel.updateName(name)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -136,7 +144,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                 }
             }
             R.id.action_add_user ->{
-                val selected = mUserListDetailViewModel?.listUsers?.value?.mapNotNull {
+                val selected = mUserListDetailViewModel.listUsers.value?.mapNotNull {
                     it.userId
                 } ?: return false
                 val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selected)
@@ -160,10 +168,10 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             val removed = changedDiff?.removed
             Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
             added?.forEach{
-                mUserListDetailViewModel?.pushUser(it)
+                mUserListDetailViewModel.pushUser(it)
             }
             removed?.forEach{
-                mUserListDetailViewModel?.pullUser(it)
+                mUserListDetailViewModel.pullUser(it)
             }
         }
     }
@@ -196,11 +204,11 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     @FlowPreview
     private fun updatedResultFinish(){
-        val updatedEvent = mUserListDetailViewModel?.updateEvents?.toList()?: emptyList()
+        val updatedEvent = mUserListDetailViewModel.updateEvents.toList()?: emptyList()
 
         val data = Intent().apply{
             if(updatedEvent.isNotEmpty()){
-                putExtra(EXTRA_UPDATED_USER_LIST, mUserListDetailViewModel?.userList?.value)
+                putExtra(EXTRA_UPDATED_USER_LIST, mUserListDetailViewModel.userList.value)
             }
         }
         if(mListId == null || updatedEvent.isEmpty()){

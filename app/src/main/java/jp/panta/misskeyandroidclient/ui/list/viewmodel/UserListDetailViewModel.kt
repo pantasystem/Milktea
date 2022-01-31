@@ -2,6 +2,10 @@ package jp.panta.misskeyandroidclient.ui.list.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.list.ListId
 import jp.panta.misskeyandroidclient.api.list.ListUserOperation
@@ -16,17 +20,33 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentLinkedDeque
+import javax.inject.Inject
+
 @FlowPreview
 @ExperimentalCoroutinesApi
-class UserListDetailViewModel(
-    val listId: UserList.Id,
-    val miCore: MiCore
+class UserListDetailViewModel @AssistedInject constructor(
+    val miCore: MiCore,
+    @Assisted val listId: UserList.Id,
 ) : ViewModel(){
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val listId: UserList.Id, private val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return UserListDetailViewModel(listId, miCore) as T
+//    @Suppress("UNCHECKED_CAST")
+//    class Factory(val listId: UserList.Id, private val miCore: MiCore) : ViewModelProvider.Factory{
+//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//            return UserListDetailViewModel(listId, miCore) as T
+//        }
+//    }
+
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(listId: UserList.Id): UserListDetailViewModel
+    }
+
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun provideFactory(assistedFactory: ViewModelAssistedFactory, listId: UserList.Id) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return assistedFactory.create(listId) as T
+            }
         }
     }
 
