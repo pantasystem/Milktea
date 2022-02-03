@@ -3,15 +3,15 @@ package jp.panta.misskeyandroidclient.streaming
 import android.util.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @Serializable
 data class Pong(val pong: Long)
@@ -36,7 +36,7 @@ data class Body(
 )
 
 
-fun createPingRequest(): PingRequest{
+fun createPingRequest(): PingRequest {
     return PingRequest(
         "api",
         Body(
@@ -70,7 +70,10 @@ internal class PollingJob(
     }
     private val job = SupervisorJob()
     private val scope = CoroutineScope(job + dispatcher)
-    private val pongs = MutableSharedFlow<PongRes>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 1024)
+    private val pongs = MutableSharedFlow<PongRes>(
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        extraBufferCapacity = 1024
+    )
 
 
     val isPolling: Boolean get() = job.isActive
@@ -84,7 +87,7 @@ internal class PollingJob(
             }.collect {
                 val ping = createPingRequest()
                 val sendTime = Clock.System.now()
-                if(!socket.send(json.encodeToString(ping))) {
+                if (!socket.send(json.encodeToString(ping))) {
                     Log.d("PollingJob", "sendしたらfalse帰ってきた")
                 }
                 try {
@@ -99,9 +102,9 @@ internal class PollingJob(
                     Log.d("PollingJob", "polling成功 msg:$pong, かかった時間(ミリ秒):${diff}")
                     // NOTE: pingに成功したらTTLのカウントを初期値に戻す
                     ttl = TTL_COUNT
-                } catch(e: TimeoutCancellationException) {
+                } catch (e: TimeoutCancellationException) {
                     Log.d("PollingJob", "polling失敗")
-                    if(--ttl <= 0) {
+                    if (--ttl <= 0) {
                         socket.reconnect()
                     }
                 }
