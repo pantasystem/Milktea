@@ -86,7 +86,6 @@ class AutoCollapsingLayout : FrameLayout {
             expandedButton?.visibility = View.GONE
             //setExpanded(true)
         }
-        Log.d("AutoExpandableLayout", "改変後maxHeight:$maxHeight")
 
         setMeasuredDimension(
             resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
