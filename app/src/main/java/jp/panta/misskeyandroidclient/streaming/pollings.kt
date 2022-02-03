@@ -16,6 +16,9 @@ import kotlin.coroutines.suspendCoroutine
 @Serializable
 data class Pong(val pong: Long)
 
+@Serializable
+data class Error(val message: String)
+
 /**
  * {"type": "api", "body": {"id": "3", "endpoint": "notes/create", "data":{"text":"test", "visibility":"public"}}}
  */
@@ -49,7 +52,9 @@ data class PongRes(
     val body: Body
 ) {
     @Serializable
-    data class Body(val res: Pong)
+    data class Body(val res: Pong? = null, val error: Error? = null)
+
+
     val id: String get() = type.split(":")[1]
 }
 
@@ -91,7 +96,7 @@ internal class PollingJob(
                     val resTime = Clock.System.now()
                     val diff = resTime.toEpochMilliseconds() - sendTime.toEpochMilliseconds()
 
-                    Log.d("PollingJob", "polling成功 id:${pong.id}, かかった時間(ミリ秒):${diff}")
+                    Log.d("PollingJob", "polling成功 msg:$pong, かかった時間(ミリ秒):${diff}")
                     // NOTE: pingに成功したらTTLのカウントを初期値に戻す
                     ttl = TTL_COUNT
                 } catch(e: TimeoutCancellationException) {
