@@ -13,6 +13,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import java.util.regex.Pattern
+import javax.inject.Inject
 
 
 data class SearchUser(
@@ -31,18 +32,12 @@ data class SearchUser(
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
-class SearchUserViewModel(
+@HiltViewModel
+class SearchUserViewModel @Inject constructor(
     val miCore: MiCore,
 ) : ViewModel(){
 
     private val logger = miCore.loggerFactory.create("SearchUserViewModel")
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return SearchUserViewModel(miCore) as T
-        }
-    }
 
 
     private val searchUserRequests = MutableSharedFlow<SearchUser>(
@@ -117,7 +112,5 @@ class SearchUserViewModel(
         )
         searchUserRequests.tryEmit(request)
     }
-
-
 
 }

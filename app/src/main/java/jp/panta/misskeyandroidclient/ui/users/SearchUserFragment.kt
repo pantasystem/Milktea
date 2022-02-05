@@ -3,9 +3,11 @@ package jp.panta.misskeyandroidclient.ui.users
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
@@ -19,6 +21,7 @@ import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDetails {
 
     companion object{
@@ -36,6 +39,7 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
 
     val mBinding: FragmentSearchUserBinding by dataBinding()
 
+    val viewModel: SearchUserViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,7 +47,6 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
         val userName = arguments?.getString(EXTRA_USER_NAME)?: ""
 
         val miCore = requireContext().applicationContext as MiCore
-        val viewModel =  ViewModelProvider(this, SearchUserViewModel.Factory(miCore))[SearchUserViewModel::class.java]
         viewModel.userName.value = userName
 
         val toggleFollowViewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miCore))[ToggleFollowViewModel::class.java]
