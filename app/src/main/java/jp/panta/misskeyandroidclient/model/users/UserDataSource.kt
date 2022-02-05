@@ -29,4 +29,6 @@ interface UserDataSource {
     suspend fun addAll(users: List<User>): List<AddResult>
 
     suspend fun remove(user: User): Boolean
+
+    suspend fun all(): List<User>
 }

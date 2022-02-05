@@ -120,6 +120,9 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
+    override suspend fun all(): List<User> {
+        return userMap.values.toList()
+    }
 
     @ExperimentalCoroutinesApi
     private fun publish(e: UserDataSource.Event) {

@@ -6,11 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
@@ -23,6 +25,7 @@ import java.io.Serializable
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class SearchAndSelectUserActivity : AppCompatActivity() {
 
     companion object{
@@ -44,6 +47,8 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     @FlowPreview
     @ExperimentalCoroutinesApi
     private var mSelectedUserViewModel: SelectedUserViewModel? = null
+
+    val searchUserViewModel: SearchUserViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,8 +79,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
             ViewModelProvider(this, SelectedUserViewModel.Factory(miCore, selectableMaximumSize, selectedUserIdList, null))[SelectedUserViewModel::class.java]
         val selectableUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
 
-        val searchUserViewModel =
-            ViewModelProvider(this, SearchUserViewModel.Factory(miCore, false))[SearchUserViewModel::class.java]
+
         activitySearchAndSelectUserBinding.usersView.adapter = selectableUsersAdapter
         activitySearchAndSelectUserBinding.searchUserViewModel = searchUserViewModel
         activitySearchAndSelectUserBinding.selectedUserViewModel = selectedUserViewModel
@@ -87,7 +91,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter = selectedUsersAdapter
         activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager = LinearLayoutManager(this)
 
-        searchUserViewModel.getUsers().observe(this, {
+        searchUserViewModel.users.observe(this, {
             selectableUsersAdapter.submitList(it)
         })
 
