@@ -101,6 +101,38 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun searchByName(accountId: Long, name: String): List<User> {
+        return userDataSource.all().asSequence().filter {
+            it.id.accountId == accountId
+        }.filter {
+            it.getDisplayName().startsWith(name)
+        }.toList()
+    }
+
+    override suspend fun searchByUserName(
+        accountId: Long,
+        userName: String,
+        host: String?
+    ): List<User> {
+        val ac = accountRepository.get(accountId)
+        val i = ac.getI(encryption)
+        val api = misskeyAPIProvider.get(ac)
+
+        val results = SearchByUserAndHost(api)
+            .search(RequestUser(
+                userName = userName,
+                host = host,
+                i = i
+            ))
+            .throwIfHasError()
+
+        return results.body()!!.map {
+            it.toUser(ac, false).also { u ->
+                userDataSource.add(u)
+            }
+        }
+    }
+
     override suspend fun mute(userId: User.Id): Boolean {
         return action(userId.getMisskeyAPI()::muteUser, userId) { user ->
             user.copy(isMuting = true)
