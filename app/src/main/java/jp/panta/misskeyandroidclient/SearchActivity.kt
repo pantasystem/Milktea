@@ -46,12 +46,12 @@ class SearchActivity : AppCompatActivity() {
         mSearchWord = intent.getStringExtra(EXTRA_SEARCH_WORD)
 
         val miCore = applicationContext as MiCore
-        mSearchUserViewModel = ViewModelProvider(this, SearchUserViewModel.Factory(miCore, null))[SearchUserViewModel::class.java]
+        mSearchUserViewModel = ViewModelProvider(this, SearchUserViewModel.Factory(miCore))[SearchUserViewModel::class.java]
 
         val usersAdapter = ClickableUserListAdapter(this)
         binding.searchedUsers.adapter = usersAdapter
         binding.searchedUsers.layoutManager = LinearLayoutManager(this)
-        mSearchUserViewModel.getUsers().observe(this, {
+        mSearchUserViewModel.users.observe(this, {
             usersAdapter.submitList(it)
         })
     }

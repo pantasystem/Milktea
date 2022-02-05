@@ -183,7 +183,7 @@ class SearchResultActivity : AppCompatActivity() {
                     TimelineFragment.newInstance(request)
                 }
                 SEARCH_USERS ->{
-                    SearchUserFragment.newInstance(keyword, true)
+                    SearchUserFragment.newInstance(keyword)
                 }
                 else ->{
                     TimelineFragment.newInstance(

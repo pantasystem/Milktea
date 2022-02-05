@@ -23,14 +23,12 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
 
     companion object{
         const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.ui.users.SearchUserFragment"
-        const val EXTRA_HAS_DETAIL = "jp.panta.misskeyandroidclient.ui.users.HAS_DETAIL"
 
         @JvmStatic
-        fun newInstance(userName: String, hasDetail: Boolean): SearchUserFragment{
+        fun newInstance(userName: String): SearchUserFragment{
             return SearchUserFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_USER_NAME, userName)
-                    putBoolean(EXTRA_HAS_DETAIL, hasDetail)
                 }
             }
         }
@@ -42,11 +40,10 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val hasDetail = arguments?.getBoolean(EXTRA_HAS_DETAIL)
         val userName = arguments?.getString(EXTRA_USER_NAME)?: ""
 
         val miCore = requireContext().applicationContext as MiCore
-        val viewModel =  ViewModelProvider(this, SearchUserViewModel.Factory(miCore, hasDetail))[SearchUserViewModel::class.java]
+        val viewModel =  ViewModelProvider(this, SearchUserViewModel.Factory(miCore))[SearchUserViewModel::class.java]
         viewModel.userName.value = userName
 
         val toggleFollowViewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miCore))[ToggleFollowViewModel::class.java]
@@ -54,7 +51,7 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
         val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
         mBinding.searchUsersView.adapter = adapter
         mBinding.searchUsersView.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.getUsers().observe(viewLifecycleOwner, {
+        viewModel.users.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
         viewModel.isLoading.observe(viewLifecycleOwner, {

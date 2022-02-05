@@ -75,7 +75,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         val selectableUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
 
         val searchUserViewModel =
-            ViewModelProvider(this, SearchUserViewModel.Factory(miCore, false))[SearchUserViewModel::class.java]
+            ViewModelProvider(this, SearchUserViewModel.Factory(miCore))[SearchUserViewModel::class.java]
         activitySearchAndSelectUserBinding.usersView.adapter = selectableUsersAdapter
         activitySearchAndSelectUserBinding.searchUserViewModel = searchUserViewModel
         activitySearchAndSelectUserBinding.selectedUserViewModel = selectedUserViewModel
@@ -87,7 +87,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter = selectedUsersAdapter
         activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager = LinearLayoutManager(this)
 
-        searchUserViewModel.getUsers().observe(this, {
+        searchUserViewModel.users.observe(this, {
             selectableUsersAdapter.submitList(it)
         })
 
