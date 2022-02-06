@@ -32,6 +32,9 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
             return inMem
         }
         val result = userNicknameDAO.findByUserNameAndHost(id.userName, id.host)
+        lock.withLock {
+            notExistsIds.add(id)
+        }
         result?: throw UserNicknameNotFoundException()
         return result.toUserNickname()
     }
