@@ -41,6 +41,7 @@ import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionUnRegistratio
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
@@ -158,4 +159,6 @@ interface MiCore{
     fun getTranslationStore(): NoteTranslationStore
 
     fun getNoteReservationPostExecutor(): NoteReservationPostExecutor
+
+    fun getUserNicknameRepository(): UserNicknameRepository
 }

@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.nickname.UpdateNicknameUseCase
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNickname
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -121,30 +123,9 @@ class UserDetailViewModel(
 
     fun load() {
         viewModelScope.launch(dispatcher) {
-            val u = userId?.let {
-                runCatching {
-                    miCore.getUserRepository().find(userId, true)
-                }.onSuccess {
-                    logger.debug("ユーザー取得成功:$it")
-                }.onFailure {
-                    logger.error("ユーザー取得失敗", e = it)
-                }.getOrNull()
-            }?: fqdnUserName?.let {
-                val account = getAccount()
-                val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
-                val userName = userNameAndHost[0]
-                val host = userNameAndHost.getOrNull(1)
-                runCatching {
-                    miCore.getUserRepository().findByUserName(account.accountId, userName, host, true)
-                }.onFailure {
-                    logger.error("ユーザー取得失敗", e = it)
-                }.onSuccess {
-                    logger.debug("ユーザー取得成功: $it")
-                }.getOrNull()
-            }
+            val u = findUser()
             logger.debug("user:$u")
         }
-
     }
 
     fun changeFollow() {
@@ -229,6 +210,49 @@ class UserDetailViewModel(
         }
     }
 
+    fun changeNickname(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val user = findUser()
+                UpdateNicknameUseCase(
+                    miCore.getAccountRepository(),
+                    miCore.getUserDataSource(),
+                    miCore.getUserNicknameRepository(),
+                    user,
+                    name
+                ).execute()
+            }.onSuccess {
+                logger.debug("ニックネーム更新処理成功")
+            }.onFailure {
+                logger.error("ニックネーム更新処理失敗", e = it)
+            }
+        }
+    }
+
+    private suspend fun findUser(): User {
+        val u = userId?.let {
+            runCatching {
+                miCore.getUserRepository().find(userId!!, true)
+            }.onSuccess {
+                logger.debug("ユーザー取得成功:$it")
+            }.onFailure {
+                logger.error("ユーザー取得失敗", e = it)
+            }.getOrNull()
+        }?: fqdnUserName?.let {
+            val account = getAccount()
+            val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
+            val userName = userNameAndHost[0]
+            val host = userNameAndHost.getOrNull(1)
+            runCatching {
+                miCore.getUserRepository().findByUserName(account.accountId, userName, host, true)
+            }.onFailure {
+                logger.error("ユーザー取得失敗", e = it)
+            }.onSuccess {
+                logger.debug("ユーザー取得成功: $it")
+            }.getOrNull()
+        }
+        return u!!
+    }
 
     private var mAc: Account? = null
     private suspend fun getAccount(): Account {
