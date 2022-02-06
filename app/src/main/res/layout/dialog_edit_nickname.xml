@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <variable
-                name="reportViewModel"
-                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel" />
+
     </data>
 
     <RelativeLayout
@@ -15,7 +13,7 @@
                 android:id="@+id/titleView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/report"
+                android:text="@string/change_nickname"
                 android:textSize="24sp"
                 android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginBottom="8dp"
@@ -31,13 +29,11 @@
                     android:id="@+id/input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/detail"
+                    android:hint="@string/nickname"
                     android:singleLine="true"
                     android:inputType="textMultiLine"
-                    android:text="@{reportViewModel.comment}"
                     />
         </com.google.android.material.textfield.TextInputLayout>
-
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,7 +52,6 @@
                 android:layout_alignParentEnd="true"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:text="@string/send"
-                android:enabled="@{reportViewModel.canSend}"
                 />
     </RelativeLayout>
 </layout>

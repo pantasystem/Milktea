@@ -4,6 +4,7 @@ import jp.panta.misskeyandroidclient.model.UseCase
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 
 class UpdateNicknameUseCase(
     val accountRepository: AccountRepository,
