@@ -103,7 +103,7 @@ sealed interface User : Entity{
     }
 
     fun getDisplayName(): String{
-        return name?: userName
+        return nickname?.name?: name?: userName
     }
 
     fun getShortDisplayName(): String{

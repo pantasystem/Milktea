@@ -2,17 +2,23 @@ package jp.panta.misskeyandroidclient.model.users.impl
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNickname
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
+// TODO: 色々と依存していてよくわからないのでアーキテクチャレベルでリファクタリングをする
 class InMemoryUserDataSource @Inject constructor(
-    loggerFactory: Logger.Factory?
+    loggerFactory: Logger.Factory?,
+    private val userNicknameRepository: UserNicknameRepository,
+    private val accountRepository: AccountRepository,
 ) : UserDataSource{
     private val logger = loggerFactory?.create("InMemoryUserDataSource")
 
@@ -84,7 +90,18 @@ class InMemoryUserDataSource @Inject constructor(
 
     }
 
-    private suspend fun createOrUpdate(user: User): AddResult {
+    private suspend fun createOrUpdate(argUser: User): AddResult {
+        // TODO: ここで変更処理までをしてしまうのは責務外なのでいつかリファクタリングをする
+        val nickname = runCatching {
+            val ac = accountRepository.get(argUser.id.accountId)
+            userNicknameRepository.findOne(
+                UserNickname.Id(argUser.userName, argUser.host?: ac.getHost())
+            )
+        }.getOrNull()
+        val user = when(argUser) {
+            is User.Detail -> argUser.copy(nickname = nickname)
+            is User.Simple -> argUser.copy(nickname = nickname)
+        }
         usersLock.withLock {
             val u = userMap[user.id]
             if(u == null) {

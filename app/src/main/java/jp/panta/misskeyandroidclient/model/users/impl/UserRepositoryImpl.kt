@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import jp.panta.misskeyandroidclient.model.users.report.Report
 import retrofit2.Response
 import javax.inject.Inject
@@ -28,6 +29,7 @@ class UserRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
     val loggerFactory: Logger.Factory,
+    val nicknameRepository: UserNicknameRepository
 ) : UserRepository{
     private val logger: Logger by lazy {
         loggerFactory.create("UserRepositoryImpl")
@@ -62,7 +64,7 @@ class UserRepositoryImpl @Inject constructor(
                     noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
                 }
                 userDataSource.add(user)
-                return user
+                return userDataSource.get(userId)
             }
         }
 
@@ -94,7 +96,7 @@ class UserRepositoryImpl @Inject constructor(
             }
             val user = it.toUser(account, true)
             userDataSource.add(user)
-            return user
+            return userDataSource.get(user.id)
         }
 
         throw UserNotFoundException(null, userName = userName, host = host)
@@ -129,6 +131,7 @@ class UserRepositoryImpl @Inject constructor(
         return results.body()!!.map {
             it.toUser(ac, false).also { u ->
                 userDataSource.add(u)
+                userDataSource.get(u.id)
             }
         }
     }
