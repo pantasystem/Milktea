@@ -53,7 +53,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         val miApplication = application as MiApplication
         val userDetailViewModel = ViewModelProvider(this, UserDetailViewModelFactory(miApplication, userId, null))[UserDetailViewModel::class.java]
         userDetailViewModel.user.observe(this) {
-            setTitle(it.getDisplayName())
+            title = it?.getDisplayName()
         }
 
         mBinding.followFollowerPager.adapter = FollowFollowerPagerAdapter(userId)

@@ -29,7 +29,6 @@ class UserRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
     val loggerFactory: Logger.Factory,
-    val nicknameRepository: UserNicknameRepository
 ) : UserRepository{
     private val logger: Logger by lazy {
         loggerFactory.create("UserRepositoryImpl")
@@ -63,7 +62,8 @@ class UserRepositoryImpl @Inject constructor(
                 it.pinnedNotes?.forEach { dto ->
                     noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
                 }
-                userDataSource.add(user)
+                val result = userDataSource.add(user)
+                logger.debug("add result: $result")
                 return userDataSource.get(userId)
             }
         }
@@ -73,9 +73,14 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun findByUserName(accountId: Long, userName: String, host: String?, detail: Boolean): User {
         val local = runCatching {
-            userDataSource.get(accountId, userName, host) as User.Detail
+            userDataSource.get(accountId, userName, host).let{
+                if(detail) {
+                    it as? User.Detail
+                }else it
+            }
         }.getOrNull()
 
+        logger.debug("local:$local")
         if(local != null) {
             return local
         }
@@ -85,16 +90,18 @@ class UserRepositoryImpl @Inject constructor(
             RequestUser(
                 i = account.getI(encryption),
                 userName = userName,
-                host = host
+                host = host,
+                detail = detail
             )
         )
+        logger.debug("res:$res")
         res.throwIfHasError()
 
         res.body()?.let {
             it.pinnedNotes?.forEach { dto ->
                 noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
             }
-            val user = it.toUser(account, true)
+            val user = it.toUser(account, detail)
             userDataSource.add(user)
             return userDataSource.get(user.id)
         }
