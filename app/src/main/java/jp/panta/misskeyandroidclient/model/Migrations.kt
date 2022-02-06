@@ -126,9 +126,9 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
-val MIGRATION_8_9 = object : Migration(8, 9) {
+val MIGRATION_8_10 = object : Migration(8, 10) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE IF NOT EXISTS 'nicknames' ('nickname' TEXT NOT NULL, 'username' TEXT NOT NULL, 'host' TEXT NOT NULL, 'id' INTEGER NOT NULL, PRIMARY KEY('id'))")
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'nicknames' ('nickname' TEXT NOT NULL, 'username' TEXT NOT NULL, 'host' TEXT NOT NULL, 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
         database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS 'index_nicknames_username_host' ON 'nicknames' ('username', 'host')")
     }
 }

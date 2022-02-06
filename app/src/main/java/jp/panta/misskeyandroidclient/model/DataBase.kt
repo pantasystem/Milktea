@@ -47,7 +47,7 @@ import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDTO
         UnreadNotification::class,
         UserNicknameDTO::class,
     ],
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class)

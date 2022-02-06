@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.users.impl
 
+import android.util.Log
 import jp.panta.misskeyandroidclient.model.users.nickname.UserNickname
 import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameNotFoundException
 import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
@@ -32,11 +33,13 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
             return inMem
         }
         val result = userNicknameDAO.findByUserNameAndHost(id.userName, id.host)
+        if (result != null) {
+            return result.toUserNickname()
+        }
         lock.withLock {
             notExistsIds.add(id)
         }
-        result?: throw UserNicknameNotFoundException()
-        return result.toUserNickname()
+        throw UserNicknameNotFoundException()
     }
 
     override suspend fun save(nickname: UserNickname) {

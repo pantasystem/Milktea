@@ -15,7 +15,7 @@ data class UserNicknameDTO (
 
     @ColumnInfo(name = "host")
     val host: String,
-    @PrimaryKey val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 )
 
 @Dao

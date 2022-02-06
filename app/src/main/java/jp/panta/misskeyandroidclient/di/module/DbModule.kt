@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.di.module
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,6 +25,7 @@ object DbModule {
     @Provides
     fun database(@ApplicationContext context: Context): DataBase {
         return Room.databaseBuilder(context, DataBase::class.java, "milk_database")
+            .fallbackToDestructiveMigration()
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
@@ -33,7 +33,7 @@ object DbModule {
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
             .addMigrations(MIGRATION_7_8)
-            .addMigrations(MIGRATION_8_9)
+            .addMigrations(MIGRATION_8_10)
             .build()
     }
 
