@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistor
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
+import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDAO
 import javax.inject.Singleton
 
 @Module
@@ -65,4 +66,8 @@ object DbModule {
     @Provides
     @Singleton
     fun urlPreviewDAO(db: DataBase): UrlPreviewDAO = db.urlPreviewDAO()
+
+    @Provides
+    @Singleton
+    fun userNicknameDAO(db: DataBase): UserNicknameDAO = db.userNicknameDAO()
 }
