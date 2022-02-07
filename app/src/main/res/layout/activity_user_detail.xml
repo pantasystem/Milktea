@@ -38,8 +38,8 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:id="@+id/remoteUserState"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
                             android:paddingTop="4dp"
                             android:paddingBottom="4dp"
                             app:layout_constraintTop_toTopOf="parent"
@@ -91,7 +91,7 @@
                             android:layout_toEndOf="@id/avatarIcon"
                             android:gravity="end"
                             android:layout_alignBottom="@id/avatarIcon"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="16dp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@id/avatarIcon"
                             app:layout_constraintBottom_toBottomOf="@id/avatarIcon"
@@ -155,7 +155,7 @@
                             app:layout_constraintTop_toTopOf="@id/mainName"
                             app:layout_constraintBottom_toBottomOf="@id/subName"
                             app:layout_constraintEnd_toEndOf="parent"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="16dp"
                             android:src="@drawable/ic_edit_black_24dp"
                             android:contentDescription="@string/change_nickname"
                             />
@@ -163,28 +163,32 @@
 
                     <TextView
                             android:id="@+id/profileText"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_alignStart="@id/avatarIcon"
                             app:sourceText="@{userViewModel.user.description}"
                             app:emojis="@{userViewModel.user.emojis}"
                             tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="16dp"
                             android:layout_marginTop="8dp"
                             android:visibility="@{userViewModel.user.description == null ? View.GONE : View.VISIBLE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/subName"
                             android:layout_marginStart="16dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+
 
                             />
                     <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_alignStart="@id/avatarIcon"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="16dp"
                             app:layout_constraintTop_toBottomOf="@id/profileText"
                             android:layout_marginStart="16dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
 
                             >
                         <TextView
