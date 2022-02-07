@@ -50,6 +50,7 @@ import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
@@ -146,6 +147,9 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
+
+    @Inject
+    lateinit var mUserNicknameRepository: UserNicknameRepository
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -549,6 +553,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getNoteReservationPostExecutor(): NoteReservationPostExecutor {
         return mNoteReservationPostExecutor
+    }
+
+    override fun getUserNicknameRepository(): UserNicknameRepository {
+        return mUserNicknameRepository
     }
 
     private suspend fun loadAndInitializeAccounts(){

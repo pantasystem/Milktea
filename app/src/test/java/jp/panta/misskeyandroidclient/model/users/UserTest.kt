@@ -15,7 +15,8 @@ class UserTest : TestCase() {
             isBot = false,
             isCat = false,
             name = "Panta",
-            userName = "Panta"
+            userName = "Panta",
+            nickname = null
         )
 
         val profileUrl = user.getProfileUrl(
@@ -38,7 +39,8 @@ class UserTest : TestCase() {
             isBot = false,
             isCat = false,
             name = "Panta",
-            userName = "Panta"
+            userName = "Panta",
+            nickname = null
         )
 
         val profileUrl = user.getProfileUrl(Account(

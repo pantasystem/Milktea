@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.di.module
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistor
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
+import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDAO
 import javax.inject.Singleton
 
 @Module
@@ -25,6 +25,7 @@ object DbModule {
     @Provides
     fun database(@ApplicationContext context: Context): DataBase {
         return Room.databaseBuilder(context, DataBase::class.java, "milk_database")
+            .fallbackToDestructiveMigration()
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
@@ -32,6 +33,7 @@ object DbModule {
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
             .addMigrations(MIGRATION_7_8)
+            .addMigrations(MIGRATION_8_10)
             .build()
     }
 
@@ -64,4 +66,8 @@ object DbModule {
     @Provides
     @Singleton
     fun urlPreviewDAO(db: DataBase): UrlPreviewDAO = db.urlPreviewDAO()
+
+    @Provides
+    @Singleton
+    fun userNicknameDAO(db: DataBase): UserNicknameDAO = db.userNicknameDAO()
 }

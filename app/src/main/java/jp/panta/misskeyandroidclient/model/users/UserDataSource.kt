@@ -1,6 +1,29 @@
 package jp.panta.misskeyandroidclient.model.users
 
 import jp.panta.misskeyandroidclient.model.AddResult
+import kotlinx.coroutines.flow.StateFlow
+
+data class UsersState (
+    val usersMap: Map<User.Id, User> = emptyMap()
+) {
+
+    fun get(userId: User.Id): User? {
+        return usersMap[userId]
+    }
+
+    fun get(userName: String, host: String? = null): User? {
+        return usersMap.values.firstOrNull {
+            it.userName == userName && it.host == host
+        }
+    }
+
+    fun get(fqdnUserName: String): User? {
+        val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
+        val userName = userNameAndHost[0]
+        val host = userNameAndHost.getOrNull(1)
+        return get(userName, host)
+    }
+}
 
 interface UserDataSource {
 
@@ -19,6 +42,8 @@ interface UserDataSource {
     fun addEventListener(listener: Listener)
 
     fun removeEventListener(listener: Listener)
+
+    val state: StateFlow<UsersState>
 
     suspend fun get(userId: User.Id): User
 

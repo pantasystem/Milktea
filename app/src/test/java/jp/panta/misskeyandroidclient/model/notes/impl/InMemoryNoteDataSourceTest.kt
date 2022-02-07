@@ -42,14 +42,14 @@ class InMemoryNoteDataSourceTest {
                 note
             )
 
-            assertTrue(result == AddResult.CREATED)
+            assertEquals(AddResult.CREATED, result)
             val old = note.copy()
 
-            assertTrue(noteDataSource.add(note) == AddResult.UPDATED)
+            assertEquals(AddResult.UPDATED, noteDataSource.add(note))
 
-            assertTrue(noteDataSource.add(old) == AddResult.CANCEL)
+            assertEquals(AddResult.CANCEL, noteDataSource.add(old))
 
-            assertTrue(noteDataSource.add(old.copy()) == AddResult.CANCEL)
+            assertEquals(AddResult.CANCEL, noteDataSource.add(old.copy()))
         }
 
     }

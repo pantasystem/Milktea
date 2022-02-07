@@ -125,3 +125,10 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
         database.execSQL("CREATE TABLE IF NOT EXISTS 'unread_notifications_table' ('accountId' INTEGER NOT NULL, 'notificationId' TEXT NOT NULL, PRIMARY KEY('accountId', 'notificationId'), FOREIGN KEY('accountId') REFERENCES 'account_table'('accountId') ON UPDATE CASCADE ON DELETE CASCADE )")
     }
 }
+
+val MIGRATION_8_10 = object : Migration(8, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS 'nicknames' ('nickname' TEXT NOT NULL, 'username' TEXT NOT NULL, 'host' TEXT NOT NULL, 'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)")
+        database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS 'index_nicknames_username_host' ON 'nicknames' ('username', 'host')")
+    }
+}

@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNickname
 import java.io.Serializable
 import java.lang.Exception
 import java.util.*
@@ -13,17 +14,18 @@ import java.util.*
  * Userはfollowやunfollowなどは担当しない
  * Userはfollowやunfollowに関連しないため
  */
-sealed class User : Entity{
+sealed interface User : Entity{
 
-    abstract val id: Id
-    abstract val userName: String
-    abstract val name: String?
-    abstract val avatarUrl: String?
-    abstract val emojis: List<Emoji>
-    abstract val isCat: Boolean?
-    abstract val isBot: Boolean?
-    abstract val host: String?
-    abstract var instanceUpdatedAt: Date
+    val id: Id
+    val userName: String
+    val name: String?
+    val avatarUrl: String?
+    val emojis: List<Emoji>
+    val isCat: Boolean?
+    val isBot: Boolean?
+    val host: String?
+    val nickname: UserNickname?
+    var instanceUpdatedAt: Date
 
     data class Id(
         val accountId: Long,
@@ -39,8 +41,9 @@ sealed class User : Entity{
         override val isCat: Boolean?,
         override val isBot: Boolean?,
         override val host: String?,
+        override val nickname: UserNickname?,
         override var instanceUpdatedAt: Date = Date()
-    ) : User()
+    ) : User
 
     data class Detail(
         override val id: Id,
@@ -51,6 +54,7 @@ sealed class User : Entity{
         override val isCat: Boolean?,
         override val isBot: Boolean?,
         override val host: String?,
+        override val nickname: UserNickname?,
         val description: String?,
         val followersCount: Int?,
         val followingCount: Int?,
@@ -67,7 +71,7 @@ sealed class User : Entity{
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
         override var instanceUpdatedAt: Date = Date()
-    ) : User() {
+    ) : User {
         val followState: FollowState
             get() {
                 if(isFollowing) {
@@ -99,7 +103,7 @@ sealed class User : Entity{
     }
 
     fun getDisplayName(): String{
-        return name?: userName
+        return nickname?.name?: name?: userName
     }
 
     fun getShortDisplayName(): String{

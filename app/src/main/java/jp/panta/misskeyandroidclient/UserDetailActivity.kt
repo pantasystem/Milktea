@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
@@ -34,12 +35,14 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.users.ReportDialog
+import jp.panta.misskeyandroidclient.ui.users.nickname.EditNicknameDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 
+@AndroidEntryPoint
 class UserDetailActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_USER_ID =
@@ -198,6 +201,10 @@ class UserDetailActivity : AppCompatActivity() {
             }
 
         }.launchIn(lifecycleScope)
+
+        binding.editNicknameButton.setOnClickListener {
+            EditNicknameDialog().show(supportFragmentManager, "editNicknameDialog")
+        }
 
 
     }
