@@ -60,4 +60,12 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
             userNicknameDAO.update(dto)
         }
     }
+
+    override suspend fun delete(id: UserNickname.Id) {
+        lock.withLock {
+            notExistsIds.add(id)
+        }
+        userNicknameDAO.delete(id.userName, id.host)
+        userNicknameRepositoryOnMemoryImpl.delete(id)
+    }
 }

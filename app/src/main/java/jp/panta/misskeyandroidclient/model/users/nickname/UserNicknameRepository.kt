@@ -7,5 +7,6 @@ interface UserNicknameRepository {
 
     suspend fun findOne(id: UserNickname.Id): UserNickname
 
+    suspend fun delete(id: UserNickname.Id)
 
 }

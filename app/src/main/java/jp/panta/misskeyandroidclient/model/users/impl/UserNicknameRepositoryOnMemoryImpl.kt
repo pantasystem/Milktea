@@ -23,4 +23,10 @@ class UserNicknameRepositoryOnMemoryImpl : UserNicknameRepository{
             map[nickname.id] = nickname
         }
     }
+
+    override suspend fun delete(id: UserNickname.Id) {
+        lock.withLock {
+            map.remove(id)
+        }
+    }
 }

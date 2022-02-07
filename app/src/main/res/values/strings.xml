@@ -381,5 +381,6 @@
     <string name="create_mention">Create mention</string>
     <string name="change_nickname">Change nickname</string>
     <string name="nickname">Nickname</string>
+    <string name="delete_nickname">Delete nickname</string>
 
 </resources>

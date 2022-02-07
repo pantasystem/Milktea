@@ -35,6 +35,9 @@ abstract class UserNicknameDAO {
     @Query("select * from nicknames where id=:id")
     abstract suspend fun findOne(id: Long): UserNicknameDTO?
 
+    @Query("delete from nicknames where username=:username and host=:host")
+    abstract suspend fun delete(username: String, host: String)
+
 }
 
 fun UserNicknameDTO.toUserNickname(): UserNickname {

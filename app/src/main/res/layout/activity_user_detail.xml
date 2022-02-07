@@ -112,7 +112,7 @@
 
                     <TextView
                             android:id="@+id/mainName"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_alignStart="@id/avatarIcon"
                             android:textSize="24sp"
@@ -122,10 +122,11 @@
                             app:layout_constraintStart_toStartOf="parent"
                             android:layout_marginStart="16dp"
 
-                            />
+                            app:layout_constraintEnd_toStartOf="@+id/deleteNicknameButton" />
+
                     <TextView
                             android:id="@+id/subName"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_alignStart="@id/avatarIcon"
                             tools:text="userName"
@@ -134,7 +135,19 @@
                             app:layout_constraintTop_toBottomOf="@id/mainName"
                             android:layout_marginStart="16dp"
 
-                            />
+                            app:layout_constraintEnd_toStartOf="@+id/deleteNicknameButton" />
+                    <ImageButton
+                            android:id="@+id/deleteNicknameButton"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            app:layout_constraintTop_toTopOf="@id/mainName"
+                            app:layout_constraintBottom_toBottomOf="@id/subName"
+                            app:layout_constraintEnd_toStartOf="@id/editNicknameButton"
+                            android:layout_marginEnd="8dp"
+                            android:src="@drawable/ic_delete_black_24dp"
+                            android:contentDescription="@string/delete_nickname"
+                            android:visibility="@{ userViewModel.user.nickname == null ? View.GONE : View.VISIBLE }"
+                            android:onClick="@{() -> userViewModel.deleteNickname() }"/>
                     <ImageButton
                             android:id="@+id/editNicknameButton"
                             android:layout_width="40dp"

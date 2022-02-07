@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.nickname.DeleteNicknameUseCase
 import jp.panta.misskeyandroidclient.model.users.nickname.UpdateNicknameUseCase
 import jp.panta.misskeyandroidclient.model.users.nickname.UserNickname
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -225,6 +226,24 @@ class UserDetailViewModel(
                 logger.debug("ニックネーム更新処理成功")
             }.onFailure {
                 logger.error("ニックネーム更新処理失敗", e = it)
+            }
+        }
+    }
+
+    fun deleteNickname() {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val user = findUser()
+                DeleteNicknameUseCase(
+                    miCore.getUserNicknameRepository(),
+                    miCore.getAccountRepository(),
+                    miCore.getUserDataSource(),
+                    user
+                ).execute()
+            }.onSuccess {
+                logger.debug("ニックネーム削除処理成功")
+            }.onFailure {
+                logger.error("ニックネーム削除失敗", e = it)
             }
         }
     }
