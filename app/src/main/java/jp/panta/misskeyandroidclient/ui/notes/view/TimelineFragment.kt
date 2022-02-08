@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.api.APIError
@@ -32,6 +34,7 @@ import java.net.SocketTimeoutException
 
 @ExperimentalCoroutinesApi
 @FlowPreview
+@AndroidEntryPoint
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop,
     PageableView {
 
@@ -62,7 +65,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     @ExperimentalCoroutinesApi
     private var mViewModel: TimelineViewModel? = null
-    private var mNotesViewModel: NotesViewModel? = null
 
 
     private var mPage: Page? = null
@@ -81,6 +83,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     lateinit var miApplication: MiApplication
 
     val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
+    
+    val notesViewModel by activityViewModels<NotesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,13 +116,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
-        val notesViewModelFactory = NotesViewModelFactory(miApplication)
-
-        val notesViewModel = ViewModelProvider(
-            requireActivity(),
-            notesViewModelFactory
-        ).get(NotesViewModel::class.java)
-        mNotesViewModel = notesViewModel
+        
         //sharedPreference = view.context.getSharedPreferences()
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.core.app.TaskStackBuilder
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
@@ -19,7 +20,6 @@ import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -48,6 +48,7 @@ class NoteDetailActivity : AppCompatActivity() {
     private var mParentActivity: Activities? = null
 
     private val binding: ActivityNoteDetailBinding by dataBinding()
+    val notesViewModel: NotesViewModel by viewModels()
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,8 +72,6 @@ class NoteDetailActivity : AppCompatActivity() {
 
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        val miApplication = applicationContext as MiApplication
-        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!, accountId = mAccountId))

@@ -9,9 +9,11 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.*
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionPickerBinding
@@ -19,15 +21,15 @@ import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class ReactionPickerDialog : AppCompatDialogFragment(){
+    val notesViewModel by activityViewModels<NotesViewModel>()
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -39,7 +41,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         val miApplication = view.context.applicationContext as MiApplication
         val ac = miApplication.getCurrentAccount().value
 
-        val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
+
         val adapter =
             ReactionChoicesAdapter {
                 dismiss()

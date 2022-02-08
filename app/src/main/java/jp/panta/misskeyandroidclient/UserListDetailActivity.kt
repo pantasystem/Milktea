@@ -27,7 +27,6 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -72,6 +71,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     private var mUserListName: String = ""
     private val binding: ActivityUserListDetailBinding by dataBinding()
+    val notesViewModel by viewModels<NotesViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +85,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
 
         mListId = listId
-        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
 
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()

@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,7 +13,6 @@ import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -22,6 +22,9 @@ import kotlinx.coroutines.FlowPreview
 class FavoriteActivity : AppCompatActivity() {
 
     lateinit var mBinding: ActivityFavoriteBinding
+
+    val notesViewModel by viewModels<NotesViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -30,9 +33,7 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.favorite)
 
-        val miApplication = applicationContext as MiApplication
 
-        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         val fragment = TimelineFragment.newInstance(
             Pageable.Favorite

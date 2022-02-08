@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.MainThread
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -56,7 +57,6 @@ import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import kotlinx.coroutines.*
@@ -65,7 +65,8 @@ import kotlinx.coroutines.flow.*
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
 
-    lateinit var mNotesViewModel: NotesViewModel
+    val mNotesViewModel: NotesViewModel by viewModels()
+
     @ExperimentalCoroutinesApi
     private lateinit var mAccountViewModel: AccountViewModel
 
@@ -122,7 +123,6 @@ class MainActivity : AppCompatActivity(){
         initAccountViewModelListener()
         binding.setupHeaderProfile()
 
-        mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
         // NOTE: メッセージの既読数をバッジに表示する

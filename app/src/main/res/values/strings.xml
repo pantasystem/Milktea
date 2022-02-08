@@ -382,5 +382,6 @@
     <string name="change_nickname">Change nickname</string>
     <string name="nickname">Nickname</string>
     <string name="delete_nickname">Delete nickname</string>
+    <string name="suggested_emojis">Suggested Emojis</string>
 
 </resources>

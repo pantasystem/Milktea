@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +15,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModelFactory
@@ -30,6 +30,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
     lateinit var mViewModel: NotificationViewModel
 
     private val mBinding: FragmentNotificationBinding by dataBinding()
+    val notesViewModel by activityViewModels<NotesViewModel>()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,7 +40,6 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
         val miApplication = context?.applicationContext as MiApplication
 
-        val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
 
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
         val factory = NotificationViewModelFactory(miApplication)

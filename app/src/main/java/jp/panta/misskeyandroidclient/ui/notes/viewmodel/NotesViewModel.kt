@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.api.notes.NoteState
 import jp.panta.misskeyandroidclient.api.throwIfHasError
@@ -29,6 +30,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll.PollViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 //sealed interface Action {
 //    data class ShowRenoteDialog(val note: PlaneNoteViewData) : Action
@@ -55,7 +57,8 @@ import kotlinx.coroutines.withContext
 //
 //
 //}
-class NotesViewModel(
+@HiltViewModel
+class NotesViewModel @Inject constructor(
     val miCore: MiCore,
     private val reactionHistoryDao: ReactionHistoryDao
 ) : ViewModel() {
@@ -98,6 +101,10 @@ class NotesViewModel(
 
     val showRenotesEvent = EventBus<Note.Id?>()
 
+    /**
+     * リモートのリアクションを選択したときに
+     * ローカルの絵文字からそれに近い候補を表示するためのダイアログを表示するイベント
+     */
     val showRemoteReactionEmojiSuggestionDialog = EventBus<String>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){

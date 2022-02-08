@@ -8,25 +8,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
-import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
-
+@AndroidEntryPoint
 class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
 
     private var mNoteViewModel: NotesViewModel? = null
+    val notesViewModel by activityViewModels<NotesViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,8 +48,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
 
         activity?: return
         ar?: return
-        val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(miApplication)).get(
-            NotesViewModel::class.java)
+
         mNoteViewModel = notesViewModel
 
 

@@ -3,14 +3,15 @@ package jp.panta.misskeyandroidclient.ui.notes.view.detail
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModelFactory
 import jp.panta.misskeyandroidclient.model.account.page.Page
@@ -21,6 +22,7 @@ import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
     companion object{
@@ -57,6 +59,8 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
     private val binding: FragmentNoteDetailBinding by dataBinding()
 
 
+    val notesViewModel: NotesViewModel by activityViewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -68,7 +72,6 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail){
 
         val miApplication = context?.applicationContext as MiApplication
 
-        val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
 
         val noteDetailViewModel = ViewModelProvider(this, NoteDetailViewModelFactory(page, accountId = accountId, miApplication = miApplication))[NoteDetailViewModel::class.java]
 

@@ -14,6 +14,7 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.report.Report
@@ -183,6 +184,10 @@ class ActionNoteHandler(
         }
     }
 
+    private val showRemoteReactionEmojiSuggestionDialogObserver: (String) -> Unit = { reaction ->
+        Reaction(reaction)
+    }
+
     fun initViewModelListener() {
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
         mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
@@ -243,5 +248,8 @@ class ActionNoteHandler(
 
         mNotesViewModel.confirmReportEvent.removeObserver(reportDialogObserver)
         mNotesViewModel.confirmReportEvent.observe(activity, reportDialogObserver)
+
+        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.removeObserver(showRemoteReactionEmojiSuggestionDialogObserver)
+        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.observe(activity, showRemoteReactionEmojiSuggestionDialogObserver)
     }
 }

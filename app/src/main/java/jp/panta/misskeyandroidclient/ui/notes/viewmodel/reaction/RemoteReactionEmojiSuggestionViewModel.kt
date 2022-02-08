@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
@@ -18,12 +19,22 @@ data class RemoteReaction(
     val reaction: Reaction,
     val currentAccountId: Long
 )
+
 @HiltViewModel
 class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
     val metaRepository: MetaRepository,
     val accountRepository: AccountRepository,
 ) : ViewModel() {
 
+    @Suppress("UNCHECKED_CAST")
+    class Factory(
+        val metaRepository: MetaRepository,
+        val accountRepository: AccountRepository,
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return RemoteReactionEmojiSuggestionViewModel(metaRepository, accountRepository) as T
+        }
+    }
     private val _reaction = MutableStateFlow<RemoteReaction?>(null)
     val reaction: StateFlow<RemoteReaction?> = _reaction
 
