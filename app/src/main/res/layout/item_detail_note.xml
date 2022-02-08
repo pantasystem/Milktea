@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <variable name="note" type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewData"/>
-        <import type="android.view.View"/>
+
+        <variable
+                name="note"
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewData" />
+
+        <import type="android.view.View" />
 
 
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
 
 
-        <import type="jp.panta.misskeyandroidclient.R"/>
+        <import type="jp.panta.misskeyandroidclient.R" />
 
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
     </data>
+
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,8 +50,7 @@
                 app:foldingButton="@{contentFoldingButton}"
                 app:cw="@{cw}"
                 app:foldingContent="@{contentMain}"
-                app:isFolding="@{note.contentFolding}"
-                >
+                app:isFolding="@{note.contentFolding}">
 
             <androidx.emoji.widget.EmojiTextView
                     android:id="@+id/statusView"
@@ -138,6 +144,7 @@
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                         app:textNode="@{note.textNode}"
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw" />
+
                 <include
                         android:layout_below="@id/text"
                         android:layout_width="match_parent"
@@ -147,8 +154,8 @@
                         android:layout_marginTop="8dp"
                         emojis="@{note.toShowNote.note.emojis}"
                         translationState="@{note.translateState}"
-                        android:layout_marginBottom="8dp"
-                        />
+                        android:layout_marginBottom="8dp" />
+
                 <include
                         android:id="@+id/mediaPreview"
                         layout="@layout/media_preview"
@@ -157,8 +164,7 @@
                         android:layout_below="@id/translationView"
                         android:visibility="@{note.files.empty ? View.GONE : View.VISIBLE}"
                         app:media="@{note.media}"
-                        tools:visibility="gone"
-                        />
+                        tools:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/manyFilePreviewListView"
@@ -168,7 +174,7 @@
                         tools:layout_height="20dp"
                         android:visibility="gone"
                         mediaViewData="@{note.media}"
-                        previewAbleList="@{note.media.files}"/>
+                        previewAbleList="@{note.media.files}" />
 
                 <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/poll"
@@ -286,6 +292,7 @@
 
                 </RelativeLayout>
             </RelativeLayout>
+
             <ImageView
                     android:id="@+id/visibility"
                     android:layout_width="20dp"
@@ -322,6 +329,7 @@
                     android:layout_marginEnd="4dp"
 
                     />
+
             <TextView
                     android:id="@+id/via_name"
                     android:layout_width="wrap_content"
@@ -331,8 +339,7 @@
                     android:layout_below="@id/contentMain"
                     tools:text="Milktea"
                     android:textStyle="bold"
-                    android:layout_alignParentEnd="true"
-                    />
+                    android:layout_alignParentEnd="true" />
 
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/reaction_view"
@@ -355,14 +362,14 @@
                 <ImageButton
                         android:id="@+id/imageButton"
                         style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/reply_title"
                         android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
-                        android:padding="4dp"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_reply_black_24dp"
-                        app:tint="?attr/colorNoteActionButtonTint"/>
+                        app:tint="?attr/colorNoteActionButtonTint" />
 
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/textView3"
@@ -377,14 +384,14 @@
                 <ImageButton
                         android:id="@+id/imageButton2"
                         style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/renote"
                         android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
-                        android:padding="4dp"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_re_note"
-                        app:tint="?attr/colorNoteActionButtonTint"/>
+                        app:tint="?attr/colorNoteActionButtonTint" />
 
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/textView4"
@@ -402,15 +409,15 @@
                 <ImageButton
                         android:id="@+id/imageButton3"
                         style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/reaction"
                         android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
-                        android:padding="4dp"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:isReacted="@{note.myReaction != null}"
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
-                        app:tint="?attr/colorNoteActionButtonTint"/>
+                        app:tint="?attr/colorNoteActionButtonTint" />
 
                 <androidx.emoji.widget.EmojiTextView
                         android:layout_width="50dp"
@@ -427,14 +434,14 @@
                 <ImageButton
                         android:id="@+id/imageButton4"
                         style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/more"
                         android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
-                        android:padding="4dp"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_more_horiz_black_24dp"
-                        app:tint="?attr/colorNoteActionButtonTint"/>
+                        app:tint="?attr/colorNoteActionButtonTint" />
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
