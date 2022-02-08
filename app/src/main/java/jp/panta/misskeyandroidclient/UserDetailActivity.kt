@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -25,7 +26,6 @@ import jp.panta.misskeyandroidclient.ui.users.PinNoteFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModelFactory
 import java.lang.IllegalArgumentException
@@ -78,6 +78,7 @@ class UserDetailActivity : AppCompatActivity() {
     private var mIsMainActive: Boolean = true
 
     private var mParentActivity: Activities? = null
+    val notesViewModel by viewModels<NotesViewModel>()
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,10 +117,6 @@ class UserDetailActivity : AppCompatActivity() {
 
         val miApplication = applicationContext as MiApplication
 
-        val notesViewModel = ViewModelProvider(
-            this,
-            NotesViewModelFactory(miApplication)
-        )[NotesViewModel::class.java]
         ActionNoteHandler(
             this,
             notesViewModel,

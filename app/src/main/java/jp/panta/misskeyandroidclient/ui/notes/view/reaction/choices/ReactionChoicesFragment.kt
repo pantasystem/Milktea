@@ -8,27 +8,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
+import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+
 @ExperimentalCoroutinesApi
 @FlowPreview
-class ReactionChoicesFragment : Fragment(){
+class ReactionChoicesFragment : Fragment() {
 
-    companion object{
-        private const val EXTRA_TYPE = "jp.panta.misskeyandroidclient.ui.notes.ReactionChoicesFragment.EXTRA_TYPE"
-        private const val EXTRA_CATEGORY = "jp.panta.misskeyandroidclient.vaie.notes.reaction.choices.ReactionChoicesFragment.EXTRA_CATEGORY"
+    companion object {
+        private const val EXTRA_TYPE =
+            "jp.panta.misskeyandroidclient.ui.notes.ReactionChoicesFragment.EXTRA_TYPE"
+        private const val EXTRA_CATEGORY =
+            "jp.panta.misskeyandroidclient.vaie.notes.reaction.choices.ReactionChoicesFragment.EXTRA_CATEGORY"
+
         fun newInstance(type: Type, category: String? = null): ReactionChoicesFragment {
             val fragment = ReactionChoicesFragment()
-            val bundle = Bundle().apply{
+            val bundle = Bundle().apply {
                 putInt(EXTRA_TYPE, type.ordinal)
                 putString(EXTRA_CATEGORY, category)
             }
@@ -39,7 +43,7 @@ class ReactionChoicesFragment : Fragment(){
 
     }
 
-    enum class Type{
+    enum class Type {
         DEFAULT,
         FREQUENCY,
         CATEGORY,
@@ -59,30 +63,32 @@ class ReactionChoicesFragment : Fragment(){
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentReactionChoicesBinding.bind(view)
 
-        val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
 
         val columns = view.context.resources.getInteger(R.integer.reaction_choices_columns)
 
         val adapter =
-            ReactionChoicesAdapter(
-                notesViewModel
-            )
+            ReactionChoicesAdapter {
+                val selection = (parentFragment as? ReactionSelection)
+                    ?: (requireActivity() as? ReactionSelection)
+                Log.w("ReactionChoicesFragment", "ReactionSelectionの実装が行われていません")
+                selection?.selectReaction(it)
+            }
         val layoutManager = GridLayoutManager(view.context, columns)
 
         binding.reactionsView.layoutManager = layoutManager
         binding.reactionsView.adapter = adapter
 
 
-        val typeOrdinal = arguments?.getInt(EXTRA_TYPE)?: 0
+        val typeOrdinal = arguments?.getInt(EXTRA_TYPE) ?: 0
 
-        when(Type.values()[typeOrdinal]){
+        when (Type.values()[typeOrdinal]) {
             Type.DEFAULT -> showDefault(adapter)
             Type.FREQUENCY -> showFrequency(adapter)
-            Type.CATEGORY ->{
-                val category = arguments?.getString(EXTRA_CATEGORY)?: return
+            Type.CATEGORY -> {
+                val category = arguments?.getString(EXTRA_CATEGORY) ?: return
                 showCategoryBy(category, adapter)
             }
-            Type.USER ->{
+            Type.USER -> {
                 showUserSettings(adapter)
             }
         }
@@ -90,9 +96,9 @@ class ReactionChoicesFragment : Fragment(){
     }
 
 
-    private fun showDefault(adapter: ReactionChoicesAdapter){
+    private fun showDefault(adapter: ReactionChoicesAdapter) {
         val miApplication = context?.applicationContext as MiApplication
-        val defaultReaction = ReactionResourceMap.reactionDrawableMap.map{
+        val defaultReaction = ReactionResourceMap.reactionDrawableMap.map {
             it.key
         }
         val emojiFlow = miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
@@ -100,31 +106,31 @@ class ReactionChoicesFragment : Fragment(){
         }.mapNotNull {
             it?.emojis
         }.map { emojis ->
-            ArrayList<String>(defaultReaction).apply{
-                addAll(emojis.map{
+            ArrayList<String>(defaultReaction).apply {
+                addAll(emojis.map {
                     ":${it.name}:"
                 })
             }
         }
         lifecycleScope.launchWhenResumed {
-            emojiFlow.flowOn(Dispatchers.IO).collect {
-                adapter.submitList(it)
+            emojiFlow.flowOn(Dispatchers.IO).collect { list ->
+                adapter.submitList(list)
             }
         }
     }
 
-    private fun showFrequency(adapter: ReactionChoicesAdapter){
+    private fun showFrequency(adapter: ReactionChoicesAdapter) {
         val miApplication = context?.applicationContext as MiApplication
-        val ac = miApplication.getCurrentAccount().value?: return
-        lifecycleScope.launch(Dispatchers.IO){
+        val ac = miApplication.getCurrentAccount().value ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
             val meta = miApplication.getMetaRepository().get(ac.instanceDomain)
-            val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map{
+            val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map {
                 it.reaction
             }.map { reaction ->
-                if(reaction.codePointCount(0, reaction.length) == 1) {
+                if (reaction.codePointCount(0, reaction.length) == 1) {
                     return@map reaction
                 }
-                if(reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains("@")) {
+                if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains("@")) {
                     return@map (reaction.replace(":", "").split("@")[0]).let {
                         ":$it:"
                     }
@@ -133,9 +139,9 @@ class ReactionChoicesFragment : Fragment(){
             }.filter { reaction ->
                 reaction.codePointCount(0, reaction.length) == 1
                         || meta?.emojis?.any {
-                            it.name == reaction.replace(":", "")
+                    it.name == reaction.replace(":", "")
 
-                        }?: false
+                } ?: false
             }.distinct()
             withContext(Dispatchers.Main) {
                 adapter.submitList(list)
@@ -145,7 +151,7 @@ class ReactionChoicesFragment : Fragment(){
     }
 
     @ExperimentalCoroutinesApi
-    private fun showCategoryBy(category: String, adapter: ReactionChoicesAdapter){
+    private fun showCategoryBy(category: String, adapter: ReactionChoicesAdapter) {
         val miApplication = context?.applicationContext as MiApplication
         val emojiFlow = miApplication.getCurrentAccount().filterNotNull()
             .flatMapLatest {
@@ -170,21 +176,22 @@ class ReactionChoicesFragment : Fragment(){
 
     }
 
-    private fun showUserSettings(adapter: ReactionChoicesAdapter){
+    private fun showUserSettings(adapter: ReactionChoicesAdapter) {
         val miApplication = context?.applicationContext as MiApplication
-        lifecycleScope.launch(Dispatchers.IO){
-            try{
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
                 val instance = miApplication.getCurrentAccount().value?.instanceDomain
-                var reactions = miApplication.reactionUserSettingDao.findByInstanceDomain(instance!!)?.map{
-                    it.reaction
-                }?: ReactionResourceMap.defaultReaction
-                if(reactions.isEmpty()){
+                var reactions =
+                    miApplication.reactionUserSettingDao.findByInstanceDomain(instance!!)?.map {
+                        it.reaction
+                    } ?: ReactionResourceMap.defaultReaction
+                if (reactions.isEmpty()) {
                     reactions = ReactionResourceMap.defaultReaction
                 }
-                Handler(Looper.getMainLooper()).post{
+                Handler(Looper.getMainLooper()).post {
                     adapter.submitList(reactions)
                 }
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 Log.e("ReactionChoicesFragment", "load error", e)
             }
         }

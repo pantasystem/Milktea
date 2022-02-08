@@ -14,12 +14,14 @@ import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.report.Report
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
+import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.picker.ReactionPickerDialog
@@ -28,6 +30,7 @@ import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.SelectedReaction
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,14 +41,24 @@ class ActionNoteHandler(
     val mNotesViewModel: NotesViewModel,
     val confirmViewModel: ConfirmViewModel
 ) {
-    private val settingStore = SettingStore(activity.getSharedPreferences(activity.getPreferenceName(), Context.MODE_PRIVATE))
+    private val settingStore = SettingStore(
+        activity.getSharedPreferences(
+            activity.getPreferenceName(),
+            Context.MODE_PRIVATE
+        )
+    )
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
-        activity.startActivity(NoteEditorActivity.newBundle(activity, replyTo = it.toShowNote.note.id))
+        activity.startActivity(
+            NoteEditorActivity.newBundle(
+                activity,
+                replyTo = it.toShowNote.note.id
+            )
+        )
     }
 
-    private val reNoteTargetObserver = Observer<PlaneNoteViewData>{
+    private val reNoteTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "renote clicked :$it")
         val dialog = RenoteBottomSheetDialog()
         dialog.show(activity.supportFragmentManager, "timelineFragment")
@@ -55,7 +68,7 @@ class ActionNoteHandler(
         Log.d("MainActivity", "share clicked :$it")
         ShareBottomSheetDialog().show(activity.supportFragmentManager, "MainActivity")
     }
-    private val targetUserObserver = Observer<User>{
+    private val targetUserObserver = Observer<User> {
         Log.d("MainActivity", "user clicked :$it")
         val intent = UserDetailActivity.newInstance(activity, userId = it.id)
 
@@ -65,39 +78,34 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
-    private val statusMessageObserver = Observer<String>{
+    private val statusMessageObserver = Observer<String> {
         Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
     }
 
-    private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData>{
+    private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData> {
         val intent = NoteEditorActivity.newBundle(activity, quoteTo = it.toShowNote.note.id)
         activity.startActivity(intent)
     }
 
-    private val reactionTargetObserver = Observer<PlaneNoteViewData>{
+    private val reactionTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
-        when(settingStore.reactionPickerType){
-            ReactionPickerType.LIST ->{
+        when (settingStore.reactionPickerType) {
+            ReactionPickerType.LIST -> {
                 ReactionSelectionDialog().show(activity.supportFragmentManager, "MainActivity")
             }
-            ReactionPickerType.SIMPLE ->{
+            ReactionPickerType.SIMPLE -> {
                 ReactionPickerDialog().show(activity.supportFragmentManager, "Activity")
             }
         }
     }
 
-    private val noteTargetObserver = Observer<PlaneNoteViewData>{
-        NoteDetailActivity.newIntent(activity, noteId = it.toShowNote.note.id).let{
-            activity.startActivity(it)
-        }
-    }
 
-    private val showNoteEventObserver = Observer<Note>{
+    private val showNoteEventObserver = Observer<Note> {
         activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = it.id))
     }
-    private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>>{
+    private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>> {
         Log.d("ActionNoteHandler", "${it.first.file}")
-        val list = it.second.files.value!!.map{fv ->
+        val list = it.second.files.value!!.map { fv ->
             fv.file
         }
         val index = it.second.files.value!!.indexOfFirst { fv ->
@@ -108,16 +116,16 @@ class ActionNoteHandler(
         //val intent =
     }
 
-    private val reactionInputObserver = Observer<Unit>{
+    private val reactionInputObserver = Observer<Unit> {
         val dialog = ReactionInputDialog()
         dialog.show(activity.supportFragmentManager, "")
     }
 
-    private val openNoteEditor = Observer<DraftNote?>{ note ->
+    private val openNoteEditor = Observer<DraftNote?> { note ->
         activity.startActivity(NoteEditorActivity.newBundle(activity, draftNote = note))
     }
 
-    private val confirmDeletionEventObserver = Observer<PlaneNoteViewData>{
+    private val confirmDeletionEventObserver = Observer<PlaneNoteViewData> {
         confirmViewModel.confirmEvent.event = ConfirmCommand(
             activity.getString(R.string.confirm_deletion),
             null,
@@ -135,36 +143,37 @@ class ActionNoteHandler(
         )
     }
 
-    private val confirmCommandEventObserver = Observer<ConfirmCommand>{
+    private val confirmCommandEventObserver = Observer<ConfirmCommand> {
         ConfirmDialog().show(activity.supportFragmentManager, "")
     }
 
     private val confirmedEventObserver = Observer<ConfirmEvent> {
-        if(it.resultType == ResultType.NEGATIVE){
+        if (it.resultType == ResultType.NEGATIVE) {
             return@Observer
         }
-        when(it.eventType){
-            "delete_note" ->{
-                if(it.args is Note){
+        when (it.eventType) {
+            "delete_note" -> {
+                if (it.args is Note) {
                     mNotesViewModel.removeNote(it.args.id)
                 }
             }
-            "delete_and_edit_note" ->{
-                if(it.args is NoteRelation){
+            "delete_and_edit_note" -> {
+                if (it.args is NoteRelation) {
                     mNotesViewModel.removeAndEditNote(it.args)
                 }
             }
         }
     }
 
-    private val showReactionHistoryDialogObserver: (ReactionHistoryRequest?)->Unit = { req ->
+    private val showReactionHistoryDialogObserver: (ReactionHistoryRequest?) -> Unit = { req ->
         req?.let {
-            ReactionHistoryPagerDialog.newInstance(req.noteId, it.type).show(activity.supportFragmentManager, "")
+            ReactionHistoryPagerDialog.newInstance(req.noteId, it.type)
+                .show(activity.supportFragmentManager, "")
         }
     }
 
-    private val showRenotesDialogObserver: (Note.Id?)-> Unit = { id ->
-        id?.let{
+    private val showRenotesDialogObserver: (Note.Id?) -> Unit = { id ->
+        id?.let {
             RenotesBottomSheetDialog.newInstance(id).show(activity.supportFragmentManager, "")
         }
     }
@@ -172,11 +181,22 @@ class ActionNoteHandler(
 
     private val reportDialogObserver: (Report?) -> Unit = { report ->
         report?.let {
-            ReportDialog.newInstance(report.userId, report.comment).show(activity.supportFragmentManager, "")
+            ReportDialog.newInstance(report.userId, report.comment)
+                .show(activity.supportFragmentManager, "")
         }
     }
 
-    fun initViewModelListener(){
+    private val showRemoteReactionEmojiSuggestionDialogObserver: (SelectedReaction?) -> Unit = { reaction ->
+        if (reaction != null) {
+            RemoteReactionEmojiSuggestionDialog.newInstance(
+                accountId = reaction.noteId.accountId,
+                noteId = reaction.noteId.noteId,
+                reaction = reaction.reaction
+            ).show(activity.supportFragmentManager, "")
+        }
+    }
+
+    fun initViewModelListener() {
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
         mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
 
@@ -198,9 +218,6 @@ class ActionNoteHandler(
         mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
         mNotesViewModel.reactionTarget.observe(activity, reactionTargetObserver)
 
-        mNotesViewModel.targetNote.removeObserver(noteTargetObserver)
-        mNotesViewModel.targetNote.observe(activity, noteTargetObserver)
-
         mNotesViewModel.targetFile.removeObserver(fileTargetObserver)
         mNotesViewModel.targetFile.observe(activity, fileTargetObserver)
 
@@ -217,7 +234,10 @@ class ActionNoteHandler(
         mNotesViewModel.confirmDeletionEvent.observe(activity, confirmDeletionEventObserver)
 
         mNotesViewModel.confirmDeleteAndEditEvent.removeObserver(confirmDeleteAndEditEventObserver)
-        mNotesViewModel.confirmDeleteAndEditEvent.observe(activity, confirmDeleteAndEditEventObserver)
+        mNotesViewModel.confirmDeleteAndEditEvent.observe(
+            activity,
+            confirmDeleteAndEditEventObserver
+        )
 
         confirmViewModel.confirmEvent.removeObserver(confirmCommandEventObserver)
         confirmViewModel.confirmEvent.observe(activity, confirmCommandEventObserver)
@@ -226,12 +246,18 @@ class ActionNoteHandler(
         confirmViewModel.confirmedEvent.observe(activity, confirmedEventObserver)
 
         mNotesViewModel.showReactionHistoryEvent.removeObserver(showReactionHistoryDialogObserver)
-        mNotesViewModel.showReactionHistoryEvent.observe(activity, showReactionHistoryDialogObserver)
+        mNotesViewModel.showReactionHistoryEvent.observe(
+            activity,
+            showReactionHistoryDialogObserver
+        )
 
         mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
         mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
 
         mNotesViewModel.confirmReportEvent.removeObserver(reportDialogObserver)
         mNotesViewModel.confirmReportEvent.observe(activity, reportDialogObserver)
+
+        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.removeObserver(showRemoteReactionEmojiSuggestionDialogObserver)
+        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.observe(activity, showRemoteReactionEmojiSuggestionDialogObserver)
     }
 }

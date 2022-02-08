@@ -378,5 +378,8 @@
     <string name="change_nickname">Change nickname</string>
     <string name="nickname">Nickname</string>
     <string name="delete_nickname">Delete nickname</string>
+    <string name="suggested_emojis">Suggested Emojis</string>
+    <string name="the_remote_emoji_does_not_exist_in_this_instance">此实例中不存在远程表情符号。</string>
+
 
 </resources>

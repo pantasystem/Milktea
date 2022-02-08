@@ -8,23 +8,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
-
-class ReactionSelectionDialog : BottomSheetDialogFragment() {
+@AndroidEntryPoint
+class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
 
     private var mNoteViewModel: NotesViewModel? = null
+    val notesViewModel by activityViewModels<NotesViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,14 +49,10 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
         activity?: return
         ar?: return
-        val notesViewModel = ViewModelProvider(activity, NotesViewModelFactory(miApplication)).get(
-            NotesViewModel::class.java)
+
         mNoteViewModel = notesViewModel
 
-        notesViewModel.submittedNotesOnReaction.observe(activity, {
-            Log.d("ReactionSelectionDialog", "終了が呼び出された")
-            dismiss()
-        })
+
         miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
@@ -72,12 +71,16 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
 
         binding.reactionInputKeyboard.setOnClickListener {
-
+            ReactionInputDialog().show(parentFragmentManager, "")
             dismiss()
-            notesViewModel.showInputReactionEvent.event = Unit
         }
 
 
+    }
+
+    override fun selectReaction(reaction: String) {
+        mNoteViewModel?.postReaction(reaction)
+        dismiss()
     }
 
     inner class ReactionChoicesPagerAdapter(

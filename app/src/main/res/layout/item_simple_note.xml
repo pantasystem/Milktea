@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <variable name="note" type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData"/>
-        <import type="android.view.View"/>
+
+        <variable
+                name="note"
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData" />
+
+        <import type="android.view.View" />
 
 
+        <import type="jp.panta.misskeyandroidclient.R" />
 
-
-        <import type="jp.panta.misskeyandroidclient.R"/>
-        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
 
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
     </data>
+
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,8 +38,7 @@
             app:foldingButton="@{contentFoldingButton}"
             app:cw="@{cw}"
             app:foldingContent="@{contentMain}"
-            app:isFolding="@{note.contentFolding}"
-            >
+            app:isFolding="@{note.contentFolding}">
 
         <ImageView
                 android:id="@+id/avatarIcon"
@@ -43,22 +48,23 @@
                 app:circleIcon='@{note.avatarUrl}'
                 tools:srcCompat="@android:drawable/sym_def_app_icon"
                 android:contentDescription="@string/avataricon"
-                app:transitionDestinationUser="@{note.toShowNote.user}"
-                />
+                app:transitionDestinationUser="@{note.toShowNote.user}" />
 
         <androidx.emoji.widget.EmojiTextView
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/avatarIcon"
                 android:id="@+id/mainName"
                 android:textStyle="bold"
                 android:textSize="15sp"
 
                 android:layout_marginEnd="4dp"
-                tools:text="名前"
-                />
+                tools:text="名前" />
+
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/subName"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/mainName"
                 android:textStyle="italic"
                 android:singleLine="true"
@@ -67,6 +73,7 @@
                 tools:text="ユーザー名"
 
                 />
+
         <androidx.emoji.widget.EmojiTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -79,8 +86,8 @@
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"
-                android:id="@+id/elapsedTime"
-                />
+                android:id="@+id/elapsedTime" />
+
         <jp.panta.misskeyandroidclient.ui.components.AutoCollapsingLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -88,8 +95,8 @@
                 android:layout_toEndOf="@+id/avatarIcon"
                 android:layout_below="@+id/mainName"
                 overflowExpanded="@{note.expanded}"
-                app:expandableButton="@id/autoExpandableButton"
-                >
+                app:expandableButton="@id/autoExpandableButton">
+
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -100,6 +107,7 @@
                     android:visibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
 
                     />
+
             <LinearLayout
                     android:id="@+id/expandableBase"
                     android:layout_width="match_parent"
@@ -107,13 +115,13 @@
                     android:orientation="vertical"
 
                     >
+
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/cw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="cwcwcwwcwcw"
-                        app:textNode="@{note.cwNode}"
-                        />
+                        app:textNode="@{note.cwNode}" />
 
 
                 <androidx.emoji.widget.EmojiTextView
@@ -126,22 +134,24 @@
                         tools:text="展開する"
                         android:textColor="?attr/colorAccent"
                         android:onClick="@{()-> note.changeContentFolding() }"
-                        android:text="@string/auto_note_folding"
-                        />
+                        android:text="@string/auto_note_folding" />
+
                 <RelativeLayout
                         android:id="@+id/contentMain"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                        android:layout_height="wrap_content">
+
                     <androidx.emoji.widget.EmojiTextView
                             android:id="@id/text"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:textSize="15sp"
                             app:textNode="@{note.textNode}"
                             tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                             android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
 
                             />
+
                     <include
                             android:layout_below="@id/text"
                             android:layout_width="match_parent"
@@ -149,8 +159,7 @@
                             android:id="@+id/translationView"
                             layout="@layout/view_translation"
                             emojis="@{note.toShowNote.note.emojis}"
-                            translationState="@{note.translateState}"
-                            />
+                            translationState="@{note.translateState}" />
 
                     <include
                             android:id="@+id/mediaPreview"
@@ -172,9 +181,7 @@
                             tools:layout_height="20dp"
                             android:visibility="gone"
                             mediaViewData="@{note.media}"
-                            previewAbleList="@{note.media.files}"/>
-
-
+                            previewAbleList="@{note.media.files}" />
 
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -196,13 +203,12 @@
                             android:layout_below="@id/poll"
                             tools:itemCount="1"
                             tools:listitem="@layout/item_url_preview"
-                            app:previewList="@{note.previews}"
-                            />
-
+                            app:previewList="@{note.previews}" />
 
 
                     <RelativeLayout
-                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_below="@+id/url_preview_list"
                             android:padding="8dp"
                             android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
@@ -213,29 +219,31 @@
                             app:subNameView="@{subNoteSubName}"
                             app:mainNameView="@{subNoteMainName}"
                             app:user="@{note.subNote.user}"
-                            android:layout_marginTop="4dp"
-                            >
+                            android:layout_marginTop="4dp">
+
                         <ImageView
                                 android:id="@+id/subAvatarIcon"
-                                android:layout_width="20dp" android:layout_height="20dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_marginEnd="5dp"
                                 app:circleIcon='@{note.subNoteAvatarUrl}'
                                 android:contentDescription="@string/avataricon"
-                                app:transitionDestinationUser="@{note.subNote.user}"
-                                />
+                                app:transitionDestinationUser="@{note.subNote.user}" />
 
                         <androidx.emoji.widget.EmojiTextView
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_toEndOf="@+id/subAvatarIcon"
                                 android:id="@+id/subNoteMainName"
                                 android:textStyle="bold"
                                 android:textSize="15sp"
 
-                                android:layout_marginEnd="8dp"
-                                />
+                                android:layout_marginEnd="8dp" />
+
                         <androidx.emoji.widget.EmojiTextView
                                 android:layout_toEndOf="@id/subNoteMainName"
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:textStyle="italic"
                                 android:id="@+id/subNoteSubName"
                                 android:textSize="15sp"
@@ -250,8 +258,7 @@
                                 tools:text="cwcwcwwcwcw"
                                 app:textNode="@{note.subCwNode}"
                                 android:layout_below="@+id/subNoteMainName"
-                                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
-                                />
+                                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}' />
 
 
                         <androidx.emoji.widget.EmojiTextView
@@ -268,15 +275,16 @@
                                 android:onClick="@{()-> note.changeSubContentFolding() }"
 
                                 />
+
                         <androidx.emoji.widget.EmojiTextView
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/subContentFoldingButton"
                                 android:textSize="15sp"
                                 android:id="@+id/subNoteText"
                                 tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                                 app:textNode="@{note.subNoteTextNode}"
-                                android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
-                                />
+                                android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }" />
 
                         <include
                                 layout="@layout/media_preview"
@@ -287,7 +295,6 @@
                                 android:layout_below="@id/subNoteText"
                                 android:visibility="@{note.subNoteFiles.empty || note.subNoteMedia.isOver4Files ? View.GONE : View.VISIBLE}"
                                 tools:layout_height="20dp" />
-
 
 
                     </RelativeLayout>
@@ -307,67 +314,76 @@
                 android:layout_marginTop="4dp"
                 tools:visibility="visible"
                 tools:listitem="@layout/item_reaction"
-                tools:itemCount="1"
-                />
+                tools:itemCount="1" />
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_below="@+id/reaction_view"
-                android:layout_toEndOf="@+id/avatarIcon"
-                >
+                android:layout_toEndOf="@+id/avatarIcon">
 
             <ImageButton
-                    android:layout_width="34dp"
-                    android:layout_height="34dp" app:srcCompat="@drawable/ic_reply_black_24dp"
+                    android:layout_width="@dimen/note_bottom_action_icon_size"
+                    android:layout_height="@dimen/note_bottom_action_icon_size"
+                    app:srcCompat="@drawable/ic_reply_black_24dp"
                     android:id="@+id/imageButton"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="6dp"
+                    android:padding="@dimen/note_bottom_action_icon_padding_size"
                     android:scaleType="centerCrop"
                     android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                     android:contentDescription="@string/reply_title"
-                    app:tint="?attr/colorNoteActionButtonTint"/>
+                    app:tint="?attr/colorNoteActionButtonTint" />
+
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
                     android:layout_width="50dp"
-                    android:layout_height="wrap_content" android:id="@+id/textView3" android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView3"
+                    android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:singleLine="true"
-                    android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
-                    />
+                    android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
+
             <ImageButton
-                    android:layout_width="34dp"
-                    android:layout_height="34dp" app:srcCompat="@drawable/ic_re_note"
+                    android:layout_width="@dimen/note_bottom_action_icon_size"
+                    android:layout_height="@dimen/note_bottom_action_icon_size"
+                    app:srcCompat="@drawable/ic_re_note"
                     android:id="@+id/imageButton2"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="6dp"
+                    android:padding="@dimen/note_bottom_action_icon_padding_size"
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/renote"
                     app:tint="?attr/colorNoteActionButtonTint"
                     app:clickTargetNote="@{note}"
-                    app:notesViewModelForClickRenote="@{notesViewModel}"
-                    />
+                    app:notesViewModelForClickRenote="@{notesViewModel}" />
+
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
                     android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                     android:layout_width="50dp"
-                    android:layout_height="wrap_content" android:id="@+id/textView4" android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView4"
+                    android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:singleLine="true"
 
                     />
+
             <ImageButton
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
+                    android:layout_width="@dimen/note_bottom_action_icon_size"
+                    android:layout_height="@dimen/note_bottom_action_icon_size"
                     app:isReacted="@{note.myReaction != null}"
                     tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                     android:id="@+id/imageButton3"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="6dp"
+                    android:padding="@dimen/note_bottom_action_icon_padding_size"
                     android:scaleType="centerCrop"
                     android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
                     android:contentDescription="@string/reaction"
-                    app:tint="?attr/colorNoteActionButtonTint"/>
+                    app:tint="?attr/colorNoteActionButtonTint" />
+
             <androidx.emoji.widget.EmojiTextView
                     android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
 
@@ -379,16 +395,18 @@
                     android:layout_weight="1"
 
                     />
+
             <ImageButton
-                    android:layout_width="34dp"
-                    android:layout_height="34dp" app:srcCompat="@drawable/ic_more_horiz_black_24dp"
+                    android:layout_width="@dimen/note_bottom_action_icon_size"
+                    android:layout_height="@dimen/note_bottom_action_icon_size"
+                    app:srcCompat="@drawable/ic_more_horiz_black_24dp"
                     android:id="@+id/imageButton4"
                     style="?android:attr/borderlessButtonStyle"
-                    android:padding="6dp"
+                    android:padding="@dimen/note_bottom_action_icon_padding_size"
                     android:scaleType="centerCrop"
                     android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
                     android:contentDescription="@string/more"
-                    app:tint="?attr/colorNoteActionButtonTint"/>
+                    app:tint="?attr/colorNoteActionButtonTint" />
         </LinearLayout>
 
     </RelativeLayout>
