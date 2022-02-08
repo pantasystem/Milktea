@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -70,6 +71,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
 
 
         binding.reactionInputKeyboard.setOnClickListener {
+            ReactionInputDialog().show(parentFragmentManager, "")
             dismiss()
         }
 
