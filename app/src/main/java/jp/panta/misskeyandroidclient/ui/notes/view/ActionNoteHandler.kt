@@ -21,6 +21,7 @@ import jp.panta.misskeyandroidclient.model.users.report.Report
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
+import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.picker.ReactionPickerDialog
@@ -29,6 +30,7 @@ import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.SelectedReaction
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -184,8 +186,14 @@ class ActionNoteHandler(
         }
     }
 
-    private val showRemoteReactionEmojiSuggestionDialogObserver: (String) -> Unit = { reaction ->
-        Reaction(reaction)
+    private val showRemoteReactionEmojiSuggestionDialogObserver: (SelectedReaction?) -> Unit = { reaction ->
+        if (reaction != null) {
+            RemoteReactionEmojiSuggestionDialog.newInstance(
+                accountId = reaction.noteId.accountId,
+                noteId = reaction.noteId.noteId,
+                reaction = reaction.reaction
+            ).show(activity.supportFragmentManager, "")
+        }
     }
 
     fun initViewModelListener() {

@@ -57,6 +57,8 @@ import javax.inject.Inject
 //
 //
 //}
+data class SelectedReaction(val noteId: Note.Id, val reaction: String)
+
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     val miCore: MiCore,
@@ -105,7 +107,7 @@ class NotesViewModel @Inject constructor(
      * リモートのリアクションを選択したときに
      * ローカルの絵文字からそれに近い候補を表示するためのダイアログを表示するイベント
      */
-    val showRemoteReactionEmojiSuggestionDialog = EventBus<String>()
+    val showRemoteReactionEmojiSuggestionDialog = EventBus<SelectedReaction?>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
@@ -210,7 +212,7 @@ class NotesViewModel @Inject constructor(
 
         val id = planeNoteViewData.toShowNote.note.id
         if(!Reaction(reaction).isLocal()) {
-            showRemoteReactionEmojiSuggestionDialog.event = reaction
+            showRemoteReactionEmojiSuggestionDialog.event = SelectedReaction(noteId = id, reaction = reaction)
             return
         }
         viewModelScope.launch(Dispatchers.IO){
