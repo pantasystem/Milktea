@@ -14,7 +14,7 @@ data class Reaction(val reaction: String) {
      */
     fun isCustomEmojiFormat(): Boolean {
         // 初めのコロンと末端のコロンで２文字、カスタム絵文字の名称で１文字
-        return reaction.codePointCount(0, reaction.length) > 3
+        return reaction.codePointCount(0, reaction.length) >= 3
                 && reaction.startsWith(":")
                 && reaction.endsWith(":")
     }
