@@ -10,6 +10,7 @@ import android.view.MenuItem
 import androidx.core.app.TaskStackBuilder
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
@@ -22,7 +23,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-
+@AndroidEntryPoint
 class NoteDetailActivity : AppCompatActivity() {
     companion object{
         private const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_NOTE_ID"
