@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
-import jp.panta.misskeyandroidclient.api.notes.State
+import jp.panta.misskeyandroidclient.api.notes.NoteState
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
@@ -14,10 +14,10 @@ import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.toDraftNote
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
+import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.report.Report
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -30,10 +30,35 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+//sealed interface Action {
+//    data class ShowRenoteDialog(val note: PlaneNoteViewData) : Action
+//    data class ShowQuoteEditor(val note: PlaneNoteViewData) : Action
+//    data class ShowReplyEditor(val note: PlaneNoteViewData) : Action
+//    data class ShowReactionPicker(val note: PlaneNoteViewData) : Action
+//    data class ShowOptionalDialog(val note: PlaneNoteViewData) : Action
+//    data class ShowReportConfirmDialog(val report: Report) : Action
+//    data class ShowNoteDetail(val note: PlaneNoteViewData) : Action
+//    data class ShowUserDetail(val user: User) : Action
+//
+//}
+//
+//sealed interface NotesState {
+//
+//    sealed interface SendRenoteState : NotesState {
+//        val note: Note
+//        data class Sending(override val note: Note) : SendRenoteState
+//        data class Success(override val note: Note) : SendRenoteState
+//        data class Failure(override val note: Note) : SendRenoteState
+//    }
+//
+//    data class GetNoteStatusState (val note: Note, val noteState: State<NoteState>) : NotesState
+//
+//
+//}
 class NotesViewModel(
     val miCore: MiCore,
     private val reactionHistoryDao: ReactionHistoryDao
-) : ViewModel(), ReactionSelection{
+) : ViewModel() {
     private val TAG = "NotesViewModel"
     val encryption = miCore.getEncryption()
 
@@ -49,8 +74,6 @@ class NotesViewModel(
 
     val reactionTarget = EventBus<PlaneNoteViewData>()
 
-    val submittedNotesOnReaction = EventBus<PlaneNoteViewData>()
-
     val shareTarget = EventBus<PlaneNoteViewData>()
 
     val confirmDeletionEvent = EventBus<PlaneNoteViewData>()
@@ -59,11 +82,9 @@ class NotesViewModel(
 
     val confirmReportEvent = EventBus<Report>()
 
-    val shareNoteState = MutableLiveData<State>()
+    val shareNoteState = MutableLiveData<NoteState>()
 
     val targetUser = EventBus<User>()
-
-    val targetNote = EventBus<PlaneNoteViewData>()
 
     val showNoteEvent = EventBus<Note>()
 
@@ -76,6 +97,8 @@ class NotesViewModel(
     val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
 
     val showRenotesEvent = EventBus<Note.Id?>()
+
+    val showRemoteReactionEmojiSuggestionDialog = EventBus<String>()
 
     fun setTargetToReNote(note: PlaneNoteViewData){
         //reNoteTarget.postValue(note)
@@ -97,10 +120,11 @@ class NotesViewModel(
     }
 
     fun setTargetToNote(){
-        targetNote.event = shareTarget.event
+        showNoteEvent.event = shareTarget.event?.toShowNote?.note
     }
+
     fun setTargetToNote(note: PlaneNoteViewData){
-        targetNote.event = note
+        showNoteEvent.event = note.toShowNote.note
     }
 
     fun setShowNote(note: Note){
@@ -161,16 +185,13 @@ class NotesViewModel(
         }
     }
 
-    override fun selectReaction(reaction: String) {
-        postReaction(reaction)
-    }
 
-    //setTargetToReactionが呼び出されている必要がある
     fun postReaction(reaction: String){
         val targetNote =  reactionTarget.event
-        if(targetNote != null){
-            postReaction(targetNote, reaction)
+        require(targetNote != null) {
+            "targetNoteはNotNullである必要があります。"
         }
+        postReaction(targetNote, reaction)
     }
 
     /**
@@ -180,19 +201,17 @@ class NotesViewModel(
      */
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String){
 
-        if(reaction.contains("@") && reaction.replace(":", "").split("@").getOrNull(1) != ".") {
+        val id = planeNoteViewData.toShowNote.note.id
+        if(!Reaction(reaction).isLocal()) {
+            showRemoteReactionEmojiSuggestionDialog.event = reaction
             return
         }
         viewModelScope.launch(Dispatchers.IO){
-            //リアクション解除処理をする
-            withContext(Dispatchers.Main) {
-                submittedNotesOnReaction.event = planeNoteViewData
-            }
-            Log.d("NotesViewModel", "postReaction(n, n)")
+
             runCatching {
                 val result = miCore.getNoteRepository().toggleReaction(
                     CreateReaction(
-                        noteId = planeNoteViewData.toShowNote.note.id,
+                        noteId = id,
                         reaction = reaction
                     )
                 )

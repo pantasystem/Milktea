@@ -30,7 +30,6 @@ import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
 import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -135,7 +134,7 @@ interface MisskeyAPI {
     suspend fun searchNote(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/state")
-    suspend fun noteState(@Body noteRequest: NoteRequest): Response<State>
+    suspend fun noteState(@Body noteRequest: NoteRequest): Response<NoteState>
 
     @POST("api/notes/show")
     suspend fun showNote(@Body requestNote: NoteRequest): Response<NoteDTO>

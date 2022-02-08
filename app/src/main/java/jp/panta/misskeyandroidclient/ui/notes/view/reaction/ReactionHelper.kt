@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable
 import android.widget.LinearLayout
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
@@ -16,7 +17,7 @@ object ReactionHelper {
     @BindingAdapter("reactionNote", "reactionBackground")
     fun LinearLayout.setBackground(note: PlaneNoteViewData, reaction: ReactionCount){
 
-        if(!reaction.isLocal()) {
+        if(!Reaction(reaction.reaction).isLocal()) {
             this.background = ColorDrawable(Color.argb(0,0,0,0))
             return
         }

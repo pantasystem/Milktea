@@ -14,6 +14,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
+import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
+import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModelFactory
@@ -22,7 +24,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
 
-class ReactionSelectionDialog : BottomSheetDialogFragment() {
+class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
 
     private var mNoteViewModel: NotesViewModel? = null
 
@@ -50,10 +52,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
             NotesViewModel::class.java)
         mNoteViewModel = notesViewModel
 
-        notesViewModel.submittedNotesOnReaction.observe(activity, {
-            Log.d("ReactionSelectionDialog", "終了が呼び出された")
-            dismiss()
-        })
+
         miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
@@ -72,12 +71,15 @@ class ReactionSelectionDialog : BottomSheetDialogFragment() {
 
 
         binding.reactionInputKeyboard.setOnClickListener {
-
             dismiss()
-            notesViewModel.showInputReactionEvent.event = Unit
         }
 
 
+    }
+
+    override fun selectReaction(reaction: String) {
+        mNoteViewModel?.postReaction(reaction)
+        dismiss()
     }
 
     inner class ReactionChoicesPagerAdapter(

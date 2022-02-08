@@ -32,7 +32,6 @@ import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import retrofit2.Response
 
 open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI by misskeyAPI{
@@ -70,7 +69,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun muteUser(requestUser: RequestUser): Response<Unit> = misskeyAPI.muteUser(requestUser)
     override suspend fun followUser(requestUser: RequestUser): Response<UserDTO> = misskeyAPI.followUser(requestUser)
     override suspend fun myApps(i: I): Response<List<App>> = misskeyAPI.myApps(i)
-    override suspend fun noteState(noteRequest: NoteRequest): Response<State> = misskeyAPI.noteState(noteRequest)
+    override suspend fun noteState(noteRequest: NoteRequest): Response<NoteState> = misskeyAPI.noteState(noteRequest)
     override suspend fun notification(notificationRequest: NotificationRequest): Response<List<NotificationDTO>?> = misskeyAPI.notification(notificationRequest)
     override suspend fun pullUserFromList(listUserOperation: ListUserOperation): Response<Unit> = misskeyAPI.pullUserFromList(listUserOperation)
     override suspend fun pushUserToList(listUserOperation: ListUserOperation): Response<Unit> = misskeyAPI.pushUserToList(listUserOperation)

@@ -41,14 +41,13 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         val notesViewModel = ViewModelProvider(requireActivity(), NotesViewModelFactory(miApplication))[NotesViewModel::class.java]
         val adapter =
-            ReactionChoicesAdapter(
-                notesViewModel
-            )
+            ReactionChoicesAdapter {
+                dismiss()
+                notesViewModel.postReaction(it)
+            }
         binding.reactionsView.adapter = adapter
 
-        notesViewModel.submittedNotesOnReaction.observe(requireActivity(), {
-            dismiss()
-        })
+
         
         binding.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
         //adapter.submitList(ReactionResourceMap.defaultReaction)

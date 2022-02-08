@@ -31,7 +31,6 @@ import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import retrofit2.Response
 import retrofit2.http.Body
 
@@ -101,7 +100,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun myApps(i: I): Response<List<App>> = misskey.myApps(i)
 
-    override suspend fun noteState(noteRequest: NoteRequest): Response<State> = misskey.noteState(noteRequest)
+    override suspend fun noteState(noteRequest: NoteRequest): Response<NoteState> = misskey.noteState(noteRequest)
 
     override suspend fun notification(notificationRequest: NotificationRequest): Response<List<NotificationDTO>?> = misskey.notification(notificationRequest)
 

@@ -96,11 +96,6 @@ class ActionNoteHandler(
         }
     }
 
-    private val noteTargetObserver = Observer<PlaneNoteViewData> {
-        NoteDetailActivity.newIntent(activity, noteId = it.toShowNote.note.id).let {
-            activity.startActivity(it)
-        }
-    }
 
     private val showNoteEventObserver = Observer<Note> {
         activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = it.id))
@@ -209,9 +204,6 @@ class ActionNoteHandler(
 
         mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
         mNotesViewModel.reactionTarget.observe(activity, reactionTargetObserver)
-
-        mNotesViewModel.targetNote.removeObserver(noteTargetObserver)
-        mNotesViewModel.targetNote.observe(activity, noteTargetObserver)
 
         mNotesViewModel.targetFile.removeObserver(fileTargetObserver)
         mNotesViewModel.targetFile.observe(activity, fileTargetObserver)
