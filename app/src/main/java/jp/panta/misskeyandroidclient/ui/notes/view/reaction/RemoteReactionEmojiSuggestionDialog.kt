@@ -11,15 +11,10 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogRemoteReactionEmojiSuggestionBinding
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.instance.MetaRepository
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.RemoteReactionEmojiSuggestionViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import javax.inject.Inject
 
 private const val EXTRA_REACTION = "EXTRA_REACTION"
 private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"
@@ -75,8 +70,13 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
                     is State.Fixed -> {
                         binding.progressBar.visibility = View.GONE
                         binding.suggestedEmojis.visibility = View.VISIBLE
-                        binding.errorMessage.visibility = View.GONE
                         val emojis = (state.content as? StateContent.Exist)?.rawContent?: emptyList()
+                        if (emojis.isEmpty()) {
+                            binding.errorMessage.visibility = View.VISIBLE
+                            binding.errorMessage.text = getString(R.string.the_remote_emoji_does_not_exist_in_this_instance)
+                        } else {
+                            binding.errorMessage.visibility = View.GONE
+                        }
                         adapter.submitList(emojis.map {
                             ":${it.name}:"
                         })
@@ -85,6 +85,7 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.suggestedEmojis.visibility = View.GONE
                         binding.errorMessage.visibility = View.VISIBLE
+                        binding.errorMessage.text = state.throwable.stackTraceToString()
                     }
                 }
             }

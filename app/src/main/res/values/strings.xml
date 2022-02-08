@@ -383,5 +383,5 @@
     <string name="nickname">Nickname</string>
     <string name="delete_nickname">Delete nickname</string>
     <string name="suggested_emojis">Suggested Emojis</string>
-
+    <string name="the_remote_emoji_does_not_exist_in_this_instance">The remote emoji does not exist in this instance.</string>
 </resources>
