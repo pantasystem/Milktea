@@ -69,6 +69,8 @@ class NotificationViewModel(
             val notificationRelation = accountAndNotificationRelation.second
             val account = accountAndNotificationRelation.first
             NotificationViewData(notificationRelation, account,  miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+        }.catch { e ->
+            logger.warning("ストーリミング受信中にエラー発生", e = e)
         }.onEach {
 
             it.noteViewData?.eventFlow?.launchIn(viewModelScope + Dispatchers.IO)
