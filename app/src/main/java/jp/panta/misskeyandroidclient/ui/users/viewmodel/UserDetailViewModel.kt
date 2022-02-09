@@ -124,8 +124,13 @@ class UserDetailViewModel(
 
     fun load() {
         viewModelScope.launch(dispatcher) {
-            val u = findUser()
-            logger.debug("user:$u")
+            runCatching {
+                findUser()
+            }.onFailure {
+                logger.error("読み込みエラー", e = it)
+            }.onSuccess { u ->
+                logger.debug("user:$u")
+            }
         }
     }
 

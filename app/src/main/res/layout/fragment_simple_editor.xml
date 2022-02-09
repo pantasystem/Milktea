@@ -2,38 +2,47 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
                 name="noteEditorViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel" />
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
                 name="accountViewModel"
                 type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
+
         <variable
                 name="simpleEditor"
                 type="jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditor" />
+
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
+
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:background="?colorSurface"
+            android:layout_height="wrap_content"
+            android:background="?colorSurface"
             android:orientation="vertical"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp">
+
         <ProgressBar
                 android:id="@+id/progressBar2"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="@{noteEditorViewModel.maxTextLength}"
-                android:progress="@{noteEditorViewModel.maxTextLength - noteEditorViewModel.textRemaining}"
-                />
+                android:progress="@{noteEditorViewModel.maxTextLength - noteEditorViewModel.textRemaining}" />
+
         <androidx.compose.ui.platform.ComposeView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/filePreview"/>
+                android:id="@+id/filePreview" />
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/addressUsersView"
@@ -41,16 +50,15 @@
                 android:layout_height="wrap_content"
                 android:visibility="@{SafeUnbox.unboxBool(noteEditorViewModel.isSpecified()) &amp;&amp; SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE}"
 
-                tools:layout_height="50dp"/>
+                tools:layout_height="50dp" />
+
         <Button
                 android:id="@+id/addAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_add_black_24dp"
                 android:text="@string/add_address"
-                android:visibility="@{SafeUnbox.unboxBool(noteEditorViewModel.isSpecified()) &amp;&amp; SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE}"
-                />
-
+                android:visibility="@{SafeUnbox.unboxBool(noteEditorViewModel.isSpecified()) &amp;&amp; SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE}" />
 
 
         <MultiAutoCompleteTextView
@@ -61,16 +69,15 @@
 
                 android:hint="@string/cw_hint"
                 android:inputType="textMultiLine"
-                android:text="@{noteEditorViewModel.text}"
-                android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) &amp;&amp; SafeUnbox.unboxBool(noteEditorViewModel.hasCw) ? View.VISIBLE : View.GONE}"
-                />
+                android:text="@{noteEditorViewModel.cw}"
+                android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) &amp;&amp; SafeUnbox.unboxBool(noteEditorViewModel.hasCw) ? View.VISIBLE : View.GONE}" />
+
         <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:orientation="horizontal"
-                android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE}"
-                >
+                android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.VISIBLE : View.GONE}">
 
             <ImageButton
                     android:id="@+id/currentAccountAvatarIcon"
@@ -83,7 +90,8 @@
                     app:circleIcon="@{noteEditorViewModel.currentUser.user.avatarUrl}"
 
                     tools:ignore="ContentDescription"
-                    tools:src="@mipmap/ic_launcher"/>
+                    tools:src="@mipmap/ic_launcher" />
+
             <ImageButton
                     android:id="@+id/selectFileFromLocal"
                     style="@style/Widget.AppCompat.Button.Borderless"
@@ -109,7 +117,6 @@
                     app:tint="?attr/colorNoteActionButtonTint" />
 
 
-
             <ImageButton
                     android:id="@+id/setCw"
                     style="@style/Widget.AppCompat.Button.Borderless"
@@ -123,6 +130,7 @@
                     app:srcCompat="@drawable/ic_visibility_off_black_24dp"
                     tools:ignore="ContentDescription"
                     app:tint="?attr/colorNoteActionButtonTint" />
+
             <ImageButton
                     android:id="@+id/mentionButton"
                     style="@style/Widget.AppCompat.Button.Borderless"
@@ -137,6 +145,7 @@
                     tools:ignore="ContentDescription"
 
                     app:tint="?attr/colorNoteActionButtonTint" />
+
             <ImageButton
                     android:id="@+id/showEmojisButton"
                     style="@style/Widget.AppCompat.Button.Borderless"
@@ -172,8 +181,8 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
+
             <ImageButton
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="40dp"
@@ -184,8 +193,8 @@
                     android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) ? View.GONE : View.VISIBLE }"
                     tools:ignore="ContentDescription"
                     tools:visibility="gone"
-                    app:tint="?attr/colorNoteActionButtonTint"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint" />
+
             <MultiAutoCompleteTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -193,8 +202,8 @@
                     android:layout_weight="1"
                     android:hint="@string/please_speak"
                     android:inputType="textMultiLine"
-                    android:text="@{noteEditorViewModel.text}"
-                    />
+                    android:text="@{noteEditorViewModel.text}" />
+
             <ImageButton
                     android:id="@+id/postButton"
                     style="@style/Widget.AppCompat.Button.Borderless"
