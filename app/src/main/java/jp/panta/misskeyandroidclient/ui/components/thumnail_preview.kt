@@ -10,12 +10,18 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import coil.compose.rememberImagePainter
 import com.google.accompanist.glide.rememberGlidePainter
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.R
 
 @Composable
-fun ThumbnailPreview(file: FileProperty, modifier: Modifier = Modifier, isHidden: Boolean = false ,  onClick: ()->Unit, ) {
+fun ThumbnailPreview(
+    file: FileProperty,
+    modifier: Modifier = Modifier,
+    isHidden: Boolean = false,
+    onClick: () -> Unit,
+) {
     Box(
         modifier = modifier.clickable(onClick = onClick)
     ) {
@@ -34,8 +40,8 @@ fun ThumbnailPreview(file: FileProperty, modifier: Modifier = Modifier, isHidden
         
         if(isHidden.not()) {
             Image(
-                painter = rememberGlidePainter(
-                    request = file.thumbnailUrl ?: "",
+                painter = rememberImagePainter(
+                    file.thumbnailUrl ?: "",
                 ),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,

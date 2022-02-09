@@ -6,16 +6,21 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
+import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
-import jp.panta.misskeyandroidclient.view.users.ClickableUserListAdapter
+import jp.panta.misskeyandroidclient.ui.users.ClickableUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
 
     companion object{
@@ -28,12 +33,11 @@ class SearchActivity : AppCompatActivity() {
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private lateinit var mSearchUserViewModel: SearchUserViewModel
+    private val mSearchUserViewModel: SearchUserViewModel by viewModels()
 
     private val binding: ActivitySearchBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -44,19 +48,14 @@ class SearchActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         mSearchWord = intent.getStringExtra(EXTRA_SEARCH_WORD)
 
-        val miCore = applicationContext as MiCore
-        mSearchUserViewModel = ViewModelProvider(this, SearchUserViewModel.Factory(miCore, null))[SearchUserViewModel::class.java]
-
         val usersAdapter = ClickableUserListAdapter(this)
         binding.searchedUsers.adapter = usersAdapter
         binding.searchedUsers.layoutManager = LinearLayoutManager(this)
-        mSearchUserViewModel.getUsers().observe(this, {
+        mSearchUserViewModel.users.observe(this, {
             usersAdapter.submitList(it)
         })
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         menuInflater.inflate(R.menu.menu_search, menu)
@@ -91,6 +90,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     fun showSearchResult(searchWord: String){
         val intent = Intent(this, SearchResultActivity::class.java)
         intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)

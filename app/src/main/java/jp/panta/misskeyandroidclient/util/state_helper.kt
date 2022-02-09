@@ -1,8 +1,5 @@
 package jp.panta.misskeyandroidclient.util
 
-import jp.panta.misskeyandroidclient.model.Pageable
-import kotlinx.coroutines.coroutineScope
-
 
 sealed class State<out T>(val content: StateContent<T>) {
     class Fixed<out T>(content: StateContent<T>) : State<T>(content)
@@ -29,7 +26,7 @@ sealed class PageableState<T>(val content: StateContent<T>) {
         }
     }
     sealed class Loading<T>(content: StateContent<T>) : PageableState<T>(content) {
-        class Init<T>() : Loading<T>(StateContent.NotExist())
+        class Init<T> : Loading<T>(StateContent.NotExist())
         class Previous<T>(content: StateContent<T>) : Loading<T>(content)
         class Future<T>(content: StateContent<T>) : Loading<T>(content)
 

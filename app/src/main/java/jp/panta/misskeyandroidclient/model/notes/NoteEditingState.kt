@@ -1,13 +1,18 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.file.File
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Instant
 import java.util.*
+
+data class AddMentionResult(
+    val cursorPos: Int,
+    val state: NoteEditingState
+)
 
 data class NoteEditingState(
     val author: Account? = null,
@@ -16,10 +21,11 @@ data class NoteEditingState(
     val cw: String? = null,
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
-    val files: List<File> = emptyList(),
+    val files: List<AppFile> = emptyList(),
     val poll: PollEditingState? = null,
     val viaMobile: Boolean = true,
     val draftNoteId: Long? = null,
+    val reservationPostingAt: Instant? = null,
 ) {
 
     val hasCw: Boolean
@@ -35,13 +41,43 @@ data class NoteEditingState(
         get() = this.visibility.isLocalOnly()
 
 
-    fun checkValidate(textMaxLength: Int = 3000) : Boolean {
-        return !(this.files.isEmpty()
-                && this.files.size > 4
-                && this.renoteId == null
-                && this.text.isNullOrBlank()
-                && (this.text?.codePointCount(0, this.text.length) ?: 0) > textMaxLength
-                && this.poll?.checkValidate() == true)
+    fun setDraftNote(draftNote: DraftNote?) : NoteEditingState {
+        return draftNote?.toNoteEditingState()?: this
+    }
+
+    fun changeRenoteId(renoteId: Note.Id?): NoteEditingState {
+        return copy(
+            renoteId = renoteId
+        )
+    }
+
+    fun changeReplyTo(replyId: Note.Id?): NoteEditingState {
+        return copy(
+            replyId = replyId
+        )
+    }
+
+    fun checkValidate(textMaxLength: Int = 3000, maxFileCount: Int = 4) : Boolean {
+        if(this.files.size > maxFileCount) {
+            return false
+        }
+
+        if((this.text?.codePointCount(0, this.text.length) ?: 0) > textMaxLength) {
+            return false
+        }
+
+        if(this.renoteId != null) {
+            return true
+        }
+
+        if(this.poll != null && this.poll.checkValidate()) {
+            return true
+        }
+
+        return !(
+                this.text.isNullOrBlank()
+                        && this.files.isNullOrEmpty()
+                )
     }
 
     fun changeText(text: String) : NoteEditingState {
@@ -50,13 +86,29 @@ data class NoteEditingState(
         )
     }
 
+    fun addMentionUserNames(userNames: List<String>, pos: Int) : AddMentionResult {
+        val mentionBuilder = StringBuilder()
+        userNames.forEachIndexed { index, userName ->
+            if (index < userNames.size - 1) {
+                // NOTE: 次の文字がつながらないようにする
+                mentionBuilder.appendLine("$userName ")
+            } else {
+                // NOTE: 次の文字がつながらないようにする
+                mentionBuilder.append("$userName ")
+            }
+        }
+        val builder = StringBuilder(text ?: "")
+        builder.insert(pos, mentionBuilder.toString())
+        return AddMentionResult(pos + mentionBuilder.length, copy(text = builder.toString()))
+    }
+
     fun changeCw(text: String?) : NoteEditingState {
         return this.copy(
             cw = text
         )
     }
 
-    fun addFile(file: File) : NoteEditingState {
+    fun addFile(file: AppFile) : NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 add(file)
@@ -64,7 +116,7 @@ data class NoteEditingState(
         )
     }
 
-    fun removeFile(file: File) : NoteEditingState {
+    fun removeFile(file: AppFile) : NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 remove(file)
@@ -87,7 +139,7 @@ data class NoteEditingState(
         if(account == null) {
             throw IllegalArgumentException("現在の状態に未指定のAccountを指定することはできません")
         }
-        if(files.any { it.remoteFileId != null }) {
+        if(files.any { it is AppFile.Remote }) {
             throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
         }
         if(!(replyId == null || author.instanceDomain == account.instanceDomain)) {
@@ -213,7 +265,7 @@ data class PollEditingState(
     fun checkValidate() : Boolean {
         return choices.all {
             it.text.isNotBlank()
-        }
+        } && this.choices.size >= 2
     }
 
     fun toggleMultiple() : PollEditingState{
@@ -256,7 +308,25 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
         renoteId = this.renoteId?.let {
             Note.Id(accountId = accountId, noteId = it)
         },
-        files = this.files ?: emptyList()
+        files = this.files?.map {
+            if(it.isRemoteFile) {
+                AppFile.Remote(
+                    it.remoteFileId!!
+                )
+            }else{
+                AppFile.Local(
+                    name = it.name,
+                    isSensitive = it.isSensitive ?: false,
+                    path = it.path ?: "",
+                    thumbnailUrl = it.thumbnailUrl,
+                    type = it.type ?: "",
+                    folderId = null
+                )
+            }
+        } ?: emptyList(),
+        reservationPostingAt = reservationPostingAt?.let {
+            Instant.fromEpochMilliseconds(it.time)
+        }
     )
 }
 

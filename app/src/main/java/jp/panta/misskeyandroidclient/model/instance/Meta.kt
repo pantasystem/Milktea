@@ -47,8 +47,4 @@ data class Meta(
         return Version(version)
     }
 
-    @Ignore
-    var emojiNameMap: Map<String, Emoji> = emojis?.map{
-        it.name to it
-    }?.toMap()?: emptyMap()
 }

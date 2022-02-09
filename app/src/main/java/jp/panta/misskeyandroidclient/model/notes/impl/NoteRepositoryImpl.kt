@@ -1,62 +1,81 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
+import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.notes.DeleteNote
 import jp.panta.misskeyandroidclient.api.notes.NoteRequest
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
+import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.notes.editor.PostNoteTask
+import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.PostNoteTask
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class NoteRepositoryImpl(
-    val miCore: MiCore
+class NoteRepositoryImpl @Inject constructor(
+    val loggerFactory: Logger.Factory,
+    val userDataSource: UserDataSource,
+    val noteDataSource: NoteDataSource,
+    val filePropertyDataSource: FilePropertyDataSource,
+    val encryption: Encryption,
+    val uploader: FileUploaderProvider,
+    val misskeyAPIProvider: MisskeyAPIProvider,
+    val draftNoteDao: DraftNoteDao,
+    val settingStore: SettingStore,
+    val accountRepository: AccountRepository,
+    val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
 ) : NoteRepository {
 
-    private val logger = miCore.loggerFactory.create("NoteRepositoryImpl")
+    private val logger = loggerFactory.create("NoteRepositoryImpl")
     private val noteDataSourceAdder: NoteDataSourceAdder by lazy {
-        NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
+        NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
     }
 
     override suspend fun create(createNote: CreateNote): Note {
-        val task = PostNoteTask(miCore.getEncryption(), createNote, createNote.author, miCore.loggerFactory, miCore.getFilePropertyDataSource())
+        val task = PostNoteTask(encryption, createNote, createNote.author, loggerFactory, filePropertyDataSource)
         val result = runCatching {task.execute(
-            miCore.getFileUploaderProvider().get(createNote.author)
+            uploader.get(createNote.author)
         )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.runCatching {
             getOrThrow().let {
-                miCore.getMisskeyAPI(createNote.author).create(it).body()?.createdNote
+                misskeyAPIProvider.get(createNote.author).create(it).body()?.createdNote
             }
         }
 
         if(result.isFailure) {
-            val exDraft = createNote.draftNoteId?.let{ miCore.getDraftNoteDAO().getDraftNote(createNote.author.accountId, createNote.draftNoteId) }
-            miCore.getDraftNoteDAO().fullInsert(task.toDraftNote(exDraft))
+            val exDraft = createNote.draftNoteId?.let{ draftNoteDao.getDraftNote(createNote.author.accountId, createNote.draftNoteId) }
+            draftNoteDao.fullInsert(task.toDraftNote(exDraft))
         }
         val noteDTO = result.getOrThrow()
         require(noteDTO != null)
         createNote.draftNoteId?.let{
-            miCore.getDraftNoteDAO().deleteDraftNote(createNote.author.accountId, draftNoteId = it)
+            draftNoteDao.deleteDraftNote(createNote.author.accountId, draftNoteId = it)
         }
-        miCore.getSettingStore().setNoteVisibility(createNote)
+        settingStore.setNoteVisibility(createNote)
 
         return noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
 
     }
 
     override suspend fun delete(noteId: Note.Id): Boolean {
-        val account = miCore.getAccountRepository().get(noteId.accountId)
-        return miCore.getMisskeyAPI(account).delete(
-            DeleteNote(i = account.getI(miCore.getEncryption()), noteId = noteId.noteId)
+        val account = accountRepository.get(noteId.accountId)
+        return misskeyAPIProvider.get(account).delete(
+            DeleteNote(i = account.getI(encryption), noteId = noteId.noteId)
         ).isSuccessful
     }
 
     override suspend fun find(noteId: Note.Id): Note {
-        val account = miCore.getAccount(noteId.accountId)
+        val account = accountRepository.get(noteId.accountId)
 
         var note = runCatching {
-            miCore.getNoteDataSource().get(noteId)
+            noteDataSource.get(noteId)
         }.getOrNull()
         if(note != null) {
             return note
@@ -64,8 +83,8 @@ class NoteRepositoryImpl(
 
         logger.debug("request notes/show=$noteId")
         note = runCatching {
-            miCore.getMisskeyAPI(account).showNote(NoteRequest(
-                i = account.getI(miCore.getEncryption()),
+            misskeyAPIProvider.get(account).showNote(NoteRequest(
+                i = account.getI(encryption),
                 noteId = noteId.noteId
             ))
         }.getOrNull()?.body()?.let{
@@ -75,9 +94,9 @@ class NoteRepositoryImpl(
         return note
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun toggleReaction(createReaction: CreateReaction): Boolean {
-        val account = miCore.getAccount(createReaction.noteId.accountId)
+        val account = accountRepository.get(createReaction.noteId.accountId)
         var note = find(createReaction.noteId)
         if(note.myReaction?.isNotBlank() == true) {
             if(!unreaction(createReaction.noteId)) {
@@ -88,13 +107,13 @@ class NoteRepositoryImpl(
                 logger.debug("同一のリアクションが選択されています。")
                 return true
             }
-            note = miCore.getNoteDataSource().get(createReaction.noteId)
+            note = noteDataSource.get(createReaction.noteId)
         }
 
 
         return runCatching {
-            if(postReaction(createReaction) && !miCore.getNoteCaptureAPI(account).isCaptured(createReaction.noteId.noteId)) {
-                miCore.getNoteDataSource().add(note.onIReacted(createReaction.reaction))
+            if(postReaction(createReaction) && !noteCaptureAPIProvider.get(account).isCaptured(createReaction.noteId.noteId)) {
+                noteDataSource.add(note.onIReacted(createReaction.reaction))
             }
             true
         }.getOrThrow()
@@ -104,18 +123,18 @@ class NoteRepositoryImpl(
 
     override suspend fun unreaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
-        val account = miCore.getAccountRepository().get(noteId.accountId)
+        val account = accountRepository.get(noteId.accountId)
         return postUnReaction(noteId)
-                && (miCore.getNoteCaptureAPI(account).isCaptured(noteId.noteId)
+                && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
                 || (note.myReaction != null
-                && miCore.getNoteDataSource().add(note.onIUnReacted()) != AddResult.CANCEL))
+                && noteDataSource.add(note.onIUnReacted()) != AddResult.CANCEL))
     }
 
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
-        val account = miCore.getAccount(createReaction.noteId.accountId)
-        val res = miCore.getMisskeyAPI(account).createReaction(
+        val account = accountRepository.get(createReaction.noteId.accountId)
+        val res = misskeyAPIProvider.get(account).createReaction(
             jp.panta.misskeyandroidclient.api.notes.CreateReaction(
-                i = account.getI(miCore.getEncryption()),
+                i = account.getI(encryption),
                 noteId = createReaction.noteId.noteId,
                 reaction = createReaction.reaction
             )
@@ -126,10 +145,10 @@ class NoteRepositoryImpl(
 
     private suspend fun postUnReaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
-        val account  = miCore.getAccount(noteId.accountId)
-        val res = miCore.getMisskeyAPI(account).deleteReaction(DeleteNote(
+        val account  = accountRepository.get(noteId.accountId)
+        val res = misskeyAPIProvider.get(account).deleteReaction(DeleteNote(
             noteId = note.id.noteId,
-            i = account.getI(miCore.getEncryption())
+            i = account.getI(encryption)
         ))
         res.throwIfHasError()
         return res.isSuccessful

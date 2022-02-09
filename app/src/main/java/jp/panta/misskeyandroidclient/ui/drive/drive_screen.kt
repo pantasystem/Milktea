@@ -22,16 +22,17 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.PathViewData
-import jp.panta.misskeyandroidclient.viewmodel.drive.directory.DirectoryViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.PathViewData
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 
 @ExperimentalPagerApi
 @ExperimentalCoroutinesApi
+@ExperimentalMaterialApi
 @Composable
 fun DriveScreen(
     driveViewModel: DriveViewModel,
@@ -146,7 +147,7 @@ fun DriveScreen(
 fun PathHorizontalView(path: List<PathViewData>, onSelected: (PathViewData)->Unit) {
     LazyRow(
         Modifier
-            .background(MaterialTheme.colors.primary)
+            .background(MaterialTheme.colors.primarySurface)
             .fillMaxWidth(),
 
     ){

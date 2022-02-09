@@ -2,23 +2,36 @@ package jp.panta.misskeyandroidclient.model.users.impl
 
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.AddResult
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.model.users.UsersState
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNickname
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
-class InMemoryUserDataSource(
-    loggerFactory: Logger.Factory? = null
+// TODO: 色々と依存していてよくわからないのでアーキテクチャレベルでリファクタリングをする
+class InMemoryUserDataSource @Inject constructor(
+    loggerFactory: Logger.Factory?,
+    private val userNicknameRepository: UserNicknameRepository,
+    private val accountRepository: AccountRepository,
 ) : UserDataSource{
     private val logger = loggerFactory?.create("InMemoryUserDataSource")
 
-    private val userMap = ConcurrentHashMap<User.Id, User>()
+    private var userMap = mapOf<User.Id, User>()
 
     private val usersLock = Mutex()
+
+    private val _state = MutableStateFlow<UsersState>(UsersState())
+    override val state: StateFlow<UsersState>
+        get() = _state
 
 
     private var listeners = setOf<UserDataSource.Listener>()
@@ -35,7 +48,7 @@ class InMemoryUserDataSource(
         }
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun add(user: User): AddResult {
         return createOrUpdate(user).also {
             if(it == AddResult.CREATED) {
@@ -48,7 +61,7 @@ class InMemoryUserDataSource(
 
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun addAll(users: List<User>): List<AddResult> {
         return users.map {
             add(it)
@@ -73,10 +86,13 @@ class InMemoryUserDataSource(
         }
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun remove(user: User): Boolean {
         return usersLock.withLock {
-            userMap.remove(user.id)
+            val map = userMap.toMutableMap()
+            val result = map.remove(user.id)
+            userMap = map
+            result
         }?.also{
             publish(UserDataSource.Event.Removed(user.id))
         } != null
@@ -84,34 +100,50 @@ class InMemoryUserDataSource(
 
     }
 
-    private suspend fun createOrUpdate(user: User): AddResult {
+    private suspend fun createOrUpdate(argUser: User): AddResult {
+        // TODO: ここで変更処理までをしてしまうのは責務外なのでいつかリファクタリングをする
+        val nickname = runCatching {
+            val ac = accountRepository.get(argUser.id.accountId)
+            userNicknameRepository.findOne(
+                UserNickname.Id(argUser.userName, argUser.host?: ac.getHost())
+            )
+        }.getOrNull()
+        val user = when(argUser) {
+            is User.Detail -> argUser.copy(nickname = nickname)
+            is User.Simple -> argUser.copy(nickname = nickname)
+        }
         usersLock.withLock {
             val u = userMap[user.id]
             if(u == null) {
-                userMap[user.id] = user
+                userMap = userMap.toMutableMap().also { map ->
+                    map[user.id] = user
+                }
                 return AddResult.CREATED
-            }
-            if(u.instanceUpdatedAt > user.instanceUpdatedAt){
-                return AddResult.CANCEL
             }
             when {
                 user is User.Detail -> {
-                    userMap[user.id] = user
+                    userMap = userMap.toMutableMap().also { map ->
+                        map[user.id] = user
+                    }
                 }
                 u is User.Detail -> {
                     // RepositoryのUserがDetailで与えられたUserがSimpleの時Simpleと一致する部分のみ更新する
-                    userMap[user.id] = u.copy(
-                        name = user.name,
-                        userName = user.userName,
-                        avatarUrl = user.avatarUrl,
-                        emojis = user.emojis,
-                        isCat = user.isCat,
-                        isBot = user.isBot,
-                        host = user.host
-                    )
+                    userMap = userMap.toMutableMap().also { map ->
+                        map[user.id] = u.copy(
+                            name = user.name,
+                            userName = user.userName,
+                            avatarUrl = user.avatarUrl,
+                            emojis = user.emojis,
+                            isCat = user.isCat,
+                            isBot = user.isBot,
+                            host = user.host
+                        )
+                    }
                 }
                 else -> {
-                    userMap[user.id] = user
+                    userMap = userMap.toMutableMap().also { map ->
+                        map[user.id] = user
+                    }
                 }
             }
 
@@ -120,9 +152,16 @@ class InMemoryUserDataSource(
         }
     }
 
+    override suspend fun all(): List<User> {
+        return userMap.values.toList()
+    }
 
     @ExperimentalCoroutinesApi
     private fun publish(e: UserDataSource.Event) {
+        _state.value = _state.value.copy(
+            usersMap = userMap
+        )
+        logger?.debug("publish events:$e")
         listeners.forEach { listener ->
             listener.on(e)
         }

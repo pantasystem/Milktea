@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.MainThread
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
@@ -40,30 +42,31 @@ import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.util.getPreferenceName
-import jp.panta.misskeyandroidclient.view.ScrollableTop
-import jp.panta.misskeyandroidclient.view.account.AccountSwitchingDialog
-import jp.panta.misskeyandroidclient.view.messaging.MessagingHistoryFragment
-import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notes.TabFragment
-import jp.panta.misskeyandroidclient.view.notes.editor.SimpleEditorFragment
-import jp.panta.misskeyandroidclient.view.notification.NotificationMentionFragment
-import jp.panta.misskeyandroidclient.view.notification.notificationMessageScope
-import jp.panta.misskeyandroidclient.view.search.SearchTopFragment
-import jp.panta.misskeyandroidclient.view.settings.activities.PageSettingActivity
-import jp.panta.misskeyandroidclient.view.strings_helper.webSocketStateMessageScope
+import jp.panta.misskeyandroidclient.ui.ScrollableTop
+import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.ui.messaging.MessagingHistoryFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.view.TabFragment
+import jp.panta.misskeyandroidclient.ui.notification.NotificationMentionFragment
+import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
+import jp.panta.misskeyandroidclient.ui.search.SearchTopFragment
+import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
+import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
+import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.users.ReportState
-import jp.panta.misskeyandroidclient.viewmodel.users.ReportViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
 
-    lateinit var mNotesViewModel: NotesViewModel
+    val mNotesViewModel: NotesViewModel by viewModels()
+
     @ExperimentalCoroutinesApi
     private lateinit var mAccountViewModel: AccountViewModel
 
@@ -79,8 +82,8 @@ class MainActivity : AppCompatActivity(){
 
     private val binding: ActivityMainBinding by dataBinding()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -120,7 +123,6 @@ class MainActivity : AppCompatActivity(){
         initAccountViewModelListener()
         binding.setupHeaderProfile()
 
-        mNotesViewModel = ViewModelProvider(this, NotesViewModelFactory(miApplication)).get(NotesViewModel::class.java)
         ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
         // NOTE: メッセージの既読数をバッジに表示する
@@ -169,7 +171,7 @@ class MainActivity : AppCompatActivity(){
 
         // NOTE: 最新の通知をSnackBar等に表示する
         miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
-            miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.MAIN).map { body ->
+            miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
                 body as? ChannelBody.Main.Notification
             }.filterNotNull().map {
                 ac to it
@@ -238,6 +240,7 @@ class MainActivity : AppCompatActivity(){
     }
 
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     inner class MainBottomNavigationAdapter(savedInstanceState: Bundle?, bottomNavigation: BottomNavigationView)
         : BottomNavigationAdapter(bottomNavigation, supportFragmentManager, R.id.navigation_home, R.id.content_main, savedInstanceState){
 
@@ -277,6 +280,7 @@ class MainActivity : AppCompatActivity(){
     /**
      * シンプルエディターの表示・非表示を行う
      */
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun ActivityMainBinding.setSimpleEditor() {
         val miCore = applicationContext as MiCore
         val ft = supportFragmentManager.beginTransaction()
@@ -306,6 +310,7 @@ class MainActivity : AppCompatActivity(){
         snackBar.show()
     }
 
+
     private val switchAccountButtonObserver = Observer<Int>{
         runOnUiThread{
             binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -334,7 +339,7 @@ class MainActivity : AppCompatActivity(){
         intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun initAccountViewModelListener(){
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
@@ -409,6 +414,7 @@ class MainActivity : AppCompatActivity(){
         return store
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val idAndActivityMap = mapOf(
             R.id.action_settings to SettingsActivity::class.java,
@@ -465,10 +471,13 @@ class MainActivity : AppCompatActivity(){
 
 }
 
+@ExperimentalCoroutinesApi
 fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?>{
-    return this.getCurrentAccount().map {
-        it?.instanceDomain?.let { baseURL ->
-            this.getMisskeyAPIProvider().get(baseURL)
+    return getCurrentAccount().filterNotNull().flatMapLatest {
+        getMetaRepository().observe(it.instanceDomain)
+    }.map {
+        it?.let {
+            this.getMisskeyAPIProvider().get(it.uri, it.getVersion())
         }
     }
 }

@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="userViewData"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.UserViewData" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData" />
     </data>
     <LinearLayout
             android:background="@drawable/shape_chip"

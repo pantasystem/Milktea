@@ -6,10 +6,10 @@ import jp.panta.misskeyandroidclient.api.v12_75_0.LikedGalleryPost
 import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.api.IllegalVersionException
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,12 +60,12 @@ class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<Str
     }
 }
 
-class LikedGalleryPostsAdder(
+class LikedGalleryPostsConverter(
     private val getAccount: suspend () -> Account,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userDataSource: UserDataSource,
     private val galleryDataSource: GalleryDataSource
-) : EntityAdder<LikedGalleryPost, LikedGalleryPostId> {
+) : EntityConverter<LikedGalleryPost, LikedGalleryPostId> {
 
     override suspend fun addAll(list: List<LikedGalleryPost>): List<LikedGalleryPostId> {
         val account = getAccount.invoke()

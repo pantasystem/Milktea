@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.gettters
 
-import com.google.android.exoplayer2.upstream.FileDataSource
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
@@ -10,8 +9,11 @@ import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class Getters(
+@Singleton
+class Getters @Inject constructor(
     noteDataSource: NoteDataSource,
     noteRepository: NoteRepository,
     userDataSource: UserDataSource,
@@ -21,7 +23,7 @@ class Getters(
     groupDataSource: GroupDataSource,
     loggerFactory: Logger.Factory
 ) {
-    val noteRelationGetter = NoteRelationGetter(noteDataSource, noteRepository, userDataSource, filePropertyDataSource, loggerFactory.create("NoteRelationGetter"))
+    val noteRelationGetter = NoteRelationGetter(noteRepository, userDataSource, filePropertyDataSource, loggerFactory.create("NoteRelationGetter"))
 
     val notificationRelationGetter = NotificationRelationGetter(userDataSource, notificationDataSource, noteRelationGetter, noteDataSourceAdder = NoteDataSourceAdder(
         userDataSource, noteDataSource, filePropertyDataSource

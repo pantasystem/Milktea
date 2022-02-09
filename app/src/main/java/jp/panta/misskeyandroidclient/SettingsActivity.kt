@@ -8,11 +8,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
-import jp.panta.misskeyandroidclient.view.settings.SettingAdapter
-import jp.panta.misskeyandroidclient.view.settings.activities.*
-import jp.panta.misskeyandroidclient.viewmodel.setting.Group
-import jp.panta.misskeyandroidclient.viewmodel.setting.MoveSettingActivityPanel
+import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
+import jp.panta.misskeyandroidclient.ui.settings.activities.*
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.Group
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.MoveSettingActivityPanel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class SettingsActivity : AppCompatActivity() {
 
     private val binding: ActivitySettingsBinding by dataBinding()
@@ -25,7 +29,7 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(binding.settingToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val movementSetting = MoveSettingActivityPanel<SettingMovementActivity>(
+        val movementSetting = MoveSettingActivityPanel(
             titleStringRes = R.string.movement,
             activity = SettingMovementActivity::class.java,
             context = this

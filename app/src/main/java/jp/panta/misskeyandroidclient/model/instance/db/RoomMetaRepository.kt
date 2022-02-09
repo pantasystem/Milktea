@@ -1,14 +1,14 @@
 package jp.panta.misskeyandroidclient.model.instance.db
 
-import androidx.room.Database
-import androidx.room.Room
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class RoomMetaRepository(
-    val metaDAO: MetaDAO,
-    val emojiAliasDAO: EmojiAliasDAO,
+    private val metaDAO: MetaDAO,
+    private val emojiAliasDAO: EmojiAliasDAO,
     val database: DataBase
 ) : MetaRepository {
 
@@ -45,5 +45,11 @@ class RoomMetaRepository(
 
     override suspend fun get(instanceDomain: String): Meta? {
         return metaDAO.findByInstanceDomain(instanceDomain)?.toMeta()
+    }
+
+    override fun observe(instanceDomain: String): Flow<Meta?> {
+        return metaDAO.observeByInstanceDomain(instanceDomain).map {
+            it?.toMeta()
+        }
     }
 }

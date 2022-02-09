@@ -6,11 +6,11 @@
     <data>
         <variable
                 name="selectedUserViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel" />
         <variable
                 name="searchUserViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"

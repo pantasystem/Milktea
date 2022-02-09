@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
         >
     <data>
-        <variable name="note" type="jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData"/>
+        <variable name="note" type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData"/>
         <import type="android.view.View"/>
 
 
@@ -12,7 +12,7 @@
 
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -33,7 +33,9 @@
             <androidx.emoji.widget.EmojiTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:id="@+id/textView2"
-                    android:padding="5dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="8dp"
                     android:onClick="@{()-> notesViewModel.setTargetToUser(note.note.user)}"
                     app:statusMessageTargetViewNote="@{note}"
             />

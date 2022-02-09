@@ -1,7 +1,5 @@
 package jp.panta.misskeyandroidclient.util
 
-import androidx.databinding.InverseMethod
-
 /*object SafeUnbox{
     @JvmStatic
     @InverseMethod("box")

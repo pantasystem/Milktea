@@ -10,10 +10,8 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.api.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.api.users.UserDTO
-import jp.panta.misskeyandroidclient.model.UnauthorizedException
 import jp.panta.misskeyandroidclient.util.Hash
 import java.io.Serializable
-import java.net.URL
 
 @Entity(
     tableName = "account_table",
@@ -27,18 +25,7 @@ data class Account (
     val remoteId: String,
     val instanceDomain: String,
     val userName: String,
-    /*val name: String?,
-    val description: String?,
-    val followersCount: Int,
-    val followingCount: Int,
-    val notesCount: Int,
-    val isBot: Boolean,
-    val isCat: Boolean,
-    val avatarUrl: String?,
-    val bannerUrl: String?,*/
     val encryptedToken: String,
-    //@Ignore val emojis: List<Emoji>,
-
     @Ignore val pages: List<Page>,
     @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
@@ -49,31 +36,12 @@ data class Account (
     constructor(remoteId: String,
                 instanceDomain: String,
                 userName: String,
-                /*name: String?,
-                description: String?,
-                followersCount: Int,
-                followingCount: Int,
-                notesCount: Int,
-                isBot: Boolean,
-                isCat: Boolean,
-                avatarUrl: String?,
-                bannerUrl: String?,*/
                 encryptedToken: String) :
             this(
                 remoteId,
                 instanceDomain,
                 userName,
-                /*name,
-                description,
-                followersCount,
-                followingCount,
-                notesCount,
-                isBot,
-                isCat,
-                avatarUrl,
-                bannerUrl,*/
                 encryptedToken,
-                //emptyList(),
                 emptyList()
             )
 
@@ -89,8 +57,14 @@ data class Account (
     }
 
     fun getHost(): String {
-        return URL(this.instanceDomain).host
+        if (instanceDomain.startsWith("https://")) {
+            return instanceDomain.substring("https://".length, instanceDomain.length)
+        } else if (instanceDomain.startsWith("http://")) {
+            return instanceDomain.substring("http://".length, instanceDomain.length)
+        }
+        return instanceDomain
     }
+
 }
 
 
@@ -121,11 +95,6 @@ fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account{
         pages = emptyList()
     )
 }
-
-fun UserDTO.newAccount(instanceDomain: String, encryption: Encryption, token: String): Account{
-    return newAccount(instanceDomain, encryption.encrypt(this.id, token))
-}
-
 fun AccountRelation.newAccount(user: UserDTO?): Account?{
     val ci = getCurrentConnectionInformation()
         ?: return null

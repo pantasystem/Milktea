@@ -6,21 +6,26 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.view.users.selectable.SelectableUsersAdapter
+import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.users.search.SearchUserViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.io.Serializable
 
+@FlowPreview
+@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class SearchAndSelectUserActivity : AppCompatActivity() {
 
     companion object{
@@ -43,8 +48,9 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     private var mSelectedUserViewModel: SelectedUserViewModel? = null
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+    val searchUserViewModel: SearchUserViewModel by viewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -73,8 +79,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
             ViewModelProvider(this, SelectedUserViewModel.Factory(miCore, selectableMaximumSize, selectedUserIdList, null))[SelectedUserViewModel::class.java]
         val selectableUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
 
-        val searchUserViewModel =
-            ViewModelProvider(this, SearchUserViewModel.Factory(miCore, false))[SearchUserViewModel::class.java]
+
         activitySearchAndSelectUserBinding.usersView.adapter = selectableUsersAdapter
         activitySearchAndSelectUserBinding.searchUserViewModel = searchUserViewModel
         activitySearchAndSelectUserBinding.selectedUserViewModel = selectedUserViewModel
@@ -86,7 +91,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter = selectedUsersAdapter
         activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager = LinearLayoutManager(this)
 
-        searchUserViewModel.getUsers().observe(this, {
+        searchUserViewModel.users.observe(this, {
             selectableUsersAdapter.submitList(it)
         })
 
@@ -96,22 +101,19 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         mSelectedUserViewModel = selectedUserViewModel
 
     }
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> setResultFinish()
         }
         return super.onOptionsItemSelected(item)
     }
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onBackPressed() {
         setResultFinish()
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     private fun setResultFinish(){
         val selectedDiff = mSelectedUserViewModel?.getSelectedUserIdsChangedDiff()
 

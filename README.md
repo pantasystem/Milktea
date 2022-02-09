@@ -41,6 +41,13 @@ touch local.properties
 ```
 local.propertiesには<br>
 以下のような属性を追加してプッシュ通知の中継鯖についての設定をします。<br>
+プッシュ通知中継サーバについて<br>
+https://github.com/pantasystem/MisskeyAndroidClient/blob/develop/PushToFCM/README.md<br>
+
+push_to_fcm.server_base_urlにはプッシュ通知サーバのベースURLを設定します。<br>
+push_to_fcm.public_keyにはPushToFCMで生成したpublicを設定します。<br>
+push_to_fcm.authにはPushToFCMで生成したauthを設定します。
+
 ```
 push_to_fcm.server_base_url=https://hogehogehoge-pus
 push_to_fcm.public_key=中継鯖（PushToFCM）に設定したpublic_keyを設定します

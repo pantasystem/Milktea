@@ -4,6 +4,7 @@ import androidx.room.*
 import jp.panta.misskeyandroidclient.model.Page
 
 @Dao
+@Deprecated("model.accountへ移行")
 interface PageDao {
     @Query("select * from page")
     fun findAll(): List<Page>?

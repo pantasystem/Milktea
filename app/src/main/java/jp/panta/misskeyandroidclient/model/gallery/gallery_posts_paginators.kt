@@ -6,10 +6,10 @@ import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import jp.panta.misskeyandroidclient.model.api.IllegalVersionException
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,12 +53,12 @@ class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>, Get
     }
 }
 
-class GalleryPostsAdder(
+class GalleryPostsConverter(
     private val getAccount: suspend ()-> Account,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userDataSource: UserDataSource,
     private val galleryDataSource: GalleryDataSource
-) : EntityAdder<GalleryPostDTO, GalleryPost.Id> {
+) : EntityConverter<GalleryPostDTO, GalleryPost.Id> {
 
     override suspend fun addAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
         return list.map {
@@ -98,7 +98,12 @@ class GalleryPostsLoader (
         when(pageable) {
             is Pageable.Gallery.MyPosts -> {
                 return {
-                    api.myGalleryPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20,))
+                    api.myGalleryPosts(GetPosts(
+                        i,
+                        sinceId = sinceId,
+                        untilId = untilId,
+                        limit = 20,
+                    ))
                 }
             }
             is Pageable.Gallery.ILikedPosts -> {

@@ -14,11 +14,11 @@ import org.junit.Test
 
 class RoomMetaRepositoryTest {
 
-    lateinit var metaRepository: MetaRepository
+    private lateinit var metaRepository: MetaRepository
 
-    lateinit var database: DataBase
+    private lateinit var database: DataBase
 
-    lateinit var sampleMeta: Meta
+    private lateinit var sampleMeta: Meta
 
     @Before
     fun setUp(){

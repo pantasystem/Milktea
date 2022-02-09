@@ -6,8 +6,8 @@ import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class ChannelAPIWithAccountProvider(
-    val socketWithAccountProvider: SocketWithAccountProvider,
+class ChannelAPIWithAccountProvider (
+    private val socketWithAccountProvider: SocketWithAccountProvider,
     private val loggerFactory: Logger.Factory
 ) {
 

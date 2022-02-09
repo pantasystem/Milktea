@@ -12,7 +12,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="リストを作成"
-                android:textSize="24sp"
+                android:textSize="@dimen/dialog_title_font_size"
                 android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginBottom="8dp"
                 />

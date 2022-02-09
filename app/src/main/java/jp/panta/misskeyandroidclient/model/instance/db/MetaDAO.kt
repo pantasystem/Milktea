@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.instance.db
 
 import androidx.room.*
 import jp.panta.misskeyandroidclient.model.instance.Meta
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class MetaDAO{
@@ -27,5 +28,9 @@ abstract class MetaDAO{
 
     @Query("select * from emoji_table where instanceDomain = :instanceDomain")
     abstract fun findAllByInstanceDomain(instanceDomain: String) : List<EmojiDTO>
+
+    @Transaction
+    @Query("select * from meta_table where uri = :instanceDomain")
+    abstract fun observeByInstanceDomain(instanceDomain: String): Flow<MetaRelation?>
 
 }

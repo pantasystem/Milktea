@@ -3,13 +3,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable
                 name="antenna"
                 type="jp.panta.misskeyandroidclient.model.antenna.Antenna" />
         <variable
                 name="antennaListViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel" />
     </data>
     <androidx.cardview.widget.CardView
 
@@ -40,13 +40,12 @@
                     tools:srcCompat="@drawable/ic_add_to_tab_24px"
                     app:srcCompat="@drawable/ic_add_black_24dp"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:contentDescription="@string/add_to_tab"
                     android:layout_below="@id/antennaNameInputLayout"
                     android:onClick="@{ ()-> antennaListViewModel.toggleTab(antenna) }"
                     app:pagedAntennaIds="@{antennaListViewModel.pagedAntennaIds}"
                     app:targetAntenna="@{antenna}"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
             <ImageButton
                     android:id="@+id/removeAntennaButton"
@@ -54,12 +53,11 @@
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_delete_black_24dp"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:contentDescription="@string/add_to_tab"
                     android:layout_below="@id/antennaNameInputLayout"
                     android:layout_toStartOf="@id/editAntennaButton"
                     android:onClick="@{ ()-> antennaListViewModel.confirmDeletionAntenna(antenna) }"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint" />
 
             <ImageButton
                     android:id="@+id/editAntennaButton"
@@ -67,12 +65,11 @@
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_edit_black_24dp"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:tint="?attr/colorNoteActionButtonTint"
                     android:contentDescription="@string/add_to_tab"
                     android:layout_below="@id/antennaNameInputLayout"
                     android:layout_alignParentEnd="true"
                     android:onClick="@{ ()-> antennaListViewModel.editAntenna(antenna) }"
-                    />
+                    app:tint="?attr/colorNoteActionButtonTint" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 

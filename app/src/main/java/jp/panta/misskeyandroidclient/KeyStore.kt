@@ -15,14 +15,18 @@ object KeyStore {
         LENGTH(300)
     }
 
+    enum class DisableAutoNoteExpandedContentSize(val default: Boolean) {
+        STATE(false)
+    }
+
+    enum class AutoNoteExpandedContentSize(val default: Int) {
+        HEIGHT(300)
+    }
+
     fun isNightTheme(key: IntKey): Boolean{
         return IntKey.THEME_BLACK == key
                 || IntKey.THEME_DARK == key
     }
-    enum class StringKey{
-
-    }
-
     enum class BooleanKey(val default: Boolean){
         INCLUDE_MY_RENOTES(true),
         INCLUDE_RENOTED_MY_NOTES(true),
@@ -38,6 +42,7 @@ object KeyStore {
         IS_USER_NAME_DEFAULT(true),
         IS_POST_BUTTON_TO_BOTTOM(false),
         IS_SIMPLE_EDITOR_ENABLED(false),
-        IS_LEARN_NOTE_VISIBILITY(true)
+        IS_LEARN_NOTE_VISIBILITY(true),
+        IS_DISABLE_AUTO_NOTE_EXPANDABLE(false)
     }
 }

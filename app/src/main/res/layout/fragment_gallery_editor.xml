@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.gallery.GalleryEditorViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -43,18 +43,20 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         />
-                <androidx.recyclerview.widget.RecyclerView
+
+                <androidx.compose.ui.platform.ComposeView
                         android:id="@+id/pickedImages"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@id/pickedImageLabel"
+
                         />
                 <Button
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@id/pickedImages"
                         android:id="@+id/pickedImageFromLocalButton"
-                        android:text="@string/pick_image_from_device"
+                        android:text="@string/pick_image_from_drive"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
 

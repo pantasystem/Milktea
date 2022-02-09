@@ -27,13 +27,14 @@ import jp.panta.misskeyandroidclient.api.notes.translation.Translate
 import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
+import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
 import retrofit2.http.Body
 
-open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) : MisskeyAPI {
+open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV10Diff) : MisskeyAPI {
     override suspend fun blockUser(requestUser: RequestUser) = misskey.blockUser(requestUser)
 
     override suspend fun children(noteRequest: NoteRequest) = misskey.children(noteRequest)
@@ -99,7 +100,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override suspend fun myApps(i: I): Response<List<App>> = misskey.myApps(i)
 
-    override suspend fun noteState(noteRequest: NoteRequest): Response<State> = misskey.noteState(noteRequest)
+    override suspend fun noteState(noteRequest: NoteRequest): Response<NoteState> = misskey.noteState(noteRequest)
 
     override suspend fun notification(notificationRequest: NotificationRequest): Response<List<NotificationDTO>?> = misskey.notification(notificationRequest)
 
@@ -161,4 +162,9 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, val diff: MisskeyAPIV10Diff) :
 
     override suspend fun translate(req: Translate): Response<TranslationResult> = misskey.translate(req)
     override suspend fun report(req: ReportDTO): Response<Unit> = misskey.report(req)
+    override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskey.updateFile(updateFileRequest)
+    override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskey.deleteFile(req)
+    override suspend fun showFile(req: ShowFile) : Response<FilePropertyDTO> = misskey.showFile(req)
+    override suspend fun swUnRegister(unSub: UnSubscription): Response<Unit> = misskey.swUnRegister(unSub)
+
 }

@@ -11,11 +11,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import okhttp3.Dispatcher
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.Serializable
 
 class SortedHashTagListViewModel(
@@ -74,13 +69,10 @@ class SortedHashTagListViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getMisskeyAPI(account).getHashTagList(
+                miCore.getMisskeyAPIProvider().get(account).getHashTagList(
                     RequestHashTagList(
                         i = i,
-                        sort = conditions.sort,
-                        attachedToRemoteUserOnly = conditions.isAttachedToRemoteUserOnly,
-                        attachedToUserOnly = conditions.isAttachedToUserOnly,
-                        attachedToLocalUserOnly = conditions.isAttachedToLocalUserOnly
+                        sort = conditions.sort
                     )
                 ).throwIfHasError()
             }.onSuccess { response ->

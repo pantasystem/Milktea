@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
@@ -237,7 +238,7 @@ data class NoteUpdated (
         data class Deleted(override val id: String, val body: Body) : Body() {
 
             @Serializable
-            data class Body(
+            data class Body @OptIn(ExperimentalSerializationApi::class) constructor(
                 @Serializable(with = DateSerializer::class)
                 val deletedAt: Date
             )

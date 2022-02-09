@@ -38,7 +38,7 @@ object MisskeyGetMeta {
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
                     try{
                         val meta = response.body?.let{
-                            gson.fromJson<Meta>(it.string(), Meta::class.java)
+                            gson.fromJson(it.string(), Meta::class.java)
                         }
                         callback.onResponse(this@MetaCall, Response.success(meta))
                     }catch(e: JsonSyntaxException){

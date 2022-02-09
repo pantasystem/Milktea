@@ -68,10 +68,6 @@ class DriveStore(
         this._state.value = s.copy(path = s.path.push(directory))
     }
 
-    fun moveToRoot() {
-        val s = this.state.value
-        this._state.value = s.copy(path = s.path.clear())
-    }
 
     fun setAccount(account: Account) {
         if(this.state.value.accountId == account.accountId) {

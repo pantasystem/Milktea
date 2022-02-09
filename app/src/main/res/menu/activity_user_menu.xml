@@ -29,4 +29,7 @@
     <item
             android:id="@+id/report_user"
             android:title="@string/report"/>
+    <item
+            android:id="@+id/share"
+            android:title="@string/share"/>
 </menu>

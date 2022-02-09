@@ -2,19 +2,19 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="notification" type="jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData"/>
+        <variable name="notification" type="jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData"/>
 
-        <import type="jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewData" />
+        <import type="jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData" />
         <import type="android.view.View"/>
 
         <import type="jp.panta.misskeyandroidclient.R"/>
 
         <variable
                 name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
         <variable
                 name="notificationViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notification.NotificationViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

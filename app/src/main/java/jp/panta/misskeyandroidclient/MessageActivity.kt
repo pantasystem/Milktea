@@ -1,25 +1,32 @@
 package jp.panta.misskeyandroidclient
 
-import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.view.text.CustomEmojiCompleteAdapter
-import jp.panta.misskeyandroidclient.view.text.CustomEmojiTokenizer
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel
-import jp.panta.misskeyandroidclient.view.messaging.MessageFragment
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
-import jp.panta.misskeyandroidclient.view.TitleSettable
+import jp.panta.misskeyandroidclient.ui.TitleSettable
+import jp.panta.misskeyandroidclient.ui.messaging.MessageFragment
+import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
+import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class MessageActivity : AppCompatActivity(), TitleSettable {
 
     companion object{
@@ -32,7 +39,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        mBinding = DataBindingUtil.setContentView<ActivityMessageBinding>(this, R.layout.activity_message)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_message)
         mBinding.lifecycleOwner = this
         setSupportActionBar(mBinding.messageToolbar)
 
@@ -71,15 +78,19 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
         }
 
         val miCore = application as MiCore
-        miCore.getCurrentInstanceMeta()?.emojis?.let{ emojis ->
-            mBinding.inputMessage.setTokenizer(CustomEmojiTokenizer())
-            mBinding.inputMessage.setAdapter(
-                CustomEmojiCompleteAdapter(
-                    emojis,
-                    this
+
+        miCore.getMetaRepository().observe(account.instanceDomain)
+            .mapNotNull { it?.emojis }
+            .distinctUntilChanged()
+            .onEach { emojis ->
+                mBinding.inputMessage.setTokenizer(CustomEmojiTokenizer())
+                mBinding.inputMessage.setAdapter(
+                    CustomEmojiCompleteAdapter(
+                        emojis,
+                        this
+                    )
                 )
-            )
-        }
+            }.launchIn(lifecycleScope)
     }
 
     override fun setTitle(text: String) {

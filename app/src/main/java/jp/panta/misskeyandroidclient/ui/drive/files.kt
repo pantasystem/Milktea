@@ -1,39 +1,30 @@
 package jp.panta.misskeyandroidclient.ui.drive
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asLiveData
-import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
-import jp.panta.misskeyandroidclient.viewmodel.drive.DriveViewModel
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewData
-import jp.panta.misskeyandroidclient.viewmodel.drive.file.FileViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 @ExperimentalCoroutinesApi
+@ExperimentalMaterialApi
 @Composable
 fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveViewModel) {
     val filesState: PageableState<List<FileViewData>> by fileViewModel.state.asLiveData().observeAsState(
@@ -60,15 +51,24 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             onCheckedChanged = { id, _ ->
                 driveViewModel.driveStore.toggleSelect(id)
             },
-            state = listViewState
+            state = listViewState,
+            onToggleNsfwMenuItemClicked = {
+                fileViewModel.toggleNsfw(it)
+            },
+            onDeleteMenuItemClicked = {
+                fileViewModel.deleteFile(it)
+            },
         )
     }
 }
+@ExperimentalMaterialApi
 @Composable
 fun FileViewDataListView(
     list: List<FileViewData>,
     isSelectMode: Boolean = false,
     onCheckedChanged: (FileProperty.Id, Boolean) -> Unit,
+    onDeleteMenuItemClicked: (FileProperty.Id) -> Unit,
+    onToggleNsfwMenuItemClicked: (FileProperty.Id) -> Unit,
     state: LazyListState = rememberLazyListState(),
 ) {
     LazyColumn(
@@ -81,60 +81,15 @@ fun FileViewDataListView(
                 it.fileProperty.id
             }
         ) { item ->
-            FilePropertySimpleCard(file = item, isSelectMode = isSelectMode, onCheckedChanged = {
-                onCheckedChanged.invoke(item.fileProperty.id, it)
-            })
-        }
-    }
-}
-
-@Composable
-fun FilePropertySimpleCard(file: FileViewData, isSelectMode: Boolean = false, onCheckedChanged: (Boolean)->Unit ) {
-    Card(
-        shape = RoundedCornerShape(0.dp),
-        modifier = Modifier.padding(0.5.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = rememberGlidePainter(
-                    request = file.fileProperty.url,
-                ),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(64.dp)
-                    .width(64.dp)
-                    .padding(end = 4.dp),
-                contentScale = ContentScale.Crop
+            FilePropertySimpleCard(
+                file = item,
+                isSelectMode = isSelectMode,
+                onCheckedChanged = {
+                    onCheckedChanged.invoke(item.fileProperty.id, it)
+                },
+                onDeleteMenuItemClicked = { onDeleteMenuItemClicked(item.fileProperty.id) },
+                onToggleNsfwMenuItemClicked = { onToggleNsfwMenuItemClicked(item.fileProperty.id) },
             )
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    file.fileProperty.name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-
-                )
-                Row {
-                    Text(
-                        file.fileProperty.type,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                    Text(
-                        file.fileProperty.size.toString()
-                    )
-                }
-            }
-            if(isSelectMode) {
-                Checkbox(checked = file.isSelected, enabled = file.isEnabled, onCheckedChange = onCheckedChanged)
-            }
-
         }
     }
 }

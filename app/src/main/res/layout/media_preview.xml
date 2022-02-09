@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <import type="android.view.View" />
         <variable
                 name="media"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.media.MediaViewData" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData" />
 
 
     </data>
@@ -39,10 +40,10 @@
                     tools:ignore="NestedWeights"
                     thumbnailView="@{thumbnailTopLeft}"
                     playButton="@{actionButtonTopLeft}"
-                    fileViewDataList="@{media.files}"
-                    fileViewData="@{media.fileOne}"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileOne}"
 
-                    android:onClick="@{()-> media.fileOne.show()}"
+                    android:onClick="@{()-> media.show(0) }"
                     >
 
                 <ImageView
@@ -63,8 +64,7 @@
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
                         android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) || SafeUnbox.unbox(media.fileOne.image) ? View.GONE : View.VISIBLE }"
-                        android:tint="?attr/colorAccent"
-                        />
+                        app:tint="?attr/colorAccent" />
 
                 <TextView
                         android:id="@+id/nsfwMessageTopLeft"
@@ -75,6 +75,16 @@
                         android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
                         android:text="@string/nsfw_message"
                         />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+
+                        android:src="@{media.fileOne.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+                        android:layout_gravity="top|end"
+
+                        android:onClick="@{()-> media.toggleVisibility(0) }"
+
+                        tools:ignore="ContentDescription" />
 
             </FrameLayout>
             <FrameLayout
@@ -84,9 +94,9 @@
                     android:layout_weight="1"
                     thumbnailView="@{thumbnailBottomLeft}"
                     playButton="@{actionButtonBottomLeft}"
-                    fileViewDataList="@{media.files}"
-                    fileViewData="@{media.fileThree}"
-                    android:onClick="@{()-> media.fileThree.show()}"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileThree}"
+                    android:onClick="@{()-> media.show(2)}"
                     android:layout_marginTop="4dp"
                     >
                 <ImageView
@@ -106,9 +116,9 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/play_media"
                         android:scaleType="fitCenter"
-                        android:tint="?attr/colorAccent"
                         android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) || SafeUnbox.unbox(media.fileOne.image)? View.GONE : View.VISIBLE }"
-                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp" />
+                        tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+                        app:tint="?attr/colorAccent" />
 
                 <TextView
                         android:id="@+id/nsfwMessageBottomLeft"
@@ -117,6 +127,17 @@
                         android:text="@string/nsfw_message"
                         android:layout_gravity="center"
                         android:visibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
+                        />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top|end"
+
+                        android:onClick="@{()-> media.toggleVisibility(2) }"
+                        android:src="@{media.fileThree.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+
+                        tools:ignore="ContentDescription"
+
                         />
             </FrameLayout>
         </LinearLayout>
@@ -139,9 +160,9 @@
 
                     playButton="@{actionButtonTopRight}"
 
-                    fileViewData="@{media.fileTwo}"
-                    fileViewDataList="@{media.files}"
-                    android:onClick="@{()-> media.fileTwo.show() }"
+                    previewAbleFile="@{media.fileTwo}"
+                    previewAbleFileList="@{media.files}"
+                    android:onClick="@{()-> media.show(1) }"
 
                     >
                 <ImageView
@@ -162,8 +183,7 @@
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
                         android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) || SafeUnbox.unbox(media.fileOne.image)? View.GONE : View.VISIBLE }"
-                        android:tint="?attr/colorAccent"
-                        />
+                        app:tint="?attr/colorAccent" />
                 <TextView
                         android:id="@+id/nsfwMessageTopRight"
                         android:layout_width="wrap_content"
@@ -172,6 +192,17 @@
                         android:layout_gravity="center"
                         android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
                         android:text="@string/nsfw_message"
+                        />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top|end"
+
+                        android:onClick="@{()-> media.toggleVisibility(1) }"
+                        android:src="@{media.fileTwo.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+
+                        tools:ignore="ContentDescription"
+
                         />
             </FrameLayout>
             <FrameLayout
@@ -183,9 +214,9 @@
 
                     playButton="@{actionButtonBottomRight}"
 
-                    fileViewDataList="@{media.files}"
-                    fileViewData="@{media.fileFour}"
-                    android:onClick="@{()-> media.fileFour.show() }"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileFour}"
+                    android:onClick="@{()-> media.show(3) }"
                     android:layout_marginTop="4dp"
                     >
                 <ImageView
@@ -205,9 +236,8 @@
                         style="?android:attr/borderlessButtonStyle"
                         tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
-                        android:tint="?attr/colorAccent"
                         android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) || SafeUnbox.unbox(media.fileOne.image) ? View.GONE : View.VISIBLE}"
-                        />
+                        app:tint="?attr/colorAccent" />
 
                 <TextView
                         android:id="@+id/nsfwMessageBottomRight"
@@ -216,7 +246,17 @@
                         android:layout_gravity="center"
                         android:text="@string/nsfw_message"
                         android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}" />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top|end"
 
+                        android:onClick="@{()-> media.toggleVisibility(3) }"
+                        android:src="@{media.fileFour.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+
+                        tools:ignore="ContentDescription"
+
+                        />
             </FrameLayout>
         </LinearLayout>
     </LinearLayout>

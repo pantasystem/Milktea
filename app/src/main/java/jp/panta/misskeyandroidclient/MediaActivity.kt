@@ -11,40 +11,30 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
 import jp.panta.misskeyandroidclient.databinding.ActivityMediaBinding
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.view.media.ImageFragment
-import jp.panta.misskeyandroidclient.view.media.PlayerFragment
+import jp.panta.misskeyandroidclient.ui.media.ImageFragment
+import jp.panta.misskeyandroidclient.ui.media.PlayerFragment
 import java.io.Serializable
 
 class MediaActivity : AppCompatActivity() {
 
     private sealed class Media : Serializable{
-        data class UriMedia(val uri: Uri): Media()
-        data class FilePropertyMedia(val fileProperty: FileProperty) : Media()
         data class FileMedia(val file: File): Media()
     }
 
 
     companion object{
         const val TAG = "MediaActivity"
-        const val EXTRA_URI = "jp.panta.misskeyadnroidclient.MediaActivity.EXTRA_URI"
         const val EXTRA_FILE = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILE"
         const val EXTRA_FILES = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILES"
         const val EXTRA_FILE_CURRENT_INDEX = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILES_CURRENT_INDEX"
 
 
 
-
-        fun newIntent(activity: AppCompatActivity, file: File) : Intent{
-            return Intent(activity, MediaActivity::class.java).apply{
-                putExtra(EXTRA_FILE, file)
-            }
-        }
-
-        fun newInstance(activity: AppCompatActivity, files: List<File>, index: Int) : Intent{
+        fun newInstance(activity: FragmentActivity, files: List<File>, index: Int) : Intent{
             return Intent(activity, MediaActivity::class.java).apply{
                 putExtra(EXTRA_FILES, ArrayList(files))
                 putExtra(EXTRA_FILE_CURRENT_INDEX, index)
@@ -76,8 +66,6 @@ class MediaActivity : AppCompatActivity() {
         val fileCurrentIndex = intent.getIntExtra(EXTRA_FILE_CURRENT_INDEX, 0)
 
 
-        val extraUri: String? = intent.getStringExtra(EXTRA_URI)
-        val uri = if(extraUri.isNullOrBlank()) null else Uri.parse(extraUri)
 
         val list = when{
 
@@ -85,9 +73,6 @@ class MediaActivity : AppCompatActivity() {
                 files.map{
                     Media.FileMedia(it)
                 }
-            }
-            uri != null ->{
-                listOf<Media>(Media.UriMedia(uri))
             }
             file != null ->{
                 listOf<Media>(Media.FileMedia(file))
@@ -111,13 +96,7 @@ class MediaActivity : AppCompatActivity() {
             android.R.id.home -> finish()
             R.id.download_file ->{
                 mCurrentMedia?.let{ m ->
-                    val file = if(m is Media.FileMedia){
-                        m.file
-                    }else if(m is Media.FilePropertyMedia){
-                        m.fileProperty.toFile()
-                    }else{
-                        null
-                    }?: return false
+                    val file = (m as Media.FileMedia).file
                     downloadFile(file)
                 }
             }
@@ -130,7 +109,7 @@ class MediaActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_media, menu)
         val media = mCurrentMedia
         if(media is Media.FileMedia){
-            menu.findItem(R.id.download_file)?.isVisible = media.file.path.startsWith("http")
+            menu.findItem(R.id.download_file)?.isVisible = media.file.path?.startsWith("http") == true
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -173,36 +152,18 @@ class MediaActivity : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             return when (val item = list[position]) {
-                is Media.FilePropertyMedia -> createFragment(position, item.fileProperty, null, null)
-                is Media.UriMedia -> createFragment(position, null, item.uri, null)
-                is Media.FileMedia -> createFragment(position,null, null, item.file)
+                is Media.FileMedia -> createFragment(position,item.file)
             }
         }
     }
 
-    private fun createFragment(index: Int, fileProperty: FileProperty?, uri: Uri?, file: File?): Fragment{
-        if(fileProperty != null){
-            return if(fileProperty.type.contains("image")){
-                ImageFragment.newInstance(index, fileProperty.url)
-            }else{
-                PlayerFragment.newInstance(index, fileProperty.url)
-            }
+    private fun createFragment(index: Int, file: File): Fragment{
+
+        return if(file.type?.contains("image") == true){
+            ImageFragment.newInstance(index, file)
+        }else{
+            PlayerFragment.newInstance(index, file.path!!)
         }
-        if(uri != null){
-            return if(contentResolver.getType(uri)?.contains("image") == true){
-                ImageFragment.newInstance(index, uri)
-            }else{
-                PlayerFragment.newInstance(index, uri)
-            }
-        }
-        if(file != null){
-            return if(file.type?.contains("image") == true){
-                ImageFragment.newInstance(index, file)
-            }else{
-                PlayerFragment.newInstance(index, file.path)
-            }
-        }
-        throw NullPointerException("fileProperty xor uri must not null")
     }
 
     private fun getStatus(downloadManager: DownloadManager, id: Long): String {

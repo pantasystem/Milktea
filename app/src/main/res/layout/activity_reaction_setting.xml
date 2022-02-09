@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".view.settings.activities.ReactionSettingActivity">
+        tools:context=".ui.settings.activities.ReactionSettingActivity">
     <data>
         <variable
                 name="reactionPickerSettingViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.setting.reaction.ReactionPickerSettingViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction.ReactionPickerSettingViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"

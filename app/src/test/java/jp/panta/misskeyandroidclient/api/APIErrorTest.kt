@@ -2,40 +2,40 @@ package jp.panta.misskeyandroidclient.api
 
 import jp.panta.misskeyandroidclient.api.notes.CreateNote
 import jp.panta.misskeyandroidclient.model.I
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 
 class APIErrorTest {
 
-    lateinit var misskeyAPI: MisskeyAPI
-    val formatter = Json {
+    private val  misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
 
-    }
 
-    @Before
-    fun setup(){
-        misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
-    }
 
     @Test(expected = APIError.ForbiddenException::class)
-    suspend fun testClientError() {
+    fun testClientError(): Unit = runBlocking {
         misskeyAPI.create(CreateNote("", text = null)).throwIfHasError()
     }
 
 
 
-    @Test(expected = APIError.AuthenticationException::class)
-    suspend fun testAuthenticationError() {
-        val res = misskeyAPI.i(I(null))
+    //@Test(expected = APIError.AuthenticationException::class)
+    @Test
+    fun testAuthenticationError() {
+        assertThrows(APIError.AuthenticationException::class.java) {
+            runBlocking {
+                val res = misskeyAPI.i(I(null))
+                res.throwIfHasError()
+            }
 
-        res.throwIfHasError()
+        }
+        assertTrue(true)
     }
 
 
+
     @Test
-    suspend fun testHasErrorBody() {
+    fun testHasErrorBody(): Unit = runBlocking {
         val res = misskeyAPI.i(I(null))
 
         try{

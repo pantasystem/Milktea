@@ -4,12 +4,13 @@ import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12_75_0.*
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.IllegalVersionException
-import jp.panta.misskeyandroidclient.model.UnauthorizedException
+import jp.panta.misskeyandroidclient.model.api.IllegalVersionException
+import jp.panta.misskeyandroidclient.model.account.UnauthorizedException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
+import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.gallery.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -17,6 +18,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import javax.inject.Inject
 import jp.panta.misskeyandroidclient.api.v12_75_0.CreateGallery as CreateGalleryDTO
 
 fun MiCore.createGalleryRepository() : GalleryRepository{
@@ -31,7 +33,7 @@ fun MiCore.createGalleryRepository() : GalleryRepository{
     )
 }
 
-class GalleryRepositoryImpl(
+class GalleryRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val galleryDataSource: GalleryDataSource,
     private val encryption: Encryption,
@@ -46,12 +48,16 @@ class GalleryRepositoryImpl(
         val files = coroutineScope {
             createGalleryPost.files.map {
                 async {
-                    it.remoteFileId?:
-                    fileUploaderProvider.get(createGalleryPost.author).upload(it, true).let {
-                        it.toFileProperty(createGalleryPost.author).also { entity ->
-                            filePropertyDataSource.add(entity)
+                    when(it) {
+                        is AppFile.Remote -> it.id
+                        is AppFile.Local -> {
+                            fileUploaderProvider.get(createGalleryPost.author).upload(it, true).let {
+                                it.toFileProperty(createGalleryPost.author).also { entity ->
+                                    filePropertyDataSource.add(entity)
+                                }
+                            }.id
                         }
-                    }.id
+                    }
                 }
             }.awaitAll()
         }
@@ -117,7 +123,14 @@ class GalleryRepositoryImpl(
         val files = coroutineScope {
             updateGalleryPost.files.map {
                 async {
-                    fileUploaderProvider.get(account).upload(it, true)
+                    when(it) {
+                        is AppFile.Remote -> it.id.fileId
+                        is AppFile.Local -> {
+                            fileUploaderProvider.get(account).upload(it, true).also {
+                                filePropertyDataSource.add(it.toFileProperty(account))
+                            }.id
+                        }
+                    }
                 }
             }.awaitAll()
         }
@@ -127,9 +140,7 @@ class GalleryRepositoryImpl(
                 postId = updateGalleryPost.id.galleryId,
                 description = updateGalleryPost.description,
                 title = updateGalleryPost.title,
-                fileIds = files.map {
-                    it.id
-                },
+                fileIds = files,
                 isSensitive = updateGalleryPost.isSensitive
             )
         ).throwIfHasError().body()

@@ -42,6 +42,7 @@
                     />
         </LinearLayout>
         <LinearLayout
+                android:id="@+id/renoteBase"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -72,6 +73,7 @@
         </LinearLayout>
 
         <LinearLayout
+                android:id="@+id/quoteRenoteBase"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"

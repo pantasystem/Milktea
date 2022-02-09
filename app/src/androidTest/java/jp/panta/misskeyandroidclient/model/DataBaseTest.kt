@@ -6,7 +6,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.*
-import jp.panta.misskeyandroidclient.viewmodel.setting.page.PageableTemplate
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Before
@@ -17,12 +16,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DataBaseTest{
 
-    lateinit var db: DataBase
-    lateinit var accountDao: AccountDao
-    lateinit var connectionInformationDao: ConnectionInformationDao
-    lateinit var pageDao: PageDao
+    private lateinit var db: DataBase
+    private lateinit var accountDao: AccountDao
+    private lateinit var connectionInformationDao: ConnectionInformationDao
+    private lateinit var pageDao: PageDao
 
-    lateinit var encryption: Encryption
+    private lateinit var encryption: Encryption
 
     @Before
     fun init(){
@@ -53,7 +52,7 @@ class DataBaseTest{
 
         val read = accountDao.findAllSetting()
         assert(read[0].connectionInformationList.isNotEmpty())
-        Assert.assertThat(read[0].connectionInformationList, not(`is`(empty<EncryptedConnectionInformation>())))
+        Assert.assertThat(read[0].connectionInformationList, not(`is`(empty())))
         pageDao.insert(
             Page("114514", "Global", 1, globalTimeline = Page.GlobalTimeline()).apply{
 

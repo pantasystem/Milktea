@@ -5,21 +5,22 @@ import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.TaskExecutor
-import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.messaging.MessageStreamFilter
+import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Page
+import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
+import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaStore
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
@@ -33,11 +34,14 @@ import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
 import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
+import jp.panta.misskeyandroidclient.model.notes.reservation.NoteReservationPostExecutor
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
+import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionUnRegistration
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import jp.panta.misskeyandroidclient.streaming.Socket
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
@@ -50,7 +54,7 @@ interface MiCore{
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    var messageStreamFilter: MessageStreamFilter
+    val messageObserver: MessageObserver
 
     val loggerFactory: Logger.Factory
 
@@ -85,11 +89,13 @@ interface MiCore{
 
     fun getFilePropertyDataSource() : FilePropertyDataSource
 
+    fun getDriveFileRepository() : DriveFileRepository
+
     fun getSubscriptionRegistration() : SubscriptionRegistration
 
-    suspend fun setCurrentAccount(account: Account)
+    fun getSubscriptionUnRegstration() : SubscriptionUnRegistration
 
-    fun logoutAccount(account: Account)
+    suspend fun setCurrentAccount(account: Account)
 
     suspend fun addAccount(account: Account)
 
@@ -101,11 +107,6 @@ interface MiCore{
 
     fun removeAllPagesInCurrentAccount(pages: List<Page>)
 
-
-    fun getMisskeyAPI(instanceDomain: String): MisskeyAPI
-
-
-    fun getMisskeyAPI(account: Account): MisskeyAPI
 
     fun getEncryption(): Encryption
 
@@ -143,6 +144,8 @@ interface MiCore{
 
     fun getMetaStore(): MetaStore
 
+    fun getMetaRepository(): MetaRepository
+
     fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory
 
     fun getReactionHistoryDataSource(): ReactionHistoryDataSource
@@ -155,4 +158,7 @@ interface MiCore{
 
     fun getTranslationStore(): NoteTranslationStore
 
+    fun getNoteReservationPostExecutor(): NoteReservationPostExecutor
+
+    fun getUserNicknameRepository(): UserNicknameRepository
 }

@@ -6,10 +6,6 @@ import java.lang.IllegalArgumentException
 
 object ColorUtil{
 
-    fun matchOpaqueAndColor(opacity: Int, color: String): Int{
-        val parsedColor = Color.parseColor(color)
-        return matchOpaqueAndColor(opacity, parsedColor)
-    }
 
     fun matchOpaqueAndColor(opaque: Int, color: Int): Int{
         if(opaque in 0..255){

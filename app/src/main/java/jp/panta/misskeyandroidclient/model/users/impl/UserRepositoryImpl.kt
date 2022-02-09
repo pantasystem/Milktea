@@ -1,27 +1,43 @@
 package jp.panta.misskeyandroidclient.model.users.impl
 
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
+import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
+import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
+import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import jp.panta.misskeyandroidclient.model.users.report.Report
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import retrofit2.Response
+import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
-class UserRepositoryImpl(
-    val miCore: MiCore
+class UserRepositoryImpl @Inject constructor(
+    val userDataSource: UserDataSource,
+    val noteDataSource: NoteDataSource,
+    val filePropertyDataSource: FilePropertyDataSource,
+    val accountRepository: AccountRepository,
+    val misskeyAPIProvider: MisskeyAPIProvider,
+    val encryption: Encryption,
+    val loggerFactory: Logger.Factory,
 ) : UserRepository{
-    private val logger = miCore.loggerFactory.create("UserRepositoryImpl")
-    private val noteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
+    private val logger: Logger by lazy {
+        loggerFactory.create("UserRepositoryImpl")
+    }
+    private val noteDataSourceAdder = NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
 
     override suspend fun find(userId: User.Id, detail: Boolean): User {
         val localResult = runCatching {
-            miCore.getUserDataSource().get(userId).let{
+            userDataSource.get(userId).let{
                 if(detail) {
                     it as? User.Detail
                 }else it
@@ -33,10 +49,10 @@ class UserRepositoryImpl(
             return it
         }
 
-        val account = miCore.getAccount(userId.accountId)
+        val account = accountRepository.get(userId.accountId)
         if(localResult.getOrNull() == null) {
-            val res = miCore.getMisskeyAPI(account).showUser(RequestUser(
-                i = account.getI(miCore.getEncryption()),
+            val res = misskeyAPIProvider.get(account).showUser(RequestUser(
+                i = account.getI(encryption),
                 userId = userId.id,
                 detail = true
             ))
@@ -46,8 +62,9 @@ class UserRepositoryImpl(
                 it.pinnedNotes?.forEach { dto ->
                     noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
                 }
-                miCore.getUserDataSource().add(user)
-                return user
+                val result = userDataSource.add(user)
+                logger.debug("add result: $result")
+                return userDataSource.get(userId)
             }
         }
 
@@ -56,34 +73,74 @@ class UserRepositoryImpl(
 
     override suspend fun findByUserName(accountId: Long, userName: String, host: String?, detail: Boolean): User {
         val local = runCatching {
-            miCore.getUserDataSource().get(accountId, userName, host) as User.Detail
+            userDataSource.get(accountId, userName, host).let{
+                if(detail) {
+                    it as? User.Detail
+                }else it
+            }
         }.getOrNull()
 
+        logger.debug("local:$local")
         if(local != null) {
             return local
         }
-        val account = miCore.getAccountRepository().get(accountId)
-        val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
+        val account = accountRepository.get(accountId)
+        val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
         val res = misskeyAPI.showUser(
             RequestUser(
-                i = account.getI(miCore.getEncryption()),
+                i = account.getI(encryption),
                 userName = userName,
-                host = host
+                host = host,
+                detail = detail
             )
         )
+        logger.debug("res:$res")
         res.throwIfHasError()
 
         res.body()?.let {
             it.pinnedNotes?.forEach { dto ->
                 noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
             }
-            val user = it.toUser(account, true)
-            miCore.getUserDataSource().add(user)
-            return user
+            val user = it.toUser(account, detail)
+            userDataSource.add(user)
+            return userDataSource.get(user.id)
         }
 
         throw UserNotFoundException(null, userName = userName, host = host)
 
+    }
+
+    override suspend fun searchByName(accountId: Long, name: String): List<User> {
+        return userDataSource.all().asSequence().filter {
+            it.id.accountId == accountId
+        }.filter {
+            it.getDisplayName().startsWith(name)
+        }.toList()
+    }
+
+    override suspend fun searchByUserName(
+        accountId: Long,
+        userName: String,
+        host: String?
+    ): List<User> {
+        val ac = accountRepository.get(accountId)
+        val i = ac.getI(encryption)
+        val api = misskeyAPIProvider.get(ac)
+
+        val results = SearchByUserAndHost(api)
+            .search(RequestUser(
+                userName = userName,
+                host = host,
+                i = i
+            ))
+            .throwIfHasError()
+
+        return results.body()!!.map {
+            it.toUser(ac, false).also { u ->
+                userDataSource.add(u)
+                userDataSource.get(u.id)
+            }
+        }
     }
 
     override suspend fun mute(userId: User.Id): Boolean {
@@ -111,31 +168,33 @@ class UserRepositoryImpl(
     }
 
     override suspend fun follow(userId: User.Id): Boolean {
-        val account = miCore.getAccountRepository().get(userId.accountId)
+        val account = accountRepository.get(userId.accountId)
         val user = find(userId, true) as User.Detail
-        val req = RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption()))
+        val req = RequestUser(userId = userId.id, i = account.getI(encryption))
         logger.debug("follow req:$req")
-        val res = miCore.getMisskeyAPI(account).followUser(req)
+        val res = misskeyAPIProvider.get(account).followUser(req)
         res.throwIfHasError()
         if(res.isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(
                 isFollowing = if(user.isLocked) user.isFollowing else true,
                 hasPendingFollowRequestFromYou = if(user.isLocked) true else user.hasPendingFollowRequestFromYou
             )
-            miCore.getUserDataSource().add(updated)
+            userDataSource.add(updated)
         }
         return res.isSuccessful
     }
 
     override suspend fun unfollow(userId: User.Id): Boolean {
-        val account = miCore.getAccountRepository().get(userId.accountId)
+        val account = accountRepository.get(userId.accountId)
         val user = find(userId, true) as User.Detail
 
 
         val res = if(user.isLocked) {
-            miCore.getMisskeyAPI(account).cancelFollowRequest(CancelFollow(userId = userId.id, i = account.getI(miCore.getEncryption())))
+            misskeyAPIProvider.get(account)
+                .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.getI(encryption)))
         }else{
-            miCore.getMisskeyAPI(account).unFollowUser(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
+            misskeyAPIProvider.get(account)
+                .unFollowUser(RequestUser(userId = userId.id, i = account.getI(encryption)))
         }
         res.throwIfHasError()
         if(res.isSuccessful) {
@@ -143,57 +202,58 @@ class UserRepositoryImpl(
                 isFollowing = if(user.isLocked) user.isFollowing else false,
                 hasPendingFollowRequestFromYou = if(user.isLocked) false else user.hasPendingFollowRequestFromYou
             )
-            miCore.getUserDataSource().add(updated)
+            userDataSource.add(updated)
         }
         return res.isSuccessful
     }
 
     override suspend fun acceptFollowRequest(userId: User.Id): Boolean {
-        val account = miCore.getAccountRepository().get(userId.accountId)
+        val account = accountRepository.get(userId.accountId)
         val user = find(userId, true) as User.Detail
         if(!user.hasPendingFollowRequestToYou) {
             return false
         }
-        val res = miCore.getMisskeyAPI(account).acceptFollowRequest(AcceptFollowRequest(i = account.getI(miCore.getEncryption()), userId = userId.id))
+        val res = misskeyAPIProvider.get(account)
+            .acceptFollowRequest(AcceptFollowRequest(i = account.getI(encryption), userId = userId.id))
             .throwIfHasError()
         if(res.isSuccessful) {
-            miCore.getUserDataSource().add(user.copy(hasPendingFollowRequestToYou = false, isFollower = true))
+            userDataSource.add(user.copy(hasPendingFollowRequestToYou = false, isFollower = true))
         }
         return res.isSuccessful
 
     }
 
     override suspend fun rejectFollowRequest(userId: User.Id): Boolean {
-        val account = miCore.getAccountRepository().get(userId.accountId)
+        val account = accountRepository.get(userId.accountId)
         val user = find(userId, true) as User.Detail
         if(!user.hasPendingFollowRequestToYou) {
             return false
         }
-        val res = miCore.getMisskeyAPI(account).rejectFollowRequest(RejectFollowRequest(i = account.getI(miCore.getEncryption()), userId = userId.id))
+        val res = misskeyAPIProvider.get(account).rejectFollowRequest(RejectFollowRequest(i = account.getI(encryption), userId = userId.id))
             .throwIfHasError()
         if(res.isSuccessful) {
-            miCore.getUserDataSource().add(user.copy(hasPendingFollowRequestToYou = false, isFollower = false))
+            userDataSource.add(user.copy(hasPendingFollowRequestToYou = false, isFollower = false))
         }
         return res.isSuccessful
     }
 
     private suspend fun action(requestAPI: suspend (RequestUser)-> Response<Unit>, userId: User.Id, reducer: (User.Detail)-> User.Detail): Boolean {
-        val account = miCore.getAccountRepository().get(userId.accountId)
-        val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(miCore.getEncryption())))
+        val account = accountRepository.get(userId.accountId)
+        val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(encryption)))
         res.throwIfHasError()
         if(res.isSuccessful) {
 
             val updated = reducer.invoke(find(userId, true) as User.Detail)
-            miCore.getUserDataSource().add(updated)
+            userDataSource.add(updated)
         }
         return res.isSuccessful
     }
 
     override suspend fun report(report: Report): Boolean {
-        val account = miCore.getAccountRepository().get(report.userId.accountId)
+        val account = accountRepository.get(report.userId.accountId)
         val api = report.userId.getMisskeyAPI()
         val res = api.report(ReportDTO(
-            i = account.getI(miCore.getEncryption()),
+            i = account.getI(encryption),
             comment = report.comment,
             userId = report.userId.id
         ))
@@ -202,6 +262,6 @@ class UserRepositoryImpl(
     }
 
     private suspend fun User.Id.getMisskeyAPI(): MisskeyAPI {
-        return miCore.getMisskeyAPI(miCore.getAccountRepository().get(accountId))
+        return misskeyAPIProvider.get(accountRepository.get(accountId))
     }
 }

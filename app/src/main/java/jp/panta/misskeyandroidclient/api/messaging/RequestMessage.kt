@@ -1,7 +1,5 @@
 package jp.panta.misskeyandroidclient.api.messaging
 
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.serialization.Serializable
 
 @Serializable

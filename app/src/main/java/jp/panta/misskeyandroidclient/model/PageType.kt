@@ -20,6 +20,7 @@ enum class PageType(val defaultName: String){
     //USER_PINは別
 }
 
+@Deprecated("model.account.pages.Pageへ移行")
 class PageTypeConverter{
 
     @TypeConverter

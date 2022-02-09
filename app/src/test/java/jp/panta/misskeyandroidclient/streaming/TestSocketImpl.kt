@@ -2,9 +2,9 @@ package jp.panta.misskeyandroidclient.streaming
 
 class TestSocketImpl : Socket {
 
-    var state: Socket.State = Socket.State.NeverConnected
-    val messageListeners = mutableSetOf<SocketMessageEventListener>()
-    val stateEventListeners = mutableSetOf<SocketStateEventListener>()
+    private var state: Socket.State = Socket.State.NeverConnected
+    private val messageListeners = mutableSetOf<SocketMessageEventListener>()
+    private val stateEventListeners = mutableSetOf<SocketStateEventListener>()
 
     override fun connect(): Boolean {
         state = Socket.State.Connected

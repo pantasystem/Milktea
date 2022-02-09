@@ -12,7 +12,6 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 
 class NoteRelationGetter(
-    private val noteDataSource: NoteDataSource,
     private val noteRepository: NoteRepository,
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,

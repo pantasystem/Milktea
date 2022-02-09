@@ -3,22 +3,27 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaListBinding
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
-import jp.panta.misskeyandroidclient.viewmodel.antenna.AntennaListViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+
 
 class AntennaListActivity : AppCompatActivity() {
 
-    companion object{
-        const val REQUEST_ANTENNA_EDITOR_CODE = 239
-    }
+
     private lateinit var mAntennaListViewModel: AntennaListViewModel
 
     private lateinit var mBinding: ActivityAntennaListBinding
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -28,7 +33,7 @@ class AntennaListActivity : AppCompatActivity() {
 
         mAntennaListViewModel = ViewModelProvider(
             this,
-            AntennaListViewModel.Factory(this.applicationContext as MiApplication)
+            AntennaListViewModel.Factory(this.applicationContext as MiCore)
         )[AntennaListViewModel::class.java]
 
 
@@ -37,11 +42,11 @@ class AntennaListActivity : AppCompatActivity() {
         })
         mAntennaListViewModel.editAntennaEvent.observe( this, {
             val intent = AntennaEditorActivity.newIntent(this, it.id)
-            startActivityForResult(intent, REQUEST_ANTENNA_EDITOR_CODE)
+            requestEditAntennaResult.launch(intent)
         })
 
         mBinding.addAntennaFab.setOnClickListener {
-            startActivityForResult(Intent(this, AntennaEditorActivity::class.java), REQUEST_ANTENNA_EDITOR_CODE)
+            requestEditAntennaResult.launch(Intent(this, AntennaEditorActivity::class.java))
         }
 
     }
@@ -65,16 +70,10 @@ class AntennaListActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        when(requestCode){
-            REQUEST_ANTENNA_EDITOR_CODE ->{
-                if(resultCode == RESULT_OK){
-                    mAntennaListViewModel.loadInit()
-                }
-            }
-        }
+
+    private val requestEditAntennaResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        mAntennaListViewModel.loadInit()
     }
 
 

@@ -5,12 +5,12 @@
     <data>
         <variable
                 name="viewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel" />
         <variable
                 name="accountViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
         <import type="android.view.View"/>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
                 android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/image_preview"
+                app:layout_constraintBottom_toTopOf="@+id/filePreview"
                 app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar">
 
             <ScrollView
@@ -52,6 +52,58 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="16dp"
+                            android:visibility="@{ viewModel.reservationPostingAt == null ? View.GONE : View.VISIBLE }">
+                        <TextView
+                                android:id="@+id/reservationLabelTextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/reservation_at"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                android:textSize="18sp"/>
+                        <TextView
+                                android:id="@+id/reservationWarningMsgTextView"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintTop_toBottomOf="@id/reservationLabelTextView"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/closeReservationButton"
+                                android:text="@string/warning_reservation_msg"
+                                android:textColor="#FF0000"/>
+                        <Button
+                                android:id="@+id/reservationAtPickDateButton"
+                                app:layout_constraintTop_toBottomOf="@id/reservationWarningMsgTextView"
+                                app:layout_constraintStart_toStartOf="parent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                dateOnly="@{viewModel.reservationPostingAt}"/>
+                        <Button
+                                android:id="@+id/reservationAtPickTimeButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintStart_toEndOf="@id/reservationAtPickDateButton"
+                                app:layout_constraintTop_toBottomOf="@id/reservationWarningMsgTextView"
+                                android:layout_marginStart="4dp"
+                                timeOnly="@{viewModel.reservationPostingAt}" />
+                        <ImageButton
+                                android:id="@+id/closeReservationButton"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:src="@drawable/ic_close_black_24dp"
+                                app:tint="?attr/colorNoteActionButtonTint"
+                                android:onClick="@{()-> viewModel.toggleReservationAt() }"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                     <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/addressUsersView"
                             android:layout_width="match_parent"
@@ -87,10 +139,10 @@
                             android:gravity="top"
                             android:hint="@string/please_speak"
                             android:inputType="textMultiLine"
-                            android:text="@{viewModel.text}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar"
+                            android:text="@{viewModel.text}"
                             />
 
                     <FrameLayout
@@ -201,42 +253,17 @@
 
         </LinearLayout>
 
-        <LinearLayout
-                android:id="@+id/image_preview"
+        <androidx.compose.ui.platform.ComposeView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:layout_height="50dp"
-                android:layout_marginStart="1dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginEnd="1dp"
-                android:layout_marginBottom="1dp"
-                android:orientation="horizontal"
+                android:layout_marginEnd="5dp"
+                android:id="@+id/filePreview"
                 app:layout_constraintBottom_toTopOf="@+id/bottomToolbarBase"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/frameLayout"
-                android:padding="5dp"
-                android:visibility="@{SafeUnbox.unboxInt(viewModel.totalImageCount) == 0 ? View.GONE : View.VISIBLE}"
-                >
+                />
 
-            <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/image_list_preview"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="5dp"
-                    />
-
-
-            <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text='@{String.valueOf(SafeUnbox.unboxInt(viewModel.totalImageCount)) + "/" + "4"}'
-
-                    tools:text="3/4"/>
-        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

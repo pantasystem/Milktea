@@ -1,27 +1,35 @@
 package jp.panta.misskeyandroidclient.model.messaging.impl
 
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.messaging.MessageAction
 import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.gettters.MessageRelationGetter
+import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.messaging.CreateMessage
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import java.io.IOException
 import java.lang.IllegalStateException
+import javax.inject.Inject
 import kotlin.jvm.Throws
 
 @Suppress("BlockingMethodInNonBlockingContext")
-class MessageRepositoryImpl(
-    val miCore: MiCore
+class MessageRepositoryImpl @Inject constructor(
+    val misskeyAPIProvider: MisskeyAPIProvider,
+    val messageDataSource: MessageDataSource,
+    val accountRepository: AccountRepository,
+    val encryption: Encryption,
+    val messageRelationGetter: MessageRelationGetter
 ) : MessageRepository {
-    private val accountRepository = miCore.getAccountRepository()
 
     @Throws(IOException::class)
     override suspend fun read(messageId: Message.Id): Boolean {
         val account = accountRepository.get(messageId.accountId)
-        val result = miCore.getMisskeyAPI(account).readMessage(
+        val result = misskeyAPIProvider.get(account).readMessage(
             MessageAction(
-                account.getI(miCore.getEncryption()),
+                account.getI(encryption),
                 null,
                 null,
                 null,
@@ -31,8 +39,8 @@ class MessageRepositoryImpl(
         ).isSuccessful
 
         if(result) {
-            miCore.getMessageDataSource().find(messageId)?.read()?.let{
-                miCore.getMessageDataSource().add(it)
+            messageDataSource.find(messageId)?.read()?.let{
+                messageDataSource.add(it)
             }
         }
 
@@ -42,7 +50,7 @@ class MessageRepositoryImpl(
     @Throws(IOException::class)
     override suspend fun create(createMessage: CreateMessage): Message {
         val account = accountRepository.get(createMessage.accountId)
-        val i = account.getI(miCore.getEncryption())
+        val i = account.getI(encryption)
         val action = when(createMessage) {
             is CreateMessage.Group -> {
                 MessageAction(
@@ -66,19 +74,19 @@ class MessageRepositoryImpl(
             }
         }
 
-        val body: MessageDTO = miCore.getMisskeyAPI(account).createMessage(action).body()
+        val body: MessageDTO = misskeyAPIProvider.get(account).createMessage(action).body()
             ?: throw IllegalStateException("メッセージの作成に失敗しました")
 
-        return miCore.getGetters().messageRelationGetter.get(account, body).message
+        return messageRelationGetter.get(account, body).message
 
     }
 
     @Throws(IOException::class)
     override suspend fun delete(messageId: Message.Id): Boolean {
         val account = accountRepository.get(messageId.accountId)
-        val result = miCore.getMisskeyAPI(account).deleteMessage(
+        val result = misskeyAPIProvider.get(account).deleteMessage(
             MessageAction(
-                account.getI(miCore.getEncryption()),
+                account.getI(encryption),
                 null,
                 null,
                 null,
@@ -88,7 +96,7 @@ class MessageRepositoryImpl(
         ).isSuccessful
 
         if(result) {
-            miCore.getMessageDataSource().delete(messageId)
+            messageDataSource.delete(messageId)
         }
 
         return result

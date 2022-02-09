@@ -1,16 +1,17 @@
 package jp.panta.misskeyandroidclient.view
 
+import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
 import kotlinx.datetime.Clock
 import org.junit.Test
 
 import org.junit.Before
-import java.util.*
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 class SimpleElapsedTimeTest {
 
-    lateinit var simple: SimpleElapsedTime
+    private lateinit var simple: SimpleElapsedTime
 
     @Before
     fun init(){
@@ -41,9 +42,7 @@ class SimpleElapsedTimeTest {
     @Test
     fun nowTest(){
 
-        val nowTest = Clock.System.now().let {
-            it.plus(Duration.seconds( - 9))
-        }
+        val nowTest = Clock.System.now().plus((-9).seconds)
         assert(simple.format(nowTest) == "今")
 
     }

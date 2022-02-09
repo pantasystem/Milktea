@@ -5,8 +5,8 @@
     <data>
         <variable
                 name="selectedUserViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:id="@+id/selectedUsersBottomSheet"

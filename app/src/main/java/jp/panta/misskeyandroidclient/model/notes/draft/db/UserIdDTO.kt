@@ -27,7 +27,5 @@ data class UserIdDTO(
             return UserIdDTO(userId, draftNoteId)
         }
     }
-    fun toUserId(): String{
-        return userId
-    }
+
 }

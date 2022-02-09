@@ -8,6 +8,10 @@ interface UserRepository {
 
     suspend fun findByUserName(accountId: Long, userName: String, host: String?, detail: Boolean = true): User
 
+    suspend fun searchByName(accountId: Long, name: String): List<User>
+
+    suspend fun searchByUserName(accountId: Long, userName: String, host: String?): List<User>
+
     suspend fun follow(userId: User.Id): Boolean
 
     suspend fun unfollow(userId: User.Id): Boolean

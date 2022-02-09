@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package jp.panta.misskeyandroidclient
 
 import android.content.Context
@@ -11,12 +12,14 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityFollowFollowerBinding
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.view.TitleSettable
-import jp.panta.misskeyandroidclient.view.users.FollowFollowerFragment
-import jp.panta.misskeyandroidclient.viewmodel.users.FollowFollowerViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.users.UserDetailViewModelFactory
+import jp.panta.misskeyandroidclient.ui.TitleSettable
+import jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+
 
 class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
@@ -36,7 +39,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     lateinit var mBinding: ActivityFollowFollowerBinding
 
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -50,7 +53,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         val miApplication = application as MiApplication
         val userDetailViewModel = ViewModelProvider(this, UserDetailViewModelFactory(miApplication, userId, null))[UserDetailViewModel::class.java]
         userDetailViewModel.user.observe(this) {
-            setTitle(it.getDisplayName())
+            title = it?.getDisplayName()
         }
 
         mBinding.followFollowerPager.adapter = FollowFollowerPagerAdapter(userId)
@@ -83,6 +86,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
             return titleList[position]
         }
 
+        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun getItem(position: Int): Fragment {
             return if(position == 0){
                 FollowFollowerFragment.newInstance(FollowFollowerViewModel.Type.FOLLOWING, userId)

@@ -5,8 +5,8 @@
         <import type="android.view.View"/>
         <variable
                 name="selection"
-                type="jp.panta.misskeyandroidclient.viewmodel.setting.SelectionSharedItem" />
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+                type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:orientation="vertical" android:layout_width="match_parent"

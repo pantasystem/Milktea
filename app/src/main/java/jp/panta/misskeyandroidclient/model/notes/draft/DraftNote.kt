@@ -5,6 +5,7 @@ import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.getName
 import jp.panta.misskeyandroidclient.model.notes.isLocalOnly
 import java.io.Serializable
+import java.util.*
 
 
 data class DraftNote(
@@ -21,10 +22,10 @@ data class DraftNote(
     val noExtractEmojis: Boolean? = null,
     val replyId: String? = null,
     val renoteId: String? = null,
-    val draftPoll: DraftPoll? = null
+    val draftPoll: DraftPoll? = null,
+    val reservationPostingAt: Date? = null,
 
-
-): Serializable{
+    ): Serializable{
 
     var draftNoteId: Long? = null
 

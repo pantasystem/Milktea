@@ -9,8 +9,9 @@ import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
-class InMemoryNoteDataSource(
+class InMemoryNoteDataSource @Inject constructor(
     loggerFactory: Logger.Factory
 ): NoteDataSource{
 
@@ -110,7 +111,7 @@ class InMemoryNoteDataSource(
         }
     }
 
-    private fun publish(ev: NoteDataSource.Event) = runBlocking<Unit> {
+    private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {
             listeners.forEach {
                 it.on(ev)

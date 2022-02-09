@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.mfm
 
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 
 class MFMParserTest{
@@ -19,8 +18,16 @@ class MFMParserTest{
     fun quoteTest(){
         val text = "> Hello quote\n>>>>> Hello world"
         println(text)
-        val node = MFMParser.parse(text)
-        println(node)
+        val root = MFMParser.parse(text)
+        assertNotNull(root)
+        var node: Node? = root!!.childElements[1] as Node
+        for (i in 0 until 4) {
+            node = node!!.childElements[0] as Node
+            assertEquals(ElementType.QUOTE, node.elementType)
+        }
+        //assertEquals(ElementType.TEXT, node?.elementType)
+        assertEquals(ElementType.TEXT, node!!.childElements[0].elementType)
+        println("node:$node")
     }
 
     @Test
@@ -28,6 +35,8 @@ class MFMParserTest{
         val text = ">\n"
         println(text)
         val node = MFMParser.parse(text)
+        val n = node!!.childElements[0]
+        assertEquals(ElementType.TEXT, n.elementType)
         println(node)
     }
 
@@ -36,6 +45,7 @@ class MFMParserTest{
         val text = ">  "
         println(text)
         val node = MFMParser.parse(text)
+        assertEquals(ElementType.QUOTE, node!!.childElements[0].elementType)
         println(node)
     }
 
@@ -44,6 +54,11 @@ class MFMParserTest{
         val text = "<i>test<small>小さい文字のテスト</small></i>"
         println(text)
         val node = MFMParser.parse(text)
+        val italic = node!!.childElements[0] as Node
+        assertEquals(ElementType.ITALIC, italic.elementType)
+        assertEquals("test", (italic.childElements[0] as Text).text)
+        assertEquals(ElementType.SMALL, italic.childElements[1].elementType)
+
         println(node)
     }
 
@@ -52,6 +67,9 @@ class MFMParserTest{
         val text = "<i>\n> must error\n </i>"
         println(text)
         val node = MFMParser.parse(text)
+        val italic = node!!.childElements[0] as Node
+        assertEquals(ElementType.ITALIC, italic.elementType)
+        assertEquals("\n> must error\n ", (italic.childElements[0] as Text).text)
         println(node)
     }
 
@@ -59,6 +77,11 @@ class MFMParserTest{
     fun testSameBlockNest(){
         val text = "<i><i>error</i></i>"
         val node = MFMParser.parse(text)
+        val italic = node!!.childElements[0] as Node
+        println(node)
+
+        assertEquals(ElementType.ITALIC, italic.elementType)
+        assertEquals(ElementType.TEXT, italic.childElements[0].elementType)
         println(node)
     }
 

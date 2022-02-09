@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.mfm
 
 import android.app.SearchManager
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
@@ -13,15 +12,13 @@ import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.util.svg.GlideApp
-import jp.panta.misskeyandroidclient.view.text.BitmapEmojiSpan
-import jp.panta.misskeyandroidclient.view.text.DrawableEmojiSpan
-import jp.panta.misskeyandroidclient.view.text.EmojiAdapter
-import jp.panta.misskeyandroidclient.view.text.EmojiSpan
+import jp.panta.misskeyandroidclient.util.glide.GlideApp
+import jp.panta.misskeyandroidclient.ui.text.DrawableEmojiSpan
+import jp.panta.misskeyandroidclient.ui.text.EmojiAdapter
+import jp.panta.misskeyandroidclient.ui.text.EmojiSpan
 import java.lang.ref.WeakReference
 
 object MFMDecorator {
-    private val br = System.getProperty("line.separator")
 
 
     fun decorate(textView: TextView, node: Root): Spanned{
@@ -38,10 +35,9 @@ object MFMDecorator {
         val textView: WeakReference<TextView>,
         val root: Root,
         val parent: Element,
-        val emojiAdapter: EmojiAdapter
+        private val emojiAdapter: EmojiAdapter
     ){
         private var position = 0
-        private val start = position
         private val spannableStringBuilder = SpannableStringBuilder()
 
 
@@ -97,15 +93,16 @@ object MFMDecorator {
 
         }
 
-        private fun decorateEmoji(emojiElement: EmojiElement): Spanned?{
+        private fun decorateEmoji(emojiElement: EmojiElement): Spanned{
             val spanned = SpannableString(emojiElement.text)
             textView.get()?.let{ textView ->
                 //val emojiSpan = EmojiSpan(textView)
                 val emojiSpan: EmojiSpan<*>
                 if(emojiElement.emoji.isSvg()){
-                    emojiSpan = BitmapEmojiSpan(emojiAdapter)
+                    //emojiSpan = BitmapEmojiSpan(emojiAdapter)
+                    emojiSpan = DrawableEmojiSpan(emojiAdapter)
+
                     GlideApp.with(textView.context)
-                        .`as`(Bitmap::class.java)
                         .load(emojiElement.emoji.url?: emojiElement.emoji.url)
                         .into(emojiSpan.target)
                 }else{
@@ -122,18 +119,18 @@ object MFMDecorator {
             return spanned
         }
 
-        private fun decorateText(text: Text): Spanned?{
+        private fun decorateText(text: Text): Spanned{
             return SpannedString(text.text)
         }
 
-        private fun decorateSearch(search: Search): Spanned?{
+        private fun decorateSearch(search: Search): Spanned{
             val intent = Intent(Intent.ACTION_SEARCH)
             //intent.setClassName("com.google.android.googlequicksearchbox",  "com.google.android.googlequicksearchbox.SearchActivity")
             intent.putExtra(SearchManager.QUERY, search.text)
             return makeClickableSpan("${search.text}  ${(textView.get()?.context?.getString(R.string.search)?: "Search")}", intent)
         }
 
-        private fun decorateMention(mention: Mention): Spanned?{
+        private fun decorateMention(mention: Mention): Spanned{
             return textView.get()?.let{ textView ->
                 val intent = UserDetailActivity.newInstance(textView.context, userName = mention.text)
                 intent.putActivity(Activities.ACTIVITY_IN_APP)
@@ -144,12 +141,12 @@ object MFMDecorator {
 
         }
 
-        private fun decorateLink(link: Link): Spanned?{
+        private fun decorateLink(link: Link): Spanned{
             return makeClickableSpan(link.text, Intent(Intent.ACTION_VIEW, Uri.parse(link.url)))
         }
 
 
-        private fun decorateHashTag(hashTag: HashTag): Spanned?{
+        private fun decorateHashTag(hashTag: HashTag): Spanned{
             return textView.get()?.let{ textView ->
                 val intent = Intent(textView.context, SearchResultActivity::class.java)
                 intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, hashTag.text)

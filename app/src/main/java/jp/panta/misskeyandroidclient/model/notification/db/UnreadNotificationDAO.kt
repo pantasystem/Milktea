@@ -23,9 +23,6 @@ abstract class UnreadNotificationDAO {
     @Query("SELECT COUNT(*) FROM unread_notifications_table WHERE accountId = :accountId")
     abstract fun countByAccountId(accountId: Long) : Flow<Int>
 
-    @Query("SELECT * FROM unread_notifications_table WHERE accountId = :accountId")
-    abstract suspend fun findByAccountId(accountId: Long): List<UnreadNotification>
-
     @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId")
     abstract suspend fun deleteWhereAccountId(accountId: Long)
 }

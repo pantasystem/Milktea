@@ -18,10 +18,7 @@ import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
 import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
 import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPIImpl
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import org.junit.Assert.*
 import org.junit.Before
@@ -32,9 +29,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class NoteCaptureAPIAdapterTest {
 
-    lateinit var loggerFactory: Logger.Factory
-    lateinit var accountRepository: AccountRepository
-    lateinit var noteDataSource: NoteDataSource
+    private lateinit var loggerFactory: Logger.Factory
+    private lateinit var accountRepository: AccountRepository
+    private lateinit var noteDataSource: NoteDataSource
 
     @Before
     fun setUp() {
@@ -52,16 +49,16 @@ class NoteCaptureAPIAdapterTest {
         )
 
 
-        val coroutineScope = CoroutineScope(Job())
+//        val coroutineScope = CoroutineScope(Job())
 
 
-        val noteCaptureAPIAdapter = NoteCaptureAPIAdapter(
-            accountRepository = accountRepository,
-            noteDataSource = noteDataSource,
-            noteCaptureAPIWithAccountProvider = noteCaptureAPIWithAccountProvider,
-            loggerFactory,
-            coroutineScope
-        )
+//        val noteCaptureAPIAdapter = NoteCaptureAPIAdapter(
+//            accountRepository = accountRepository,
+//            noteDataSource = noteDataSource,
+//            noteCaptureAPIWithAccountProvider = noteCaptureAPIWithAccountProvider,
+//            loggerFactory,
+//            coroutineScope
+//        )
 
         runBlocking {
 
@@ -81,73 +78,19 @@ class NoteCaptureAPIAdapterTest {
                 note
             )
 
-            val sendCount = AtomicInteger()
-            val job = launch {
-
-                for(n in 0 until 10){
-                    noteCaptureAPIAdapter.capture(note.id).onEach {
-                        if(it is NoteDataSource.Event.Updated){
-                            assertTrue(it.note.reactionCounts[0].count == 1)
-                        }
-                    }.launchIn(this)
+            var counter = 1
+            noteDataSource.addEventListener {
+                if (it.noteId == note.id) {
+                    assertEquals(1, (it as NoteDataSource.Event.Updated).note.reactionCounts[0].count)
+                    counter ++
                 }
-
-
-                delay(400)
-                noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-                sendCount.incrementAndGet()
-
             }
 
-            delay(2000)
-            assertTrue(true)
-            job.cancel()
-
-            val job2 = launch {
-                noteCaptureAPIAdapter.capture(note.id).onEach {
-                    println("job2: on ev")
-                }.launchIn(this + Dispatchers.IO)
-            }
-
-            val job3 = launch {
-                noteCaptureAPIAdapter.capture(note.id).onEach {
-                    println("job3: on ev")
-                }.launchIn(this + Dispatchers.IO)
-            }
-
-            launch {
-                noteCaptureAPIAdapter.capture(note.id).onEach {
-                    println("job4: on ev: $it")
-                }.launchIn(this + Dispatchers.IO)
-            }
-
-
-            delay(1000)
             noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-            sendCount.incrementAndGet()
-            job2.cancel()
-            job3.cancel()
+            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
 
-            delay(100)
 
-            launch {
-                println("nowCount:$sendCount")
-                for(n in 0 until 100) {
-                    if(n % 2 == 0){
-                        noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-                        sendCount.incrementAndGet()
-                    }else{
-                        noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Unreacted(id = note.id.noteId, body = NoteUpdated.Body.Unreacted.Body(reaction = "hoge", account.remoteId))))
-                        sendCount.decrementAndGet()
-                    }
-
-                    println("sendMsg:$sendCount, n:$n")
-
-                }
-
-            }
-
-            delay(1000)
         }
 
     }

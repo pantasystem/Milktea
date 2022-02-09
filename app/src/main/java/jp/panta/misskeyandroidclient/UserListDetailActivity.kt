@@ -7,36 +7,40 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
 import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.view.list.UserListDetailFragment
-import jp.panta.misskeyandroidclient.view.notes.ActionNoteHandler
-import jp.panta.misskeyandroidclient.view.notes.TimelineFragment
+import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.view.list.UserListEditorDialog
-import jp.panta.misskeyandroidclient.viewmodel.list.UserListDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.notes.NotesViewModelFactory
-import jp.panta.misskeyandroidclient.viewmodel.users.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
+import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
+@FlowPreview
+@AndroidEntryPoint
 class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmittedListener {
 
     companion object {
         private const val TAG = "UserListDetailActivity"
         private const val EXTRA_LIST_ID = "jp.panta.misskeyandroidclient.EXTRA_LIST_ID"
-        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.extra.ACCOUNT_ID"
 
-        private const val SELECT_USER_REQUEST_CODE = 252
 
         const val ACTION_SHOW = "ACTION_SHOW"
         const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
@@ -53,16 +57,23 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     private var account: Account? = null
     private var mListId: UserList.Id? = null
 
+    @Inject
+    lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
+
+
+
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private var mUserListDetailViewModel: UserListDetailViewModel? = null
+    val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
+        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
+        UserListDetailViewModel.provideFactory(assistedFactory, listId)
+    }
 
-    private var mIsNameUpdated: Boolean = false
     private var mUserListName: String = ""
     private val binding: ActivityUserListDetailBinding by dataBinding()
+    val notesViewModel by viewModels<NotesViewModel>()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -71,24 +82,21 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         setSupportActionBar(binding.userListToolbar)
 
         val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
-        //val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
 
 
         mListId = listId
-        val miCore = application as MiCore
-        val notesViewModel = ViewModelProvider(this, NotesViewModelFactory(application as MiApplication))[NotesViewModel::class.java]
 
-        val userListDetailViewModel = ViewModelProvider(this, UserListDetailViewModel.Factory(listId, miCore))[UserListDetailViewModel::class.java]
-        mUserListDetailViewModel = userListDetailViewModel
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
 
-        userListDetailViewModel.userList.observe(this, { ul ->
+        binding.userListDetailViewPager.adapter = PagerAdapter(listId)
+        binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
+
+        mUserListDetailViewModel.userList.observe(this, { ul ->
             supportActionBar?.title = ul.name
             mUserListName = ul.name
 
-            binding.userListDetailViewPager.adapter = PagerAdapter(ul.id)
-            binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
+
 
             if(intent.action == ACTION_EDIT_NAME){
                 intent.action = ACTION_SHOW
@@ -96,7 +104,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             }
         })
 
-        userListDetailViewModel.userList.observe(this, {
+        mUserListDetailViewModel.userList.observe(this, {
             invalidateOptionsMenu()
         })
 
@@ -104,10 +112,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onSubmit(name: String) {
-        mUserListDetailViewModel?.updateName(name)
+        mUserListDetailViewModel.updateName(name)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -125,8 +131,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         return super.onCreateOptionsMenu(menu)
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_add_to_tab ->{
@@ -136,44 +140,35 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                 showEditUserListDialog()
             }
             android.R.id.home ->{
-                if(mIsNameUpdated){
-                    updatedResultFinish()
-                }
+                finish()
             }
             R.id.action_add_user ->{
-                val selected = mUserListDetailViewModel?.listUsers?.value?.map{
+                val selected = mUserListDetailViewModel.listUsers.value?.mapNotNull {
                     it.userId
-                }?.filterNotNull()?: return false
+                } ?: return false
                 val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selected)
-                startActivityForResult(intent, SELECT_USER_REQUEST_CODE)
+                requestSelectUserResult.launch(intent)
             }
         }
         return super.onOptionsItemSelected(item)
     }
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    override fun onBackPressed() {
-        updatedResultFinish()
-    }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        Log.d(TAG, "onActivityResult: reqCode:$requestCode, resultCode:$resultCode")
-        if(requestCode == SELECT_USER_REQUEST_CODE){
-            if(resultCode == RESULT_OK){
-                val changedDiff = data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-                val added = changedDiff?.added
-                val removed = changedDiff?.removed
-                Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
-                added?.forEach{
-                    mUserListDetailViewModel?.pushUser(it)
-                }
-                removed?.forEach{
-                    mUserListDetailViewModel?.pullUser(it)
-                }
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    val requestSelectUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val resultCode = result.resultCode
+        val data = result.data
+        if(resultCode == RESULT_OK){
+            val changedDiff = data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+            val added = changedDiff?.added
+            val removed = changedDiff?.removed
+            Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
+            added?.forEach{
+                mUserListDetailViewModel.pushUser(it)
+            }
+            removed?.forEach{
+                mUserListDetailViewModel.pullUser(it)
             }
         }
     }
@@ -202,24 +197,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }else{
             miCore.removePageInCurrentAccount(page)
         }
-    }
-
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    private fun updatedResultFinish(){
-        val updatedEvent = mUserListDetailViewModel?.updateEvents?.toList()?: emptyList()
-
-        val data = Intent().apply{
-            if(updatedEvent.isNotEmpty()){
-                putExtra(EXTRA_UPDATED_USER_LIST, mUserListDetailViewModel?.userList?.value)
-            }
-        }
-        if(mListId == null || updatedEvent.isEmpty()){
-            setResult(RESULT_CANCELED)
-        }else{
-            setResult(RESULT_OK, data)
-        }
-        finish()
     }
 
 

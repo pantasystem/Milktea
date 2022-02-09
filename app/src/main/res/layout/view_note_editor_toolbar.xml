@@ -3,14 +3,15 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <import type="android.view.View" />
         <variable
                 name="viewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.notes.editor.NoteEditorViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel" />
         <variable
                 name="accountViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.account.AccountViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
+        <import type="jp.panta.misskeyandroidclient.BuildConfig" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -76,10 +77,27 @@
                 android:layout_marginEnd="4dp"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/textCounter"
-                app:layout_constraintEnd_toStartOf="@id/textCounter"
+                app:layout_constraintEnd_toStartOf="@id/reservationPostButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:tint="?attr/colorNoteActionButtonTint" />
+
+        <ImageButton
+                android:id="@+id/reservationPostButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:layout_constraintEnd_toStartOf="@id/textCounter"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="?attr/colorNoteActionButtonTint"
+                android:src="@drawable/ic_baseline_edit_calendar_24"
+                android:layout_marginEnd="8dp"
+                android:onClick="@{()-> viewModel.toggleReservationAt()}"
+
+                tools:ignore="ContentDescription"
+                android:visibility="@{BuildConfig.DEBUG ? View.VISIBLE : View.GONE}"/>
+
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textCounter"
                 android:layout_width="wrap_content"
@@ -97,11 +115,13 @@
                 />
 
 
+
         <com.google.android.material.button.MaterialButton
                 android:id="@+id/postButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
+                android:enabled="@{SafeUnbox.unboxBool(viewModel.isPostAvailable)}"
                 android:onClick="@{()-> viewModel.post()}"
                 android:text="@string/post"
                 app:layout_constraintEnd_toEndOf="parent"

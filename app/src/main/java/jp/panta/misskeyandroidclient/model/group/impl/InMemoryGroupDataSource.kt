@@ -6,8 +6,9 @@ import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupNotFoundException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
-class InMemoryGroupDataSource : GroupDataSource{
+class InMemoryGroupDataSource @Inject constructor(): GroupDataSource{
 
     private val lock = Mutex()
 

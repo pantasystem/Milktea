@@ -2,10 +2,10 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox"/>
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
         <variable
                 name="actionViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.messaging.MessageActionViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
@@ -78,8 +78,8 @@
                         android:padding="8dp"
                         app:srcCompat="@drawable/ic_cloud_black_24dp"
                         style="@style/Widget.AppCompat.Button.Borderless"
-                        android:tint="?attr/colorNoteActionButtonTint"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription"
+                        app:tint="?attr/colorNoteActionButtonTint" />
                 <TextView
                         android:id="@+id/selecting_file_name"
                         android:layout_width="0dp"
@@ -97,13 +97,12 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:padding="8dp"
-                        android:tint="?attr/colorNoteActionButtonTint"
 
                         app:srcCompat="@drawable/ic_menu_send"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         tools:ignore="ContentDescription"
                         android:onClick="@{()-> actionViewModel.send()}"
-                        />
+                        app:tint="?attr/colorNoteActionButtonTint" />
 
 
             </LinearLayout>

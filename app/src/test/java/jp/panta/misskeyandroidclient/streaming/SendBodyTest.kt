@@ -38,7 +38,7 @@ class SendBodyTest {
 
     @Test
     fun testDecodeSubNote() {
-        val json = """{"type":"sn","body":{"id":"hogepiyo"}}"""
+        val json = """{"type":"subNote","body":{"id":"hogepiyo"}}"""
         val h: Send = Json.decodeFromString(json)
 
         println(h)

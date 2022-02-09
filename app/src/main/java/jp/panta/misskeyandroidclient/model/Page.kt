@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.core.Account
 import androidx.room.Entity
 
+@Deprecated("model.account.pages.Pageへ移行")
 @Entity(tableName = "page", foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = NO_ACTION, onUpdate = NO_ACTION)])
 data class Page(
     var accountId: String?,

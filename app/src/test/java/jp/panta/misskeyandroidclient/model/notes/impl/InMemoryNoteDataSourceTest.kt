@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -17,8 +18,8 @@ import java.util.*
 
 class InMemoryNoteDataSourceTest {
 
-    lateinit var loggerFactory: Logger.Factory
-    lateinit var account: Account
+    private lateinit var loggerFactory: Logger.Factory
+    private lateinit var account: Account
     @Before
     fun setUp() {
         loggerFactory = TestLogger.Factory()
@@ -41,15 +42,19 @@ class InMemoryNoteDataSourceTest {
             val result = noteDataSource.add(
                 note
             )
+            delay(10)
 
-            assertTrue(result == AddResult.CREATED)
+            assertEquals(AddResult.CREATED, result)
             val old = note.copy()
+            delay(10)
 
-            assertTrue(noteDataSource.add(note) == AddResult.UPDATED)
+            assertEquals(AddResult.UPDATED, noteDataSource.add(note))
+            delay(10)
 
-            assertTrue(noteDataSource.add(old) == AddResult.CANCEL)
+            assertEquals(AddResult.CANCEL, noteDataSource.add(old))
+            delay(10)
 
-            assertTrue(noteDataSource.add(old.copy()) == AddResult.CANCEL)
+            assertEquals(AddResult.CANCEL, noteDataSource.add(old.copy()))
         }
 
     }

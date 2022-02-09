@@ -27,6 +27,7 @@ import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
+import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.model.drive.Directory
 import retrofit2.Response
@@ -133,7 +134,7 @@ interface MisskeyAPI {
     suspend fun searchNote(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/state")
-    suspend fun noteState(@Body noteRequest: NoteRequest): Response<State>
+    suspend fun noteState(@Body noteRequest: NoteRequest): Response<NoteState>
 
     @POST("api/notes/show")
     suspend fun showNote(@Body requestNote: NoteRequest): Response<NoteDTO>
@@ -182,6 +183,15 @@ interface MisskeyAPI {
     @POST("api/drive/files")
     suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FilePropertyDTO>>
 
+    @POST("api/drive/files/update")
+    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO>
+
+    @POST("api/drive/files/delete")
+    suspend fun deleteFile(@Body req: DeleteFileDTO): Response<Unit>
+
+    @POST("api/drive/files/show")
+    suspend fun showFile(@Body req: ShowFile) : Response<FilePropertyDTO>
+
     @POST("api/drive/folders")
     suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
 
@@ -221,6 +231,9 @@ interface MisskeyAPI {
 
     @POST("api/sw/register")
     suspend fun swRegister(@Body subscription: Subscription) : Response<SubscriptionState>
+
+    @POST("api/sw/unregister")
+    suspend fun swUnRegister(@Body unSub: UnSubscription) : Response<Unit>
 
     @POST("api/following/requests/cancel")
     suspend fun cancelFollowRequest(@Body req: CancelFollow) : Response<UserDTO>

@@ -28,6 +28,7 @@ import jp.panta.misskeyandroidclient.api.notes.translation.Translate
 import jp.panta.misskeyandroidclient.api.notes.translation.TranslationResult
 import jp.panta.misskeyandroidclient.api.sw.register.Subscription
 import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
+import jp.panta.misskeyandroidclient.api.sw.register.UnSubscription
 import jp.panta.misskeyandroidclient.api.users.*
 import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.drive.Directory
@@ -68,7 +69,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun muteUser(requestUser: RequestUser): Response<Unit> = misskeyAPI.muteUser(requestUser)
     override suspend fun followUser(requestUser: RequestUser): Response<UserDTO> = misskeyAPI.followUser(requestUser)
     override suspend fun myApps(i: I): Response<List<App>> = misskeyAPI.myApps(i)
-    override suspend fun noteState(noteRequest: NoteRequest): Response<State> = misskeyAPI.noteState(noteRequest)
+    override suspend fun noteState(noteRequest: NoteRequest): Response<NoteState> = misskeyAPI.noteState(noteRequest)
     override suspend fun notification(notificationRequest: NotificationRequest): Response<List<NotificationDTO>?> = misskeyAPI.notification(notificationRequest)
     override suspend fun pullUserFromList(listUserOperation: ListUserOperation): Response<Unit> = misskeyAPI.pullUserFromList(listUserOperation)
     override suspend fun pushUserToList(listUserOperation: ListUserOperation): Response<Unit> = misskeyAPI.pushUserToList(listUserOperation)
@@ -109,4 +110,11 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun swRegister(subscription: Subscription): Response<SubscriptionState> = misskeyAPI.swRegister(subscription)
     override suspend fun translate(req: Translate): Response<TranslationResult> = misskeyAPI.translate(req)
     override suspend fun report(req: ReportDTO): Response<Unit> = misskeyAPI.report(req)
+    override suspend fun acceptFollowRequest(followRequest: AcceptFollowRequest): Response<Unit> = misskeyAPI.acceptFollowRequest(followRequest)
+    override suspend fun cancelFollowRequest(req: CancelFollow): Response<UserDTO> = misskeyAPI.cancelFollowRequest(req)
+    override suspend fun renotes(req: FindRenotes): Response<List<NoteDTO>> = misskeyAPI.renotes(req)
+    override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskeyAPI.updateFile(updateFileRequest)
+    override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskeyAPI.deleteFile(req)
+    override suspend fun showFile(req: ShowFile): Response<FilePropertyDTO> = misskeyAPI.showFile(req)
+    override suspend fun swUnRegister(unSub: UnSubscription): Response<Unit> = misskeyAPI.swUnRegister(unSub)
 }

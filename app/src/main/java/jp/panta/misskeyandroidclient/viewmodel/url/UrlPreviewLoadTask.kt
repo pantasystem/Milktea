@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.url
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
-import jp.panta.misskeyandroidclient.viewmodel.notes.PlaneNoteViewData
 import kotlinx.coroutines.*
 
 class UrlPreviewLoadTask(

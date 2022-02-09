@@ -27,12 +27,22 @@ sealed class Send {
             @SerialName("localTimeline") LOCAL_TIMELINE,
             @SerialName("hybridTimeline") HYBRID_TIMELINE,
             @SerialName("globalTimeline") GLOBAL_TIMELINE,
+            @SerialName("userList") USER_LIST,
+            @SerialName("antenna") ANTENNA,
         }
 
         @Serializable
-        data class Body (val id: String, val channel: Type, val pong: Boolean = false)
-
-
+        data class Body (val id: String, val channel: Type, val pong: Boolean = false, val params: Params? = null) {
+            @Serializable
+            data class Params(
+                val listId: String? = null,
+                val antennaId: String? = null,
+            )
+            init {
+                require(channel != Type.USER_LIST || params?.listId != null)
+                require(channel != Type.ANTENNA || params?.antennaId != null)
+            }
+        }
     }
 
     @SerialName("readNotification")
@@ -99,6 +109,3 @@ fun Send.toJson(): String {
     return Json.encodeToString(this)
 }
 
-fun String.fromJson(): Send {
-    return Json.decodeFromString(this)
-}

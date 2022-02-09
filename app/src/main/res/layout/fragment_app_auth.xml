@@ -5,7 +5,8 @@
     <data>
         <variable
                 name="appAuthViewModel"
-                type="jp.panta.misskeyandroidclient.viewmodel.auth.app.AppAuthViewModel" />
+                type="jp.panta.misskeyandroidclient.ui.auth.viewmodel.app.AppAuthViewModel" />
+        <import type="android.view.View" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -71,7 +72,16 @@
                             android:hint="@string/custom_app_name"
                             android:text="@={appAuthViewModel.appName}"/>
                 </com.google.android.material.textfield.TextInputLayout>
-
+                <ProgressBar
+                        android:layout_marginTop="16dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{appAuthViewModel.isProgress() ? View.VISIBLE : View.GONE }"/>
+                <TextView
+                        android:id="@+id/errorMsgView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
             </LinearLayout>
         </ScrollView>
 

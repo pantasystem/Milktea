@@ -23,6 +23,8 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUse
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotification
 import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
+import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDAO
+import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDTO
 
 @Database(
     entities = [
@@ -42,18 +44,24 @@ import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
         MetaDTO::class,
         EmojiDTO::class,
         EmojiAlias::class,
-        UnreadNotification::class
+        UnreadNotification::class,
+        UserNicknameDTO::class,
     ],
-    version = 8,
+    version = 10,
     exportSchema = true
 )
 @TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class)
 abstract class DataBase : RoomDatabase(){
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
+    @Deprecated("pageDaoへ移行")
     abstract fun connectionInformationDao(): ConnectionInformationDao
+
+    @Deprecated("accountDAOへ移行")
     abstract fun accountDao(): AccountDao
     abstract fun reactionHistoryDao(): ReactionHistoryDao
     abstract fun reactionUserSettingDao(): ReactionUserSettingDao
+
+    @Deprecated("pageDaoへ移行")
     abstract fun pageDao(): PageDao
     abstract fun draftNoteDao(): DraftNoteDao
 
@@ -67,4 +75,6 @@ abstract class DataBase : RoomDatabase(){
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
 
     abstract fun unreadNotificationDAO(): UnreadNotificationDAO
+
+    abstract fun userNicknameDAO(): UserNicknameDAO
 }

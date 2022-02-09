@@ -24,12 +24,12 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val socket = SocketImpl(wssURL, okHttpClient,logger)
         socket.blockingConnect()
 
         var count = 0
         launch {
-            ChannelAPI(socket, logger).connect(ChannelAPI.Type.GLOBAL).collect {
+            ChannelAPI(socket, logger).connect(ChannelAPI.Type.Global).collect {
                 println(it)
                 assertTrue(it is ChannelBody.ReceiveNote)
                 count ++
@@ -48,23 +48,23 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, { true }, logger)
+        val socket = SocketImpl(wssURL, okHttpClient, logger)
         val channelAPI = ChannelAPI(socket, logger)
         runBlocking {
 
             val job1 = launch {
-                channelAPI.connect(ChannelAPI.Type.MAIN).collect ()
+                channelAPI.connect(ChannelAPI.Type.Main).collect ()
             }
 
             val job2 = launch {
-                channelAPI.connect(ChannelAPI.Type.GLOBAL).collect ()
+                channelAPI.connect(ChannelAPI.Type.Global).collect ()
             }
 
             val job3 = launch {
-                channelAPI.connect(ChannelAPI.Type.GLOBAL).collect ()
+                channelAPI.connect(ChannelAPI.Type.Global).collect ()
             }
 
-            val closedRes: Socket.State = suspendCoroutine<Socket.State> { continuation ->
+            val closedRes: Socket.State = suspendCoroutine { continuation ->
                 var flag = true
                 socket.addStateEventListener { ev ->
                     if(flag) {

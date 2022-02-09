@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -21,11 +20,15 @@ import jp.panta.misskeyandroidclient.model.notification.toPushNotification
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 const val NOTIFICATION_CHANNEL_ID = "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
 const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifications"
 
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class FCMService : FirebaseMessagingService() {
 
 
@@ -63,17 +66,20 @@ class FCMService : FirebaseMessagingService() {
             .setGroupSummary(true)
 
         runCatching {
-            val pendingIntent = TaskStackBuilder.create(this)
+            val pendingIntentBuilder = TaskStackBuilder.create(this)
                 .addNextIntentWithParentStack(pushNotification.makeIntent())
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                pendingIntentBuilder
+                    .getPendingIntent(0, PendingIntent.FLAG_MUTABLE)
+            }else{
+                pendingIntentBuilder
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
 
             builder.setContentIntent(pendingIntent)
         }.onFailure { e ->
             Log.e("FCMService", "Intent作成に失敗", e)
-            if(BuildConfig.DEBUG) {
-                Toast.makeText(this, "Intent作成処理に失敗:${pushNotification}, e:${e}", Toast.LENGTH_LONG).show()
-                throw e
-            }
+            throw e
         }
 
         with(makeNotificationManager(NOTIFICATION_CHANNEL_ID)){
@@ -86,10 +92,10 @@ class FCMService : FirebaseMessagingService() {
 
     }
 
-    override fun onDeletedMessages() {
-        super.onDeletedMessages()
-
-    }
+//    override fun onDeletedMessages() {
+//        super.onDeletedMessages()
+//
+//    }
 
     private fun PushNotification.makeIntent() : Intent {
         return when(this.type) {

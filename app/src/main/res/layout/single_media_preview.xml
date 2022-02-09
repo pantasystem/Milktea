@@ -4,7 +4,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
-        <import type="jp.panta.misskeyandroidclient.view.SafeUnbox" />
+        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable
                 name="fileViewData"
                 type="jp.panta.misskeyandroidclient.viewmodel.file.FileViewData" />
@@ -13,9 +13,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:ignore="NestedWeights"
-            app:thumbnailView="@{thumbnail}"
-            app:playButton="@{actionButton}"
-            app:fileViewData="@{fileViewData}"
+            thumbnailView="@{thumbnail}"
+            playButton="@{actionButton}"
+            fileViewData="@{fileViewData.file}"
             android:onClick="@{()-> fileViewData.show()}"
             >
 
@@ -37,8 +37,7 @@
                 tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
                 android:scaleType="fitCenter"
                 android:visibility="@{SafeUnbox.unbox(fileViewData.isHiding) || SafeUnbox.unbox(fileViewData.image) ? View.GONE : View.VISIBLE }"
-                android:tint="?attr/colorAccent"
-                />
+                app:tint="?attr/colorAccent" />
 
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/nsfwMessage"
