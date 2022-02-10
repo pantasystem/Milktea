@@ -8,6 +8,7 @@ import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -18,13 +19,13 @@ import kotlin.collections.ArrayList
 class MessageViewModel(
     private val miCore: MiCore,
     private val messagingId: MessagingId,
-) : ViewModel(){
+) : ViewModel() {
 
     class State(
         val messages: List<MessageViewData>,
         val type: Type
-    ){
-        enum class Type{
+    ) {
+        enum class Type {
             LOAD_INIT, LOAD_OLD, RECEIVED
         }
     }
@@ -37,7 +38,7 @@ class MessageViewModel(
     private val mTitle = MutableLiveData<String>().apply {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                when(messagingId) {
+                when (messagingId) {
                     is MessagingId.Direct -> {
                         miCore.getUserRepository().find(messagingId.userId).getDisplayUserName()
                     }
@@ -56,15 +57,17 @@ class MessageViewModel(
 
     private val logger = miCore.loggerFactory.create("MessageViewModel")
 
-    init{
+    init {
         miCore.messageObserver.observeByMessagingId(messagingId).map {
             miCore.getGetters().messageRelationGetter.get(it)
+        }.catch { e ->
+            logger.warning("ストリーミング受信中にエラー発生", e = e)
         }.onEach { msg ->
             val messages = messagesLiveData.value?.messages.toArrayList()
             val a = messagingId.getAccount()
-            val viewData = if(msg.isMime(a)) {
+            val viewData = if (msg.isMime(a)) {
                 SelfMessageViewData(msg, a)
-            }else{
+            } else {
                 OtherUserMessageViewData(msg, a)
             }
             logger.debug("onMessage: $msg")
@@ -75,8 +78,8 @@ class MessageViewModel(
 
     }
 
-    fun loadInit(){
-        if(isLoading){
+    fun loadInit() {
+        if (isLoading) {
             logger.debug("load cancel")
             return
         }
@@ -93,36 +96,38 @@ class MessageViewModel(
                 ).throwIfHasError().body()?.asReversed()
             }.onFailure {
                 logger.debug("メッセージの読み込みに失敗しました。", e = it)
-            }.getOrNull()?.toMessageViewData(account)?: emptyList()
+            }.getOrNull()?.toMessageViewData(account) ?: emptyList()
             messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
             isLoading = false
         }
 
     }
 
-    fun loadOld(){
-        if(isLoading){
+    fun loadOld() {
+        if (isLoading) {
             return
         }
         isLoading = true
         val exMessages = messagesLiveData.value?.messages
         val untilId = exMessages?.firstOrNull()?.id
-        if(exMessages.isNullOrEmpty() || untilId == null){
+        if (exMessages.isNullOrEmpty() || untilId == null) {
             isLoading = false
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
             val account = messagingId.getAccount()
             val viewData = runCatching {
-                miCore.getMisskeyAPIProvider().get(messagingId.getAccount()).getMessages(RequestMessage(
-                    i = account.getI(miCore.getEncryption()),
-                    untilId = untilId.messageId,
-                    groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
-                    userId = (messagingId as? MessagingId.Direct)?.userId?.id
-                )).body()?.asReversed()
-            }.getOrNull()?.toMessageViewData(account)?: emptyList()
+                miCore.getMisskeyAPIProvider().get(messagingId.getAccount()).getMessages(
+                    RequestMessage(
+                        i = account.getI(miCore.getEncryption()),
+                        untilId = untilId.messageId,
+                        groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
+                        userId = (messagingId as? MessagingId.Direct)?.userId?.id
+                    )
+                ).body()?.asReversed()
+            }.getOrNull()?.toMessageViewData(account) ?: emptyList()
 
-            val messages = ArrayList<MessageViewData>(exMessages).apply{
+            val messages = ArrayList<MessageViewData>(exMessages).apply {
                 addAll(0, viewData)
             }
             messagesLiveData.postValue(State(messages, State.Type.LOAD_OLD))
@@ -134,24 +139,24 @@ class MessageViewModel(
         return this.map {
             miCore.getGetters().messageRelationGetter.get(account, it)
         }.map { msg ->
-            if(msg.isMime(account)) {
+            if (msg.isMime(account)) {
                 SelfMessageViewData(msg, account)
-            }else{
+            } else {
                 OtherUserMessageViewData(msg, account)
             }
         }
     }
 
-    private fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData>{
-        return if(this == null){
+    private fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData> {
+        return if (this == null) {
             ArrayList()
-        }else{
+        } else {
             ArrayList(this)
         }
     }
 
     private suspend fun MessagingId.getAccount(): Account {
-        val accountId = when(this) {
+        val accountId = when (this) {
             is MessagingId.Direct -> this.userId.accountId
             is MessagingId.Group -> this.groupId.accountId
         }

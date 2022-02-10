@@ -152,6 +152,8 @@ class TimelineViewModel(
                 notes = list
             )
 
+        }.catch { e ->
+            logger.warning("ストリーミング受信中にエラー発生", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
         loadInit()
