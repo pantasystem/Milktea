@@ -145,31 +145,6 @@ object MediaPreviewHelper{
         }
     }
 
-    @BindingAdapter("leftMediaBase", "rightMediaBase", "mediaViewData")
-    @JvmStatic
-    fun ViewGroup.visibilityControl(
-        leftMediaBase: LinearLayout,
-        rightMediaBase: LinearLayout,
-        mediaViewData: MediaViewData?
-    ){
-        val files = mediaViewData?.files?.value ?: emptyList()
-        when {
-
-            mediaViewData == null || files.isEmpty() -> {
-                this.visibility = View.GONE
-                leftMediaBase.visibility = View.GONE
-                rightMediaBase.visibility = View.GONE
-            }
-            files.size < 2 ->{
-                leftMediaBase.visibility = View.VISIBLE
-                rightMediaBase.visibility = View.GONE
-            }
-            else -> {
-                leftMediaBase.visibility = View.VISIBLE
-                rightMediaBase.visibility = View.VISIBLE
-            }
-        }
-    }
     
     @JvmStatic
     @BindingAdapter("previewAbleList", "mediaViewData")
