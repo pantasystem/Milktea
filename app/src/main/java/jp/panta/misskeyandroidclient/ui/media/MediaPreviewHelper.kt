@@ -27,7 +27,7 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView", "playButton", "fileViewData", "fileViewDataList")
     @JvmStatic
     fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?, fileViewDataList: List<FileViewData>?) {
-        setPreview(thumbnailView, playButton, fileViewData?.file)
+        //setPreview(thumbnailView, playButton, fileViewData?.file)
         fileViewData?: return
 
         if(fileViewDataList.isNullOrEmpty()) {
@@ -57,8 +57,6 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView", "playButton", "previewAbleFile", "previewAbleFileList")
     @JvmStatic
     fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, previewAbleFile: PreviewAbleFile?, previewAbleFileList: List<PreviewAbleFile>?) {
-        setPreview(thumbnailView, playButton, previewAbleFile?.file)
-        previewAbleFile?: return
 
         if(previewAbleFileList.isNullOrEmpty()) {
             return
@@ -97,6 +95,18 @@ object MediaPreviewHelper{
         }catch(e: Exception){
             this.visibility = View.GONE
         }
+    }
+
+    @BindingAdapter("thumbnailView")
+    @JvmStatic
+    fun ImageView.setPreview(file: PreviewAbleFile?) {
+        if (this.visibility == View.GONE || file == null) {
+            return
+        }
+        Glide.with(this)
+            .load(file.file.thumbnailUrl)
+            .centerCrop()
+            .into(this)
     }
 
     private fun setPreview(thumbnailView: ImageView, playButton: ImageButton, file: File){

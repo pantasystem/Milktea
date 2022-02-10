@@ -17,5 +17,8 @@ data class PreviewAbleFile(val file: File, val isHiding: Boolean) {
 
 
     val isImage = type == Type.IMAGE
+    val isVideo = type == Type.VIDEO
+    val isVisiblePlayButton: Boolean
+        get() = isVideo && !isHiding
 
 }
