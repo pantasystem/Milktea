@@ -15,9 +15,6 @@
     <LinearLayout
             android:orientation="horizontal" android:layout_width="match_parent"
             android:layout_height="match_parent"
-            leftMediaBase="@{leftMediaBase}"
-            rightMediaBase="@{rightMediaBase}"
-            mediaViewData="@{media}"
             android:baselineAligned="false"
             rect="@{30F}"
 
@@ -30,6 +27,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:id="@+id/leftMediaBase"
+                android:visibility="@{ media.fileOne != null || media.fileThree != null ? View.VISIBLE : View.GONE }"
                 >
 
             <FrameLayout
@@ -152,7 +150,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="@{ media.fileTwo != null || media.fileFour != null ? View.VISIBLE : View.GONE }">
 
             <FrameLayout
                     android:id="@+id/baseFrameTopRight"
