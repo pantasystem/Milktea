@@ -11,6 +11,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.clear
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
@@ -101,6 +102,7 @@ object MediaPreviewHelper{
     @JvmStatic
     fun ImageView.setPreview(file: PreviewAbleFile?) {
         if (this.visibility == View.GONE || file == null) {
+            this.setImageResource(0)
             return
         }
         Glide.with(this)
