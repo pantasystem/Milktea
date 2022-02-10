@@ -165,7 +165,6 @@
                             />
 
                     <include
-                            android:layout_below="@id/text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:id="@+id/translationView"
@@ -180,7 +179,6 @@
                             app:media="@{note.media}"
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
-                            android:layout_below="@id/translationView"
                             android:visibility="@{note.files.empty || note.media.isOver4Files ? View.GONE : View.VISIBLE}"
                             tools:visibility="visible"
                             tools:layout_height="20dp" />
@@ -189,7 +187,6 @@
                             android:id="@+id/manyFilePreviewListView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/mediaPreview"
                             tools:layout_height="20dp"
                             android:visibility="gone"
                             mediaViewData="@{note.media}"
@@ -202,7 +199,6 @@
                             android:layout_height="wrap_content"
                             tools:listitem="@layout/item_choice"
                             tools:itemCount="2"
-                            android:layout_below="@id/manyFilePreviewListView"
                             android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
 
 
@@ -212,7 +208,6 @@
                             android:id="@+id/url_preview_list"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/poll"
                             tools:itemCount="1"
                             tools:listitem="@layout/item_url_preview"
                             app:previewList="@{note.previews}" />
@@ -221,7 +216,6 @@
                     <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/url_preview_list"
                             android:padding="8dp"
                             android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                             android:id="@+id/subNote"
@@ -349,7 +343,7 @@
                 android:layout_marginStart="8dp"
                 app:layout_constraintEnd_toStartOf="@+id/textView3" />
 
-        <androidx.emoji.widget.EmojiTextView
+        <TextView
                 android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -383,7 +377,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/textView4"
                 app:layout_constraintStart_toEndOf="@id/textView3" />
 
-        <androidx.emoji.widget.EmojiTextView
+        <TextView
                 android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
                 android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
@@ -421,7 +415,7 @@
                 app:layout_constraintStart_toEndOf="@id/textView4" />
 
 
-        <androidx.emoji.widget.EmojiTextView
+        <TextView
                 android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
 
                 android:visibility="@{SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE}"
