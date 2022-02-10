@@ -65,18 +65,18 @@
 
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/subName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/mainName"
                 android:textStyle="italic"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textSize="15sp"
-                tools:text="ユーザー名"
+                tools:text="ユーザー名awefawefawefawefawefawefwaefwef"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/mainName"
-                app:layout_constraintEnd_toStartOf="@id/subName"
-                android:layout_marginStart="4dp" />
+                android:layout_marginStart="4dp"
+                app:layout_constraintEnd_toStartOf="@id/elapsedTime"/>
 
         <androidx.emoji.widget.EmojiTextView
                 android:layout_width="wrap_content"
