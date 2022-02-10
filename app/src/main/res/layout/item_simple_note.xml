@@ -78,7 +78,7 @@
                 android:layout_marginStart="4dp"
                 app:layout_constraintEnd_toStartOf="@id/elapsedTime"/>
 
-        <androidx.emoji.widget.EmojiTextView
+        <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
@@ -92,7 +92,8 @@
                 tools:text="16分前"
                 android:id="@+id/elapsedTime"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:textColor="?attr/colorPrimary"/>
 
         <jp.panta.misskeyandroidclient.ui.components.AutoCollapsingLayout
                 android:layout_width="0dp"
