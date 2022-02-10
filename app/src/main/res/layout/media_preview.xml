@@ -85,7 +85,7 @@
                 android:id="@+id/baseFrameTopRight"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                tools:ignore="NestedWeights"
+                tools:ignore="NestedWeights,RtlSymmetry"
                 thumbnailView="@{thumbnailTopRight}"
 
                 playButton="@{actionButtonTopRight}"
@@ -99,7 +99,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/baseFrameBottomRight"
-                android:layout_marginStart="4dp"
+                android:paddingStart="4dp"
                 >
             <ImageView
                     android:id="@+id/thumbnailTopRight"
@@ -157,10 +157,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/baseFrameTopLeft"
 
-                android:layout_marginTop="4dp"
                 app:layout_constraintWidth_percent="0.5"
-
-
+                android:paddingTop="4dp"
                 >
             <ImageView
                     android:id="@+id/thumbnailBottomLeft"
@@ -182,7 +180,8 @@
                     android:scaleType="fitCenter"
                     android:visibility="@{media.fileThree.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
                     android:src="@drawable/ic_play_circle_outline_black_24dp"
-                    app:tint="?attr/colorAccent" />
+                    app:tint="?attr/colorAccent"
+                    />
 
             <TextView
                     android:id="@+id/nsfwMessageBottomLeft"
@@ -211,6 +210,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
 
+
                 thumbnailView="@{thumbnailBottomRight}"
 
                 playButton="@{actionButtonBottomRight}"
@@ -223,11 +223,10 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/baseFrameBottomLeft"
                 app:layout_constraintTop_toBottomOf="@id/baseFrameTopRight"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="4dp"
+                android:paddingTop="4dp"
+                android:paddingStart="4dp"
 
-
-                >
+                tools:ignore="RtlSymmetry">
             <ImageView
                     android:id="@+id/thumbnailBottomRight"
                     android:layout_width="match_parent"
