@@ -156,8 +156,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/baseFrameTopLeft"
-                app:layout_constraintEnd_toStartOf="@id/baseFrameBottomRight"
+
                 android:layout_marginTop="4dp"
+                app:layout_constraintWidth_percent="0.5"
+
 
                 >
             <ImageView
@@ -224,6 +226,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="4dp"
 
+
                 >
             <ImageView
                     android:id="@+id/thumbnailBottomRight"
@@ -266,5 +269,7 @@
 
                     />
         </FrameLayout>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
