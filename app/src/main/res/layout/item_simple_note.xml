@@ -213,7 +213,7 @@
                             app:previewList="@{note.previews}" />
 
 
-                    <RelativeLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:padding="8dp"
@@ -231,10 +231,11 @@
                                 android:id="@+id/subAvatarIcon"
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:layout_marginEnd="5dp"
                                 app:circleIcon='@{note.subNoteAvatarUrl}'
                                 android:contentDescription="@string/avataricon"
-                                app:transitionDestinationUser="@{note.subNote.user}" />
+                                app:transitionDestinationUser="@{note.subNote.user}"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
 
                         <androidx.emoji.widget.EmojiTextView
                                 android:layout_width="wrap_content"
@@ -243,8 +244,12 @@
                                 android:id="@+id/subNoteMainName"
                                 android:textStyle="bold"
                                 android:textSize="15sp"
+                                app:layout_constraintStart_toEndOf="@id/subAvatarIcon"
+                                android:layout_marginStart="4dp"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:text="mainName"
 
-                                android:layout_marginEnd="8dp" />
+                                />
 
                         <androidx.emoji.widget.EmojiTextView
                                 android:layout_toEndOf="@id/subNoteMainName"
@@ -254,6 +259,10 @@
                                 android:id="@+id/subNoteSubName"
                                 android:textSize="15sp"
                                 android:singleLine="true"
+                                app:layout_constraintStart_toEndOf="@id/subNoteMainName"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:text="subName"
+                                android:layout_marginStart="4dp"
 
                                 />
 
@@ -264,7 +273,9 @@
                                 tools:text="cwcwcwwcwcw"
                                 app:textNode="@{note.subCwNode}"
                                 android:layout_below="@+id/subNoteMainName"
-                                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}' />
+                                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
+                                app:layout_constraintTop_toBottomOf="@id/subNoteMainName"
+                                app:layout_constraintStart_toStartOf="parent"/>
 
 
                         <androidx.emoji.widget.EmojiTextView
@@ -279,6 +290,8 @@
                                 android:textColor="?attr/colorAccent"
                                 android:text="@{SafeUnbox.unboxString(note.subContentFoldingStatusMessage)}"
                                 android:onClick="@{()-> note.changeSubContentFolding() }"
+                                app:layout_constraintTop_toBottomOf="@id/subCw"
+                                app:layout_constraintStart_toStartOf="parent"
 
                                 />
 
@@ -290,7 +303,9 @@
                                 android:id="@+id/subNoteText"
                                 tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                                 app:textNode="@{note.subNoteTextNode}"
-                                android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }" />
+                                android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
+                                app:layout_constraintTop_toBottomOf="@id/subContentFoldingButton"
+                                app:layout_constraintStart_toStartOf="parent"/>
 
                         <include
                                 layout="@layout/media_preview"
@@ -300,10 +315,13 @@
                                 android:layout_height="200dp"
                                 android:layout_below="@id/subNoteText"
                                 android:visibility="@{note.subNoteFiles.empty || note.subNoteMedia.isOver4Files ? View.GONE : View.VISIBLE}"
-                                tools:layout_height="20dp" />
+                                tools:layout_height="20dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/subNoteText"/>
 
 
-                    </RelativeLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
 
 
