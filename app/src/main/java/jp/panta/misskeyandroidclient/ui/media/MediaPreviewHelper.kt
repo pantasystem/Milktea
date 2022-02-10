@@ -11,6 +11,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.clear
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
@@ -27,7 +28,7 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView", "playButton", "fileViewData", "fileViewDataList")
     @JvmStatic
     fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?, fileViewDataList: List<FileViewData>?) {
-        setPreview(thumbnailView, playButton, fileViewData?.file)
+        //setPreview(thumbnailView, playButton, fileViewData?.file)
         fileViewData?: return
 
         if(fileViewDataList.isNullOrEmpty()) {
@@ -57,8 +58,6 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView", "playButton", "previewAbleFile", "previewAbleFileList")
     @JvmStatic
     fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, previewAbleFile: PreviewAbleFile?, previewAbleFileList: List<PreviewAbleFile>?) {
-        setPreview(thumbnailView, playButton, previewAbleFile?.file)
-        previewAbleFile?: return
 
         if(previewAbleFileList.isNullOrEmpty()) {
             return
@@ -99,6 +98,19 @@ object MediaPreviewHelper{
         }
     }
 
+    @BindingAdapter("thumbnailView")
+    @JvmStatic
+    fun ImageView.setPreview(file: PreviewAbleFile?) {
+        if (this.visibility == View.GONE || file == null) {
+            this.setImageResource(0)
+            return
+        }
+        Glide.with(this)
+            .load(file.file.thumbnailUrl)
+            .centerCrop()
+            .into(this)
+    }
+
     private fun setPreview(thumbnailView: ImageView, playButton: ImageButton, file: File){
         when(file.aboutMediaType){
             File.AboutMediaType.IMAGE, File.AboutMediaType.VIDEO -> {
@@ -135,31 +147,6 @@ object MediaPreviewHelper{
         }
     }
 
-    @BindingAdapter("leftMediaBase", "rightMediaBase", "mediaViewData")
-    @JvmStatic
-    fun ViewGroup.visibilityControl(
-        leftMediaBase: LinearLayout,
-        rightMediaBase: LinearLayout,
-        mediaViewData: MediaViewData?
-    ){
-        val files = mediaViewData?.files?.value ?: emptyList()
-        when {
-
-            mediaViewData == null || files.isEmpty() -> {
-                this.visibility = View.GONE
-                leftMediaBase.visibility = View.GONE
-                rightMediaBase.visibility = View.GONE
-            }
-            files.size < 2 ->{
-                leftMediaBase.visibility = View.VISIBLE
-                rightMediaBase.visibility = View.GONE
-            }
-            else -> {
-                leftMediaBase.visibility = View.VISIBLE
-                rightMediaBase.visibility = View.VISIBLE
-            }
-        }
-    }
     
     @JvmStatic
     @BindingAdapter("previewAbleList", "mediaViewData")

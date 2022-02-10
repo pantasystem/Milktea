@@ -48,7 +48,8 @@ class AutoCollapsingLayout : FrameLayout {
         @StyleRes defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         val a = context.obtainStyledAttributes(
-            attrs, R.styleable.AutoCollapsingLayout, defStyleAttr, defStyleRes)
+            attrs, R.styleable.AutoCollapsingLayout, defStyleAttr, defStyleRes
+        )
         a.apply {
             val buttonId = getResourceId(R.styleable.AutoCollapsingLayout_expandableButton, -1)
             expandableButtonId = if (buttonId == -1) null else buttonId
@@ -71,7 +72,7 @@ class AutoCollapsingLayout : FrameLayout {
             if (child.id == expandableButtonId) {
                 expandedButton = child
             }
-            if (child.visibility != View.GONE) {
+            if (child.visibility != View.GONE && child.id != expandableButtonId) {
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
                 maxHeight = maxHeight.coerceAtLeast(child.measuredHeight)
                 maxWidth = maxWidth.coerceAtLeast(child.measuredWidth)
@@ -80,7 +81,10 @@ class AutoCollapsingLayout : FrameLayout {
         }
         if (!expanded && maxHeight > limitedMaxPxHeight) {
             maxHeight = limitedMaxPxHeight.toInt()
-            expandedButton?.visibility = View.VISIBLE
+            if (expandedButton != null) {
+                measureChildWithMargins(expandedButton, widthMeasureSpec, 0, heightMeasureSpec, 0)
+                expandedButton.visibility = View.VISIBLE
+            }
         } else {
 
             expandedButton?.visibility = View.GONE

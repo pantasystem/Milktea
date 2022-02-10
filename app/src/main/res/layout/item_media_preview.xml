@@ -31,6 +31,7 @@
                 android:scaleType="centerCrop"
                 tools:srcCompat="@drawable/ic_reaction_laugh"
                 android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.GONE : View.VISIBLE }"
+                thumbnailView="@{previewAbleFile}"
                 />
         <ImageButton
                 android:id="@+id/actionButton"
@@ -38,9 +39,9 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/play_media"
                 style="?android:attr/borderlessButtonStyle"
-                tools:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+                android:src="@drawable/ic_play_circle_outline_black_24dp"
                 android:scaleType="fitCenter"
-                android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) || SafeUnbox.unbox(previewAbleFile.image) ? View.GONE : View.VISIBLE }"
+                android:visibility="@{previewAbleFile.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
                 app:tint="?attr/colorAccent" />
 
         <androidx.emoji.widget.EmojiTextView
