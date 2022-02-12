@@ -28,7 +28,6 @@
         <item name="android:navigationBarColor">@color/navigationColor</item>
 
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
-        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
 
 
 
@@ -73,7 +72,6 @@
 
         <item name="android:navigationBarColor">@color/navigationDarkColor</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
-        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
         <item name="colorDotTabSelected">@color/colorDarkAccent</item>
         <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
     </style>
@@ -84,9 +82,7 @@
 
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
         <item name="actionBarSize">53dp</item>
-
-        <item name="colorMessageSelf">@color/colorMessageSelf</item>
-        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+        
         <item name="colorSeparator">@color/colorSeparator</item>
         <item name="android:navigationBarColor">@color/colorBlackPrimary</item>
 
