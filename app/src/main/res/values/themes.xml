@@ -82,9 +82,7 @@
 
         <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
         <item name="actionBarSize">53dp</item>
-
-        <item name="colorMessageSelf">@color/colorMessageSelf</item>
-        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+        
         <item name="colorSeparator">@color/colorSeparator</item>
         <item name="android:navigationBarColor">@color/colorBlackPrimary</item>
 
