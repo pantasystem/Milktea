@@ -106,6 +106,7 @@ class TimelineListAdapter(
             }
             reactionCountAdapter?.note = note
             reactionCountsView.adapter = reactionCountAdapter
+            reactionCountsView.isNestedScrollingEnabled = false
             reactionCountsView.itemAnimator = if(reactionList.isEmpty()) DefaultItemAnimator() else null
             reactionCountAdapter?.submitList(reactionList) {
                 reactionCountsView.itemAnimator = DefaultItemAnimator()

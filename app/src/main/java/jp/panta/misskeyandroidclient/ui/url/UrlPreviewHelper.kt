@@ -18,10 +18,15 @@ object UrlPreviewHelper {
             this.visibility = View.GONE
 
         }else{
+            this.isNestedScrollingEnabled = false
             this.visibility = View.VISIBLE
-            val adapter = PreviewListAdapter()
+            val adapter = this.adapter as? PreviewListAdapter
+                ?: PreviewListAdapter()
             adapter.submitList(previewList)
-            this.layoutManager = LinearLayoutManager(this.context)
+
+            val layoutManager = this.layoutManager as? LinearLayoutManager
+                ?: LinearLayoutManager(this.context)
+            this.layoutManager = layoutManager
             this.adapter = adapter
         }
 

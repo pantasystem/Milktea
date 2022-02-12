@@ -161,10 +161,14 @@ object MediaPreviewHelper{
             return
         }
         isNestedScrollingEnabled = false
+        this.itemAnimator = null
 
-        val adapter = PreviewAbleFileListAdapter(mediaViewData)
+        val adapter = this.adapter as? PreviewAbleFileListAdapter
+            ?: PreviewAbleFileListAdapter(mediaViewData)
         this.adapter = adapter
-        this.layoutManager = GridLayoutManager(context, 2)
+        val layoutManager = this.layoutManager as? GridLayoutManager
+            ?: GridLayoutManager(context, 2)
+        this.layoutManager =layoutManager
 
         adapter.submitList(previewAbleList)
         this.visibility = View.VISIBLE
