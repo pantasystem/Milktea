@@ -6,21 +6,23 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFollowFollowerBinding
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModelFactory
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     companion object{
@@ -39,6 +41,14 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     lateinit var mBinding: ActivityFollowFollowerBinding
 
+    @Inject
+    lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
+
+    private val userDetailViewModel: UserDetailViewModel by viewModels {
+        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
+        UserDetailViewModel.provideFactory(assistedFactory, userId)
+    }
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +57,9 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         setSupportActionBar(mBinding.followFollowerToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        //val user = intent.getSerializableExtra(EXTRA_USER) as UserDTO?
+
         val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
 
-        val miApplication = application as MiApplication
-        val userDetailViewModel = ViewModelProvider(this, UserDetailViewModelFactory(miApplication, userId, null))[UserDetailViewModel::class.java]
         userDetailViewModel.user.observe(this) {
             title = it?.getDisplayName()
         }
