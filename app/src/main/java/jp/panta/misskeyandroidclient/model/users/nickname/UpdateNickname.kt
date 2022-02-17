@@ -27,16 +27,17 @@ class UpdateNicknameUseCase @Inject constructor(
             )
         )
         val existsUserName = userNicknameRepository.findOne(id)
-        userDataSource.add(
-            when(user) {
-                is User.Detail -> {
-                    user.copy(nickname = existsUserName)
-                }
-                is User.Simple -> {
-                    user.copy(nickname = existsUserName)
-                }
+        val updatedUser = when(user) {
+            is User.Detail -> {
+                user.copy(nickname = existsUserName)
             }
+            is User.Simple -> {
+                user.copy(nickname = existsUserName)
+            }
+        }
+        userDataSource.add(
+            updatedUser
         )
-        return user
+        return updatedUser
     }
 }
