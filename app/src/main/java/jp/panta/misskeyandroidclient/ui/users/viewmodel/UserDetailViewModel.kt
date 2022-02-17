@@ -1,12 +1,14 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.*
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.nickname.DeleteNicknameUseCase
 import jp.panta.misskeyandroidclient.model.users.nickname.UpdateNicknameUseCase
-import jp.panta.misskeyandroidclient.model.users.nickname.UserNickname
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -14,15 +16,25 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.lang.IllegalArgumentException
 
-@ExperimentalCoroutinesApi
-class UserDetailViewModel(
-    val userId: User.Id?,
-    private val fqdnUserName: String?,
+class UserDetailViewModel @AssistedInject constructor(
     val miCore: MiCore,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val translationStore: NoteTranslationStore
+    private val translationStore: NoteTranslationStore,
+    private val deleteNicknameUseCase: DeleteNicknameUseCase,
+    private val updateNicknameUseCase: UpdateNicknameUseCase,
+    @Assisted val userId: User.Id?,
+    @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(userId: User.Id?, fqdnUserName: String?): UserDetailViewModel
+    }
+
+    companion object {}
+
     private val logger = miCore.loggerFactory.create("UserDetailViewModel")
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+
 
     val userState = miCore.getUserDataSource().state.map { state ->
         when {
@@ -54,6 +66,7 @@ class UserDetailViewModel(
         it.getProfileUrl(ac)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
 
         pinNotesState.map { notes ->
@@ -220,13 +233,7 @@ class UserDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val user = findUser()
-                UpdateNicknameUseCase(
-                    miCore.getAccountRepository(),
-                    miCore.getUserDataSource(),
-                    miCore.getUserNicknameRepository(),
-                    user,
-                    name
-                ).execute()
+                updateNicknameUseCase(user, name)
             }.onSuccess {
                 logger.debug("ニックネーム更新処理成功")
             }.onFailure {
@@ -239,12 +246,7 @@ class UserDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val user = findUser()
-                DeleteNicknameUseCase(
-                    miCore.getUserNicknameRepository(),
-                    miCore.getAccountRepository(),
-                    miCore.getUserDataSource(),
-                    user
-                ).execute()
+                deleteNicknameUseCase(user)
             }.onSuccess {
                 logger.debug("ニックネーム削除処理成功")
             }.onFailure {
@@ -262,7 +264,7 @@ class UserDetailViewModel(
             }.onFailure {
                 logger.error("ユーザー取得失敗", e = it)
             }.getOrNull()
-        }?: fqdnUserName?.let {
+        } ?: fqdnUserName?.let {
             val account = getAccount()
             val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
             val userName = userNameAndHost[0]
@@ -292,4 +294,24 @@ class UserDetailViewModel(
         return mAc!!
     }
 
+}
+
+@Suppress("UNCHECKED_CAST")
+fun UserDetailViewModel.Companion.provideFactory(
+    assistedFactory: UserDetailViewModel.ViewModelAssistedFactory,
+    userId: User.Id
+) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return assistedFactory.create(userId, null) as T
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun UserDetailViewModel.Companion.provideFactory(
+    assistedFactory: UserDetailViewModel.ViewModelAssistedFactory,
+    fqdnUserName: String,
+) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return assistedFactory.create(null, fqdnUserName) as T
+    }
 }
