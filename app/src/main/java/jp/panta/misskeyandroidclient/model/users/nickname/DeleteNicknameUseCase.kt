@@ -4,15 +4,17 @@ import jp.panta.misskeyandroidclient.model.UseCase
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DeleteNicknameUseCase(
+@Singleton
+class DeleteNicknameUseCase @Inject constructor(
     val userNicknameRepository: UserNicknameRepository,
     val accountRepository: AccountRepository,
     val userDataSource: UserDataSource,
-    val user: User
-) : UseCase<Unit>{
+) : UseCase {
 
-    override suspend fun execute() {
+    suspend operator fun invoke(user: User) {
         val account = accountRepository.get(user.id.accountId)
         userNicknameRepository.delete(
             UserNickname.Id(

@@ -27,7 +27,6 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModelFactory
 import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Page
@@ -36,10 +35,12 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.ui.users.nickname.EditNicknameDialog
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -69,8 +70,28 @@ class UserDetailActivity : AppCompatActivity() {
         }
     }
 
+    @Inject
+    lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
+
     @ExperimentalCoroutinesApi
-    private var mViewModel: UserDetailViewModel? = null
+    val mViewModel: UserDetailViewModel by viewModels {
+        val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
+        val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
+        if (!(remoteUserId == null || accountId == -1L)) {
+            val userId = User.Id(accountId, remoteUserId)
+            return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userId)
+        }
+        val userName = intent.data?.getQueryParameter("userName")
+            ?: intent.getStringExtra(EXTRA_USER_NAME)
+            ?: intent.data?.path?.let { path ->
+                if (path.startsWith("/")) {
+                    path.substring(1, path.length)
+                } else {
+                    path
+                }
+            }
+        return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userName!!)
+    }
 
     private var mAccountRelation: Account? = null
 
@@ -125,18 +146,13 @@ class UserDetailActivity : AppCompatActivity() {
             .initViewModelListener()
 
         miApplication.getCurrentAccount().filterNotNull().onEach { ar ->
-            mAccountRelation = ar
-            val viewModel = ViewModelProvider(
-                this,
-                UserDetailViewModelFactory(miApplication, userId, userName)
-            )[UserDetailViewModel::class.java]
-            mViewModel = viewModel
-            binding.userViewModel = viewModel
+
+            binding.userViewModel = mViewModel
 
             val isEnableGallery =
                 miApplication.getMisskeyAPIProvider().get(ar.instanceDomain) is MisskeyAPIV1275
-            viewModel.load()
-            viewModel.user.observe(this, { detail ->
+            mViewModel.load()
+            mViewModel.user.observe(this, { detail ->
                 if (detail != null) {
                     val adapter = UserTimelinePagerAdapterV2(ar, detail.id.id, isEnableGallery)
                     binding.userTimelinePager.adapter = adapter
@@ -153,18 +169,18 @@ class UserDetailActivity : AppCompatActivity() {
             })
 
 
-            viewModel.userName.observe(this, {
+            mViewModel.userName.observe(this, {
                 supportActionBar?.title = it
             })
             //userTimelineTab.setupWithViewPager()
-            viewModel.showFollowers.observe(this, {
+            mViewModel.showFollowers.observe(this, {
                 it?.let {
                     val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
                     startActivity(intent)
                 }
             })
 
-            viewModel.showFollows.observe(this, {
+            mViewModel.showFollows.observe(this, {
                 it?.let {
                     val intent = FollowFollowerActivity.newIntent(this, it.id, true)
                     startActivity(intent)
@@ -174,14 +190,14 @@ class UserDetailActivity : AppCompatActivity() {
             val updateMenu = Observer<Boolean> {
                 invalidateOptionsMenu()
             }
-            viewModel.isBlocking.observe(this, updateMenu)
-            viewModel.isMuted.observe(this, updateMenu)
+            mViewModel.isBlocking.observe(this, updateMenu)
+            mViewModel.isMuted.observe(this, updateMenu)
 
             invalidateOptionsMenu()
 
 
             binding.showRemoteUser.setOnClickListener {
-                viewModel.user.value?.url?.let {
+                mViewModel.user.value?.url?.let {
                     val uri = Uri.parse(it)
                     startActivity(
                         Intent(Intent.ACTION_VIEW, uri)
@@ -190,7 +206,7 @@ class UserDetailActivity : AppCompatActivity() {
             }
 
             binding.createMention.setOnClickListener {
-                mViewModel?.user?.value?.getDisplayUserName()?.let {
+                mViewModel.user.value?.getDisplayUserName()?.let {
                     val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
                     startActivity(intent)
                 }
@@ -250,11 +266,11 @@ class UserDetailActivity : AppCompatActivity() {
         val unblock = menu.findItem(R.id.unblock)
         val unmute = menu.findItem(R.id.unmute)
         val report = menu.findItem(R.id.report_user)
-        mute?.isVisible = !(mViewModel?.isMuted?.value ?: true)
-        block?.isVisible = !(mViewModel?.isBlocking?.value ?: true)
-        unblock?.isVisible = mViewModel?.isBlocking?.value ?: false
-        unmute?.isVisible = mViewModel?.isMuted?.value ?: false
-        if (mViewModel?.isMine?.value == true) {
+        mute?.isVisible = !(mViewModel.isMuted.value ?: true)
+        block?.isVisible = !(mViewModel.isBlocking.value ?: true)
+        unblock?.isVisible = mViewModel.isBlocking.value ?: false
+        unmute?.isVisible = mViewModel.isMuted.value ?: false
+        if (mViewModel.isMine.value == true) {
             block?.isVisible = false
             mute?.isVisible = false
             unblock?.isVisible = false
@@ -292,16 +308,16 @@ class UserDetailActivity : AppCompatActivity() {
                 return true
             }
             R.id.block -> {
-                mViewModel?.block()
+                mViewModel.block()
             }
             R.id.mute -> {
-                mViewModel?.mute()
+                mViewModel.mute()
             }
             R.id.unblock -> {
-                mViewModel?.unblock()
+                mViewModel.unblock()
             }
             R.id.unmute -> {
-                mViewModel?.unmute()
+                mViewModel.unmute()
             }
             R.id.nav_add_to_tab -> {
                 addPageToTab()
@@ -316,7 +332,7 @@ class UserDetailActivity : AppCompatActivity() {
                 }
             }
             R.id.share -> {
-                val url = mViewModel?.profileUrl?.value
+                val url = mViewModel.profileUrl.value
                     ?: return false
 
                 val intent = Intent().apply {
@@ -361,7 +377,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     @ExperimentalCoroutinesApi
     private fun addPageToTab() {
-        val user = mViewModel?.user?.value
+        val user = mViewModel.user.value
         user ?: return
 
         val page = mAccountRelation?.pages?.firstOrNull {

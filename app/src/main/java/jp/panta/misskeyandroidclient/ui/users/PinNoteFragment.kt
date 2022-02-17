@@ -3,11 +3,12 @@ package jp.panta.misskeyandroidclient.ui.users
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
 import jp.panta.misskeyandroidclient.model.users.User
@@ -15,12 +16,14 @@ import jp.panta.misskeyandroidclient.ui.notes.view.TimelineListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModelFactory
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
 
     val mBinding: FragmentPinNoteBinding by dataBinding()
@@ -47,23 +50,27 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
         }
     }
 
+    @Inject
+    lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
+
+    @ExperimentalCoroutinesApi
+    val userViewModel: UserDetailViewModel by activityViewModels {
+
+        val accountId: Long = requireArguments().getLong("ACCOUNT_ID", -1)
+        val remoteUserId: String? = requireArguments().getString("USER_ID")
+        if (!(remoteUserId == null || accountId == -1L)) {
+            val userId = User.Id(accountId, remoteUserId)
+            return@activityViewModels UserDetailViewModel.provideFactory(assistedFactory, userId)
+        }
+        val userName = requireArguments().getString("FQCN_USER_NAME")
+        return@activityViewModels UserDetailViewModel.provideFactory(assistedFactory, userName!!)
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val userId = arguments?.getString("USER_ID")
-        val accountId = arguments?.getLong("ACCOUNT_ID")
-        val fqcnUserName = arguments?.getString("FQCN_USER_NAME")
-        val miApplication = requireContext().applicationContext as MiApplication
-        val userViewModel = ViewModelProvider(
-            requireActivity(),
-            UserDetailViewModelFactory(
-                miApplication,
-                userId = userId?.let {
-                    User.Id(accountId!!, userId)
-                },
-                fqcnUserName = fqcnUserName
-            )
-        )[UserDetailViewModel::class.java]
+
+
         val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
         val adapter = TimelineListAdapter(object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
             override fun areContentsTheSame(
