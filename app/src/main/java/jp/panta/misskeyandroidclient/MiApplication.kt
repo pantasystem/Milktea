@@ -154,6 +154,9 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mUserNicknameRepository: UserNicknameRepository
 
+    @Inject
+    lateinit var noteTranslationStore: NoteTranslationStore
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     override val messageObserver: MessageObserver by lazy {
@@ -198,15 +201,6 @@ class MiApplication : Application(), MiCore {
             getEncryption(),
             lang = Locale.getDefault().language,
             misskeyAPIProvider = getMisskeyAPIProvider()
-        )
-    }
-
-    private val noteTranslationStore: NoteTranslationStore by lazy {
-        NoteTranslationStore(
-            getNoteRepository(),
-            getAccountRepository(),
-            getMisskeyAPIProvider(),
-            getEncryption(),
         )
     }
 

@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
 data class NoteTranslationsState(
     val noteIdWithTranslation: Map<Note.Id, Translation>,
@@ -79,7 +81,9 @@ data class NoteTranslationsState(
 
     }
 }
-class NoteTranslationStore(
+
+@Singleton
+class NoteTranslationStore @Inject constructor(
     val noteRepository: NoteRepository,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,

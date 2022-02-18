@@ -25,7 +25,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     val miCore: MiCore,
     val userListStore: UserListStore,
     @Assisted val listId: UserList.Id,
-) : ViewModel(){
+) : ViewModel() {
 
     @AssistedFactory
     interface ViewModelAssistedFactory {
@@ -34,7 +34,10 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        fun provideFactory(assistedFactory: ViewModelAssistedFactory, listId: UserList.Id) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        fun provideFactory(
+            assistedFactory: ViewModelAssistedFactory,
+            listId: UserList.Id
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(listId) as T
             }
@@ -57,11 +60,11 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     private val logger = miCore.loggerFactory.create("UserListDetailViewModel")
 
-    init{
+    init {
         load()
     }
 
-    fun load(){
+    fun load() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 userListStore.findOne(listId)
@@ -75,7 +78,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     }
 
-    fun updateName(name: String){
+    fun updateName(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 userListStore.update(listId, name)
@@ -88,9 +91,9 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     }
 
-    fun pushUser(userId: User.Id){
+    fun pushUser(userId: User.Id) {
 
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 userListStore.appendUser(listId, userId)
             }.onSuccess {
@@ -103,7 +106,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     }
 
 
-    fun pullUser(userId: User.Id){
+    fun pullUser(userId: User.Id) {
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
