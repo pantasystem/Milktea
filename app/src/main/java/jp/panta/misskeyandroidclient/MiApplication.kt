@@ -88,11 +88,9 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    private val mAccountsState = MutableStateFlow(emptyList<Account>())
-    private val mCurrentAccountState = MutableStateFlow<Account?>(null)
-
-
-    var connectionStatus = MutableLiveData<ConnectionStatus>()
+    //private val mAccountsState = MutableStateFlow(emptyList<Account>())
+    //private val mCurrentAccountState = MutableStateFlow<Account?>(null)
+    @Inject lateinit var accountStore: AccountStore
 
     @Inject lateinit var mEncryption: Encryption
 
@@ -151,10 +149,6 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var noteTranslationStore: NoteTranslationStore
-
-    val makeDefaultPagesUseCase: MakeDefaultPagesUseCase by lazy {
-        MakeDefaultPagesUseCase(PageDefaultStringsOnAndroid(this))
-    }
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -217,10 +211,6 @@ class MiApplication : Application(), MiCore {
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
-
-
-
-
         mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 
 
@@ -247,7 +237,7 @@ class MiApplication : Application(), MiCore {
                     if(ev is AccountRepository.Event.Deleted) {
                         mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
                     }
-                    loadAndInitializeAccounts()
+                    accountStore.initialize()
                 }catch(e: Exception) {
                     logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
                 }
@@ -258,7 +248,7 @@ class MiApplication : Application(), MiCore {
             try{
                 //val connectionInstances = connectionInstanceDao!!.findAll()
                 AccountMigration(database.accountDao(), mAccountRepository, sharedPreferences).executeMigrate()
-                loadAndInitializeAccounts()
+                accountStore.initialize()
             }catch(e: Exception){
                 logger.error("load account error", e = e)
                 //isSuccessCurrentAccount.postValue(false)
@@ -296,14 +286,21 @@ class MiApplication : Application(), MiCore {
         }.addOnFailureListener {
             logger.debug("fcm token取得失敗", e = it)
         }
+        accountStore.state.onEach {
+            setUpMetaMap(it.accounts)
+        }
     }
 
     override fun getAccounts(): StateFlow<List<Account>> {
-        return mAccountsState
+        return accountStore.state.map {
+            it.accounts
+        }.stateIn(applicationScope, SharingStarted.Eagerly, emptyList())
     }
 
     override fun getCurrentAccount(): StateFlow<Account?> {
-        return mCurrentAccountState
+        return accountStore.state.map {
+            it.currentAccount
+        }.stateIn(applicationScope, SharingStarted.Eagerly, null)
     }
 
     override suspend fun getAccount(accountId: Long): Account {
@@ -372,7 +369,7 @@ class MiApplication : Application(), MiCore {
                     urlPreviewDAO
                     ,mSettingStore.urlPreviewSetting.getSourceType(),
                     mSettingStore.urlPreviewSetting.getSummalyUrl(),
-                    mCurrentAccountState.value
+                    accountStore.state.value.currentAccount
                 ).create()
             }
             mUrlPreviewStoreInstanceBaseUrlMap[url] = store
@@ -383,7 +380,8 @@ class MiApplication : Application(), MiCore {
     override suspend fun setCurrentAccount(account: Account) {
         try{
             mAccountRepository.setCurrentAccount(account)
-            loadAndInitializeAccounts()
+            accountStore.initialize()
+//            loadAndInitializeAccounts()
         }catch(e: Exception){
             logger.error("switchAccount error", e)
         }
@@ -393,7 +391,8 @@ class MiApplication : Application(), MiCore {
         try{
             mAccountRepository.add(account, true)
 
-            loadAndInitializeAccounts()
+            accountStore.initialize()
+
         }catch(e: Exception){
 
         }
@@ -411,7 +410,8 @@ class MiApplication : Application(), MiCore {
             }catch(e: Exception){
                 logger.error("アカウント更新処理中にエラー発生", e)
             }
-            loadAndInitializeAccounts()
+            accountStore.initialize()
+
         }
     }
 
@@ -423,9 +423,9 @@ class MiApplication : Application(), MiCore {
                     it == page || it.pageId == page.pageId
                 })
                 mAccountRepository.add(removed, true)
-                loadAndInitializeAccounts()
+                accountStore.initialize()
+
             }catch(e: AccountNotFoundException){
-                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
             }
         }
     }
@@ -435,9 +435,9 @@ class MiApplication : Application(), MiCore {
             try{
                 val updated = mAccountRepository.getCurrentAccount().copy(pages = pages)
                 mAccountRepository.add(updated, true)
-                loadAndInitializeAccounts()
+                accountStore.initialize()
+
             }catch(e: AccountNotFoundException){
-                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
             }
         }
     }
@@ -447,7 +447,6 @@ class MiApplication : Application(), MiCore {
             mAccountRepository.getCurrentAccount()
         }catch(e: AccountNotFoundException){
             logger.error("アカウントローディング中に失敗しました", e)
-            connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
             return null
         }
     }
@@ -533,58 +532,50 @@ class MiApplication : Application(), MiCore {
 
 
 
-    private suspend fun loadAndInitializeAccounts(){
-        try{
-            val current: Account
-            val tmpAccounts = try{
-                current = mAccountRepository.getCurrentAccount()
+//    private suspend fun loadAndInitializeAccounts(){
+//        try{
+//            val current: Account
+//            val tmpAccounts = try{
+//                current = mAccountRepository.getCurrentAccount()
+//
+//                mAccountRepository.findAll()
+//            }catch(e: AccountNotFoundException){
+//                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
+//                return
+//            }
+//
+//
+//            logger.debug(this.javaClass.simpleName, "load account result : $current")
+//
+//
+//            val meta = loadInstanceMetaAndSetupAPI(current.instanceDomain)
+//
+//            if(meta == null){
+//                connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
+//            }
+//
+//            logger.debug("accountId:${current.accountId}, account:$current")
+//            if(current.pages.isEmpty()){
+//                saveDefaultPages(current, meta)
+//                return loadAndInitializeAccounts()
+//            }
+//
+//            mCurrentAccountState.value = current
+//            mAccountsState.value = tmpAccounts
+//            connectionStatus.postValue(ConnectionStatus.SUCCESS)
+//
+//            setUpMetaMap(tmpAccounts)
+//
+//        }catch(e: Exception){
+//            //isSuccessCurrentAccount.postValue(false)
+//            logger.error( "初期読み込みに失敗しまちた", e)
+//        }
+//    }
 
-                mAccountRepository.findAll()
-            }catch(e: AccountNotFoundException){
-                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
-                return
-            }
-
-
-            logger.debug(this.javaClass.simpleName, "load account result : $current")
-
-
-            val meta = loadInstanceMetaAndSetupAPI(current.instanceDomain)
-
-            if(meta == null){
-                connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
-            }
-
-            logger.debug("accountId:${current.accountId}, account:$current")
-            if(current.pages.isEmpty()){
-                saveDefaultPages(current, meta)
-                return loadAndInitializeAccounts()
-            }
-
-            mCurrentAccountState.value = current
-            mAccountsState.value = tmpAccounts
-            connectionStatus.postValue(ConnectionStatus.SUCCESS)
-
-            setUpMetaMap(tmpAccounts)
-
-        }catch(e: Exception){
-            //isSuccessCurrentAccount.postValue(false)
-            logger.error( "初期読み込みに失敗しまちた", e)
-        }
-    }
-
-    private suspend fun saveDefaultPages(account: Account, meta: Meta?){
-        try{
-            val pages = makeDefaultPagesUseCase(account, meta)
-            mAccountRepository.add(account.copy(pages = pages), true)
-        }catch(e: Exception){
-            logger.error("default pages create error", e)
-        }
-    }
 
 
     override fun getCurrentInstanceMeta(): Meta?{
-        return mCurrentAccountState.value?.instanceDomain?.let{ url ->
+        return accountStore.state.value.currentAccount?.instanceDomain?.let{ url ->
             mMetaCache.get(url)
         }
     }
@@ -611,7 +602,6 @@ class MiApplication : Application(), MiCore {
 
         }catch(e: Exception){
             logger.error("metaの読み込み一連処理に失敗したでち", e)
-            connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
             null
         }
     }
@@ -641,7 +631,7 @@ class MiApplication : Application(), MiCore {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when(key){
                 UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
-                    mAccountsState.value.forEach {
+                    accountStore.state.value.accounts.forEach {
                         getUrlPreviewStore(it, true)
                     }
                 }

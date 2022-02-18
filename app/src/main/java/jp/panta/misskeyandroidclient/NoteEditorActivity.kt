@@ -23,6 +23,7 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
@@ -51,6 +52,7 @@ import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -103,6 +105,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     private lateinit var mBinding: ActivityNoteEditorBinding
 
     private lateinit var mConfirmViewModel: ConfirmViewModel
+
+    @Inject lateinit var accountStore: AccountStore
 
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -329,20 +333,16 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             ReservationPostTimePickerDialog().show(supportFragmentManager, "Pick time")
         }
 
-        (applicationContext as? MiApplication)?.connectionStatus?.observe(this) { status ->
-            when (status) {
-                ConnectionStatus.SUCCESS -> Log.d("MainActivity", "成功")
-                ConnectionStatus.ACCOUNT_ERROR -> {
+
+        lifecycleScope.launchWhenStarted {
+            accountStore.state.collect() {
+                if (it.isUnauthorized) {
                     finish()
-                    startActivity(Intent(this, AuthorizationActivity::class.java))
+                    startActivity(Intent(this@NoteEditorActivity, AuthorizationActivity::class.java))
                 }
-                ConnectionStatus.NETWORK_ERROR -> {
-                    Toast.makeText(this, getString(R.string.network_error), Toast.LENGTH_SHORT)
-                        .show()
-                }
-                else -> Log.d("MainActivity", "not initialized")
             }
         }
+
 
         mConfirmViewModel.confirmedEvent.observe(this) {
             when (it.eventType) {
