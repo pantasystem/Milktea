@@ -86,12 +86,16 @@ class AccountStateTest {
             currentAccountId = 1L
         )
         assertTrue(accountState.hasAccount(accountState.accounts.first()))
-        assertFalse(accountState.hasAccount(Account(
-            "id:100",
-            "host",
-            "name",
-            ""
-        ).copy(accountId = 1000L)))
+        assertFalse(
+            accountState.hasAccount(
+                Account(
+                    "id:100",
+                    "host",
+                    "name",
+                    ""
+                ).copy(accountId = 1000L)
+            )
+        )
     }
 
     @Test
@@ -135,6 +139,7 @@ class AccountStateTest {
         assertEquals(100L, added.accounts.first().accountId)
         assertEquals(100L, added.currentAccountId)
     }
+
     @Test
     fun addWhenAdded() {
         val accountState = AccountState(
@@ -156,6 +161,24 @@ class AccountStateTest {
 
     @Test
     fun delete() {
+        val accountState = AccountState(
+            isLoading = false,
+            accounts = (1..4).map {
+                Account(
+                    "id:$it",
+                    "host",
+                    "name",
+                    ""
+                ).copy(accountId = it.toLong())
+            },
+            currentAccountId = 1L
+        )
+        val deleted = accountState.delete(accountState.accounts.first().accountId)
+        assertArrayEquals(
+            (2L..4L).toList().toLongArray(),
+            deleted.accounts.map { it.accountId }.toLongArray()
+        )
+        assertNotEquals(deleted.currentAccountId, 1L)
 
     }
 }
