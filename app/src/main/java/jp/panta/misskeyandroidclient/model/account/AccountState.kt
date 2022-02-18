@@ -33,7 +33,8 @@ data class AccountState(
                 accounts.toMutableList().also { list ->
                     list.add(account)
                 }
-            }
+            },
+            currentAccountId = if (accounts.isEmpty()) account.accountId else currentAccountId
         )
     }
 
