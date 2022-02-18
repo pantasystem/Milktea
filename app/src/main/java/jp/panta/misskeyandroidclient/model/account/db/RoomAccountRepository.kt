@@ -2,15 +2,11 @@ package jp.panta.misskeyandroidclient.model.account.db
 
 import android.content.SharedPreferences
 import android.util.Log
-import io.reactivex.Observable
-import io.reactivex.Single
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.account.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
 import kotlinx.coroutines.runBlocking
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 import java.util.concurrent.Callable
 
 const val CURRENT_ACCOUNT_ID_KEY = "CURRENT_ACCOUNT_ID"
@@ -123,26 +119,6 @@ class RoomAccountRepository(
         publish(AccountRepository.Event.Deleted(account.accountId))
     }
 
-    override suspend fun findAllByUserName(userName: String): List<Account> {
-        return accountDao.findAllByUserName(userName).map{ account ->
-            account.toAccount()
-        }
-    }
-
-
-    override suspend fun findByRemoteIdAndInstanceDomain(
-        remoteId: String,
-        instanceDomain: String
-    ): Account? {
-        return accountDao.findByRemoteIdAndInstanceDomain(remoteId, instanceDomain)?.toAccount()
-    }
-
-    override suspend fun findByUserNameAndInstanceDomain(
-        userName: String,
-        instanceDomain: String
-    ): Account? {
-        return accountDao.findByUserNameAndInstanceDomain(userName, instanceDomain)?.toAccount()
-    }
 
 
     @Throws(AccountNotFoundException::class)

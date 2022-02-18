@@ -33,34 +33,11 @@ class MediatorAccountRepository(
         return mAccounts
     }
 
-    override suspend fun findAllByUserName(userName: String): List<Account> {
-        return findAll().filter {
-            it.userName == userName
-        }
-    }
 
     override suspend fun get(accountId: Long): Account {
         return findAll().firstOrNull {
             it.accountId == accountId
         }?: throw AccountNotFoundException()
-    }
-
-    override suspend fun findByRemoteIdAndInstanceDomain(
-        remoteId: String,
-        instanceDomain: String
-    ): Account? {
-        return findAll().firstOrNull {
-            it.remoteId == remoteId && it.instanceDomain == instanceDomain
-        }
-    }
-
-    override suspend fun findByUserNameAndInstanceDomain(
-        userName: String,
-        instanceDomain: String
-    ): Account? {
-        return findAll().firstOrNull {
-            it.userName == userName && it.instanceDomain == instanceDomain
-        }
     }
 
     override suspend fun getCurrentAccount(): Account {
