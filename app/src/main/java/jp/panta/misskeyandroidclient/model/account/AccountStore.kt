@@ -1,34 +1,103 @@
 package jp.panta.misskeyandroidclient.model.account
 
+import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
+import jp.panta.misskeyandroidclient.model.instance.FetchMeta
+import jp.panta.misskeyandroidclient.model.instance.Meta
+import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class AccountStore @Inject constructor(
     val accountRepository: AccountRepository,
+    val metaRepository: MetaRepository,
+    val loggerFactory: Logger.Factory,
+    val fetchMeta: FetchMeta,
+    val makeDefaultPagesUseCase: MakeDefaultPagesUseCase,
 ){
-    private val _state = MutableStateFlow<AccountState>(AccountState.Loading)
+    val logger = loggerFactory.create("AccountStore")
+    private val _state = MutableStateFlow<AccountState>(AccountState())
     val state: StateFlow<AccountState> = _state
+
+
+    init {
+        accountRepository.addEventListener {
+            when (it) {
+                is AccountRepository.Event.Created -> {
+                    _state.value = state.value.add(it.account)
+                }
+                is AccountRepository.Event.Deleted -> {
+                    _state.value = state.value.delete(it.accountId)
+                }
+                is AccountRepository.Event.Updated -> {
+                    _state.value = state.value.add(it.account)
+                }
+            }
+        }
+    }
 
 
     suspend fun addAccount(account: Account) {
         accountRepository.add(account, true)
-        val state = state.value
-        if (state is AccountState.Unauthorized) {
-            _state.value = state.changeCurrent(account)
-        }
     }
 
     suspend fun setCurrent(account: Account) {
         accountRepository.setCurrentAccount(account)
-        _state.value = AccountState.Authorized(account)
+        _state.value = state.value.setCurrentAccount(account)
     }
 
     suspend fun initialize() {
-        runCatching {
+        try{
+            var current: Account
+            var accounts: List<Account>
+            try{
+                current = accountRepository.getCurrentAccount()
+                accounts = accountRepository.findAll()
+            }catch(e: AccountNotFoundException){
+                _state.value = AccountState(isLoading = false)
+                return
+            }
 
+            logger.debug(this.javaClass.simpleName, "load account result : $current")
+
+            val meta = runCatching {
+                fetchMeta.fetch(current.instanceDomain)
+            }.getOrNull()
+
+
+            logger.debug("accountId:${current.accountId}, account:$current")
+            if(current.pages.isEmpty()){
+                saveDefaultPages(current, meta)
+                accounts = accountRepository.findAll()
+                current = accountRepository.getCurrentAccount()
+            }
+
+
+            _state.value = AccountState(
+                accounts = accounts,
+                currentAccountId = current.accountId,
+                isLoading = false
+            )
+        }catch(e: Exception){
+            //isSuccessCurrentAccount.postValue(false)
+            logger.error( "初期読み込みに失敗しまちた", e)
+            _state.value = state.value.copy(error = e)
+        }finally {
+            _state.value = state.value.copy(isLoading = false)
         }
     }
 
+
+    private suspend fun saveDefaultPages(account: Account, meta: Meta?){
+        try{
+            val pages = makeDefaultPagesUseCase(account, meta)
+            accountRepository.add(account.copy(pages = pages), true)
+        }catch(e: Exception){
+            logger.error("default pages create error", e)
+        }
+    }
 
 }
