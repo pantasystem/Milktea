@@ -39,7 +39,7 @@ data class AccountState(
     }
 
     fun delete(accountId: Long): AccountState {
-        val filtered = accounts.filter { it.accountId == accountId }
+        val filtered = accounts.filterNot { it.accountId == accountId }
         return copy(
             currentAccountId = if (currentAccountId == accountId) {
                 filtered.firstOrNull()?.accountId
