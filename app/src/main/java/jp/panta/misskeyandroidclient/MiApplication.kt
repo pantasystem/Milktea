@@ -23,7 +23,8 @@ import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
-import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.FetchMeta
+import jp.panta.misskeyandroidclient.model.instance.MetaCache
 import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
@@ -86,7 +87,7 @@ class MiApplication : Application(), MiCore {
 
     @Inject lateinit var mMetaRepository: MetaRepository
 
-    @Inject lateinit var mMetaStore: MetaStore
+    @Inject lateinit var mFetchMeta: FetchMeta
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -98,7 +99,9 @@ class MiApplication : Application(), MiCore {
 
     @Inject lateinit var mEncryption: Encryption
 
-    private val mMetaInstanceUrlMap = HashMap<String, Meta>()
+    // private val mMetaInstanceUrlMap = HashMap<String, Meta>()
+    @Inject lateinit var mMetaCache: MetaCache
+
     @Inject lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
 
     @Inject lateinit var mNoteDataSource: NoteDataSource
@@ -515,8 +518,8 @@ class MiApplication : Application(), MiCore {
         return mSocketWithAccountProvider.get(account)
     }
 
-    override fun getMetaStore(): MetaStore {
-        return mMetaStore
+    override fun getMetaStore(): FetchMeta {
+        return mFetchMeta
     }
 
     override fun getFilePropertyDataSource(): FilePropertyDataSource {
@@ -631,10 +634,8 @@ class MiApplication : Application(), MiCore {
 
 
     override fun getCurrentInstanceMeta(): Meta?{
-        return synchronized(mMetaInstanceUrlMap){
-            mCurrentAccountState.value?.instanceDomain?.let{ url ->
-                mMetaInstanceUrlMap[url]
-            }
+        return mCurrentAccountState.value?.instanceDomain?.let{ url ->
+            mMetaCache.get(url)
         }
     }
 
@@ -652,11 +653,9 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
         try{
-            val meta = mMetaStore.fetch(instanceDomain)
+            val meta = mFetchMeta.fetch(instanceDomain)
 
-            synchronized(mMetaInstanceUrlMap){
-                mMetaInstanceUrlMap[instanceDomain] = meta
-            }
+            mMetaCache.put(instanceDomain, meta)
 
             return meta
 

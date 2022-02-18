@@ -3,11 +3,11 @@ package jp.panta.misskeyandroidclient.model.instance
 import jp.panta.misskeyandroidclient.Logger
 import java.lang.IllegalStateException
 
-class MediatorMetaStore(
+class MediatorFetchMeta(
     private val metaRepository : MetaRepository,
-    private val metaStore: MetaStore,
+    private val fetchMeta: FetchMeta,
     val loggerFactory: Logger.Factory,
-    ) : MetaStore{
+    ) : FetchMeta{
 
     val logger: Logger by lazy {
         loggerFactory.create("MediatorMetaStore")
@@ -19,7 +19,7 @@ class MediatorMetaStore(
             var remoteError: Throwable? = null
             if(local == null || isForceFetch){
                 val remote = try{
-                    metaStore.fetch(instanceDomain)
+                    fetchMeta.fetch(instanceDomain)
                 }catch(e: Exception){
                     remoteError = e
                     null

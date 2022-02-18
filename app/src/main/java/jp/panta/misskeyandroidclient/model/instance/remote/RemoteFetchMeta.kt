@@ -3,9 +3,9 @@ package jp.panta.misskeyandroidclient.model.instance.remote
 import jp.panta.misskeyandroidclient.api.MisskeyGetMeta
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.FetchMeta
 
-class RemoteMetaStore : MetaStore{
+class RemoteFetchMeta : FetchMeta{
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun fetch(instanceDomain: String, isForceFetch: Boolean): Meta {

@@ -21,7 +21,7 @@ import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
-import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.FetchMeta
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
@@ -142,7 +142,7 @@ interface MiCore{
 
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
-    fun getMetaStore(): MetaStore
+    fun getMetaStore(): FetchMeta
 
     fun getMetaRepository(): MetaRepository
 
