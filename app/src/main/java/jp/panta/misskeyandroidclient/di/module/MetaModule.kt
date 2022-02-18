@@ -6,13 +6,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.instance.MediatorMetaStore
+import jp.panta.misskeyandroidclient.model.instance.MediatorFetchMeta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
-import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.FetchMeta
 import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
 import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.remote.RemoteMetaStore
+import jp.panta.misskeyandroidclient.model.instance.remote.RemoteFetchMeta
 import javax.inject.Singleton
 
 @Module
@@ -37,10 +37,10 @@ object MetaModule {
     fun metaStore(
         metaRepository: MetaRepository,
         loggerFactory: Logger.Factory
-    ): MetaStore {
-        return MediatorMetaStore(
+    ): FetchMeta {
+        return MediatorFetchMeta(
             metaRepository,
-            RemoteMetaStore(),
+            RemoteFetchMeta(),
             loggerFactory
         )
     }

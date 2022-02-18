@@ -53,7 +53,7 @@ class AntennaListViewModel (
 
     init{
 
-        miCore.getCurrentAccount().onEach {
+        miCore.getAccountStore().observeCurrentAccount.onEach {
             if(account?.accountId != it?.accountId) {
                 loadInit()
                 account = it
@@ -151,6 +151,6 @@ class AntennaListViewModel (
     }
 
     private fun getMisskeyAPI(): MisskeyAPIV12?{
-        return miCore.getMisskeyAPIProvider().get(miCore.getCurrentAccount().value!!) as? MisskeyAPIV12
+        return miCore.getMisskeyAPIProvider().get(miCore.getAccountStore().currentAccount!!) as? MisskeyAPIV12
     }
 }

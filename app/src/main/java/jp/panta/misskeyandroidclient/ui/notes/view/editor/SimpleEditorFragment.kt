@@ -56,6 +56,7 @@ interface SimpleEditor{
 class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEditor {
 
 
+    val accountViewModel: AccountViewModel by activityViewModels()
 
     val mViewModel: NoteEditorViewModel by activityViewModels()
     private val mBinding: FragmentSimpleEditorBinding by dataBinding()
@@ -78,7 +79,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         mBinding.addressUsersView.applyFlexBoxLayout(requireContext())
 
 
-        val accountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         mBinding.accountViewModel = accountViewModel
         accountViewModel.switchAccount.observe(this) {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
@@ -90,7 +90,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             startActivity(intent)
         }
 
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis

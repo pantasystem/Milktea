@@ -40,21 +40,19 @@ class RoomAccountRepositoryTest{
         runBlocking {
             val result = roomAccountRepository.add(account)
 
-            assertEquals(result.userName, account.userName)
-            assertEquals(result.instanceDomain, account.instanceDomain)
+            assertEquals(account.userName, result.userName)
+            assertEquals(account.instanceDomain, result.instanceDomain)
             assertNotEquals(result.accountId, 0)
-            assertEquals(result.accountId, 1)
-            assert(result.accountId < 0)
+            assertEquals(1, result.accountId,)
             println(result)
 
             val account2 = Account(remoteId, instanceDomain, "Test", "hogehogehoge")
 
             val result2 = roomAccountRepository.add(account2)
-            assertEquals(result2.userName, "Test")
-            assertEquals(result2.instanceDomain, account.instanceDomain)
-            assertNotEquals(result2.accountId, 0)
-            assertEquals(result2.accountId, 2)
-            assert(result2.accountId < 0)
+            assertEquals("Test", result2.userName, )
+            assertEquals(account.instanceDomain, result2.instanceDomain, )
+            assertEquals(1, result2.accountId)
+            assert(result2.accountId > 0)
             println(result2)
         }
 
@@ -90,13 +88,12 @@ class RoomAccountRepositoryTest{
         val account = Account(remoteId, instanceDomain, userName, "hogehogehoge")
         runBlocking {
             val resultId = accountDAO.insert(account)
-            assertNotEquals(resultId, 0)
+            assertNotEquals(0, resultId)
             val result = accountDAO.get(resultId)!!
-            assertEquals(result.userName, account.userName)
-            assertEquals(result.instanceDomain, account.instanceDomain)
-            assertNotEquals(result.accountId, 0)
-            assertEquals(result.accountId, 1)
-            assert(result.accountId < 0)
+            assertEquals(account.userName, result.userName)
+            assertEquals(account.instanceDomain, result.instanceDomain)
+            assertNotEquals(0, result.accountId,)
+            assertEquals(1, result.accountId)
             println(result)
 
             /*val account2 = Account(remoteId, instanceDomain, "Test", "hogehogehoge")

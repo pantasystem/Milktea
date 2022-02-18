@@ -100,7 +100,7 @@ class SortedUsersViewModel(
     val users = object : MediatorLiveData<List<UserViewData>>(){
 
     }.apply{
-        miCore.getCurrentAccount().onEach {
+        miCore.getAccountStore().observeCurrentAccount.onEach {
             loadUsers()
         }.launchIn(viewModelScope + Dispatchers.Main)
     }
@@ -109,7 +109,7 @@ class SortedUsersViewModel(
 
     fun loadUsers(){
 
-        val account = miCore.getCurrentAccount().value
+        val account = miCore.getAccountStore().currentAccount
         val i = account?.getI(miCore.getEncryption())
 
         if(i == null){

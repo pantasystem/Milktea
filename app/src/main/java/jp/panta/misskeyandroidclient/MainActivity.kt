@@ -32,6 +32,7 @@ import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
@@ -61,14 +62,15 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
 
     val mNotesViewModel: NotesViewModel by viewModels()
 
     @ExperimentalCoroutinesApi
-    private lateinit var mAccountViewModel: AccountViewModel
+    private val mAccountViewModel: AccountViewModel by viewModels()
 
     private lateinit var mBottomNavigationAdapter: MainBottomNavigationAdapter
 
@@ -82,6 +84,8 @@ class MainActivity : AppCompatActivity(){
 
     private val binding: ActivityMainBinding by dataBinding()
 
+    @Inject
+    lateinit var accountStore: AccountStore
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,7 +96,11 @@ class MainActivity : AppCompatActivity(){
         setSupportActionBar(binding.appBarMain.toolbar)
 
         val toggle = ActionBarDrawerToggle(
-            this, binding.drawerLayout, binding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this,
+            binding.drawerLayout,
+            binding.appBarMain.toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -113,25 +121,28 @@ class MainActivity : AppCompatActivity(){
             false
         }
 
-        binding.appBarMain.fab.setOnClickListener{
+        binding.appBarMain.fab.setOnClickListener {
             startActivity(Intent(this, NoteEditorActivity::class.java))
         }
 
         val miApplication = application as MiApplication
 
-        mAccountViewModel = ViewModelProvider(this, AccountViewModel.Factory(miApplication))[AccountViewModel::class.java]
         initAccountViewModelListener()
         binding.setupHeaderProfile()
 
-        ActionNoteHandler(this, mNotesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        ActionNoteHandler(
+            this,
+            mNotesViewModel,
+            ViewModelProvider(this)[ConfirmViewModel::class.java]
+        ).initViewModelListener()
 
         // NOTE: メッセージの既読数をバッジに表示する
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getUnreadMessages().findByAccountId(it.accountId)
         }.map {
             it.size
         }.flowOn(Dispatchers.IO).onEach { count ->
-            binding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_message_list).let{
+            binding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_message_list).let {
                 it.isVisible = count > 0
                 it.number = count
             }
@@ -147,30 +158,40 @@ class MainActivity : AppCompatActivity(){
             }
         }.launchIn(lifecycleScope)
 
-        miApplication.connectionStatus.observe(this) { status ->
-            if(status == ConnectionStatus.ACCOUNT_ERROR) {
-                startActivity(Intent(this, AuthorizationActivity::class.java))
-                finish()
+
+        lifecycleScope.launchWhenStarted {
+            accountStore.state.collect {
+                if (it.isUnauthorized) {
+                    this@MainActivity.startActivity(
+                        Intent(
+                            this@MainActivity,
+                            AuthorizationActivity::class.java
+                        )
+                    )
+                    finish()
+                }
             }
         }
 
         // NOTE: 通知の既読数を表示する
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getNotificationRepository().countUnreadNotification(it.accountId)
         }.flowOn(Dispatchers.IO).onEach { count ->
-            if(count <= 0) {
-                binding.appBarMain.bottomNavigation.getBadge(R.id.navigation_notification)?.clearNumber()
+            if (count <= 0) {
+                binding.appBarMain.bottomNavigation.getBadge(R.id.navigation_notification)
+                    ?.clearNumber()
             }
-            binding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_notification).apply{
-                isVisible = count > 0
-                number = count
-            }
+            binding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_notification)
+                .apply {
+                    isVisible = count > 0
+                    number = count
+                }
         }.catch { e ->
             logger.error("通知既読数取得エラー", e = e)
         }.launchIn(lifecycleScope)
 
         // NOTE: 最新の通知をSnackBar等に表示する
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
             miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
                 body as? ChannelBody.Main.Notification
             }.filterNotNull().map {
@@ -186,9 +207,9 @@ class MainActivity : AppCompatActivity(){
             logger.error("通知取得エラー", e = e)
         }.launchIn(lifecycleScope + Dispatchers.Main)
 
-        if(BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
             lifecycleScope.launchWhenResumed {
-                miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+                accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
                     miApplication.getSocket(it).stateEvent()
                 }.catch { e ->
                     logger.error("WebSocket　状態取得エラー", e)
@@ -210,19 +231,22 @@ class MainActivity : AppCompatActivity(){
             }
         }
 
-        ViewModelProvider(this, ReportViewModel.Factory(miApplication))[ReportViewModel::class.java].also { viewModel ->
+        ViewModelProvider(
+            this,
+            ReportViewModel.Factory(miApplication)
+        )[ReportViewModel::class.java].also { viewModel ->
             lifecycleScope.launchWhenResumed {
                 viewModel.state.distinctUntilChangedBy {
                     it is ReportState.Sending.Success
                             || it is ReportState.Sending.Failed
                 }.collect { state ->
-                    if(state is ReportState.Sending.Success) {
+                    if (state is ReportState.Sending.Success) {
                         Snackbar.make(
                             binding.appBarMain.simpleNotification,
                             R.string.successful_report,
                             Snackbar.LENGTH_SHORT
                         ).show()
-                    }else if(state is ReportState.Sending.Failed) {
+                    } else if (state is ReportState.Sending.Failed) {
                         Snackbar.make(
                             binding.appBarMain.simpleNotification,
                             R.string.report_failed,
@@ -235,20 +259,29 @@ class MainActivity : AppCompatActivity(){
 
 
         startService(Intent(this, NotificationService::class.java))
-        mBottomNavigationAdapter = MainBottomNavigationAdapter(savedInstanceState, binding.appBarMain.bottomNavigation)
+        mBottomNavigationAdapter =
+            MainBottomNavigationAdapter(savedInstanceState, binding.appBarMain.bottomNavigation)
 
     }
 
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    inner class MainBottomNavigationAdapter(savedInstanceState: Bundle?, bottomNavigation: BottomNavigationView)
-        : BottomNavigationAdapter(bottomNavigation, supportFragmentManager, R.id.navigation_home, R.id.content_main, savedInstanceState){
+    inner class MainBottomNavigationAdapter(
+        savedInstanceState: Bundle?,
+        bottomNavigation: BottomNavigationView
+    ) : BottomNavigationAdapter(
+        bottomNavigation,
+        supportFragmentManager,
+        R.id.navigation_home,
+        R.id.content_main,
+        savedInstanceState
+    ) {
 
         var currentMenuItem: MenuItem? = null
 
         override fun viewChanged(menuItem: MenuItem, fragment: Fragment) {
             super.viewChanged(menuItem, fragment)
-            when(menuItem.itemId){
+            when (menuItem.itemId) {
                 R.id.navigation_home -> changeTitle(getString(R.string.menu_home))
                 R.id.navigation_search -> changeTitle(getString(R.string.search))
                 R.id.navigation_notification -> changeTitle(getString(R.string.notification))
@@ -256,8 +289,9 @@ class MainActivity : AppCompatActivity(){
             }
             currentMenuItem = menuItem
         }
+
         override fun getItem(menuItem: MenuItem): Fragment? {
-            return when(menuItem.itemId){
+            return when (menuItem.itemId) {
                 R.id.navigation_home -> TabFragment()
                 R.id.navigation_search -> SearchTopFragment()
                 R.id.navigation_notification -> NotificationMentionFragment()
@@ -267,14 +301,13 @@ class MainActivity : AppCompatActivity(){
         }
 
         override fun menuRetouched(menuItem: MenuItem, fragment: Fragment) {
-            if(fragment is ScrollableTop){
+            if (fragment is ScrollableTop) {
                 fragment.showTop()
             }
         }
 
 
     }
-
 
 
     /**
@@ -287,15 +320,15 @@ class MainActivity : AppCompatActivity(){
 
         val editor = supportFragmentManager.findFragmentByTag("simpleEditor")
 
-        if(miCore.getSettingStore().isSimpleEditorEnabled){
+        if (miCore.getSettingStore().isSimpleEditorEnabled) {
             this.appBarMain.fab.visibility = View.GONE
-            if(editor == null){
+            if (editor == null) {
                 ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
             }
-        }else{
+        } else {
             this.appBarMain.fab.visibility = View.VISIBLE
 
-            editor?.let{
+            editor?.let {
                 ft.remove(it)
             }
 
@@ -305,14 +338,15 @@ class MainActivity : AppCompatActivity(){
 
 
     private fun String.showSnackBar() {
-        val snackBar = Snackbar.make(binding.appBarMain.simpleNotification, this, Snackbar.LENGTH_LONG)
+        val snackBar =
+            Snackbar.make(binding.appBarMain.simpleNotification, this, Snackbar.LENGTH_LONG)
 
         snackBar.show()
     }
 
 
-    private val switchAccountButtonObserver = Observer<Int>{
-        runOnUiThread{
+    private val switchAccountButtonObserver = Observer<Int> {
+        runOnUiThread {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             val dialog = AccountSwitchingDialog()
             dialog.show(supportFragmentManager, "mainActivity")
@@ -320,27 +354,29 @@ class MainActivity : AppCompatActivity(){
     }
 
 
-    private val showFollowingsObserver = Observer<User.Id>{
+    private val showFollowingsObserver = Observer<User.Id> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent = FollowFollowerActivity.newIntent(this, it, true)
         startActivity(intent)
     }
 
-    private val showFollowersObserver = Observer<User.Id>{
+    private val showFollowersObserver = Observer<User.Id> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent = FollowFollowerActivity.newIntent(this, it, false)
         startActivity(intent)
     }
 
     @ExperimentalCoroutinesApi
-    private val showProfileObserver = Observer<Account>{
+    private val showProfileObserver = Observer<Account> {
         binding.drawerLayout.closeDrawerWhenOpened()
-        val intent = UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
+        val intent =
+            UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
         intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun initAccountViewModelListener(){
+    private fun initAccountViewModelListener() {
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
 
@@ -348,7 +384,8 @@ class MainActivity : AppCompatActivity(){
         mAccountViewModel.showFollowers.observe(this, showFollowersObserver)
         mAccountViewModel.showProfile.observe(this, showProfileObserver)
     }
-    fun changeTitle(title: String?){
+
+    fun changeTitle(title: String?) {
         supportActionBar?.title = title
     }
 
@@ -357,7 +394,8 @@ class MainActivity : AppCompatActivity(){
     @ExperimentalCoroutinesApi
     private fun ActivityMainBinding.setupHeaderProfile() {
         DataBindingUtil.bind<NavHeaderMainBinding>(this.navView.getHeaderView(0))
-        val headerBinding = DataBindingUtil.getBinding<NavHeaderMainBinding>(this.navView.getHeaderView(0))
+        val headerBinding =
+            DataBindingUtil.getBinding<NavHeaderMainBinding>(this.navView.getHeaderView(0))
         headerBinding?.lifecycleOwner = this@MainActivity
         headerBinding?.accountViewModel = mAccountViewModel
     }
@@ -372,10 +410,14 @@ class MainActivity : AppCompatActivity(){
                 mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
             }
             else -> {
-                if(mBackPressedDelegate.back()){
+                if (mBackPressedDelegate.back()) {
                     super.onBackPressed()
-                }else{
-                    Toast.makeText(this, getString(R.string.please_again_to_finish), Toast.LENGTH_SHORT).apply{
+                } else {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.please_again_to_finish),
+                        Toast.LENGTH_SHORT
+                    ).apply {
                         setGravity(Gravity.CENTER, 0, 0)
                         show()
                     }
@@ -387,7 +429,7 @@ class MainActivity : AppCompatActivity(){
 
     @MainThread
     private fun DrawerLayout.closeDrawerWhenOpened() {
-        if(this.isDrawerOpen(GravityCompat.START)){
+        if (this.isDrawerOpen(GravityCompat.START)) {
             this.closeDrawer(GravityCompat.START)
         }
     }
@@ -400,7 +442,7 @@ class MainActivity : AppCompatActivity(){
             menu.findItem(R.id.action_messaging),
             menu.findItem(R.id.action_notification),
             menu.findItem(R.id.action_search)
-        ).forEach{
+        ).forEach {
             it.isVisible = getSettingStore().isClassicUI
         }
 
@@ -408,8 +450,13 @@ class MainActivity : AppCompatActivity(){
         return true
     }
 
-    private fun getSettingStore(): SettingStore{
-        val store: SettingStore = mSettingStore ?: SettingStore(getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE))
+    private fun getSettingStore(): SettingStore {
+        val store: SettingStore = mSettingStore ?: SettingStore(
+            getSharedPreferences(
+                getPreferenceName(),
+                Context.MODE_PRIVATE
+            )
+        )
         mSettingStore = store
         return store
     }
@@ -437,7 +484,6 @@ class MainActivity : AppCompatActivity(){
     }
 
 
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
@@ -447,37 +493,43 @@ class MainActivity : AppCompatActivity(){
     }
 
 
-    private fun setBackgroundImage(){
-        val path = SettingStore(getSharedPreferences(getPreferenceName() ,Context.MODE_PRIVATE)).backgroundImagePath
+    private fun setBackgroundImage() {
+        val path = SettingStore(
+            getSharedPreferences(
+                getPreferenceName(),
+                Context.MODE_PRIVATE
+            )
+        ).backgroundImagePath
         Glide.with(this)
             .load(path)
             .into(binding.appBarMain.contentMain.backgroundImage)
     }
 
     @MainThread
-    private fun applyUI(){
+    private fun applyUI() {
         invalidateOptionsMenu()
         binding.setSimpleEditor()
 
-        binding.appBarMain.bottomNavigation.visibility = if(getSettingStore().isClassicUI){
+        binding.appBarMain.bottomNavigation.visibility = if (getSettingStore().isClassicUI) {
             View.GONE
-        }else{
+        } else {
             View.VISIBLE
         }
-        if(getSettingStore().isClassicUI){
+        if (getSettingStore().isClassicUI) {
             mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
         }
     }
 
-}
-
-@ExperimentalCoroutinesApi
-fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?>{
-    return getCurrentAccount().filterNotNull().flatMapLatest {
-        getMetaRepository().observe(it.instanceDomain)
-    }.map {
-        it?.let {
-            this.getMisskeyAPIProvider().get(it.uri, it.getVersion())
+    @ExperimentalCoroutinesApi
+    fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
+        return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            getMetaRepository().observe(it.instanceDomain)
+        }.map {
+            it?.let {
+                this.getMisskeyAPIProvider().get(it.uri, it.getVersion())
+            }
         }
     }
+
 }
+

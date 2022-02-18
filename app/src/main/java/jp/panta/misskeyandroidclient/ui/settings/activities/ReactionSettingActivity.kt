@@ -52,7 +52,7 @@ class ReactionSettingActivity : AppCompatActivity() {
         val touchHelper = ItemTouchHelper(ItemTouchCallback())
         touchHelper.attachToRecyclerView(binding.reactionSettingListView)
         binding.reactionSettingListView.addItemDecoration(touchHelper)
-        miApplication.getCurrentAccount().filterNotNull().onEach {
+        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().onEach {
             mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
             binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel!!
             val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel!!)
@@ -73,7 +73,7 @@ class ReactionSettingActivity : AppCompatActivity() {
 
         }.launchIn(lifecycleScope)
 
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.distinctUntilChanged().mapNotNull {
             it?.emojis
@@ -116,11 +116,6 @@ class ReactionSettingActivity : AppCompatActivity() {
 
             }
         }
-
-        /*binding.reactionPickerType.setOnItemClickListener { _, _, position,_ ->
-            mReactionPickerSettingViewModel?.reactionPickerType?.value = ReactionPickerType.values()[position]
-        }*/
-
 
 
     }

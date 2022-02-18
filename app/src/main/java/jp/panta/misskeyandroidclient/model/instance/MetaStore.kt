@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.model.instance
 
-interface MetaStore {
+class MetaStore {
 
-    suspend fun fetch(instanceDomain: String, isForceFetch: Boolean = false) : Meta
 
 }

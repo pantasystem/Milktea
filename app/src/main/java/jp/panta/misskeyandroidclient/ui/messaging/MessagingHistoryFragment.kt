@@ -7,30 +7,33 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MessageActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessagingHistoryBinding
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.HistoryViewData
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel
-import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
+@AndroidEntryPoint
+class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history) {
 
     private var mLinearLayoutManager: LinearLayoutManager? = null
 
     private val binding: FragmentMessagingHistoryBinding by dataBinding()
 
+    private val historyViewModel: MessageHistoryViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,12 +41,6 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
         val layoutManager = LinearLayoutManager(context)
         binding.historyListView.layoutManager = layoutManager
         mLinearLayoutManager = layoutManager
-
-        val miApplication = context?.applicationContext as MiCore
-        val historyViewModel = ViewModelProvider(
-            this,
-            MessageHistoryViewModelFactory(miApplication)
-        )[MessageHistoryViewModel::class.java]
 
         val adapter =
             HistoryListAdapter(diffUtilItemCallback, historyViewModel, viewLifecycleOwner)
@@ -77,7 +74,7 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history){
     }
 
 
-    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<HistoryViewData>(){
+    private val diffUtilItemCallback = object : DiffUtil.ItemCallback<HistoryViewData>() {
         override fun areContentsTheSame(
             oldItem: HistoryViewData,
             newItem: HistoryViewData

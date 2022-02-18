@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
+import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
 import jp.panta.misskeyandroidclient.util.file.toAppFile
@@ -27,8 +29,10 @@ import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModelFactor
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class DriveActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE = "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
@@ -44,6 +48,8 @@ class DriveActivity : AppCompatActivity() {
     private lateinit var _fileViewModel: FileViewModel
     private lateinit var _directoryViewModel: DirectoryViewModel
 
+    @Inject
+    lateinit var accountStore: AccountStore
 
 
     @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
@@ -67,7 +73,7 @@ class DriveActivity : AppCompatActivity() {
         }
         val miCore = applicationContext as MiCore
         val driveSelectableMode: DriveSelectableMode? = if(intent.action == Intent.ACTION_OPEN_DOCUMENT) {
-            val aId = accountId?: accountIds.lastOrNull()?:  miCore.getCurrentAccount().value?.accountId
+            val aId = accountId?: accountIds.lastOrNull()?:  accountStore.currentAccountId
             requireNotNull(aId)
             DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
         }else{

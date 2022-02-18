@@ -54,7 +54,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
             mEmojisAdapter = adapter
             Log.d("PickerDialog", "アダプターをセットアップしました")
 
-            miCore.getCurrentAccount().filterNotNull().flatMapLatest {
+            miCore.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
                 miCore.getMetaRepository().observe(it.instanceDomain)
             }.map {
                 it?.emojis?: emptyList()

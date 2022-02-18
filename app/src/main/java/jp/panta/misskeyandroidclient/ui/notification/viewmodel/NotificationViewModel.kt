@@ -24,7 +24,7 @@ import kotlin.collections.ArrayList
 class NotificationViewModel(
     private val miCore: MiCore,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : ViewModel(){
+) : ViewModel() {
 
     private val encryption: Encryption = miCore.getEncryption()
 
@@ -43,7 +43,10 @@ class NotificationViewModel(
 
 
     val notificationsLiveData = MutableLiveData<List<NotificationViewData>>()
-    private val _error = MutableSharedFlow<Throwable>(onBufferOverflow = BufferOverflow.DROP_LATEST, extraBufferCapacity = 100)
+    private val _error = MutableSharedFlow<Throwable>(
+        onBufferOverflow = BufferOverflow.DROP_LATEST,
+        extraBufferCapacity = 100
+    )
     val error: Flow<Throwable> = _error
     private var notifications: List<NotificationViewData> = emptyList()
         set(value) {
@@ -53,22 +56,31 @@ class NotificationViewModel(
     private val logger = miCore.loggerFactory.create("NotificationViewModel")
 
     init {
-        miCore.getCurrentAccount().filterNotNull().flowOn(Dispatchers.IO).onEach {
-            loadInit()
-        }.launchIn(viewModelScope)
+        miCore.getAccountStore().observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
+            .onEach {
+                loadInit()
+            }.launchIn(viewModelScope)
 
-        miCore.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+        miCore.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
             miCore.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map {
                 it as? ChannelBody.Main.Notification
             }.filterNotNull().map {
                 ac to it
             }.map {
-                it.first to miCore.getGetters().notificationRelationGetter.get(it.first, it.second.body)
+                it.first to miCore.getGetters().notificationRelationGetter.get(
+                    it.first,
+                    it.second.body
+                )
             }
-        }.map {  accountAndNotificationRelation ->
+        }.map { accountAndNotificationRelation ->
             val notificationRelation = accountAndNotificationRelation.second
             val account = accountAndNotificationRelation.first
-            NotificationViewData(notificationRelation, account,  miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+            NotificationViewData(
+                notificationRelation,
+                account,
+                miCore.getNoteCaptureAdapter(),
+                miCore.getTranslationStore()
+            )
         }.catch { e ->
             logger.warning("ストーリミング受信中にエラー発生", e = e)
         }.onEach {
@@ -82,8 +94,8 @@ class NotificationViewModel(
         //loadInit()
     }
 
-    fun loadInit(){
-        if(isLoadingFlag){
+    fun loadInit() {
+        if (isLoadingFlag) {
             logger.debug("cancel loadInit")
             return
         }
@@ -121,16 +133,17 @@ class NotificationViewModel(
         }
 
     }
-    fun loadOld(){
+
+    fun loadOld() {
         logger.debug("loadOld")
-        if(isLoadingFlag){
+        if (isLoadingFlag) {
             return
         }
         isLoadingFlag = true
 
         val exNotificationList = notifications
         val untilId = exNotificationList.lastOrNull()?.id
-        if(exNotificationList.isNullOrEmpty() || untilId == null){
+        if (exNotificationList.isNullOrEmpty() || untilId == null) {
             isLoadingFlag = false
             return loadInit()
         }
@@ -139,12 +152,16 @@ class NotificationViewModel(
             val account = miCore.getAccountRepository().getCurrentAccount()
             val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
 
-            val request = NotificationRequest(i = account.getI(encryption), limit = 20, untilId = untilId.notificationId)
+            val request = NotificationRequest(
+                i = account.getI(encryption),
+                limit = 20,
+                untilId = untilId.notificationId
+            )
             val notifications = runCatching {
                 misskeyAPI.notification(request).throwIfHasError().body()
             }.getOrNull()
             val list = notifications?.toNotificationViewData(account)
-            if(list.isNullOrEmpty()) {
+            if (list.isNullOrEmpty()) {
                 isLoadingFlag = false
                 return@launch
             }
@@ -152,11 +169,12 @@ class NotificationViewModel(
                 it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
             }
 
-            val notificationViewDataList = ArrayList<NotificationViewData>(exNotificationList).also {
-                it.addAll(
-                    list
-                )
-            }
+            val notificationViewDataList =
+                ArrayList<NotificationViewData>(exNotificationList).also {
+                    it.addAll(
+                        list
+                    )
+                }
             this@NotificationViewModel.notifications = notificationViewDataList
             isLoadingFlag = false
         }
@@ -165,12 +183,12 @@ class NotificationViewModel(
     }
 
     fun acceptFollowRequest(notification: Notification) {
-        if(notification is ReceiveFollowRequestNotification) {
+        if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     miCore.getUserRepository().acceptFollowRequest(notification.userId)
                 }.onSuccess {
-                    if(it) {
+                    if (it) {
                         notifications = notifications.filterNot { n ->
                             n.id == notification.id
                         }
@@ -185,12 +203,12 @@ class NotificationViewModel(
     }
 
     fun rejectFollowRequest(notification: Notification) {
-        if(notification is ReceiveFollowRequestNotification) {
+        if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     miCore.getUserRepository().rejectFollowRequest(notification.userId)
                 }.onSuccess {
-                    if(it) {
+                    if (it) {
                         notifications = notifications.filterNot { n ->
                             n.id == notification.id
                         }
@@ -217,7 +235,12 @@ class NotificationViewModel(
 
     private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
         return this.toNotificationRelations(account).map {
-            NotificationViewData(it, account, miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
+            NotificationViewData(
+                it,
+                account,
+                miCore.getNoteCaptureAdapter(),
+                miCore.getTranslationStore()
+            )
         }
     }
 

@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -21,7 +22,7 @@ import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupRepository
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
-import jp.panta.misskeyandroidclient.model.instance.MetaStore
+import jp.panta.misskeyandroidclient.model.instance.FetchMeta
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
 import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
@@ -49,7 +50,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.StateFlow
 
-interface MiCore{
+interface MiCore {
 
 
     @ExperimentalCoroutinesApi
@@ -58,12 +59,9 @@ interface MiCore{
 
     val loggerFactory: Logger.Factory
 
-    fun getAccounts(): StateFlow<List<Account>>
-
-    fun getCurrentAccount(): StateFlow<Account?>
 
     @Throws(AccountNotFoundException::class)
-    suspend fun getAccount(accountId: Long) : Account
+    suspend fun getAccount(accountId: Long): Account
 
     fun getAccountRepository(): AccountRepository
 
@@ -87,13 +85,13 @@ interface MiCore{
 
     fun getGroupRepository(): GroupRepository
 
-    fun getFilePropertyDataSource() : FilePropertyDataSource
+    fun getFilePropertyDataSource(): FilePropertyDataSource
 
-    fun getDriveFileRepository() : DriveFileRepository
+    fun getDriveFileRepository(): DriveFileRepository
 
-    fun getSubscriptionRegistration() : SubscriptionRegistration
+    fun getSubscriptionRegistration(): SubscriptionRegistration
 
-    fun getSubscriptionUnRegstration() : SubscriptionUnRegistration
+    fun getSubscriptionUnRegstration(): SubscriptionUnRegistration
 
     suspend fun setCurrentAccount(account: Account)
 
@@ -105,22 +103,19 @@ interface MiCore{
 
     fun removePageInCurrentAccount(page: Page)
 
-    fun removeAllPagesInCurrentAccount(pages: List<Page>)
-
 
     fun getEncryption(): Encryption
 
 
     suspend fun getChannelAPI(account: Account): ChannelAPI
 
-    fun getNoteCaptureAdapter() : NoteCaptureAPIAdapter
+    fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter
 
     fun getSocket(account: Account): Socket
 
-    fun getNoteCaptureAPI(account: Account) : NoteCaptureAPI
+    fun getNoteCaptureAPI(account: Account): NoteCaptureAPI
 
     fun getCurrentInstanceMeta(): Meta?
-
 
 
     fun getSettingStore(): SettingStore
@@ -136,13 +131,13 @@ interface MiCore{
 
     fun getDraftNoteDAO(): DraftNoteDao
 
-    fun getUnreadNotificationDAO() : UnreadNotificationDAO
+    fun getUnreadNotificationDAO(): UnreadNotificationDAO
 
-    fun getTaskExecutor() : TaskExecutor
+    fun getTaskExecutor(): TaskExecutor
 
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
-    fun getMetaStore(): MetaStore
+    fun getMetaStore(): FetchMeta
 
     fun getMetaRepository(): MetaRepository
 
@@ -160,5 +155,5 @@ interface MiCore{
 
     fun getNoteReservationPostExecutor(): NoteReservationPostExecutor
 
-    fun getUserNicknameRepository(): UserNicknameRepository
+    fun getAccountStore(): AccountStore
 }

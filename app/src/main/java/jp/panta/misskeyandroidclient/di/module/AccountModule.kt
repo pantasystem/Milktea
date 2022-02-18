@@ -8,6 +8,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.MakeDefaultPagesUseCase
+import jp.panta.misskeyandroidclient.model.account.PageDefaultStringsOnAndroid
 import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
 import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
 import jp.panta.misskeyandroidclient.util.getPreferenceName
@@ -27,5 +29,13 @@ object AccountModule {
         val preferences = context.getPreferences()
         val roomAccountRepository = RoomAccountRepository(database, preferences, database.accountDAO(), database.pageDAO())
         return MediatorAccountRepository(roomAccountRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMakeDefaultPagesUseCase(
+        @ApplicationContext context: Context
+    ) : MakeDefaultPagesUseCase {
+        return MakeDefaultPagesUseCase(PageDefaultStringsOnAndroid(context))
     }
 }

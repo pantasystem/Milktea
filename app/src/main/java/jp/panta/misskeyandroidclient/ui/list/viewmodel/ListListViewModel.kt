@@ -5,6 +5,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.list.UserList
@@ -24,35 +25,36 @@ class ListListViewModel @Inject constructor(
     val miCore: MiCore,
     val encryption: Encryption,
     private val userListStore: UserListStore,
+    val accountStore: AccountStore
 ) : ViewModel() {
 
 
-
-    val userListList = miCore.getCurrentAccount().filterNotNull().flatMapLatest { account ->
+    val userListList = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         userListStore.state.map {
             it.getUserLists(account.accountId)
         }
     }.asLiveData()
 
-    val pagedUserList = miCore.getCurrentAccount().filterNotNull().flatMapLatest { account ->
-        userListStore.state.map {
-            it.getUserLists(account.accountId)
-        }.map { lists ->
-            lists.filter { list ->
-                account.pages.any { page ->
-                    list.id.userListId == page.pageParams.listId
-                }
-            }.toSet()
-        }
+    val pagedUserList =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+            userListStore.state.map {
+                it.getUserLists(account.accountId)
+            }.map { lists ->
+                lists.filter { list ->
+                    account.pages.any { page ->
+                        list.id.userListId == page.pageParams.listId
+                    }
+                }.toSet()
+            }
 
-    }.asLiveData()
+        }.asLiveData()
 
     val showUserDetailEvent = EventBus<UserList>()
 
     private val logger = miCore.loggerFactory.create("ListListViewModel")
 
     init {
-        miCore.getCurrentAccount().onEach {
+        accountStore.observeCurrentAccount.onEach {
             fetch()
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
@@ -76,7 +78,6 @@ class ListListViewModel @Inject constructor(
     private suspend fun loadListList(accountId: Long): List<UserList> {
         return userListStore.findByAccount(accountId)
     }
-
 
 
     fun showUserListDetail(userList: UserList?) {

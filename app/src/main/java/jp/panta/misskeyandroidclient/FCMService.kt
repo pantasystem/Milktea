@@ -14,6 +14,8 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notification.PushNotification
 import jp.panta.misskeyandroidclient.model.notification.toPushNotification
@@ -22,26 +24,31 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
-const val NOTIFICATION_CHANNEL_ID = "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
+const val NOTIFICATION_CHANNEL_ID =
+    "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
 const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifications"
 
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
 
 
+    @Inject lateinit var accountStore: AccountStore
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        val subscriptionRegistrationWorker = OneTimeWorkRequestBuilder<SubscriptionRegistrationWorker>()
-            .setInputData(
-                workDataOf(
-                    SubscriptionRegistrationWorker.TOKEN to token
-                )
-            ).build()
+        val subscriptionRegistrationWorker =
+            OneTimeWorkRequestBuilder<SubscriptionRegistrationWorker>()
+                .setInputData(
+                    workDataOf(
+                        SubscriptionRegistrationWorker.TOKEN to token
+                    )
+                ).build()
 
         WorkManager.getInstance(this).enqueue(subscriptionRegistrationWorker)
     }
@@ -51,9 +58,10 @@ class FCMService : FirebaseMessagingService() {
 
         // receive message
         val pushNotification = msg.data.toPushNotification()
-        val isCurrentAccountsNotification = (application as? MiCore)?.getCurrentAccount()?.value?.accountId == pushNotification.accountId
+        val isCurrentAccountsNotification =
+            accountStore.currentAccountId == pushNotification.accountId
 
-        if(isCurrentAccountsNotification) {
+        if (isCurrentAccountsNotification) {
             // 通知がcurrent accountでプッシュ通知の不要なActivityがActiveな時はこれ以上処理をしない
             return
         }
@@ -68,10 +76,10 @@ class FCMService : FirebaseMessagingService() {
         runCatching {
             val pendingIntentBuilder = TaskStackBuilder.create(this)
                 .addNextIntentWithParentStack(pushNotification.makeIntent())
-            val pendingIntent = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 pendingIntentBuilder
                     .getPendingIntent(0, PendingIntent.FLAG_MUTABLE)
-            }else{
+            } else {
                 pendingIntentBuilder
                     .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
@@ -82,12 +90,10 @@ class FCMService : FirebaseMessagingService() {
             throw e
         }
 
-        with(makeNotificationManager(NOTIFICATION_CHANNEL_ID)){
+        with(makeNotificationManager(NOTIFICATION_CHANNEL_ID)) {
             notify(5, builder.build())
             this
         }
-
-
 
 
     }
@@ -97,13 +103,19 @@ class FCMService : FirebaseMessagingService() {
 //
 //    }
 
-    private fun PushNotification.makeIntent() : Intent {
-        return when(this.type) {
-            "follow", "receiveFollowRequest",  "followRequestAccepted" -> UserDetailActivity.newInstance(this@FCMService, User.Id(accountId, this.userId!!)).apply {
+    private fun PushNotification.makeIntent(): Intent {
+        return when (this.type) {
+            "follow", "receiveFollowRequest", "followRequestAccepted" -> UserDetailActivity.newInstance(
+                this@FCMService,
+                User.Id(accountId, this.userId!!)
+            ).apply {
                 putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
 
             }
-            "mention", "reply", "renote", "quote", "reaction" -> NoteDetailActivity.newIntent(this@FCMService, Note.Id(accountId, noteId!!)).apply {
+            "mention", "reply", "renote", "quote", "reaction" -> NoteDetailActivity.newIntent(
+                this@FCMService,
+                Note.Id(accountId, noteId!!)
+            ).apply {
                 putExtra(NoteDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
             }
             else -> Intent(this@FCMService, MainActivity::class.java)
@@ -111,13 +123,15 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun makeNotificationManager(channelId: String): NotificationManager {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val name = getString(R.string.app_name)
         val description = "THE NOTIFICATION"
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            if(notificationManager.getNotificationChannel(channelId) == null){
-                val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_HIGH)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (notificationManager.getNotificationChannel(channelId) == null) {
+                val channel =
+                    NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_HIGH)
                 channel.description = description
                 notificationManager.createNotificationChannel(channel)
             }
@@ -125,7 +139,6 @@ class FCMService : FirebaseMessagingService() {
         return notificationManager
 
     }
-
 
 
 }

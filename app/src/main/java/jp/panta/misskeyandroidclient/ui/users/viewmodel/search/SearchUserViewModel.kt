@@ -2,6 +2,9 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.model.account.AccountStore
+import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
@@ -34,10 +37,13 @@ data class SearchUser(
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
-    val miCore: MiCore,
+    accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
+    private val userRepository: UserRepository,
+    private val miCore: MiCore,
 ) : ViewModel(){
 
-    private val logger = miCore.loggerFactory.create("SearchUserViewModel")
+    private val logger = loggerFactory.create("SearchUserViewModel")
 
 
     private val searchUserRequests = MutableSharedFlow<SearchUser>(
@@ -49,13 +55,13 @@ class SearchUserViewModel @Inject constructor(
     val userName = MutableLiveData<String>()
     val host = MutableLiveData<String>()
 
-    private val searchState = miCore.getCurrentAccount().filterNotNull()
+    private val searchState = accountStore.observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
             searchUserRequests.distinctUntilChanged()
                 .flatMapLatest {
                     suspend {
                         if (it.isUserName) {
-                            miCore.getUserRepository()
+                            userRepository
                                 .searchByUserName(
                                     accountId = account.accountId,
                                     userName = it.word,

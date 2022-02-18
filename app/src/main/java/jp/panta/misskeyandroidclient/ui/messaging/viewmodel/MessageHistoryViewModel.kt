@@ -1,50 +1,74 @@
 package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.groups.toGroup
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.AccountStore
+import jp.panta.misskeyandroidclient.model.group.GroupDataSource
+import jp.panta.misskeyandroidclient.model.group.GroupRepository
+import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
 import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
+import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.toHistory
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.util.asLoadingStateFlow
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @FlowPreview
-class MessageHistoryViewModel(
-    private val miCore: MiCore,
-    private val encryption: Encryption = miCore.getEncryption(),
+@HiltViewModel
+class MessageHistoryViewModel @Inject constructor(
+    accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
+    private val encryption: Encryption,
+    private val userRepository: UserRepository,
+    private val accountRepository: AccountRepository,
+    private val groupDataSource: GroupDataSource,
+    private val userDataSource: UserDataSource,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val getters: Getters,
+    private val groupRepository: GroupRepository,
+    private val messageObserver: MessageObserver,
+    private val unreadMessages: UnReadMessages,
 ) : ViewModel() {
 
 
-    private val logger = miCore.loggerFactory.create("MessageHistoryViewModel")
+    private val logger = loggerFactory.create("MessageHistoryViewModel")
 
     private val _actionFetchMessageHistories = MutableSharedFlow<Long>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
         extraBufferCapacity = 100
     )
 
-    private val updateEvent = miCore.getCurrentAccount().filterNotNull().flatMapLatest { account ->
-        miCore.messageObserver.observeAccountMessages(account).map {
-            account to miCore.getGetters().messageRelationGetter.get(it)
-        }
-    }.map { (a, msg) ->
-        a to msg.toHistory(miCore.getGroupRepository(), miCore.getUserRepository())
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    private val updateEvent =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+            messageObserver.observeAccountMessages(account).map {
+                account to getters.messageRelationGetter.get(it)
+            }
+        }.map { (a, msg) ->
+            a to msg.toHistory(groupRepository, userRepository)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val fetchUserMsgHistories = _actionFetchMessageHistories.map {
         logger.debug("読み込み命令を検出")
-        miCore.getAccountRepository().getCurrentAccount()
+        accountRepository.getCurrentAccount()
     }.filterNotNull().flatMapLatest {
         suspend {
             fetchHistory(false, it)
@@ -53,7 +77,7 @@ class MessageHistoryViewModel(
 
     private val fetchGroupMsgHistories = _actionFetchMessageHistories.map {
         logger.debug("読み込み命令を検出")
-        miCore.getAccountRepository().getCurrentAccount()
+        accountRepository.getCurrentAccount()
     }.filterNotNull().flatMapLatest {
         suspend {
             fetchHistory(true, it)
@@ -79,19 +103,19 @@ class MessageHistoryViewModel(
             list + HistoryViewData(
                 a,
                 ev,
-                miCore.getUnreadMessages(),
+                unreadMessages,
                 viewModelScope,
             )
         } else {
             list.map {
-                if(it.messagingId == anyMsg.messagingId) {
+                if (it.messagingId == anyMsg.messagingId) {
                     HistoryViewData(
                         a,
                         ev,
-                        miCore.getUnreadMessages(),
+                        unreadMessages,
                         viewModelScope,
                     )
-                }else{
+                } else {
                     it
                 }
             }
@@ -122,19 +146,19 @@ class MessageHistoryViewModel(
             res.throwIfHasError()
             res.body()?.map {
                 it.group?.let { groupDTO ->
-                    miCore.getGroupDataSource().add(groupDTO.toGroup(account.accountId))
+                    groupDataSource.add(groupDTO.toGroup(account.accountId))
                 }
                 it.recipient?.let { userDTO ->
-                    miCore.getUserDataSource().add(userDTO.toUser(account))
+                    userDataSource.add(userDTO.toUser(account))
                 }
-                miCore.getGetters().messageRelationGetter.get(account, it)
+                getters.messageRelationGetter.get(account, it)
             }
         }.onFailure {
             logger.error("fetchMessagingHistory error", e = it)
         }.getOrNull()?.map {
-            it.toHistory(miCore.getGroupRepository(), miCore.getUserRepository())
+            it.toHistory(groupRepository, userRepository)
         }?.map {
-            HistoryViewData(account, it, miCore.getUnreadMessages(), viewModelScope)
+            HistoryViewData(account, it, unreadMessages, viewModelScope)
         } ?: emptyList()
     }
 
@@ -143,7 +167,7 @@ class MessageHistoryViewModel(
     }
 
     private fun getMisskeyAPI(account: Account): MisskeyAPI {
-        return miCore.getMisskeyAPIProvider().get(account)
+        return misskeyAPIProvider.get(account)
     }
 
 }
