@@ -34,30 +34,6 @@ class TestAccountRepository : AccountRepository {
         return accounts.values.toList()
     }
 
-    override suspend fun findAllByUserName(userName: String): List<Account> {
-        return accounts.values.filter{
-            it.userName == userName
-        }
-    }
-
-    override suspend fun findByRemoteIdAndInstanceDomain(
-        remoteId: String,
-        instanceDomain: String
-    ): Account? {
-        return accounts.values.firstOrNull{
-            it.instanceDomain == instanceDomain && it.remoteId == remoteId
-        }
-    }
-
-    override suspend fun findByUserNameAndInstanceDomain(
-        userName: String,
-        instanceDomain: String
-    ): Account? {
-        return accounts.values.firstOrNull{
-            it.instanceDomain == instanceDomain && it.userName == userName
-        }
-    }
-
     override suspend fun get(accountId: Long): Account {
         return accounts[accountId]?: throw AccountNotFoundException()
     }
