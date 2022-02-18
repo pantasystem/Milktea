@@ -39,7 +39,7 @@ class DraftNotesViewModel(
             }
         }
     }.apply{
-        miCore.getCurrentAccount().onEach {
+        miCore.getAccountStore().observeCurrentAccount.onEach {
             loadDraftNotes()
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
@@ -64,7 +64,7 @@ class DraftNotesViewModel(
     }
 
     fun loadDraftNotes(){
-        miCore.getCurrentAccount().value?.let{
+        miCore.getAccountStore().currentAccount?.let{
             loadDraftNotes(it)
         }
     }

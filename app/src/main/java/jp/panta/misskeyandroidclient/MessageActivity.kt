@@ -46,7 +46,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as MessagingId?
-        val account = (applicationContext as MiApplication).getCurrentAccount().value
+        val account = (applicationContext as MiApplication).getAccountStore().currentAccount
 
 
         if(messagingId == null){

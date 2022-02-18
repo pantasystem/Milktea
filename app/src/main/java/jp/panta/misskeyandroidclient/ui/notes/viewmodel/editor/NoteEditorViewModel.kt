@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.api.Version
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -34,7 +35,8 @@ class NoteEditorViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val filePropertyDataSource: FilePropertyDataSource,
     val metaRepository: MetaRepository,
-    val driveFileRepository: DriveFileRepository
+    val driveFileRepository: DriveFileRepository,
+    val accountStore: AccountStore
 ) : ViewModel() {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -52,22 +54,23 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
 
     private val currentAccount = MutableLiveData<Account>().apply {
-        miCore.getCurrentAccount().onEach {
+        accountStore.observeCurrentAccount.onEach {
             this.postValue(it)
         }.launchIn(viewModelScope + dispatcher)
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    val currentUser: StateFlow<UserViewData?> = miCore.getCurrentAccount().filterNotNull().map {
-        val userId = User.Id(it.accountId, it.remoteId)
-        UserViewData(
-            userId,
-            miCore,
-            viewModelScope,
-            dispatcher
-        )
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    val currentUser: StateFlow<UserViewData?> =
+        accountStore.state.map { it.currentAccount }.filterNotNull().map {
+            val userId = User.Id(it.accountId, it.remoteId)
+            UserViewData(
+                userId,
+                miCore,
+                viewModelScope,
+                dispatcher
+            )
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
@@ -88,7 +91,7 @@ class NoteEditorViewModel @Inject constructor(
     }.asLiveData()
 
 
-    val maxTextLength = miCore.getCurrentAccount().filterNotNull().map {
+    val maxTextLength = accountStore.observeCurrentAccount.filterNotNull().map {
         metaRepository.get(it.instanceDomain)?.maxNoteTextLength ?: 1500
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
@@ -96,7 +99,7 @@ class NoteEditorViewModel @Inject constructor(
         max - (t?.codePointCount(0, t.length) ?: 0)
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
-    val maxFileCount = miCore.getCurrentAccount().filterNotNull().mapNotNull {
+    val maxFileCount = accountStore.observeCurrentAccount.filterNotNull().mapNotNull {
         metaRepository.get(it.instanceDomain)?.getVersion()
     }.map {
         if (it >= Version("12.100.2")) {
@@ -195,7 +198,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     init {
-        miCore.getCurrentAccount().filterNotNull().onEach {
+        accountStore.observeCurrentAccount.filterNotNull().onEach {
             _state.value = runCatching {
                 _state.value.setAccount(it)
             }.getOrElse {
@@ -203,7 +206,7 @@ class NoteEditorViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope + Dispatchers.IO)
 
-        miCore.getCurrentAccount().filterNotNull().onEach {
+        accountStore.observeCurrentAccount.filterNotNull().onEach {
             val v = miCore.getSettingStore().getNoteVisibility(it.accountId)
             _state.value = _state.value.copy(
                 visibility = v
@@ -437,7 +440,7 @@ class NoteEditorViewModel @Inject constructor(
             files = files.value?.map {
                 it.toFile()
             },
-            reservationPostingAt = _state.value.reservationPostingAt?.toEpochMilliseconds()?.let{
+            reservationPostingAt = _state.value.reservationPostingAt?.toEpochMilliseconds()?.let {
                 Date(it)
             }
         ).apply {

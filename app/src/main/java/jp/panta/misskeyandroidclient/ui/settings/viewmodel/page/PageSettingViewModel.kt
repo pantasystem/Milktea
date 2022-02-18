@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.account.page.PageType
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.api.users.RequestUser
 import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -31,18 +32,25 @@ class PageSettingViewModel(
     private val pageTypeNameMap: PageTypeNameMap
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
 
-    class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory{
+    class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return PageSettingViewModel(miApplication, miApplication.getSettingStore(), PageTypeNameMap(miApplication)) as T
+            return PageSettingViewModel(
+                miApplication,
+                miApplication.getSettingStore(),
+                PageTypeNameMap(miApplication)
+            ) as T
         }
     }
+
     val encryption = miCore.getEncryption()
 
     val selectedPages = MediatorLiveData<List<Page>>()
 
-    var account = miCore.getCurrentAccount().value
+    var account: Account? = null
+        get() = miCore.getAccountStore().currentAccount
+        private set
 
 
     val pageAddedEvent = EventBus<PageType>()
@@ -51,9 +59,9 @@ class PageSettingViewModel(
 
     val pageOnUpdateEvent = EventBus<Page>()
 
-    init{
+    init {
 
-        miCore.getCurrentAccount().filterNotNull().onEach {
+        miCore.getAccountStore().observeCurrentAccount.filterNotNull().onEach {
             account = it
             selectedPages.postValue(
                 it.pages.sortedBy { p ->
@@ -64,15 +72,16 @@ class PageSettingViewModel(
 
     }
 
-    fun setList(pages: List<Page>){
+    fun setList(pages: List<Page>) {
         selectedPages.value = pages.mapIndexed { index, page ->
-            page.apply{
+            page.apply {
                 weight = index + 1
             }
         }
     }
-    fun save(){
-        val list = selectedPages.value?: emptyList()
+
+    fun save() {
+        val list = selectedPages.value ?: emptyList()
         list.forEachIndexed { index, page ->
             page.weight = index + 1
         }
@@ -80,39 +89,40 @@ class PageSettingViewModel(
         miCore.replaceAllPagesInCurrentAccount(list)
     }
 
-    fun updatePage(page: Page){
-        val pages = selectedPages.value?.let{
+    fun updatePage(page: Page) {
+        val pages = selectedPages.value?.let {
             ArrayList(it)
         } ?: return
 
         var pageIndex = pages.indexOfFirst {
             it.pageId == page.pageId && it.pageId > 0
         }
-        if(pageIndex < 0){
-            pageIndex = pages.indexOfFirst{
+        if (pageIndex < 0) {
+            pageIndex = pages.indexOfFirst {
                 it.weight == page.weight && page.weight > 0
             }
         }
-        if(pageIndex >= 0 && pageIndex < pages.size){
+        if (pageIndex >= 0 && pageIndex < pages.size) {
             pages[pageIndex] = page.copy()
         }
 
         setList(pages)
 
     }
-    private fun addPage(page: Page){
-        val list = ArrayList<Page>(selectedPages.value?: emptyList())
+
+    private fun addPage(page: Page) {
+        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
         page.weight = list.size
         list.add(page)
         setList(list)
     }
 
-    fun addUserPageById(userId: String){
+    fun addUserPageById(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 miCore.getMisskeyAPIProvider().get(account!!).showUser(
                     RequestUser(userId = userId, i = account?.getI(encryption))
-                ).throwIfHasError().body()?: throw IllegalStateException()
+                ).throwIfHasError().body() ?: throw IllegalStateException()
             }.onSuccess {
                 addUserPage(it)
             }.onFailure { t ->
@@ -121,10 +131,11 @@ class PageSettingViewModel(
 
         }
     }
-    private fun addUserPage(user: UserDTO){
-        val page = if(settingStore.isUserNameDefault){
+
+    private fun addUserPage(user: UserDTO) {
+        val page = if (settingStore.isUserNameDefault) {
             PageableTemplate(account!!).user(user.id, title = user.getShortDisplayName())
-        }else{
+        } else {
             PageableTemplate(account!!).user(user.id, title = user.getDisplayName())
         }
         addPage(page)
@@ -134,55 +145,61 @@ class PageSettingViewModel(
         val pageable = Pageable.Gallery.User(userId = userId)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val user = miCore.getUserRepository().find(User.Id(accountId = account!!.accountId, id = userId))
-                val name = if(settingStore.isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
-                val page =  account!!.newPage(pageable, name = name)
+                val user = miCore.getUserRepository()
+                    .find(User.Id(accountId = account!!.accountId, id = userId))
+                val name =
+                    if (settingStore.isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
+                val page = account!!.newPage(pageable, name = name)
                 addPage(page)
             }
         }
     }
 
-    fun removePage(page: Page){
-        val list = ArrayList<Page>(selectedPages.value?: emptyList())
+    fun removePage(page: Page) {
+        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
         list.remove(page)
         setList(list)
     }
 
 
-
     override fun add(type: PageType) {
         pageAddedEvent.event = type
         val name = pageTypeNameMap.get(type)
-        when(type){
-            PageType.GLOBAL->{
+        when (type) {
+            PageType.GLOBAL -> {
                 addPage(PageableTemplate(account!!).globalTimeline(name))
             }
-            PageType.SOCIAL->{
+            PageType.SOCIAL -> {
                 addPage(PageableTemplate(account!!).hybridTimeline(name))
             }
             PageType.LOCAL -> {
                 addPage(PageableTemplate(account!!).localTimeline(name))
             }
-            PageType.HOME ->{
+            PageType.HOME -> {
                 addPage(PageableTemplate(account!!).homeTimeline(name))
             }
-            PageType.NOTIFICATION ->{
+            PageType.NOTIFICATION -> {
                 addPage(PageableTemplate(account!!).notification(name))
             }
-            PageType.FAVORITE ->{
+            PageType.FAVORITE -> {
                 addPage(PageableTemplate(account!!).favorite(name))
             }
-            PageType.FEATURED ->{
+            PageType.FEATURED -> {
                 addPage(PageableTemplate(account!!).featured(name))
             }
-            PageType.MENTION ->{
+            PageType.MENTION -> {
                 addPage(PageableTemplate(account!!).mention(name))
             }
             PageType.GALLERY_FEATURED -> addPage(account!!.newPage(Pageable.Gallery.Featured, name))
             PageType.GALLERY_POPULAR -> addPage(account!!.newPage(Pageable.Gallery.Popular, name))
             PageType.GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.Posts, name))
             PageType.MY_GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.MyPosts, name))
-            PageType.I_LIKED_GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.ILikedPosts, name))
+            PageType.I_LIKED_GALLERY_POSTS -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.ILikedPosts,
+                    name
+                )
+            )
             else -> {
                 Log.d("PageSettingViewModel", "管轄外な設定パターン:$type, name:$name")
             }
@@ -190,7 +207,7 @@ class PageSettingViewModel(
     }
 
     override fun action(page: Page?) {
-        page?: return
+        page ?: return
         pageOnActionEvent.event = page
     }
 

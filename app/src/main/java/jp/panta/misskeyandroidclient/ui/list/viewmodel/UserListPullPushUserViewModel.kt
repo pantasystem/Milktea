@@ -35,14 +35,14 @@ class UserListPullPushUserViewModel(val miCore: MiCore) : ViewModel(){
         }
     }
 
-    val account = MutableLiveData<Account>(miCore.getCurrentAccount().value)
+    val account = MutableLiveData<Account>(miCore.getAccountStore().currentAccount)
 
     private val subject = PublishSubject.create<Event>()
     val pullPushEvent: Observable<Event> = subject
 
 
     fun toggle(userList: UserList, userId: User.Id){
-        val account = miCore.getCurrentAccount().value
+        val account = miCore.getAccountStore().currentAccount
         if(account == null){
             Log.w(this.javaClass.simpleName, "Accountを見つけることができなかった処理を中断する")
             return

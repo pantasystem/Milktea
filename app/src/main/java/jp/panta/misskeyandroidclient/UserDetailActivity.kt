@@ -145,7 +145,7 @@ class UserDetailActivity : AppCompatActivity() {
         )
             .initViewModelListener()
 
-        miApplication.getCurrentAccount().filterNotNull().onEach { ar ->
+        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().onEach { ar ->
 
             binding.userViewModel = mViewModel
 

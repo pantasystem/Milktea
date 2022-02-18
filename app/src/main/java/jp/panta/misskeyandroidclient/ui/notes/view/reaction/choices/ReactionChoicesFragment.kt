@@ -101,7 +101,7 @@ class ReactionChoicesFragment : Fragment() {
         val defaultReaction = ReactionResourceMap.reactionDrawableMap.map {
             it.key
         }
-        val emojiFlow = miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        val emojiFlow = miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis
@@ -121,7 +121,7 @@ class ReactionChoicesFragment : Fragment() {
 
     private fun showFrequency(adapter: ReactionChoicesAdapter) {
         val miApplication = context?.applicationContext as MiApplication
-        val ac = miApplication.getCurrentAccount().value ?: return
+        val ac = miApplication.getAccountStore().currentAccount?: return
         lifecycleScope.launch(Dispatchers.IO) {
             val meta = miApplication.getMetaRepository().get(ac.instanceDomain)
             val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map {
@@ -153,7 +153,7 @@ class ReactionChoicesFragment : Fragment() {
     @ExperimentalCoroutinesApi
     private fun showCategoryBy(category: String, adapter: ReactionChoicesAdapter) {
         val miApplication = context?.applicationContext as MiApplication
-        val emojiFlow = miApplication.getCurrentAccount().filterNotNull()
+        val emojiFlow = miApplication.getAccountStore().observeCurrentAccount.filterNotNull()
             .flatMapLatest {
                 miApplication.getMetaRepository().observe(it.instanceDomain)
             }.mapNotNull {
@@ -180,7 +180,7 @@ class ReactionChoicesFragment : Fragment() {
         val miApplication = context?.applicationContext as MiApplication
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val instance = miApplication.getCurrentAccount().value?.instanceDomain
+                val instance = miApplication.getAccountStore().currentAccount?.instanceDomain
                 var reactions =
                     miApplication.reactionUserSettingDao.findByInstanceDomain(instance!!)?.map {
                         it.reaction

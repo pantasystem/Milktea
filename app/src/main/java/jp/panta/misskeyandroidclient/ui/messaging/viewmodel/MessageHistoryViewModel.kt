@@ -34,13 +34,14 @@ class MessageHistoryViewModel(
         extraBufferCapacity = 100
     )
 
-    private val updateEvent = miCore.getCurrentAccount().filterNotNull().flatMapLatest { account ->
-        miCore.messageObserver.observeAccountMessages(account).map {
-            account to miCore.getGetters().messageRelationGetter.get(it)
-        }
-    }.map { (a, msg) ->
-        a to msg.toHistory(miCore.getGroupRepository(), miCore.getUserRepository())
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    private val updateEvent =
+        miCore.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+            miCore.messageObserver.observeAccountMessages(account).map {
+                account to miCore.getGetters().messageRelationGetter.get(it)
+            }
+        }.map { (a, msg) ->
+            a to msg.toHistory(miCore.getGroupRepository(), miCore.getUserRepository())
+        }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val fetchUserMsgHistories = _actionFetchMessageHistories.map {
         logger.debug("読み込み命令を検出")
@@ -84,14 +85,14 @@ class MessageHistoryViewModel(
             )
         } else {
             list.map {
-                if(it.messagingId == anyMsg.messagingId) {
+                if (it.messagingId == anyMsg.messagingId) {
                     HistoryViewData(
                         a,
                         ev,
                         miCore.getUnreadMessages(),
                         viewModelScope,
                     )
-                }else{
+                } else {
                     it
                 }
             }

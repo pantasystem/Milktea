@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
@@ -13,7 +12,6 @@ import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
@@ -56,14 +54,12 @@ import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 //基本的な情報はここを返して扱われる
 @HiltAndroidApp
@@ -90,7 +86,7 @@ class MiApplication : Application(), MiCore {
 
     //private val mAccountsState = MutableStateFlow(emptyList<Account>())
     //private val mCurrentAccountState = MutableStateFlow<Account?>(null)
-    @Inject lateinit var accountStore: AccountStore
+    @Inject lateinit var mAccountStore: AccountStore
 
     @Inject lateinit var mEncryption: Encryption
 
@@ -217,7 +213,7 @@ class MiApplication : Application(), MiCore {
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
 
         val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
-        getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+        getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
             getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
                 ac to body
             }
@@ -237,7 +233,7 @@ class MiApplication : Application(), MiCore {
                     if(ev is AccountRepository.Event.Deleted) {
                         mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
                     }
-                    accountStore.initialize()
+                    mAccountStore.initialize()
                 }catch(e: Exception) {
                     logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
                 }
@@ -248,7 +244,7 @@ class MiApplication : Application(), MiCore {
             try{
                 //val connectionInstances = connectionInstanceDao!!.findAll()
                 AccountMigration(database.accountDao(), mAccountRepository, sharedPreferences).executeMigrate()
-                accountStore.initialize()
+                mAccountStore.initialize()
             }catch(e: Exception){
                 logger.error("load account error", e = e)
                 //isSuccessCurrentAccount.postValue(false)
@@ -286,22 +282,12 @@ class MiApplication : Application(), MiCore {
         }.addOnFailureListener {
             logger.debug("fcm token取得失敗", e = it)
         }
-        accountStore.state.onEach {
+        mAccountStore.state.onEach {
             setUpMetaMap(it.accounts)
         }
     }
 
-    override fun getAccounts(): StateFlow<List<Account>> {
-        return accountStore.state.map {
-            it.accounts
-        }.stateIn(applicationScope, SharingStarted.Eagerly, emptyList())
-    }
 
-    override fun getCurrentAccount(): StateFlow<Account?> {
-        return accountStore.state.map {
-            it.currentAccount
-        }.stateIn(applicationScope, SharingStarted.Eagerly, null)
-    }
 
     override suspend fun getAccount(accountId: Long): Account {
         return mAccountRepository.get(accountId)
@@ -311,6 +297,9 @@ class MiApplication : Application(), MiCore {
         return getUrlPreviewStore(account, false)
     }
 
+    override fun getAccountStore(): AccountStore {
+        return mAccountStore
+    }
 
 
     override fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter {
@@ -369,7 +358,7 @@ class MiApplication : Application(), MiCore {
                     urlPreviewDAO
                     ,mSettingStore.urlPreviewSetting.getSourceType(),
                     mSettingStore.urlPreviewSetting.getSummalyUrl(),
-                    accountStore.state.value.currentAccount
+                    mAccountStore.state.value.currentAccount
                 ).create()
             }
             mUrlPreviewStoreInstanceBaseUrlMap[url] = store
@@ -380,7 +369,7 @@ class MiApplication : Application(), MiCore {
     override suspend fun setCurrentAccount(account: Account) {
         try{
             mAccountRepository.setCurrentAccount(account)
-            accountStore.initialize()
+            mAccountStore.initialize()
 //            loadAndInitializeAccounts()
         }catch(e: Exception){
             logger.error("switchAccount error", e)
@@ -391,7 +380,7 @@ class MiApplication : Application(), MiCore {
         try{
             mAccountRepository.add(account, true)
 
-            accountStore.initialize()
+            mAccountStore.initialize()
 
         }catch(e: Exception){
 
@@ -410,7 +399,7 @@ class MiApplication : Application(), MiCore {
             }catch(e: Exception){
                 logger.error("アカウント更新処理中にエラー発生", e)
             }
-            accountStore.initialize()
+            mAccountStore.initialize()
 
         }
     }
@@ -423,7 +412,7 @@ class MiApplication : Application(), MiCore {
                     it == page || it.pageId == page.pageId
                 })
                 mAccountRepository.add(removed, true)
-                accountStore.initialize()
+                mAccountStore.initialize()
 
             }catch(e: AccountNotFoundException){
             }
@@ -435,7 +424,7 @@ class MiApplication : Application(), MiCore {
             try{
                 val updated = mAccountRepository.getCurrentAccount().copy(pages = pages)
                 mAccountRepository.add(updated, true)
-                accountStore.initialize()
+                mAccountStore.initialize()
 
             }catch(e: AccountNotFoundException){
             }
@@ -575,7 +564,7 @@ class MiApplication : Application(), MiCore {
 
 
     override fun getCurrentInstanceMeta(): Meta?{
-        return accountStore.state.value.currentAccount?.instanceDomain?.let{ url ->
+        return mAccountStore.state.value.currentAccount?.instanceDomain?.let{ url ->
             mMetaCache.get(url)
         }
     }
@@ -631,7 +620,7 @@ class MiApplication : Application(), MiCore {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when(key){
                 UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
-                    accountStore.state.value.accounts.forEach {
+                    mAccountStore.state.value.accounts.forEach {
                         getUrlPreviewStore(it, true)
                     }
                 }

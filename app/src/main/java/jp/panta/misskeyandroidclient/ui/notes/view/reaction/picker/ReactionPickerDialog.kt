@@ -39,7 +39,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         val binding = DialogReactionPickerBinding.bind(view)
 
         val miApplication = view.context.applicationContext as MiApplication
-        val ac = miApplication.getCurrentAccount().value
+        val ac = miApplication.getAccountStore().currentAccount
 
 
         val adapter =
@@ -73,7 +73,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         }
 
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis

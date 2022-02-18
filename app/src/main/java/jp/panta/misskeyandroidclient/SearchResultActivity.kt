@@ -74,7 +74,7 @@ class SearchResultActivity : AppCompatActivity() {
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         invalidateOptionsMenu()
 
-        (application as MiCore).getCurrentAccount().onEach { ar ->
+        (application as MiCore).getAccountStore().observeCurrentAccount.onEach { ar ->
             mAccountRelation = ar
         }.launchIn(lifecycleScope)
 

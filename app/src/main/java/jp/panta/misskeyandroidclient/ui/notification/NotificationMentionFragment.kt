@@ -41,7 +41,7 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
         mBinding.notificationTab.setupWithViewPager(mBinding.notificationPager)
 
         val miCore = requireContext().applicationContext as MiApplication
-        miCore.getCurrentAccount().filterNotNull().onEach {
+        miCore.getAccountStore().observeCurrentAccount.filterNotNull().onEach {
             notificationPagerAdapter.notifyDataSetChanged()
         }.launchIn(lifecycleScope)
 

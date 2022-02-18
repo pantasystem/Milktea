@@ -49,7 +49,7 @@ class SearchUserViewModel @Inject constructor(
     val userName = MutableLiveData<String>()
     val host = MutableLiveData<String>()
 
-    private val searchState = miCore.getCurrentAccount().filterNotNull()
+    private val searchState = miCore.getAccountStore().observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
             searchUserRequests.distinctUntilChanged()
                 .flatMapLatest {

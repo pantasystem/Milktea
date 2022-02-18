@@ -5,8 +5,10 @@ import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.instance.FetchMeta
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,6 +24,16 @@ class AccountStore @Inject constructor(
     private val _state = MutableStateFlow<AccountState>(AccountState())
     val state: StateFlow<AccountState> = _state
 
+    val currentAccount: Account?
+        get() = state.value.currentAccount
+
+    val currentAccountId: Long?
+        get() = currentAccount?.accountId
+
+    val observeCurrentAccount: Flow<Account?>
+        get() = state.map { it.currentAccount }
+    val observeAccounts: Flow<List<Account>>
+        get() = state.map { it.accounts }
 
     init {
         accountRepository.addEventListener {
@@ -99,5 +111,4 @@ class AccountStore @Inject constructor(
             logger.error("default pages create error", e)
         }
     }
-
 }

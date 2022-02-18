@@ -45,7 +45,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
 
         val activity = activity
         val miApplication = context?.applicationContext as MiApplication
-        val ar  = miApplication.getCurrentAccount().value
+        val ar  = miApplication.getAccountStore().currentAccount
 
         activity?: return
         ar?: return
@@ -53,7 +53,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
         mNoteViewModel = notesViewModel
 
 
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis

@@ -108,6 +108,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     @Inject lateinit var accountStore: AccountStore
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val accountViewModel: AccountViewModel by viewModels()
+
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -172,10 +175,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         binding.addressUsersView.applyFlexBoxLayout(this)
 
 
-        val accountViewModel = ViewModelProvider(
-            this,
-            AccountViewModel.Factory(miApplication)
-        )[AccountViewModel::class.java]
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
         accountViewModel.switchAccount.observe(this) {
@@ -191,7 +190,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             startActivity(intent)
         }
 
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis
@@ -449,7 +448,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
-            .putExtra(DriveActivity.EXTRA_ACCOUNT_ID, miCore.getCurrentAccount().value?.accountId)
+            .putExtra(DriveActivity.EXTRA_ACCOUNT_ID, accountStore.currentAccount?.accountId)
         intent.action = Intent.ACTION_OPEN_DOCUMENT
         openDriveActivityResult.launch(intent)
     }

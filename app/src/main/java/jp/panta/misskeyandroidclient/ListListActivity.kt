@@ -72,7 +72,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         }else{
             val pullPushUserViewModel = ViewModelProvider(this, UserListPullPushUserViewModel.Factory(miCore))[UserListPullPushUserViewModel::class.java]
 
-            miCore.getCurrentAccount().filterNotNull().onEach{
+            miCore.getAccountStore().observeCurrentAccount.filterNotNull().onEach{
                 pullPushUserViewModel.account.value = it
             }.launchIn(lifecycleScope)
 
@@ -94,9 +94,9 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
         mBinding.contentListList.listListView.adapter = listAdapter
         mBinding.contentListList.listListView.layoutManager = layoutManager
-        mListListViewModel.userListList.observe(this, { userListList ->
+        mListListViewModel.userListList.observe(this) { userListList ->
             listAdapter.submitList(userListList)
-        })
+        }
 
 
         setUpObservers()

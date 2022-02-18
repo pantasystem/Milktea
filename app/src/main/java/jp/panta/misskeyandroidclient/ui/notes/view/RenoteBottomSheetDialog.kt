@@ -23,7 +23,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
         dialog.setContentView(view)
         val binding = DialogRenoteBinding.bind(view)
         val miApplication = context?.applicationContext as MiApplication
-        val account = miApplication.getCurrentAccount().value
+        val account = miApplication.getAccountStore().currentAccount
         //val requestSetting =
 
 

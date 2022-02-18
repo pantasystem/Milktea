@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     val mNotesViewModel: NotesViewModel by viewModels()
 
     @ExperimentalCoroutinesApi
-    private lateinit var mAccountViewModel: AccountViewModel
+    private val mAccountViewModel: AccountViewModel by viewModels()
 
     private lateinit var mBottomNavigationAdapter: MainBottomNavigationAdapter
 
@@ -127,10 +127,6 @@ class MainActivity : AppCompatActivity() {
 
         val miApplication = application as MiApplication
 
-        mAccountViewModel = ViewModelProvider(
-            this,
-            AccountViewModel.Factory(miApplication)
-        )[AccountViewModel::class.java]
         initAccountViewModelListener()
         binding.setupHeaderProfile()
 
@@ -141,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         ).initViewModelListener()
 
         // NOTE: メッセージの既読数をバッジに表示する
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getUnreadMessages().findByAccountId(it.accountId)
         }.map {
             it.size
@@ -178,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // NOTE: 通知の既読数を表示する
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getNotificationRepository().countUnreadNotification(it.accountId)
         }.flowOn(Dispatchers.IO).onEach { count ->
             if (count <= 0) {
@@ -195,7 +191,7 @@ class MainActivity : AppCompatActivity() {
         }.launchIn(lifecycleScope)
 
         // NOTE: 最新の通知をSnackBar等に表示する
-        miApplication.getCurrentAccount().filterNotNull().flatMapLatest { ac ->
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
             miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
                 body as? ChannelBody.Main.Notification
             }.filterNotNull().map {
@@ -213,7 +209,7 @@ class MainActivity : AppCompatActivity() {
 
         if (BuildConfig.DEBUG) {
             lifecycleScope.launchWhenResumed {
-                miApplication.getCurrentAccount().filterNotNull().flatMapLatest {
+                accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
                     miApplication.getSocket(it).stateEvent()
                 }.catch { e ->
                     logger.error("WebSocket　状態取得エラー", e)
@@ -528,7 +524,7 @@ class MainActivity : AppCompatActivity() {
 
 @ExperimentalCoroutinesApi
 fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
-    return getCurrentAccount().filterNotNull().flatMapLatest {
+    return getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
         getMetaRepository().observe(it.instanceDomain)
     }.map {
         it?.let {

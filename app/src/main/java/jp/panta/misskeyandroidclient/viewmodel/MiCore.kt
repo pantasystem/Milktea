@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -58,9 +59,6 @@ interface MiCore {
 
     val loggerFactory: Logger.Factory
 
-    fun getAccounts(): StateFlow<List<Account>>
-
-    fun getCurrentAccount(): StateFlow<Account?>
 
     @Throws(AccountNotFoundException::class)
     suspend fun getAccount(accountId: Long): Account
@@ -157,4 +155,5 @@ interface MiCore {
 
     fun getNoteReservationPostExecutor(): NoteReservationPostExecutor
 
+    fun getAccountStore(): AccountStore
 }

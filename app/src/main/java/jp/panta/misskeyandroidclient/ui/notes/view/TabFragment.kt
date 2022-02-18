@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.*
 class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
 
-
     private var mPagerAdapter: TimelinePagerAdapter? = null
 
     private val binding: FragmentTabBinding by dataBinding()
@@ -38,13 +37,19 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
         val miApp = context?.applicationContext as MiApplication
 
-        val sharedPreferences = requireContext().getSharedPreferences(requireContext().getPreferenceName(), Context.MODE_PRIVATE)
-        val includeMyRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_MY_RENOTES.name, true)
-        val includeRenotedMyNotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name, true)
-        val includeLocalRenotes = sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
+        val sharedPreferences = requireContext().getSharedPreferences(
+            requireContext().getPreferenceName(),
+            Context.MODE_PRIVATE
+        )
+        val includeMyRenotes =
+            sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_MY_RENOTES.name, true)
+        val includeRenotedMyNotes =
+            sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name, true)
+        val includeLocalRenotes =
+            sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
 
         mPagerAdapter = binding.viewPager.adapter as? TimelinePagerAdapter
-        if(mPagerAdapter == null){
+        if (mPagerAdapter == null) {
             mPagerAdapter = TimelinePagerAdapter(this.childFragmentManager, emptyList())
             binding.viewPager.adapter = mPagerAdapter
         }
@@ -52,43 +57,38 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
 
         Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
-        miApp.getCurrentAccount().filterNotNull().flowOn(Dispatchers.IO).onEach { account ->
-            val pages = account.pages
+        miApp.getAccountStore().observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
+            .onEach { account ->
+                val pages = account.pages
+                Log.d("TabFragment", "pages:$pages")
+                mPagerAdapter?.setList(
+                    account,
+                    pages.sortedBy {
+                        it.weight
+                    })
+                //mPagerAdapter?.notifyDataSetChanged()
+                binding.tabLayout.setupWithViewPager(binding.viewPager)
 
-
-            Log.d("TabFragment", "pages:$pages")
-
-
-            mPagerAdapter?.setList(
-                account,
-                pages.sortedBy {
-                    it.weight
-                })
-            //mPagerAdapter?.notifyDataSetChanged()
-
-
-            binding.tabLayout.setupWithViewPager(binding.viewPager)
-
-
-            if(pages.size <= 1){
-                binding.tabLayout.visibility = View.GONE
-                binding.elevationView.visibility = View.VISIBLE
-            }else{
-                binding.tabLayout.visibility = View.VISIBLE
-                binding.elevationView.visibility = View.GONE
-                binding.tabLayout.elevation
-                if(pages.size > 5) {
-                    binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
-                }else{
-                    binding.tabLayout.tabMode = TabLayout.MODE_FIXED
+                if (pages.size <= 1) {
+                    binding.tabLayout.visibility = View.GONE
+                    binding.elevationView.visibility = View.VISIBLE
+                } else {
+                    binding.tabLayout.visibility = View.VISIBLE
+                    binding.elevationView.visibility = View.GONE
+                    binding.tabLayout.elevation
+                    if (pages.size > 5) {
+                        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+                    } else {
+                        binding.tabLayout.tabMode = TabLayout.MODE_FIXED
+                    }
                 }
-            }
-        }.launchIn(lifecycleScope)
+            }.launchIn(lifecycleScope)
 
     }
 
 
-    class TimelinePagerAdapter( fragmentManager: FragmentManager, list: List<Page>) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) :
+        FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         private var requestBaseList: List<Page> = list
             private set
         private var oldRequestBaseSetting = requestBaseList
@@ -107,7 +107,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
             val item = requestBaseList[position]
             val fragment = PageableFragmentFactory.create(item)
 
-            if(fragment is ScrollableTop){
+            if (fragment is ScrollableTop) {
                 scrollableTopFragments.add(fragment)
             }
             mFragments.add(fragment)
@@ -115,31 +115,30 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         }
 
 
-        override fun getPageTitle(position: Int): String{
+        override fun getPageTitle(position: Int): String {
             val page = requestBaseList[position]
             return page.title
         }
 
         override fun getItemPosition(any: Any): Int {
             val target = any as Fragment
-            if(mFragments.contains(target)){
+            if (mFragments.contains(target)) {
                 return PagerAdapter.POSITION_UNCHANGED
             }
             return PagerAdapter.POSITION_NONE
         }
 
 
-        fun setList(account: Account, list: List<Page>){
+        fun setList(account: Account, list: List<Page>) {
             mFragments.clear()
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list
             this.account = account
-            if(requestBaseList != oldRequestBaseSetting){
+            if (requestBaseList != oldRequestBaseSetting) {
                 notifyDataSetChanged()
             }
 
         }
-
 
 
     }
@@ -148,12 +147,12 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         showTopCurrentFragment()
     }
 
-    private fun showTopCurrentFragment(){
-        try{
-            mPagerAdapter?.scrollableTopFragments?.forEach{
+    private fun showTopCurrentFragment() {
+        try {
+            mPagerAdapter?.scrollableTopFragments?.forEach {
                 it.showTop()
             }
-        }catch(e: UninitializedPropertyAccessException){
+        } catch (e: UninitializedPropertyAccessException) {
 
         }
 

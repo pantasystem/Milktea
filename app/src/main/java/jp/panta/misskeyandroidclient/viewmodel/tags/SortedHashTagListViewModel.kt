@@ -53,12 +53,12 @@ class SortedHashTagListViewModel(
     val isLoading = MutableLiveData<Boolean>()
 
     init{
-        miCore.getCurrentAccount().filterNotNull().flowOn(Dispatchers.IO).onEach {
+        miCore.getAccountStore().observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO).onEach {
             load()
         }.launchIn(viewModelScope)
     }
     fun load(){
-        val account = miCore.getCurrentAccount().value
+        val account = miCore.getAccountStore().currentAccount
             ?:return
         isLoading.value = true
         val i = runCatching { account.getI(miCore.getEncryption()) }.getOrNull()

@@ -413,7 +413,7 @@ class NotesViewModel @Inject constructor(
     }
 
     fun getAccount(): Account? {
-        return miCore.getCurrentAccount().value
+        return miCore.getAccountStore().currentAccount
     }
 
 
