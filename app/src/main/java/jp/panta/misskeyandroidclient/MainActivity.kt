@@ -520,15 +520,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-}
-
-@ExperimentalCoroutinesApi
-fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
-    return getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
-        getMetaRepository().observe(it.instanceDomain)
-    }.map {
-        it?.let {
-            this.getMisskeyAPIProvider().get(it.uri, it.getVersion())
+    @ExperimentalCoroutinesApi
+    fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
+        return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            getMetaRepository().observe(it.instanceDomain)
+        }.map {
+            it?.let {
+                this.getMisskeyAPIProvider().get(it.uri, it.getVersion())
+            }
         }
     }
+
 }
+

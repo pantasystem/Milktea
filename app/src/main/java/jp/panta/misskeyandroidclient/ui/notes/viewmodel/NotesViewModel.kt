@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.api.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
@@ -48,7 +49,7 @@ class NotesViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val miCore: MiCore
+    val accountStore: AccountStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
 
@@ -413,7 +414,7 @@ class NotesViewModel @Inject constructor(
     }
 
     fun getAccount(): Account? {
-        return miCore.getAccountStore().currentAccount
+        return accountStore.currentAccount
     }
 
 

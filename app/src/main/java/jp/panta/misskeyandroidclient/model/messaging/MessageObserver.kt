@@ -9,8 +9,11 @@ import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProv
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MessageObserver(
+@Singleton
+class MessageObserver @Inject constructor(
     private val accountRepository: AccountRepository,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val getters: Getters

@@ -14,6 +14,8 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notification.PushNotification
 import jp.panta.misskeyandroidclient.model.notification.toPushNotification
@@ -22,6 +24,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
 const val NOTIFICATION_CHANNEL_ID =
     "jp.panta.misskeyandroidclient.NotificationService.NOTIFICATION_CHANNEL_ID"
@@ -30,8 +33,11 @@ const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifi
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
 
+
+    @Inject lateinit var accountStore: AccountStore
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -53,7 +59,7 @@ class FCMService : FirebaseMessagingService() {
         // receive message
         val pushNotification = msg.data.toPushNotification()
         val isCurrentAccountsNotification =
-            (application as? MiCore)?.getAccountStore()?.currentAccountId == pushNotification.accountId
+            accountStore.currentAccountId == pushNotification.accountId
 
         if (isCurrentAccountsNotification) {
             // 通知がcurrent accountでプッシュ通知の不要なActivityがActiveな時はこれ以上処理をしない

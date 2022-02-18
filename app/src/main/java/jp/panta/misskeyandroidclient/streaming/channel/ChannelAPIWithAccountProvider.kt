@@ -5,8 +5,10 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
-class ChannelAPIWithAccountProvider (
+
+class ChannelAPIWithAccountProvider @Inject constructor(
     private val socketWithAccountProvider: SocketWithAccountProvider,
     private val loggerFactory: Logger.Factory
 ) {
@@ -15,11 +17,11 @@ class ChannelAPIWithAccountProvider (
     private val logger = loggerFactory.create("ChannelAPIWithAccountProvider")
     private val mutex = Mutex()
 
-    suspend fun get(account: Account) : ChannelAPI{
+    suspend fun get(account: Account): ChannelAPI {
         mutex.withLock {
             logger.debug("ChannelAPIWithAccountProvider get accountId=${account.accountId} hash=${hashCode()}")
             var channelAPI = accountWithChannelAPI[account.accountId]
-            if(channelAPI != null){
+            if (channelAPI != null) {
                 return channelAPI
             }
             channelAPI = ChannelAPI(socketWithAccountProvider.get(account), loggerFactory)

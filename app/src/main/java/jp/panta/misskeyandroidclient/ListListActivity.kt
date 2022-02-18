@@ -7,15 +7,14 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.list.UserList
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.list.ListListAdapter
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
@@ -25,6 +24,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -47,6 +47,12 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     @ExperimentalCoroutinesApi
     val mListListViewModel: ListListViewModel by viewModels()
 
+    val pullPushUserViewModel: UserListPullPushUserViewModel by viewModels()
+
+    @Inject
+    lateinit var accountStore: AccountStore
+
+
     private var mPullPushUserViewModelEventDisposable: Disposable? = null
 
     private lateinit var mBinding: ActivityListListBinding
@@ -58,8 +64,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
         val addUserId = intent.getSerializableExtra(EXTRA_ADD_USER_ID) as? User.Id
 
-        val miCore = application as MiCore
-
         val layoutManager = LinearLayoutManager(this)
 
         val listAdapter =
@@ -70,9 +74,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
                 this
             )
         }else{
-            val pullPushUserViewModel = ViewModelProvider(this, UserListPullPushUserViewModel.Factory(miCore))[UserListPullPushUserViewModel::class.java]
 
-            miCore.getAccountStore().observeCurrentAccount.filterNotNull().onEach{
+            accountStore.observeCurrentAccount.filterNotNull().onEach{
                 pullPushUserViewModel.account.value = it
             }.launchIn(lifecycleScope)
 
