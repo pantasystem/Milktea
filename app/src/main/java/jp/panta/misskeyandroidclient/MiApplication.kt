@@ -284,7 +284,7 @@ class MiApplication : Application(), MiCore {
         }
         mAccountStore.state.onEach {
             setUpMetaMap(it.accounts)
-        }
+        }.launchIn(applicationScope + Dispatchers.IO)
     }
 
 
@@ -564,7 +564,7 @@ class MiApplication : Application(), MiCore {
 
 
     override fun getCurrentInstanceMeta(): Meta?{
-        return mAccountStore.state.value.currentAccount?.instanceDomain?.let{ url ->
+        return mAccountStore.currentAccount?.instanceDomain?.let{ url ->
             mMetaCache.get(url)
         }
     }
