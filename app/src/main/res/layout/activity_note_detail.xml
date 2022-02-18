@@ -12,7 +12,6 @@
                 android:id="@+id/noteDetailToolbar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme"
                 android:elevation="4dp"
