@@ -49,7 +49,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.StateFlow
 
-interface MiCore{
+interface MiCore {
 
 
     @ExperimentalCoroutinesApi
@@ -63,7 +63,7 @@ interface MiCore{
     fun getCurrentAccount(): StateFlow<Account?>
 
     @Throws(AccountNotFoundException::class)
-    suspend fun getAccount(accountId: Long) : Account
+    suspend fun getAccount(accountId: Long): Account
 
     fun getAccountRepository(): AccountRepository
 
@@ -87,13 +87,13 @@ interface MiCore{
 
     fun getGroupRepository(): GroupRepository
 
-    fun getFilePropertyDataSource() : FilePropertyDataSource
+    fun getFilePropertyDataSource(): FilePropertyDataSource
 
-    fun getDriveFileRepository() : DriveFileRepository
+    fun getDriveFileRepository(): DriveFileRepository
 
-    fun getSubscriptionRegistration() : SubscriptionRegistration
+    fun getSubscriptionRegistration(): SubscriptionRegistration
 
-    fun getSubscriptionUnRegstration() : SubscriptionUnRegistration
+    fun getSubscriptionUnRegstration(): SubscriptionUnRegistration
 
     suspend fun setCurrentAccount(account: Account)
 
@@ -105,22 +105,19 @@ interface MiCore{
 
     fun removePageInCurrentAccount(page: Page)
 
-    fun removeAllPagesInCurrentAccount(pages: List<Page>)
-
 
     fun getEncryption(): Encryption
 
 
     suspend fun getChannelAPI(account: Account): ChannelAPI
 
-    fun getNoteCaptureAdapter() : NoteCaptureAPIAdapter
+    fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter
 
     fun getSocket(account: Account): Socket
 
-    fun getNoteCaptureAPI(account: Account) : NoteCaptureAPI
+    fun getNoteCaptureAPI(account: Account): NoteCaptureAPI
 
     fun getCurrentInstanceMeta(): Meta?
-
 
 
     fun getSettingStore(): SettingStore
@@ -136,9 +133,9 @@ interface MiCore{
 
     fun getDraftNoteDAO(): DraftNoteDao
 
-    fun getUnreadNotificationDAO() : UnreadNotificationDAO
+    fun getUnreadNotificationDAO(): UnreadNotificationDAO
 
-    fun getTaskExecutor() : TaskExecutor
+    fun getTaskExecutor(): TaskExecutor
 
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
@@ -160,5 +157,4 @@ interface MiCore{
 
     fun getNoteReservationPostExecutor(): NoteReservationPostExecutor
 
-    fun getUserNicknameRepository(): UserNicknameRepository
 }

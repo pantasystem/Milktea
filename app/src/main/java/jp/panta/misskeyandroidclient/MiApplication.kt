@@ -49,7 +49,6 @@ import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
-import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import jp.panta.misskeyandroidclient.streaming.*
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
@@ -149,8 +148,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
 
-    @Inject
-    lateinit var mUserNicknameRepository: UserNicknameRepository
 
     @Inject
     lateinit var noteTranslationStore: NoteTranslationStore
@@ -418,26 +415,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun removeAllPagesInCurrentAccount(pages: List<Page>) {
-        applicationScope.launch(Dispatchers.IO) {
-
-            val account = getCurrentAccountErrorSafe()?: return@launch
-            val removed = account.pages.filterNot{ i ->
-                i.pageId == pages.firstOrNull { j ->
-                    i.pageId == j.pageId
-                }?.pageId
-            }
-            try{
-                mAccountRepository.add(account.copy(pages = removed), true)
-                loadAndInitializeAccounts()
-            }catch(e: AccountNotFoundException){
-                logger.error("ページを削除しようとしたところエラーが発生した", e)
-            }
-        }
-    }
-
-
-
     override fun removePageInCurrentAccount(page: Page) {
         applicationScope.launch(Dispatchers.IO){
             try{
@@ -554,9 +531,7 @@ class MiApplication : Application(), MiCore {
         return mNoteReservationPostExecutor
     }
 
-    override fun getUserNicknameRepository(): UserNicknameRepository {
-        return mUserNicknameRepository
-    }
+
 
     private suspend fun loadAndInitializeAccounts(){
         try{

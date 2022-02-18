@@ -10,8 +10,12 @@ import jp.panta.misskeyandroidclient.api.notes.NoteState
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.draft.toDraftNote
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
@@ -32,40 +36,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-//sealed interface Action {
-//    data class ShowRenoteDialog(val note: PlaneNoteViewData) : Action
-//    data class ShowQuoteEditor(val note: PlaneNoteViewData) : Action
-//    data class ShowReplyEditor(val note: PlaneNoteViewData) : Action
-//    data class ShowReactionPicker(val note: PlaneNoteViewData) : Action
-//    data class ShowOptionalDialog(val note: PlaneNoteViewData) : Action
-//    data class ShowReportConfirmDialog(val report: Report) : Action
-//    data class ShowNoteDetail(val note: PlaneNoteViewData) : Action
-//    data class ShowUserDetail(val user: User) : Action
-//
-//}
-//
-//sealed interface NotesState {
-//
-//    sealed interface SendRenoteState : NotesState {
-//        val note: Note
-//        data class Sending(override val note: Note) : SendRenoteState
-//        data class Success(override val note: Note) : SendRenoteState
-//        data class Failure(override val note: Note) : SendRenoteState
-//    }
-//
-//    data class GetNoteStatusState (val note: Note, val noteState: State<NoteState>) : NotesState
-//
-//
-//}
+
 data class SelectedReaction(val noteId: Note.Id, val reaction: String)
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    val miCore: MiCore,
-    private val reactionHistoryDao: ReactionHistoryDao
+    private val reactionHistoryDao: ReactionHistoryDao,
+    private val encryption: Encryption,
+    private val translationStore: NoteTranslationStore,
+    private val draftNoteDAO: DraftNoteDao,
+    private val noteRepository: NoteRepository,
+    private val accountRepository: AccountRepository,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val miCore: MiCore
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
-    val encryption = miCore.getEncryption()
 
     val statusMessage = EventBus<String>()
 
@@ -109,34 +94,34 @@ class NotesViewModel @Inject constructor(
      */
     val showRemoteReactionEmojiSuggestionDialog = EventBus<SelectedReaction?>()
 
-    fun setTargetToReNote(note: PlaneNoteViewData){
+    fun setTargetToReNote(note: PlaneNoteViewData) {
         //reNoteTarget.postValue(note)
         Log.d("NotesViewModel", "登録しました: $note")
         reNoteTarget.event = note
     }
 
-    fun setTargetToReply(note: PlaneNoteViewData){
+    fun setTargetToReply(note: PlaneNoteViewData) {
         replyTarget.event = note
     }
 
-    fun setTargetToShare(note: PlaneNoteViewData){
+    fun setTargetToShare(note: PlaneNoteViewData) {
         shareTarget.event = note
         loadNoteState(note)
     }
 
-    fun setTargetToUser(user: User){
+    fun setTargetToUser(user: User) {
         targetUser.event = user
     }
 
-    fun setTargetToNote(){
+    fun setTargetToNote() {
         showNoteEvent.event = shareTarget.event?.toShowNote?.note
     }
 
-    fun setTargetToNote(note: PlaneNoteViewData){
+    fun setTargetToNote(note: PlaneNoteViewData) {
         showNoteEvent.event = note.toShowNote.note
     }
 
-    fun setShowNote(note: Note){
+    fun setShowNote(note: Note) {
         showNoteEvent.event = note
     }
 
@@ -150,13 +135,20 @@ class NotesViewModel @Inject constructor(
         showRenotesEvent.event = noteId
     }
 
-    fun postRenote(){
+    fun postRenote() {
         val renoteId = reNoteTarget.event?.toShowNote?.note?.id
-            ?:return
+            ?: return
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val author = miCore.getAccountRepository().get(renoteId.accountId)
-                miCore.getNoteRepository().create(CreateNote(renoteId = renoteId, text = null, visibility = Visibility.Public(true), author = author))
+                val author = accountRepository.get(renoteId.accountId)
+                noteRepository.create(
+                    CreateNote(
+                        renoteId = renoteId,
+                        text = null,
+                        visibility = Visibility.Public(true),
+                        author = author
+                    )
+                )
             }.onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "renoteしました"
@@ -171,32 +163,32 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    fun putQuoteRenoteTarget(){
+    fun putQuoteRenoteTarget() {
         quoteRenoteTarget.event = reNoteTarget.event
     }
 
     /**
      * イベントにリアクション送信ボタンを押したことを登録する
      */
-    fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData){
+    fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData) {
         //Log.d("NotesViewModel", "getAccount()?: $getAccount()?")
         val myReaction = planeNoteViewData.myReaction.value
-        if(myReaction != null){
-            viewModelScope.launch(Dispatchers.IO){
-                try{
+        if (myReaction != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
                     syncDeleteReaction(planeNoteViewData)
-                }catch(e: Exception){
+                } catch (e: Exception) {
                     Log.d(TAG, "error", e)
                 }
             }
-        }else{
+        } else {
             reactionTarget.event = planeNoteViewData
         }
     }
 
 
-    fun postReaction(reaction: String){
-        val targetNote =  reactionTarget.event
+    fun postReaction(reaction: String) {
+        val targetNote = reactionTarget.event
         require(targetNote != null) {
             "targetNoteはNotNullである必要があります。"
         }
@@ -208,23 +200,24 @@ class NotesViewModel @Inject constructor(
      * @param reaction 既存のリアクションと値が同様の場合は解除のみする
      * 既に含まれているmyReactionと一致しない場合は一度解除し再送する
      */
-    fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String){
+    fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String) {
 
         val id = planeNoteViewData.toShowNote.note.id
-        if(!Reaction(reaction).isLocal()) {
-            showRemoteReactionEmojiSuggestionDialog.event = SelectedReaction(noteId = id, reaction = reaction)
+        if (!Reaction(reaction).isLocal()) {
+            showRemoteReactionEmojiSuggestionDialog.event =
+                SelectedReaction(noteId = id, reaction = reaction)
             return
         }
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
 
             runCatching {
-                val result = miCore.getNoteRepository().toggleReaction(
+                val result = noteRepository.toggleReaction(
                     CreateReaction(
                         noteId = id,
                         reaction = reaction
                     )
                 )
-                if(result) {
+                if (result) {
                     syncAddReactionHistory(reaction)
                 }
             }
@@ -237,24 +230,29 @@ class NotesViewModel @Inject constructor(
      * 同期リアクション削除
      * 既にリアクションが含まれている場合のみ実行される
      */
-    private suspend fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData){
-        if(planeNoteViewData.myReaction.value.isNullOrBlank()) {
+    private suspend fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData) {
+        if (planeNoteViewData.myReaction.value.isNullOrBlank()) {
             return
         }
-        miCore.getNoteRepository().unreaction(planeNoteViewData.toShowNote.note.id)
+        noteRepository.unreaction(planeNoteViewData.toShowNote.note.id)
     }
 
-    private fun syncAddReactionHistory(reaction: String){
-        try{
+    private fun syncAddReactionHistory(reaction: String) {
+        try {
             val domain = getAccount()?.instanceDomain
-            reactionHistoryDao.insert(ReactionHistory(instanceDomain = domain!!, reaction = reaction))
-        }catch(e: Exception){
+            reactionHistoryDao.insert(
+                ReactionHistory(
+                    instanceDomain = domain!!,
+                    reaction = reaction
+                )
+            )
+        } catch (e: Exception) {
             Log.e(TAG, "reaction追加中にエラー発生", e)
         }
     }
 
-    fun addFavorite(note: PlaneNoteViewData? = shareTarget.event){
-        note?: return
+    fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
+        note ?: return
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 getMisskeyAPI()?.createFavorite(
@@ -278,8 +276,8 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event){
-        note?: return
+    fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event) {
+        note ?: return
         viewModelScope.launch(Dispatchers.IO) {
             val result = runCatching {
                 val res = getMisskeyAPI()?.deleteFavorite(
@@ -292,9 +290,9 @@ class NotesViewModel @Inject constructor(
                 res
             }.getOrNull() != null
             withContext(Dispatchers.Main) {
-                statusMessage.event = if(result) {
+                statusMessage.event = if (result) {
                     "お気に入りから削除しました"
-                }else{
+                } else {
                     "お気に入りの削除に失敗しました"
                 }
             }
@@ -304,10 +302,10 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    fun removeNote(noteId: Note.Id){
+    fun removeNote(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getNoteRepository().delete(noteId)
+                noteRepository.delete(noteId)
             }.onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "削除に成功しました"
@@ -317,13 +315,13 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    fun removeAndEditNote(note: NoteRelation){
+    fun removeAndEditNote(note: NoteRelation) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
 
-                val id = miCore.getDraftNoteDAO().fullInsert(note.toDraftNote())
-                val dn = miCore.getDraftNoteDAO().getDraftNote(note.note.id.accountId, id)!!
-                miCore.getNoteRepository().delete(note.note.id)
+                val id = draftNoteDAO.fullInsert(note.toDraftNote())
+                val dn = draftNoteDAO.getDraftNote(note.note.id.accountId, id)!!
+                noteRepository.delete(note.note.id)
                 dn
             }.onSuccess {
                 withContext(Dispatchers.Main) {
@@ -337,13 +335,13 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    fun unRenote(planeNoteViewData: PlaneNoteViewData){
-        if(planeNoteViewData.isRenotedByMe){
+    fun unRenote(planeNoteViewData: PlaneNoteViewData) {
+        if (planeNoteViewData.isRenotedByMe) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
-                    miCore.getNoteRepository().delete(planeNoteViewData.note.note.id)
+                    noteRepository.delete(planeNoteViewData.note.note.id)
                 }.onSuccess {
-                    if(it) {
+                    if (it) {
                         withContext(Dispatchers.Main) {
                             statusMessage.event = "削除に成功しました"
                         }
@@ -357,18 +355,23 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    private fun loadNoteState(planeNoteViewData: PlaneNoteViewData){
+    private fun loadNoteState(planeNoteViewData: PlaneNoteViewData) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val response = getMisskeyAPI()?.noteState(NoteRequest(i = getAccount()?.getI(encryption)!!, noteId = planeNoteViewData.toShowNote.note.id.noteId))
+                val response = getMisskeyAPI()?.noteState(
+                    NoteRequest(
+                        i = getAccount()?.getI(encryption)!!,
+                        noteId = planeNoteViewData.toShowNote.note.id.noteId
+                    )
+                )
                     ?.throwIfHasError()
                 val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
-                if(nowNoteId == planeNoteViewData.toShowNote.note.id.noteId){
+                if (nowNoteId == planeNoteViewData.toShowNote.note.id.noteId) {
                     val state = response?.body()!!
                     Log.d(TAG, "state: $state")
                     shareNoteState.postValue(state)
                 }
-            }.onFailure { t->
+            }.onFailure { t ->
                 Log.e(TAG, "note stateの取得に失敗しました", t)
             }
         }
@@ -376,8 +379,8 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    fun vote(poll: PollViewData, choice: PollViewData.Choice){
-        if(SafeUnbox.unbox(poll.canVote.value)){
+    fun vote(poll: PollViewData, choice: PollViewData.Choice) {
+        if (SafeUnbox.unbox(poll.canVote.value)) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     getMisskeyAPI()?.vote(
@@ -398,20 +401,20 @@ class NotesViewModel @Inject constructor(
 
     fun translate(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-
-            miCore.getTranslationStore().translate(noteId)
-        }
-    }
-    
-    private fun getMisskeyAPI(): MisskeyAPI?{
-        return miCore.getCurrentAccount().value?.let{
-            miCore.getMisskeyAPIProvider().get(it)
+            translationStore.translate(noteId)
         }
     }
 
-    fun getAccount(): Account?{
+    private suspend fun getMisskeyAPI(): MisskeyAPI? {
+        return runCatching {
+            val account = accountRepository.getCurrentAccount()
+            misskeyAPIProvider.get(account.instanceDomain)
+        }.getOrNull()
+    }
+
+    fun getAccount(): Account? {
         return miCore.getCurrentAccount().value
     }
 
-    
+
 }
