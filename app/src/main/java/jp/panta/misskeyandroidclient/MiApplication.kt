@@ -11,9 +11,7 @@ import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountNotFoundException
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.*
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.drive.*
@@ -156,6 +154,10 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var noteTranslationStore: NoteTranslationStore
+
+    val makeDefaultPagesUseCase: MakeDefaultPagesUseCase by lazy {
+        MakeDefaultPagesUseCase(PageDefaultStringsOnAndroid(this))
+    }
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -598,33 +600,12 @@ class MiApplication : Application(), MiCore {
 
     private suspend fun saveDefaultPages(account: Account, meta: Meta?){
         try{
-            val pages = makeDefaultPages(account, meta)
+            val pages = makeDefaultPagesUseCase(account, meta)
             mAccountRepository.add(account.copy(pages = pages), true)
         }catch(e: Exception){
             logger.error("default pages create error", e)
         }
     }
-
-    private fun makeDefaultPages(account: Account, meta: Meta?): List<Page>{
-        val isGlobalEnabled = !(meta?.disableGlobalTimeline?: false)
-        val isLocalEnabled = !(meta?.disableLocalTimeline?: false)
-
-        val defaultPages = ArrayList<Page>()
-        defaultPages.add(PageableTemplate(account).homeTimeline(getString(R.string.home_timeline)))
-        if(isLocalEnabled){
-            defaultPages.add(PageableTemplate(account).hybridTimeline(getString(R.string.hybrid_timeline)))
-        }
-        if(isGlobalEnabled){
-            defaultPages.add(PageableTemplate(account).globalTimeline(getString(R.string.global_timeline)))
-        }
-        return defaultPages.mapIndexed { index, page ->
-            page.also {
-                page.weight = index
-            }
-        }
-    }
-
-
 
 
     override fun getCurrentInstanceMeta(): Meta?{
@@ -646,20 +627,18 @@ class MiApplication : Application(), MiCore {
 
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
-        try{
+        return try{
             val meta = mFetchMeta.fetch(instanceDomain)
 
             mMetaCache.put(instanceDomain, meta)
 
-            return meta
+            meta
 
         }catch(e: Exception){
             logger.error("metaの読み込み一連処理に失敗したでち", e)
             connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
-            return null
+            null
         }
-
-
     }
 
 

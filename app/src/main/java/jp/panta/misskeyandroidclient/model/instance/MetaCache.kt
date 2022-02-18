@@ -2,13 +2,14 @@ package jp.panta.misskeyandroidclient.model.instance
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * InMemoryなMetaのCache
  */
 @Singleton
-class MetaCache {
+class MetaCache @Inject constructor(){
 
     private val lock = Mutex()
     private var map = mapOf<String, Meta>()
