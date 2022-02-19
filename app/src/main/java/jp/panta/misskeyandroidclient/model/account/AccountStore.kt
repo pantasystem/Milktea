@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account
 
 import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.instance.FetchMeta
 import jp.panta.misskeyandroidclient.model.instance.Meta
@@ -60,6 +61,40 @@ class AccountStore @Inject constructor(
         accountRepository.setCurrentAccount(account)
         _state.value = state.value.setCurrentAccount(account)
     }
+
+    suspend fun addPage(page: Page): Boolean {
+        val account = _state.value.get(page.accountId)
+            ?: _state.value.currentAccount
+            ?: return false
+        val updated = account.copy(pages = account.pages.toMutableList().also { list ->
+            list.add(page)
+        })
+        _state.value = _state.value.add(accountRepository.add(updated, true))
+
+        return true
+    }
+
+    suspend fun replaceAllPage(pages: List<Page>): Result<Account> {
+        return runCatching {
+            val account = _state.value.currentAccount
+                ?: throw IllegalStateException()
+            val updated = account.copy(pages = pages)
+            val result = accountRepository.add(updated, true)
+            _state.value = _state.value.add(result)
+            result
+        }
+
+    }
+
+    suspend fun removePage(page: Page): Boolean {
+        val account = _state.value.get(page.accountId)
+            ?: _state.value.currentAccount
+            ?: return false
+        val updated = account.copy(pages = account.pages.filterNot { it.pageId == page.pageId })
+        _state.value = _state.value.add(accountRepository.add(updated, true))
+        return true
+    }
+
 
     suspend fun initialize() {
         try{
