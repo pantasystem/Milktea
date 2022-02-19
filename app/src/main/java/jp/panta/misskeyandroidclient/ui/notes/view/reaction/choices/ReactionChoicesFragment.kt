@@ -10,18 +10,23 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
 import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
+import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @FlowPreview
+@AndroidEntryPoint
 class ReactionChoicesFragment : Fragment() {
 
     companion object {
@@ -49,6 +54,8 @@ class ReactionChoicesFragment : Fragment() {
         CATEGORY,
         USER
     }
+
+    @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -120,11 +127,11 @@ class ReactionChoicesFragment : Fragment() {
     }
 
     private fun showFrequency(adapter: ReactionChoicesAdapter) {
-        val miApplication = context?.applicationContext as MiApplication
+        val miApplication = context?.applicationContext as MiCore
         val ac = miApplication.getAccountStore().currentAccount?: return
         lifecycleScope.launch(Dispatchers.IO) {
             val meta = miApplication.getMetaRepository().get(ac.instanceDomain)
-            val list = miApplication.reactionHistoryDao.sumReactions(ac.instanceDomain).map {
+            val list = reactionHistoryDao.sumReactions(ac.instanceDomain).map {
                 it.reaction
             }.map { reaction ->
                 if (reaction.codePointCount(0, reaction.length) == 1) {
