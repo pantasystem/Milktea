@@ -11,7 +11,6 @@ import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.*
-import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.drive.*
 import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
 import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
@@ -372,18 +371,6 @@ class MiApplication : Application(), MiCore {
             logger.error("switchAccount error", e)
         }
     }
-
-    override suspend fun addAccount(account: Account) {
-        try{
-            mAccountRepository.add(account, true)
-
-            mAccountStore.initialize()
-
-        }catch(e: Exception){
-
-        }
-    }
-
 
     override fun getDraftNoteDAO(): DraftNoteDao {
         return draftNoteDao

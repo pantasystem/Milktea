@@ -3,31 +3,31 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel.url
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.url.UrlPreviewStoreFactory
+import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: SettingStore) :
+@HiltViewModel
+class UrlPreviewSourceSettingViewModel @Inject constructor(
+    val accountStore: AccountStore,
+    val settingStore: SettingStore,
+    val urlPreviewDAO: UrlPreviewDAO,
+    val miCore: MiCore
+
+) :
     ViewModel() {
 
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory {
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return UrlPreviewSourceSettingViewModel(
-                miApplication,
-                miApplication.getSettingStore()
-            ) as T
-        }
-    }
-
-    private var mUrlPreviewStore = miCore.getAccountStore().currentAccount?.let { it ->
+    private var mUrlPreviewStore = accountStore.currentAccount?.let { it ->
         miCore.getUrlPreviewStore(it)
     }
     val urlPreviewSourceType =
@@ -52,17 +52,17 @@ class UrlPreviewSourceSettingViewModel(val miCore: MiCore, val settingStore: Set
                 url = "https://$url"
             }
             mUrlPreviewStore = UrlPreviewStoreFactory(
-                (miCore as MiApplication).urlPreviewDAO,
+                urlPreviewDAO,
                 it,
                 url,
-                miCore.getAccountStore().currentAccount
+                accountStore.currentAccount
             ).create()
         }
 
     }
 
     val previewTestUrl = MutableLiveData<String?>(
-        miCore.getAccountStore().currentAccount?.instanceDomain?.replace("https://", "")
+        accountStore.currentAccount?.instanceDomain?.replace("https://", "")
     )
 
     val urlPreviewData = MediatorLiveData<UrlPreview>().apply {
