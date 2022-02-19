@@ -81,7 +81,7 @@ class RoomAccountRepository(
 
                 for(page in pages){
                     when{
-                        page.pageId <= 0 ->{
+                        page.pageId == 0L ->{
                             addedPages.add(page)
                         }
                         page != exPageMap[page.pageId] ->{
@@ -97,8 +97,8 @@ class RoomAccountRepository(
                 Log.d("Repo", "削除されたページ:$removedPages ${exPages.size}, ${pages.size}")
 
                 pageDAO.deleteAll(removedPages)
-                pageDAO.updateAll(updatedPages.filterNot { it.pageId <= 0 })
-                pageDAO.insertAll(addedPages.filterNot { it.pageId == 0L })
+                pageDAO.updateAll(updatedPages)
+                pageDAO.insertAll(addedPages)
 
                 exAccount = runBlocking {
                     get(exAccount!!.accountId)
@@ -127,15 +127,9 @@ class RoomAccountRepository(
     }
 
     override suspend fun findAll(): List<Account> {
-        try {
-            return accountDao.findAll().map{
-                it.toAccount()
-            }
-        } catch (e: Throwable) {
-            Log.e("AccountRepository", "致命的なエラー発生", e)
-            throw e
+        return accountDao.findAll().map{
+            it.toAccount()
         }
-
     }
 
     @Throws(AccountNotFoundException::class)

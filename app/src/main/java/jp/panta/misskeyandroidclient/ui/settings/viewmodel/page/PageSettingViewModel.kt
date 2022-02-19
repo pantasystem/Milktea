@@ -87,7 +87,9 @@ class PageSettingViewModel(
         }
         Log.d("PageSettingVM", "pages:$list")
         viewModelScope.launch(Dispatchers.IO) {
-            miCore.getAccountStore().replaceAllPage(list)
+            miCore.getAccountStore().replaceAllPage(list).onFailure {
+                Log.e("PageSettingVM", "保存失敗", it)
+            }
         }
     }
 

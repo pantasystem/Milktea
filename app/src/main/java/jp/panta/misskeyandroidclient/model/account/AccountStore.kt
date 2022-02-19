@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -65,11 +66,12 @@ class AccountStore @Inject constructor(
     suspend fun addPage(page: Page): Boolean {
         val account = _state.value.get(page.accountId)
             ?: _state.value.currentAccount
-            ?: return false
+            ?: throw IllegalArgumentException()
         val updated = account.copy(pages = account.pages.toMutableList().also { list ->
             list.add(page)
         })
         _state.value = _state.value.add(accountRepository.add(updated, true))
+        initialize()
 
         return true
     }
@@ -80,7 +82,7 @@ class AccountStore @Inject constructor(
                 ?: throw IllegalStateException()
             val updated = account.copy(pages = pages)
             val result = accountRepository.add(updated, true)
-            _state.value = _state.value.add(result)
+            initialize()
             result
         }
 
@@ -92,6 +94,7 @@ class AccountStore @Inject constructor(
             ?: return false
         val updated = account.copy(pages = account.pages.filterNot { it.pageId == page.pageId })
         _state.value = _state.value.add(accountRepository.add(updated, true))
+        initialize()
         return true
     }
 
