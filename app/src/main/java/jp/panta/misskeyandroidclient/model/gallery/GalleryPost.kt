@@ -5,7 +5,6 @@ import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.drive.InMemoryFilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import java.util.*
@@ -54,13 +53,17 @@ sealed class GalleryPost {
     ) : GalleryPost()
 }
 
-suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: FilePropertyDataSource, userDataSource: UserDataSource) : GalleryPost{
+suspend fun GalleryPostDTO.toEntity(
+    account: Account,
+    filePropertyDataSource: FilePropertyDataSource,
+    userDataSource: UserDataSource
+): GalleryPost {
     filePropertyDataSource.addAll(files.map {
         it.toFileProperty(account)
     })
     // NOTE: API上ではdetailだったが実際に受信されたデータはSimpleだったのでfalse
     userDataSource.add(user.toUser(account, false))
-    if(this.likedCount == null || this.isLiked == null) {
+    if (this.likedCount == null || this.isLiked == null) {
 
         return GalleryPost.Normal(
             GalleryPost.Id(account.accountId, this.id),
@@ -72,10 +75,10 @@ suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: Fi
             files.map {
                 FileProperty.Id(account.accountId, it.id)
             },
-            tags?: emptyList(),
+            tags ?: emptyList(),
             isSensitive
         )
-    }else{
+    } else {
         return GalleryPost.Authenticated(
             GalleryPost.Id(account.accountId, this.id),
             createdAt,
@@ -86,7 +89,7 @@ suspend fun GalleryPostDTO.toEntity(account: Account, filePropertyDataSource: Fi
             files.map {
                 FileProperty.Id(account.accountId, it.id)
             },
-            tags?: emptyList(),
+            tags ?: emptyList(),
             isSensitive,
             likedCount,
             isLiked

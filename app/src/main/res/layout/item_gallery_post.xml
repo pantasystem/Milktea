@@ -60,6 +60,7 @@
                     app:tabPaddingEnd="6dp"
                     app:tabPaddingTop="6dp"
                     app:tabPaddingBottom="6dp"
+                    android:elevation="0dp"
                     android:visibility="@{ galleryPostState.files.size() == 1 ? View.GONE : View.VISIBLE }"
                     />
 
