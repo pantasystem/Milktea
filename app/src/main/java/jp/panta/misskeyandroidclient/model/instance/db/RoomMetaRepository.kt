@@ -13,8 +13,8 @@ class RoomMetaRepository(
 ) : MetaRepository {
 
     override suspend fun add(meta: Meta): Meta {
-
         return database.runInTransaction<Meta>{
+            metaDAO.delete(MetaDTO(meta))
             metaDAO.insert(MetaDTO(meta))
             val emojiDTOList = meta.emojis?.map{
                 EmojiDTO(it, meta.uri)

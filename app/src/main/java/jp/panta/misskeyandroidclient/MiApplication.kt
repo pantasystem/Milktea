@@ -58,7 +58,6 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 //基本的な情報はここを返して扱われる
 @HiltAndroidApp
@@ -237,12 +236,10 @@ class MiApplication : Application(), MiCore {
 
         applicationScope.launch(Dispatchers.IO){
             try{
-                //val connectionInstances = connectionInstanceDao!!.findAll()
                 AccountMigration(database.accountDao(), mAccountRepository, sharedPreferences).executeMigrate()
                 mAccountStore.initialize()
             }catch(e: Exception){
                 logger.error("load account error", e = e)
-                //isSuccessCurrentAccount.postValue(false)
             }
         }
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
@@ -277,7 +274,10 @@ class MiApplication : Application(), MiCore {
         }.addOnFailureListener {
             logger.debug("fcm token取得失敗", e = it)
         }
-        mAccountStore.state.onEach {
+
+        mAccountStore.state.distinctUntilChangedBy { state ->
+            state.accounts.map { it.accountId } to state.currentAccountId
+        }.onEach {
             setUpMetaMap(it.accounts)
         }.launchIn(applicationScope + Dispatchers.IO)
     }
@@ -458,28 +458,22 @@ class MiApplication : Application(), MiCore {
     }
 
     private suspend fun setUpMetaMap(accounts: List<Account>){
-        try{
-            // NOTE: メモリ等にインスタンスを読み込んでおく
-            accounts.forEach { ac ->
-                loadInstanceMetaAndSetupAPI(ac.instanceDomain)
-            }
-        }catch(e: Exception){
-            logger.error("meta取得中にエラー発生", e = e)
+        coroutineScope {
+            accounts.map { ac ->
+                async {
+                    loadInstanceMetaAndSetupAPI(ac.instanceDomain)
+                }
+            }.awaitAll()
         }
     }
 
 
-    private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String): Meta?{
-        return try{
-            val meta = mFetchMeta.fetch(instanceDomain)
-
+    private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String) {
+        try{
+            val meta = mFetchMeta.fetch(instanceDomain, isForceFetch = true)
             mMetaCache.put(instanceDomain, meta)
-
-            meta
-
         }catch(e: Exception){
             logger.error("metaの読み込み一連処理に失敗したでち", e)
-            null
         }
     }
 

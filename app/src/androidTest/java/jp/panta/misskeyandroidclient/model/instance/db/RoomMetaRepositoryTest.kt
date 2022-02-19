@@ -19,15 +19,24 @@ class RoomMetaRepositoryTest {
     private lateinit var database: DataBase
 
     private lateinit var sampleMeta: Meta
+    private lateinit var emojis: List<Emoji>
 
     @Before
-    fun setUp(){
+    fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(context, DataBase::class.java).build()
 
         metaRepository = RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database)
 
-        sampleMeta =  Meta(
+        emojis = listOf(
+            Emoji("wakaru"),
+            Emoji("kawaii"),
+            Emoji("ai"),
+            Emoji("test"),
+            Emoji("nemui"),
+            Emoji("hoge")
+        )
+        sampleMeta = Meta(
             bannerUrl = "https://hogehoge.io/hogehoge.jpg",
             cacheRemoteFiles = true,
             description = "hogehogeTest",
@@ -56,34 +65,53 @@ class RoomMetaRepositoryTest {
             swPublicKey = "swPublicKey",
             toSUrl = "toSUrl",
             version = "12.0.1",
-            emojis = listOf(Emoji("wakaru"), Emoji("kawaii"), Emoji("ai"), Emoji("test"), Emoji("nemui"), Emoji("hoge")),
+            emojis = emojis,
             uri = "https://test.misskey.io"
         )
 
     }
 
     @Test
-    fun addAndGetMetaTest(){
-        runBlocking{
+    fun addAndGetMetaTest() {
+        runBlocking {
             val added = metaRepository.add(sampleMeta)
             val got = metaRepository.get(added.uri)
             assertNotNull(got)
-            assertEquals(added, got)
+            assertEquals(added.copy(emojis = emptyList()), got?.copy(emojis = emptyList()))
             assertEquals(added.emojis?.size!!, got?.emojis?.size!!)
+            assertEquals(
+                added.emojis?.map { it.name }?.toSet(),
+                got.emojis?.map { it.name }?.toSet()
+            )
         }
     }
 
     @Test
-    fun doubleAddTest(){
-        val emojis =  sampleMeta.emojis?: emptyList()
+    fun addMetaCheckEmojisDiff() {
+        runBlocking {
+            val newEmojis = emojis.subList(0, 3)
+            val newMeta = sampleMeta.copy(emojis = newEmojis)
+            metaRepository.add(newMeta)
+            val updatedMeta = metaRepository.get(newMeta.uri)
+            assertEquals(
+                newEmojis.map { it.name }.toSet(),
+                updatedMeta?.emojis?.map { it.name }?.toSet()
+            )
+        }
+
+    }
+
+    @Test
+    fun doubleAddTest() {
+        val emojis = sampleMeta.emojis ?: emptyList()
         val arrayList = ArrayList<Emoji>(emojis)
         arrayList.add(Emoji("added"))
         val updated = sampleMeta.copy(emojis = arrayList)
-        runBlocking{
+        runBlocking {
             val added = metaRepository.add(updated)
             val got = metaRepository.get(added.uri)
             assertNotNull(got)
-            assertEquals(added, got)
+            assertEquals(added.copy(emojis = emptyList()), got?.copy(emojis = emptyList()))
             assertEquals(added.emojis?.size!!, got?.emojis?.size!!)
 
         }

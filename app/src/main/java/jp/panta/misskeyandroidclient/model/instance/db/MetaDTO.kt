@@ -1,10 +1,8 @@
 package jp.panta.misskeyandroidclient.model.instance.db
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.instance.Meta
 
 @Entity(tableName = "meta_table")
