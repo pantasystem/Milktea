@@ -29,9 +29,11 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.ui.users.nickname.EditNicknameDialog
@@ -73,6 +75,12 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
 
+    @Inject
+    lateinit var accountStore: AccountStore
+
+    private val accountViewModel: AccountViewModel by viewModels()
+
+
     @ExperimentalCoroutinesApi
     val mViewModel: UserDetailViewModel by viewModels {
         val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
@@ -93,7 +101,6 @@ class UserDetailActivity : AppCompatActivity() {
         return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userName!!)
     }
 
-    private var mAccountRelation: Account? = null
 
     private var mUserId: User.Id? = null
     private var mIsMainActive: Boolean = true
@@ -279,7 +286,7 @@ class UserDetailActivity : AppCompatActivity() {
         }
 
         val tab = menu.findItem(R.id.nav_add_to_tab)
-        val page = mAccountRelation?.pages?.firstOrNull {
+        val page = accountStore.currentAccount?.pages?.firstOrNull {
             val pageable = it.pageable()
             if (pageable is Pageable.UserTimeline) {
                 pageable.userId == mUserId?.id
@@ -380,7 +387,7 @@ class UserDetailActivity : AppCompatActivity() {
         val user = mViewModel.user.value
         user ?: return
 
-        val page = mAccountRelation?.pages?.firstOrNull {
+        val page = accountStore.currentAccount?.pages?.firstOrNull {
             val pageable = it.pageable()
             if (pageable is Pageable.UserTimeline) {
                 pageable.userId == mUserId?.id && mUserId != null
@@ -390,11 +397,11 @@ class UserDetailActivity : AppCompatActivity() {
         }
         val isAdded = page != null
         if (isAdded) {
-            (application as MiCore).removePageInCurrentAccount(page!!)
+            accountViewModel.removePage(page!!)
         } else {
-            (application as MiApplication).addPageInCurrentAccount(
+            accountViewModel.addPage(
                 Page(
-                    mAccountRelation?.accountId ?: -1,
+                    accountStore.currentAccountId ?: -1,
                     title = user.getDisplayUserName(),
                     weight = -1,
                     pageable = Pageable.UserTimeline(userId = user.id.id)

@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package jp.panta.misskeyandroidclient
 
 import android.content.Context
@@ -18,6 +19,7 @@ import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.users.SearchUserFragment
@@ -45,6 +47,7 @@ class SearchResultActivity : AppCompatActivity() {
     private var mAccountRelation: Account? = null
     private val binding: ActivitySearchResultBinding by dataBinding()
     val notesViewModel by viewModels<NotesViewModel>()
+    private val accountViewModel: AccountViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,7 +115,6 @@ class SearchResultActivity : AppCompatActivity() {
     private fun searchAddToTab(){
         val word = mSearchWord ?: return
 
-        val miCore = application as MiCore
         val samePage = getSamePage()
         if(samePage == null){
             val page = if(mIsTag == true){
@@ -120,11 +122,11 @@ class SearchResultActivity : AppCompatActivity() {
             }else{
                 Page(mAccountRelation?.accountId?: - 1, mSearchWord?: "", -1, pageable = Pageable.Search(word))
             }
-            miCore.addPageInCurrentAccount(
+            accountViewModel.addPage(
                 page
             )
         }else{
-            miCore.removePageInCurrentAccount(samePage)
+            accountViewModel.removePage(samePage)
         }
     }
 

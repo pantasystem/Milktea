@@ -19,10 +19,18 @@ data class Page(
             : this(accountId, title, weight, pageable.toParams(), pageId)
 
 
-
-
     @Ignore
-    fun pageable(): Pageable{
+    fun pageable(): Pageable {
         return pageParams.toPageable()
+    }
+
+    fun isEqualEntity(page: Page): Boolean {
+        if (page.accountId != this.accountId) {
+            return false
+        }
+        if (page.pageId == this.pageId) {
+            return true
+        }
+        return page.pageable() == pageable()
     }
 }

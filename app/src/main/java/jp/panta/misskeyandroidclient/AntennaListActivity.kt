@@ -4,10 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaListBinding
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -15,11 +17,11 @@ import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-
+@AndroidEntryPoint
 class AntennaListActivity : AppCompatActivity() {
 
 
-    private lateinit var mAntennaListViewModel: AntennaListViewModel
+    private val mAntennaListViewModel: AntennaListViewModel by viewModels()
 
     private lateinit var mBinding: ActivityAntennaListBinding
 
@@ -30,11 +32,6 @@ class AntennaListActivity : AppCompatActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_antenna_list)
         setSupportActionBar(mBinding.antennaListToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        mAntennaListViewModel = ViewModelProvider(
-            this,
-            AntennaListViewModel.Factory(this.applicationContext as MiCore)
-        )[AntennaListViewModel::class.java]
 
 
         mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, {

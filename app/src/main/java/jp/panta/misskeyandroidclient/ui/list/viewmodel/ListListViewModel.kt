@@ -106,8 +106,12 @@ class ListListViewModel @Inject constructor(
                             pageable = Pageable.UserListTimeline(ul.id.userListId),
                             weight = 0
                         )
-                        miCore.addPageInCurrentAccount(page)
+                        miCore.getAccountStore().addPage(page)
+                    } else {
+                        miCore.getAccountStore().removePage(exPage)
                     }
+                }.onFailure {
+                    logger.error("タブtoggle処理失敗", e = it)
                 }
             }
         }

@@ -86,7 +86,9 @@ class PageSettingViewModel(
             page.weight = index + 1
         }
         Log.d("PageSettingVM", "pages:$list")
-        miCore.replaceAllPagesInCurrentAccount(list)
+        viewModelScope.launch(Dispatchers.IO) {
+            miCore.getAccountStore().replaceAllPage(list)
+        }
     }
 
     fun updatePage(page: Page) {

@@ -97,11 +97,11 @@ interface MiCore {
 
     suspend fun addAccount(account: Account)
 
-    fun addPageInCurrentAccount(page: Page)
+//    fun addPageInCurrentAccount(page: Page)
 
-    fun replaceAllPagesInCurrentAccount(pages: List<Page>)
+//    fun replaceAllPagesInCurrentAccount(pages: List<Page>)
 
-    fun removePageInCurrentAccount(page: Page)
+//    fun removePageInCurrentAccount(page: Page)
 
 
     fun getEncryption(): Encryption

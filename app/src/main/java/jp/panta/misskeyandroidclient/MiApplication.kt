@@ -84,13 +84,10 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    //private val mAccountsState = MutableStateFlow(emptyList<Account>())
-    //private val mCurrentAccountState = MutableStateFlow<Account?>(null)
     @Inject lateinit var mAccountStore: AccountStore
 
     @Inject lateinit var mEncryption: Encryption
 
-    // private val mMetaInstanceUrlMap = HashMap<String, Meta>()
     @Inject lateinit var mMetaCache: MetaCache
 
     @Inject lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
@@ -388,59 +385,6 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun addPageInCurrentAccount(page: Page) {
-        applicationScope.launch(Dispatchers.IO){
-            val account = getCurrentAccountErrorSafe()
-                ?: return@launch
-            val pages = account.pages.toArrayList()
-            pages.add(page)
-            try{
-                mAccountRepository.add(account.copy(pages = pages), true)
-            }catch(e: Exception){
-                logger.error("アカウント更新処理中にエラー発生", e)
-            }
-            mAccountStore.initialize()
-
-        }
-    }
-
-    override fun removePageInCurrentAccount(page: Page) {
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                val current = mAccountRepository.getCurrentAccount()
-                val removed = current.copy(pages = current.pages.filterNot{
-                    it == page || it.pageId == page.pageId
-                })
-                mAccountRepository.add(removed, true)
-                mAccountStore.initialize()
-
-            }catch(e: AccountNotFoundException){
-            }
-        }
-    }
-
-    override fun replaceAllPagesInCurrentAccount(pages: List<Page>) {
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                val updated = mAccountRepository.getCurrentAccount().copy(pages = pages)
-                mAccountRepository.add(updated, true)
-                mAccountStore.initialize()
-
-            }catch(e: AccountNotFoundException){
-            }
-        }
-    }
-
-    private suspend fun getCurrentAccountErrorSafe(): Account?{
-        return try{
-            mAccountRepository.getCurrentAccount()
-        }catch(e: AccountNotFoundException){
-            logger.error("アカウントローディング中に失敗しました", e)
-            return null
-        }
-    }
-
-
     override fun getDraftNoteDAO(): DraftNoteDao {
         return draftNoteDao
     }
@@ -521,48 +465,6 @@ class MiApplication : Application(), MiCore {
 
 
 
-//    private suspend fun loadAndInitializeAccounts(){
-//        try{
-//            val current: Account
-//            val tmpAccounts = try{
-//                current = mAccountRepository.getCurrentAccount()
-//
-//                mAccountRepository.findAll()
-//            }catch(e: AccountNotFoundException){
-//                connectionStatus.postValue(ConnectionStatus.ACCOUNT_ERROR)
-//                return
-//            }
-//
-//
-//            logger.debug(this.javaClass.simpleName, "load account result : $current")
-//
-//
-//            val meta = loadInstanceMetaAndSetupAPI(current.instanceDomain)
-//
-//            if(meta == null){
-//                connectionStatus.postValue(ConnectionStatus.NETWORK_ERROR)
-//            }
-//
-//            logger.debug("accountId:${current.accountId}, account:$current")
-//            if(current.pages.isEmpty()){
-//                saveDefaultPages(current, meta)
-//                return loadAndInitializeAccounts()
-//            }
-//
-//            mCurrentAccountState.value = current
-//            mAccountsState.value = tmpAccounts
-//            connectionStatus.postValue(ConnectionStatus.SUCCESS)
-//
-//            setUpMetaMap(tmpAccounts)
-//
-//        }catch(e: Exception){
-//            //isSuccessCurrentAccount.postValue(false)
-//            logger.error( "初期読み込みに失敗しまちた", e)
-//        }
-//    }
-
-
-
     override fun getCurrentInstanceMeta(): Meta?{
         return mAccountStore.currentAccount?.instanceDomain?.let{ url ->
             mMetaCache.get(url)
@@ -626,11 +528,6 @@ class MiApplication : Application(), MiCore {
                 }
             }
         }
-
-    private fun<T> List<T>.toArrayList(): ArrayList<T>{
-        return ArrayList(this)
-    }
-
 
 
     override fun getTaskExecutor(): TaskExecutor {

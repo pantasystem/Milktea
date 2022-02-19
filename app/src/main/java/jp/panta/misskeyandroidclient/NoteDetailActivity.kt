@@ -13,15 +13,18 @@ import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NoteDetailActivity : AppCompatActivity() {
@@ -50,6 +53,7 @@ class NoteDetailActivity : AppCompatActivity() {
     private val binding: ActivityNoteDetailBinding by dataBinding()
     val notesViewModel: NotesViewModel by viewModels()
 
+    private val accountViewModel: AccountViewModel by viewModels()
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,7 +136,8 @@ class NoteDetailActivity : AppCompatActivity() {
 
     private fun addToTab(){
         val title = getString(R.string.detail)
-        (application as MiApplication).addPageInCurrentAccount(
+
+        accountViewModel.addPage(
             Page(-1, title, pageable = Pageable.Show(mNoteId!!), weight = 0)
         )
     }
