@@ -32,8 +32,8 @@ data class FilePropertyDTO(
 
     @kotlinx.serialization.Serializable
     data class Properties(
-        val width: Int? = null,
-        val height: Int? = null
+        val width: Float? = null,
+        val height: Float? = null
     ) : Serializable
 
     private fun getThumbnailUrl(instanceBaseUrl: String): String{

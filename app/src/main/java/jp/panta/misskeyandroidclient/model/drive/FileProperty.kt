@@ -26,8 +26,8 @@ data class FileProperty (
         val fileId: String
     ) : JSerializable
     data class Properties(
-        val width: Int?,
-        val height: Int?
+        val width: Float?,
+        val height: Float?
     ) : JSerializable
 
     fun toFile(): File {
