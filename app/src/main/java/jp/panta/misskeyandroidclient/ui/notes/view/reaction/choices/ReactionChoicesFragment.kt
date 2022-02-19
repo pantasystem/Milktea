@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
 import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -56,6 +57,8 @@ class ReactionChoicesFragment : Fragment() {
     }
 
     @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
+    @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -189,7 +192,7 @@ class ReactionChoicesFragment : Fragment() {
             try {
                 val instance = miApplication.getAccountStore().currentAccount?.instanceDomain
                 var reactions =
-                    miApplication.reactionUserSettingDao.findByInstanceDomain(instance!!)?.map {
+                    reactionUserSettingDao.findByInstanceDomain(instance!!)?.map {
                         it.reaction
                     } ?: ReactionResourceMap.defaultReaction
                 if (reactions.isEmpty()) {

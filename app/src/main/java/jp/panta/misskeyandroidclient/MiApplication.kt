@@ -65,7 +65,6 @@ import kotlin.collections.ArrayList
 class MiApplication : Application(), MiCore {
 
     @Inject lateinit var database: DataBase
-    @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
 
     @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
 

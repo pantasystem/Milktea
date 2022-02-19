@@ -10,26 +10,29 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.*
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionPickerBinding
+import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReactionPickerDialog : AppCompatDialogFragment(){
     val notesViewModel by activityViewModels<NotesViewModel>()
+    @Inject
+    lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -38,7 +41,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         dialog.setContentView(view)
         val binding = DialogReactionPickerBinding.bind(view)
 
-        val miApplication = view.context.applicationContext as MiApplication
+        val miApplication = view.context.applicationContext as MiCore
         val ac = miApplication.getAccountStore().currentAccount
 
 
@@ -55,7 +58,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         //adapter.submitList(ReactionResourceMap.defaultReaction)
 
         lifecycleScope.launch(Dispatchers.IO){
-            var reactionSettings = miApplication.reactionUserSettingDao.findByInstanceDomain(
+            var reactionSettings = reactionUserSettingDao.findByInstanceDomain(
                 ac?.instanceDomain!!
             )?.sortedBy {
                 it.weight
