@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.api.logger
 
 import android.util.Log
+import jp.panta.misskeyandroidclient.BuildConfig
 import jp.panta.misskeyandroidclient.Logger
 
 class AndroidDefaultLogger(
@@ -8,7 +9,9 @@ class AndroidDefaultLogger(
 ) : Logger{
 
     override fun debug(msg: String, tag: String, e: Throwable?) {
-        Log.d(tag, msg, e)
+        if (BuildConfig.DEBUG) {
+            Log.d(tag, msg, e)
+        }
     }
 
     override fun error(msg: String, e: Throwable?, tag: String) {

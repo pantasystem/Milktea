@@ -111,7 +111,7 @@ class AccountStore @Inject constructor(
                 return
             }
 
-            logger.debug(this.javaClass.simpleName, "load account result : $current")
+            logger.debug("load account result : $current")
 
             val meta = runCatching {
                 fetchMeta.fetch(current.instanceDomain)
