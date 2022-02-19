@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.instance.db
 
+import android.util.Log
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
@@ -13,8 +14,9 @@ class RoomMetaRepository(
 ) : MetaRepository {
 
     override suspend fun add(meta: Meta): Meta {
-
+        Log.d("RoomMetaRepository", "metaの更新があった")
         return database.runInTransaction<Meta>{
+            metaDAO.delete(MetaDTO(meta))
             metaDAO.insert(MetaDTO(meta))
             val emojiDTOList = meta.emojis?.map{
                 EmojiDTO(it, meta.uri)
