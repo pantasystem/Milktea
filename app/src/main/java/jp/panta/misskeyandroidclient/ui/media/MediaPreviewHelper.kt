@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.media
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -101,6 +102,20 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView")
     @JvmStatic
     fun ImageView.setPreview(file: PreviewAbleFile?) {
+        if (this.visibility == View.GONE || file == null) {
+            this.setImageResource(0)
+            return
+        }
+        Glide.with(this)
+            .load(file.file.thumbnailUrl)
+            .centerCrop()
+            .into(this)
+    }
+
+    @BindingAdapter("thumbnailView")
+    @JvmStatic
+    fun ImageView.setPreview(file: FileViewData?) {
+        Log.d("MediaPreviewHelper", "setPreview:${file?.file}")
         if (this.visibility == View.GONE || file == null) {
             this.setImageResource(0)
             return

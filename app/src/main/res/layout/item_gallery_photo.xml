@@ -37,6 +37,7 @@
                 android:contentDescription="@string/thumbnail"
                 android:scaleType="fitCenter"
                 tools:srcCompat="@drawable/ic_reaction_laugh"
+                thumbnailView="@{ fileViewData }"
                 android:visibility="@{SafeUnbox.unbox(fileViewData.isHiding) ? View.GONE : View.VISIBLE }"
                 />
         <ImageButton
