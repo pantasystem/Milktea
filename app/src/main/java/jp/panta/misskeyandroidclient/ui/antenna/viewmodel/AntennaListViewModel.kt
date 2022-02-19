@@ -1,33 +1,34 @@
 package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.throwIfHasError
 import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
-import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.Encryption
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import javax.inject.Inject
 
-class AntennaListViewModel (
-    val miCore: MiCore
-) : ViewModel(){
+@HiltViewModel
+class AntennaListViewModel @Inject constructor(
+    val accountStore: AccountStore,
+    val accountRepository: AccountRepository,
+    val misskeyAPIProvider: MisskeyAPIProvider,
+    val encryption: Encryption
+) : ViewModel() {
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AntennaListViewModel(miCore) as T
-        }
-    }
-
-    companion object{
+    companion object {
         const val TAG = "AntennaViewModel"
     }
 
@@ -49,27 +50,24 @@ class AntennaListViewModel (
     private val mPagedAntennaIds = MutableLiveData<Set<Antenna.Id>>()
     val pagedAntennaIds: LiveData<Set<Antenna.Id>> = mPagedAntennaIds
 
-    var account: Account? = null
 
-    init{
+    init {
 
-        miCore.getAccountStore().observeCurrentAccount.onEach {
-            if(account?.accountId != it?.accountId) {
-                loadInit()
-                account = it
-            }
+        accountStore.observeCurrentAccount.onEach {
+            loadInit()
+
             mPagedAntennaIds.postValue(
                 it?.pages?.mapNotNull { page ->
                     val pageable = page.pageable()
                     if (pageable is Pageable.Antenna) {
-                        account?.accountId?.let { accountId ->
+                        it.accountId.let { accountId ->
                             Antenna.Id(accountId, pageable.antennaId)
 
                         }
                     } else {
                         null
                     }
-                }?.toSet()?: emptySet()
+                }?.toSet() ?: emptySet()
             )
         }.launchIn(viewModelScope + Dispatchers.IO)
 
@@ -78,18 +76,19 @@ class AntennaListViewModel (
 
     private val deleteResultEvent = EventBus<Boolean>()
 
-    fun loadInit(){
+    fun loadInit() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = miCore.getAccountRepository().getCurrentAccount()
-                val res = (miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12).getAntennas(
-                    AntennaQuery(
-                        i = account.getI(miCore.getEncryption()),
-                        limit = null,
-                        antennaId = null
-                    )
-                ).body()
-                    ?: throw IllegalStateException("アンテナの取得に失敗しました")
+                val account = accountRepository.getCurrentAccount()
+                val res =
+                    (misskeyAPIProvider.get(account) as MisskeyAPIV12).getAntennas(
+                        AntennaQuery(
+                            i = account.getI(encryption),
+                            limit = null,
+                            antennaId = null
+                        )
+                    ).body()
+                        ?: throw IllegalStateException("アンテナの取得に失敗しました")
                 res.map { dto ->
                     dto.toEntity(account)
                 }
@@ -101,43 +100,52 @@ class AntennaListViewModel (
 
     }
 
-    fun toggleTab(antenna: Antenna?){
-        antenna?: return
-        val paged = account?.pages?.firstOrNull {
+    fun toggleTab(antenna: Antenna?) {
+        antenna ?: return
+        val paged = accountStore.currentAccount?.pages?.firstOrNull {
 
             it.pageParams.antennaId == antenna.id.antennaId
         }
-        if(paged == null){
-            miCore.addPageInCurrentAccount(PageableTemplate(account!!).antenna(antenna))
-        }else{
-            miCore.removePageInCurrentAccount(paged)
+        viewModelScope.launch(Dispatchers.IO) {
+            if (paged == null) {
+                accountStore.addPage(
+                    PageableTemplate(accountStore.currentAccount!!).antenna(
+                        antenna
+                    )
+                )
+            } else {
+                accountStore.removePage(paged)
+            }
         }
+
     }
 
-    fun confirmDeletionAntenna(antenna: Antenna?){
-        antenna?: return
+    fun confirmDeletionAntenna(antenna: Antenna?) {
+        antenna ?: return
         confirmDeletionAntennaEvent.event = antenna
     }
 
-    fun editAntenna(antenna: Antenna?){
-        antenna?: return
+    fun editAntenna(antenna: Antenna?) {
+        antenna ?: return
         editAntennaEvent.event = antenna
     }
 
-    fun openAntennasTimeline(antenna: Antenna?){
+    fun openAntennasTimeline(antenna: Antenna?) {
         openAntennasTimelineEvent.event = antenna
     }
 
-    fun deleteAntenna(antenna: Antenna){
+    fun deleteAntenna(antenna: Antenna) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val i = account?.getI(miCore.getEncryption())
+                val i = accountStore.currentAccount?.getI(encryption)
                     ?: return@launch
-                getMisskeyAPI()?.deleteAntenna(AntennaQuery(
-                    i = i,
-                    antennaId = antenna.id.antennaId,
-                    limit = null
-                ))?.throwIfHasError()
+                getMisskeyAPI()?.deleteAntenna(
+                    AntennaQuery(
+                        i = i,
+                        antennaId = antenna.id.antennaId,
+                        limit = null
+                    )
+                )?.throwIfHasError()
             }.onSuccess {
                 loadInit()
             }.onFailure {
@@ -150,7 +158,8 @@ class AntennaListViewModel (
 
     }
 
-    private fun getMisskeyAPI(): MisskeyAPIV12?{
-        return miCore.getMisskeyAPIProvider().get(miCore.getAccountStore().currentAccount!!) as? MisskeyAPIV12
+    private fun getMisskeyAPI(): MisskeyAPIV12? {
+        return misskeyAPIProvider
+            .get(accountStore.currentAccount!!) as? MisskeyAPIV12
     }
 }

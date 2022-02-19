@@ -19,6 +19,10 @@ data class AccountState(
         return accounts.any { it.accountId == account.accountId }
     }
 
+    fun get(accountId: Long): Account? {
+        return accounts.firstOrNull { it.accountId == accountId }
+    }
+
     fun add(account: Account): AccountState {
         return copy(
             accounts = if (hasAccount(account)) {

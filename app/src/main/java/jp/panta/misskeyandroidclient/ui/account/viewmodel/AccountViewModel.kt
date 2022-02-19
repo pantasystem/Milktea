@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.AccountStore
+import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
@@ -19,7 +20,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("UNCHECKED_CAST")
 @HiltViewModel
 class AccountViewModel @Inject constructor(
@@ -33,6 +34,7 @@ class AccountViewModel @Inject constructor(
 
     private val logger = miCore.loggerFactory.create("AccountViewModel")
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @FlowPreview
     val accounts = MediatorLiveData<List<AccountViewData>>().apply {
         accountStore.observeAccounts.onEach { accounts ->
@@ -137,5 +139,23 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+    fun addPage(page: Page) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                accountStore.addPage(page)
+            } catch (e: Throwable) {
+                logger.error("pageの追加に失敗", e = e)
+            }
+        }
+    }
+    fun removePage(page: Page) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                accountStore.removePage(page)
+            } catch (e: Throwable) {
+                logger.error("pageの削除に失敗", e = e)
+            }
+        }
+    }
 
 }

@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package jp.panta.misskeyandroidclient
 
 import android.content.Context
@@ -19,10 +20,10 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
 import jp.panta.misskeyandroidclient.model.list.UserList
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
@@ -45,7 +46,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         const val ACTION_SHOW = "ACTION_SHOW"
         const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
 
-        const val EXTRA_UPDATED_USER_LIST = "EXTRA_UPDATED_USER_LIST"
 
         fun newIntent(context: Context, listId: UserList.Id): Intent {
             return Intent(context, UserListDetailActivity::class.java).apply {
@@ -59,6 +59,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     @Inject
     lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
+    private val accountViewModel: AccountViewModel by viewModels()
 
 
 
@@ -189,13 +190,12 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                 false
             }
         }
-        val miCore = application as MiCore
         if(page == null){
-            miCore.addPageInCurrentAccount(
+            accountViewModel.addPage(
                 Page(account?.accountId?: - 1, mUserListName, weight = -1, pageable = Pageable.UserListTimeline(mListId?.userListId!!))
             )
         }else{
-            miCore.removePageInCurrentAccount(page)
+            accountViewModel.removePage(page)
         }
     }
 

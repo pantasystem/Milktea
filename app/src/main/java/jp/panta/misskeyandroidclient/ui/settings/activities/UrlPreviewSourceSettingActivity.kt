@@ -3,15 +3,18 @@ package jp.panta.misskeyandroidclient.ui.settings.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityUrlPreviewSourceSettingBinding
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.url.UrlPreviewSourceSettingViewModel
 
+@AndroidEntryPoint
 class UrlPreviewSourceSettingActivity : AppCompatActivity() {
+
+    val viewModel: UrlPreviewSourceSettingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +23,6 @@ class UrlPreviewSourceSettingActivity : AppCompatActivity() {
         setSupportActionBar(binding.urlPreviewSrcSettingToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val miApplication = applicationContext as MiApplication
-        val viewModel = ViewModelProvider(this, UrlPreviewSourceSettingViewModel.Factory(miApplication))[UrlPreviewSourceSettingViewModel::class.java]
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
     }
