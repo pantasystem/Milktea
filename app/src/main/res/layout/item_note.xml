@@ -22,7 +22,7 @@
             app:cardCornerRadius="0dp"
             android:layout_marginTop="0.5dp"
             android:elevation="0dp"
-            app:setCardViewSurfaceColor="@{null}"
+            setCardViewSurfaceColor="@{null}"
     >
         <LinearLayout
                 android:layout_width="match_parent"
