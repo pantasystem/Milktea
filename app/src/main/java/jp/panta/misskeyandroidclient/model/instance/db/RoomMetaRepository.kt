@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.model.instance.db
 
-import android.util.Log
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
