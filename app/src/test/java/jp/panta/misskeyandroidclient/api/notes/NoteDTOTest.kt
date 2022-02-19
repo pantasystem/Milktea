@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.api.notes
 
-import com.google.gson.Gson
-import jp.panta.misskeyandroidclient.GsonFactory
+
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.junit.Assert
