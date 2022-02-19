@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.util
 
-import android.graphics.Color
 import android.util.Log
 import java.lang.IllegalArgumentException
 

@@ -441,11 +441,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun showDriveFileSelector() {
         val selectedSize = mViewModel.state.value.totalFilesCount
-
-        val miCore = applicationContext as MiCore
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = mViewModel.maxFileCount.value - selectedSize
-        Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(this, DriveActivity::class.java)
             .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
             .putExtra(DriveActivity.EXTRA_ACCOUNT_ID, accountStore.currentAccount?.accountId)
@@ -460,7 +457,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     }
 
     private fun requestPermission() {
-        //val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
         if (!checkPermission()) {
             requestReadStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }

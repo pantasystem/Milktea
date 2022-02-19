@@ -1,32 +1,39 @@
 package jp.panta.misskeyandroidclient.ui.settings.activities
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.SeekBar
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.KeyStore
-import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.R
+import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBinding
+import jp.panta.misskeyandroidclient.model.account.AccountStore
+import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
+import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.setTheme
-import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem
+import kotlinx.coroutines.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingAppearanceActivity : AppCompatActivity() {
 
-    private  lateinit var mSettingStore: SettingStore
+    @Inject
+    lateinit var mSettingStore: SettingStore
+
+    @Inject
+    lateinit var accountStore: AccountStore
+    @Inject
+    lateinit var driveFileRepository: DriveFileRepository
     private val mBinding: ActivitySettingAppearanceBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +73,6 @@ class SettingAppearanceActivity : AppCompatActivity() {
             themeChoices,
             this
         )
-        mSettingStore = SettingStore(getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE))
         //val group = Group(null, listOf(themeSelection), this)
         val adapter = SettingAdapter(this)
         mBinding.settingList.layoutManager = LinearLayoutManager(this)
@@ -107,7 +113,8 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
         val miApplication = applicationContext as MiApplication
 
-        mBinding.noteOpacitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        mBinding.noteOpacitySeekBar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 miApplication.colorSettingStore.surfaceColorOpaque = progress
             }
@@ -123,57 +130,32 @@ class SettingAppearanceActivity : AppCompatActivity() {
             showFileManager()
         }
 
-        mBinding.deleteBackgroundImage.setOnClickListener{
+        mBinding.deleteBackgroundImage.setOnClickListener {
             setBackgroundImagePath(null)
         }
 
     }
 
 
-
-    private fun showFileManager(){
-        if(checkPermission()){
-            requestSelectFileResult.launch(arrayOf("*/*"))
-        }else{
-            requestPermission()
-        }
+    private fun showFileManager() {
+        val intent = Intent(this, DriveActivity::class.java)
+            .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 1)
+            .putExtra(DriveActivity.EXTRA_ACCOUNT_ID, accountStore.currentAccount?.accountId)
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        openDriveActivityResult.launch(intent)
     }
 
-    private fun checkPermission(): Boolean{
-        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-        return permissionCheck == PackageManager.PERMISSION_GRANTED
-    }
 
-    private fun requestPermission(){
-        if(! checkPermission()){
-            requestReadExternalStorageLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
     }
 
 
-
-    private val requestSelectFileResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let{
-            setBackgroundImagePath(uri.toString())
-        }
-    }
-
-    private val requestReadExternalStorageLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if(it){
-            showFileManager()
-        }else{
-            Toast.makeText(this, "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun setBackgroundImagePath(path: String?){
-        mBinding.backgroundImagePath.text = path?: ""
+    private fun setBackgroundImagePath(path: String?) {
+        mBinding.backgroundImagePath.text = path ?: ""
         Glide.with(this)
             .load(path)
             .into(mBinding.backgroundImagePreview)
@@ -181,4 +163,26 @@ class SettingAppearanceActivity : AppCompatActivity() {
         mSettingStore.backgroundImagePath = path
 
     }
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private val openDriveActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val ids =
+                (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
+                    it as? FileProperty.Id
+                }
+            val fileId = ids?.firstOrNull() ?: return@registerForActivityResult
+            lifecycleScope.launch(Dispatchers.IO) {
+                val file = runCatching {
+                    driveFileRepository.find(fileId)
+                }.onFailure {
+                    Log.e("SettingAppearanceACT", "画像の取得に失敗", it)
+                }.getOrNull()
+                    ?: return@launch
+                withContext(Dispatchers.Main) {
+                    setBackgroundImagePath(file.url)
+                }
+            }
+        }
+
 }

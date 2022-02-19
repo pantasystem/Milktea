@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.*
 /**
  * 選択状態とFileの読み込み＆表示を担当する
  */
-@ExperimentalCoroutinesApi
 class FileViewModel(
     private val currentAccountWatcher: CurrentAccountWatcher,
     private val miCore: MiCore,
@@ -32,9 +31,10 @@ class FileViewModel(
         it.selectedFilePropertyIds?.selectedIds
     }
 
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val account = currentAccountWatcher.account.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val state = miCore.getFilePropertyDataSource().state.flatMapLatest { state ->
         filePropertiesPagingStore.state.map { pageable ->
             pageable.convert {

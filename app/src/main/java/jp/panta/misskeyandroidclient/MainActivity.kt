@@ -33,7 +33,6 @@ import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streaming.stateEvent
@@ -74,8 +73,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mBottomNavigationAdapter: MainBottomNavigationAdapter
 
-    private var mSettingStore: SettingStore? = null
-
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
     private val logger: Logger by lazy {
@@ -86,6 +83,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var settingStore: SettingStore
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -443,23 +443,14 @@ class MainActivity : AppCompatActivity() {
             menu.findItem(R.id.action_notification),
             menu.findItem(R.id.action_search)
         ).forEach {
-            it.isVisible = getSettingStore().isClassicUI
+            it.isVisible = settingStore.isClassicUI
         }
 
         //setMenuTint(menu)
         return true
     }
 
-    private fun getSettingStore(): SettingStore {
-        val store: SettingStore = mSettingStore ?: SettingStore(
-            getSharedPreferences(
-                getPreferenceName(),
-                Context.MODE_PRIVATE
-            )
-        )
-        mSettingStore = store
-        return store
-    }
+
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -494,12 +485,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setBackgroundImage() {
-        val path = SettingStore(
-            getSharedPreferences(
-                getPreferenceName(),
-                Context.MODE_PRIVATE
-            )
-        ).backgroundImagePath
+        val path = settingStore.backgroundImagePath
         Glide.with(this)
             .load(path)
             .into(binding.appBarMain.contentMain.backgroundImage)
@@ -510,12 +496,12 @@ class MainActivity : AppCompatActivity() {
         invalidateOptionsMenu()
         binding.setSimpleEditor()
 
-        binding.appBarMain.bottomNavigation.visibility = if (getSettingStore().isClassicUI) {
+        binding.appBarMain.bottomNavigation.visibility = if (settingStore.isClassicUI) {
             View.GONE
         } else {
             View.VISIBLE
         }
-        if (getSettingStore().isClassicUI) {
+        if (settingStore.isClassicUI) {
             mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
         }
     }
