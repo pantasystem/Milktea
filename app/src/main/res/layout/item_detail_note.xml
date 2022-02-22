@@ -184,7 +184,9 @@
                         android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
                         tools:itemCount="2"
                         tools:listitem="@layout/item_choice"
-
+                        noteId="@{note.toShowNote.note.id}"
+                        poll="@{note.poll}"
+                        notesViewModel="@{notesViewModel}"
 
                         />
 
