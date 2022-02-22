@@ -90,10 +90,7 @@ class NoteDetailAdapter(
                 holder.binding.note = note
                 holder.binding.notesViewModel = notesViewModel
                 setReactionCounter(note, holder.binding.simpleNote.reactionView)
-                if(note.poll != null){
-                    holder.binding.simpleNote.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)
-                    holder.binding.simpleNote.poll.layoutManager = LinearLayoutManager(holder.binding.root.context)
-                }
+
                 holder.binding.lifecycleOwner = viewLifecycleOwner
                 holder.binding.executePendingBindings()
             }
@@ -101,11 +98,6 @@ class NoteDetailAdapter(
                 holder.binding.note = note as NoteDetailViewData
                 holder.binding.notesViewModel = notesViewModel
                 setReactionCounter(note, holder.binding.reactionView)
-
-                if(note.poll != null){
-                    holder.binding.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)
-                    holder.binding.poll.layoutManager = LinearLayoutManager(holder.binding.root.context)
-                }
                 holder.binding.lifecycleOwner = viewLifecycleOwner
                 holder.binding.executePendingBindings()
             }
