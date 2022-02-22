@@ -3,36 +3,37 @@ package jp.panta.misskeyandroidclient.ui.notes.view.poll
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemChoiceBinding
+import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll.PollViewData
 
 class PollListAdapter(
-    val poll: PollViewData,
+    val noteId: Note.Id,
+    val poll: Poll,
     val notesViewModel: NotesViewModel,
-    val lifecycleOwner: LifecycleOwner
-) : RecyclerView.Adapter<PollListAdapter.ChoiceHolder>(){
-    class ChoiceHolder(val binding: ItemChoiceBinding) : RecyclerView.ViewHolder(binding.root)
-
-    override fun getItemCount(): Int {
-        return poll.choices.size
+) : ListAdapter<Poll.Choice, PollListAdapter.ChoiceHolder>(object : DiffUtil.ItemCallback<Poll.Choice>() {
+    override fun areContentsTheSame(oldItem: Poll.Choice, newItem: Poll.Choice): Boolean {
+        return oldItem == newItem
     }
 
+    override fun areItemsTheSame(oldItem: Poll.Choice, newItem: Poll.Choice): Boolean {
+        return oldItem == newItem
+    }
+}){
+    class ChoiceHolder(val binding: ItemChoiceBinding) : RecyclerView.ViewHolder(binding.root)
+
+
     override fun onBindViewHolder(holder: ChoiceHolder, position: Int) {
-        /*holder.binding.apply{
-            poll = poll
-            choice = poll!!.choices[position]
-        }*/
         holder.binding.poll = poll
         holder.binding.choice = poll.choices[position]
-
         holder.binding.notesViewModel = notesViewModel
-        holder.binding.lifecycleOwner = lifecycleOwner
+        holder.binding.noteId = noteId
         holder.binding.executePendingBindings()
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChoiceHolder {

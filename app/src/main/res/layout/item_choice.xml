@@ -5,10 +5,13 @@
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
         <variable
                 name="poll"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll.PollViewData" />
+                type="jp.panta.misskeyandroidclient.model.notes.poll.Poll" />
         <variable
                 name="choice"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll.PollViewData.Choice" />
+                type="jp.panta.misskeyandroidclient.model.notes.poll.Poll.Choice" />
+        <variable
+                name="noteId"
+                type="jp.panta.misskeyandroidclient.model.notes.Note.Id" />
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
@@ -28,7 +31,7 @@
                 tools:text="候補１"
                 android:text='@{choice.text}'
                 android:enabled="@{SafeUnbox.unbox(poll.canVote)}"
-                android:onClick="@{()-> notesViewModel.vote(poll, choice)}"
+                android:onClick="@{()-> notesViewModel.vote(noteId, poll, choice)}"
                 android:checked="@{SafeUnbox.unbox(choice.isVoted)}"
                 android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginBottom="4dp"
@@ -40,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="@{SafeUnbox.unboxInt(poll.totalVoteCount)}"
-                android:progress="@{SafeUnbox.unboxInt(choice.voteCount)}"
+                android:progress="@{SafeUnbox.unboxInt(choice.votes)}"
                 tools:max="200"
                 tools:progress="50"
                 android:layout_gravity="bottom"

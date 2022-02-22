@@ -8,10 +8,10 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.*
+import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll.PollViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.onEach
@@ -150,9 +150,7 @@ open class PlaneNoteViewData (
 
     val myReaction = MutableLiveData<String?>(toShowNote.note.myReaction)
 
-    val poll = toShowNote.note.poll?.let {
-        PollViewData(it, toShowNote.note.id.noteId)
-    }
+    val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
     //reNote先
     val subNote: NoteRelation? = toShowNote.renote
@@ -204,7 +202,7 @@ open class PlaneNoteViewData (
         myReaction.postValue(note.myReaction)
         reactionCounts.postValue(note.reactionCounts)
         note.poll?.let {
-            poll?.update(it)
+            poll.postValue(it)
         }
     }
 

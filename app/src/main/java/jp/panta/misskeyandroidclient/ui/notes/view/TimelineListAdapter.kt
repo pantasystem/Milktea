@@ -34,7 +34,6 @@ class TimelineListAdapter(
         abstract val lifecycleOwner: LifecycleOwner
         abstract val reactionCountsView: RecyclerView
         abstract val notesViewModel: NotesViewModel
-        //private var reactionCountAdapter: ReactionCountAdapter =             ReactionCountAdapter(notesViewModel)
 
         private var reactionCountAdapter: ReactionCountAdapter? = null
 
@@ -79,21 +78,6 @@ class TimelineListAdapter(
         private fun unbind() {
             mCurrentNote?.reactionCounts?.removeObserver(reactionCountsObserver)
             mCurrentNote = null
-        }
-
-
-        protected fun getPollAdapter(notesViewModel: NotesViewModel, note: PlaneNoteViewData, lifecycleOwner: LifecycleOwner): PollListAdapter?{
-            val noteAndPoll = mNoteIdAndPollListAdapter
-            if(note.poll != null){
-                val pollAdapter = if(note.id != noteAndPoll?.first){
-                    PollListAdapter(note.poll, notesViewModel, lifecycleOwner)
-                }else{
-                    noteAndPoll.second
-                }
-                mNoteIdAndPollListAdapter = note.id to pollAdapter
-                return pollAdapter
-            }
-            return null
         }
 
         private fun bindReactionCounter() {
@@ -145,14 +129,6 @@ class TimelineListAdapter(
             binding.note = note
             binding.notesViewModel = notesViewModel
 
-            if(note.poll != null){
-                val pollAdapter = getPollAdapter(notesViewModel,note, lifecycleOwner)
-                pollAdapter?.let{
-                    binding.simpleNote.poll.adapter = pollAdapter
-                    binding.simpleNote.poll.layoutManager = LinearLayoutManager(binding.root.context)
-                }
-
-            }
         }
     }
 
@@ -170,16 +146,6 @@ class TimelineListAdapter(
                 binding.hasReplyToNote = note
 
                 binding.notesViewModel = notesViewModel
-                if(note.poll != null){
-                    val pollAdapter = getPollAdapter(notesViewModel,note, lifecycleOwner)
-                    pollAdapter?.let{
-                        binding.simpleNote.poll.adapter = pollAdapter
-                        binding.simpleNote.poll.layoutManager = LinearLayoutManager(binding.root.context)
-                    }
-
-                }
-
-
             }
         }
     }

@@ -207,7 +207,9 @@
                             tools:itemCount="2"
                             android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
 
-
+                            noteId="@{note.toShowNote.note.id}"
+                            poll="@{note.poll}"
+                            notesViewModel="@{notesViewModel}"
                             />
 
                     <androidx.recyclerview.widget.RecyclerView

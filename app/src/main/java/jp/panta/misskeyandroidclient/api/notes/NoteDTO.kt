@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.auth.custom.App
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.api.users.UserDTO
 import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -14,9 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.Visibility
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.serializers.InstantIso8601Serializer
-import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
 import kotlinx.serialization.SerialName
 import java.io.Serializable
 import kotlin.collections.LinkedHashMap
@@ -59,7 +56,7 @@ data class NoteDTO(
     val files: List<FilePropertyDTO>? = null,
     //@JsonProperty("fileIds") val mediaIds: List<String?>? = null,    //v10, v11の互換性が取れない
     val fileIds: List<String>? = null,
-    val poll: Poll? = null,
+    val poll: PollDTO? = null,
     @SerializedName("renote")
     @SerialName("renote")
     val reNote: NoteDTO? = null,
@@ -96,7 +93,7 @@ fun NoteDTO.toNote(account: Account): Note{
         emojis = this.emojis,
         app = this.app,
         fileIds = this.fileIds?.map { FileProperty.Id(account.accountId, it) },
-        poll = this.poll,
+        poll = this.poll?.toPoll(),
         reactionCounts = this.reactionCounts?.map{
             ReactionCount(reaction = it.key, it.value)
         }?: emptyList(),

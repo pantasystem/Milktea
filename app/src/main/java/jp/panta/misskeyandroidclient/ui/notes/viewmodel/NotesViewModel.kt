@@ -18,6 +18,7 @@ import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.draft.toDraftNote
+import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.notes.poll.Vote
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
@@ -380,15 +381,18 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    fun vote(poll: PollViewData, choice: PollViewData.Choice) {
-        if (SafeUnbox.unbox(poll.canVote.value)) {
+    fun vote(noteId: Note.Id?, poll: Poll?, choice: Poll.Choice?) {
+        if (noteId == null || poll == null || choice == null) {
+             return
+        }
+        if (SafeUnbox.unbox(poll.canVote)) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     getMisskeyAPI()?.vote(
                         Vote(
                             i = getAccount()?.getI(encryption)!!,
-                            choice = choice.number,
-                            noteId = poll.noteId
+                            choice = choice.index,
+                            noteId = noteId.noteId
                         )
                     )?.throwIfHasError()
                 }.onSuccess {
