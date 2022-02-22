@@ -9,7 +9,6 @@ import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import java.util.*
 import java.io.Serializable as JSerializable
 
