@@ -7,7 +7,7 @@ data class UsersState (
     val usersMap: Map<User.Id, User> = emptyMap()
 ) {
 
-    fun get(userId: User.Id): User? {
+    fun get(userId: User.Id?): User? {
         return usersMap[userId]
     }
 
