@@ -18,10 +18,9 @@ data class Poll(
 
     val canVote: Boolean
         get() {
-            return (expiresAt == null || expiresAt >= Clock.System.now())
-                    && (multiple
-                    || !choices.any { it.isVoted }
-                    )
+            return (expiresAt == null
+                    || expiresAt >= Clock.System.now())
+                    && (multiple || !choices.any { it.isVoted })
                     && !choices.all { it.isVoted }
         }
 
