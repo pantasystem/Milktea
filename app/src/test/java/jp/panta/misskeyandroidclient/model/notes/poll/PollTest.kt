@@ -149,7 +149,99 @@ class PollTest {
     }
 
     @Test
-    fun canVoteExpired() {
+    fun canVoteWithinExpiredAt() {
+        val poll = Poll(
+            choices = listOf(
+                Poll.Choice(
+                    index = 0,
+                    votes = 10,
+                    text = "aaa",
+                    isVoted = false
+                ),
+                Poll.Choice(
+                    index = 0,
+                    votes = 20,
+                    text = "aaa",
+                    isVoted = false
+                ),
+                Poll.Choice(
+                    index = 0,
+                    votes = 15,
+                    text = "aaa",
+                    isVoted = false
+                ),
+                Poll.Choice(
+                    index = 0,
+                    votes = 8,
+                    text = "aaa",
+                    isVoted = false
+                ),
+            ),
+            expiresAt = Clock.System.now() + 10.minutes,
+            multiple = false
+        )
+        Assert.assertTrue(poll.canVote)
+    }
+    @Test
+    fun canVoteWhenExpired() {
+        val poll = Poll(
+            choices = listOf(
+                Poll.Choice(
+                    index = 0,
+                    votes = 10,
+                    text = "aaa",
+                    isVoted = false
+                ),
+                Poll.Choice(
+                    index = 0,
+                    votes = 20,
+                    text = "aaa",
+                    isVoted = false
+                ),
+                Poll.Choice(
+                    index = 0,
+                    votes = 15,
+                    text = "aaa",
+                    isVoted = false
+                ),
+                Poll.Choice(
+                    index = 0,
+                    votes = 8,
+                    text = "aaa",
+                    isVoted = false
+                ),
+            ),
+            expiresAt = Clock.System.now() - 1.minutes,
+            multiple = false
+        )
+        Assert.assertFalse(poll.canVote)
+    }
+
+    @Test
+    fun canVoteVotedAndExpired() {
+        val poll = Poll(
+            choices = listOf(
+                Poll.Choice(
+                    index = 0,
+                    votes = 10,
+                    text = "aaa",
+                    isVoted = false
+                ),
+                Poll.Choice(
+                    index = 0,
+                    votes = 20,
+                    text = "aaa",
+                    isVoted = true
+                ),
+            ),
+            expiresAt = Clock.System.now() - 1.minutes,
+            multiple = false
+        )
+        Assert.assertFalse(poll.canVote)
+    }
+
+    @Test
+    fun canVoteAllVotedAndMultiple() {
         val poll = Poll(
             choices = listOf(
                 Poll.Choice(
@@ -164,21 +256,9 @@ class PollTest {
                     text = "aaa",
                     isVoted = true
                 ),
-                Poll.Choice(
-                    index = 0,
-                    votes = 15,
-                    text = "aaa",
-                    isVoted = true
-                ),
-                Poll.Choice(
-                    index = 0,
-                    votes = 8,
-                    text = "aaa",
-                    isVoted = true
-                ),
             ),
-            expiresAt = Clock.System.now() + 10.minutes,
-            multiple = false
+            multiple = true,
+            expiresAt = null
         )
         Assert.assertFalse(poll.canVote)
     }
