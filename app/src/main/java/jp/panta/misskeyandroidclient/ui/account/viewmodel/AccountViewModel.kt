@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.account.viewmodel
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +11,7 @@ import jp.panta.misskeyandroidclient.api.users.toUser
 import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -25,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     val miCore: MiCore,
-    val accountStore: AccountStore
+    val accountStore: AccountStore,
+    val userDataSource: UserDataSource,
 ) : ViewModel() {
 
     companion object {
@@ -50,7 +52,15 @@ class AccountViewModel @Inject constructor(
     val currentAccount =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    val user = MediatorLiveData<User.Detail>()
+    val user = currentAccount.flatMapLatest { account ->
+        userDataSource.state.map { state ->
+            account?.let {
+                state.get(User.Id(account.accountId, account.remoteId))
+            }
+        }.map {
+            it as? User.Detail
+        }
+    }.asLiveData()
 
     val switchAccount = EventBus<Int>()
 
@@ -63,32 +73,13 @@ class AccountViewModel @Inject constructor(
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init {
-        accountStore.observeCurrentAccount.filterNotNull().map { ac ->
+        accountStore.observeCurrentAccount.filterNotNull().onEach { ac ->
             miCore.getUserRepository()
-                .find(User.Id(ac.accountId, ac.remoteId), true) as? User.Detail
-        }.filterNotNull().map { user ->
-            user
-        }.onEach {
-            user.postValue(it)
+                .find(User.Id(ac.accountId, ac.remoteId), true)
         }.catch { e ->
             logger.error("現在のアカウントの取得に失敗した", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map {
-                ac to it
-            }
-        }.map { pair ->
-            (pair.second as? ChannelBody.Main.MeUpdated)?.let { meUpdated ->
-                pair.first to meUpdated
-            }
-        }.filterNotNull().onEach {
-            val user = it.second.body.toUser(it.first, true)
-            miCore.getUserDataSource().add(user)
-            this.user.postValue(user as User.Detail)
-        }.catch { e ->
-            logger.error("MeUpdated取得エラー", e = e)
-        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     fun setSwitchTargetConnectionInstance(account: Account) {
@@ -115,7 +106,10 @@ class AccountViewModel @Inject constructor(
     }
 
     fun showProfile(account: Account?) {
-        account ?: return
+        if (account == null) {
+            logger.debug("showProfile account未取得のためキャンセル")
+            return
+        }
         showProfile.event = account
     }
 
@@ -148,6 +142,7 @@ class AccountViewModel @Inject constructor(
             }
         }
     }
+
     fun removePage(page: Page) {
         viewModelScope.launch(Dispatchers.IO) {
             try {

@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -41,7 +40,6 @@ import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
-import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.ui.messaging.MessagingHistoryFragment
