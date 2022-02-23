@@ -49,7 +49,6 @@ class ChannelAPI(
         socket.addStateEventListener(this)
     }
 
-    @ExperimentalCoroutinesApi
     fun connect(type: Type): Flow<ChannelBody> {
         return channelFlow {
             val callback: (ChannelBody) -> Unit = {
