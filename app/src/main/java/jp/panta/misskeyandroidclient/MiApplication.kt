@@ -28,7 +28,6 @@ import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
 import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.model.notes.reservation.NoteReservationPostExecutor
@@ -38,6 +37,7 @@ import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
 import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
+import jp.panta.misskeyandroidclient.model.streaming.ChannelAPIMainEventDispatcherAdapter
 import jp.panta.misskeyandroidclient.model.streaming.MediatorMainEventDispatcher
 import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
 import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionUnRegistration
@@ -63,62 +63,93 @@ import javax.inject.Inject
 @HiltAndroidApp
 class MiApplication : Application(), MiCore {
 
-    @Inject lateinit var database: DataBase
+    @Inject
+    lateinit var database: DataBase
 
-    @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
+    @Inject
+    lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
-    @Inject lateinit var mSettingStore: SettingStore
+    @Inject
+    lateinit var mSettingStore: SettingStore
 
-    @Inject lateinit var draftNoteDao: DraftNoteDao
+    @Inject
+    lateinit var draftNoteDao: DraftNoteDao
 
-    @Inject lateinit var urlPreviewDAO: UrlPreviewDAO
+    @Inject
+    lateinit var urlPreviewDAO: UrlPreviewDAO
 
-    @Inject lateinit var mAccountRepository: AccountRepository
+    @Inject
+    lateinit var mAccountRepository: AccountRepository
 
-    @Inject lateinit var mMetaRepository: MetaRepository
+    @Inject
+    lateinit var mMetaRepository: MetaRepository
 
-    @Inject lateinit var mFetchMeta: FetchMeta
+    @Inject
+    lateinit var mFetchMeta: FetchMeta
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    @Inject lateinit var mAccountStore: AccountStore
+    @Inject
+    lateinit var mAccountStore: AccountStore
 
-    @Inject lateinit var mEncryption: Encryption
+    @Inject
+    lateinit var mEncryption: Encryption
 
-    @Inject lateinit var mMetaCache: MetaCache
+    @Inject
+    lateinit var mMetaCache: MetaCache
 
-    @Inject lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
+    @Inject
+    lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
 
-    @Inject lateinit var mNoteDataSource: NoteDataSource
-    @Inject lateinit var mUserDataSource: UserDataSource
-    @Inject lateinit var mNotificationDataSource: NotificationDataSource
-    @Inject lateinit var mMessageDataSource: MessageDataSource
-    @Inject lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
-    @Inject lateinit var mGroupDataSource: GroupDataSource
-    @Inject lateinit var mFilePropertyDataSource: FilePropertyDataSource
-    @Inject lateinit var mGalleryDataSource: GalleryDataSource
+    @Inject
+    lateinit var mNoteDataSource: NoteDataSource
+    @Inject
+    lateinit var mUserDataSource: UserDataSource
+    @Inject
+    lateinit var mNotificationDataSource: NotificationDataSource
+    @Inject
+    lateinit var mMessageDataSource: MessageDataSource
+    @Inject
+    lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
+    @Inject
+    lateinit var mGroupDataSource: GroupDataSource
+    @Inject
+    lateinit var mFilePropertyDataSource: FilePropertyDataSource
+    @Inject
+    lateinit var mGalleryDataSource: GalleryDataSource
 
-    @Inject lateinit var mNoteRepository: NoteRepository
-    @Inject lateinit var mUserRepository: UserRepository
+    @Inject
+    lateinit var mNoteRepository: NoteRepository
+    @Inject
+    lateinit var mUserRepository: UserRepository
 
-    @Inject lateinit var mNotificationRepository: NotificationRepository
+    @Inject
+    lateinit var mNotificationRepository: NotificationRepository
 
     private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
-    @Inject lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
-    @Inject lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
+    @Inject
+    lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+    @Inject
+    lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
-    @Inject lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
+    @Inject
+    lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
 
-    @Inject lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
+    @Inject
+    lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
 
-    @Inject lateinit var mUnreadMessages: UnReadMessages
+    @Inject
+    lateinit var mUnreadMessages: UnReadMessages
 
-    @Inject lateinit var mMessageRepository: MessageRepository
-    @Inject lateinit var mGroupRepository: GroupRepository
+    @Inject
+    lateinit var mMessageRepository: MessageRepository
+    @Inject
+    lateinit var mGroupRepository: GroupRepository
 
-    @Inject lateinit var mGetters: Getters
+    @Inject
+    lateinit var mGetters: Getters
 
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
@@ -127,11 +158,14 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-    @Inject lateinit var mGalleryRepository: GalleryRepository
+    @Inject
+    lateinit var mGalleryRepository: GalleryRepository
 
-    @Inject lateinit var mFileUploaderProvider: FileUploaderProvider
+    @Inject
+    lateinit var mFileUploaderProvider: FileUploaderProvider
 
-    @Inject lateinit var mDriveFileRepository: DriveFileRepository
+    @Inject
+    lateinit var mDriveFileRepository: DriveFileRepository
 
     @Inject
     lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
@@ -139,6 +173,12 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var noteTranslationStore: NoteTranslationStore
+
+    @Inject
+    lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
+
+    @Inject
+    lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -151,9 +191,11 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    @Inject lateinit var applicationScope: CoroutineScope
+    @Inject
+    lateinit var applicationScope: CoroutineScope
 
-    @Inject lateinit var lf: Logger.Factory
+    @Inject
+    lateinit var lf: Logger.Factory
     override val loggerFactory: Logger.Factory
         get() = lf
     private val logger: Logger by lazy {
@@ -166,7 +208,8 @@ class MiApplication : Application(), MiCore {
         AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
     }
 
-    @Inject lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
+    @Inject
+    lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
 
     private val _subscribeRegistration: SubscriptionRegistration by lazy {
         SubscriptionRegistration(
@@ -201,65 +244,59 @@ class MiApplication : Application(), MiCore {
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
-        mUserRepositoryEventToFlow = UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
+        mUserRepositoryEventToFlow =
+            UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
 
 
-        mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(mReactionHistoryDataSource, mMisskeyAPIProvider, mAccountRepository, getEncryption(), mUserDataSource)
+        mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(
+            mReactionHistoryDataSource,
+            mMisskeyAPIProvider,
+            mAccountRepository,
+            getEncryption(),
+            mUserDataSource
+        )
 
-        val mainEventDispatcher = MediatorMainEventDispatcher.Factory(this).create()
-        getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
-                ac to body
-            }
-        }.mapNotNull {
-            (it.second as? ChannelBody.Main)?.let{ main ->
-                it.first to main
-            }
-        }.onEach {
-            mainEventDispatcher.dispatch(it.first, it.second)
-        }.catch { e ->
-            logger.error("Dispatchi時にエラー発生", e = e)
-        }.launchIn(applicationScope + Dispatchers.IO)
+        val mainEventDispatcher = mainEventDispatcherFactory.create()
+        channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
 
         mAccountRepository.addEventListener { ev ->
             applicationScope.launch(Dispatchers.IO) {
-                try{
-                    if(ev is AccountRepository.Event.Deleted) {
+                try {
+                    if (ev is AccountRepository.Event.Deleted) {
                         mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
                     }
                     mAccountStore.initialize()
-                }catch(e: Exception) {
+                } catch (e: Exception) {
                     logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
                 }
             }
         }
 
-        applicationScope.launch(Dispatchers.IO){
-            try{
-                AccountMigration(database.accountDao(), mAccountRepository, sharedPreferences).executeMigrate()
+        applicationScope.launch(Dispatchers.IO) {
+            try {
                 mAccountStore.initialize()
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 logger.error("load account error", e = e)
             }
         }
+
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
 
         _networkState.distinctUntilChanged().onEach {
-            logger.debug("接続状態が変化:${if(it) "接続" else "未接続"}")
+            logger.debug("接続状態が変化:${if (it) "接続" else "未接続"}")
             mSocketWithAccountProvider.all().forEach { socket ->
-                if(it) {
+                if (it) {
                     socket.onNetworkActive()
-                }else{
+                } else {
                     socket.onNetworkInActive()
                 }
             }
-
         }.catch { e ->
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
-            if(!it.isSuccessful) {
+            if (!it.isSuccessful) {
                 return@addOnCompleteListener
             }
             it.result?.also { token ->
@@ -281,7 +318,6 @@ class MiApplication : Application(), MiCore {
             setUpMetaMap(it.accounts)
         }.launchIn(applicationScope + Dispatchers.IO)
     }
-
 
 
     override suspend fun getAccount(accountId: Long): Account {
@@ -343,15 +379,14 @@ class MiApplication : Application(), MiCore {
 
     override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
-    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore{
-        return account.instanceDomain.let{ accountUrl ->
-            val url = mSettingStore.urlPreviewSetting.getSummalyUrl()?: accountUrl
+    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore {
+        return account.instanceDomain.let { accountUrl ->
+            val url = mSettingStore.urlPreviewSetting.getSummalyUrl() ?: accountUrl
 
             var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
-            if(store == null || isReplace){
+            if (store == null || isReplace) {
                 store = UrlPreviewStoreFactory(
-                    urlPreviewDAO
-                    ,mSettingStore.urlPreviewSetting.getSourceType(),
+                    urlPreviewDAO, mSettingStore.urlPreviewSetting.getSourceType(),
                     mSettingStore.urlPreviewSetting.getSummalyUrl(),
                     mAccountStore.state.value.currentAccount
                 ).create()
@@ -362,11 +397,11 @@ class MiApplication : Application(), MiCore {
     }
 
     override suspend fun setCurrentAccount(account: Account) {
-        try{
+        try {
             mAccountRepository.setCurrentAccount(account)
             mAccountStore.initialize()
 //            loadAndInitializeAccounts()
-        }catch(e: Exception){
+        } catch (e: Exception) {
             logger.error("switchAccount error", e)
         }
     }
@@ -374,7 +409,6 @@ class MiApplication : Application(), MiCore {
     override fun getDraftNoteDAO(): DraftNoteDao {
         return draftNoteDao
     }
-
 
 
     override fun getSettingStore(): SettingStore {
@@ -450,14 +484,13 @@ class MiApplication : Application(), MiCore {
     }
 
 
-
-    override fun getCurrentInstanceMeta(): Meta?{
-        return mAccountStore.currentAccount?.instanceDomain?.let{ url ->
+    override fun getCurrentInstanceMeta(): Meta? {
+        return mAccountStore.currentAccount?.instanceDomain?.let { url ->
             mMetaCache.get(url)
         }
     }
 
-    private suspend fun setUpMetaMap(accounts: List<Account>){
+    private suspend fun setUpMetaMap(accounts: List<Account>) {
         coroutineScope {
             accounts.map { ac ->
                 async {
@@ -469,10 +502,10 @@ class MiApplication : Application(), MiCore {
 
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String) {
-        try{
+        try {
             val meta = mFetchMeta.fetch(instanceDomain, isForceFetch = true)
             mMetaCache.put(instanceDomain, meta)
-        }catch(e: Exception){
+        } catch (e: Exception) {
             logger.error("metaの読み込み一連処理に失敗したでち", e)
         }
     }
@@ -500,7 +533,7 @@ class MiApplication : Application(), MiCore {
 
     private val sharedPreferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            when(key){
+            when (key) {
                 UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
                     mAccountStore.state.value.accounts.forEach {
                         getUrlPreviewStore(it, true)
@@ -513,7 +546,6 @@ class MiApplication : Application(), MiCore {
     override fun getTaskExecutor(): TaskExecutor {
         return _taskExecutor
     }
-
 
 
 }
