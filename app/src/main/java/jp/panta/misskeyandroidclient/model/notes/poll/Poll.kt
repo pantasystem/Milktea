@@ -13,13 +13,15 @@ data class Poll(
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
-    data class Choice(val index: Int, val text: String, val votes: Int, val isVoted: Boolean) : Serializable
+    data class Choice(val index: Int, val text: String, val votes: Int, val isVoted: Boolean) :
+        Serializable
 
     val canVote: Boolean
         get() {
-            return (expiresAt == null || expiresAt < Clock.System.now()) && (multiple || !choices.any {
-                it.isVoted
-            })
+            return (expiresAt == null
+                    || expiresAt >= Clock.System.now())
+                    && (multiple || !choices.any { it.isVoted })
+                    && !choices.all { it.isVoted }
         }
 
     val totalVoteCount: Int
