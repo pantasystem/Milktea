@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.notes.DeleteNote
-import jp.panta.misskeyandroidclient.api.notes.NoteRequest
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.notes.DeleteNote
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
@@ -83,10 +83,12 @@ class NoteRepositoryImpl @Inject constructor(
 
         logger.debug("request notes/show=$noteId")
         note = runCatching {
-            misskeyAPIProvider.get(account).showNote(NoteRequest(
+            misskeyAPIProvider.get(account).showNote(
+                NoteRequest(
                 i = account.getI(encryption),
                 noteId = noteId.noteId
-            ))
+            )
+            )
         }.getOrNull()?.body()?.let{
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
@@ -133,7 +135,7 @@ class NoteRepositoryImpl @Inject constructor(
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
         val account = accountRepository.get(createReaction.noteId.accountId)
         val res = misskeyAPIProvider.get(account).createReaction(
-            jp.panta.misskeyandroidclient.api.notes.CreateReaction(
+            jp.panta.misskeyandroidclient.api.misskey.notes.CreateReaction(
                 i = account.getI(encryption),
                 noteId = createReaction.noteId.noteId,
                 reaction = createReaction.reaction
@@ -146,10 +148,12 @@ class NoteRepositoryImpl @Inject constructor(
     private suspend fun postUnReaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
         val account  = accountRepository.get(noteId.accountId)
-        val res = misskeyAPIProvider.get(account).deleteReaction(DeleteNote(
+        val res = misskeyAPIProvider.get(account).deleteReaction(
+            DeleteNote(
             noteId = note.id.noteId,
             i = account.getI(encryption)
-        ))
+        )
+        )
         res.throwIfHasError()
         return res.isSuccessful
 

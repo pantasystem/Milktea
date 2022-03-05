@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.model.list.impl
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.list.CreateList
-import jp.panta.misskeyandroidclient.api.list.ListId
-import jp.panta.misskeyandroidclient.api.list.ListUserOperation
-import jp.panta.misskeyandroidclient.api.list.UpdateList
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.list.CreateList
+import jp.panta.misskeyandroidclient.api.misskey.list.ListId
+import jp.panta.misskeyandroidclient.api.misskey.list.ListUserOperation
+import jp.panta.misskeyandroidclient.api.misskey.list.UpdateList
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.AccountRepository

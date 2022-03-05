@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
-import jp.panta.misskeyandroidclient.api.users.UserDTO
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaDTO
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.misskey.notification.NotificationDTO
+import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
+import jp.panta.misskeyandroidclient.api.misskey.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.ExperimentalSerializationApi

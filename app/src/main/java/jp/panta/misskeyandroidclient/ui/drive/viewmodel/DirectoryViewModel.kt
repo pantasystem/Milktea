@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.drive.CreateFolder
-import jp.panta.misskeyandroidclient.api.drive.RequestFolder
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.drive.CreateFolder
+import jp.panta.misskeyandroidclient.api.misskey.drive.RequestFolder
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
 import jp.panta.misskeyandroidclient.model.drive.DriveStore

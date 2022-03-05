@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.model.notes.reaction.impl
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.notes.reaction.RequestReactionHistoryDTO
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory

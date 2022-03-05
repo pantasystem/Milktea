@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.tags
 
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.hashtag.HashTag
 import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

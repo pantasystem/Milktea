@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.notes.translation.Translate
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.notes.translation.Translate
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.util.State

@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
-import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 

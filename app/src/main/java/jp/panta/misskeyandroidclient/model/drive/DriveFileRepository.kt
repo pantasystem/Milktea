@@ -1,14 +1,11 @@
 package jp.panta.misskeyandroidclient.model.drive
 
-import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.drive.ShowFile
-import jp.panta.misskeyandroidclient.api.drive.UpdateFileDTO
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.drive.ShowFile
+import jp.panta.misskeyandroidclient.api.misskey.drive.UpdateFileDTO
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface DriveFileRepository {

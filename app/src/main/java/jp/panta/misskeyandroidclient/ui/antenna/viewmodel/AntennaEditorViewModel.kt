@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.model.I
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.list.UserListDTO
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
-import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaToAdd
+import jp.panta.misskeyandroidclient.api.misskey.list.UserListDTO
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaQuery
+import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaToAdd
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.model.group.Group
 import jp.panta.misskeyandroidclient.model.users.User

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.api.notes
 
 
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.junit.Assert

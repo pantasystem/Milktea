@@ -2,12 +2,12 @@ package jp.panta.misskeyandroidclient.ui.auth.viewmodel.app
 
 import android.util.Log
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.app.CreateApp
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.api.misskey.app.CreateApp
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.api.Version
-import jp.panta.misskeyandroidclient.api.auth.AppSecret
-import jp.panta.misskeyandroidclient.api.auth.Session
+import jp.panta.misskeyandroidclient.api.misskey.auth.AppSecret
+import jp.panta.misskeyandroidclient.api.misskey.auth.Session
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.*
 import jp.panta.misskeyandroidclient.model.instance.Meta

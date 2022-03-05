@@ -7,9 +7,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.api.auth.AccessToken
+import jp.panta.misskeyandroidclient.api.misskey.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.util.Hash
 import java.io.Serializable
 

@@ -2,10 +2,10 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.v12.antenna.AntennaQuery
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.AccountStore

@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.model.users.impl
 
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.users.*
-import jp.panta.misskeyandroidclient.api.users.report.ReportDTO
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.users.*
+import jp.panta.misskeyandroidclient.api.misskey.users.report.ReportDTO
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -15,7 +15,6 @@ import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserNotFoundException
 import jp.panta.misskeyandroidclient.model.users.UserRepository
-import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
 import jp.panta.misskeyandroidclient.model.users.report.Report
 import retrofit2.Response
 import javax.inject.Inject
@@ -51,11 +50,13 @@ class UserRepositoryImpl @Inject constructor(
 
         val account = accountRepository.get(userId.accountId)
         if(localResult.getOrNull() == null) {
-            val res = misskeyAPIProvider.get(account).showUser(RequestUser(
+            val res = misskeyAPIProvider.get(account).showUser(
+                RequestUser(
                 i = account.getI(encryption),
                 userId = userId.id,
                 detail = true
-            ))
+            )
+            )
             res.throwIfHasError()
             res.body()?.let{
                 val user = it.toUser(account, true)
@@ -128,11 +129,13 @@ class UserRepositoryImpl @Inject constructor(
         val api = misskeyAPIProvider.get(ac)
 
         val results = SearchByUserAndHost(api)
-            .search(RequestUser(
+            .search(
+                RequestUser(
                 userName = userName,
                 host = host,
                 i = i
-            ))
+            )
+            )
             .throwIfHasError()
 
         return results.body()!!.map {
@@ -252,11 +255,13 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun report(report: Report): Boolean {
         val account = accountRepository.get(report.userId.accountId)
         val api = report.userId.getMisskeyAPI()
-        val res = api.report(ReportDTO(
+        val res = api.report(
+            ReportDTO(
             i = account.getI(encryption),
             comment = report.comment,
             userId = report.userId.id
-        ))
+        )
+        )
         res.throwIfHasError()
         return res.isSuccessful
     }

@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.notes.getNoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*

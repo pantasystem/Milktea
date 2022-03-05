@@ -10,8 +10,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.api.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
+import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
 import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.account.page.galleryTypes

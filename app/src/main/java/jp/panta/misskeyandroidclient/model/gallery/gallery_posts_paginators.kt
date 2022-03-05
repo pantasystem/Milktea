@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.v12_75_0.GetPosts
-import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.GetPosts
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Response
 import java.lang.IllegalStateException
-import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.GalleryPost as GalleryPostDTO
 
 
 interface GetGalleryPostsStateFlow {
@@ -98,12 +98,14 @@ class GalleryPostsLoader (
         when(pageable) {
             is Pageable.Gallery.MyPosts -> {
                 return {
-                    api.myGalleryPosts(GetPosts(
+                    api.myGalleryPosts(
+                        GetPosts(
                         i,
                         sinceId = sinceId,
                         untilId = untilId,
                         limit = 20,
-                    ))
+                    )
+                    )
                 }
             }
             is Pageable.Gallery.ILikedPosts -> {

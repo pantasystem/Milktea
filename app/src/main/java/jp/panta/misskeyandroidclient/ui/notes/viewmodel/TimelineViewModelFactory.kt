@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.model.account.Account
 
-import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import java.lang.IllegalArgumentException
 import jp.panta.misskeyandroidclient.model.account.page.Pageable

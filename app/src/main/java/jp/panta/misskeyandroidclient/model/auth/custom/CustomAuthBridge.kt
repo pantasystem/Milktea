@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.auth.custom
 
-import jp.panta.misskeyandroidclient.api.auth.Session
+import jp.panta.misskeyandroidclient.api.misskey.auth.Session
 import java.util.*
 
 data class CustomAuthBridge(

@@ -1,7 +1,5 @@
 package jp.panta.misskeyandroidclient
 
-import jp.panta.misskeyandroidclient.api.logger.AndroidDefaultLogger
-
 /**
  * Android標準のLogはAndroidに依存してしまっているため、
  * ユニットテストで邪魔になることが多いのと環境によって、出力先を変えたいので抽象化することにした。

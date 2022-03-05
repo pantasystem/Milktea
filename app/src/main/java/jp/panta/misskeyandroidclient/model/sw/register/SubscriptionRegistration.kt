@@ -2,10 +2,10 @@ package jp.panta.misskeyandroidclient.model.sw.register
 
 import jp.panta.misskeyandroidclient.BuildConfig
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.sw.register.Subscription
-import jp.panta.misskeyandroidclient.api.sw.register.SubscriptionState
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.sw.register.Subscription
+import jp.panta.misskeyandroidclient.api.misskey.sw.register.SubscriptionState
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import kotlinx.coroutines.async

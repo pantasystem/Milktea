@@ -2,12 +2,11 @@ package jp.panta.misskeyandroidclient.model.drive
 
 import android.content.Context
 import com.google.gson.Gson
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
-import jp.panta.misskeyandroidclient.api.drive.OkHttpDriveFileUploader
+import jp.panta.misskeyandroidclient.api.misskey.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.api.misskey.drive.OkHttpDriveFileUploader
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.file.File
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

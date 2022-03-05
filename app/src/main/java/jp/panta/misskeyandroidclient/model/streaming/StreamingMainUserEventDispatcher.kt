@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.streaming
 
-import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.streaming.ChannelBody

@@ -3,10 +3,10 @@ package jp.panta.misskeyandroidclient.ui.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.auth.UserKey
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.api.misskey.auth.UserKey
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.account.newAccount
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.users.User
