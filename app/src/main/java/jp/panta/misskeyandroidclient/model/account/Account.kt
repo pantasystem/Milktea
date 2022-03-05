@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account
 
 
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.api.misskey.auth.AccessToken
@@ -27,22 +24,29 @@ data class Account (
     val userName: String,
     val encryptedToken: String,
     @Ignore val pages: List<Page>,
+    val instanceType: InstanceType,
     @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
 ): Serializable{
 
 
+    enum class InstanceType {
+        MISSKEY, MASTODON
+    }
+
 
     constructor(remoteId: String,
                 instanceDomain: String,
                 userName: String,
+                instanceType: InstanceType,
                 encryptedToken: String) :
             this(
                 remoteId,
                 instanceDomain,
                 userName,
                 encryptedToken,
-                emptyList()
+                emptyList(),
+                instanceType
             )
 
 
@@ -92,7 +96,8 @@ fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account{
         bannerUrl = this.bannerUrl,*/
         encryptedToken = encryptedToken,
         //emojis = this.emojis?: emptyList(),
-        pages = emptyList()
+        pages = emptyList(),
+        instanceType = Account.InstanceType.MISSKEY
     )
 }
 fun AccountRelation.newAccount(user: UserDTO?): Account?{
@@ -115,6 +120,30 @@ fun AccountRelation.newAccount(user: UserDTO?): Account?{
             encryptedToken = ci.encryptedI,
             pages = this.pages.mapNotNull{
                 it.toPage()
-            }
+            },
+            instanceType = Account.InstanceType.MISSKEY,
         )
+}
+
+
+class AccountInstanceTypeConverter{
+
+    @TypeConverter
+    fun convert(type: Account.InstanceType): String{
+        // NOTE: enum.nameで取得するとリファクタリング時にデータが壊れる可能性があるのであえて愚直に変換している
+        return when(type) {
+            Account.InstanceType.MISSKEY -> "misskey"
+            Account.InstanceType.MASTODON -> "mastodon"
+        }
+    }
+
+    @TypeConverter
+    fun convert(type: String): Account.InstanceType {
+        // NOTE: enum.nameで取得するとリファクタリング時にデータが壊れる可能性があるのであえて愚直に変換している
+        return when(type) {
+            "misskey" -> Account.InstanceType.MISSKEY
+            "mastodon" -> Account.InstanceType.MASTODON
+            else -> throw IllegalArgumentException("未知のアカウント種別です")
+        }
+    }
 }

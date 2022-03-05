@@ -132,3 +132,9 @@ val MIGRATION_8_10 = object : Migration(8, 10) {
         database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS 'index_nicknames_username_host' ON 'nicknames' ('username', 'host')")
     }
 }
+
+val MIGRATION_10_11 = object : Migration(10, 11) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("alter table 'account_table' add column 'instanceType' TEXT default 'misskey'")
+    }
+}

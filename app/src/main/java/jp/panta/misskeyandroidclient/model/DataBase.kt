@@ -13,6 +13,7 @@ import jp.panta.misskeyandroidclient.model.notes.draft.db.UserIdDTO
 import jp.panta.misskeyandroidclient.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountInstanceTypeConverter
 import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
 import jp.panta.misskeyandroidclient.model.account.page.TimelinePageTypeConverter
 import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
@@ -47,10 +48,10 @@ import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDTO
         UnreadNotification::class,
         UserNicknameDTO::class,
     ],
-    version = 10,
+    version = 11,
     exportSchema = true
 )
-@TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class)
+@TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class, AccountInstanceTypeConverter::class)
 abstract class DataBase : RoomDatabase(){
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
     @Deprecated("pageDaoへ移行")
