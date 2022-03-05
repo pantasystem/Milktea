@@ -3,9 +3,9 @@ package jp.panta.misskeyandroidclient.model.account
 class TestAccountRepository : AccountRepository {
 
     val accounts = mutableMapOf(
-        1L to Account("remote1", "test.misskey.jp", "test1", "token", emptyList(), 1),
-        2L to Account("remote2", "test.misskey.jp", "test2", "token", emptyList(), 2),
-        3L to Account("remote3", "test.misskey.jp", "test1", "token", emptyList(), 3)
+        1L to Account("remote1", "test.misskey.jp", "test1", "token", emptyList(), Account.InstanceType.MISSKEY,1),
+        2L to Account("remote2", "test.misskey.jp", "test2", "token", emptyList(), Account.InstanceType.MISSKEY,2),
+        3L to Account("remote3", "test.misskey.jp", "test1", "token", emptyList(), Account.InstanceType.MISSKEY,3)
     )
 
     private var currentAccountId = 1L

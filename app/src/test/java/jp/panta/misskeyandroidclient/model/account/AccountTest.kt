@@ -11,7 +11,8 @@ class AccountTest : TestCase() {
             instanceDomain = "https://example.com",
             userName = "",
             encryptedToken = "",
-            remoteId = "remoteId"
+            remoteId = "remoteId",
+            instanceType = Account.InstanceType.MISSKEY
         )
         assertEquals("example.com", account.getHost())
     }
@@ -21,7 +22,8 @@ class AccountTest : TestCase() {
             instanceDomain = "http://example.com",
             userName = "",
             encryptedToken = "",
-            remoteId = "remoteId"
+            remoteId = "remoteId",
+            instanceType = Account.InstanceType.MISSKEY
         )
         assertEquals("example.com", account.getHost())
     }
@@ -31,7 +33,8 @@ class AccountTest : TestCase() {
             instanceDomain = "example.com",
             userName = "",
             encryptedToken = "",
-            remoteId = "remoteId"
+            remoteId = "remoteId",
+            instanceType = Account.InstanceType.MISSKEY
         )
         assertEquals("example.com", account.getHost())
     }

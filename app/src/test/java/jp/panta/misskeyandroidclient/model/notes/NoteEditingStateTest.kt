@@ -132,12 +132,11 @@ class NoteEditingStateTest : TestCase() {
 
 
     fun testSetAccount() {
-        val account = Account("", "", "", "", emptyList(), 1)
+        val account = Account("", "", "", "", emptyList(), Account.InstanceType.MISSKEY, 1)
         val state = NoteEditingState()
             .setAccount(account)
         assertEquals(account, state.author)
     }
-
 
 
     fun testRemovePollChoice() {
@@ -149,7 +148,7 @@ class NoteEditingStateTest : TestCase() {
             .addPollChoice()
         val id = state.poll!!.choices.first().id
         state = state.removePollChoice(id)
-        assertFalse(state.poll!!.choices.any{ it.id == id })
+        assertFalse(state.poll!!.choices.any { it.id == id })
         assertEquals(3, state.poll?.choices?.size)
     }
 
@@ -195,12 +194,13 @@ class NoteEditingStateTest : TestCase() {
 
     fun testClear() {
         val initialState = NoteEditingState()
-        assertEquals(initialState, initialState
-            .changeText("ほげ")
-            .changeCw("ぴよ")
-            .togglePoll()
-            .addFile(AppFile.Remote(FileProperty.Id(0, "")))
-            .clear()
+        assertEquals(
+            initialState, initialState
+                .changeText("ほげ")
+                .changeCw("ぴよ")
+                .togglePoll()
+                .addFile(AppFile.Remote(FileProperty.Id(0, "")))
+                .clear()
         )
     }
 

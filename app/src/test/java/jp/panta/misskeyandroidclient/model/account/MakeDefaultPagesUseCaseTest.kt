@@ -10,13 +10,21 @@ class MakeDefaultPagesUseCaseTest {
 
     lateinit var makeDefaultPagesUseCase: MakeDefaultPagesUseCase
     lateinit var account: Account
+
     @Before
     fun setup() {
         makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
             PageDefaultStringsJp()
         )
-        account = Account("remoteId", "https://misskey.io", "", "")
+        account = Account(
+            "remoteId",
+            "https://misskey.io",
+            "",
+            instanceType = Account.InstanceType.MISSKEY,
+            "",
+        )
     }
+
     @Test
     fun disableGlobalTimeline() {
         val meta = Meta(

@@ -24,7 +24,8 @@ class UserTest : TestCase() {
                 instanceDomain = "https://example.com",
                 encryptedToken = "",
                 remoteId = "",
-                userName = ""
+                userName = "",
+                instanceType = Account.InstanceType.MISSKEY
             ))
         assertEquals("https://example.com/@Panta", profileUrl)
     }
@@ -47,7 +48,8 @@ class UserTest : TestCase() {
             instanceDomain = "https://example.com",
             encryptedToken = "",
             remoteId = "",
-            userName = ""
+            userName = "",
+            instanceType = Account.InstanceType.MISSKEY
         ))
         assertEquals("https://example.com/@Panta@misskey.io", profileUrl)
     }

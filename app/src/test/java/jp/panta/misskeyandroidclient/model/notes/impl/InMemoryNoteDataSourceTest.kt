@@ -18,11 +18,19 @@ class InMemoryNoteDataSourceTest {
 
     private lateinit var loggerFactory: Logger.Factory
     private lateinit var account: Account
+
     @Before
     fun setUp() {
         loggerFactory = TestLogger.Factory()
-        account = Account(remoteId = "piyo", instanceDomain = "", encryptedToken = "", userName = "piyoName")
+        account = Account(
+            remoteId = "piyo",
+            instanceDomain = "",
+            encryptedToken = "",
+            userName = "piyoName",
+            instanceType = Account.InstanceType.MISSKEY
+        )
     }
+
     @Test
     fun testAdd() {
         val noteDataSource = InMemoryNoteDataSource(loggerFactory)
@@ -59,7 +67,7 @@ class InMemoryNoteDataSourceTest {
 
 
     @Test
-    fun testUpdateNote(): Unit = runBlocking{
+    fun testUpdateNote(): Unit = runBlocking {
         val noteDataSource = InMemoryNoteDataSource(loggerFactory)
 
         val dto = NoteDTO(
