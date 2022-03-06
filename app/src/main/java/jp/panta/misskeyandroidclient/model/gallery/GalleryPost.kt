@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
-import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import java.util.*
-import jp.panta.misskeyandroidclient.api.v12_75_0.GalleryPost as GalleryPostDTO
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.GalleryPost as GalleryPostDTO
 
 sealed class GalleryPost {
     data class Id(

@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.gallery.impl
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.v12_75_0.*
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.*
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.api.IllegalVersionException
 import jp.panta.misskeyandroidclient.model.account.UnauthorizedException
@@ -19,7 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
-import jp.panta.misskeyandroidclient.api.v12_75_0.CreateGallery as CreateGalleryDTO
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.CreateGallery as CreateGalleryDTO
 
 fun MiCore.createGalleryRepository() : GalleryRepository{
     return GalleryRepositoryImpl(
@@ -150,7 +150,7 @@ class GalleryRepositoryImpl @Inject constructor(
         return gallery
     }
 
-    private fun getMisskeyAPI(account: Account) : MisskeyAPIV1275{
+    private fun getMisskeyAPI(account: Account) : MisskeyAPIV1275 {
         return misskeyAPIProvider.get(account.instanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
     }

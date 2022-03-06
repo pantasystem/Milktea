@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.notes.toEntities
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.misskey.notes.toEntities
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.users.UserDataSource

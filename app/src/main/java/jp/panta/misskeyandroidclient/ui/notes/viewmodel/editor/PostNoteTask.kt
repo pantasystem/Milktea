@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.drive.FileUploader
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.api.notes.CreateNote as CreateNoteDTO
+import jp.panta.misskeyandroidclient.api.misskey.notes.CreateNote as CreateNoteDTO
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
 import kotlinx.coroutines.*

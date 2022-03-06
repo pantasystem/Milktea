@@ -1,15 +1,14 @@
 package jp.panta.misskeyandroidclient.model.messaging.impl
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.messaging.MessageAction
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageAction
+import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageDTO
 import jp.panta.misskeyandroidclient.gettters.MessageRelationGetter
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.messaging.CreateMessage
 import jp.panta.misskeyandroidclient.model.messaging.Message
 import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import java.io.IOException
 import java.lang.IllegalStateException
 import javax.inject.Inject

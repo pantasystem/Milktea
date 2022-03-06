@@ -6,7 +6,7 @@
     <data>
         <variable
                 name="user"
-                type="jp.panta.misskeyandroidclient.api.users.UserDTO" />
+                type="jp.panta.misskeyandroidclient.api.misskey.users.UserDTO" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -30,7 +30,8 @@
                 android:text="@string/continue_auth"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:enabled="@{user != null}"/>
+                android:enabled="false"
+                />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

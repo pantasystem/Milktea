@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.notes.renote
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.notes.FindRenotes
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.notes.FindRenotes
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
@@ -30,7 +30,7 @@ class RenotesPagingServiceImpl(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val encryption: Encryption,
 
-) : RenotesPagingService{
+    ) : RenotesPagingService{
 
     private val pagingImpl = RenotesPagingImpl(targetNoteId, misskeyAPIProvider, accountRepository, noteDataSourceAdder, encryption)
     private val controller = PreviousPagingController(pagingImpl, pagingImpl, pagingImpl, pagingImpl)

@@ -15,6 +15,7 @@ class AccountStateTest {
                     "id:$it",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -36,6 +37,7 @@ class AccountStateTest {
                     "id:$it",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -61,6 +63,7 @@ class AccountStateTest {
                     "id:$it",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -80,6 +83,7 @@ class AccountStateTest {
                     "id:$it",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -92,6 +96,7 @@ class AccountStateTest {
                     "id:100",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = 1000L)
             )
@@ -107,6 +112,7 @@ class AccountStateTest {
                     "id:$it",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -117,6 +123,7 @@ class AccountStateTest {
                 "id:10",
                 "host",
                 "name",
+                Account.InstanceType.MISSKEY,
                 ""
             ).copy(accountId = 100L)
         )
@@ -132,6 +139,7 @@ class AccountStateTest {
                 "id:10",
                 "host",
                 "name",
+                Account.InstanceType.MISSKEY,
                 ""
             ).copy(accountId = 100L)
         )
@@ -149,6 +157,7 @@ class AccountStateTest {
                     "id:$it",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -168,6 +177,7 @@ class AccountStateTest {
                     "id:$it",
                     "host",
                     "name",
+                    Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },

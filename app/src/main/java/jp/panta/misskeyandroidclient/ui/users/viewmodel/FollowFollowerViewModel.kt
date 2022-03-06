@@ -5,13 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.v10.MisskeyAPIV10
-import jp.panta.misskeyandroidclient.api.v10.RequestFollowFollower
-import jp.panta.misskeyandroidclient.api.v11.MisskeyAPIV11
+import jp.panta.misskeyandroidclient.api.misskey.v10.MisskeyAPIV10
+import jp.panta.misskeyandroidclient.api.misskey.v10.RequestFollowFollower
+import jp.panta.misskeyandroidclient.api.misskey.v11.MisskeyAPIV11
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
@@ -69,11 +69,13 @@ class FollowFollowerViewModel(
         override suspend fun next(): List<User.Detail> {
             lock.withLock {
                 logger?.debug("next: $nextId")
-                val res = api.invoke(RequestUser(
+                val res = api.invoke(
+                    RequestUser(
                     account.getI(encryption),
                     userId = userId.id,
                     untilId = nextId
-                )).body()
+                )
+                ).body()
                     ?: return emptyList()
                 nextId = res.last().id
                 require(nextId != null)

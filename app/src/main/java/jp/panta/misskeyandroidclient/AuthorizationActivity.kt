@@ -3,14 +3,16 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProvider
+import android.util.Log
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
+import jp.panta.misskeyandroidclient.model.auth.from
 import jp.panta.misskeyandroidclient.ui.auth.AuthFragment
 import jp.panta.misskeyandroidclient.ui.auth.AuthResultFragment
 import jp.panta.misskeyandroidclient.ui.auth.Waiting4userAuthorizationFragment
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -18,21 +20,17 @@ import java.lang.IllegalStateException
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class AuthorizationActivity : AppCompatActivity() {
 
-    lateinit var mViewModel: AuthViewModel
+    private val mViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization)
 
-
-        val miCore = application as MiCore
-        val authViewModel = ViewModelProvider(this, AuthViewModel.Factory(miCore))[AuthViewModel::class.java]
-        mViewModel = authViewModel
-
         lifecycleScope.launchWhenResumed {
-            authViewModel.authorization.collect {
+            mViewModel.authorization.collect {
                 if(it is Authorization.Finish) {
                     startActivity(Intent(this@AuthorizationActivity, MainActivity::class.java))
                     finish()
@@ -72,17 +70,20 @@ class AuthorizationActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         val authStore = CustomAuthStore.newInstance(this)
         val callbackToken = intent?.data?.getQueryParameter("token")
+        val callbackMastodonCode = intent?.data?.getQueryParameter("code")
 
         if(callbackToken?.isNotBlank() == true) {
             authStore.getCustomAuthBridge()?.let {
-                val a = Authorization.Waiting4UserAuthorization(
-                    instanceBaseURL = it.instanceDomain,
-                    session = it.session,
-                    appSecret = it.secret,
-                    viaName = it.viaName
-                )
-                mViewModel.setState(a)
+                val state = Authorization.Waiting4UserAuthorization.from(it)
+                mViewModel.setState(state)
                 mViewModel.getAccessToken()
+
+            }
+        } else if (callbackMastodonCode?.isNotBlank() == true) {
+            authStore.getCustomAuthBridge()?.let {
+                val state = Authorization.Waiting4UserAuthorization.from(it)
+                mViewModel.setState(state)
+                mViewModel.getAccessToken(callbackMastodonCode)
             }
         }
     }

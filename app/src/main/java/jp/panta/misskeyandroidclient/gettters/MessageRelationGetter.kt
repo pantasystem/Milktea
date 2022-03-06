@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.gettters
 
-import jp.panta.misskeyandroidclient.api.groups.toGroup
-import jp.panta.misskeyandroidclient.api.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.api.messaging.entities
+import jp.panta.misskeyandroidclient.api.misskey.groups.toGroup
+import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageDTO
+import jp.panta.misskeyandroidclient.api.misskey.messaging.entities
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.messaging.Message

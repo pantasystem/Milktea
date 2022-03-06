@@ -1,30 +1,36 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
 import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.notes.toNote
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
+import jp.panta.misskeyandroidclient.api.misskey.notes.toNote
+import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import java.util.*
 
 class InMemoryNoteDataSourceTest {
 
     private lateinit var loggerFactory: Logger.Factory
     private lateinit var account: Account
+
     @Before
     fun setUp() {
         loggerFactory = TestLogger.Factory()
-        account = Account(remoteId = "piyo", instanceDomain = "", encryptedToken = "", userName = "piyoName")
+        account = Account(
+            remoteId = "piyo",
+            instanceDomain = "",
+            encryptedToken = "",
+            userName = "piyoName",
+            instanceType = Account.InstanceType.MISSKEY
+        )
     }
+
     @Test
     fun testAdd() {
         val noteDataSource = InMemoryNoteDataSource(loggerFactory)
@@ -61,7 +67,7 @@ class InMemoryNoteDataSourceTest {
 
 
     @Test
-    fun testUpdateNote(): Unit = runBlocking{
+    fun testUpdateNote(): Unit = runBlocking {
         val noteDataSource = InMemoryNoteDataSource(loggerFactory)
 
         val dto = NoteDTO(

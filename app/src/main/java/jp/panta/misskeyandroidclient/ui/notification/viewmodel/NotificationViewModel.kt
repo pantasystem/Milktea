@@ -3,9 +3,9 @@ package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
-import jp.panta.misskeyandroidclient.api.notification.NotificationRequest
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.notification.NotificationDTO
+import jp.panta.misskeyandroidclient.api.misskey.notification.NotificationRequest
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notification.Notification

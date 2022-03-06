@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.gettters
 
-import jp.panta.misskeyandroidclient.api.notification.NotificationDTO
-import jp.panta.misskeyandroidclient.api.users.toUser
+import jp.panta.misskeyandroidclient.api.misskey.notification.NotificationDTO
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.model.notification.HasNote

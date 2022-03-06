@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel.page
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.api.list.UserListDTO
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+import jp.panta.misskeyandroidclient.api.misskey.list.UserListDTO
+import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.model.antenna.Antenna
 
 class PageableTemplate(val account: Account?) {

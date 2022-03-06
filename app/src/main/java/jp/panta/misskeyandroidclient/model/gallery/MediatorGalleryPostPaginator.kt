@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.FuturePaginatorController
 import jp.panta.misskeyandroidclient.model.PreviousPagingController

@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.model.gallery
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.v12_75_0.GetPosts
-import jp.panta.misskeyandroidclient.api.v12_75_0.LikedGalleryPost
-import jp.panta.misskeyandroidclient.api.v12_75_0.MisskeyAPIV1275
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.GetPosts
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.LikedGalleryPost
+import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.api.IllegalVersionException
@@ -90,18 +90,22 @@ class LikedGalleryPostsLoader(
     override suspend fun loadFuture(): Response<List<LikedGalleryPost>> {
         val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
-        return api.likedGalleryPosts(GetPosts(
+        return api.likedGalleryPosts(
+            GetPosts(
            sinceId = idGetter.getSinceId(),
             i = getAccount.invoke().getI(encryption)
-        ))
+        )
+        )
     }
 
     override suspend fun loadPrevious(): Response<List<LikedGalleryPost>> {
         val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
-        return api.likedGalleryPosts(GetPosts(
+        return api.likedGalleryPosts(
+            GetPosts(
             untilId = idGetter.getUntilId(),
             i = getAccount.invoke().getI(encryption)
-        ))
+        )
+        )
     }
 }

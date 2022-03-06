@@ -3,18 +3,18 @@ package jp.panta.misskeyandroidclient.ui.auth
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAppAuthBinding
-import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.app.AppAuthViewModel
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.app.AuthErrors
@@ -23,9 +23,13 @@ import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class AuthFragment : Fragment(){
 
     lateinit var binding: FragmentAppAuthBinding
+
+    private val appAuthViewModel: AppAuthViewModel by activityViewModels()
+    private val authViewModel: AuthViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,16 +43,13 @@ class AuthFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val miCore = context?.applicationContext as MiCore
-        val appAuthViewModel = ViewModelProvider(this, AppAuthViewModel.Factory(CustomAuthStore.newInstance(requireContext()), miCore))[AppAuthViewModel::class.java]
         appAuthViewModel.appName.value = getString(R.string.app_name)
 
-        val authViewModel = ViewModelProvider(requireActivity(), AuthViewModel.Factory(miCore))[AuthViewModel::class.java]
         binding.lifecycleOwner = this
         binding.appAuthViewModel = appAuthViewModel
         appAuthViewModel.waiting4UserAuthorization.observe(viewLifecycleOwner) {
             it?.let {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.session.url)))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.generateAuthUrl())))
                 authViewModel.setState(it)
                 appAuthViewModel.waiting4UserAuthorization.postValue(null)
             }

@@ -1,14 +1,18 @@
 package jp.panta.misskeyandroidclient.ui.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.auth.UserKey
-import jp.panta.misskeyandroidclient.api.throwIfHasError
-import jp.panta.misskeyandroidclient.api.users.toUser
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.api.mastodon.MastodonAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
+import jp.panta.misskeyandroidclient.api.misskey.auth.UserKey
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.account.newAccount
 import jp.panta.misskeyandroidclient.model.auth.Authorization
+import jp.panta.misskeyandroidclient.model.auth.custom.AccessToken
+import jp.panta.misskeyandroidclient.model.auth.custom.toModel
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
@@ -17,19 +21,16 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
 import java.lang.IllegalStateException
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
-class AuthViewModel(
-    private val miCore: MiCore
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val miCore: MiCore,
+    private val mastodonAPIProvider: MastodonAPIProvider,
+    loggerFactory: Logger.Factory
 ) : ViewModel(){
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AuthViewModel(miCore) as T
-        }
-    }
+    private val logger = loggerFactory.create("AuthViewModel")
 
     val error = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
 
@@ -40,7 +41,7 @@ class AuthViewModel(
         authorization.flatMapLatest { a ->
             (0..Int.MAX_VALUE).asFlow().map {
                 delay(4000)
-                if(a is Authorization.Waiting4UserAuthorization) {
+                if(a is Authorization.Waiting4UserAuthorization.Misskey) {
                     try {
                         val token = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
                             .getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
@@ -50,8 +51,7 @@ class AuthViewModel(
 
                         val authenticated = Authorization.Approved(
                             a.instanceBaseURL,
-                            appSecret = a.appSecret,
-                            token
+                            accessToken = token.toModel(a.appSecret)
                         )
                         State.Fixed(StateContent.Exist(authenticated))
                     }catch (e: Throwable) {
@@ -71,19 +71,27 @@ class AuthViewModel(
     /**
      * 認可されていることを前提にAuthTokenを取得しに行く
      */
-    fun getAccessToken() {
+    fun getAccessToken(code: String? = null) {
         val a = authorization.value as? Authorization.Waiting4UserAuthorization
             ?: throw IllegalStateException("現在の状態: ${authorization.value}でアクセストークンを取得することはできません。")
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
 
-                MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
-                    .throwIfHasError().body()
-                    ?: throw IllegalStateException("response bodyがありません。")
+            runCatching {
+                when (a) {
+                    is Authorization.Waiting4UserAuthorization.Misskey -> {
+                        val accessToken = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
+                            .throwIfHasError().body()
+                            ?: throw IllegalStateException("response bodyがありません。")
+                        accessToken.toModel(a.appSecret)
+                    }
+                    is Authorization.Waiting4UserAuthorization.Mastodon -> {
+                        getAccessToken4Mastodon(a, code!!)
+                    }
+                }
+
             }.onSuccess {
                 val authenticated = Authorization.Approved(
                     a.instanceBaseURL,
-                    appSecret = a.appSecret,
                     it
                 )
                 setState(authenticated)
@@ -94,20 +102,49 @@ class AuthViewModel(
         }
     }
 
+    private suspend fun getAccessToken4Mastodon(
+        a: Authorization.Waiting4UserAuthorization.Mastodon,
+        code: String
+    ): AccessToken.Mastodon {
+        try {
+            logger.debug("認証種別Mastodon: $a")
+            val obtainToken = a.client.createObtainToken(scope = a.scope, code = code)
+            val accessToken = mastodonAPIProvider.get(a.instanceBaseURL).obtainToken(obtainToken)
+                .throwIfHasError()
+                .body()
+            logger.debug("accessToken:$accessToken")
+            val me = mastodonAPIProvider.get(a.instanceBaseURL, accessToken!!.accessToken)
+                .verifyCredentials()
+                .throwIfHasError()
+            logger.debug("自身の情報, code=${me.code()}, message=${me.message()}")
+            val account = me.body()!!
+            return accessToken.toModel(account)
+        } catch (e: Exception) {
+            logger.warning("AccessToken取得失敗", e = e)
+            throw e
+        }
+    }
+
     /**
      * 認可の確認
      */
     fun confirmApprove() {
         val a = authorization.value as? Authorization.Approved
             ?: throw IllegalStateException("confirmApproveは状態がApprovedの時以外呼び出すことはできません。")
-        requireNotNull(a.appSecret)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = miCore.getAccountRepository().add(
-                    a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption(), a.appSecret),
+                    a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption()),
                     false
                 )
-                val user = a.accessToken.user.toUser(account, true) as User.Detail
+                val user = when(a.accessToken) {
+                    is AccessToken.Mastodon -> {
+                        a.accessToken.account.toModel(account)
+                    }
+                    is AccessToken.Misskey -> {
+                        a.accessToken.user.toUser(account, true) as User.Detail
+                    }
+                }
                 miCore.getUserDataSource().add(user)
                 miCore.getAccountRepository().add(account)
                 miCore.setCurrentAccount(account)

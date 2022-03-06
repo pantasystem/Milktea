@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.model.drive
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.drive.FilePropertyDTO
-import jp.panta.misskeyandroidclient.api.drive.RequestFile
-import jp.panta.misskeyandroidclient.api.throwIfHasError
+import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
+import jp.panta.misskeyandroidclient.api.misskey.drive.FilePropertyDTO
+import jp.panta.misskeyandroidclient.api.misskey.drive.RequestFile
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.util.PageableState
@@ -23,7 +23,7 @@ class FilePropertyPagingStore(
     filePropertyDataSource: FilePropertyDataSource,
     encryption: Encryption,
 
-) {
+    ) {
 
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
         misskeyAPIProvider,

@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account.page
 
 
-import jp.panta.misskeyandroidclient.api.notes.NoteRequest
+import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.account.page.PageType.*
 import java.io.Serializable
 
