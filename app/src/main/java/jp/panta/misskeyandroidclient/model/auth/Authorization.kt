@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.auth
 
-import jp.panta.misskeyandroidclient.api.misskey.auth.AccessToken
 import jp.panta.misskeyandroidclient.api.misskey.auth.Session
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.auth.custom.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.custom.AppType
 import jp.panta.misskeyandroidclient.model.auth.custom.TemporarilyAuthState
 import jp.panta.misskeyandroidclient.model.users.User
@@ -46,12 +46,11 @@ sealed interface Authorization {
 
     data class Approved(
         val instanceBaseURL: String,
-        val appSecret: String,
         val accessToken: AccessToken
     ) : Authorization
 
     data class Finish(
-        val account: Account, val user: User.Detail
+        val account: Account, val user: User
     ) : Authorization
 
 }
