@@ -4,9 +4,9 @@ package jp.panta.misskeyandroidclient.model.account
 import androidx.room.*
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.api.misskey.auth.AccessToken
 import jp.panta.misskeyandroidclient.model.core.AccountRelation
 import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
+import jp.panta.misskeyandroidclient.model.auth.custom.AccessToken
 import jp.panta.misskeyandroidclient.util.Hash
 import java.io.Serializable
 
@@ -73,12 +73,38 @@ data class Account (
 
 
 
-fun AccessToken.newAccount(instanceDomain: String, encryption: Encryption, appSecret: String): Account{
+fun AccessToken.Misskey.newAccount(instanceDomain: String, encryption: Encryption): Account{
     return this.user.newAccount(
         instanceDomain,
         encryption.encrypt(user.id , Hash.sha256(accessToken + appSecret))
     )
 }
+fun AccessToken.Mastodon.newAccount(
+    instanceDomain: String,
+    encryption: Encryption,
+): Account {
+    return Account(
+        remoteId = this.account.id,
+        userName = this.account.username,
+        instanceDomain = instanceDomain,
+        encryptedToken = encryption.encrypt(account.id, accessToken),
+        instanceType = Account.InstanceType.MASTODON
+    )
+}
+
+
+fun AccessToken.newAccount(instanceDomain: String, encryption: Encryption): Account {
+    return when(this) {
+        is AccessToken.Misskey -> {
+            this.newAccount(instanceDomain, encryption)
+        }
+        is AccessToken.Mastodon -> {
+            this.newAccount(instanceDomain, encryption)
+        }
+    }
+}
+
+
 
 fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account{
     return Account(
