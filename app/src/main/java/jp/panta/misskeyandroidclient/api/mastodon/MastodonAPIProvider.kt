@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.api.mastodon
 
+import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -8,12 +9,13 @@ import javax.inject.Singleton
 
 @Singleton
 class MastodonAPIProvider @Inject constructor(
-    private val mastodonAPIFactory: MastodonAPIFactory
+    private val mastodonAPIFactory: MastodonAPIFactory,
+    val encryption: Encryption,
 ){
 
     data class Key(
         val instanceBaseURL: String,
-        val accountId: Long?,
+        val token: String?,
     )
 
     private val lock = Mutex()
@@ -24,7 +26,7 @@ class MastodonAPIProvider @Inject constructor(
             if (api != null) {
                 return api
             }
-            api = mastodonAPIFactory.build(baseURL)
+            api = mastodonAPIFactory.build(baseURL, null)
             apiMap[Key(baseURL, null)] = api
             return@withLock api
         }
@@ -34,16 +36,21 @@ class MastodonAPIProvider @Inject constructor(
         if (account.instanceType == Account.InstanceType.MISSKEY) {
             throw IllegalArgumentException("アカウント種別Misskeyは受け入れていません")
         }
-        val key = Key(account.instanceDomain, account.accountId)
+        return get(account.instanceDomain, account.getI(encryption))
+
+    }
+
+    suspend fun get(baseURL: String, token: String): MastodonAPI {
+
+        val key = Key(baseURL, token)
         lock.withLock {
             var api = apiMap[key]
             if (api != null) {
                 return api
             }
-            api = mastodonAPIFactory.build(account.instanceDomain, account)
+            api = mastodonAPIFactory.build(baseURL, token)
             apiMap[key] = api
             return api
         }
-
     }
 }

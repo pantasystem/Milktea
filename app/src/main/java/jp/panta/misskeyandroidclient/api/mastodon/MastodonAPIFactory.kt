@@ -21,8 +21,8 @@ class MastodonAPIFactory @Inject constructor(
     private val sharedOkHttp = OkHttpClient()
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun build(baseURL: String, account: Account? = null): MastodonAPI {
-        val okHttp = if (account == null) {
+    fun build(baseURL: String, token: String?): MastodonAPI {
+        val okHttp = if (token == null) {
             sharedOkHttp
         } else {
             OkHttpClient.Builder()
@@ -30,18 +30,20 @@ class MastodonAPIFactory @Inject constructor(
                     val request = it.request()
                     val newReq = request.headers["Authorization"]?.let {
                         request.newBuilder()
-                            .header("Authorization", "Bearer ${account.getI(encryption)}")
+                            .header("Authorization", "Bearer ${token}")
                             .build()
                     }?: request
                     it.proceed(newReq)
                 }.build()
         }
         return Retrofit.Builder()
-            .baseUrl(account?.instanceDomain?: baseURL)
+            .baseUrl(baseURL)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(okHttp)
             .build()
             .create(MastodonAPI::class.java)
 
     }
+
+
 }
