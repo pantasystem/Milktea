@@ -54,8 +54,6 @@ class AppAuthViewModel(
     private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
     val instanceDomain = MutableStateFlow("")
-    //private val _metaState = MutableStateFlow<State<Meta>>(State.Fixed(StateContent.NotExist()))
-    //private val metaState: StateFlow<State<Meta>> = _metaState
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(StateContent.NotExist()))
