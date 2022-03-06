@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAuthResultBinding
 import jp.panta.misskeyandroidclient.model.auth.Authorization
+import jp.panta.misskeyandroidclient.model.auth.custom.AccessToken
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -37,7 +38,10 @@ class AuthResultFragment : Fragment(){
         lifecycleScope.launchWhenCreated {
             viewModel.authorization.collect {
                 if(it is Authorization.Approved) {
-                    binding.user = it.accessToken.user
+                    if (it.accessToken is AccessToken.Misskey) {
+                        binding.user = it.accessToken.user
+                    }
+                    binding.continueAuth.isEnabled = true
                 }
             }
         }

@@ -30,7 +30,8 @@
                 android:text="@string/continue_auth"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:enabled="@{user != null}"/>
+                android:enabled="false"
+                />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

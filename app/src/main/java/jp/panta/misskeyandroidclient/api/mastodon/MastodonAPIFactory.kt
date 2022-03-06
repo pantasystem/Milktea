@@ -26,11 +26,9 @@ class MastodonAPIFactory @Inject constructor(){
             OkHttpClient.Builder()
                 .addInterceptor {
                     val request = it.request()
-                    val newReq = request.headers["Authorization"]?.let {
-                        request.newBuilder()
-                            .header("Authorization", "Bearer $token")
-                            .build()
-                    }?: request
+                    val newReq = request.newBuilder()
+                        .header("Authorization", "Bearer $token")
+                        .build()
                     it.proceed(newReq)
                 }.build()
         }
