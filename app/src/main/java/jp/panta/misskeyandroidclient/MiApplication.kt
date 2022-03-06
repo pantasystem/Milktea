@@ -295,7 +295,9 @@ class MiApplication : Application(), MiCore {
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+        runCatching {
+            FirebaseMessaging.getInstance()
+        }.getOrNull()?.token?.addOnCompleteListener {
             if (!it.isSuccessful) {
                 return@addOnCompleteListener
             }
@@ -308,7 +310,7 @@ class MiApplication : Application(), MiCore {
                     }
                 }
             }
-        }.addOnFailureListener {
+        }?.addOnFailureListener {
             logger.debug("fcm token取得失敗", e = it)
         }
 
