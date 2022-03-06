@@ -16,6 +16,6 @@ class AccountInstanceTypeConverterTest {
     fun convertFromString() {
         val converter = AccountInstanceTypeConverter()
         assertEquals(Account.InstanceType.MASTODON, converter.convert("mastodon"))
-        assertEquals(Account.InstanceType.MASTODON, converter.convert("misskey"))
+        assertEquals(Account.InstanceType.MISSKEY, converter.convert("misskey"))
     }
 }
