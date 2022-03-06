@@ -18,18 +18,24 @@ class MastodonAPIFactory @Inject constructor(
 
     val json = Json { ignoreUnknownKeys = true }
 
+    private val sharedOkHttp = OkHttpClient()
+
     @OptIn(ExperimentalSerializationApi::class)
     fun build(baseURL: String, account: Account? = null): MastodonAPI {
-        val okHttp = OkHttpClient.Builder()
-            .addInterceptor {
-                val request = it.request()
-                val newReq = request.headers["Authorization"]?.let {
-                    request.newBuilder()
-                        .header("Authorization", "Bearer ${account?.getI(encryption)}")
-                        .build()
-                }?: request
-                it.proceed(newReq)
-            }.build()
+        val okHttp = if (account == null) {
+            sharedOkHttp
+        } else {
+            OkHttpClient.Builder()
+                .addInterceptor {
+                    val request = it.request()
+                    val newReq = request.headers["Authorization"]?.let {
+                        request.newBuilder()
+                            .header("Authorization", "Bearer ${account.getI(encryption)}")
+                            .build()
+                    }?: request
+                    it.proceed(newReq)
+                }.build()
+        }
         return Retrofit.Builder()
             .baseUrl(account?.instanceDomain?: baseURL)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
