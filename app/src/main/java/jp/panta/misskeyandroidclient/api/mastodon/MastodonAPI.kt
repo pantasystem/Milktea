@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.api.mastodon.apps.CreateApp
 import jp.panta.misskeyandroidclient.api.mastodon.apps.ObtainToken
 import jp.panta.misskeyandroidclient.api.mastodon.emojis.TootEmojiDTO
 import jp.panta.misskeyandroidclient.api.mastodon.instance.Instance
+import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
 import retrofit2.Response
 import retrofit2.http.Body
 
@@ -26,4 +27,7 @@ interface MastodonAPI {
     @POST("oauth/token")
     suspend fun obtainToken(@Body body: ObtainToken): Response<AccessToken>
 
+
+    @POST("api/v1/accounts/verify_credentials")
+    suspend fun verifyCredentials(): Response<UserDTO>
 }
