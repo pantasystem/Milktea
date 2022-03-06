@@ -46,8 +46,6 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
                     putString(MASTODON_APP_CLIENT_ID, customAuthBridge.app.clientId)
                     putString(MASTODON_APP_CLIENT_SECRET, customAuthBridge.app.clientSecret)
                     putString(MASTODON_APP_ID, customAuthBridge.app.id)
-                    putString(MASTODON_APP_VAPID_KEY, customAuthBridge.app.vapidKey)
-                    putString(MASTODON_APP_WEBSITE, customAuthBridge.app.website)
                     putString(MASTODON_APP_NAME, customAuthBridge.app.name)
                     putString(TYPE, "mastodon")
                 }.apply()
@@ -98,8 +96,6 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
                             clientSecret = it.getString(MASTODON_APP_CLIENT_SECRET, null)?: return null,
                             redirectUri = it.getString(REDIRECT_URI, null)?: return null,
                             id = it.getString(MASTODON_APP_ID, null)?: return null,
-                            website = it.getString(MASTODON_APP_WEBSITE, null),
-                            vapidKey = it.getString(MASTODON_APP_VAPID_KEY, null)?: return null,
                             name = it.getString(MASTODON_APP_NAME, null)?: return null,
                         ),
                         instanceDomain = instanceDomain,

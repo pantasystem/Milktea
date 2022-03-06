@@ -39,12 +39,11 @@ sealed interface AppType {
         override val secret: String? = null
     ) : AppType
 
-    companion object {}
+    companion object;
 
     data class Mastodon(
         val id: String,
         override val name: String,
-        val website: String?,
 
         val clientId: String,
 
@@ -52,7 +51,6 @@ sealed interface AppType {
 
         val clientSecret: String,
 
-        val vapidKey: String
     ) : AppType {
         override val callbackUrl: String
             get() = redirectUri
@@ -64,7 +62,7 @@ sealed interface AppType {
             val encodedRedirectUri = URLEncoder.encode(redirectUri, "utf-8")
             val encodedResponseType = URLEncoder.encode("code", "utf-8")
             val encodedScope = URLEncoder.encode(scope, "utf-8")
-            return "$baseURL/oauth/authorize?client_id=${encodedClientId}&redirect_uri=$encodedRedirectUri&response_type=$encodedResponseType&code=code&scope=$encodedScope"
+            return "$baseURL/oauth/authorize?client_id=${encodedClientId}&redirect_uri=$encodedRedirectUri&response_type=$encodedResponseType&scope=$encodedScope"
         }
 
         /**
@@ -77,7 +75,8 @@ sealed interface AppType {
                 clientSecret = clientSecret,
                 scope = scope,
                 redirectUri = redirectUri,
-                code = code
+                code = code,
+                grantType = "authorization_code"
             )
         }
     }

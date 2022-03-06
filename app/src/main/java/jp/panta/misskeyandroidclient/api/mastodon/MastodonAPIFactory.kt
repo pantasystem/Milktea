@@ -12,9 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MastodonAPIFactory @Inject constructor(
-    val encryption: Encryption
-){
+class MastodonAPIFactory @Inject constructor(){
 
     val json = Json { ignoreUnknownKeys = true }
 
@@ -30,7 +28,7 @@ class MastodonAPIFactory @Inject constructor(
                     val request = it.request()
                     val newReq = request.headers["Authorization"]?.let {
                         request.newBuilder()
-                            .header("Authorization", "Bearer ${token}")
+                            .header("Authorization", "Bearer $token")
                             .build()
                     }?: request
                     it.proceed(newReq)

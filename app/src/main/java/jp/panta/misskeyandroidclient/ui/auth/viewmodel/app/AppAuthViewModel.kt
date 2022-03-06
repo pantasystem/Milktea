@@ -197,11 +197,10 @@ class AppAuthViewModel @Inject constructor(
 
 
             }.onSuccess { w4a ->
+                this@AppAuthViewModel.waiting4UserAuthorization.postValue(w4a)
                 if (w4a is Authorization.Waiting4UserAuthorization.Misskey) {
-                    this@AppAuthViewModel.waiting4UserAuthorization.postValue(w4a)
                     _generatingTokenState.value = State.Fixed(StateContent.Exist(w4a.session))
                 }
-
             }.onFailure {
                 Log.e("AppAuthViewModel", "認証開始処理失敗", it)
                 _generatingTokenState.value = State.Error(StateContent.NotExist(), it)

@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
@@ -28,13 +29,10 @@ class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_u
 
     private val binding: FragmentWaiting4UserAuthorizationBinding by dataBinding()
 
+    private val authViewModel: AuthViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val miCore = context?.applicationContext as MiCore
-        val authViewModel = ViewModelProvider(requireActivity(), AuthViewModel.Factory(miCore))[AuthViewModel::class.java]
-
         // EditTextにフォーカスが当たるようにしたいが、編集はできないようにしたいためこのようにしています。
         binding.authenticationUrlViewEditText.setOnKeyListener { _, _, _ ->
             return@setOnKeyListener true
@@ -43,16 +41,28 @@ class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_u
         authViewModel.authorization.mapNotNull {
             it as? Authorization.Waiting4UserAuthorization
         }.onEach {
-            Log.d("Waiting4Auth", "auth url: ${it.session.url}")
-            binding.authenticationUrlViewEditText.setText(it.session.url)
+            when (it) {
+                is Authorization.Waiting4UserAuthorization.Mastodon -> {
+
+                }
+                is Authorization.Waiting4UserAuthorization.Misskey -> {
+                    Log.d("Waiting4Auth", "auth url: ${it.session.url}")
+                    binding.authenticationUrlViewEditText.setText(it.session.url)
+                }
+            }
+
 
         }.launchIn(lifecycleScope)
 
         binding.copyToClipboardButton.setOnClickListener {
             (requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.also { clipboardManager ->
-                (authViewModel.authorization.value as? Authorization.Waiting4UserAuthorization)?.session?.url?.let {
+                (authViewModel.authorization.value as? Authorization.Waiting4UserAuthorization.Misskey)?.session?.url?.let {
                     clipboardManager.setPrimaryClip(ClipData.newPlainText("misskey auth url", it))
-                    Toast.makeText(requireContext(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.copied_to_clipboard),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }

@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.api.mastodon.apps
 import jp.panta.misskeyandroidclient.model.auth.custom.AppType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.net.URLEncoder
 
 @Serializable
 data class CreateApp(
@@ -18,7 +17,6 @@ data class CreateApp(
 data class App(
     val id: String,
     val name: String,
-    val website: String?,
 
     @SerialName("client_id")
     val clientId: String,
@@ -29,30 +27,26 @@ data class App(
     @SerialName("client_secret")
     val clientSecret: String,
 
-    @SerialName("vapid_key")
-    val vapidKey: String
 ) {
     fun toModel(): AppType.Mastodon {
         return AppType.Mastodon(
             id = id,
             name = name,
-            website = website,
             clientSecret = clientSecret,
             clientId = clientId,
             redirectUri = redirectUri,
-            vapidKey = vapidKey
         )
     }
 }
 
 @Serializable
 data class ObtainToken(
-    val clientId: String,
-    val clientSecret: String,
-    val redirectUri: String,
+    @SerialName("client_id") val clientId: String,
+    @SerialName("client_secret") val clientSecret: String,
+    @SerialName("redirect_uri") val redirectUri: String,
     val scope: String,
     val code: String,
-    val grantType: String = "authorization_code",
+    @SerialName("grant_type") val grantType: String,
 )
 
 @Serializable
@@ -64,5 +58,6 @@ data class AccessToken(
     val tokenType: String,
 
     val scope: String,
+    @SerialName("created_at")
     val createdAt: Long
 )
