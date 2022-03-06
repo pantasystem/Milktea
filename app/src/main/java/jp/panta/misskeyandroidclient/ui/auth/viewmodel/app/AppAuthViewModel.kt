@@ -3,23 +3,23 @@ package jp.panta.misskeyandroidclient.ui.auth.viewmodel.app
 import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.BuildConfig
 import jp.panta.misskeyandroidclient.api.mastodon.MastodonAPIProvider
 import jp.panta.misskeyandroidclient.api.mastodon.instance.Instance
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.api.misskey.app.CreateApp
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.api.misskey.auth.AppSecret
 import jp.panta.misskeyandroidclient.api.misskey.auth.Session
+import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.*
 import jp.panta.misskeyandroidclient.model.instance.Meta
+import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
 import jp.panta.misskeyandroidclient.util.State
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.lang.IllegalArgumentException
 import java.util.*
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -122,18 +122,21 @@ class AppAuthViewModel @Inject constructor(
                 emit(State.Loading(StateContent.NotExist()))
                 runCatching {
                     coroutineScope {
-                        val misskey = async {
+                        val misskey = withContext(Dispatchers.IO) {
                             runCatching {
                                 metaStore.fetch(url)
                             }.getOrNull()
-                        }.await()
-                        val mastodon = async {
-                            runCatching {
-                                mastodonAPIProvider.get(url)
-                                    .getInstance()
-                            }.getOrNull()
-
-                        }.await()
+                        }
+                        val mastodon =
+                            withContext(Dispatchers.IO) {
+                                if (!BuildConfig.DEBUG) {
+                                    return@withContext null
+                                }
+                                runCatching {
+                                    mastodonAPIProvider.get(url)
+                                        .getInstance()
+                                }.getOrNull()
+                            }
                         if (misskey != null) {
                             return@coroutineScope InstanceType.Misskey(misskey)
                         }
