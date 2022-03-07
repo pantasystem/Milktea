@@ -21,8 +21,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         multiDexEnabled true
-        versionCode 80
-        versionName "v2.14.2"
+        versionCode 81
+        versionName "v2.14.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -145,8 +145,7 @@ dependencies {
     implementation 'com.caverock:androidsvg-aar:1.4'
 
     //ExoPlayer
-
-    implementation 'com.google.android.exoplayer:exoplayer:2.16.1'
+    implementation 'com.google.android.exoplayer:exoplayer:2.17.0'
 
     //PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
