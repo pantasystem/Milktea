@@ -5,9 +5,7 @@ import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
 import jp.panta.misskeyandroidclient.model.account.newAccount
-import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
 import jp.panta.misskeyandroidclient.model.core.AccountDao
 
 
@@ -135,6 +133,6 @@ val MIGRATION_8_10 = object : Migration(8, 10) {
 
 val MIGRATION_10_11 = object : Migration(10, 11) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("alter table 'account_table' add column 'instanceType' TEXT default 'misskey'")
+        database.execSQL("alter table 'account_table' add column 'instanceType' TEXT NOT NULL default 'misskey'")
     }
 }

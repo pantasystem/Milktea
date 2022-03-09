@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 11,
-    "identityHash": "891056cf0301037b95ff038e9772d45f",
+    "identityHash": "c50ce2972f355ed260b3b30b300c8a9f",
     "entities": [
       {
         "tableName": "connection_information",
@@ -873,7 +873,7 @@
       },
       {
         "tableName": "account_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`remoteId` TEXT NOT NULL, `instanceDomain` TEXT NOT NULL, `userName` TEXT NOT NULL, `encryptedToken` TEXT NOT NULL, `instanceType` TEXT NOT NULL, `accountId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`remoteId` TEXT NOT NULL, `instanceDomain` TEXT NOT NULL, `userName` TEXT NOT NULL, `encryptedToken` TEXT NOT NULL, `instanceType` TEXT NOT NULL DEFAULT 'misskey', `accountId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
         "fields": [
           {
             "fieldPath": "remoteId",
@@ -903,7 +903,8 @@
             "fieldPath": "instanceType",
             "columnName": "instanceType",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "'misskey'"
           },
           {
             "fieldPath": "accountId",
@@ -1554,7 +1555,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '891056cf0301037b95ff038e9772d45f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c50ce2972f355ed260b3b30b300c8a9f')"
     ]
   }
 }

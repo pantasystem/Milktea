@@ -24,7 +24,7 @@ data class Account (
     val userName: String,
     val encryptedToken: String,
     @Ignore val pages: List<Page>,
-    val instanceType: InstanceType,
+    @ColumnInfo(name ="instanceType", defaultValue = "misskey") val instanceType: InstanceType,
     @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
 ): Serializable{
