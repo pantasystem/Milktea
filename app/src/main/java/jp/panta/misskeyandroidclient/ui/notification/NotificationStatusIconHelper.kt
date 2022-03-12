@@ -40,6 +40,7 @@ object NotificationStatusIconHelper {
             "renote" -> statusView.setImageResource(R.drawable.ic_re_note)
             "quote" -> statusView.setImageResource(R.drawable.ic_format_quote_black_24dp)
             "pollVote" -> statusView.setImageResource(R.drawable.ic_poll_black_24dp)
+            "pollEnded" -> statusView.setImageResource(R.drawable.ic_poll_black_24dp)
             "receiveFollowRequest" -> statusView.setImageResource(R.drawable.ic_supervisor_account_black_24dp)
             "followRequestAccepted" -> statusView.setImageResource(R.drawable.ic_done_black_24dp)
             "unknown" -> statusView.setImageResource(R.drawable.ic_baseline_report_problem_24)
