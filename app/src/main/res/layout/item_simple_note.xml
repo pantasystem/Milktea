@@ -185,7 +185,7 @@
                             app:media="@{note.media}"
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
-                            android:visibility="@{note.files.empty || note.media.isOver4Files ? View.GONE : View.VISIBLE}"
+                            android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
                             tools:visibility="visible"
                             tools:layout_height="20dp" />
 
