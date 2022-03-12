@@ -5,6 +5,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.nickname.DeleteNicknameUseCase
@@ -21,6 +22,7 @@ class UserDetailViewModel @AssistedInject constructor(
     private val translationStore: NoteTranslationStore,
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
+    private val accountStore: AccountStore,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
@@ -30,7 +32,7 @@ class UserDetailViewModel @AssistedInject constructor(
         fun create(userId: User.Id?, fqdnUserName: String?): UserDetailViewModel
     }
 
-    companion object {}
+    companion object;
 
     private val logger = miCore.loggerFactory.create("UserDetailViewModel")
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -119,11 +121,6 @@ class UserDetailViewModel @AssistedInject constructor(
         }
     }
 
-    val isRemoteUser = MediatorLiveData<Boolean>().apply {
-        addSource(user) {
-            value = it?.url != null
-        }
-    }
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
 
