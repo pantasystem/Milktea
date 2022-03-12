@@ -5,6 +5,6 @@ import jp.panta.misskeyandroidclient.model.users.User
 
 data class NotificationRelation (
     val notification: Notification,
-    val user: User,
+    val user: User?,
     val note: NoteRelation?
 )
