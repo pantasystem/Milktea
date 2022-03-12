@@ -22,7 +22,6 @@ class UserDetailViewModel @AssistedInject constructor(
     private val translationStore: NoteTranslationStore,
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
-    private val accountStore: AccountStore,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
