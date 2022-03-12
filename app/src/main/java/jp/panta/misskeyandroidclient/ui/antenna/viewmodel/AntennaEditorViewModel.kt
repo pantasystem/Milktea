@@ -265,7 +265,9 @@ class AntennaEditorViewModel (
                 )
             }.onSuccess {
                 if(it.isSuccessful) {
-                    antennaRemovedEvent.event = Unit
+                    withContext(Dispatchers.Main) {
+                        antennaRemovedEvent.event = Unit
+                    }
                 }
             }
         }
