@@ -40,9 +40,6 @@
                     app:notificationReaction="@{notification.reaction}"
                     app:notification="@{notification}"
                     android:orientation="horizontal"
-                    app:user="@{notification.user}"
-                    app:subNameView="@{null}"
-                    app:mainNameView="@{mainName}"
 
                     >
 
@@ -84,17 +81,17 @@
                         android:layout_marginEnd="5dp"
                         app:circleIcon="@{notification.avatarIconUrl}"
                         android:onClick="@{()-> notesViewModel.setTargetToUser(notification.user)}"
-
+                        android:visibility="@{ notification.user == null ? View.GONE : View.VISIBLE }"
                         tools:ignore="ContentDescription" />
 
 
 
                 <androidx.emoji.widget.EmojiTextView
-                        android:id="@+id/mainName"
+                        android:id="@+id/notificationStatusMessage"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="@{notification.userName}"
+                        notificationTitle="@{ notification.notification }"
                         tools:text="name"
                         android:layout_weight="1"/>
                 <androidx.emoji.widget.EmojiTextView

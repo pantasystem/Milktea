@@ -116,6 +116,7 @@
     <string name="mention_by">被 %s 提及</string>
     <string name="reacted_by">被 %s 回应</string>
     <string name="renoted_by">被 %s 记录</string>
+    <string name="poll_ended">投票结束</string>
 
     <string name="input_message">告诉别人你的想法</string>
 

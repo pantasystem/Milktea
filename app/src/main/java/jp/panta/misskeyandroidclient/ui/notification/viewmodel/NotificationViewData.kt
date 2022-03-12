@@ -18,6 +18,7 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
         POLL_VOTE("pollVote"),
         RECEIVE_FOLLOW_REQUEST("receiveFollowRequest"),
         FOLLOW_REQUEST_ACCEPTED("followRequestAccepted"),
+        POLL_ENDED("pollEnded"),
         UNKNOWN("unknown"),
 
     }
@@ -34,14 +35,15 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
         is PollVoteNotification -> Type.POLL_VOTE
         is ReceiveFollowRequestNotification -> Type.RECEIVE_FOLLOW_REQUEST
         is FollowRequestAcceptedNotification -> Type.FOLLOW_REQUEST_ACCEPTED
+        is PollEndedNotification -> Type.POLL_ENDED
         is UnknownNotification -> Type.UNKNOWN
     }
     val statusType: String = type.default
 
-    val user: User = notification.user
-    val avatarIconUrl = notification.user.avatarUrl
-    val name = notification.user.name
-    val userName = notification.user.userName
+    val user: User? = notification.user
+    val avatarIconUrl = notification.user?.avatarUrl
+    val name = notification.user?.name
+    val userName = notification.user?.userName
 
     val reaction =  (notification.notification as? ReactionNotification)?.reaction
 

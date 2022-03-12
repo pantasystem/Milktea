@@ -1,0 +1,27 @@
+package jp.panta.misskeyandroidclient.ui.notification
+
+import android.widget.TextView
+import androidx.databinding.BindingAdapter
+import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
+import jp.panta.misskeyandroidclient.model.notification.PollEndedNotification
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+
+object NotificationTitleHelper {
+
+    @JvmStatic
+    @BindingAdapter("notificationTitle")
+    fun TextView.setNotificationTitle(notification: NotificationRelation) {
+        val miCore = this.context.applicationContext as MiCore
+        this.text = when (notification.notification) {
+            is PollEndedNotification -> {
+                context.getString(R.string.poll_ended)
+            }
+            else -> if (miCore.getSettingStore().isUserNameDefault) {
+                notification.user?.getDisplayUserName()?: ""
+            } else {
+                notification.user?.getDisplayName()?: ""
+            }
+        }
+    }
+}

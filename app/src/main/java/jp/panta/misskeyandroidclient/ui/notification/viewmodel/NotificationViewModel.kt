@@ -229,6 +229,8 @@ class NotificationViewModel(
         return this.mapNotNull {
             runCatching {
                 it.toNotificationRelation(account)
+            }.onFailure {
+                logger.error("変換失敗", e = it)
             }.getOrNull()
         }
     }
