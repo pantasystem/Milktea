@@ -150,6 +150,19 @@ data class PollVoteNotification(
     }
 }
 
+data class PollEndedNotification(
+    override val id: Id,
+    override val createdAt: Instant,
+    override val userId: User.Id,
+    override val isRead: Boolean,
+    override val noteId: Note.Id,
+
+) : Notification(), HasNote {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
+
 data class UnknownNotification(
     override val id: Id,
     override val createdAt: Instant,
