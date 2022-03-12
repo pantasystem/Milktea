@@ -8,7 +8,6 @@ import kotlinx.datetime.Instant
 
 sealed class Notification {
     abstract val id: Id
-    abstract val userId: User.Id
     abstract val createdAt: Instant
     abstract val isRead: Boolean
 
@@ -25,13 +24,17 @@ interface HasNote {
     val noteId: Note.Id
 }
 
+interface HasUser {
+    val userId: User.Id
+}
+
 data class FollowNotification(
     override val id: Id,
 
     override val createdAt: Instant,
     override val userId: User.Id,
     override val isRead: Boolean
-) : Notification() {
+) : Notification(), HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -44,7 +47,7 @@ data class FollowRequestAcceptedNotification(
     override val userId: User.Id,
     override val isRead: Boolean
 
-) : Notification() {
+) : Notification(), HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -57,7 +60,7 @@ data class ReceiveFollowRequestNotification(
     override val userId: User.Id,
     override val isRead: Boolean
 
-) : Notification() {
+) : Notification(), HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -71,7 +74,7 @@ data class MentionNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote {
+) : Notification(), HasNote, HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -86,7 +89,7 @@ data class ReplyNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote {
+) : Notification(), HasNote, HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -100,7 +103,7 @@ data class RenoteNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote {
+) : Notification(), HasNote, HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -114,7 +117,7 @@ data class QuoteNotification(
     override val noteId: Note.Id,
     override val isRead: Boolean
 
-) : Notification(), HasNote {
+) : Notification(), HasNote, HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -129,7 +132,7 @@ data class ReactionNotification(
     val reaction: String,
     override val isRead: Boolean
 
-) : Notification(), HasNote {
+) : Notification(), HasNote, HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -144,7 +147,7 @@ data class PollVoteNotification(
     val choice: Int,
     override val isRead: Boolean
 
-) : Notification(), HasNote {
+) : Notification(), HasNote, HasUser {
     override fun read(): Notification {
         return copy(isRead = true)
     }
@@ -153,7 +156,6 @@ data class PollVoteNotification(
 data class PollEndedNotification(
     override val id: Id,
     override val createdAt: Instant,
-    override val userId: User.Id,
     override val isRead: Boolean,
     override val noteId: Note.Id,
 
@@ -170,7 +172,7 @@ data class UnknownNotification(
     override val userId: User.Id,
     val rawType: String
 
-) : Notification() {
+) : Notification(), HasUser {
     override fun read(): Notification {
         return this.copy(isRead = true)
     }
