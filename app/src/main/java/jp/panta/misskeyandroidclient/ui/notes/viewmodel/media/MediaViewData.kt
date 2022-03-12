@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.Preview
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 
 class MediaViewData(files: List<File>) {
 
@@ -32,6 +30,7 @@ class MediaViewData(files: List<File>) {
     }
 
     val isOver4Files = files.size > 4
+    val isVisibleMediaPreviewArea = !(isOver4Files || files.isEmpty())
 
     fun show(index: Int) {
         val list = (_files.value ?: emptyList()).toMutableList()
