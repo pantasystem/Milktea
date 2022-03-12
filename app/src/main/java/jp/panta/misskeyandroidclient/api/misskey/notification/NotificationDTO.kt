@@ -18,7 +18,7 @@ data class NotificationDTO(
     @kotlinx.serialization.Serializable(with = InstantIso8601Serializer::class) val createdAt: Instant,
     val type: String,
     val userId: String,
-    val user: UserDTO,
+    val user: UserDTO?,
     val note: NoteDTO? = null,
     val noteId: String? = null,
     val reaction: String? = null,
@@ -125,7 +125,6 @@ data class NotificationDTO(
                 PollEndedNotification(
                     id,
                     createdAt,
-                    User.Id(account.accountId, this.userId),
                     isRead = isRead ?: true,
                     Note.Id(account.accountId, note.id)
                 )
