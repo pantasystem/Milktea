@@ -203,11 +203,14 @@ class UserDetailActivity : AppCompatActivity() {
 
 
             binding.showRemoteUser.setOnClickListener {
-                mViewModel.user.value?.url?.let {
-                    val uri = Uri.parse(it)
-                    startActivity(
-                        Intent(Intent.ACTION_VIEW, uri)
-                    )
+                val account = accountStore.currentAccount
+                if (account != null) {
+                    mViewModel.user.value?.getProfileUrl(account)?.let {
+                        val uri = Uri.parse(it)
+                        startActivity(
+                            Intent(Intent.ACTION_VIEW, uri)
+                        )
+                    }
                 }
             }
 

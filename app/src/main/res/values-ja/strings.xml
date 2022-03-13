@@ -387,4 +387,5 @@
     <string name="delete_nickname">ニックネームを削除</string>
     <string name="suggested_emojis">絵文字の候補</string>
     <string name="the_remote_emoji_does_not_exist_in_this_instance">そのリモート絵文字はこのインスタンスには存在しません。</string>
+    <string name="view_in_browswer">ブラウザで表示</string>
 </resources>
