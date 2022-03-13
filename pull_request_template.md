@@ -16,5 +16,3 @@
 ## TODO
 * [ ] `CHANGES.md` に新しいバージョンと変更点を記載
     - バージョニングは[セマンティックバージョニング](https://semver.org/lang/ja/)に従い、 `X.Y.Z` の形式で付ける
-* [ ] `pubspec.yaml` のversion変更
-* [ ] `release_notes.txt` に最新Verのリリースノートを記載（追記ではなく上書き）
