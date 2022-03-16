@@ -27,18 +27,21 @@ class NoteDetailViewModel(
     val miCore: MiCore,
     val accountId: Long? = null,
     val encryption: Encryption = miCore.getEncryption(),
-    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
-) : ViewModel(){
+    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(
+        miCore.getUserDataSource(),
+        miCore.getNoteDataSource(),
+        miCore.getFilePropertyDataSource()
+    )
+) : ViewModel() {
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
 
-
     @FlowPreview
     @ExperimentalCoroutinesApi
-    fun loadDetail(){
+    fun loadDetail() {
 
-        viewModelScope.launch(Dispatchers.IO){
-            try{
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 val account = getAccount()
                 val note = miCore.getNoteRepository().find(Note.Id(account.accountId, show.noteId))
 
@@ -55,41 +58,45 @@ class NoteDetailViewModel(
                 notes.postValue(list)
 
                 val conversation = loadConversation()?.asReversed()
-                if(conversation != null){
-                    list = ArrayList<PlaneNoteViewData>(conversation).apply{
+                if (conversation != null) {
+                    list = ArrayList<PlaneNoteViewData>(conversation).apply {
                         addAll(list)
                     }
                     list.captureAll()
                     notes.postValue(list)
                 }
                 val children = loadChildren()
-                if(children != null){
-                    list = ArrayList<PlaneNoteViewData>(list).apply{
+                if (children != null) {
+                    list = ArrayList<PlaneNoteViewData>(list).apply {
                         addAll(children)
                     }
                     list.captureAll()
                     notes.postValue(list)
                 }
 
-            }catch (e: Exception){
-
+            } catch (e: Exception) {
+                Log.w("NoteDetailViewModel", "loadDetail失敗", e)
             }
         }
 
     }
 
 
-    fun loadNewConversation(noteConversationViewData: NoteConversationViewData){
-        Log.d("NoteDetailViewModel", "新たにConversationを読み込もうとした")
-        viewModelScope.launch(Dispatchers.IO){
-            try{
+    fun loadNewConversation(noteConversationViewData: NoteConversationViewData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 val conversation = noteConversationViewData.conversation.value
                     ?: emptyList()
                 getChildrenToIterate(noteConversationViewData, ArrayList(conversation))
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 Log.e("NoteDetailViewModel", "loadNewConversation中にエラー発生", e)
             }
         }
+    }
+
+    suspend fun getUrl(): String {
+        val account = getAccount()
+        return "${account.instanceDomain}/notes/${show.noteId}"
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -98,22 +105,26 @@ class NoteDetailViewModel(
         conversation: ArrayList<PlaneNoteViewData>
     ): NoteConversationViewData {
         val next = noteConversationViewData.getNextNoteForConversation()
-        println("ねくすと: ${next?.id}, :${next?.text}")
-        return if(next == null){
+        return if (next == null) {
             noteConversationViewData.conversation.postValue(conversation)
             noteConversationViewData.hasConversation.postValue(false)
-            println("こんばーせーしょんの最終さいずは:${conversation.size}")
             noteConversationViewData
-        }else{
+        } else {
             conversation.add(next)
-            val children = miCore.getMisskeyAPIProvider().get(getAccount()).children(NoteRequest(getAccount().getI(encryption), limit = 100,noteId =  next.toShowNote.note.id.noteId)).body()?.map{
+            val children = miCore.getMisskeyAPIProvider().get(getAccount()).children(
+                NoteRequest(
+                    getAccount().getI(encryption),
+                    limit = 100,
+                    noteId = next.toShowNote.note.id.noteId
+                )
+            ).body()?.map {
                 val n = noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it)
                 PlaneNoteViewData(
                     miCore.getGetters().noteRelationGetter.get(n),
                     getAccount(),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
-                ).apply{
+                ).apply {
                     loadUrlPreview(this)
                 }
             }
@@ -123,41 +134,57 @@ class NoteDetailViewModel(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun loadConversation(): List<PlaneNoteViewData>?{
-        return miCore.getMisskeyAPIProvider().get(getAccount()).conversation(makeRequest()).body()?.map{
-            miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it))
-        }?.map{
+    private suspend fun loadConversation(): List<PlaneNoteViewData>? {
+        return miCore.getMisskeyAPIProvider().get(getAccount()).conversation(makeRequest()).body()
+            ?.map {
+                miCore.getGetters().noteRelationGetter.get(
+                    noteDataSourceAdder.addNoteDtoToDataSource(
+                        getAccount(),
+                        it
+                    )
+                )
+            }?.map {
             PlaneNoteViewData(
                 it,
                 getAccount(),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore()
-            ).apply{
+            ).apply {
                 loadUrlPreview(this)
             }
         }
     }
 
-    private suspend fun loadChildren(): List<NoteConversationViewData>?{
-        return loadChildren(id = show.noteId)?.filter{
+    private suspend fun loadChildren(): List<NoteConversationViewData>? {
+        return loadChildren(id = show.noteId)?.filter {
             it.reNote?.id != show.noteId
-        }?.map{
-            miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it))
-        }?.map{
+        }?.map {
+            miCore.getGetters().noteRelationGetter.get(
+                noteDataSourceAdder.addNoteDtoToDataSource(
+                    getAccount(),
+                    it
+                )
+            )
+        }?.map {
             val planeNoteViewData = PlaneNoteViewData(
                 it,
                 getAccount(),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore(),
             )
-            val childInChild = loadChildren(planeNoteViewData.toShowNote.note.id.noteId)?.map{n ->
+            val childInChild = loadChildren(planeNoteViewData.toShowNote.note.id.noteId)?.map { n ->
 
                 PlaneNoteViewData(
-                    miCore.getGetters().noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), n)),
+                    miCore.getGetters().noteRelationGetter.get(
+                        noteDataSourceAdder.addNoteDtoToDataSource(
+                            getAccount(),
+                            n
+                        )
+                    ),
                     getAccount(),
                     miCore.getNoteCaptureAdapter(),
                     miCore.getTranslationStore()
-                ).apply{
+                ).apply {
                     loadUrlPreview(this)
                 }
             }
@@ -167,20 +194,20 @@ class NoteDetailViewModel(
                 getAccount(),
                 miCore.getNoteCaptureAdapter(),
                 miCore.getTranslationStore()
-            ).apply{
+            ).apply {
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }
         }
 
     }
 
-    private suspend fun loadChildren(id: String): List<NoteDTO>?{
+    private suspend fun loadChildren(id: String): List<NoteDTO>? {
         return miCore.getMisskeyAPIProvider().get(getAccount())
             .children(NoteRequest(i = getAccount().getI(encryption), limit = 100, noteId = id))
             .body()
     }
 
-    private suspend fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData){
+    private suspend fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData) {
         UrlPreviewLoadTask(
             miCore.getUrlPreviewStore(getAccount()),
             planeNoteViewData.urls,
@@ -189,7 +216,7 @@ class NoteDetailViewModel(
     }
 
     @ExperimentalCoroutinesApi
-    private fun<T: PlaneNoteViewData> T.capture():  T{
+    private fun <T : PlaneNoteViewData> T.capture(): T {
         val self = this
         viewModelScope.launch(Dispatchers.IO) {
             self.eventFlow.collect()
@@ -198,7 +225,7 @@ class NoteDetailViewModel(
     }
 
     @ExperimentalCoroutinesApi
-    private fun<T: PlaneNoteViewData> List<T>.captureAll() {
+    private fun <T : PlaneNoteViewData> List<T>.captureAll() {
         this.forEach {
             it.capture()
         }
@@ -206,11 +233,11 @@ class NoteDetailViewModel(
 
     private var mAc: Account? = null
     private suspend fun getAccount(): Account {
-        if(mAc != null) {
+        if (mAc != null) {
             return mAc!!
         }
 
-        if(accountId != null) {
+        if (accountId != null) {
             mAc = miCore.getAccountRepository().get(accountId)
             return mAc!!
         }
