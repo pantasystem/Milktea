@@ -50,7 +50,7 @@
                                 android:id="@+id/showRemoteUser"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/view_in_browswer"
+                                android:text="@string/view_in_browser"
                                 style="@style/Widget.MaterialComponents.Button.TextButton"
                                 />
                     </LinearLayout>
