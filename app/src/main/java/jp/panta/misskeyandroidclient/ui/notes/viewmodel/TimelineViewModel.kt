@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.streaming.ChannelBody
 import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import jp.panta.misskeyandroidclient.streaming.channel.connectUserTimeline
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite.FavoriteNotePagingStore
@@ -83,6 +84,7 @@ class TimelineViewModel(
                     || pageable is Pageable.HomeTimeline
                     || pageable is Pageable.UserListTimeline
                     || pageable is Pageable.Antenna
+                    || pageable is Pageable.UserTimeline
         }.flatMapLatest { account ->
             when (pageable) {
                 is Pageable.GlobalTimeline -> {
@@ -106,6 +108,10 @@ class TimelineViewModel(
                 is Pageable.Antenna -> {
                     miCore.getChannelAPI(account)
                         .connect(ChannelAPI.Type.Antenna(antennaId = pageable.antennaId))
+                }
+                is Pageable.UserTimeline -> {
+                    miCore.getChannelAPI(account)
+                        .connectUserTimeline(pageable.userId)
                 }
                 else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
             }
