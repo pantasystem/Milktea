@@ -213,9 +213,3 @@ class ChannelAPI(
     }
 
 }
-
-fun ChannelAPI.connectUserTimeline(userId: String): Flow<ChannelBody> {
-    return this.connect(ChannelAPI.Type.Global).filter {
-        it is ChannelBody.ReceiveNote && it.body.userId == userId
-    }
-}
