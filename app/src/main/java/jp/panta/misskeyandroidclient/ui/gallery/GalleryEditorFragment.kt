@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
@@ -26,7 +27,9 @@ import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -43,16 +46,23 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
     }
 
     val binding: FragmentGalleryEditorBinding by dataBinding()
-    private lateinit var viewModel: GalleryEditorViewModel
+
+    @Inject
+    lateinit var assistedFactory: GalleryEditorViewModel.ViewModelAssistedFactory
+
+
+
+    val viewModel: GalleryEditorViewModel by viewModels {
+        val args = arguments?.getSerializable("EDIT_TYPE") as? EditType ?: EditType.Create(null)
+        GalleryEditorViewModel.provideFactory(assistedFactory, args)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val args = arguments?.getSerializable("EDIT_TYPE") as? EditType ?: EditType.Create(null)
 
         val miCore = requireContext().applicationContext as MiCore
 
-        viewModel = ViewModelProvider(this, GalleryEditorViewModel.Factory(args, miCore))[GalleryEditorViewModel::class.java]
         binding.viewModel = viewModel
 
         (requireActivity() as AppCompatActivity).also { appCompatActivity ->
