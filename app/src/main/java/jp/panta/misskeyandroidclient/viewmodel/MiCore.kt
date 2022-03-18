@@ -122,8 +122,6 @@ interface MiCore {
 
     fun getUnreadNotificationDAO(): UnreadNotificationDAO
 
-    fun getTaskExecutor(): TaskExecutor
-
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
     fun getMetaStore(): FetchMeta
