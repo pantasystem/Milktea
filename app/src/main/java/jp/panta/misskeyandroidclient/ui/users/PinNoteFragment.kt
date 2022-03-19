@@ -24,23 +24,23 @@ import javax.inject.Inject
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
+class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
 
     val mBinding: FragmentPinNoteBinding by dataBinding()
 
     companion object {
 
-        fun newInstance(userId: User.Id?, fqcnUserName: String?) : PinNoteFragment{
+        fun newInstance(userId: User.Id?, fqcnUserName: String?): PinNoteFragment {
             require(!(userId == null && fqcnUserName == null)) {
                 "userId, fqcnUserNameどちらか一つは必須です。"
             }
             return PinNoteFragment().also {
                 it.arguments = Bundle().also { bundle ->
-                    if(userId != null) {
+                    if (userId != null) {
                         bundle.putString("USER_ID", userId.id)
                         bundle.putLong("ACCOUNT_ID", userId.accountId)
                     }
-                    if(fqcnUserName != null) {
+                    if (fqcnUserName != null) {
                         bundle.putString("FQCN_USER_NAME", fqcnUserName)
                     }
 
@@ -72,7 +72,7 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note){
 
 
         val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
-        val adapter = TimelineListAdapter(object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
+        val adapter = TimelineListAdapter(object : DiffUtil.ItemCallback<PlaneNoteViewData>() {
             override fun areContentsTheSame(
                 oldItem: PlaneNoteViewData,
                 newItem: PlaneNoteViewData

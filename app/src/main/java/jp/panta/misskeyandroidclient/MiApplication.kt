@@ -204,10 +204,6 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var _networkState: Flow<Boolean>
 
-    private val _taskExecutor: TaskExecutor by lazy {
-        AppTaskExecutor(applicationScope + Dispatchers.IO, loggerFactory.create("TaskExecutor"))
-    }
-
     @Inject
     lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
 
@@ -543,11 +539,5 @@ class MiApplication : Application(), MiCore {
                 }
             }
         }
-
-
-    override fun getTaskExecutor(): TaskExecutor {
-        return _taskExecutor
-    }
-
 
 }

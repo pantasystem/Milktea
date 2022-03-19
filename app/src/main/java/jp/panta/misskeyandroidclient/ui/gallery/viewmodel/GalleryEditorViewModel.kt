@@ -1,7 +1,12 @@
 package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
 
 import androidx.lifecycle.*
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.model.CreateGalleryTaskExecutor
 import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
@@ -9,16 +14,14 @@ import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.gallery.CreateGalleryPost
-import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
-import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.gallery.toTask
+import jp.panta.misskeyandroidclient.model.gallery.*
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.Serializable
+import javax.inject.Inject
 
 
 sealed class EditType : Serializable{
@@ -31,30 +34,21 @@ sealed class EditType : Serializable{
     ) : EditType()
 }
 
-class GalleryEditorViewModel(
-    private val editType: EditType,
+class GalleryEditorViewModel @AssistedInject constructor(
     private val galleryRepository: GalleryRepository,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
-    private val taskExecutor: TaskExecutor,
+    private val taskExecutor: CreateGalleryTaskExecutor,
     private val driveFileRepository: DriveFileRepository,
     val logger: Logger,
-) : ViewModel(){
+    @Assisted private val editType: EditType,
+    ) : ViewModel(){
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(private val editType: EditType, val miCore: MiCore) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return GalleryEditorViewModel(
-                editType,
-                miCore.getGalleryRepository(),
-                miCore.getFilePropertyDataSource(),
-                miCore.getAccountRepository(),
-                miCore.getTaskExecutor(),
-                miCore.getDriveFileRepository(),
-                miCore.loggerFactory.create("GalleryEditorVM")
-            ) as T
-        }
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(type: EditType): GalleryEditorViewModel
     }
+    companion object;
 
     private val _title = MutableLiveData<String>()
     val title = _title
@@ -178,5 +172,15 @@ class GalleryEditorViewModel(
             }
             return accountRepository.get(_accountId!!)
         }
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun GalleryEditorViewModel.Companion.provideFactory(
+    assistedFactory: GalleryEditorViewModel.ViewModelAssistedFactory,
+    type: EditType,
+) : ViewModelProvider.Factory = object  : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return assistedFactory.create(type) as T
     }
 }

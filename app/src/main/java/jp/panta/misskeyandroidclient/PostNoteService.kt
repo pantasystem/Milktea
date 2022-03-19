@@ -23,10 +23,10 @@ class PostNoteService : IntentService("PostNoteService") {
             Log.e(tag, "EXTRA_NOTE_TASKがnullです")
             return
         }
-        val miApplication = applicationContext as MiApplication
+//        val miApplication = applicationContext as MiApplication
 
 
-        miApplication.getTaskExecutor().dispatch(noteTask.createNote.task(miApplication.getNoteRepository()))
+//        miApplication.getTaskExecutor().dispatch(noteTask.createNote.task(miApplication.getNoteRepository()))
 
     }
 

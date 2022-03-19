@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
+import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.api.Version
@@ -36,7 +37,8 @@ class NoteEditorViewModel @Inject constructor(
     val filePropertyDataSource: FilePropertyDataSource,
     val metaRepository: MetaRepository,
     val driveFileRepository: DriveFileRepository,
-    val accountStore: AccountStore
+    val accountStore: AccountStore,
+    val createNoteTaskExecutor: CreateNoteTaskExecutor
 ) : ViewModel() {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -249,7 +251,7 @@ class NoteEditorViewModel @Inject constructor(
                 val reservationPostingAt = _state.value.reservationPostingAt
                 if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                     val createNote = _state.value.toCreateNote(account)
-                    miCore.getTaskExecutor().dispatch(createNote.task(noteRepository))
+                    createNoteTaskExecutor.dispatch(createNote.task(noteRepository))
                 } else {
                     runCatching {
                         val dfNote = toDraftNote()
