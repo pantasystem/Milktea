@@ -453,7 +453,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val idAndActivityMap = mapOf(
@@ -509,7 +508,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {
-        when(taskState) {
+        when (taskState) {
             is TaskState.Error -> {
                 getString(R.string.note_creation_failure).showSnackBar(
                     getString(R.string.retry) to ({
@@ -526,7 +525,8 @@ class MainActivity : AppCompatActivity() {
                     })
                 )
             }
-            is TaskState.Executing -> {}
+            is TaskState.Executing -> {
+            }
         }
     }
 

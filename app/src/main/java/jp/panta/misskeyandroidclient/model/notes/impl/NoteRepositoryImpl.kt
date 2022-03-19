@@ -39,23 +39,35 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun create(createNote: CreateNote): Note {
-        val task = PostNoteTask(encryption, createNote, createNote.author, loggerFactory, filePropertyDataSource)
-        val result = runCatching {task.execute(
-            uploader.get(createNote.author)
-        )?: throw IllegalStateException("ファイルのアップロードに失敗しました")
+        val task = PostNoteTask(
+            encryption,
+            createNote,
+            createNote.author,
+            loggerFactory,
+            filePropertyDataSource
+        )
+        val result = runCatching {
+            task.execute(
+                uploader.get(createNote.author)
+            ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.runCatching {
             getOrThrow().let {
                 misskeyAPIProvider.get(createNote.author).create(it).body()?.createdNote
             }
         }
 
-        if(result.isFailure) {
-            val exDraft = createNote.draftNoteId?.let{ draftNoteDao.getDraftNote(createNote.author.accountId, createNote.draftNoteId) }
+        if (result.isFailure) {
+            val exDraft = createNote.draftNoteId?.let {
+                draftNoteDao.getDraftNote(
+                    createNote.author.accountId,
+                    createNote.draftNoteId
+                )
+            }
             draftNoteDao.fullInsert(task.toDraftNote(exDraft))
         }
         val noteDTO = result.getOrThrow()
         require(noteDTO != null)
-        createNote.draftNoteId?.let{
+        createNote.draftNoteId?.let {
             draftNoteDao.deleteDraftNote(createNote.author.accountId, draftNoteId = it)
         }
         settingStore.setNoteVisibility(createNote)
@@ -77,7 +89,7 @@ class NoteRepositoryImpl @Inject constructor(
         var note = runCatching {
             noteDataSource.get(noteId)
         }.getOrNull()
-        if(note != null) {
+        if (note != null) {
             return note
         }
 
@@ -85,14 +97,14 @@ class NoteRepositoryImpl @Inject constructor(
         note = runCatching {
             misskeyAPIProvider.get(account).showNote(
                 NoteRequest(
-                i = account.getI(encryption),
-                noteId = noteId.noteId
+                    i = account.getI(encryption),
+                    noteId = noteId.noteId
+                )
             )
-            )
-        }.getOrNull()?.body()?.let{
+        }.getOrNull()?.body()?.let {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
-        note?: throw NoteNotFoundException(noteId)
+        note ?: throw NoteNotFoundException(noteId)
         return note
     }
 
@@ -100,12 +112,12 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun toggleReaction(createReaction: CreateReaction): Boolean {
         val account = accountRepository.get(createReaction.noteId.accountId)
         var note = find(createReaction.noteId)
-        if(note.myReaction?.isNotBlank() == true) {
-            if(!unreaction(createReaction.noteId)) {
+        if (note.myReaction?.isNotBlank() == true) {
+            if (!unreaction(createReaction.noteId)) {
                 return false
             }
 
-            if(note.myReaction == createReaction.reaction) {
+            if (note.myReaction == createReaction.reaction) {
                 logger.debug("同一のリアクションが選択されています。")
                 return true
             }
@@ -114,7 +126,9 @@ class NoteRepositoryImpl @Inject constructor(
 
 
         return runCatching {
-            if(postReaction(createReaction) && !noteCaptureAPIProvider.get(account).isCaptured(createReaction.noteId.noteId)) {
+            if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
+                    .isCaptured(createReaction.noteId.noteId)
+            ) {
                 noteDataSource.add(note.onIReacted(createReaction.reaction))
             }
             true
@@ -147,12 +161,12 @@ class NoteRepositoryImpl @Inject constructor(
 
     private suspend fun postUnReaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
-        val account  = accountRepository.get(noteId.accountId)
+        val account = accountRepository.get(noteId.accountId)
         val res = misskeyAPIProvider.get(account).deleteReaction(
             DeleteNote(
-            noteId = note.id.noteId,
-            i = account.getI(encryption)
-        )
+                noteId = note.id.noteId,
+                i = account.getI(encryption)
+            )
         )
         res.throwIfHasError()
         return res.isSuccessful
