@@ -16,7 +16,7 @@ fun interface ITask<T> {
 
 sealed class TaskState<T> {
     data class Success<T>(val res: T) : TaskState<T>()
-    data class Error<T>(val e: Throwable) : TaskState<T>()
+    data class Error<T>(val e: Throwable, val task: ITask<T>) : TaskState<T>()
     class Executing<T> : TaskState<T>()
 }
 
@@ -48,7 +48,7 @@ class TaskExecutorImpl<T>(
                 emit(TaskState.Success(it))
             }.onFailure {
                 logger.debug("タスクの実行中にエラーが発生しました", e = it)
-                emit(TaskState.Error(it))
+                emit(TaskState.Error(it, task))
             }
         }.onEach {
             _tasks.tryEmit(it)

@@ -29,6 +29,7 @@ import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
+import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
 import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountStore
@@ -84,6 +85,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var settingStore: SettingStore
+
+    @Inject
+    lateinit var noteTaskExecutor: CreateNoteTaskExecutor
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -219,14 +223,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // NOTE: ノート作成処理の状態をSnackBarで表示する
         lifecycleScope.launchWhenCreated {
-            miApplication.getTaskExecutor().tasks.mapNotNull {
-                it as? TaskState.Success<*>
-            }.mapNotNull {
-                it.res as? Note
-            }.collect {
-                getString(R.string.successfully_created_note).showSnackBar()
+            noteTaskExecutor.tasks.collect { taskState ->
+                showCreateNoteTaskStatusSnackBar(taskState)
             }
+
         }
 
         ViewModelProvider(
@@ -335,10 +337,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun String.showSnackBar() {
+    private fun String.showSnackBar(action: Pair<String, (View) -> Unit>? = null) {
         val snackBar =
             Snackbar.make(binding.appBarMain.simpleNotification, this, Snackbar.LENGTH_LONG)
-
+        if (action != null) {
+            snackBar.setAction(action.first, action.second)
+        }
         snackBar.show()
     }
 
@@ -504,8 +508,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {
+        when(taskState) {
+            is TaskState.Error -> {
+                getString(R.string.note_creation_failure).showSnackBar(
+                    getString(R.string.retry) to ({
+                        noteTaskExecutor.dispatch(taskState.task)
+                    })
+                )
+            }
+            is TaskState.Success -> {
+                getString(R.string.successfully_created_note).showSnackBar(
+                    getString(R.string.show) to ({
+                        startActivity(
+                            NoteDetailActivity.newIntent(this@MainActivity, taskState.res.id)
+                        )
+                    })
+                )
+            }
+            is TaskState.Executing -> {}
+        }
+    }
+
     @ExperimentalCoroutinesApi
-    fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
+    private fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
         return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             getMetaRepository().observe(it.instanceDomain)
         }.map {
