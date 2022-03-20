@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -48,11 +49,19 @@ import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDTO
         UnreadNotification::class,
         UserNicknameDTO::class,
     ],
-    version = 11,
-    exportSchema = true
+    version = 12,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 11, to = 12)
+    ]
 )
-@TypeConverters(PageTypeConverter::class, DateConverter::class, TimelinePageTypeConverter::class, AccountInstanceTypeConverter::class)
-abstract class DataBase : RoomDatabase(){
+@TypeConverters(
+    PageTypeConverter::class,
+    DateConverter::class,
+    TimelinePageTypeConverter::class,
+    AccountInstanceTypeConverter::class,
+)
+abstract class DataBase : RoomDatabase() {
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
     @Deprecated("pageDaoへ移行")
     abstract fun connectionInformationDao(): ConnectionInformationDao

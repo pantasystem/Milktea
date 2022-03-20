@@ -50,7 +50,8 @@ class PostNoteTask(
                 replyId = createNote.replyId?.noteId,
                 renoteId = createNote.renoteId?.noteId,
                 poll = createNote.poll,
-                fileIds = filesIds
+                fileIds = filesIds,
+                channelId = createNote.channelId?.channelId,
                 )
         }else{
             logger.error("投稿データ作成に失敗しました。")
@@ -96,7 +97,8 @@ class PostNoteTask(
             visibility = createNote.visibility.type(),
             localOnly = createNote.visibility.isLocalOnly(),
             renoteId = createNote.renoteId?.noteId,
-            replyId = createNote.replyId?.noteId
+            replyId = createNote.replyId?.noteId,
+            channelId = createNote.channelId
         ).apply{
             this.draftNoteId = draftNote?.draftNoteId
         }

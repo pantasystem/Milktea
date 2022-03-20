@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.notes
 import jp.panta.misskeyandroidclient.model.Entity
 import jp.panta.misskeyandroidclient.model.EntityId
 import jp.panta.misskeyandroidclient.model.auth.custom.App
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.notes.poll.Poll
@@ -41,6 +42,7 @@ data class Note(
 
 
     val app: App?,
+    val channelId: Channel.Id?,
     var instanceUpdatedAt: Date = Date()
 ) : Entity{
 

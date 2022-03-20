@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.model.notes.draft.db
 
 import androidx.room.*
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 
 @Entity(tableName = "draft_note_table", foreignKeys = [
@@ -26,6 +27,7 @@ data class DraftNoteDTO(
     val noExtractEmojis: Boolean? = null,
     val replyId: String? = null,
     val renoteId: String? = null,
+    val channelId: String? = null,
     @Embedded val poll: DraftPollDTO?
 
 ){
@@ -48,6 +50,7 @@ data class DraftNoteDTO(
                 draftNote.noExtractEmojis,
                 draftNote.replyId,
                 draftNote.renoteId,
+                draftNote.channelId?.channelId,
                 DraftPollDTO.make(draftNote.draftPoll)
             ).apply {
                 draftNoteId = draftNote.draftNoteId
@@ -80,7 +83,10 @@ data class DraftNoteDTO(
             noExtractEmojis,
             replyId,
             renoteId,
-            poll?.toDraftPoll(pollChoicesDTO)
+            poll?.toDraftPoll(pollChoicesDTO),
+            channelId = channelId?.let {
+                Channel.Id(accountId, it)
+            }
 
 
         ).apply{

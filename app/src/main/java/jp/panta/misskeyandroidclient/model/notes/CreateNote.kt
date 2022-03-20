@@ -3,10 +3,10 @@ package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.ITask
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
-import kotlinx.datetime.Instant
+
 
 /**
  * @param noExtractEmojis 本文からカスタム絵文字を展開しないか否か
@@ -26,9 +26,8 @@ data class CreateNote(
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
     val poll: CreatePoll? = null,
-    val draftNoteId: Long? = null
-
-
+    val draftNoteId: Long? = null,
+    val channelId: Channel.Id? = null,
 )
 
 class CreateNoteTask(
@@ -55,6 +54,7 @@ fun NoteEditingState.toCreateNote(account: Account): CreateNote {
         replyId = replyId,
         renoteId = renoteId,
         poll = poll?.toCreatePoll(),
-        draftNoteId = draftNoteId
+        draftNoteId = draftNoteId,
+        channelId = channelId
     )
 }

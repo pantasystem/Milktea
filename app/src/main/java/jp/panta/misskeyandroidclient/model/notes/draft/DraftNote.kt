@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.draft
 
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.file.File
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.getName
@@ -24,6 +25,7 @@ data class DraftNote(
     val renoteId: String? = null,
     val draftPoll: DraftPoll? = null,
     val reservationPostingAt: Date? = null,
+    val channelId: Channel.Id? = null,
 
     ): Serializable{
 
@@ -51,6 +53,7 @@ fun NoteRelation.toDraftNote() : DraftNote {
         replyId = this.note.replyId.let {
             it?.noteId
         },
-        draftPoll = this.note.poll?.toDraftPoll()
+        draftPoll = this.note.poll?.toDraftPoll(),
+        channelId = this.note.channelId,
     )
 }
