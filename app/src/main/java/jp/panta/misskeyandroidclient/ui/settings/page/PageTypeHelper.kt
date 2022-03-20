@@ -43,6 +43,7 @@ object PageTypeHelper{
             USERS_GALLERY_POSTS -> context.getString(R.string.gallery) + "(User)"
             MY_GALLERY_POSTS -> context.getString(R.string.my_posts) + String.format("(%s)", context.getString(R.string.gallery))
             I_LIKED_GALLERY_POSTS -> context.getString(R.string.my_liking) + String.format("(%s)", context.getString(R.string.gallery))
+            CHANNEL_TIMELINE -> context.getString(R.string.channel)
         }
     }
 }

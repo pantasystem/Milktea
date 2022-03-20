@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.api.misskey.drive.FilePropertyDTO
 import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.Visibility
@@ -71,6 +72,7 @@ data class NoteDTO(
     @SerialName("_prId_")
     @SerializedName("_prId_")
     val promotionId: String? = null,
+    val channelId: String? = null,
 
     val app: App? = null
 ): Serializable
@@ -104,7 +106,10 @@ fun NoteDTO.toNote(account: Account): Note{
         visibleUserIds = this.visibleUserIds?.map{
             User.Id(account.accountId, it)
         }?: emptyList(),
-        myReaction = this.myReaction
+        myReaction = this.myReaction,
+        channelId = this.channelId?.let {
+            Channel.Id(account.accountId, it)
+        }
     )
 }
 

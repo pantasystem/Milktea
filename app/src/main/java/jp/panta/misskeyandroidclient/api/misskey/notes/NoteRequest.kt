@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.api.misskey.notes
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import kotlinx.serialization.Serializable
@@ -33,7 +34,8 @@ data class NoteRequest(
     val offset: Int? = null,
     val includeReplies: Boolean? = null,
     val host: String? = null,
-    val markAsRead: Boolean? = null
+    val markAsRead: Boolean? = null,
+    val channelId: String? = null,
 ): JavaSerializable{
 
 
@@ -72,7 +74,8 @@ data class NoteRequest(
                 renote = params.renote,
                 reply = params.reply,
                 listId = params.listId,
-                noteId = params.noteId
+                noteId = params.noteId,
+                channelId = params.channelId
             )
         }
 
