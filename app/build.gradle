@@ -222,6 +222,7 @@ dependencies {
 
     implementation 'com.github.penfeizhou.android.animation:apng:2.17.2'
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0"
 
 }
 

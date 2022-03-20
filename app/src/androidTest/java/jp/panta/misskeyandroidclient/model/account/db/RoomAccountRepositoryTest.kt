@@ -36,7 +36,7 @@ class RoomAccountRepositoryTest{
         val remoteId = "hogehoge"
         val instanceDomain = "http://misskey.io"
         val userName = "Panta"
-        val account = Account(remoteId, instanceDomain, userName, "hogehogehoge")
+        val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY,"hogehogehoge")
         runBlocking {
             val result = roomAccountRepository.add(account)
 
@@ -46,7 +46,7 @@ class RoomAccountRepositoryTest{
             assertEquals(1, result.accountId,)
             println(result)
 
-            val account2 = Account(remoteId, instanceDomain, "Test", "hogehogehoge")
+            val account2 = Account(remoteId, instanceDomain, "Test", Account.InstanceType.MISSKEY, "hogehogehoge")
 
             val result2 = roomAccountRepository.add(account2)
             assertEquals("Test", result2.userName, )
@@ -63,7 +63,7 @@ class RoomAccountRepositoryTest{
         val remoteId = "hogehoge"
         val instanceDomain = "http://misskey.io"
         val userName = "Panta"
-        val account = Account(remoteId, instanceDomain, userName, "hogehogehoge")
+        val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY, "hogehogehoge")
         runBlocking {
             val result = roomAccountRepository.add(account)
 
@@ -85,7 +85,7 @@ class RoomAccountRepositoryTest{
         val remoteId = "hogehoge"
         val instanceDomain = "http://misskey.io"
         val userName = "Panta"
-        val account = Account(remoteId, instanceDomain, userName, "hogehogehoge")
+        val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY,"hogehogehoge")
         runBlocking {
             val resultId = accountDAO.insert(account)
             assertNotEquals(0, resultId)
