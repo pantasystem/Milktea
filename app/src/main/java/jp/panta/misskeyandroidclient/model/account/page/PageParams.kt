@@ -8,39 +8,26 @@ import java.io.Serializable
 data class PageParams (
     val type: PageType = HOME,
     val withFiles: Boolean? = null,
-    //var withFiles: Boolean? = null,
     var excludeNsfw: Boolean? = null,
-    //var withFiles: Boolean? = null,
     var includeLocalRenotes: Boolean? = null,
     var includeMyRenotes: Boolean? = null,
     var includeRenotedMyRenotes: Boolean? = null,
-    //var withFiles: Boolean? = null,
-    //var includeLocalRenotes: Boolean? = null,
-    //var includeMyRenotes: Boolean? = null,
-    //var includeRenotedMyRenotes: Boolean? = null,
     val listId: String? = null,
-    //var withFiles: Boolean? = null,
-    //var includeLocalRenotes: Boolean? = null,
-    //var includeMyRenotes: Boolean? = null,
-    //var includeRenotedMyRenotes: Boolean? = null,
     val following: Boolean? = null,
     val visibility: String? = null,
     val noteId: String? = null,
     val tag: String? = null,
     var reply: Boolean? = null,
     var renote: Boolean? = null,
-    //var withFiles: Boolean? = null,
     var poll: Boolean? = null,
     val offset: Int? = null,
-    //var following: Boolean? = null,
     var markAsRead: Boolean? = null,
     val userId: String? = null,
     var includeReplies: Boolean? = null,
-    //var includeMyRenotes: Boolean? = null,
-    //var withFiles: Boolean? = null,
     var query: String? = null,
     var host: String? = null,
-    val antennaId: String? = null
+    val antennaId: String? = null,
+    val channelId: String? = null,
 ) : Serializable{
 
     fun toNoteRequest(i: String?) : NoteRequest {
@@ -61,7 +48,8 @@ data class PageParams (
             renote = renote,
             poll = poll,
             offset = offset,
-            markAsRead = markAsRead
+            markAsRead = markAsRead,
+            channelId = channelId,
         )
     }
 
@@ -176,6 +164,9 @@ data class PageParams (
                 }
                 MY_GALLERY_POSTS -> {
                     Pageable.Gallery.MyPosts
+                }
+                CHANNEL_TIMELINE -> {
+                    Pageable.ChannelTimeline(channelId!!)
                 }
             }
         }catch(e: NullPointerException){

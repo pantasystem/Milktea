@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
@@ -26,6 +27,7 @@ data class NoteEditingState(
     val viaMobile: Boolean = true,
     val draftNoteId: Long? = null,
     val reservationPostingAt: Instant? = null,
+    val channelId: Channel.Id? = null,
 ) {
 
     val hasCw: Boolean
@@ -326,7 +328,7 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
         } ?: emptyList(),
         reservationPostingAt = reservationPostingAt?.let {
             Instant.fromEpochMilliseconds(it.time)
-        }
+        },
     )
 }
 

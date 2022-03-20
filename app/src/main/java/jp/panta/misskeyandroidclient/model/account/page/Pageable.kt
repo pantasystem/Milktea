@@ -88,6 +88,16 @@ sealed class Pageable : Serializable{
         }
     }
 
+    data class ChannelTimeline(
+        val channelId: String,
+    ) : Pageable(), UntilPaginate, SincePaginate {
+        override fun toParams(): PageParams {
+            return PageParams(
+                channelId = channelId
+            )
+        }
+    }
+
     data class Mention(
 
         val following: Boolean?,

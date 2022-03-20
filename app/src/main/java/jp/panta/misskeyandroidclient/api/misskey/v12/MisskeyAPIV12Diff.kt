@@ -7,6 +7,8 @@ import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaDTO
 import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaQuery
 import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaToAdd
+import jp.panta.misskeyandroidclient.api.misskey.v12.channel.*
+import jp.panta.misskeyandroidclient.model.I
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -33,4 +35,31 @@ interface MisskeyAPIV12Diff {
 
     @POST("api/users/search-by-username-and-host")
     suspend fun searchByUserNameAndHost(@Body requestUser: RequestUser): Response<List<UserDTO>>
+
+    @POST("api/channels/create")
+    suspend fun createChannel(@Body dto: CreateChannelDTO): Response<ChannelDTO>
+
+    @POST("api/channels/featured")
+    suspend fun featuredChannels(@Body i: I): Response<List<ChannelDTO>>
+
+    @POST("api/channels/follow")
+    suspend fun followChannel(@Body dto: FollowChannelDTO): Response<Unit>
+
+    @POST("api/channels/unfollow")
+    suspend fun unFollowChannel(@Body dto: UnFollowChannelDTO): Response<Unit>
+
+    @POST("api/channels/followed")
+    suspend fun followedChannels(@Body dto: FindPageable): Response<List<ChannelDTO>>
+
+    @POST("api/channels/owned")
+    suspend fun ownedChannels(@Body dto: FindPageable): Response<List<ChannelDTO>>
+
+    @POST("api/channels/show")
+    suspend fun showChannel(@Body dto: ShowChannelDTO): Response<ChannelDTO>
+
+    @POST("api/channels/update")
+    suspend fun updateChannel(@Body dto: UpdateChannelDTO): Response<ChannelDTO>
+
+    @POST("api/channels/timeline")
+    suspend fun channelTimeline(@Body dto: NoteRequest): Response<List<NoteDTO>?>
 }

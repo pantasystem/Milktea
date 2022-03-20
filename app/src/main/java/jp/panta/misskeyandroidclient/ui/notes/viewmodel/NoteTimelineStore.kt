@@ -56,6 +56,14 @@ class NoteTimelineStore(
                         throw IllegalArgumentException("antennaはV12以上でなければ使用できません")
                     }
                 }
+                is Pageable.ChannelTimeline -> {
+                    val api = miCore.getMisskeyAPIProvider().get(account)
+                    if (api is MisskeyAPIV12) {
+                        (api)::channelTimeline
+                    }else{
+                        throw IllegalArgumentException("channelはV12以上でなければ使用できません")
+                    }
+                }
                 else -> throw IllegalArgumentException("unknown class:${pageableTimeline.javaClass}")
             }
 

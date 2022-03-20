@@ -18,7 +18,8 @@ data class CreateNote(
     var fileIds: List<String>? = null,
     val replyId: String? = null,
     val renoteId: String? = null,
-    val poll: CreatePoll? = null
+    val poll: CreatePoll? = null,
+    val channelId: String? = null,
 
 
 ){

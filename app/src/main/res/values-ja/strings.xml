@@ -389,5 +389,5 @@
     <string name="the_remote_emoji_does_not_exist_in_this_instance">そのリモート絵文字はこのインスタンスには存在しません。</string>
     <string name="view_in_browser">ブラウザで表示</string>
     <string name="note_creation_failure">ノートの作成失敗</string>
-
+    <string name="channel">チャンネル</string>
 </resources>
