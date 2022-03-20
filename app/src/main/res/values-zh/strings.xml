@@ -383,6 +383,7 @@
     <string name="the_remote_emoji_does_not_exist_in_this_instance">此实例中不存在远程表情符号。</string>
     <string name="view_in_browser">在浏览器中查看</string>
     <string name="note_creation_failure">笔记创建失败</string>
+    <string name="channel">Channel</string>
 
 
 </resources>

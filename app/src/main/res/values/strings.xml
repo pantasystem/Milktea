@@ -387,4 +387,5 @@
     <string name="suggested_emojis">Suggested Emojis</string>
     <string name="the_remote_emoji_does_not_exist_in_this_instance">The remote emoji does not exist in this instance.</string>
     <string name="view_in_browser">View in browser</string>
+    <string name="channel">Channel</string>
 </resources>
