@@ -22,7 +22,8 @@ enum class PageType(val defaultName: String){
     GALLERY_POSTS("GalleryPosts"),
     USERS_GALLERY_POSTS("UsersGalleryPosts"),
     MY_GALLERY_POSTS("MyGalleryPosts"),
-    I_LIKED_GALLERY_POSTS("ILikedGalleryPosts")
+    I_LIKED_GALLERY_POSTS("ILikedGalleryPosts"),
+    CHANNEL_TIMELINE("Channel"),
     //USER_PINは別
 }
 
