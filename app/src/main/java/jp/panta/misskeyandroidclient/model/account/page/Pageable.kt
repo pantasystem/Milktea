@@ -93,6 +93,7 @@ sealed class Pageable : Serializable{
     ) : Pageable(), UntilPaginate, SincePaginate {
         override fun toParams(): PageParams {
             return PageParams(
+                PageType.CHANNEL_TIMELINE,
                 channelId = channelId
             )
         }

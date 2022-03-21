@@ -11,6 +11,7 @@ class PageableChannelTimelineTest {
         val pageable = Pageable.ChannelTimeline(channelId = "channelId")
         assertNotNull(pageable.toParams().channelId)
         assertEquals("channelId", pageable.toParams().channelId)
+        assertEquals(PageType.CHANNEL_TIMELINE, pageable.toParams().type)
     }
 
     @Test
