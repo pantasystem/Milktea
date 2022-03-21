@@ -21,7 +21,7 @@ data class ChannelDTO(
     val bannerUrl: String? = null,
     val notesCount: Int,
     val usersCount: Int,
-    val userId: String,
+    val userId: String?,
     val hasUnreadNote: Boolean? = null,
     val isFollowing: Boolean? = null,
 ) {
@@ -35,7 +35,7 @@ data class ChannelDTO(
             bannerUrl = bannerUrl,
             notesCount = notesCount,
             usersCount = usersCount,
-            userId = User.Id(account.accountId, userId),
+            userId = userId?.let { User.Id(account.accountId, it) },
             hasUnreadNote = hasUnreadNote,
             isFollowing = isFollowing
         )
