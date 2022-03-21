@@ -61,10 +61,10 @@ fun ChannelListStateScreen(
                                         viewModel.toggleTab(it.channel.id)
                                     }
                                     is ChannelCardAction.OnUnFollowButtonClicked -> {
-                                        viewModel.follow(it.channel.id)
+                                        viewModel.unFollow(it.channel.id)
                                     }
                                     is ChannelCardAction.OnFollowButtonClicked -> {
-                                        viewModel.unFollow(it.channel.id)
+                                        viewModel.follow(it.channel.id)
                                     }
                                     is ChannelCardAction.OnClick -> {
 
