@@ -10,6 +10,7 @@ import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.channel.ChannelAPIAdapter
 import jp.panta.misskeyandroidclient.model.channel.CreateChannel
+import jp.panta.misskeyandroidclient.model.channel.UpdateChannel
 import javax.inject.Inject
 
 class ChannelAPIAdapterWebImpl @Inject constructor(
@@ -63,6 +64,22 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
                     channelId = id.channelId
                 )
             ).throwIfHasError()
+        }
+    }
+
+    override suspend fun update(model: UpdateChannel): Result<ChannelDTO> {
+        return runCatching {
+            val account = model.id.getAccount()
+            model.id.getAPI()
+                .updateChannel(
+                    UpdateChannelDTO(
+                        i = account.getI(encryption),
+                        name = model.name,
+                        description = model.description,
+                        bannerId = model.bannerId
+                    )
+                ).throwIfHasError()
+                .body()!!
         }
     }
 
