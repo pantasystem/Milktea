@@ -85,6 +85,7 @@ class TimelineViewModel(
                     || pageable is Pageable.UserListTimeline
                     || pageable is Pageable.Antenna
                     || pageable is Pageable.UserTimeline
+                    || pageable is Pageable.ChannelTimeline
         }.flatMapLatest { account ->
             when (pageable) {
                 is Pageable.GlobalTimeline -> {
@@ -112,6 +113,10 @@ class TimelineViewModel(
                 is Pageable.UserTimeline -> {
                     miCore.getChannelAPI(account)
                         .connectUserTimeline(pageable.userId)
+                }
+                is Pageable.ChannelTimeline -> {
+                    miCore.getChannelAPI(account)
+                        .connect(ChannelAPI.Type.Channel(channelId = pageable.channelId))
                 }
                 else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
             }
