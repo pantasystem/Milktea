@@ -43,7 +43,7 @@ interface PreviousPaginator {
  * DTOをEntityに変換し共通のDataStoreにEntityを追加するためのInterface
  */
 interface EntityConverter<DTO, E> {
-    suspend fun addAll(list: List<DTO>) : List<E>
+    suspend fun convertAll(list: List<DTO>) : List<E>
 }
 
 /**
@@ -76,7 +76,7 @@ class PreviousPagingController<DTO, E>(
             runCatching {
                 val res = previousLoader.loadPrevious().throwIfHasError()
                 res.throwIfHasError()
-                entityConverter.addAll(res.body()!!)
+                entityConverter.convertAll(res.body()!!)
             }.onFailure {
                 val errorState = PageableState.Error(
                     state.getState().content,
@@ -125,7 +125,7 @@ class FuturePaginatorController<DTO, E>(
             runCatching {
                 val res = futureLoader.loadFuture().throwIfHasError()
                 res.throwIfHasError()
-                entityConverter.addAll(res.body()!!).asReversed()
+                entityConverter.convertAll(res.body()!!).asReversed()
             }.onFailure {
                 val errorState = PageableState.Error(
                     state.getState().content,

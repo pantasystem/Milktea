@@ -67,7 +67,7 @@ class LikedGalleryPostsConverter(
     private val galleryDataSource: GalleryDataSource
 ) : EntityConverter<LikedGalleryPost, LikedGalleryPostId> {
 
-    override suspend fun addAll(list: List<LikedGalleryPost>): List<LikedGalleryPostId> {
+    override suspend fun convertAll(list: List<LikedGalleryPost>): List<LikedGalleryPostId> {
         val account = getAccount.invoke()
         return list.map {
             LikedGalleryPostId(

@@ -79,7 +79,7 @@ class RenotesPagingImpl(
         return misskeyAPIProvider.get(account.instanceDomain).renotes(FindRenotes(i = i, noteId = targetNoteId.noteId, untilId = getUntilId()))
     }
 
-    override suspend fun addAll(list: List<NoteDTO>): List<Renote> {
+    override suspend fun convertAll(list: List<NoteDTO>): List<Renote> {
         val account = accountRepository.get(targetNoteId.accountId)
         return list.map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)

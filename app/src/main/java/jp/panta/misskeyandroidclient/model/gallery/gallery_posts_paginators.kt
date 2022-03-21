@@ -60,7 +60,7 @@ class GalleryPostsConverter(
     private val galleryDataSource: GalleryDataSource
 ) : EntityConverter<GalleryPostDTO, GalleryPost.Id> {
 
-    override suspend fun addAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
+    override suspend fun convertAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
         return list.map {
             it.toEntity(getAccount.invoke(), filePropertyDataSource, userDataSource).also { post ->
                 galleryDataSource.add(post)
