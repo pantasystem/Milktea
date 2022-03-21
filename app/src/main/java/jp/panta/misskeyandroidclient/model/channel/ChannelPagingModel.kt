@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.model.channel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
@@ -16,6 +17,7 @@ import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import retrofit2.Response
 
 enum class ChannelListType {
@@ -27,10 +29,15 @@ class ChannelPagingModel @AssistedInject constructor(
     private val channelStateModel: ChannelStateModel,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val accountRepository: AccountRepository,
+    val loggerFactory: Logger.Factory,
     @Assisted val accountId: Long,
     @Assisted val type: ChannelListType,
-) : EntityConverter<ChannelDTO, Channel.Id>, PreviousLoader<ChannelDTO>, FutureLoader<ChannelDTO>,
+) : EntityConverter<ChannelDTO, Channel.Id>, PreviousLoader<ChannelDTO>,
     IdGetter<Channel.Id>, StateLocker, PaginationState<Channel.Id> {
+
+    val logger: Logger by lazy {
+        loggerFactory.create("ChannelPagingModel")
+    }
 
     @AssistedFactory
     interface ModelAssistedFactory {
@@ -47,7 +54,6 @@ class ChannelPagingModel @AssistedInject constructor(
     )
     override val state: Flow<PageableState<List<Channel.Id>>>
         get() = _state
-
 
 
     override fun getState(): PageableState<List<Channel.Id>> {
@@ -76,52 +82,70 @@ class ChannelPagingModel @AssistedInject constructor(
         val account = accountRepository.get(accountId)
         return channelStateModel.addAll(list.map { it.toModel(account) }).map { it.id }
     }
-
-    override suspend fun loadFuture(): Response<List<ChannelDTO>> {
-        val account = accountRepository.get(accountId)
-        val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
-        val i = account.getI(encryption)
-        val res = when (type) {
-            ChannelListType.FOLLOWED -> api.followedChannels(
-                FindPageable(
-                    i = i,
-                    sinceId = getSinceId()?.channelId,
-                    untilId = null,
-                )
-            )
-            ChannelListType.OWNED -> api.ownedChannels(
-                FindPageable(
-                    i = i,
-                    sinceId = getSinceId()?.channelId,
-                    untilId = null
-                )
-            )
-            ChannelListType.FEATURED -> {
-                throw IllegalStateException("featuredはサポートしていません。")
-            }
-        }
-        return res.throwIfHasError()
-    }
+//    NOTE: MisskeyのAPIがバグってるのか正常に動かない（Postmanからもチェック済み）
+//    override suspend fun loadFuture(): Response<List<ChannelDTO>> {
+//        val sinceId = getSinceId()?.channelId
+//        logger.debug("loadFuture type:$type, sinceId:$sinceId")
+//        val account = accountRepository.get(accountId)
+//        val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
+//        val i = account.getI(encryption)
+//        val res = when (type) {
+//            ChannelListType.FOLLOWED -> api.followedChannels(
+//                FindPageable(
+//                    i = i,
+//                    sinceId = sinceId,
+//                    untilId = null,
+//                )
+//            )
+//            ChannelListType.OWNED -> api.ownedChannels(
+//                FindPageable(
+//                    i = i,
+//                    sinceId = sinceId,
+//                    untilId = null
+//                )
+//            )
+//            ChannelListType.FEATURED -> {
+//                throw IllegalStateException("featuredはサポートしていません。")
+//            }
+//        }
+//        return res.throwIfHasError()
+//    }
 
     override suspend fun loadPrevious(): Response<List<ChannelDTO>> {
         val account = accountRepository.get(accountId)
         val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
         val i = account.getI(encryption)
         val res = when (type) {
-            ChannelListType.FOLLOWED -> api.followedChannels(
-                FindPageable(
-                    i = i,
-                    sinceId = null,
-                    untilId = getUntilId()?.channelId
+            ChannelListType.FOLLOWED -> {
+                if (getUntilId() != null) {
+                    // TODO: APIのページネーションが修正されたら修正する
+                    throw IllegalStateException()
+                }
+                api.followedChannels(
+                    FindPageable(
+                        i = i,
+                        sinceId = null,
+                        untilId = null,
+//                    untilId = getUntilId()?.channelId,
+                        limit = 99,
+                    )
                 )
-            )
-            ChannelListType.OWNED -> api.ownedChannels(
-                FindPageable(
-                    i = i,
-                    sinceId = null,
-                    untilId = getUntilId()?.channelId
+            }
+            ChannelListType.OWNED -> {
+                if (getUntilId() != null) {
+                    // TODO: APIのページネーションが修正されたら修正する
+                    throw IllegalStateException()
+                }
+                api.ownedChannels(
+                    FindPageable(
+                        i = i,
+                        sinceId = null,
+                        untilId = null,
+//                    untilId = getUntilId()?.channelId,
+                        limit = 99,
+                    )
                 )
-            )
+            }
             ChannelListType.FEATURED -> {
                 if (getUntilId() != null) {
                     // NOTE: featuredはページネーションできないので
@@ -131,6 +155,13 @@ class ChannelPagingModel @AssistedInject constructor(
             }
         }
         return res.throwIfHasError()
+    }
+
+
+    suspend fun clear() {
+        mutex.withLock {
+            _state.value = PageableState.Fixed(StateContent.NotExist())
+        }
     }
 
 

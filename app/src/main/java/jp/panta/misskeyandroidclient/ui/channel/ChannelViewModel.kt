@@ -61,15 +61,11 @@ class ChannelViewModel @Inject constructor(
         }
     }
 
-    fun loadFuture(key: PagingModelKey) {
+    fun clearAndLoad(key: PagingModelKey) {
         viewModelScope.launch(Dispatchers.IO) {
             val model = channelPagingModelHolder.get(key)
-            FuturePagingController(
-                model,
-                model,
-                model,
-                model,
-            ).loadFuture()
+            model.clear()
+            model.loadPrevious()
         }
     }
 

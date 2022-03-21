@@ -41,11 +41,10 @@ fun ChannelListStateScreen(
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
-            viewModel.loadPrevious(key)
+            viewModel.clearAndLoad(key)
         },
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
     ) {
         when (val content = pagingState.content) {
             is StateContent.Exist -> {
