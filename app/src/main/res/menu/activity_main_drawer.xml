@@ -20,7 +20,8 @@
                 android:title="@string/nav_cloud" />
         <item
                 android:id="@+id/nav_channel"
-                android:title="@string/channel" />
+                android:title="@string/channel"
+                android:icon="@drawable/ic_baseline_radio_24" />
         <item
                 android:id="@+id/nav_antenna"
                 android:icon="@drawable/ic_call_received_black_24dp"
