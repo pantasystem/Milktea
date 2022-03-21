@@ -18,6 +18,9 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.40.5'
     }
+    ext {
+        compose_version = '1.1.1'
+    }
 }
 
 allprojects {

@@ -390,4 +390,7 @@
     <string name="view_in_browser">ブラウザで表示</string>
     <string name="note_creation_failure">ノートの作成失敗</string>
     <string name="channel">チャンネル</string>
+    <string name="n_people">%d人</string>
+    <string name="n_posts">%d投稿</string>
+    <string name="owned">私の</string>
 </resources>

@@ -388,4 +388,7 @@
     <string name="the_remote_emoji_does_not_exist_in_this_instance">The remote emoji does not exist in this instance.</string>
     <string name="view_in_browser">View in browser</string>
     <string name="channel">Channel</string>
+    <string name="n_people">%d people</string>
+    <string name="n_posts">%d posts</string>
+    <string name="owned">Owned</string>
 </resources>

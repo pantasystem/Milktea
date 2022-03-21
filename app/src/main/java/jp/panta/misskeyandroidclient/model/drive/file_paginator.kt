@@ -119,7 +119,7 @@ class FilePropertyPagingImpl(
         ).throwIfHasError()
     }
 
-    override suspend fun addAll(list: List<FilePropertyDTO>): List<FileProperty.Id> {
+    override suspend fun convertAll(list: List<FilePropertyDTO>): List<FileProperty.Id> {
         val entities = list.map {
             it.toFileProperty(getAccount.invoke())
         }
