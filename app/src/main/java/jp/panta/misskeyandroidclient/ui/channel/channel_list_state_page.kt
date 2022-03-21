@@ -35,7 +35,7 @@ fun ChannelListStateScreen(
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
     LaunchedEffect(true) {
-        viewModel.loadPrevious(key)
+        viewModel.clearAndLoad(key)
     }
 
     SwipeRefresh(
