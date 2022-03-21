@@ -75,7 +75,6 @@ class PreviousPagingController<DTO, E>(
             state.setState(loading)
             runCatching {
                 val res = previousLoader.loadPrevious().throwIfHasError()
-                res.throwIfHasError()
                 entityConverter.convertAll(res.body()!!)
             }.onFailure {
                 val errorState = PageableState.Error(

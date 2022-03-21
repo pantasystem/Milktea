@@ -61,20 +61,15 @@ class ChannelPagingModel @AssistedInject constructor(
     }
 
     override suspend fun getSinceId(): Channel.Id? {
-        if (type == ChannelListType.FEATURED) {
-            return null
-        }
         return (getState().content as? StateContent.Exist)?.rawContent?.firstOrNull()
     }
 
     override suspend fun getUntilId(): Channel.Id? {
-        if (type == ChannelListType.FEATURED) {
-            return null
-        }
         return (getState().content as? StateContent.Exist)?.rawContent?.lastOrNull()
     }
 
     override fun setState(state: PageableState<List<Channel.Id>>) {
+        logger.debug("setState:$state")
         _state.value = state
     }
 
@@ -117,8 +112,8 @@ class ChannelPagingModel @AssistedInject constructor(
         val i = account.getI(encryption)
         val res = when (type) {
             ChannelListType.FOLLOWED -> {
+                logger.debug("loadPrevious:${_state.value}")
                 if (getUntilId() != null) {
-                    // TODO: APIのページネーションが修正されたら修正する
                     throw IllegalStateException()
                 }
                 api.followedChannels(
@@ -154,13 +149,14 @@ class ChannelPagingModel @AssistedInject constructor(
                 api.featuredChannels(I(i))
             }
         }
+        logger.debug("loadPrevious res:${res.code()}")
         return res.throwIfHasError()
     }
 
 
     suspend fun clear() {
         mutex.withLock {
-            _state.value = PageableState.Fixed(StateContent.NotExist())
+            _state.value = PageableState.Loading.Init()
         }
     }
 

@@ -65,7 +65,12 @@ class ChannelViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val model = channelPagingModelHolder.get(key)
             model.clear()
-            model.loadPrevious()
+            PreviousPagingController(
+                model,
+                model,
+                model,
+                model,
+            ).loadPrevious()
         }
     }
 
