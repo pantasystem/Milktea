@@ -11,21 +11,17 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintLayout
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 
 @Composable
 fun ChannelCard(
@@ -62,14 +58,24 @@ fun ChannelCard(
                     Column(
                         modifier = Modifier.padding(4.dp)
                     ) {
-                        Row {
-                            Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "posts count")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AccountCircle,
+                                contentDescription = "posts count"
+                            )
                             Spacer(modifier = Modifier.width(2.dp))
                             //Icon(imageVector = Icons.Default.SupervisedUserCircle, contentDescriptinon = "users count")
                             Text(stringResource(id = R.string.n_people, channel.usersCount))
                         }
-                        Row {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "posts count")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "posts count"
+                            )
                             Spacer(modifier = Modifier.width(2.dp))
                             Text(stringResource(id = R.string.n_posts, channel.notesCount))
                         }
@@ -107,7 +113,7 @@ fun ChannelCard(
 }
 
 
-@Preview(showSystemUi = true, showBackground = true)
+@Preview(showBackground = true)
 @Composable
 fun PreviewChannelCard() {
     LazyColumn {
