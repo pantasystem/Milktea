@@ -9,8 +9,8 @@ import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import retrofit2.Response
 
@@ -117,4 +117,16 @@ class ChannelPagingModel(
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeChannels(): Flow<PageableState<List<Channel>>> {
+        return channelStateModel.state.flatMapLatest { globalState ->
+            state.map { state ->
+                state.convert { list ->
+                    list.mapNotNull { id ->
+                        globalState.get(id)
+                    }
+                }
+            }
+        }.distinctUntilChanged()
+    }
 }
