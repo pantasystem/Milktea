@@ -2,21 +2,19 @@ package jp.panta.misskeyandroidclient.ui.channel
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.channel.ChannelListType
-import jp.panta.misskeyandroidclient.model.channel.ChannelPagingModel
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 
@@ -52,12 +50,26 @@ fun ChannelListStateScreen(
                 LazyColumn {
                     items(content.rawContent.size) { index ->
                         val channel = content.rawContent[index]
-                        val isPaged = account.pages.any { it.pageParams.channelId == channel.id.channelId }
+                        val isPaged =
+                            account.pages.any { it.pageParams.channelId == channel.id.channelId }
                         ChannelCard(
                             channel = channel,
                             isPaged = isPaged,
                             onAction = {
+                                when (it) {
+                                    is ChannelCardAction.OnToggleTabButtonClicked -> {
+                                        viewModel.toggleTab(it.channel.id)
+                                    }
+                                    is ChannelCardAction.OnUnFollowButtonClicked -> {
+                                        viewModel.follow(it.channel.id)
+                                    }
+                                    is ChannelCardAction.OnFollowButtonClicked -> {
+                                        viewModel.unFollow(it.channel.id)
+                                    }
+                                    is ChannelCardAction.OnClick -> {
 
+                                    }
+                                }
                             }
                         )
                     }
@@ -69,17 +81,24 @@ fun ChannelListStateScreen(
                 }
             }
             is StateContent.NotExist -> {
-                when (pagingState) {
-                    is PageableState.Loading -> {
-
-                    }
-                    is PageableState.Fixed -> {
-
-                    }
-                    is PageableState.Error -> {
-
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    when (pagingState) {
+                        is PageableState.Loading -> {
+                            CircularProgressIndicator()
+                        }
+                        is PageableState.Fixed -> {
+                            Text("no contents")
+                        }
+                        is PageableState.Error -> {
+                            Text("error:${((pagingState as PageableState.Error).throwable)}")
+                        }
                     }
                 }
+
             }
         }
     }
