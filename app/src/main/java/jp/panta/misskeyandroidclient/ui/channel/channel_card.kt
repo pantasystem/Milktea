@@ -128,7 +128,9 @@ fun PreviewChannelCard() {
                     lastNotedAt = Clock.System.now(),
                     notesCount = 10,
                     userId = User.Id(0, "userId"),
-                    usersCount = 4
+                    usersCount = 4,
+                    isFollowing = true,
+                    hasUnreadNote = true
                 )
             )
         }
@@ -143,7 +145,9 @@ fun PreviewChannelCard() {
                     lastNotedAt = Clock.System.now(),
                     notesCount = 10,
                     userId = User.Id(0, "userId"),
-                    usersCount = 4
+                    usersCount = 4,
+                    isFollowing = false,
+                    hasUnreadNote = false
                 )
             )
         }
