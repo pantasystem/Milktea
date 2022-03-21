@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.channel.ChannelListType
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
@@ -22,7 +23,8 @@ import jp.panta.misskeyandroidclient.util.StateContent
 fun ChannelListStateScreen(
     account: Account,
     listType: ChannelListType,
-    viewModel: ChannelViewModel
+    viewModel: ChannelViewModel,
+    navigateToDetailView: (Channel.Id) -> Unit = {}
 ) {
     val key = PagingModelKey(account.accountId, listType)
 
@@ -67,7 +69,7 @@ fun ChannelListStateScreen(
                                         viewModel.follow(it.channel.id)
                                     }
                                     is ChannelCardAction.OnClick -> {
-
+                                        navigateToDetailView.invoke(channel.id)
                                     }
                                 }
                             }

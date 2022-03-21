@@ -34,7 +34,8 @@ fun ChannelScreen(
     val currentAccount by accountStore.observeCurrentAccount.collectAsState(initial = null)
     val channelTypeWithTitleList = listOf(
         ChannelTypeWithTitle(ChannelListType.FEATURED, stringResource(id = R.string.featured)),
-        ChannelTypeWithTitle(ChannelListType.FOLLOWED, stringResource(id = R.string.following))
+        ChannelTypeWithTitle(ChannelListType.FOLLOWED, stringResource(id = R.string.following)),
+        ChannelTypeWithTitle(ChannelListType.OWNED, stringResource(id = R.string.owned))
     )
 
     val pagerState = rememberPagerState(pageCount = channelTypeWithTitleList.size)
