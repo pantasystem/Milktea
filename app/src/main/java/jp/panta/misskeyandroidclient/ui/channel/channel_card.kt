@@ -79,10 +79,9 @@ fun ChannelCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "posts count"
+                                contentDescription = "users count"
                             )
                             Spacer(modifier = Modifier.width(2.dp))
-                            //Icon(imageVector = Icons.Default.SupervisedUserCircle, contentDescriptinon = "users count")
                             Text(stringResource(id = R.string.n_people, channel.usersCount))
                         }
                         Row(
