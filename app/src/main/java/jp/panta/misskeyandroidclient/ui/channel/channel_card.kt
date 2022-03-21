@@ -23,14 +23,29 @@ import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Clock
 
+sealed interface ChannelCardAction {
+    val channel: Channel
+
+    data class OnClick(override val channel: Channel) : ChannelCardAction
+    data class OnFollowButtonClicked(override val channel: Channel) : ChannelCardAction
+    data class OnUnFollowButtonClicked(override val channel: Channel) : ChannelCardAction
+    data class OnToggleTabButtonClicked(override val channel: Channel) : ChannelCardAction
+}
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelCard(
-    channel: Channel
+    channel: Channel,
+    isPaged: Boolean,
+    onAction: (ChannelCardAction) -> Unit = {},
 ) {
     Card(
         elevation = 4.dp,
         modifier = Modifier.padding(8.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        onClick = {
+            onAction.invoke(ChannelCardAction.OnClick(channel))
+        }
     ) {
         Column(
             modifier = Modifier
@@ -100,12 +115,48 @@ fun ChannelCard(
                     }
                 }
                 Row {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Default.AddBox, contentDescription = "add to tab")
+                    IconButton(onClick = {
+                        onAction.invoke(ChannelCardAction.OnToggleTabButtonClicked(channel))
+                    }) {
+                        if (isPaged) {
+                            Icon(
+                                imageVector = Icons.Default.BookmarkRemove,
+                                contentDescription = "add to tab",
+                                tint = MaterialTheme.colors.secondary
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.BookmarkAdd,
+                                contentDescription = "add to tab",
+                                tint = MaterialTheme.colors.secondary
+                            )
+                        }
+
                     }
-                    Button(onClick = { /*TODO*/ }) {
-                        Text(stringResource(id = R.string.follow))
+                    if (channel.isFollowing != null) {
+                        if (channel.isFollowing) {
+                            Button(onClick = {
+                                onAction.invoke(
+                                    ChannelCardAction.OnUnFollowButtonClicked(
+                                        channel
+                                    )
+                                )
+                            }) {
+                                Text(stringResource(id = R.string.unfollow))
+                            }
+                        } else {
+                            OutlinedButton(onClick = {
+                                onAction.invoke(
+                                    ChannelCardAction.OnFollowButtonClicked(
+                                        channel
+                                    )
+                                )
+                            }) {
+                                Text(stringResource(id = R.string.follow))
+                            }
+                        }
                     }
+
                 }
             }
         }
@@ -131,7 +182,8 @@ fun PreviewChannelCard() {
                     usersCount = 4,
                     isFollowing = true,
                     hasUnreadNote = true
-                )
+                ),
+                isPaged = true,
             )
         }
         item {
@@ -148,7 +200,8 @@ fun PreviewChannelCard() {
                     usersCount = 4,
                     isFollowing = false,
                     hasUnreadNote = false
-                )
+                ),
+                isPaged = false
             )
         }
     }
