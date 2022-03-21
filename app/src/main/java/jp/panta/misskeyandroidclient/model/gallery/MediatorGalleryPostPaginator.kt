@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.model.gallery
 
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.FuturePaginatorController
+import jp.panta.misskeyandroidclient.model.FuturePagingController
 import jp.panta.misskeyandroidclient.model.PreviousPagingController
 import jp.panta.misskeyandroidclient.model.StateLocker
 import jp.panta.misskeyandroidclient.model.account.Account
@@ -67,7 +67,7 @@ class GalleryPostsStoreImpl(
     private val entityAdder = GalleryPostsConverter(getAccount, filePropertyDataSource, userDataSource, galleryDataSource)
     private val loader = GalleryPostsLoader(pageable, galleryPostState, misskeyAPIProvider, getAccount, encryption)
     private val previousPagingController = PreviousPagingController(entityAdder, this, galleryPostState, loader)
-    private val futurePaginatorController = FuturePaginatorController(entityAdder, this, galleryPostState, loader)
+    private val futurePaginatorController = FuturePagingController(entityAdder, this, galleryPostState, loader)
     override suspend fun loadPrevious() {
         return previousPagingController.loadPrevious()
     }
@@ -99,7 +99,7 @@ class LikedGalleryPostStoreImpl(
     private val entityAdder = LikedGalleryPostsConverter(getAccount, filePropertyDataSource, userDataSource, galleryDataSource)
     private val loader = LikedGalleryPostsLoader(galleryPostState, misskeyAPIProvider, getAccount, encryption)
     private val previousPagingController = PreviousPagingController(entityAdder, this, galleryPostState, loader)
-    private val futurePaginatorController = FuturePaginatorController(entityAdder, this, galleryPostState, loader)
+    private val futurePaginatorController = FuturePagingController(entityAdder, this, galleryPostState, loader)
     override suspend fun loadPrevious() {
         return previousPagingController.loadPrevious()
     }

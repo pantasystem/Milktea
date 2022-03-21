@@ -1,5 +1,8 @@
 package jp.panta.misskeyandroidclient.model.channel
 
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
@@ -7,6 +10,7 @@ import jp.panta.misskeyandroidclient.api.misskey.v12.channel.ChannelDTO
 import jp.panta.misskeyandroidclient.api.misskey.v12.channel.FindPageable
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,14 +22,20 @@ enum class ChannelListType {
     OWNED, FOLLOWED, FEATURED
 }
 
-class ChannelPagingModel(
-    val account: Account,
-    val type: ChannelListType,
+class ChannelPagingModel @AssistedInject constructor(
     val encryption: Encryption,
     private val channelStateModel: ChannelStateModel,
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val accountRepository: AccountRepository,
+    @Assisted val accountId: Long,
+    @Assisted val type: ChannelListType,
 ) : EntityConverter<ChannelDTO, Channel.Id>, PreviousLoader<ChannelDTO>, FutureLoader<ChannelDTO>,
     IdGetter<Channel.Id>, StateLocker, PaginationState<Channel.Id> {
+
+    @AssistedFactory
+    interface ModelAssistedFactory {
+        fun create(accountId: Long, type: ChannelListType): ChannelPagingModel
+    }
 
     override val mutex: Mutex = Mutex()
 
@@ -63,10 +73,12 @@ class ChannelPagingModel(
     }
 
     override suspend fun convertAll(list: List<ChannelDTO>): List<Channel.Id> {
+        val account = accountRepository.get(accountId)
         return channelStateModel.addAll(list.map { it.toModel(account) }).map { it.id }
     }
 
     override suspend fun loadFuture(): Response<List<ChannelDTO>> {
+        val account = accountRepository.get(accountId)
         val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
         val i = account.getI(encryption)
         val res = when (type) {
@@ -92,6 +104,7 @@ class ChannelPagingModel(
     }
 
     override suspend fun loadPrevious(): Response<List<ChannelDTO>> {
+        val account = accountRepository.get(accountId)
         val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
         val i = account.getI(encryption)
         val res = when (type) {

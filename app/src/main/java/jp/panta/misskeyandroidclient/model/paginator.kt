@@ -109,7 +109,7 @@ class PreviousPagingController<DTO, E>(
     }
 }
 
-class FuturePaginatorController<DTO, E>(
+class FuturePagingController<DTO, E>(
     private val entityConverter: EntityConverter<DTO, E>,
     private val locker: StateLocker,
     private val state: PaginationState<E>,
