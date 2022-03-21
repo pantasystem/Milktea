@@ -6,7 +6,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.*
@@ -29,6 +28,9 @@ class ChannelAPI(
 
         data class Antenna(
             val antennaId: String
+        ) : Type
+        data class Channel(
+            val channelId: String
         ) : Type
     }
 
@@ -163,6 +165,7 @@ class ChannelAPI(
             is Type.Main -> Send.Connect.Type.MAIN
             is Type.UserList -> Send.Connect.Type.USER_LIST
             is Type.Antenna -> Send.Connect.Type.ANTENNA
+            is Type.Channel -> Send.Connect.Type.CHANNEL
         }
 
         val id = typeIdMap[type] ?: UUID.randomUUID().toString()
@@ -177,6 +180,7 @@ class ChannelAPI(
                     params = Send.Connect.Body.Params(
                         listId = (type as? Type.UserList)?.userListId,
                         antennaId = (type as? Type.Antenna)?.antennaId,
+                        channelId = (type as? Type.Channel)?.channelId
                     )
                 )
             ).toJson()

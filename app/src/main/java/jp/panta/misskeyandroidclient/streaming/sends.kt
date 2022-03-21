@@ -29,6 +29,7 @@ sealed class Send {
             @SerialName("globalTimeline") GLOBAL_TIMELINE,
             @SerialName("userList") USER_LIST,
             @SerialName("antenna") ANTENNA,
+            @SerialName("channel") CHANNEL,
         }
 
         @Serializable
@@ -37,10 +38,12 @@ sealed class Send {
             data class Params(
                 val listId: String? = null,
                 val antennaId: String? = null,
+                val channelId: String? = null,
             )
             init {
                 require(channel != Type.USER_LIST || params?.listId != null)
                 require(channel != Type.ANTENNA || params?.antennaId != null)
+                require(channel != Type.CHANNEL || params?.channelId != null)
             }
         }
     }
