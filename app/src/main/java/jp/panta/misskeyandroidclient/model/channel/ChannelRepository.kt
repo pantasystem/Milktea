@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.channel
 
-interface ChannelService {
+interface ChannelRepository {
 
 
     suspend fun findOne(id: Channel.Id): Result<Channel>
@@ -12,5 +12,6 @@ interface ChannelService {
 
     suspend fun unFollow(id: Channel.Id): Result<Channel>
 
+    suspend fun update(model: UpdateChannel): Result<Channel>
 
 }
