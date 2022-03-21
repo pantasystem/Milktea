@@ -116,6 +116,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_antenna -> AntennaListActivity::class.java
                 R.id.nav_draft -> DraftNotesActivity::class.java
                 R.id.nav_gallery -> GalleryPostsActivity::class.java
+                R.id.nav_channel -> ChannelActivity::class.java
                 else -> throw IllegalStateException("未定義なNavigation Itemです")
             }
             startActivity(Intent(this, activity))
@@ -156,6 +157,7 @@ class MainActivity : AppCompatActivity() {
         miApplication.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
             binding.navView.menu.also { menu ->
                 menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
+                menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
                 menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
             }
         }.launchIn(lifecycleScope)

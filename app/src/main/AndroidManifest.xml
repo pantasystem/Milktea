@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
@@ -19,10 +18,14 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity
+                android:name=".ChannelActivity"
+                android:exported="false" />
+
         <receiver
                 android:name=".AlarmNotePostReceiver"
                 android:enabled="true"
-                android:exported="true"></receiver>
+                android:exported="true" />
 
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
@@ -53,16 +56,16 @@
                         android:scheme="misskey" />
             </intent-filter>
         </activity>
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.UrlPreviewSourceSettingActivity" />
+        <activity android:name=".ui.settings.activities.UrlPreviewSourceSettingActivity" />
         <activity android:name=".DraftNotesActivity" />
         <activity android:name=".SortedHashTagsActivity" />
         <activity android:name=".SortedUsersActivity" />
         <activity android:name=".AntennaEditorActivity" />
         <activity android:name=".AntennaListActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity" />
+        <activity android:name=".ui.settings.activities.PageSettingActivity" />
         <activity android:name=".MessagingListActivity" />
         <activity android:name=".NotificationsActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.ReactionSettingActivity" />
+        <activity android:name=".ui.settings.activities.ReactionSettingActivity" />
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
                 android:theme="@style/LicensePageTheme" />
@@ -95,8 +98,8 @@
                 android:exported="false" />
 
         <activity android:name=".MediaActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.SettingAppearanceActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.SettingMovementActivity" />
+        <activity android:name=".ui.settings.activities.SettingAppearanceActivity" />
+        <activity android:name=".ui.settings.activities.SettingMovementActivity" />
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings" />
