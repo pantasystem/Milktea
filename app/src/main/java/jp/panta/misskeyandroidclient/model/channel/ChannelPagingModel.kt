@@ -85,15 +85,15 @@ class ChannelPagingModel @AssistedInject constructor(
             ChannelListType.FOLLOWED -> api.followedChannels(
                 FindPageable(
                     i = i,
-                    sinceId = null,
-                    untilId = getSinceId()?.channelId
+                    sinceId = getSinceId()?.channelId,
+                    untilId = null,
                 )
             )
             ChannelListType.OWNED -> api.ownedChannels(
                 FindPageable(
                     i = i,
-                    sinceId = null,
-                    untilId = getSinceId()?.channelId
+                    sinceId = getSinceId()?.channelId,
+                    untilId = null
                 )
             )
             ChannelListType.FEATURED -> {
@@ -123,6 +123,10 @@ class ChannelPagingModel @AssistedInject constructor(
                 )
             )
             ChannelListType.FEATURED -> {
+                if (getUntilId() != null) {
+                    // NOTE: featuredはページネーションできないので
+                    throw IllegalStateException()
+                }
                 api.featuredChannels(I(i))
             }
         }
