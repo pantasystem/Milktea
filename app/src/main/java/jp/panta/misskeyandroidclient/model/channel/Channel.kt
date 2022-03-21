@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.channel
 
 import jp.panta.misskeyandroidclient.model.users.User
+import jp.panta.misskeyandroidclient.util.Hash
+import jp.panta.misskeyandroidclient.util.getRGB
 import kotlinx.datetime.Instant
 
 /**
@@ -24,4 +26,10 @@ data class Channel(
         val accountId: Long,
         val channelId: String
     )
+
+
+    val rgpFromName: Triple<Int, Int, Int> by lazy {
+        name.getRGB()
+    }
+
 }

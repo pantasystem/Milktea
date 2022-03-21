@@ -39,6 +39,7 @@ fun ChannelCard(
     isPaged: Boolean,
     onAction: (ChannelCardAction) -> Unit = {},
 ) {
+    val (r, g, b) = channel.rgpFromName
     Card(
         elevation = 4.dp,
         modifier = Modifier.padding(8.dp),
@@ -58,7 +59,7 @@ fun ChannelCard(
                     contentDescription = "header",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .background(Color.Black)
+                        .background(Color( r, g, b))
                         .height(150.dp)
                 )
 
@@ -174,8 +175,8 @@ fun PreviewChannelCard() {
                     id = Channel.Id(0, "channelId"),
                     bannerUrl = "https://s3.arkjp.net/misskey/00edb5ca-2e15-45e9-b7cb-a2ee6c7c7e1e.jpg",
                     createdAt = Clock.System.now(),
-                    description = "説明説明説明説明説明説明",
-                    name = "パン太は人間だよ",
+                    description = "消えたので作った",
+                    name = "はるのんしすてむどっとこむ",
                     lastNotedAt = Clock.System.now(),
                     notesCount = 10,
                     userId = User.Id(0, "userId"),
@@ -194,6 +195,24 @@ fun PreviewChannelCard() {
                     createdAt = Clock.System.now(),
                     description = "説明説明説明説明説明説明",
                     name = "パン太は人間だよ",
+                    lastNotedAt = Clock.System.now(),
+                    notesCount = 10,
+                    userId = User.Id(0, "userId"),
+                    usersCount = 4,
+                    isFollowing = false,
+                    hasUnreadNote = false
+                ),
+                isPaged = false
+            )
+        }
+        item {
+            ChannelCard(
+                Channel(
+                    id = Channel.Id(0, "channelId"),
+                    bannerUrl = "https://s3.arkjp.net/misskey/00edb5ca-2e15-45e9-b7cb-a2ee6c7c7e1e.jpg",
+                    createdAt = Clock.System.now(),
+                    description = "説明説明説明説明説明説明",
+                    name = "a",
                     lastNotedAt = Clock.System.now(),
                     notesCount = 10,
                     userId = User.Id(0, "userId"),
