@@ -54,42 +54,53 @@ class PageSettingActivity : AppCompatActivity() {
         binding.pagesView.adapter = pagesAdapter
         binding.pagesView.layoutManager = LinearLayoutManager(this)
 
-        mPageSettingViewModel.selectedPages.observe(this, {
+        mPageSettingViewModel.selectedPages.observe(this) {
             Log.d("PageSettingActivity", "選択済みページが更新された")
             pagesAdapter.submitList(it)
-        })
+        }
 
         binding.addPageButton.setOnClickListener {
             SelectPageToAddDialog().show(supportFragmentManager, "Activity")
         }
 
-        mPageSettingViewModel.pageOnActionEvent.observe(this, {
+        mPageSettingViewModel.pageOnActionEvent.observe(this) {
             PageSettingActionDialog().show(supportFragmentManager, "PSA")
-        })
+        }
 
-        mPageSettingViewModel.pageOnUpdateEvent.observe(this, {
+        mPageSettingViewModel.pageOnUpdateEvent.observe(this) {
             EditTabNameDialog().show(supportFragmentManager, "ETD")
-        })
+        }
 
-        mPageSettingViewModel.pageAddedEvent.observe(this, { pt ->
-            when(pt){
-                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(Intent(this, SearchActivity::class.java))
+        mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
+            when (pt) {
+                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
+                    Intent(
+                        this,
+                        SearchActivity::class.java
+                    )
+                )
                 PageType.USER -> {
-                    val intent = SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
+                    val intent =
+                        SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_RESULT_CODE)
                 }
                 PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
                 PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
                 PageType.ANTENNA -> startActivity(Intent(this, AntennaListActivity::class.java))
                 PageType.USERS_GALLERY_POSTS -> {
-                    val intent = SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
+                    val intent =
+                        SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE)
                 }
-                else ->{
+                PageType.CHANNEL_TIMELINE -> {
+                    val intent = Intent(this, ChannelActivity::class.java)
+                    startActivity(intent)
+                }
+                else -> {
                     // auto add
                 }
             }
-        })
+        }
 
     }
 
