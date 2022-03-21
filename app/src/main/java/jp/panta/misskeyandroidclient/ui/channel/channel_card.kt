@@ -104,15 +104,18 @@ fun ChannelCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f, true)
+                ) {
                     Text(
                         channel.name,
                         fontSize = 18.sp
                     )
                     if (!channel.description.isNullOrBlank()) {
-                        Text(channel.description)
+                        Text(channel.description, maxLines = 3)
                     }
                 }
                 Row {
