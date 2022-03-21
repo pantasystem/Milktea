@@ -386,6 +386,7 @@
     <string name="channel">Channel</string>
     <string name="n_people">%d人</string>
     <string name="n_posts">%d个帖子</string>
+    <string name="owned">拥有</string>
 
 
 </resources>

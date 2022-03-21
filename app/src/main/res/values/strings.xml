@@ -390,4 +390,5 @@
     <string name="channel">Channel</string>
     <string name="n_people">%d people</string>
     <string name="n_posts">%d posts</string>
+    <string name="owned">Owned</string>
 </resources>
