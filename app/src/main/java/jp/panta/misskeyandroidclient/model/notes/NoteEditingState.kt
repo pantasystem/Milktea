@@ -43,8 +43,8 @@ data class NoteEditingState(
         get() = this.visibility.isLocalOnly()
 
 
-    fun setDraftNote(draftNote: DraftNote?) : NoteEditingState {
-        return draftNote?.toNoteEditingState()?: this
+    fun setDraftNote(draftNote: DraftNote?): NoteEditingState {
+        return draftNote?.toNoteEditingState() ?: this
     }
 
     fun changeRenoteId(renoteId: Note.Id?): NoteEditingState {
@@ -59,20 +59,20 @@ data class NoteEditingState(
         )
     }
 
-    fun checkValidate(textMaxLength: Int = 3000, maxFileCount: Int = 4) : Boolean {
-        if(this.files.size > maxFileCount) {
+    fun checkValidate(textMaxLength: Int = 3000, maxFileCount: Int = 4): Boolean {
+        if (this.files.size > maxFileCount) {
             return false
         }
 
-        if((this.text?.codePointCount(0, this.text.length) ?: 0) > textMaxLength) {
+        if ((this.text?.codePointCount(0, this.text.length) ?: 0) > textMaxLength) {
             return false
         }
 
-        if(this.renoteId != null) {
+        if (this.renoteId != null) {
             return true
         }
 
-        if(this.poll != null && this.poll.checkValidate()) {
+        if (this.poll != null && this.poll.checkValidate()) {
             return true
         }
 
@@ -82,13 +82,13 @@ data class NoteEditingState(
                 )
     }
 
-    fun changeText(text: String) : NoteEditingState {
+    fun changeText(text: String): NoteEditingState {
         return this.copy(
             text = text
         )
     }
 
-    fun addMentionUserNames(userNames: List<String>, pos: Int) : AddMentionResult {
+    fun addMentionUserNames(userNames: List<String>, pos: Int): AddMentionResult {
         val mentionBuilder = StringBuilder()
         userNames.forEachIndexed { index, userName ->
             if (index < userNames.size - 1) {
@@ -104,13 +104,13 @@ data class NoteEditingState(
         return AddMentionResult(pos + mentionBuilder.length, copy(text = builder.toString()))
     }
 
-    fun changeCw(text: String?) : NoteEditingState {
+    fun changeCw(text: String?): NoteEditingState {
         return this.copy(
             cw = text
         )
     }
 
-    fun addFile(file: AppFile) : NoteEditingState {
+    fun addFile(file: AppFile): NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 add(file)
@@ -118,7 +118,7 @@ data class NoteEditingState(
         )
     }
 
-    fun removeFile(file: AppFile) : NoteEditingState {
+    fun removeFile(file: AppFile): NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 remove(file)
@@ -126,33 +126,33 @@ data class NoteEditingState(
         )
     }
 
-    fun changePollExpiresAt(expiresAt: PollExpiresAt) : NoteEditingState{
+    fun changePollExpiresAt(expiresAt: PollExpiresAt): NoteEditingState {
         return this.copy(
             poll = this.poll?.copy(expiresAt = expiresAt)
         )
     }
 
-    fun setAccount(account: Account?) : NoteEditingState{
-        if(author == null) {
+    fun setAccount(account: Account?): NoteEditingState {
+        if (author == null) {
             return this.copy(
                 author = account
             )
         }
-        if(account == null) {
+        if (account == null) {
             throw IllegalArgumentException("現在の状態に未指定のAccountを指定することはできません")
         }
-        if(files.any { it is AppFile.Remote }) {
+        if (files.any { it is AppFile.Remote }) {
             throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
         }
-        if(!(replyId == null || author.instanceDomain == account.instanceDomain)) {
+        if (!(replyId == null || author.instanceDomain == account.instanceDomain)) {
             throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(replyId)。")
         }
 
-        if(!(renoteId == null || author.instanceDomain == account.instanceDomain)) {
+        if (!(renoteId == null || author.instanceDomain == account.instanceDomain)) {
             throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(renoteId)。")
         }
 
-        if(visibility is Visibility.Specified
+        if (visibility is Visibility.Specified
             && (visibility.visibleUserIds.isNotEmpty()
                     || author.instanceDomain == account.instanceDomain)
         ) {
@@ -164,18 +164,18 @@ data class NoteEditingState(
             files = files,
             replyId = replyId?.copy(accountId = account.accountId),
             renoteId = renoteId?.copy(accountId = account.accountId),
-            visibility = if(visibility is Visibility.Specified) {
+            visibility = if (visibility is Visibility.Specified) {
                 visibility.copy(visibleUserIds = visibility.visibleUserIds.map {
                     it.copy(accountId = account.accountId)
                 })
-            }else{
+            } else {
                 visibility
             }
         )
 
     }
 
-    fun removePollChoice(id: UUID) : NoteEditingState {
+    fun removePollChoice(id: UUID): NoteEditingState {
         return this.copy(
             poll = this.poll?.let {
                 it.copy(
@@ -187,7 +187,7 @@ data class NoteEditingState(
         )
     }
 
-    fun addPollChoice() : NoteEditingState {
+    fun addPollChoice(): NoteEditingState {
         return this.copy(
             poll = this.poll?.let {
                 it.copy(
@@ -201,16 +201,16 @@ data class NoteEditingState(
         )
     }
 
-    fun updatePollChoice(id: UUID, text: String) : NoteEditingState {
+    fun updatePollChoice(id: UUID, text: String): NoteEditingState {
         return this.copy(
             poll = this.poll?.let {
                 it.copy(
                     choices = it.choices.map { choice ->
-                        if(choice.id == id) {
+                        if (choice.id == id) {
                             choice.copy(
                                 text = text
                             )
-                        }else{
+                        } else {
                             choice
                         }
                     }
@@ -219,22 +219,38 @@ data class NoteEditingState(
         )
     }
 
-    fun toggleCw() : NoteEditingState {
+    fun toggleCw(): NoteEditingState {
         return this.copy(
-            cw = if(this.hasCw) null else ""
+            cw = if (this.hasCw) null else ""
         )
     }
 
-    fun togglePoll() : NoteEditingState {
+    fun togglePoll(): NoteEditingState {
         return this.copy(
-            poll = if(poll == null) PollEditingState(emptyList(), false) else null
+            poll = if (poll == null) PollEditingState(emptyList(), false) else null
         )
     }
 
-    fun clear() : NoteEditingState {
+    fun clear(): NoteEditingState {
         return NoteEditingState(author = this.author)
     }
 
+    fun toggleFileSensitiveStatus(appFile: AppFile.Local): NoteEditingState {
+        return copy(
+            files = files.map {
+                if (it === appFile
+                    || (it is AppFile.Local
+                            && it.path == appFile.path
+                            && it.type == appFile.type
+                            && it.folderId == appFile.folderId)
+                ) {
+                    appFile.copy(isSensitive = !appFile.isSensitive)
+                } else {
+                    it
+                }
+            }
+        )
+    }
 }
 
 sealed interface PollExpiresAt {
@@ -242,14 +258,14 @@ sealed interface PollExpiresAt {
     data class DateAndTime(val expiresAt: Instant) : PollExpiresAt
 
     fun asDate(): Date? {
-        return this.expiresAt()?.toEpochMilliseconds()?.let{
+        return this.expiresAt()?.toEpochMilliseconds()?.let {
             Date(it)
         }
     }
 }
 
-fun PollExpiresAt.expiresAt() : Instant? {
-    return when(this) {
+fun PollExpiresAt.expiresAt(): Instant? {
+    return when (this) {
         is PollExpiresAt.Infinity -> null
         is PollExpiresAt.DateAndTime -> this.expiresAt
     }
@@ -264,13 +280,13 @@ data class PollEditingState(
     val isExpiresAtDateTime: Boolean
         get() = expiresAt is PollExpiresAt.DateAndTime
 
-    fun checkValidate() : Boolean {
+    fun checkValidate(): Boolean {
         return choices.all {
             it.text.isNotBlank()
         } && this.choices.size >= 2
     }
 
-    fun toggleMultiple() : PollEditingState{
+    fun toggleMultiple(): PollEditingState {
         return this.copy(
             multiple = !this.multiple
         )
@@ -282,14 +298,17 @@ data class PollChoiceState(
     val id: UUID = UUID.randomUUID()
 )
 
-fun DraftNote.toNoteEditingState() : NoteEditingState{
+fun DraftNote.toNoteEditingState(): NoteEditingState {
     return NoteEditingState(
         text = this.text,
         cw = this.cw,
         draftNoteId = this.draftNoteId,
-        visibility = Visibility(type = this.visibility, isLocalOnly = this.localOnly ?: false, visibleUserIds = this.visibleUserIds?.map {
-            User.Id(accountId = accountId, id = it)
-        }),
+        visibility = Visibility(
+            type = this.visibility,
+            isLocalOnly = this.localOnly ?: false,
+            visibleUserIds = this.visibleUserIds?.map {
+                User.Id(accountId = accountId, id = it)
+            }),
         viaMobile = this.viaMobile ?: true,
         poll = this.draftPoll?.let {
             PollEditingState(
@@ -300,7 +319,7 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
                     PollExpiresAt.DateAndTime(
                         Instant.fromEpochMilliseconds(ex)
                     )
-                }?: PollExpiresAt.Infinity,
+                } ?: PollExpiresAt.Infinity,
                 multiple = it.multiple
             )
         },
@@ -311,11 +330,11 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
             Note.Id(accountId = accountId, noteId = it)
         },
         files = this.files?.map {
-            if(it.isRemoteFile) {
+            if (it.isRemoteFile) {
                 AppFile.Remote(
                     it.remoteFileId!!
                 )
-            }else{
+            } else {
                 AppFile.Local(
                     name = it.name,
                     isSensitive = it.isSensitive ?: false,
@@ -332,7 +351,7 @@ fun DraftNote.toNoteEditingState() : NoteEditingState{
     )
 }
 
-fun PollEditingState.toCreatePoll() : CreatePoll {
+fun PollEditingState.toCreatePoll(): CreatePoll {
     return CreatePoll(
         choices = this.choices.map {
             it.text
@@ -342,7 +361,7 @@ fun PollEditingState.toCreatePoll() : CreatePoll {
     )
 }
 
-fun PollEditingState.toDraftPoll() : DraftPoll {
+fun PollEditingState.toDraftPoll(): DraftPoll {
     return DraftPoll(
         choices = this.choices.map {
             it.text

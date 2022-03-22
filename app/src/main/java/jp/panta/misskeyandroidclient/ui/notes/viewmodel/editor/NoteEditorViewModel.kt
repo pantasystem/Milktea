@@ -33,12 +33,12 @@ class NoteEditorViewModel @Inject constructor(
     private val draftNoteDao: DraftNoteDao,
     loggerFactory: Logger.Factory,
     private val miCore: MiCore,
-    val noteRepository: NoteRepository,
-    val filePropertyDataSource: FilePropertyDataSource,
-    val metaRepository: MetaRepository,
-    val driveFileRepository: DriveFileRepository,
-    val accountStore: AccountStore,
-    val createNoteTaskExecutor: CreateNoteTaskExecutor
+    private val noteRepository: NoteRepository,
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val metaRepository: MetaRepository,
+    private val driveFileRepository: DriveFileRepository,
+    private val accountStore: AccountStore,
+    private val createNoteTaskExecutor: CreateNoteTaskExecutor
 ) : ViewModel() {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -275,17 +275,7 @@ class NoteEditorViewModel @Inject constructor(
     fun toggleNsfw(appFile: AppFile) {
         when (appFile) {
             is AppFile.Local -> {
-                _state.value = state.value.copy(
-                    files = _state.value.files.map {
-                        if (appFile === appFile) {
-                            appFile.copy(
-                                isSensitive = !appFile.isSensitive
-                            )
-                        } else {
-                            appFile
-                        }
-                    }
-                )
+                _state.value = state.value.toggleFileSensitiveStatus(appFile)
             }
             is AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -444,7 +434,8 @@ class NoteEditorViewModel @Inject constructor(
             },
             reservationPostingAt = _state.value.reservationPostingAt?.toEpochMilliseconds()?.let {
                 Date(it)
-            }
+            },
+            channelId = _state.value.channelId,
         ).apply {
             setDraftNote(this)
         }

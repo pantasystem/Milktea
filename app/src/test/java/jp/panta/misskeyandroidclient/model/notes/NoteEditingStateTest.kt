@@ -227,4 +227,24 @@ class NoteEditingStateTest : TestCase() {
         assertEquals(userNames[0].length + 1 + 0, result.cursorPos)
     }
 
+    fun testToggleFilesSensitive() {
+        val targetFile = AppFile.Local("test", "/test/test2", "image/jpeg", null, false, null, 0)
+        val state = NoteEditingState(
+            text = "hello",
+            files = listOf(
+                AppFile.Remote(FileProperty.Id(0, "id1")),
+                AppFile.Remote(FileProperty.Id(0, "id2")),
+                AppFile.Local("test", "/test/test1", "image/jpeg", null, false, null, 0),
+                AppFile.Local("test", "/test/test2", "image/jpeg", null, false, null, 0),
+                AppFile.Local("test", "/test/test3", "image/jpeg", null, false, null, 0)
+            )
+        )
+        val updatedState = state.toggleFileSensitiveStatus(targetFile)
+        val expectedFile = targetFile.copy(isSensitive = true)
+        assertEquals(expectedFile, updatedState.files[3])
+        assertNotSame(expectedFile, updatedState.files[0])
+        assertNotSame(expectedFile, updatedState.files[1])
+        assertNotSame(expectedFile, updatedState.files[2])
+        assertNotSame(expectedFile, updatedState.files[4])
+    }
 }
