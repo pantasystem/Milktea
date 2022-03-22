@@ -238,12 +238,7 @@ data class NoteEditingState(
     fun toggleFileSensitiveStatus(appFile: AppFile.Local): NoteEditingState {
         return copy(
             files = files.map {
-                if (it === appFile
-                    || (it is AppFile.Local
-                            && it.path == appFile.path
-                            && it.type == appFile.type
-                            && it.folderId == appFile.folderId)
-                ) {
+                if (it === appFile || it is AppFile.Local && it.isAttributeSame(appFile)) {
                     appFile.copy(isSensitive = !appFile.isSensitive)
                 } else {
                     it
