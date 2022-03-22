@@ -68,6 +68,10 @@ data class NoteEditingState(
             return false
         }
 
+        if (channelId != null && visibility != Visibility.Public(true)) {
+            return false
+        }
+
         if (this.renoteId != null) {
             return true
         }
@@ -245,6 +249,29 @@ data class NoteEditingState(
                 }
             }
         )
+    }
+
+    fun setChannelId(channelId: Channel.Id?): NoteEditingState {
+        return copy(
+            visibility = if (channelId == null) visibility else Visibility.Public(true),
+            channelId = channelId
+        )
+    }
+
+    fun setChangeVisibility(visibility: Visibility): NoteEditingState {
+        if (channelId == null) {
+            return copy(
+                visibility = visibility
+            )
+        }
+
+        if (visibility != Visibility.Public(true)) {
+            return copy(
+                visibility = Visibility.Public(true)
+            )
+        }
+
+        return this
     }
 }
 
