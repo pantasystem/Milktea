@@ -70,7 +70,10 @@ class NoteRepositoryImpl @Inject constructor(
         createNote.draftNoteId?.let {
             draftNoteDao.deleteDraftNote(createNote.author.accountId, draftNoteId = it)
         }
-        settingStore.setNoteVisibility(createNote)
+
+        if (createNote.channelId == null) {
+            settingStore.setNoteVisibility(createNote)
+        }
 
         return noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
 
