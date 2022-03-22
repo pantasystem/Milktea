@@ -5,7 +5,6 @@ import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import junit.framework.TestCase
-import org.junit.Test
 
 class NoteEditingStateTest : TestCase() {
 
@@ -278,19 +277,19 @@ class NoteEditingStateTest : TestCase() {
     fun testSetVisibilityWhenSatChannelId() {
         val channelId = Channel.Id(0, "test1")
         var state = NoteEditingState(channelId = channelId)
-        state = state.setChangeVisibility(
+        state = state.setVisibility(
             visibility = Visibility.Public(false)
         )
         assertEquals(Visibility.Public(true), state.visibility)
-        state = state.setChangeVisibility(Visibility.Followers(true))
+        state = state.setVisibility(Visibility.Followers(true))
         assertEquals(Visibility.Public(true), state.visibility)
     }
 
     fun testSetVisibility() {
         var state = NoteEditingState()
-        state = state.setChangeVisibility(Visibility.Public(false))
+        state = state.setVisibility(Visibility.Public(false))
         assertEquals(Visibility.Public(false), state.visibility)
-        state = state.setChangeVisibility(Visibility.Home(true))
+        state = state.setVisibility(Visibility.Home(true))
         assertEquals(Visibility.Home(true), state.visibility)
     }
 }

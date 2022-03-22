@@ -258,7 +258,7 @@ data class NoteEditingState(
         )
     }
 
-    fun setChangeVisibility(visibility: Visibility): NoteEditingState {
+    fun setVisibility(visibility: Visibility): NoteEditingState {
         if (channelId == null) {
             return copy(
                 visibility = visibility

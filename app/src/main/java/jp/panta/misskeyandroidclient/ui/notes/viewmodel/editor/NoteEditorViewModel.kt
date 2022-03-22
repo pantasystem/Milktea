@@ -210,9 +210,8 @@ class NoteEditorViewModel @Inject constructor(
 
         accountStore.observeCurrentAccount.filterNotNull().onEach {
             val v = miCore.getSettingStore().getNoteVisibility(it.accountId)
-            _state.value = _state.value.copy(
-                visibility = v
-            )
+            _state.value = _state.value.setVisibility(v)
+
         }.launchIn(viewModelScope + Dispatchers.IO)
 
     }
