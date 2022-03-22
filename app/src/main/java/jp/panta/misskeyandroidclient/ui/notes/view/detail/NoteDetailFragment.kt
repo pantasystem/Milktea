@@ -21,6 +21,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewMod
 import jp.panta.misskeyandroidclient.model.account.page.Page
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.notes.Note
+import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.*
 
 @FlowPreview
@@ -66,11 +67,17 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
 
     val notesViewModel: NotesViewModel by activityViewModels()
 
+    private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
+
+    val page: Pageable.Show by lazy {
+        (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
+            ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val page = (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
-            ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
+
         val accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.let {
             if (it == -1L) null else it
         }
@@ -89,9 +96,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
             notesViewModel = notesViewModel,
             viewLifecycleOwner = viewLifecycleOwner
         )
-        noteDetailViewModel.notes.observe(viewLifecycleOwner, {
+        noteDetailViewModel.notes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
 
 
         binding.notesView.adapter = adapter
@@ -105,6 +112,12 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        currentPageableTimelineViewModel.setCurrentPageable(page)
     }
 
     @MainThread

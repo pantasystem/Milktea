@@ -27,8 +27,10 @@ import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.PageableView
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.*
+import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.currentCoroutineContext
 import java.io.IOException
 import java.net.SocketTimeoutException
 
@@ -67,9 +69,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private var mViewModel: TimelineViewModel? = null
 
 
-    private var mPage: Page? = null
+    private val mPage: Page? by lazy {
+        arguments?.getSerializable(EXTRA_PAGE) as? Page
+    }
 
-    private var mPageable: Pageable? = null
+    private val mPageable: Pageable by lazy {
+        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
+        mPage?.pageable() ?: pageable?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
+    }
 
     /**
      * タイムラインが画面上に表示されているかを判定するフラグ
@@ -86,12 +93,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     
     val notesViewModel by activityViewModels<NotesViewModel>()
 
+    private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        mPage = arguments?.getSerializable(EXTRA_PAGE) as? Page
-
-        mPageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
 
         sharedPreference = requireContext().getSharedPreferences(
             requireContext().getPreferenceName(),
@@ -100,13 +105,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         miApplication = context?.applicationContext as MiApplication
 
-
-
-        Log.d("TimelineFM", "page:${mPage?.pageable() ?: mPageable}")
-        val pageable = mPage?.pageable() ?: mPageable
-        ?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
-        val factory = TimelineViewModelFactory(null, mPage?.accountId, pageable, miApplication)
-        mViewModel = ViewModelProvider(this, factory).get(TimelineViewModel::class.java)
+        val factory = TimelineViewModelFactory(null, mPage?.accountId, mPageable, miApplication)
+        mViewModel = ViewModelProvider(this, factory)[TimelineViewModel::class.java]
 
 
     }
@@ -240,6 +240,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
 
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
@@ -262,9 +263,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onResume()
 
         isShowing = true
+        currentPageableTimelineViewModel.setCurrentPageable(mPageable)
 
-
-        //(activity as MainActivity).changeTitle(TabFragment.localizationTitle(mSetting!!))
     }
 
     override fun onPause() {

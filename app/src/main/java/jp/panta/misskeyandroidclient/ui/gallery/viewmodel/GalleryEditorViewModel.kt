@@ -40,7 +40,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
     val accountRepository: AccountRepository,
     private val taskExecutor: CreateGalleryTaskExecutor,
     private val driveFileRepository: DriveFileRepository,
-    val logger: Logger,
+    loggerFactory: Logger.Factory,
     @Assisted private val editType: EditType,
     ) : ViewModel(){
 
@@ -49,6 +49,8 @@ class GalleryEditorViewModel @AssistedInject constructor(
         fun create(type: EditType): GalleryEditorViewModel
     }
     companion object;
+
+    val logger = loggerFactory.create("GalleryEditorVM")
 
     private val _title = MutableLiveData<String>()
     val title = _title

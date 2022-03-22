@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import jp.panta.misskeyandroidclient.util.PageableState
 import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
+import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -44,11 +46,16 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
 
     val binding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
+    val pageable: Pageable.Gallery by lazy {
+        arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
+    }
+
+    val currentTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
+//        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
         var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
         if(accountId == -1L) {
             accountId = null
@@ -115,6 +122,12 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
             }
 
         })
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        currentTimelineViewModel.setCurrentPageable(pageable)
     }
 
 }

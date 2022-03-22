@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityGalleryPostsBinding
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryEditorFragment
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostTabFragment
@@ -16,6 +17,7 @@ import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostActionViewM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
+@AndroidEntryPoint
 class GalleryPostsActivity : AppCompatActivity() {
 
 

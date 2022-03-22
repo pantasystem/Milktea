@@ -13,11 +13,13 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
+import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModelFactory
+import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -31,6 +33,8 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
     private val mBinding: FragmentNotificationBinding by dataBinding()
     val notesViewModel by activityViewModels<NotesViewModel>()
+
+    val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,13 +59,13 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
         //mViewModel.loadInit()
 
-        mViewModel.notificationsLiveData.observe(viewLifecycleOwner, {
+        mViewModel.notificationsLiveData.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
 
-        mViewModel.isLoading.observe(viewLifecycleOwner, {
+        mViewModel.isLoading.observe(viewLifecycleOwner) {
             mBinding.notificationSwipeRefresh.isRefreshing = it
-        })
+        }
 
         mBinding.notificationSwipeRefresh.setOnRefreshListener {
             mViewModel.loadInit()
@@ -71,6 +75,13 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         mBinding.notificationListView.addOnScrollListener(mScrollListener)
 
 
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+        currentPageableTimelineViewModel.setCurrentPageable(Pageable.Notification())
     }
 
     @ExperimentalCoroutinesApi

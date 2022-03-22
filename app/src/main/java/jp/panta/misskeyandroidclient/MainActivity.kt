@@ -58,6 +58,9 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
+import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
+import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
+import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -88,6 +91,8 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var noteTaskExecutor: CreateNoteTaskExecutor
+
+    private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by viewModels()
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -125,7 +130,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.appBarMain.fab.setOnClickListener {
-            startActivity(Intent(this, NoteEditorActivity::class.java))
+            when (currentPageableTimelineViewModel.currentType.value.suitableType()) {
+                is SuitableType.Other -> {
+                    startActivity(Intent(this, NoteEditorActivity::class.java))
+                }
+                is SuitableType.Gallery -> {
+                    val intent = Intent(this, GalleryPostsActivity::class.java)
+                    intent.action = Intent.ACTION_EDIT
+                    startActivity(intent)
+                }
+                is SuitableType.Channel -> {
+                    startActivity(Intent(this, NoteEditorActivity::class.java))
+                }
+            }
         }
 
         val miApplication = application as MiApplication
