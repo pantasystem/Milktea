@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.api.Version
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -355,12 +356,13 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setVisibility(visibility: Visibility) {
         logger.debug("公開範囲がセットされた:$visibility")
-        _state.value = _state.value.copy(
-            visibility = visibility
-        )
+        _state.value = _state.value.setVisibility(visibility)
         this.visibilitySelectedEvent.event = Unit
     }
 
+    fun setChannelId(channelId: Channel.Id?) {
+        _state.value = _state.value.setChannelId(channelId)
+    }
 
     fun toggleReservationAt() {
         _state.value = _state.value.copy(

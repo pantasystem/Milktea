@@ -24,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.model.account.AccountStore
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
 import jp.panta.misskeyandroidclient.model.confirm.ResultType
 import jp.panta.misskeyandroidclient.model.core.ConnectionStatus
@@ -68,13 +69,15 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
         private const val EXTRA_MENTIONS = "EXTRA_MENTIONS"
+        private const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
 
         fun newBundle(
             context: Context,
             replyTo: Note.Id? = null,
             quoteTo: Note.Id? = null,
             draftNote: DraftNote? = null,
-            mentions: List<String>? = null
+            mentions: List<String>? = null,
+            channelId: Channel.Id? = null,
         ): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let {
@@ -94,6 +97,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
                 mentions?.let {
                     putExtra(EXTRA_MENTIONS, it.toTypedArray())
+                }
+
+                channelId?.let {
+                    putExtra(EXTRA_CHANNEL_ID, it.channelId)
+                    putExtra(EXTRA_ACCOUNT_ID, it.accountId)
                 }
 
             }
@@ -160,6 +168,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             Note.Id(accountId, it)
         }
 
+        val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)?.let {
+            requireNotNull(accountId)
+            Channel.Id(accountId, it)
+        }
 
         val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
@@ -217,6 +229,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
         mViewModel.setReplyTo(replyToNoteId)
         mViewModel.setRenoteTo(quoteToNoteId)
+        mViewModel.setChannelId(channelId)
         if (draftNote != null) {
             mViewModel.setDraftNote(draftNote)
         }

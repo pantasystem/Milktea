@@ -33,6 +33,7 @@ import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
 import jp.panta.misskeyandroidclient.model.TaskState
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountStore
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streaming.stateEvent
@@ -130,7 +131,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.appBarMain.fab.setOnClickListener {
-            when (currentPageableTimelineViewModel.currentType.value.suitableType()) {
+
+            when (val type = currentPageableTimelineViewModel.currentType.value.suitableType()) {
                 is SuitableType.Other -> {
                     startActivity(Intent(this, NoteEditorActivity::class.java))
                 }
@@ -140,7 +142,13 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
                 is SuitableType.Channel -> {
-                    startActivity(Intent(this, NoteEditorActivity::class.java))
+                    val accountId = accountStore.currentAccountId!!
+                    startActivity(
+                        NoteEditorActivity.newBundle(
+                            this,
+                            channelId = Channel.Id(accountId, type.channelId)
+                        )
+                    )
                 }
             }
         }
