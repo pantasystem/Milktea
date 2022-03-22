@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.file.AppFile
 import junit.framework.TestCase
@@ -227,4 +228,68 @@ class NoteEditingStateTest : TestCase() {
         assertEquals(userNames[0].length + 1 + 0, result.cursorPos)
     }
 
+    fun testToggleFilesSensitive() {
+        val targetFile = AppFile.Local("test", "/test/test2", "image/jpeg", null, false, null, 0)
+        val state = NoteEditingState(
+            text = "hello",
+            files = listOf(
+                AppFile.Remote(FileProperty.Id(0, "id1")),
+                AppFile.Remote(FileProperty.Id(0, "id2")),
+                AppFile.Local("test", "/test/test1", "image/jpeg", null, false, null, 0),
+                AppFile.Local("test", "/test/test2", "image/jpeg", null, false, null, 0),
+                AppFile.Local("test", "/test/test3", "image/jpeg", null, false, null, 0)
+            )
+        )
+        val updatedState = state.toggleFileSensitiveStatus(targetFile)
+        val expectedFile = targetFile.copy(isSensitive = true)
+        assertEquals(expectedFile, updatedState.files[3])
+        assertNotSame(expectedFile, updatedState.files[0])
+        assertNotSame(expectedFile, updatedState.files[1])
+        assertNotSame(expectedFile, updatedState.files[2])
+        assertNotSame(expectedFile, updatedState.files[4])
+    }
+
+    fun testSetChannelId() {
+        var state = NoteEditingState(
+            visibility = Visibility.Followers(false)
+        )
+
+        val channelId = Channel.Id(0, "test1")
+        state = state.setChannelId(channelId)
+        assertEquals(channelId, state.channelId)
+
+        assertEquals(Visibility.Public(true), state.visibility)
+    }
+
+
+    fun testCheckValidateWhenHasChannelId() {
+        val channelId = Channel.Id(0, "test1")
+        var state = NoteEditingState(visibility = Visibility.Public(true), channelId = channelId, text = "hoge")
+        assertTrue(state.checkValidate())
+
+        state = state.copy(visibility = Visibility.Public(false))
+        assertFalse(state.checkValidate())
+
+        state = state.copy(visibility = Visibility.Followers(true))
+        assertFalse(state.checkValidate())
+    }
+
+    fun testSetVisibilityWhenSatChannelId() {
+        val channelId = Channel.Id(0, "test1")
+        var state = NoteEditingState(channelId = channelId)
+        state = state.setVisibility(
+            visibility = Visibility.Public(false)
+        )
+        assertEquals(Visibility.Public(true), state.visibility)
+        state = state.setVisibility(Visibility.Followers(true))
+        assertEquals(Visibility.Public(true), state.visibility)
+    }
+
+    fun testSetVisibility() {
+        var state = NoteEditingState()
+        state = state.setVisibility(Visibility.Public(false))
+        assertEquals(Visibility.Public(false), state.visibility)
+        state = state.setVisibility(Visibility.Home(true))
+        assertEquals(Visibility.Home(true), state.visibility)
+    }
 }

@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.api.Version
+import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -33,12 +34,12 @@ class NoteEditorViewModel @Inject constructor(
     private val draftNoteDao: DraftNoteDao,
     loggerFactory: Logger.Factory,
     private val miCore: MiCore,
-    val noteRepository: NoteRepository,
-    val filePropertyDataSource: FilePropertyDataSource,
-    val metaRepository: MetaRepository,
-    val driveFileRepository: DriveFileRepository,
-    val accountStore: AccountStore,
-    val createNoteTaskExecutor: CreateNoteTaskExecutor
+    private val noteRepository: NoteRepository,
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val metaRepository: MetaRepository,
+    private val driveFileRepository: DriveFileRepository,
+    private val accountStore: AccountStore,
+    private val createNoteTaskExecutor: CreateNoteTaskExecutor
 ) : ViewModel() {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -210,9 +211,8 @@ class NoteEditorViewModel @Inject constructor(
 
         accountStore.observeCurrentAccount.filterNotNull().onEach {
             val v = miCore.getSettingStore().getNoteVisibility(it.accountId)
-            _state.value = _state.value.copy(
-                visibility = v
-            )
+            _state.value = _state.value.setVisibility(v)
+
         }.launchIn(viewModelScope + Dispatchers.IO)
 
     }
@@ -275,17 +275,7 @@ class NoteEditorViewModel @Inject constructor(
     fun toggleNsfw(appFile: AppFile) {
         when (appFile) {
             is AppFile.Local -> {
-                _state.value = state.value.copy(
-                    files = _state.value.files.map {
-                        if (appFile === appFile) {
-                            appFile.copy(
-                                isSensitive = !appFile.isSensitive
-                            )
-                        } else {
-                            appFile
-                        }
-                    }
-                )
+                _state.value = state.value.toggleFileSensitiveStatus(appFile)
             }
             is AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -366,12 +356,13 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setVisibility(visibility: Visibility) {
         logger.debug("公開範囲がセットされた:$visibility")
-        _state.value = _state.value.copy(
-            visibility = visibility
-        )
+        _state.value = _state.value.setVisibility(visibility)
         this.visibilitySelectedEvent.event = Unit
     }
 
+    fun setChannelId(channelId: Channel.Id?) {
+        _state.value = _state.value.setChannelId(channelId)
+    }
 
     fun toggleReservationAt() {
         _state.value = _state.value.copy(
@@ -444,7 +435,8 @@ class NoteEditorViewModel @Inject constructor(
             },
             reservationPostingAt = _state.value.reservationPostingAt?.toEpochMilliseconds()?.let {
                 Date(it)
-            }
+            },
+            channelId = _state.value.channelId,
         ).apply {
             setDraftNote(this)
         }

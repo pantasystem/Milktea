@@ -13,7 +13,13 @@ sealed interface AppFile : JSerializable {
         val isSensitive: Boolean,
         val folderId: String?,
         val id: Long = 0,
-    ) : AppFile
+    ) : AppFile {
+        fun isAttributeSame(file: Local): Boolean {
+            return file.name == name
+                    && file.path == path
+                    && file.type == type
+        }
+    }
 
     data class Remote(
         val id: FileProperty.Id,

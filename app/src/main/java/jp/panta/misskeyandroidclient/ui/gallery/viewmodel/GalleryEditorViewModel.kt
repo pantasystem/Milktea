@@ -4,24 +4,23 @@ import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.Logger
 import jp.panta.misskeyandroidclient.model.CreateGalleryTaskExecutor
-import jp.panta.misskeyandroidclient.model.TaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.gallery.*
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.model.gallery.CreateGalleryPost
+import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
+import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
+import jp.panta.misskeyandroidclient.model.gallery.toTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.Serializable
-import javax.inject.Inject
 
 
 sealed class EditType : Serializable{
@@ -48,7 +47,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
     interface ViewModelAssistedFactory {
         fun create(type: EditType): GalleryEditorViewModel
     }
-    companion object;
+    companion object
 
     val logger = loggerFactory.create("GalleryEditorVM")
 
