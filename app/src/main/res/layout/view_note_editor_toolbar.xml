@@ -96,7 +96,7 @@
                 android:onClick="@{()-> viewModel.toggleReservationAt()}"
 
                 tools:ignore="ContentDescription"
-                android:visibility="@{BuildConfig.DEBUG ? View.VISIBLE : View.GONE}"/>
+                />
 
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/textCounter"
