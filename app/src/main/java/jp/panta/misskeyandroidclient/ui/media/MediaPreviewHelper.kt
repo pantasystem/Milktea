@@ -102,10 +102,7 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView")
     @JvmStatic
     fun ImageView.setPreview(file: PreviewAbleFile?) {
-        if (this.visibility == View.GONE || file == null) {
-            this.setImageResource(0)
-            return
-        }
+        file?: return
         Glide.with(this)
             .load(file.file.thumbnailUrl)
             .centerCrop()
