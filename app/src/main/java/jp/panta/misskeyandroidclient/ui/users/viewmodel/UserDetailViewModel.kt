@@ -5,6 +5,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.model.account.Account
+import jp.panta.misskeyandroidclient.model.account.AccountStore
 import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.model.users.nickname.DeleteNicknameUseCase
@@ -21,6 +22,7 @@ class UserDetailViewModel @AssistedInject constructor(
     private val translationStore: NoteTranslationStore,
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
+    val accountStore: AccountStore,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
@@ -80,7 +82,6 @@ class UserDetailViewModel @AssistedInject constructor(
             }
         }.onEach {
             this.postValue(it)
-
         }.flatMapLatest {
             it.map { n ->
                 n.eventFlow
@@ -90,38 +91,13 @@ class UserDetailViewModel @AssistedInject constructor(
         }.launchIn(viewModelScope + dispatcher)
     }
 
-    val isMine = MutableLiveData<Boolean>()
+    val isMine = combine(userState, accountStore.state) { userState, accountState ->
+        userState?.id?.id == accountState.currentAccount?.remoteId
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val isFollowing = MediatorLiveData<Boolean>().apply {
-        addSource(user) {
-            this.value = it?.isFollowing
-        }
-    }
-
-
-    val userName = MediatorLiveData<String>().apply {
-        addSource(user) { user ->
-            user?.getDisplayUserName()
-        }
-    }
-
-    val isBlocking = MediatorLiveData<Boolean>().apply {
-        value = user.value?.isBlocking ?: false
-        addSource(user) {
-            value = it?.isBlocking
-        }
-    }
-
-    val isMuted = MediatorLiveData<Boolean>().apply {
-        value = user.value?.isMuting ?: false
-        addSource(user) {
-            value = it?.isMuting
-        }
-    }
 
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
-
 
     init {
         require(userId != null || fqdnUserName != null) {
@@ -295,7 +271,7 @@ class UserDetailViewModel @AssistedInject constructor(
 fun UserDetailViewModel.Companion.provideFactory(
     assistedFactory: UserDetailViewModel.ViewModelAssistedFactory,
     userId: User.Id
-) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return assistedFactory.create(userId, null) as T
     }
@@ -305,7 +281,7 @@ fun UserDetailViewModel.Companion.provideFactory(
 fun UserDetailViewModel.Companion.provideFactory(
     assistedFactory: UserDetailViewModel.ViewModelAssistedFactory,
     fqdnUserName: String,
-) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return assistedFactory.create(null, fqdnUserName) as T
     }

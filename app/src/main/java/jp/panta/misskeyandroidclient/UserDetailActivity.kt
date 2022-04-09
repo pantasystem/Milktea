@@ -158,7 +158,7 @@ class UserDetailActivity : AppCompatActivity() {
             val isEnableGallery =
                 miApplication.getMisskeyAPIProvider().get(ar.instanceDomain) is MisskeyAPIV1275
             mViewModel.load()
-            mViewModel.user.observe(this, { detail ->
+            mViewModel.user.observe(this) { detail ->
                 if (detail != null) {
                     val adapter = UserTimelinePagerAdapterV2(ar, detail.id.id, isEnableGallery)
                     binding.userTimelinePager.adapter = adapter
@@ -172,32 +172,31 @@ class UserDetailActivity : AppCompatActivity() {
                     supportActionBar?.title = detail.getDisplayUserName()
                 }
 
-            })
+            }
 
 
-            mViewModel.userName.observe(this, {
-                supportActionBar?.title = it
-            })
-            //userTimelineTab.setupWithViewPager()
-            mViewModel.showFollowers.observe(this, {
+
+            mViewModel.showFollowers.observe(this) {
                 it?.let {
                     val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
                     startActivity(intent)
                 }
-            })
+            }
 
-            mViewModel.showFollows.observe(this, {
+            mViewModel.showFollows.observe(this) {
                 it?.let {
                     val intent = FollowFollowerActivity.newIntent(this, it.id, true)
                     startActivity(intent)
                 }
-            })
-
-            val updateMenu = Observer<Boolean> {
-                invalidateOptionsMenu()
             }
-            mViewModel.isBlocking.observe(this, updateMenu)
-            mViewModel.isMuted.observe(this, updateMenu)
+
+
+            lifecycleScope.launch {
+                mViewModel.userState.collect {
+                    invalidateOptionsMenu()
+                    supportActionBar?.title = it?.getDisplayUserName()
+                }
+            }
 
             invalidateOptionsMenu()
 
@@ -270,15 +269,18 @@ class UserDetailActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
+        val state = mViewModel.userState.value
+        Log.d("UserDetailActivity", "onCreateOptionsMenu: state:$state")
+
         val block = menu.findItem(R.id.block)
         val mute = menu.findItem(R.id.mute)
         val unblock = menu.findItem(R.id.unblock)
         val unmute = menu.findItem(R.id.unmute)
         val report = menu.findItem(R.id.report_user)
-        mute?.isVisible = !(mViewModel.isMuted.value ?: true)
-        block?.isVisible = !(mViewModel.isBlocking.value ?: true)
-        unblock?.isVisible = mViewModel.isBlocking.value ?: false
-        unmute?.isVisible = mViewModel.isMuted.value ?: false
+        mute?.isVisible = !(state?.isMuting ?: false)
+        block?.isVisible = !(state?.isBlocking?: false)
+        unblock?.isVisible = (state?.isBlocking?: false)
+        unmute?.isVisible = (state?.isMuting ?: false)
         if (mViewModel.isMine.value == true) {
             block?.isVisible = false
             mute?.isVisible = false
