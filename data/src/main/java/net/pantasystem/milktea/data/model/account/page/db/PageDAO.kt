@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.model.account.page.db
 
 import androidx.room.*
-import jp.panta.misskeyandroidclient.model.account.page.Page
+import net.pantasystem.milktea.data.model.account.page.Page
 
 @Dao
 interface PageDAO{

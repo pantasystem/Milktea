@@ -2,9 +2,9 @@ package net.pantasystem.milktea.data.model
 
 import androidx.room.*
 import androidx.room.ForeignKey.NO_ACTION
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.core.Account
 import androidx.room.Entity
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.core.Account
 
 @Deprecated("model.account.pages.Pageへ移行")
 @Entity(tableName = "page", foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = NO_ACTION, onUpdate = NO_ACTION)])
@@ -52,9 +52,9 @@ data class Page(
     }
 
     @Ignore
-    fun toPage(): Page?{
+    fun toPage(): net.pantasystem.milktea.data.model.account.page.Page?{
         this.pageable()?.toPageable()?.let{
-            return Page(0, this.title, 0, it)
+            return Page(0L, this.title, 0, it)
         }
         return null
     }
@@ -65,8 +65,8 @@ data class Page(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
         override val type: PageType = PageType.GLOBAL
     ): Pageable, Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.GlobalTimeline(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.GlobalTimeline(
                 withFiles = withFiles
             )
         }
@@ -77,8 +77,8 @@ data class Page(
         @ColumnInfo(name = "exclude_nsfw") var excludeNsfw: Boolean? = null,
         override val type: PageType = PageType.LOCAL
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.LocalTimeline(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.LocalTimeline(
                 withFiles = withFiles,
                 excludeNsfw = excludeNsfw
             )
@@ -97,8 +97,8 @@ data class Page(
         var includeRenotedMyRenotes: Boolean? = null,
         override val type: PageType = PageType.SOCIAL
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.HybridTimeline(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.HybridTimeline(
                 withFiles = withFiles,
                 includeLocalRenotes = includeLocalRenotes,
                 includeMyRenotes = includeMyRenotes,
@@ -114,8 +114,8 @@ data class Page(
         var includeRenotedMyRenotes: Boolean? = null,
         override val type: PageType = PageType.HOME
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.HomeTimeline(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.HomeTimeline(
                 withFiles = withFiles,
                 includeRenotedMyRenotes = includeRenotedMyRenotes,
                 includeLocalRenotes = includeLocalRenotes,
@@ -134,8 +134,8 @@ data class Page(
         override val type: PageType = PageType.USER_LIST
     ) : Timeline(){
 
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.UserListTimeline(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.UserListTimeline(
                 listId = listId,
                 withFiles = withFiles,
                 includeMyRenotes = includeMyRenotes,
@@ -150,8 +150,8 @@ data class Page(
         visibility: String? = null,
         override val type: PageType = PageType.MENTION
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.Mention(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.Mention(
                 following = following,
                 visibility = visibility
             )
@@ -161,8 +161,8 @@ data class Page(
         val noteId: String,
         override val type: PageType = PageType.DETAIL
     ) : Pageable{
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.Show(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.Show(
                 noteId = noteId
             )
         }
@@ -171,8 +171,8 @@ data class Page(
         val tag: String, var reply: Boolean? = null, var renote: Boolean? = null, var withFiles: Boolean? = null, var poll: Boolean? = null,
         override val type: PageType = PageType.SEARCH_HASH
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.SearchByTag(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.SearchByTag(
                 tag = tag,
                 reply = reply,
                 renote = renote,
@@ -185,15 +185,15 @@ data class Page(
         val offset: Int?,
         override val type: PageType = PageType.FEATURED
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.Featured(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.Featured(
                 offset = offset
             )
         }
     }
     data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null, override val type: PageType = PageType.NOTIFICATION) : Pageable{
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.Notification(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.Notification(
                 following = following,
                 markAsRead = markAsRead
             )
@@ -203,8 +203,8 @@ data class Page(
         val userId: String, var includeReplies: Boolean = true, var includeMyRenotes: Boolean? = true, var withFiles: Boolean? = null,
         override val type: PageType = PageType.USER
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.UserTimeline(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.UserTimeline(
                 userId = userId,
                 includeMyRenotes = includeMyRenotes,
                 includeReplies = includeReplies,
@@ -216,8 +216,8 @@ data class Page(
         var query: String, var host: String? = null, var userId: String? = null,
         override val type: PageType = PageType.SEARCH
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.Search(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.Search(
                 query = query, host = host, userId = userId
             )
         }
@@ -226,17 +226,16 @@ data class Page(
         val antennaId: String,
         override val type: PageType = PageType.ANTENNA
     ) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.Antenna(
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.Antenna(
                 antennaId = antennaId
             )
         }
     }
 
     class Favorite(override val type: PageType = PageType.FAVORITE) : Timeline(){
-        override fun toPageable(): jp.panta.misskeyandroidclient.model.account.page.Pageable {
-            return jp.panta.misskeyandroidclient.model.account.page.Pageable.Favorite
+        override fun toPageable(): net.pantasystem.milktea.data.model.account.page.Pageable {
+            return net.pantasystem.milktea.data.model.account.page.Pageable.Favorite
         }
     }
 }
-

@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.model.core
 
 import androidx.room.*
-import jp.panta.misskeyandroidclient.model.Page
+import net.pantasystem.milktea.data.model.Page
 
 @Dao
 @Deprecated("model.accountへ移行")

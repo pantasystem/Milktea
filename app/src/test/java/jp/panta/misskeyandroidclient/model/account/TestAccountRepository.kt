@@ -1,5 +1,9 @@
 package jp.panta.misskeyandroidclient.model.account
 
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.account.AccountNotFoundException
+import net.pantasystem.milktea.data.model.account.AccountRepository
+
 class TestAccountRepository : AccountRepository {
 
     val accounts = mutableMapOf(

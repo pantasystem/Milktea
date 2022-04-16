@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
 import jp.panta.misskeyandroidclient.model.core.*
+import net.pantasystem.milktea.data.model.Page
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Before

@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import jp.panta.misskeyandroidclient.model.url.UrlPreview
+import net.pantasystem.milktea.data.model.url.UrlPreview
 
 @Dao
 interface UrlPreviewDAO {

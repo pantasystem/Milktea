@@ -14,7 +14,7 @@ import net.pantasystem.milktea.data.model.emoji.Emoji
 import net.pantasystem.milktea.data.model.messaging.Message
 import net.pantasystem.milktea.data.model.users.User
 import java.io.Serializable as JavaSerializable
-import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
+import net.pantasystem.milktea.data.model.group.Group as GroupEntity
 
 @Serializable
 data class MessageDTO(

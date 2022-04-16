@@ -1,13 +1,10 @@
 package net.pantasystem.milktea.data.model.account
 
-import android.content.ContentResolver
 import android.content.Context
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.UseCase
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate
 import net.pantasystem.milktea.data.model.UseCase
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.account.page.PageableTemplate
+import net.pantasystem.milktea.data.model.instance.Meta
 
 interface PageDefaultStrings {
     val homeTimeline: String

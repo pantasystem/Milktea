@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.model
 
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.data.model.account.page.Pageable
 import java.io.Serializable
 
 @Deprecated("model.account.pagesへ移行")
