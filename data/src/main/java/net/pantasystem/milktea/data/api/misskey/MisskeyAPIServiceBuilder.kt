@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.api.misskey
 
-import net.pantasystem.milktea.data.GsonFactory
+import net.pantasystem.milktea.common.GsonFactory
 import net.pantasystem.milktea.data.model.api.Version
 import net.pantasystem.milktea.data.api.misskey.v10.MisskeyAPIV10
 import net.pantasystem.milktea.data.api.misskey.v10.MisskeyAPIV10Diff

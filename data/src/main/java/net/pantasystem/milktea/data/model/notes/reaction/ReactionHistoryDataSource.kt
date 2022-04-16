@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.model.notes.reaction
 
-import jp.panta.misskeyandroidclient.model.notes.Note
 import kotlinx.coroutines.flow.Flow
+import net.pantasystem.milktea.data.model.notes.Note
 
 
 interface ReactionHistoryDataSource {

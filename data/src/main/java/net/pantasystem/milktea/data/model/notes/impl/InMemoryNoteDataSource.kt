@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.model.notes.impl
 
-import net.pantasystem.milktea.data.Logger
 import net.pantasystem.milktea.data.model.AddResult
 import net.pantasystem.milktea.data.model.notes.Note
 import net.pantasystem.milktea.data.model.notes.NoteNotFoundException
@@ -9,6 +8,7 @@ import net.pantasystem.milktea.data.model.users.User
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
 import javax.inject.Inject
 
 class InMemoryNoteDataSource @Inject constructor(

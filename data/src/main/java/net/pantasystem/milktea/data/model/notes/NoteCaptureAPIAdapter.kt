@@ -1,12 +1,12 @@
 package net.pantasystem.milktea.data.model.notes
 
-import net.pantasystem.milktea.data.Logger
 import net.pantasystem.milktea.data.model.account.Account
 import net.pantasystem.milktea.data.model.account.AccountRepository
 import net.pantasystem.milktea.data.streaming.NoteUpdated
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
 
 /**
  * model層とNoteCaptureAPIをいい感じに接続する

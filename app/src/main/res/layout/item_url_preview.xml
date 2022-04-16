@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="urlPreview"
-                type="jp.panta.misskeyandroidclient.model.url.UrlPreview" />
+                type="net.pantasystem.milktea.data.model.url.UrlPreview" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
 

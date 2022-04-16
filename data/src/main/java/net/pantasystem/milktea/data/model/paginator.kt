@@ -1,11 +1,11 @@
 package net.pantasystem.milktea.data.model
 
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import retrofit2.Response
 
 /**

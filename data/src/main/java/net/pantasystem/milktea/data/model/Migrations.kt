@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.newAccount
-import jp.panta.misskeyandroidclient.model.core.AccountDao
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.account.newAccount
+import net.pantasystem.milktea.data.model.core.AccountDao
 
 
 val MIGRATION_1_2 = object : Migration(1, 2){

@@ -10,7 +10,10 @@ class SubscriptionUnRegistration(
     val accountRepository: AccountRepository,
     val encryption: Encryption,
     val lang: String,
-    val misskeyAPIProvider: MisskeyAPIProvider
+    val misskeyAPIProvider: MisskeyAPIProvider,
+    private val publicKey: String,
+    private val auth: String,
+    private val endpointBase: String,
 ) {
 
     suspend fun unregister(deviceToken: String, accountId: Long) {
@@ -19,7 +22,10 @@ class SubscriptionUnRegistration(
         val endpoint = EndpointBuilder(
             accountId = account.accountId,
             deviceToken = deviceToken,
-            lang = lang
+            lang = lang,
+            publicKey = publicKey,
+            endpointBase = endpointBase,
+            auth = auth,
         ).build()
         apiProvider.swUnRegister(
             UnSubscription(

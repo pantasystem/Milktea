@@ -11,7 +11,7 @@ import net.pantasystem.milktea.data.model.notes.NoteDataSource
 import net.pantasystem.milktea.data.model.notes.NoteRepository
 import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.model.notes.impl.NoteRepositoryImpl
-import net.pantasystem.milktea.data.model.notes.reservation.AndroidNoteReservationPostExecutor
+import jp.panta.misskeyandroidclient.impl.AndroidNoteReservationPostExecutor
 import net.pantasystem.milktea.data.model.notes.reservation.NoteReservationPostExecutor
 import javax.inject.Singleton
 

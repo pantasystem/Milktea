@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="file"
-                type="jp.panta.misskeyandroidclient.model.file.File" />
+                type="net.pantasystem.milktea.data.model.file.File" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
 

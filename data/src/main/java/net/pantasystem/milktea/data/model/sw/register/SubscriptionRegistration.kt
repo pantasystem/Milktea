@@ -18,8 +18,9 @@ class SubscriptionRegistration(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val lang: String,
     loggerFactory: Logger.Factory,
-    val auth: String = BuildConfig.PUSH_TO_FCM_AUTH,
-    private val publicKey: String = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY
+    val auth: String,
+    private val publicKey: String,
+    private val endpointBase: String,
 ) {
     val logger = loggerFactory.create("sw/register")
 
@@ -33,7 +34,10 @@ class SubscriptionRegistration(
         val endpoint = EndpointBuilder(
             deviceToken = deviceToken,
             accountId = accountId,
-            lang = lang
+            lang = lang,
+            auth = auth,
+            endpointBase = endpointBase,
+            publicKey = publicKey
         ).build()
         logger.debug("endpoint:${endpoint}")
 

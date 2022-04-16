@@ -6,9 +6,7 @@ import net.pantasystem.milktea.data.api.misskey.drive.RequestFile
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.*
 import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.util.PageableState
-import net.pantasystem.milktea.data.util.StateContent
-import net.pantasystem.milktea.data.viewmodel.MiCore
+
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
@@ -67,15 +65,7 @@ class FilePropertyPagingStore(
 
 }
 
-fun MiCore.filePropertyPagingStore(getAccount: suspend () -> Account, currentDirectoryId: String?) : FilePropertyPagingStore{
-    return FilePropertyPagingStore(
-        currentDirectoryId,
-        getAccount,
-        this.getMisskeyAPIProvider(),
-        this.getFilePropertyDataSource(),
-        this.getEncryption()
-    )
-}
+
 class FilePropertyPagingImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val getAccount: suspend ()-> Account,

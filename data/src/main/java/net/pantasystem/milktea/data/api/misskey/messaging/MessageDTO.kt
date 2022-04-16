@@ -1,7 +1,5 @@
 package net.pantasystem.milktea.data.api.misskey.messaging
 
-import jp.panta.misskeyandroidclient.mfm.MFMParser
-import jp.panta.misskeyandroidclient.mfm.Root
 import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.data.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.data.api.misskey.users.UserDTO
@@ -31,14 +29,7 @@ data class MessageDTO(
     val file: FilePropertyDTO? = null,
     val isRead: Boolean,
     val emojis: List<Emoji>? = null
-): JavaSerializable{
-
-
-    val textNode: Root?
-        get() {
-            return MFMParser.parse(text, emojis)
-        }
-}
+): JavaSerializable
 
 fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
     val list = mutableListOf<User>()

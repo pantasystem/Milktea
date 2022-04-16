@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.data.api.misskey.list
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.User
+
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.list.UserList
+import net.pantasystem.milktea.data.model.users.User
 import java.io.Serializable
 
 @kotlinx.serialization.Serializable

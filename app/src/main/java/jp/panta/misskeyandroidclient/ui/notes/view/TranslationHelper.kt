@@ -17,23 +17,23 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState", "emojis")
-    fun TextView.setTranslatedText(state: net.pantasystem.milktea.common.State<Translation>?, emojis: List<Emoji>?) {
+    fun TextView.setTranslatedText(state: State<Translation>?, emojis: List<Emoji>?) {
         if(state == null) {
             this.visibility = View.GONE
             return
         }
 
-        if(state is net.pantasystem.milktea.common.State.Loading) {
+        if(state is State.Loading) {
             this.visibility = View.GONE
             return
         }
 
         val translation = runCatching {
-            (state.content as net.pantasystem.milktea.common.StateContent.Exist).rawContent
+            (state.content as StateContent.Exist).rawContent
         }.getOrNull()
         this.visibility = View.VISIBLE
 
-        if(state is net.pantasystem.milktea.common.State.Error) {
+        if(state is State.Error) {
             this.text = context.getString(R.string.error_s, state.throwable.toString())
         }
         if(translation == null) {
@@ -48,12 +48,12 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState")
-    fun ViewGroup.translationVisibility(state: net.pantasystem.milktea.common.State<Translation>?) {
+    fun ViewGroup.translationVisibility(state: State<Translation>?) {
         if(state == null) {
             this.visibility = View.GONE
             return
         }
-        this.visibility = if(state.content is net.pantasystem.milktea.common.StateContent.NotExist && state is net.pantasystem.milktea.common.State.Fixed) {
+        this.visibility = if(state.content is StateContent.NotExist && state is State.Fixed) {
             View.GONE
         }else{
             View.VISIBLE

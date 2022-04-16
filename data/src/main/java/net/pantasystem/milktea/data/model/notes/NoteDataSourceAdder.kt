@@ -23,6 +23,3 @@ class NoteDataSourceAdder(
     }
 }
 
-fun MiCore.getNoteDataSourceAdder() : NoteDataSourceAdder{
-    return NoteDataSourceAdder(getUserDataSource(), getNoteDataSource(), getFilePropertyDataSource())
-}

@@ -1,12 +1,13 @@
-package net.pantasystem.milktea.data.model.notes.reservation
+package jp.panta.misskeyandroidclient.impl
 
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import net.pantasystem.milktea.data.AlarmNotePostReceiver
+import jp.panta.misskeyandroidclient.AlarmNotePostReceiver
 import net.pantasystem.milktea.data.model.notes.draft.DraftNote
+import net.pantasystem.milktea.data.model.notes.reservation.NoteReservationPostExecutor
 
 class AndroidNoteReservationPostExecutor(
     val context: Context

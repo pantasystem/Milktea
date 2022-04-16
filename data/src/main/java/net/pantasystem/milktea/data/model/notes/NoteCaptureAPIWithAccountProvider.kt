@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.model.notes
 
-import net.pantasystem.milktea.data.Logger
 import net.pantasystem.milktea.data.model.account.Account
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPI
@@ -8,6 +7,7 @@ import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPIImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
 import javax.inject.Inject
 
 interface NoteCaptureAPIWithAccountProvider {

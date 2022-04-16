@@ -1,7 +1,8 @@
 package net.pantasystem.milktea.data.model.streaming
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.streaming.ChannelBody
+
 
 interface StreamingMainEventDispatcher {
 

@@ -214,7 +214,9 @@ class MiApplication : Application(), MiCore {
             getEncryption(),
             getMisskeyAPIProvider(),
             lang = Locale.getDefault().language,
-            loggerFactory
+            loggerFactory,
+            auth = BuildConfig.PUSH_TO_FCM_AUTH,
+            publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
         )
     }
 

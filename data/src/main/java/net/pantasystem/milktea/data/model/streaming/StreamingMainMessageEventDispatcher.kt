@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.data.model.streaming
 
-import jp.panta.misskeyandroidclient.gettters.MessageRelationGetter
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.streaming.ChannelBody
+
 
 class StreamingMainMessageEventDispatcher(
     private val messageDataSource: MessageDataSource,

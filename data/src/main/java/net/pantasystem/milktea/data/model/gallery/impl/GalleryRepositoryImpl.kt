@@ -21,17 +21,7 @@ import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 import net.pantasystem.milktea.data.api.misskey.v12_75_0.CreateGallery as CreateGalleryDTO
 
-fun MiCore.createGalleryRepository() : GalleryRepository{
-    return GalleryRepositoryImpl(
-        getMisskeyAPIProvider(),
-        getGalleryDataSource(),
-        getEncryption(),
-        getFileUploaderProvider(),
-        getUserDataSource(),
-        getFilePropertyDataSource(),
-        getAccountRepository(),
-    )
-}
+
 
 class GalleryRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,

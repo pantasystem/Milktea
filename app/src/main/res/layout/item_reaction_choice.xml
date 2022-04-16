@@ -8,7 +8,7 @@
                 type="String" />
        <variable
                 name="reactionSelection"
-                type="jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection" />
+                type="net.pantasystem.milktea.data.model.notes.reaction.ReactionSelection" />
     </data>
     <FrameLayout
             android:layout_width="40dp"

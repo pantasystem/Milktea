@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.model.streaming
 
-import jp.panta.misskeyandroidclient.gettters.NotificationRelationGetter
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
-import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.streaming.ChannelBody
+
 
 class StreamingMainNotificationEventDispatcher(
     private val notificationRelationGetter: NotificationRelationGetter,

@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.model.gallery
 
 
+import net.pantasystem.milktea.data.api.misskey.users.toUser
 import net.pantasystem.milktea.data.model.EntityId
 import net.pantasystem.milktea.data.model.account.Account
 import net.pantasystem.milktea.data.model.drive.FileProperty

@@ -9,10 +9,10 @@
                 type="List&lt;Emoji>" />
         <import type="android.view.View" />
         <import type="net.pantasystem.milktea.common.State" />
-        <import type="jp.panta.misskeyandroidclient.model.notes.Translation" />
+        <import type="net.pantasystem.milktea.data.model.notes.Translation" />
         <import type="net.pantasystem.milktea.common.StateContent"/>
         <import type="java.util.List" />
-        <import type="jp.panta.misskeyandroidclient.model.emoji.Emoji" />
+        <import type="net.pantasystem.milktea.data.model.emoji.Emoji" />
     </data>
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"

@@ -39,7 +39,7 @@ class AuthResultFragment : Fragment(){
             viewModel.authorization.collect {
                 if(it is Authorization.Approved) {
                     if (it.accessToken is AccessToken.Misskey) {
-                        binding.user = it.accessToken.user
+                        binding.user = (it.accessToken as AccessToken.Misskey).user
                     }
                     binding.continueAuth.isEnabled = true
                 }

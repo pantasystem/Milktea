@@ -25,31 +25,6 @@ interface GalleryPostsStore : StateLocker {
     suspend fun clear()
 }
 
-fun MiCore.createGalleryPostsStore(
-    pageable: Pageable.Gallery,
-    getAccount: suspend () -> Account,
-): GalleryPostsStore {
-    return if (pageable is Pageable.Gallery.ILikedPosts) {
-        LikedGalleryPostStoreImpl(
-            getAccount,
-            this.getMisskeyAPIProvider(),
-            this.getFilePropertyDataSource(),
-            this.getUserDataSource(),
-            this.getGalleryDataSource(),
-            this.getEncryption()
-        )
-    } else {
-        GalleryPostsStoreImpl(
-            pageable,
-            getAccount,
-            this.getMisskeyAPIProvider(),
-            this.getFilePropertyDataSource(),
-            this.getUserDataSource(),
-            this.getGalleryDataSource(),
-            this.getEncryption()
-        )
-    }
-}
 
 class GalleryPostsStoreImpl(
     pageable: Pageable.Gallery,

@@ -4,8 +4,6 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.notes.FindRenotes
 import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.data.model.*
-import net.pantasystem.milktea.data.util.PageableState
-import net.pantasystem.milktea.data.util.StateContent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
@@ -13,8 +11,9 @@ import retrofit2.Response
 import net.pantasystem.milktea.data.model.account.AccountRepository
 import net.pantasystem.milktea.data.model.notes.Note
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.viewmodel.MiCore
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 
 interface RenotesPagingService {
     val state: Flow<PageableState<List<Renote>>>
@@ -111,16 +110,3 @@ class RenotesPagingImpl(
 
 }
 
-fun MiCore.createRenotesPagingService(targetNoteId: Note.Id): RenotesPagingService {
-    return RenotesPagingServiceImpl(
-        targetNoteId,
-        this.getMisskeyAPIProvider(),
-        this.getAccountRepository(),
-        NoteDataSourceAdder(
-            this.getUserDataSource(),
-            this.getNoteDataSource(),
-            this.getFilePropertyDataSource()
-        ),
-        this.getEncryption(),
-    )
-}

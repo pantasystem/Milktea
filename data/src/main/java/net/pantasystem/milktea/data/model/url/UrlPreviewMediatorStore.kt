@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.model.url
 
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
-import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
 
 class UrlPreviewMediatorStore(
     private val urlPreviewDAO: UrlPreviewDAO,
