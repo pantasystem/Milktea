@@ -16,8 +16,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.api.misskey.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
@@ -73,18 +73,18 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         binding.listView.layoutManager = layoutManager
         lifecycleScope.launchWhenStarted {
             viewModel.galleryPosts.collect { state ->
-                if(state.content is StateContent.Exist) {
+                if(state.content is net.pantasystem.milktea.common.StateContent.Exist) {
                     // 要素を表示する
                     binding.refresh.visibility = View.VISIBLE
                     binding.timelineEmptyView.visibility = View.GONE
                     binding.timelineProgressBar.visibility = View.GONE
                     galleryPostsListAdapter.submitList(state.content.rawContent)
-                    binding.refresh.isRefreshing = state is PageableState.Loading
+                    binding.refresh.isRefreshing = state is net.pantasystem.milktea.common.PageableState.Loading
                 }else{
                     // エラーメッセージやプログレスバーなどを表示する
                     binding.refresh.isRefreshing = false
                     binding.refresh.visibility = View.GONE
-                    if(state is PageableState.Loading) {
+                    if(state is net.pantasystem.milktea.common.PageableState.Loading) {
                         binding.timelineProgressBar.visibility = View.VISIBLE
                         binding.timelineEmptyView.visibility = View.GONE
                     }else{

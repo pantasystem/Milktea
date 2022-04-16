@@ -8,7 +8,7 @@ import androidx.emoji.text.EmojiCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.gettters.Getters
+import net.pantasystem.milktea.data.gettters.Getters
 import jp.panta.misskeyandroidclient.model.*
 import jp.panta.misskeyandroidclient.model.account.*
 import jp.panta.misskeyandroidclient.model.drive.*
@@ -47,14 +47,16 @@ import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
 import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
+import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPI
 import jp.panta.misskeyandroidclient.util.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.data.streaming.Socket
+import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -195,10 +197,10 @@ class MiApplication : Application(), MiCore {
     lateinit var applicationScope: CoroutineScope
 
     @Inject
-    lateinit var lf: Logger.Factory
-    override val loggerFactory: Logger.Factory
+    lateinit var lf: net.pantasystem.milktea.common.Logger.Factory
+    override val loggerFactory: net.pantasystem.milktea.common.Logger.Factory
         get() = lf
-    private val logger: Logger by lazy {
+    private val logger: net.pantasystem.milktea.common.Logger by lazy {
         loggerFactory.create("MiApplication")
     }
 

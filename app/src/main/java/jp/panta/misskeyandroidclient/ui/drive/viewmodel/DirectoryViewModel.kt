@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.api.misskey.drive.CreateFolder
@@ -22,7 +22,7 @@ class DirectoryViewModel(
     private val driveStore: DriveStore,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
-    val loggerFactory: Logger.Factory
+    val loggerFactory: net.pantasystem.milktea.common.Logger.Factory
 ) : ViewModel(){
 
 

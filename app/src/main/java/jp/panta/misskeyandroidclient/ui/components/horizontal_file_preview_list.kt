@@ -13,21 +13,19 @@ import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.asLiveData
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
 import jp.panta.misskeyandroidclient.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
 
 
 @Composable
@@ -170,8 +168,8 @@ fun RemoteFilePreview(
     dataSource: FilePropertyDataSource,
     onClick: (FileProperty) -> Unit
 ) {
-    var filePropertyState: State<FileProperty>  by remember {
-        mutableStateOf(State.Loading(content = StateContent.NotExist()))
+    var filePropertyState: net.pantasystem.milktea.common.State<FileProperty> by remember {
+        mutableStateOf(net.pantasystem.milktea.common.State.Loading(content = net.pantasystem.milktea.common.StateContent.NotExist()))
     }
     val fileProperty = dataSource.observe(file.id)
         .asLiveData()
@@ -182,11 +180,11 @@ fun RemoteFilePreview(
         runCatching {
             repository.find(file.id)
         }.onSuccess {
-            filePropertyState = State.Fixed(
-                StateContent.Exist(it)
+            filePropertyState = net.pantasystem.milktea.common.State.Fixed(
+                net.pantasystem.milktea.common.StateContent.Exist(it)
             )
         }.onFailure {
-            filePropertyState = State.Error(
+            filePropertyState = net.pantasystem.milktea.common.State.Error(
                 filePropertyState.content,
                 throwable = it
             )
@@ -205,8 +203,8 @@ fun RemoteFilePreview(
             }
     ){
         when(filePropertyState.content) {
-            is StateContent.Exist -> {
-                val content = (filePropertyState.content as StateContent.Exist).rawContent
+            is net.pantasystem.milktea.common.StateContent.Exist -> {
+                val content = (filePropertyState.content as net.pantasystem.milktea.common.StateContent.Exist).rawContent
                 Box (contentAlignment = Alignment.TopEnd){
                     Image(
                         painter = rememberImagePainter(
@@ -222,7 +220,7 @@ fun RemoteFilePreview(
                     }
                 }
             }
-            is StateContent.NotExist -> {
+            is net.pantasystem.milktea.common.StateContent.NotExist -> {
                 CircularProgressIndicator()
             }
         }

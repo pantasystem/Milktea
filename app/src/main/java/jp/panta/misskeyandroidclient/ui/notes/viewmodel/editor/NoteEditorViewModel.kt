@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountStore
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
     private val draftNoteDao: DraftNoteDao,
-    loggerFactory: Logger.Factory,
+    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     private val miCore: MiCore,
     private val noteRepository: NoteRepository,
     private val filePropertyDataSource: FilePropertyDataSource,

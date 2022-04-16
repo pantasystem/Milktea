@@ -5,15 +5,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProvider
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProviderImpl
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
+import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
+import net.pantasystem.milktea.data.streaming.impl.SocketWithAccountProviderImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
@@ -42,7 +42,7 @@ object SocketModule {
     @Singleton
     @Provides
     fun provideChannelAPIProvider(
-        loggerFactory: Logger.Factory,
+        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
         socketWithAccountProvider: SocketWithAccountProvider
     ): ChannelAPIWithAccountProvider {
         return ChannelAPIWithAccountProvider(socketWithAccountProvider, loggerFactory)
@@ -53,7 +53,7 @@ object SocketModule {
     fun provideNoteCaptureAPIAdapter(
         accountRepository: AccountRepository,
         coroutineScope: CoroutineScope,
-        loggerFactory: Logger.Factory,
+        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
         noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
         noteDataSource: NoteDataSource,
     ): NoteCaptureAPIAdapter {

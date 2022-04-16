@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
 import jp.panta.misskeyandroidclient.api.misskey.notes.toNote
 import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
@@ -16,7 +16,7 @@ import org.junit.Test
 
 class InMemoryNoteDataSourceTest {
 
-    private lateinit var loggerFactory: Logger.Factory
+    private lateinit var loggerFactory: net.pantasystem.milktea.common.Logger.Factory
     private lateinit var account: Account
 
     @Before

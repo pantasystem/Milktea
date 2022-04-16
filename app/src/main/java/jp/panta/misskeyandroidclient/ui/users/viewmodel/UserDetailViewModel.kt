@@ -4,17 +4,18 @@ import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.nickname.DeleteNicknameUseCase
-import jp.panta.misskeyandroidclient.model.users.nickname.UpdateNicknameUseCase
+
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.data.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.data.model.users.nickname.DeleteNicknameUseCase
+import net.pantasystem.milktea.data.model.users.nickname.UpdateNicknameUseCase
 import java.lang.IllegalArgumentException
 
 class UserDetailViewModel @AssistedInject constructor(

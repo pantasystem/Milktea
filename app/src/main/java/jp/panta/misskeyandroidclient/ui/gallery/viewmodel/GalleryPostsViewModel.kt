@@ -7,8 +7,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.model.gallery.*
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -46,8 +46,10 @@ class GalleryPostsViewModel(
     private val galleryPostsStore = miCore.createGalleryPostsStore(pageable, this::getAccount)
 
     private val _galleryPosts =
-        MutableStateFlow<PageableState<List<GalleryPostState>>>(PageableState.Fixed(StateContent.NotExist()))
-    val galleryPosts: StateFlow<PageableState<List<GalleryPostState>>> = _galleryPosts
+        MutableStateFlow<net.pantasystem.milktea.common.PageableState<List<GalleryPostState>>>(
+            net.pantasystem.milktea.common.PageableState.Fixed(
+                net.pantasystem.milktea.common.StateContent.NotExist()))
+    val galleryPosts: StateFlow<net.pantasystem.milktea.common.PageableState<List<GalleryPostState>>> = _galleryPosts
     val lock = Mutex()
 
     private val galleryPostSendFavoriteStore = GalleryPostSendFavoriteStore(galleryRepository)
@@ -68,8 +70,8 @@ class GalleryPostsViewModel(
             lock.withLock {
                 val state = _galleryPosts.value
                 val content = state.content
-                if (content is StateContent.Exist) {
-                    _galleryPosts.value = PageableState.Fixed(
+                if (content is net.pantasystem.milktea.common.StateContent.Exist) {
+                    _galleryPosts.value = net.pantasystem.milktea.common.PageableState.Fixed(
                         content.copy(
                             content.rawContent.filterNot {
                                 it.galleryPost.id == ev.galleryPostId
@@ -129,7 +131,7 @@ class GalleryPostsViewModel(
             }
         }.onEach {
             this._galleryPosts.value = it
-            if (it is PageableState.Error) {
+            if (it is net.pantasystem.milktea.common.PageableState.Error) {
                 _error.emit(it.throwable)
             }
         }.launchIn(viewModelScope + Dispatchers.IO)

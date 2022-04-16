@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistory
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
@@ -12,16 +12,13 @@ import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginat
 import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class ReactionHistoryViewModel(
     private val reactionHistoryDataSource: ReactionHistoryDataSource,
     private val paginator: ReactionHistoryPaginator,
-    val logger: Logger?
+    val logger: net.pantasystem.milktea.common.Logger?
 ) : ViewModel(){
 
 

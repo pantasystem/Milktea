@@ -79,6 +79,8 @@ ext {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation project(path: ':data')
+    implementation project(path: ':common')
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     //noinspection GradleCompatible

@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.logger
 
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 
 class TestLogger(
     override val defaultTag: String
-) : Logger{
+) : net.pantasystem.milktea.common.Logger {
 
     override fun debug(msg: String, tag: String, e: Throwable?) {
         println("debug:$tag:$msg, error:$e")
@@ -23,8 +23,8 @@ class TestLogger(
 
     }
 
-    class Factory : Logger.Factory{
-        override fun create(tag: String): Logger {
+    class Factory : net.pantasystem.milktea.common.Logger.Factory{
+        override fun create(tag: String): net.pantasystem.milktea.common.Logger {
             return TestLogger(tag)
         }
     }

@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.model.DataBase
 import jp.panta.misskeyandroidclient.model.instance.MediatorFetchMeta
@@ -37,7 +37,7 @@ object MetaModule {
     @Singleton
     fun metaStore(
         metaRepository: MetaRepository,
-        loggerFactory: Logger.Factory,
+        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
         misskeyAPIProvider: MisskeyAPIProvider,
     ): FetchMeta {
         return MediatorFetchMeta(

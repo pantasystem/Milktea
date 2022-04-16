@@ -1,0 +1,31 @@
+package net.pantasystem.milktea.data.model.sw.register
+
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.api.misskey.sw.register.UnSubscription
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.data.model.account.AccountRepository
+
+class SubscriptionUnRegistration(
+    val accountRepository: AccountRepository,
+    val encryption: Encryption,
+    val lang: String,
+    val misskeyAPIProvider: MisskeyAPIProvider
+) {
+
+    suspend fun unregister(deviceToken: String, accountId: Long) {
+        val account = accountRepository.get(accountId)
+        val apiProvider = misskeyAPIProvider.get(account)
+        val endpoint = EndpointBuilder(
+            accountId = account.accountId,
+            deviceToken = deviceToken,
+            lang = lang
+        ).build()
+        apiProvider.swUnRegister(
+            UnSubscription(
+            i = account.getI(encryption),
+            endpoint = endpoint
+        )
+        ).throwIfHasError()
+    }
+}

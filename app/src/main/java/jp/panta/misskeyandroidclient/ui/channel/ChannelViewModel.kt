@@ -3,8 +3,7 @@ package jp.panta.misskeyandroidclient.ui.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.FuturePagingController
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.PreviousPagingController
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.AccountStore
@@ -13,8 +12,7 @@ import jp.panta.misskeyandroidclient.model.channel.Channel
 import jp.panta.misskeyandroidclient.model.channel.ChannelListType
 import jp.panta.misskeyandroidclient.model.channel.ChannelPagingModel
 import jp.panta.misskeyandroidclient.model.channel.ChannelRepository
-import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.newPage
-import jp.panta.misskeyandroidclient.util.PageableState
+import net.pantasystem.milktea.common.PageableState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -29,10 +27,10 @@ class ChannelViewModel @Inject constructor(
     private val channelRepository: ChannelRepository,
     private val accountRepository: AccountRepository,
     channelPagingModelFactory: ChannelPagingModel.ModelAssistedFactory,
-    loggerFactory: Logger.Factory,
+    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
 ) : ViewModel() {
 
-    val logger: Logger by lazy {
+    val logger: net.pantasystem.milktea.common.Logger by lazy {
         loggerFactory.create("ChannelViewModel")
     }
 
@@ -40,7 +38,7 @@ class ChannelViewModel @Inject constructor(
 
 
     @OptIn(FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    fun getObservable(key: PagingModelKey): Flow<PageableState<List<Channel>>> {
+    fun getObservable(key: PagingModelKey): Flow<net.pantasystem.milktea.common.PageableState<List<Channel>>> {
         return suspend {
             channelPagingModelHolder.get(key)
         }.asFlow().flatMapLatest {

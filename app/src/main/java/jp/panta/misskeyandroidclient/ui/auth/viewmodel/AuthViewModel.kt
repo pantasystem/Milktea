@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.api.mastodon.MastodonAPIProvider
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
 import jp.panta.misskeyandroidclient.api.misskey.auth.UserKey
@@ -14,8 +14,8 @@ import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.AccessToken
 import jp.panta.misskeyandroidclient.model.auth.custom.toModel
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val miCore: MiCore,
     private val mastodonAPIProvider: MastodonAPIProvider,
-    loggerFactory: Logger.Factory
+    loggerFactory: net.pantasystem.milktea.common.Logger.Factory
 ) : ViewModel(){
     private val logger = loggerFactory.create("AuthViewModel")
 
@@ -53,16 +53,16 @@ class AuthViewModel @Inject constructor(
                             a.instanceBaseURL,
                             accessToken = token.toModel(a.appSecret)
                         )
-                        State.Fixed(StateContent.Exist(authenticated))
+                        net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.Exist(authenticated))
                     }catch (e: Throwable) {
-                        State.Error(StateContent.NotExist(), e)
+                        net.pantasystem.milktea.common.State.Error(net.pantasystem.milktea.common.StateContent.NotExist(), e)
                     }
                 }else{
-                    State.Fixed(StateContent.NotExist())
+                    net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.NotExist())
                 }
             }
         }.mapNotNull {
-            it.content as? StateContent.Exist
+            it.content as? net.pantasystem.milktea.common.StateContent.Exist
         }.onEach {
             setState(it.rawContent)
         }.launchIn(viewModelScope + Dispatchers.IO)

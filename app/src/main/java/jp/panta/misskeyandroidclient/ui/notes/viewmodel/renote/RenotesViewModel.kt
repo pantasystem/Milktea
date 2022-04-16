@@ -3,14 +3,14 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.model.notes.renote.Renote
 import jp.panta.misskeyandroidclient.model.notes.renote.RenotesPagingService
 import jp.panta.misskeyandroidclient.model.notes.renote.createRenotesPagingService
-import jp.panta.misskeyandroidclient.util.PageableState
+import net.pantasystem.milktea.common.PageableState
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class RenotesViewModel(
     private val renotesPagingService: RenotesPagingService,
     private val noteGetter: NoteRelationGetter,
-    loggerFactory: Logger.Factory
+    loggerFactory: net.pantasystem.milktea.common.Logger.Factory
 ) : ViewModel() {
 
     @Suppress("UNCHECKED_CAST")
@@ -68,7 +68,7 @@ class RenotesViewModel(
         }
     }
 
-    private fun<T : Renote> Flow<PageableState<List<T>>>.asNoteRelation() : Flow<PageableState<List<NoteRelation>>> {
+    private fun<T : Renote> Flow<net.pantasystem.milktea.common.PageableState<List<T>>>.asNoteRelation() : Flow<net.pantasystem.milktea.common.PageableState<List<NoteRelation>>> {
         return this.map{ pageable ->
             pageable.suspendConvert { list ->
                 list.mapNotNull {

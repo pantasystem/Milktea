@@ -7,7 +7,7 @@ import android.content.IntentFilter
 import android.net.*
 import android.os.Build
 import androidx.annotation.RequiresApi
-import jp.panta.misskeyandroidclient.util.receive
+import net.pantasystem.milktea.common.receive
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

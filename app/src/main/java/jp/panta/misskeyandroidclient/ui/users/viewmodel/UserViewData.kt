@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.data.model.users.UserDataSource
 
 @ExperimentalCoroutinesApi
 @FlowPreview

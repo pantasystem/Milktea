@@ -15,8 +15,8 @@ import jp.panta.misskeyandroidclient.model.auth.Authorization
 import jp.panta.misskeyandroidclient.model.auth.custom.*
 import jp.panta.misskeyandroidclient.model.instance.Meta
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -60,26 +60,28 @@ class AppAuthViewModel @Inject constructor(
     val instanceDomain = MutableStateFlow("")
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(StateContent.NotExist()))
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, net.pantasystem.milktea.common.State.Fixed(
+        net.pantasystem.milktea.common.StateContent.NotExist()))
 
-    private val _generatingTokenState = MutableStateFlow<State<Session>>(State.Fixed(StateContent.NotExist()))
-    private val generatingTokenState: StateFlow<State<Session>> = _generatingTokenState
+    private val _generatingTokenState = MutableStateFlow<net.pantasystem.milktea.common.State<Session>>(
+        net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.NotExist()))
+    private val generatingTokenState: StateFlow<net.pantasystem.milktea.common.State<Session>> = _generatingTokenState
     private val generateTokenError = generatingTokenState.map {
-        it as? State.Error
+        it as? net.pantasystem.milktea.common.State.Error
     }.map {
         it?.throwable
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val isFetchingMeta = metaState.map {
-        it is State.Loading
+        it is net.pantasystem.milktea.common.State.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     private val fetchingMetaError = metaState.map {
-        (it as? State.Error)?.throwable
+        (it as? net.pantasystem.milktea.common.State.Error)?.throwable
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val isGeneratingToken = generatingTokenState.map {
-        it is State.Loading
+        it is net.pantasystem.milktea.common.State.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val isProgress = combine(isFetchingMeta, isGeneratingToken) { a, b ->
@@ -87,7 +89,7 @@ class AppAuthViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val validatedInstanceDomain = metaState.map {
-        it is State.Fixed && it.content is StateContent.Exist
+        it is net.pantasystem.milktea.common.State.Fixed && it.content is net.pantasystem.milktea.common.StateContent.Exist
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val appName = MutableLiveData<String>()
@@ -114,12 +116,12 @@ class AppAuthViewModel @Inject constructor(
         }
     }
 
-    private fun getMeta(instanceDomain: String): Flow<State<InstanceType>> {
-        return flow<State<InstanceType>> {
+    private fun getMeta(instanceDomain: String): Flow<net.pantasystem.milktea.common.State<InstanceType>> {
+        return flow<net.pantasystem.milktea.common.State<InstanceType>> {
             val url = toEnableUrl(instanceDomain)
-            emit(State.Fixed(StateContent.NotExist()))
+            emit(net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.NotExist()))
             if(urlPattern.matcher(url).find()){
-                emit(State.Loading(StateContent.NotExist()))
+                emit(net.pantasystem.milktea.common.State.Loading(net.pantasystem.milktea.common.StateContent.NotExist()))
                 runCatching {
                     coroutineScope {
                         val misskey = withContext(Dispatchers.IO) {
@@ -147,11 +149,12 @@ class AppAuthViewModel @Inject constructor(
                     }
 
                 }.onFailure {
-                    emit(State.Error(StateContent.NotExist(), it))
+                    emit(net.pantasystem.milktea.common.State.Error(net.pantasystem.milktea.common.StateContent.NotExist(), it))
                 }.onSuccess {
                     Log.d("AppAuthVM", "meta:$it")
-                    emit(State.Fixed(
-                        StateContent.Exist(it)
+                    emit(
+                        net.pantasystem.milktea.common.State.Fixed(
+                        net.pantasystem.milktea.common.StateContent.Exist(it)
                     ))
                 }
             }
@@ -164,10 +167,10 @@ class AppAuthViewModel @Inject constructor(
         val url = this.instanceDomain.value
         val instanceBase = toEnableUrl(url)
         val appName = this.appName.value?: return
-        val meta = (this.metaState.value.content as? StateContent.Exist)?.rawContent
+        val meta = (this.metaState.value.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent
             ?: return
         viewModelScope.launch(Dispatchers.IO){
-            _generatingTokenState.value = State.Loading(generatingTokenState.value.content)
+            _generatingTokenState.value = net.pantasystem.milktea.common.State.Loading(generatingTokenState.value.content)
             runCatching {
                 val app = createApp(instanceBase, meta, appName)
                 this@AppAuthViewModel.app.postValue(app)
@@ -202,11 +205,11 @@ class AppAuthViewModel @Inject constructor(
             }.onSuccess { w4a ->
                 this@AppAuthViewModel.waiting4UserAuthorization.postValue(w4a)
                 if (w4a is Authorization.Waiting4UserAuthorization.Misskey) {
-                    _generatingTokenState.value = State.Fixed(StateContent.Exist(w4a.session))
+                    _generatingTokenState.value = net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.Exist(w4a.session))
                 }
             }.onFailure {
                 Log.e("AppAuthViewModel", "認証開始処理失敗", it)
-                _generatingTokenState.value = State.Error(StateContent.NotExist(), it)
+                _generatingTokenState.value = net.pantasystem.milktea.common.State.Error(net.pantasystem.milktea.common.StateContent.NotExist(), it)
             }
 
         }

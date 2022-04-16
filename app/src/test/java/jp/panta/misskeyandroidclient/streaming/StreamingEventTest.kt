@@ -6,6 +6,9 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.ChannelEvent
+import net.pantasystem.milktea.data.streaming.StreamingEvent
 import org.junit.Assert.*
 import org.junit.Test
 

@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.CreateGalleryTaskExecutor
 import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
 import jp.panta.misskeyandroidclient.model.TaskExecutorImpl
@@ -19,7 +19,7 @@ object TaskExecutorsModule {
     @Singleton
     fun provideNoteCreateTaskExecutor(
         coroutineScope: CoroutineScope,
-        loggerFactory: Logger.Factory,
+        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     ): CreateNoteTaskExecutor {
         return CreateNoteTaskExecutor(
             provideTaskExecutor(coroutineScope, loggerFactory)
@@ -30,7 +30,7 @@ object TaskExecutorsModule {
     @Singleton
     fun provideGalleryPostTaskExecutor(
         coroutineScope: CoroutineScope,
-        loggerFactory: Logger.Factory,
+        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     ): CreateGalleryTaskExecutor {
         return CreateGalleryTaskExecutor(
             provideTaskExecutor(coroutineScope, loggerFactory)
@@ -39,7 +39,7 @@ object TaskExecutorsModule {
 
     private fun <T> provideTaskExecutor(
         coroutineScope: CoroutineScope,
-        loggerFactory: Logger.Factory,
+        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     ): TaskExecutorImpl<T> {
         return TaskExecutorImpl(coroutineScope, loggerFactory.create("CreateNoteTaskExecutor"))
     }

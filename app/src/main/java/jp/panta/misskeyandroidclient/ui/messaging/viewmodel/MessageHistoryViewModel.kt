@@ -2,13 +2,13 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
 import jp.panta.misskeyandroidclient.api.misskey.groups.toGroup
 import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
 import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.gettters.Getters
+import net.pantasystem.milktea.data.gettters.Getters
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
@@ -21,9 +21,9 @@ import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
 import jp.panta.misskeyandroidclient.model.messaging.toHistory
 import jp.panta.misskeyandroidclient.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.model.users.UserRepository
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
-import jp.panta.misskeyandroidclient.util.asLoadingStateFlow
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MessageHistoryViewModel @Inject constructor(
     accountStore: AccountStore,
-    loggerFactory: Logger.Factory,
+    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     private val encryption: Encryption,
     private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
@@ -86,8 +86,8 @@ class MessageHistoryViewModel @Inject constructor(
 
     private val usersAndGroups =
         combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
-            val u = (users.content as? StateContent.Exist)?.rawContent
-            val g = (groups.content as? StateContent.Exist)?.rawContent
+            val u = (users.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent
+            val g = (groups.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent
             (g ?: emptyList()) + (u ?: emptyList())
         }.flowOn(Dispatchers.IO)
 
@@ -125,7 +125,7 @@ class MessageHistoryViewModel @Inject constructor(
     }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Eagerly, emptyList())
 
     val isRefreshing = combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
-        users is State.Loading || groups is State.Loading
+        users is net.pantasystem.milktea.common.State.Loading || groups is net.pantasystem.milktea.common.State.Loading
     }.asLiveData()
 
     val messageHistorySelected = EventBus<HistoryViewData>()

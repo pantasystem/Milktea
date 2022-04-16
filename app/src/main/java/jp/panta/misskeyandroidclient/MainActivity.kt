@@ -38,8 +38,8 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.model.streaming.stateEvent
 import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
@@ -61,7 +61,6 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
-import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
-    private val logger: Logger by lazy {
+    private val logger: net.pantasystem.milktea.common.Logger by lazy {
         (applicationContext as MiCore).loggerFactory.create("MainActivity")
     }
 

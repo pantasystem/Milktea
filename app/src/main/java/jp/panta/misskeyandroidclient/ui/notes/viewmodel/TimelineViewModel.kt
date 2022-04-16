@@ -8,9 +8,9 @@ import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
 import jp.panta.misskeyandroidclient.model.notes.*
 import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
-import jp.panta.misskeyandroidclient.streaming.channel.connectUserTimeline
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.channel.connectUserTimeline
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite.FavoriteNotePagingStore

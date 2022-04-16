@@ -11,8 +11,8 @@ import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.notification.Notification
 import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
 import jp.panta.misskeyandroidclient.model.notification.ReceiveFollowRequestNotification
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow

@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
@@ -20,7 +20,7 @@ class ReactionHistoryPagerViewModel(
     val noteId: Note.Id,
     val noteRepository: NoteRepository,
     val adapter: NoteCaptureAPIAdapter,
-    val logger: Logger?
+    val logger: net.pantasystem.milktea.common.Logger?
 ) : ViewModel() {
 
     @Suppress("UNCHECKED_CAST")

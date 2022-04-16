@@ -1,5 +1,9 @@
 package jp.panta.misskeyandroidclient.streaming
 
+import net.pantasystem.milktea.data.streaming.Socket
+import net.pantasystem.milktea.data.streaming.SocketMessageEventListener
+import net.pantasystem.milktea.data.streaming.SocketStateEventListener
+
 class TestSocketImpl : Socket {
 
     private var state: Socket.State = Socket.State.NeverConnected

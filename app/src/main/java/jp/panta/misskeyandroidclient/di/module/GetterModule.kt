@@ -4,11 +4,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.gettters.Getters
-import jp.panta.misskeyandroidclient.gettters.MessageRelationGetter
-import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
-import jp.panta.misskeyandroidclient.gettters.NotificationRelationGetter
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.model.group.GroupDataSource
 import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
@@ -32,7 +32,7 @@ object GetterModule {
         notificationDataSource: NotificationDataSource,
         messageDataSource: MessageDataSource,
         groupDataSource: GroupDataSource,
-        loggerFactory: Logger.Factory
+        loggerFactory: net.pantasystem.milktea.common.Logger.Factory
     ): Getters {
         return Getters(
             noteDataSource,

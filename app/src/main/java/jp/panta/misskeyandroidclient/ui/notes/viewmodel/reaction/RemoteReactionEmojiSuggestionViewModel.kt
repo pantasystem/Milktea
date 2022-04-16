@@ -1,11 +1,9 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.model.instance.MetaRepository
@@ -13,9 +11,9 @@ import jp.panta.misskeyandroidclient.model.notes.Note
 import jp.panta.misskeyandroidclient.model.notes.NoteRepository
 import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
 import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
-import jp.panta.misskeyandroidclient.util.asLoadingStateFlow
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -33,7 +31,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
     val metaRepository: MetaRepository,
     val accountRepository: AccountRepository,
     val noteRepository: NoteRepository,
-    val loggerFactory: Logger.Factory,
+    val loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
 ) : ViewModel() {
 
     private val _reaction = MutableStateFlow<RemoteReaction?>(null)
@@ -45,7 +43,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         val name = remoteReaction?.reaction?.getName()
         if (name == null) {
             flow {
-                emit(State.Fixed<List<Emoji>>(StateContent.NotExist()))
+                emit(net.pantasystem.milktea.common.State.Fixed<List<Emoji>>(net.pantasystem.milktea.common.StateContent.NotExist()))
             }
         } else {
             suspend {
@@ -55,14 +53,15 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
                 }
             }.asLoadingStateFlow()
         }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, State.Loading(StateContent.NotExist()))
+    }.stateIn(viewModelScope, SharingStarted.Lazily, net.pantasystem.milktea.common.State.Loading(
+        net.pantasystem.milktea.common.StateContent.NotExist()))
 
     val isLoading = filteredEmojis.map {
-        it is State.Loading
+        it is net.pantasystem.milktea.common.State.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val isNotExists = filteredEmojis.map {
-        it.content is StateContent.NotExist && it is State.Fixed
+        it.content is net.pantasystem.milktea.common.StateContent.NotExist && it is net.pantasystem.milktea.common.State.Fixed
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 

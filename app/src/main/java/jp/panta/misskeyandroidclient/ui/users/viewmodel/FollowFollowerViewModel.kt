@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.api.misskey.users.toUser
 import jp.panta.misskeyandroidclient.model.Encryption
@@ -58,7 +58,7 @@ class FollowFollowerViewModel(
         val encryption: Encryption,
         val noteDataSourceAdder: NoteDataSourceAdder,
         val userDataSource: UserDataSource,
-        private val logger: Logger?
+        private val logger: net.pantasystem.milktea.common.Logger?
 
     ) : Paginator {
 

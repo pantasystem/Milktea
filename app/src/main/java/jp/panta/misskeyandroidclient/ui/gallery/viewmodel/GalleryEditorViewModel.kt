@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.CreateGalleryTaskExecutor
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.account.AccountRepository
@@ -39,7 +39,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
     val accountRepository: AccountRepository,
     private val taskExecutor: CreateGalleryTaskExecutor,
     private val driveFileRepository: DriveFileRepository,
-    loggerFactory: Logger.Factory,
+    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     @Assisted private val editType: EditType,
     ) : ViewModel(){
 

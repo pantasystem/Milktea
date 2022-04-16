@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.model.Encryption
 import jp.panta.misskeyandroidclient.model.account.Account
 import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
@@ -17,7 +17,7 @@ class PostNoteTask(
     val encryption: Encryption,
     val createNote: CreateNote,
     val account: Account,
-    loggerFactory: Logger.Factory,
+    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     val filePropertyDataSource: FilePropertyDataSource
 ): Serializable{
 
