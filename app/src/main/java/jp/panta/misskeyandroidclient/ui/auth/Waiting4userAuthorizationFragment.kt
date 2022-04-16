@@ -14,7 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentWaiting4UserAuthorizationBinding
-import jp.panta.misskeyandroidclient.model.auth.Authorization
+import net.pantasystem.milktea.data.model.auth.Authorization
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

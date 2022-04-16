@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.api.mastodon.emojis
 
 import com.google.gson.annotations.SerializedName
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.emoji.Emoji
 
 @Serializable
 data class TootEmojiDTO (

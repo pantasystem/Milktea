@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.model.notes.renote.Renote
-import jp.panta.misskeyandroidclient.model.notes.renote.RenotesPagingService
-import jp.panta.misskeyandroidclient.model.notes.renote.createRenotesPagingService
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.NoteRelation
+import net.pantasystem.milktea.data.model.notes.renote.Renote
+import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.data.model.notes.renote.createRenotesPagingService
 import net.pantasystem.milktea.common.PageableState
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers

@@ -7,14 +7,14 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.*
-import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
-import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
-import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDAO
+import net.pantasystem.milktea.data.model.*
+import net.pantasystem.milktea.data.model.account.db.AccountDAO
+import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.model.users.impl.UserNicknameDAO
 import javax.inject.Singleton
 
 @Module

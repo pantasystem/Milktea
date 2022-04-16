@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemChoiceBinding
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 
 class PollListAdapter(

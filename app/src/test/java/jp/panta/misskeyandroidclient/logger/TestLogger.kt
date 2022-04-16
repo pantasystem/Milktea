@@ -4,7 +4,7 @@ import net.pantasystem.milktea.common.Logger
 
 class TestLogger(
     override val defaultTag: String
-) : net.pantasystem.milktea.common.Logger {
+) : Logger {
 
     override fun debug(msg: String, tag: String, e: Throwable?) {
         println("debug:$tag:$msg, error:$e")

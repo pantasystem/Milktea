@@ -5,13 +5,13 @@
     <data>
         <variable
                 name="userList"
-                type="jp.panta.misskeyandroidclient.model.list.UserList" />
+                type="net.pantasystem.milktea.data.model.list.UserList" />
         <variable
                 name="pullPushViewModel"
                 type="jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel" />
         <variable
                 name="addUserId"
-                type="jp.panta.misskeyandroidclient.model.users.User.Id" />
+                type="net.pantasystem.milktea.data.model.users.User.Id" />
     </data>
 
     <androidx.cardview.widget.CardView

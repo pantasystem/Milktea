@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.api
 
-import jp.panta.misskeyandroidclient.api.misskey.APIError
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.notes.CreateNote
-import jp.panta.misskeyandroidclient.model.I
+import net.pantasystem.milktea.data.api.misskey.APIError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.notes.CreateNote
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.data.model.I
 import org.junit.Assert.*
 import org.junit.Test
 

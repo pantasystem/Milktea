@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.api.mastodon
 
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.data.model.account.Account
 import javax.inject.Inject
 import javax.inject.Singleton
 

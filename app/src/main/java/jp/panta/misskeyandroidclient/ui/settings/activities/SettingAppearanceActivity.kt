@@ -14,14 +14,15 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBinding
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
+import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.data.model.drive.DriveFileRepository
+import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.data.model.KeyStore
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -14,10 +14,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
-import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.model.notes.reaction.Reaction
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

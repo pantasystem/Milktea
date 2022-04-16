@@ -3,9 +3,9 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.messaging.Message
+import net.pantasystem.milktea.data.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import java.lang.IllegalArgumentException
 

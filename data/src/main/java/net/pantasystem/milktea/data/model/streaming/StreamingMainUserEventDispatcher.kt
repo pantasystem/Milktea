@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.model.streaming
 
-import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
+import net.pantasystem.milktea.data.api.misskey.users.toUser
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.users.UserDataSource
+import net.pantasystem.milktea.data.streaming.ChannelBody
 
 /**
  * StreamingAPIのMainイベントを各種DataSourceに適応します。

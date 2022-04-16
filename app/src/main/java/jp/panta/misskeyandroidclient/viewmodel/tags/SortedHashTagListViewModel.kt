@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel.tags
 
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.hashtag.HashTag
-import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.model.hashtag.HashTag
+import net.pantasystem.milktea.data.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull

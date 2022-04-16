@@ -1,12 +1,12 @@
 package net.pantasystem.milktea.data.api.misskey.logger
 
 import android.util.Log
-import jp.panta.misskeyandroidclient.BuildConfig
-import jp.panta.misskeyandroidclient.Logger
+import net.pantasystem.milktea.common.BuildConfig
+import net.pantasystem.milktea.common.Logger
 
 class AndroidDefaultLogger(
     override val defaultTag: String
-) : Logger{
+) : Logger {
 
     override fun debug(msg: String, tag: String, e: Throwable?) {
         if (BuildConfig.DEBUG) {

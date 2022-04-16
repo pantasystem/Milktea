@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel

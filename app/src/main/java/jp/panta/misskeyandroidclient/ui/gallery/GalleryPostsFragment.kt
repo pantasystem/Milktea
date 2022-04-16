@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.AuthorizationActivity
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.api.misskey.APIError
+import net.pantasystem.milktea.data.api.misskey.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.data.model.account.page.Pageable
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

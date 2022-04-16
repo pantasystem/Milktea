@@ -5,12 +5,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
-import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
-import jp.panta.misskeyandroidclient.model.messaging.impl.InMemoryMessageDataSource
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageRepositoryImpl
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.messaging.MessageRepository
+import net.pantasystem.milktea.data.model.messaging.UnReadMessages
+import net.pantasystem.milktea.data.model.messaging.impl.InMemoryMessageDataSource
+import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.model.messaging.impl.MessageRepositoryImpl
 import javax.inject.Singleton
 
 @Module

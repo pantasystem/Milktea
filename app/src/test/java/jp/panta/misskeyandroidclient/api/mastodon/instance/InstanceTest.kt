@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.api.mastodon.instance
+package net.pantasystem.milktea.data.api.mastodon.instance
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json

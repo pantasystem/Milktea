@@ -1,21 +1,23 @@
 package net.pantasystem.milktea.data.api.misskey.notes
 
 import com.google.gson.annotations.SerializedName
-import jp.panta.misskeyandroidclient.model.auth.custom.App
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.api.misskey.drive.FilePropertyDTO
-import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
-import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.Visibility
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
-import jp.panta.misskeyandroidclient.model.users.User
+
+import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+import net.pantasystem.milktea.data.api.misskey.users.toUser
+
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.SerialName
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.auth.custom.App
+import net.pantasystem.milktea.data.model.channel.Channel
+import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.Visibility
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.data.model.users.User
 import java.io.Serializable
 import kotlin.collections.LinkedHashMap
 
@@ -77,7 +79,7 @@ data class NoteDTO(
     val app: App? = null
 ): Serializable
 
-fun NoteDTO.toNote(account: Account): Note{
+fun NoteDTO.toNote(account: Account): Note {
     val visibility = Visibility(this.visibility?: "public", isLocalOnly = localOnly?: false, visibleUserIds = visibleUserIds?.map { id ->
         User.Id(account.accountId, id)
     }?: emptyList())

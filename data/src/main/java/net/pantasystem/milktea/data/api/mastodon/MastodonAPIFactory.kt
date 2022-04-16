@@ -1,11 +1,9 @@
 package net.pantasystem.milktea.data.api.mastodon
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -19,7 +17,7 @@ class MastodonAPIFactory @Inject constructor(){
     private val sharedOkHttp = OkHttpClient()
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun build(baseURL: String, token: String?): net.pantasystem.milktea.data.api.mastodon.MastodonAPI {
+    fun build(baseURL: String, token: String?): MastodonAPI {
         val okHttp = if (token == null) {
             sharedOkHttp
         } else {
@@ -34,10 +32,10 @@ class MastodonAPIFactory @Inject constructor(){
         }
         return Retrofit.Builder()
             .baseUrl(baseURL)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory(MediaType.get("application/json")))
             .client(okHttp)
             .build()
-            .create(net.pantasystem.milktea.data.api.mastodon.MastodonAPI::class.java)
+            .create(MastodonAPI::class.java)
 
     }
 

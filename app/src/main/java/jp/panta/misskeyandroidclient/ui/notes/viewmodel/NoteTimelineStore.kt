@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import android.util.Log
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 
@@ -13,10 +13,10 @@ import retrofit2.Response
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
-import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.model.notes.NoteTranslationStore
 
 
 @Suppress("BlockingMethodInNonBlockingContext")

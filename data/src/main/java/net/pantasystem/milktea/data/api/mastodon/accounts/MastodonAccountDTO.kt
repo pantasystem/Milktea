@@ -1,12 +1,12 @@
 package net.pantasystem.milktea.data.api.mastodon.accounts
 
-import jp.panta.misskeyandroidclient.api.mastodon.emojis.TootEmojiDTO
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.api.mastodon.emojis.TootEmojiDTO
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.users.User
 
 @Serializable
 data class MastodonAccountDTO (

@@ -6,7 +6,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 
 object UserTransitionHelper {

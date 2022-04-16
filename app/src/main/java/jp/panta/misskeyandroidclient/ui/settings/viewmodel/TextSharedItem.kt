@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel
 
 import android.content.Context
 import androidx.annotation.StringRes
-import jp.panta.misskeyandroidclient.util.getPreferenceName
+import net.pantasystem.milktea.common.getPreferenceName
 
 class TextSharedItem(
     override val key: String,

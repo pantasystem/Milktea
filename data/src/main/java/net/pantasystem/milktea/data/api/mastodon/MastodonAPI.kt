@@ -1,12 +1,12 @@
 package net.pantasystem.milktea.data.api.mastodon
 
-import jp.panta.misskeyandroidclient.api.mastodon.accounts.MastodonAccountDTO
-import jp.panta.misskeyandroidclient.api.mastodon.apps.AccessToken
-import jp.panta.misskeyandroidclient.api.mastodon.apps.App
-import jp.panta.misskeyandroidclient.api.mastodon.apps.CreateApp
-import jp.panta.misskeyandroidclient.api.mastodon.apps.ObtainToken
-import jp.panta.misskeyandroidclient.api.mastodon.emojis.TootEmojiDTO
-import jp.panta.misskeyandroidclient.api.mastodon.instance.Instance
+import net.pantasystem.milktea.data.api.mastodon.accounts.MastodonAccountDTO
+import net.pantasystem.milktea.data.api.mastodon.apps.AccessToken
+import net.pantasystem.milktea.data.api.mastodon.apps.App
+import net.pantasystem.milktea.data.api.mastodon.apps.CreateApp
+import net.pantasystem.milktea.data.api.mastodon.apps.ObtainToken
+import net.pantasystem.milktea.data.api.mastodon.emojis.TootEmojiDTO
+import net.pantasystem.milktea.data.api.mastodon.instance.Instance
 import retrofit2.Response
 import retrofit2.http.Body
 

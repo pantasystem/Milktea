@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.data.api.misskey.v12.antenna
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.antenna.Antenna
-import jp.panta.misskeyandroidclient.model.group.Group
+
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.antenna.Antenna
+import net.pantasystem.milktea.data.model.group.Group
 import java.io.Serializable as JSerializable
 
 /**

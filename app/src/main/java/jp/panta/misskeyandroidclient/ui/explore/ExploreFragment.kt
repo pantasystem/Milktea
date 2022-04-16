@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentExploreBinding
-import jp.panta.misskeyandroidclient.model.hashtag.RequestHashTagList
+import net.pantasystem.milktea.data.model.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.explore.Explore
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel

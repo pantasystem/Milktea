@@ -1,7 +1,8 @@
 package net.pantasystem.milktea.data.api.mastodon.apps
-import jp.panta.misskeyandroidclient.model.auth.custom.AppType
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.auth.custom.AppType
 
 @Serializable
 data class CreateApp(

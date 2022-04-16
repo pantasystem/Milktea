@@ -2,16 +2,16 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.misskey.list.UserListDTO
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaQuery
-import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaToAdd
-import jp.panta.misskeyandroidclient.model.antenna.Antenna
-import jp.panta.misskeyandroidclient.model.group.Group
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.I
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.api.misskey.list.UserListDTO
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaQuery
+import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaToAdd
+import net.pantasystem.milktea.data.model.antenna.Antenna
+import net.pantasystem.milktea.data.model.group.Group
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData

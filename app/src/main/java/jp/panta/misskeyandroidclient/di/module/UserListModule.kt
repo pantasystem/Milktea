@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.list.UserListRepository
-import jp.panta.misskeyandroidclient.model.list.impl.UserListRepositoryWebAPIImpl
+import net.pantasystem.milktea.data.model.list.UserListRepository
+import net.pantasystem.milktea.data.model.list.impl.UserListRepositoryWebAPIImpl
 import javax.inject.Singleton
 
 @Module

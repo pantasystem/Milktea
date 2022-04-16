@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*

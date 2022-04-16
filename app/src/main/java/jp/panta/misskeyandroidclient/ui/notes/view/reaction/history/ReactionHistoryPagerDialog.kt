@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionHistoryPagerBinding
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryPagerViewModel
 import kotlinx.coroutines.Dispatchers

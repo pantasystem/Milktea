@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.list.UserListStore
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.list.UserList
+import net.pantasystem.milktea.data.model.list.UserListStore
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers

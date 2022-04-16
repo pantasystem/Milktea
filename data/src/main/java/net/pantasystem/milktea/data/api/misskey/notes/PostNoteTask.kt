@@ -1,15 +1,14 @@
-package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
+package net.pantasystem.milktea.data.api.misskey.notes
 
-import net.pantasystem.milktea.common.Logger
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.drive.FileUploader
-import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.api.misskey.notes.CreateNote as CreateNoteDTO
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftPoll
+import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.data.model.drive.FileUploader
+import net.pantasystem.milktea.data.model.file.AppFile
+import net.pantasystem.milktea.data.model.notes.*
+import net.pantasystem.milktea.data.api.misskey.notes.CreateNote as CreateNoteDTO
+import net.pantasystem.milktea.data.model.notes.draft.DraftNote
+import net.pantasystem.milktea.data.model.notes.draft.DraftPoll
 import kotlinx.coroutines.*
 import java.io.Serializable
 

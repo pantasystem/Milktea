@@ -1,14 +1,14 @@
 package net.pantasystem.milktea.data.model.messaging.impl
 
-import jp.panta.misskeyandroidclient.model.AddResult
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessagingId
-import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
+
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.data.model.AddResult
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.messaging.Message
+import net.pantasystem.milktea.data.model.messaging.MessagingId
+import net.pantasystem.milktea.data.model.messaging.UnReadMessages
 
 interface MessageDataSource {
     suspend fun add(message: Message): AddResult

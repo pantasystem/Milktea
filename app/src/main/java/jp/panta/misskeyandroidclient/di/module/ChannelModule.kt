@@ -4,15 +4,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.channel.ChannelAPIAdapter
-import jp.panta.misskeyandroidclient.model.channel.ChannelRepository
-import jp.panta.misskeyandroidclient.model.channel.ChannelStateModel
-import jp.panta.misskeyandroidclient.model.channel.ChannelStateModelOnMemory
-import jp.panta.misskeyandroidclient.model.channel.impl.ChannelAPIAdapterWebImpl
-import jp.panta.misskeyandroidclient.model.channel.impl.ChannelRepositoryImpl
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.channel.ChannelAPIAdapter
+import net.pantasystem.milktea.data.model.channel.ChannelRepository
+import net.pantasystem.milktea.data.model.channel.ChannelStateModel
+import net.pantasystem.milktea.data.model.channel.ChannelStateModelOnMemory
+import net.pantasystem.milktea.data.model.channel.impl.ChannelAPIAdapterWebImpl
+import net.pantasystem.milktea.data.model.channel.impl.ChannelRepositoryImpl
 import javax.inject.Singleton
 
 @Module

@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.api.misskey.users
 
-import jp.panta.misskeyandroidclient.serializations.DateSerializer
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.serializations.DateSerializer
 import java.util.*
 
 @Serializable

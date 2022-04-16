@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.notes.view.reaction.history
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryRequest
 
 class ReactionHistoryPagerAdapter(
     fragmentManager: FragmentManager,

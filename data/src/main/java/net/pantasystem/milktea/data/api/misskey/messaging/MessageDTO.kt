@@ -2,17 +2,17 @@ package net.pantasystem.milktea.data.api.misskey.messaging
 
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.mfm.Root
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.misskey.drive.FilePropertyDTO
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.api.misskey.groups.GroupDTO
-import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
-import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.data.api.misskey.groups.GroupDTO
+import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+import net.pantasystem.milktea.data.api.misskey.users.toUser
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.messaging.Message
+import net.pantasystem.milktea.data.model.users.User
 import java.io.Serializable as JavaSerializable
 import jp.panta.misskeyandroidclient.model.group.Group as GroupEntity
 

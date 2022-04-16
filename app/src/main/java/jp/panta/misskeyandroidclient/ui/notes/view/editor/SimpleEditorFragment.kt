@@ -21,10 +21,10 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.file.toFile
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.file.toFile
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog

@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.drive.FileProperty
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd

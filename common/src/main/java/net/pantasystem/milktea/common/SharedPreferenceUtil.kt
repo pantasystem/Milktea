@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util
+package net.pantasystem.milktea.common
 
 import android.content.Context
 import android.content.SharedPreferences

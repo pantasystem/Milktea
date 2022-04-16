@@ -4,8 +4,8 @@ import android.view.View
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 
 object PollHelper {

@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.data.model.notes.reaction
 
-import jp.panta.misskeyandroidclient.model.Entity
-import jp.panta.misskeyandroidclient.model.EntityId
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.users.User
+
+import net.pantasystem.milktea.data.model.Entity
+import net.pantasystem.milktea.data.model.EntityId
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.users.User
 import java.util.*
 
 data class ReactionHistory (
@@ -12,7 +13,7 @@ data class ReactionHistory (
     val createdAt: Date,
     val user: User,
     val type: String
-) : Entity{
+) : Entity {
 
     data class Id(
         val reactionId: String,

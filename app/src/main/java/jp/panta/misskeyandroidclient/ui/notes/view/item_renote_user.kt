@@ -17,8 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
 import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
 import kotlinx.coroutines.Dispatchers

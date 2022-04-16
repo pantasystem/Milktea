@@ -12,8 +12,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListAddUserBinding
 import jp.panta.misskeyandroidclient.databinding.ItemListBinding
 
-import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.list.UserList
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

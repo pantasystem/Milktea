@@ -2,8 +2,8 @@ package net.pantasystem.milktea.data.api.misskey.notes
 
 import android.util.Log
 import com.google.gson.annotations.SerializedName
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.account.page.Pageable
 import java.io.Serializable as JavaSerializable
 
 @Serializable

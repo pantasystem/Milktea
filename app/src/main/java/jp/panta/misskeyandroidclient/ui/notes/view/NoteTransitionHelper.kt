@@ -6,7 +6,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.NoteDetailActivity
-import jp.panta.misskeyandroidclient.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.Note
 import jp.panta.misskeyandroidclient.putActivity
 
 object NoteTransitionHelper {

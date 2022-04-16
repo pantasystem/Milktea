@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.channel.ChannelPagingModel
+import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.data.model.channel.ChannelPagingModel
 import jp.panta.misskeyandroidclient.ui.channel.ChannelScreen
 import jp.panta.misskeyandroidclient.ui.channel.ChannelViewModel
 import javax.inject.Inject

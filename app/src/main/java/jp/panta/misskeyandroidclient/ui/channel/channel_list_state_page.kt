@@ -7,14 +7,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.channel.ChannelListType
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.channel.Channel
+import net.pantasystem.milktea.data.model.channel.ChannelListType
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 

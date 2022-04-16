@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

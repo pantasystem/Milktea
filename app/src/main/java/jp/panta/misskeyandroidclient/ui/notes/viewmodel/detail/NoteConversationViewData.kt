@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail
 
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.model.notes.NoteRelation
+import net.pantasystem.milktea.data.model.notes.NoteTranslationStore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
 //viewはRecyclerView

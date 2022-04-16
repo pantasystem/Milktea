@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.file
 
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.data.model.file.File
 
 interface FileListener {
 

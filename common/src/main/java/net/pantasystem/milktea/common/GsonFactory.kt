@@ -1,10 +1,8 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.common
 
 import com.google.gson.*
 import kotlinx.datetime.Instant
 import java.lang.reflect.Type
-import java.text.SimpleDateFormat
-import java.util.*
 
 object GsonFactory {
     private val gson = GsonBuilder()

@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notification.*
+import net.pantasystem.milktea.data.model.notification.*
 
 
 fun Context.notificationMessageScope(block: NotificationMessageScope.() -> Unit) {

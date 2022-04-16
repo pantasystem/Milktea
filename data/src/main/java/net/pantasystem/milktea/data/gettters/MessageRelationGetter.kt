@@ -1,15 +1,15 @@
 package net.pantasystem.milktea.data.gettters
 
-import jp.panta.misskeyandroidclient.api.misskey.groups.toGroup
-import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.api.misskey.messaging.entities
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.group.GroupDataSource
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessageNotFoundException
-import jp.panta.misskeyandroidclient.model.messaging.MessageRelation
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import net.pantasystem.milktea.data.api.misskey.groups.toGroup
+import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.data.api.misskey.messaging.entities
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.group.GroupDataSource
+import net.pantasystem.milktea.data.model.messaging.Message
+import net.pantasystem.milktea.data.model.messaging.MessageNotFoundException
+import net.pantasystem.milktea.data.model.messaging.MessageRelation
+import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.model.users.UserDataSource
 import kotlin.jvm.Throws
 
 class MessageRelationGetter(

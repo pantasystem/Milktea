@@ -13,17 +13,19 @@ import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.asLiveData
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.file.AppFile
+import net.pantasystem.milktea.data.model.drive.DriveFileRepository
+import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.data.model.file.AppFile
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 

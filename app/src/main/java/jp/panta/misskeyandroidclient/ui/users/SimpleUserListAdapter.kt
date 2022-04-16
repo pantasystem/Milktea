@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSimpleUserBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 
 class SimpleUserListAdapter(
     val lifecycleOwner: LifecycleOwner

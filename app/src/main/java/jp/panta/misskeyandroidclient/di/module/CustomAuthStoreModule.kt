@@ -6,8 +6,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
-import jp.panta.misskeyandroidclient.util.getPreferences
+import net.pantasystem.milktea.data.model.auth.custom.CustomAuthStore
+import net.pantasystem.milktea.common.getPreferences
 
 @Module
 @InstallIn(SingletonComponent::class)

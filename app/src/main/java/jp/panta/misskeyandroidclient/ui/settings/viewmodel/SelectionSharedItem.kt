@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import jp.panta.misskeyandroidclient.util.getPreferenceName
+import net.pantasystem.milktea.common.getPreferenceName
 
 class SelectionSharedItem (
     override val key: String,

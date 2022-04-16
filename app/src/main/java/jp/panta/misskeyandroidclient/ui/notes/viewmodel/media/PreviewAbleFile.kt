@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.media
 
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.data.model.file.File
 
 
 data class PreviewAbleFile(val file: File, val isHiding: Boolean) {

@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import net.pantasystem.milktea.common.Logger
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.model.notes.NoteDataSource
+import net.pantasystem.milktea.data.model.notes.NoteRepository
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

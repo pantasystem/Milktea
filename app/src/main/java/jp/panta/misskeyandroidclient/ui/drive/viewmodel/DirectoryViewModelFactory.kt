@@ -2,9 +2,10 @@ package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.account.watchAccount
-import jp.panta.misskeyandroidclient.model.drive.DriveStore
+import net.pantasystem.milktea.data.model.account.watchAccount
+import net.pantasystem.milktea.data.model.drive.DriveStore
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.account.watchAccount
 import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")

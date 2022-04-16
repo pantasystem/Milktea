@@ -4,16 +4,16 @@ import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.BuildConfig
-import jp.panta.misskeyandroidclient.api.mastodon.MastodonAPIProvider
-import jp.panta.misskeyandroidclient.api.mastodon.instance.Instance
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.misskey.app.CreateApp
-import jp.panta.misskeyandroidclient.api.misskey.auth.AppSecret
-import jp.panta.misskeyandroidclient.api.misskey.auth.Session
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.auth.Authorization
-import jp.panta.misskeyandroidclient.model.auth.custom.*
-import jp.panta.misskeyandroidclient.model.instance.Meta
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import net.pantasystem.milktea.data.api.mastodon.instance.Instance
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.data.api.misskey.app.CreateApp
+import net.pantasystem.milktea.data.api.misskey.auth.AppSecret
+import net.pantasystem.milktea.data.api.misskey.auth.Session
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.model.auth.Authorization
+import net.pantasystem.milktea.data.model.auth.custom.*
+import net.pantasystem.milktea.data.model.instance.Meta
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import java.util.regex.Pattern
 import javax.inject.Inject
-import jp.panta.misskeyandroidclient.api.mastodon.apps.CreateApp as CreateTootApp
+import net.pantasystem.milktea.data.api.mastodon.apps.CreateApp as CreateTootApp
 
 sealed interface AuthErrors {
     val throwable: Throwable

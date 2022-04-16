@@ -2,9 +2,8 @@ package net.pantasystem.milktea.data.model.auth.custom
 
 import android.content.Context
 import android.content.SharedPreferences
-import jp.panta.misskeyandroidclient.api.misskey.auth.Session
-import jp.panta.misskeyandroidclient.util.getPreferenceName
 import net.pantasystem.milktea.data.api.misskey.auth.Session
+import net.pantasystem.milktea.common.getPreferenceName
 import java.util.*
 
 class CustomAuthStore(private val sharedPreferences: SharedPreferences){

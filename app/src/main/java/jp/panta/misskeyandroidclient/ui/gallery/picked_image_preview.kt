@@ -2,8 +2,8 @@ package jp.panta.misskeyandroidclient.ui.gallery
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.data.model.drive.DriveFileRepository
+import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewActionType
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.components.HorizontalFilePreviewList

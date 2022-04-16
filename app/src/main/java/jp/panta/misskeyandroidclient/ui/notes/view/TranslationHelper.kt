@@ -7,8 +7,8 @@ import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.mfm.MFMDecorator
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.notes.Translation
+import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.notes.Translation
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 

@@ -1,11 +1,12 @@
 package net.pantasystem.milktea.data.model
 
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
-import jp.panta.misskeyandroidclient.model.notes.Note
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.model.gallery.GalleryPost
+import net.pantasystem.milktea.data.model.notes.Note
 
 /**
  * アプリケーションのスコープの範囲内で完了するタスク

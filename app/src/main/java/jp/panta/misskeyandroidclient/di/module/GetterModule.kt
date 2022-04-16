@@ -9,13 +9,13 @@ import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.gettters.MessageRelationGetter
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.group.GroupDataSource
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.data.model.group.GroupDataSource
+import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.model.notes.NoteDataSource
+import net.pantasystem.milktea.data.model.notes.NoteRepository
+import net.pantasystem.milktea.data.model.notification.NotificationDataSource
+import net.pantasystem.milktea.data.model.users.UserDataSource
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

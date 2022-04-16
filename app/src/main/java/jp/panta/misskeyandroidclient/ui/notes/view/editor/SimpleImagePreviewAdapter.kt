@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteEditorFilePreviewBinding
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.data.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 
 class SimpleImagePreviewAdapter(private val fileListener: FileListener) : ListAdapter<File, SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(

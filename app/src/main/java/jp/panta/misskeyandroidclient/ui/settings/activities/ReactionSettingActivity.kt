@@ -16,7 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
-import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
+import net.pantasystem.milktea.data.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter

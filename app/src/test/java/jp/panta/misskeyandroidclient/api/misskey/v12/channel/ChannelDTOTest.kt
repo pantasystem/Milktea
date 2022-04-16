@@ -1,8 +1,9 @@
 package jp.panta.misskeyandroidclient.api.misskey.v12.channel
 
-import jp.panta.misskeyandroidclient.model.account.Account
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.data.api.misskey.v12.channel.ChannelDTO
+import net.pantasystem.milktea.data.model.account.Account
 import org.junit.Assert.*
 
 import org.junit.Test

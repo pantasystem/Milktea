@@ -12,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import coil.compose.rememberImagePainter
 import com.google.accompanist.glide.rememberGlidePainter
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.R
 
 @Composable

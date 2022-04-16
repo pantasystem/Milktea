@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.users
 import android.widget.Button
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.users.FollowState
+import net.pantasystem.milktea.data.model.users.FollowState
 
 object FollowStateHelper {
 

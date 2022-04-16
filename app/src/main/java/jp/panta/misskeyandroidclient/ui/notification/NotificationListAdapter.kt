@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNotificationBinding
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData

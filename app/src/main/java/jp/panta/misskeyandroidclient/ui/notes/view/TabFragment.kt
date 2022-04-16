@@ -12,13 +12,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.KeyStore
+import net.pantasystem.milktea.data.model.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.util.getPreferenceName
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import kotlinx.coroutines.Dispatchers

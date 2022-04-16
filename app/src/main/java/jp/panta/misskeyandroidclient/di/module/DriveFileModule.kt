@@ -7,9 +7,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.drive.*
+import net.pantasystem.milktea.common.GsonFactory
+import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.data.model.drive.*
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
 

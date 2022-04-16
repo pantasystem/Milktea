@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.url
 
 import android.util.Log
-import jp.panta.misskeyandroidclient.model.url.UrlPreview
-import jp.panta.misskeyandroidclient.model.url.UrlPreviewStore
+import net.pantasystem.milktea.data.model.url.UrlPreview
+import net.pantasystem.milktea.data.model.url.UrlPreviewStore
 import kotlinx.coroutines.*
 
 class UrlPreviewLoadTask(

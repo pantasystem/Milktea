@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.api.misskey.v11
 
-import jp.panta.misskeyandroidclient.api.misskey.groups.*
-import jp.panta.misskeyandroidclient.api.misskey.users.FollowFollowerUser
-import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
-import jp.panta.misskeyandroidclient.model.I
+import net.pantasystem.milktea.data.api.misskey.groups.*
+import net.pantasystem.milktea.data.api.misskey.users.FollowFollowerUser
+import net.pantasystem.milktea.data.api.misskey.users.RequestUser
+import net.pantasystem.milktea.data.model.I
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

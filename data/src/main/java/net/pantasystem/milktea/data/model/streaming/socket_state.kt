@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.model.streaming
 
-import jp.panta.misskeyandroidclient.streaming.Socket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import net.pantasystem.milktea.data.streaming.Socket
 
 
 @ExperimentalCoroutinesApi

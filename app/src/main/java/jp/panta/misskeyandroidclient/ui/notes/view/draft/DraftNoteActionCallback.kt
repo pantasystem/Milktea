@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.notes.view.draft
 
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import net.pantasystem.milktea.data.model.notes.draft.DraftNote
 
 interface DraftNoteActionCallback {
 

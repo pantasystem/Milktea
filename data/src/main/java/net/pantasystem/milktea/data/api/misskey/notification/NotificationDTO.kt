@@ -1,15 +1,15 @@
 package net.pantasystem.milktea.data.api.misskey.notification
 
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.misskey.notes.toNote
-import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notification.*
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.data.api.misskey.notes.toNote
+import net.pantasystem.milktea.data.api.misskey.users.UserDTO
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.data.model.notification.*
+import net.pantasystem.milktea.data.model.users.User
 import java.lang.IllegalStateException
 
 @Serializable

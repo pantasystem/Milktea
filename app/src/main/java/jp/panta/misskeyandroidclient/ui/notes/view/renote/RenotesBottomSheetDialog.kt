@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.model.notes.Note
+import net.pantasystem.milktea.data.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.notes.view.RenoteUsersScreen
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel

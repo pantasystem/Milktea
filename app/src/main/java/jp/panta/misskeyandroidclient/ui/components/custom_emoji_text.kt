@@ -11,7 +11,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.emoji.Emoji
 import java.util.regex.Pattern
 
 data class EmojiPos(

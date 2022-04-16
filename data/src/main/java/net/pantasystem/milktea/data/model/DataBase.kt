@@ -4,37 +4,36 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.core.*
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftFileDTO
-import jp.panta.misskeyandroidclient.model.notes.draft.db.DraftNoteDTO
-import jp.panta.misskeyandroidclient.model.notes.draft.db.PollChoiceDTO
-import jp.panta.misskeyandroidclient.model.notes.draft.db.UserIdDTO
-import jp.panta.misskeyandroidclient.model.url.UrlPreview
-import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountInstanceTypeConverter
-import jp.panta.misskeyandroidclient.model.account.db.AccountDAO
-import jp.panta.misskeyandroidclient.model.account.page.TimelinePageTypeConverter
-import jp.panta.misskeyandroidclient.model.account.page.db.PageDAO
-import jp.panta.misskeyandroidclient.model.instance.db.*
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSetting
-import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
-import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotification
-import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDAO
-import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDTO
-
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.core.*
+import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftFileDTO
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDTO
+import net.pantasystem.milktea.data.model.notes.draft.db.PollChoiceDTO
+import net.pantasystem.milktea.data.model.notes.draft.db.UserIdDTO
+import net.pantasystem.milktea.data.model.url.UrlPreview
+import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.account.AccountInstanceTypeConverter
+import net.pantasystem.milktea.data.model.account.db.AccountDAO
+import net.pantasystem.milktea.data.model.account.page.TimelinePageTypeConverter
+import net.pantasystem.milktea.data.model.account.page.db.PageDAO
+import net.pantasystem.milktea.data.model.instance.db.*
+import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistory
+import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.model.notification.db.UnreadNotification
+import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.model.users.impl.UserNicknameDAO
+import net.pantasystem.milktea.data.model.users.impl.UserNicknameDTO
 @Database(
     entities = [
         EncryptedConnectionInformation::class,
         ReactionHistory::class,
-        jp.panta.misskeyandroidclient.model.core.Account::class,
+        net.pantasystem.milktea.data.model.core.Account::class,
         ReactionUserSetting::class,
-        jp.panta.misskeyandroidclient.model.Page::class,
+        net.pantasystem.milktea.data.model.Page::class,
         PollChoiceDTO::class,
         UserIdDTO::class,
         DraftFileDTO::class,

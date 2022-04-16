@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.model.account.page
 
 
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
 import jp.panta.misskeyandroidclient.model.account.page.PageType.*
 import java.io.Serializable
 

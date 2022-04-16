@@ -1,14 +1,14 @@
 package net.pantasystem.milktea.data.model.messaging.impl
 
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageAction
-import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.gettters.MessageRelationGetter
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.messaging.CreateMessage
-import jp.panta.misskeyandroidclient.model.messaging.Message
-import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.api.misskey.messaging.MessageAction
+import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.messaging.CreateMessage
+import net.pantasystem.milktea.data.model.messaging.Message
+import net.pantasystem.milktea.data.model.messaging.MessageRepository
 import java.io.IOException
 import java.lang.IllegalStateException
 import javax.inject.Inject

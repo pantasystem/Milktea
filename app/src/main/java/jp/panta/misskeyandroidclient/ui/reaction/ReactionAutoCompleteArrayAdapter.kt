@@ -10,7 +10,7 @@ import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionPreviewBinding
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.emoji.Emoji
 
 class ReactionAutoCompleteArrayAdapter(
     private val reactions: List<Emoji>,

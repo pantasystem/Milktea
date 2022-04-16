@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.model.auth.custom
 
-import jp.panta.misskeyandroidclient.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.data.api.mastodon.apps.ObtainToken
 import java.io.Serializable
 import java.net.URLEncoder

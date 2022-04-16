@@ -1,11 +1,11 @@
 package net.pantasystem.milktea.data.gettters
 
-import jp.panta.misskeyandroidclient.api.misskey.notification.NotificationDTO
-import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSourceAdder
-import jp.panta.misskeyandroidclient.model.notification.*
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.data.api.misskey.users.toUser
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.model.notification.*
+import net.pantasystem.milktea.data.model.users.UserDataSource
 
 class NotificationRelationGetter(
     private val userDataSource: UserDataSource,

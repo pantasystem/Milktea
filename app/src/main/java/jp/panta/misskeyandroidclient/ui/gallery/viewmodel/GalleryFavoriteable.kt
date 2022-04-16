@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
 
-import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
+import net.pantasystem.milktea.data.model.gallery.GalleryPost
 
 interface GalleryToggleLikeOrUnlike  {
 

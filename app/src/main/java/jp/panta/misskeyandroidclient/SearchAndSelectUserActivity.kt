@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel

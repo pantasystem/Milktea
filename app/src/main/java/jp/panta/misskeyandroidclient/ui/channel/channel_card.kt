@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.channel.Channel
+import net.pantasystem.milktea.data.model.users.User
 import kotlinx.datetime.Clock
 
 sealed interface ChannelCardAction {

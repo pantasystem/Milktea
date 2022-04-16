@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemEditPollChoiceBinding
-import jp.panta.misskeyandroidclient.model.notes.PollChoiceState
+import net.pantasystem.milktea.data.model.notes.PollChoiceState
 import java.util.*
 
 class PollChoicesAdapter(

@@ -12,7 +12,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
-import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
+import net.pantasystem.milktea.data.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

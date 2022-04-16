@@ -8,7 +8,7 @@
                 type="java.lang.String" />
         <variable
                 name="reaction"
-                type="jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount" />
+                type="net.pantasystem.milktea.data.model.notes.reaction.ReactionCount" />
         <variable
                 name="note"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData" />

@@ -6,14 +6,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.MakeDefaultPagesUseCase
-import jp.panta.misskeyandroidclient.model.account.PageDefaultStringsOnAndroid
-import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
-import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
-import jp.panta.misskeyandroidclient.util.getPreferenceName
-import jp.panta.misskeyandroidclient.util.getPreferences
+import net.pantasystem.milktea.data.model.DataBase
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.account.MakeDefaultPagesUseCase
+import net.pantasystem.milktea.data.model.account.PageDefaultStringsOnAndroid
+import net.pantasystem.milktea.data.model.account.db.MediatorAccountRepository
+import net.pantasystem.milktea.data.model.account.db.RoomAccountRepository
+import net.pantasystem.milktea.common.getPreferences
 import javax.inject.Singleton
 
 @Module

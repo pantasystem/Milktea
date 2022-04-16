@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.data.model.url
 
-import jp.panta.misskeyandroidclient.GsonFactory
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
-import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
+
+import net.pantasystem.milktea.common.GsonFactory
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.settings.UrlPreviewSourceSetting
+import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

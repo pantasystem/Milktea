@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.notification
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.UnknownNotification
+import net.pantasystem.milktea.data.model.notification.Notification
+import net.pantasystem.milktea.data.model.notification.UnknownNotification
 
 object NotificationHelper {
 

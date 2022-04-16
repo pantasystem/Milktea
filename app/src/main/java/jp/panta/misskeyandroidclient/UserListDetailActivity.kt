@@ -15,11 +15,11 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
-import jp.panta.misskeyandroidclient.model.list.UserList
+import net.pantasystem.milktea.data.model.list.UserList
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler

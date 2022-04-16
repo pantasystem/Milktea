@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel

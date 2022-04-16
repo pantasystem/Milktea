@@ -4,8 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
-import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.data.model.file.AppFile
+import net.pantasystem.milktea.data.model.file.File
 import java.lang.IllegalArgumentException
 
 fun Uri.toAppFile(context: Context): AppFile.Local {

@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
+import net.pantasystem.milktea.data.model.notes.draft.DraftNote
 
 class DraftNoteViewData(draftNote: DraftNote){
 

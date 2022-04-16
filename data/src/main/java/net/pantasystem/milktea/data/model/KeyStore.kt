@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.data.model
 
 object KeyStore {
 

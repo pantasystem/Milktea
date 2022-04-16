@@ -3,10 +3,10 @@ package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.gallery.*
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.data.model.gallery.*
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

@@ -9,7 +9,7 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import jp.panta.misskeyandroidclient.model.Encryption
+import net.pantasystem.milktea.data.model.Encryption
 import java.math.BigInteger
 import java.security.KeyPairGenerator
 import java.security.KeyStore
@@ -17,7 +17,7 @@ import java.util.*
 import javax.crypto.Cipher
 import javax.security.auth.x500.X500Principal
 
-class KeyStoreSystemEncryption(private val context: Context) : Encryption{
+class KeyStoreSystemEncryption(private val context: Context) : Encryption {
     companion object{
         const val PROVIDER = "AndroidKeyStore"
         const val ALGORITHM = "RSA"

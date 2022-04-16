@@ -8,7 +8,7 @@
                 type="jp.panta.misskeyandroidclient.viewmodel.file.FileListener" />
         <variable
                 name="file"
-                type="jp.panta.misskeyandroidclient.model.file.File" />
+                type="net.pantasystem.milktea.data.model.file.File" />
     </data>
     <FrameLayout
             android:layout_width="wrap_content"

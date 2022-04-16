@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.viewmodel.confirm
 
 import androidx.lifecycle.ViewModel
-import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
-import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
+import net.pantasystem.milktea.data.model.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.model.confirm.ConfirmEvent
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 
 class ConfirmViewModel : ViewModel(){

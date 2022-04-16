@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.file
 
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.data.model.file.File
 
 class FileViewData(val file: File) {
     enum class Type{

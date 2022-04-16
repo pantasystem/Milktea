@@ -21,8 +21,8 @@ import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.file.toFile
+import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.file.toFile
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

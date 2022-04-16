@@ -15,8 +15,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.data.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog

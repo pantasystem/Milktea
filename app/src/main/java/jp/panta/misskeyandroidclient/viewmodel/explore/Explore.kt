@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel.explore
 
-import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
+import net.pantasystem.milktea.data.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

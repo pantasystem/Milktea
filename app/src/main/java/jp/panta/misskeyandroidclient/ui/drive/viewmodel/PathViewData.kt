@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 
-import jp.panta.misskeyandroidclient.model.drive.Directory
+import net.pantasystem.milktea.data.model.drive.Directory
 
 class PathViewData (val folder: Directory?){
     val id = folder?.id

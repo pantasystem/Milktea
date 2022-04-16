@@ -1,5 +1,5 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 
 interface ShowUserDetails {
 

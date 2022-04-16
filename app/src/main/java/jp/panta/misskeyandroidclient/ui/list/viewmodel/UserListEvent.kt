@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.list.viewmodel
 
-import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.list.UserList
+import net.pantasystem.milktea.data.model.users.User
 
 data class UserListEvent(
     val type: Type,

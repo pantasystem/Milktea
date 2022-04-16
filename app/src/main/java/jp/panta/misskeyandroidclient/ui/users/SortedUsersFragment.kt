@@ -10,9 +10,9 @@ import jp.panta.misskeyandroidclient.Activities
 
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
+import net.pantasystem.milktea.data.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.databinding.FragmentExploreUsersBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails

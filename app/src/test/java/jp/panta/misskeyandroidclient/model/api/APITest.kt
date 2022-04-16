@@ -1,7 +1,8 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.misskey.v11.MisskeyAPIV11
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.data.api.misskey.v11.MisskeyAPIV11
+import net.pantasystem.milktea.data.model.api.Version
 import org.junit.Assert
 import org.junit.Test
 

@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
 import net.pantasystem.milktea.common.Logger
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.misskey.notes.toNote
-import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
+import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.data.api.misskey.notes.toNote
+import net.pantasystem.milktea.data.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.AddResult
 import jp.panta.misskeyandroidclient.model.account.Account

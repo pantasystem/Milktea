@@ -6,11 +6,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.common.Logger
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProviderImpl
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIWithAccountProvider
+import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIWithAccountProviderImpl
+import net.pantasystem.milktea.data.model.notes.NoteDataSource
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.impl.SocketWithAccountProviderImpl

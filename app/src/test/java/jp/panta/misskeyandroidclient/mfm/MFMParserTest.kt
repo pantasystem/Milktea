@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.mfm
 
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.emoji.Emoji
 import org.junit.Assert.*
 import org.junit.Test
 

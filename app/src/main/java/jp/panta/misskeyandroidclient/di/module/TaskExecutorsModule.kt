@@ -5,9 +5,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.common.Logger
-import jp.panta.misskeyandroidclient.model.CreateGalleryTaskExecutor
-import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
-import jp.panta.misskeyandroidclient.model.TaskExecutorImpl
+import net.pantasystem.milktea.data.model.CreateGalleryTaskExecutor
+import net.pantasystem.milktea.data.model.CreateNoteTaskExecutor
+import net.pantasystem.milktea.data.model.TaskExecutorImpl
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 

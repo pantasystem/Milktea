@@ -1,14 +1,14 @@
 package net.pantasystem.milktea.data.api.misskey.v12
 
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
-import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
-import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
-import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaDTO
-import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaQuery
-import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaToAdd
-import jp.panta.misskeyandroidclient.api.misskey.v12.channel.*
-import jp.panta.misskeyandroidclient.model.I
+import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.data.api.misskey.users.RequestUser
+import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaDTO
+import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaQuery
+import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaToAdd
+import net.pantasystem.milktea.data.api.misskey.v12.channel.*
+import net.pantasystem.milktea.data.model.I
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

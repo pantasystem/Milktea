@@ -3,10 +3,10 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.data.model.notes.draft.DraftNote
+import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn

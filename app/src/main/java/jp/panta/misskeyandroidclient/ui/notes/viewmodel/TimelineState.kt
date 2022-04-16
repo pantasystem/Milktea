@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import net.pantasystem.milktea.data.model.notes.NoteRelation
 
 sealed class TimelineState{
     abstract val notes: List<PlaneNoteViewData>

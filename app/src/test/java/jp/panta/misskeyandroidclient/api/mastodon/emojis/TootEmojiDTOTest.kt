@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.api.mastodon.emojis
+package net.pantasystem.milktea.data.api.mastodon.emojis
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json

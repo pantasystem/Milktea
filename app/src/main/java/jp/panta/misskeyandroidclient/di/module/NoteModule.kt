@@ -7,12 +7,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
-import jp.panta.misskeyandroidclient.model.notes.reservation.AndroidNoteReservationPostExecutor
-import jp.panta.misskeyandroidclient.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.data.model.notes.NoteDataSource
+import net.pantasystem.milktea.data.model.notes.NoteRepository
+import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.model.notes.impl.NoteRepositoryImpl
+import net.pantasystem.milktea.data.model.notes.reservation.AndroidNoteReservationPostExecutor
+import net.pantasystem.milktea.data.model.notes.reservation.NoteReservationPostExecutor
 import javax.inject.Singleton
 
 @Module

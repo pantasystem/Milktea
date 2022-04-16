@@ -8,7 +8,7 @@ import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.mfm.MFMDecorator
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.mfm.Root
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import net.pantasystem.milktea.data.model.emoji.Emoji
 import java.util.regex.Pattern
 
 object DecorateTextHelper {

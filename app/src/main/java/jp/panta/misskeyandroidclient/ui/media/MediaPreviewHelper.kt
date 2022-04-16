@@ -16,7 +16,7 @@ import coil.clear
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.data.model.file.File
 import jp.panta.misskeyandroidclient.ui.notes.view.media.PreviewAbleFileListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData

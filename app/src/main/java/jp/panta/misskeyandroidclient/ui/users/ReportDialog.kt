@@ -9,7 +9,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReportBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 

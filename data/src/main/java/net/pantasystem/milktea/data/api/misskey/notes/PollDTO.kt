@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.data.api.misskey.notes
 
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
+import net.pantasystem.milktea.data.model.notes.poll.Poll
 import java.io.Serializable
 
 @kotlinx.serialization.Serializable

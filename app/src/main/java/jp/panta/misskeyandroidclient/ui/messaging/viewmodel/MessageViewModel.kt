@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.misskey.messaging.MessageDTO
-import jp.panta.misskeyandroidclient.api.misskey.messaging.RequestMessage
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.data.api.misskey.messaging.RequestMessage
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch

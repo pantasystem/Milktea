@@ -2,11 +2,11 @@ package jp.panta.misskeyandroidclient.ui.drive.viewmodel.file
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.misskey.drive.DeleteFileDTO
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
-import jp.panta.misskeyandroidclient.model.drive.*
-import jp.panta.misskeyandroidclient.model.file.AppFile
+import net.pantasystem.milktea.data.api.misskey.drive.DeleteFileDTO
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.data.model.drive.*
+import net.pantasystem.milktea.data.model.file.AppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

@@ -9,7 +9,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.drive.FileProperty
 
 @Composable
 fun FileActionDropdownMenu(

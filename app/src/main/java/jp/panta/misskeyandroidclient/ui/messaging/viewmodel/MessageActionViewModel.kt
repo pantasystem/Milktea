@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.drive.FileProperty
 import java.lang.IllegalArgumentException
-import jp.panta.misskeyandroidclient.model.messaging.CreateMessage
-import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import net.pantasystem.milktea.data.model.messaging.CreateMessage
+import net.pantasystem.milktea.data.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

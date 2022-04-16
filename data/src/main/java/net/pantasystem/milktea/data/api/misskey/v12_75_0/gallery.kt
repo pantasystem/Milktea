@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.api.misskey.v12_75_0
 
-import jp.panta.misskeyandroidclient.api.misskey.drive.FilePropertyDTO
-import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
-import jp.panta.misskeyandroidclient.serializations.DateSerializer
+import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.data.api.misskey.users.UserDTO
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.serializations.DateSerializer
 import java.util.*
 
 

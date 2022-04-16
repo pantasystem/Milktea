@@ -6,11 +6,11 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.data.model.users.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.util.task.asSuspend
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

@@ -1,22 +1,22 @@
 package net.pantasystem.milktea.data.model.notes.impl
 
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.misskey.notes.DeleteNote
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.AddResult
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.drive.FileUploaderProvider
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.PostNoteTask
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.api.misskey.notes.DeleteNote
+import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.model.AddResult
+import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
+import net.pantasystem.milktea.data.model.notes.*
+import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.data.model.notes.reaction.CreateReaction
+import net.pantasystem.milktea.data.model.settings.SettingStore
+import net.pantasystem.milktea.data.model.users.UserDataSource
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.api.misskey.notes.PostNoteTask
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
@@ -152,7 +152,7 @@ class NoteRepositoryImpl @Inject constructor(
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
         val account = accountRepository.get(createReaction.noteId.accountId)
         val res = misskeyAPIProvider.get(account).createReaction(
-            jp.panta.misskeyandroidclient.api.misskey.notes.CreateReaction(
+            net.pantasystem.milktea.data.api.misskey.notes.CreateReaction(
                 i = account.getI(encryption),
                 noteId = createReaction.noteId.noteId,
                 reaction = createReaction.reaction

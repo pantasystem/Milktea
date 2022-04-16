@@ -9,8 +9,8 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.PageType
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate

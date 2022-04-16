@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.api.misskey.users
 
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
 import retrofit2.Response
 
 class SearchByUserAndHost(val misskeyAPI: MisskeyAPI){

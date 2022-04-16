@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.api.misskey
 
-import jp.panta.misskeyandroidclient.api.misskey.auth.AccessToken
-import jp.panta.misskeyandroidclient.api.misskey.auth.AppSecret
-import jp.panta.misskeyandroidclient.api.misskey.auth.Session
-import jp.panta.misskeyandroidclient.api.misskey.auth.UserKey
+import net.pantasystem.milktea.data.api.misskey.auth.AccessToken
+import net.pantasystem.milktea.data.api.misskey.auth.AppSecret
+import net.pantasystem.milktea.data.api.misskey.auth.Session
+import net.pantasystem.milktea.data.api.misskey.auth.UserKey
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

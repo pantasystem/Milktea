@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
+import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryDataSource
+import net.pantasystem.milktea.data.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
 import javax.inject.Singleton
 
 @Module

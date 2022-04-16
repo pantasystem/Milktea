@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.api.misskey.v12_75_0
 
-import jp.panta.misskeyandroidclient.api.misskey.v11.MisskeyAPIV11Diff
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12Diff
-import jp.panta.misskeyandroidclient.model.I
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.data.api.misskey.v11.MisskeyAPIV11Diff
+import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12Diff
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.data.model.I
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

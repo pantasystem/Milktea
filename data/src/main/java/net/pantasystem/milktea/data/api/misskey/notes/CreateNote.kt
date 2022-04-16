@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.api.misskey.notes
 
-import jp.panta.misskeyandroidclient.model.notes.poll.CreatePoll
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.data.model.notes.poll.CreatePoll
 
 @Serializable
 data class CreateNote(
@@ -22,7 +22,7 @@ data class CreateNote(
     val channelId: String? = null,
 
 
-){
+    ){
     data class Response(val createdNote: NoteDTO)
 
 

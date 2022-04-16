@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.util.getPreferenceName
+import net.pantasystem.milktea.common.getPreferenceName
 
 class BooleanSharedItem(
     override val key: String,

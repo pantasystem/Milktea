@@ -13,10 +13,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.notes.Note
+import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.data.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment

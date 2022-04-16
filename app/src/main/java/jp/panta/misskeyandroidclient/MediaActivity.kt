@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
 import jp.panta.misskeyandroidclient.databinding.ActivityMediaBinding
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.data.model.file.File
 import jp.panta.misskeyandroidclient.ui.media.ImageFragment
 import jp.panta.misskeyandroidclient.ui.media.PlayerFragment
 import java.io.Serializable

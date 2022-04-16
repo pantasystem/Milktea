@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account
 
+import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.data.model.account.AccountState
 import org.junit.Assert.*
 
 import org.junit.Test

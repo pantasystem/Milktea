@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.view.editor
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notes.Visibility
+import net.pantasystem.milktea.data.model.notes.Visibility
 
 object NoteVisibilityIconHelper {
 

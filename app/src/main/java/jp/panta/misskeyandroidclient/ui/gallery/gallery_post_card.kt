@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.*
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.data.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.components.ThumbnailPreview
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
 import androidx.compose.runtime.getValue

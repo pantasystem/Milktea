@@ -2,10 +2,10 @@ package jp.panta.misskeyandroidclient.viewmodel.timeline
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.model.account.page.PageType
+import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.data.model.channel.Channel
+import net.pantasystem.milktea.data.model.users.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject

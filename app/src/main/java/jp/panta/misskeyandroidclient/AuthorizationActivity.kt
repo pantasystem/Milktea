@@ -7,9 +7,9 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.auth.Authorization
-import jp.panta.misskeyandroidclient.model.auth.custom.CustomAuthStore
-import jp.panta.misskeyandroidclient.model.auth.from
+import net.pantasystem.milktea.data.model.auth.Authorization
+import net.pantasystem.milktea.data.model.auth.custom.CustomAuthStore
+import net.pantasystem.milktea.data.model.auth.from
 import jp.panta.misskeyandroidclient.ui.auth.AuthFragment
 import jp.panta.misskeyandroidclient.ui.auth.AuthResultFragment
 import jp.panta.misskeyandroidclient.ui.auth.Waiting4userAuthorizationFragment
