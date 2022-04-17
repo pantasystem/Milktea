@@ -83,7 +83,7 @@ class DraftNotesViewModel(
 
             viewModelScope.launch(Dispatchers.IO){
                 try{
-                    draftNoteDao.deleteFile(targetNote.draftNoteId!!, file.localFileId)
+                    draftNoteDao.deleteFile(targetNote.draftNoteId!!, file.localFileId!!)
 
                     loadDraftNotes()
                 }catch(e: Exception){

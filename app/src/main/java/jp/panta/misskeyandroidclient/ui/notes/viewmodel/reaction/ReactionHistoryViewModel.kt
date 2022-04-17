@@ -12,13 +12,16 @@ import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryPaginato
 import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class ReactionHistoryViewModel(
     private val reactionHistoryDataSource: ReactionHistoryDataSource,
     private val paginator: ReactionHistoryPaginator,
-    val logger: net.pantasystem.milktea.common.Logger?
+    val logger: Logger?
 ) : ViewModel(){
 
 

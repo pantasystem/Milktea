@@ -153,12 +153,12 @@ class ActionNoteHandler(
         when (it.eventType) {
             "delete_note" -> {
                 if (it.args is Note) {
-                    mNotesViewModel.removeNote(it.args.id)
+                    mNotesViewModel.removeNote((it.args as Note).id)
                 }
             }
             "delete_and_edit_note" -> {
                 if (it.args is NoteRelation) {
-                    mNotesViewModel.removeAndEditNote(it.args)
+                    mNotesViewModel.removeAndEditNote(it.args as NoteRelation)
                 }
             }
         }

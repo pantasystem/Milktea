@@ -13,12 +13,12 @@ import net.pantasystem.milktea.data.model.account.page.Page
 import net.pantasystem.milktea.data.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
-import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.data.model.account.page.PageableTemplate
 
 @FlowPreview
 @ExperimentalCoroutinesApi

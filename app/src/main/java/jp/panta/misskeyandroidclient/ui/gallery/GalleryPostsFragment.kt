@@ -15,8 +15,8 @@ import jp.panta.misskeyandroidclient.AuthorizationActivity
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.data.api.misskey.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
 import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
@@ -73,12 +73,12 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         binding.listView.layoutManager = layoutManager
         lifecycleScope.launchWhenStarted {
             viewModel.galleryPosts.collect { state ->
-                if(state.content is net.pantasystem.milktea.common.StateContent.Exist) {
+                if(state.content is StateContent.Exist) {
                     // 要素を表示する
                     binding.refresh.visibility = View.VISIBLE
                     binding.timelineEmptyView.visibility = View.GONE
                     binding.timelineProgressBar.visibility = View.GONE
-                    galleryPostsListAdapter.submitList(state.content.rawContent)
+                    galleryPostsListAdapter.submitList((state.content as StateContent.Exist<List<GalleryPostState>>).rawContent)
                     binding.refresh.isRefreshing = state is net.pantasystem.milktea.common.PageableState.Loading
                 }else{
                     // エラーメッセージやプログレスバーなどを表示する

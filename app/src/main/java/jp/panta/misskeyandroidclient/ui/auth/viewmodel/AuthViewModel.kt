@@ -136,10 +136,10 @@ class AuthViewModel @Inject constructor(
                 )
                 val user = when(a.accessToken) {
                     is AccessToken.Mastodon -> {
-                        a.accessToken.account.toModel(account)
+                        (a.accessToken as AccessToken.Mastodon).account.toModel(account)
                     }
                     is AccessToken.Misskey -> {
-                        a.accessToken.user.toUser(account, true) as User.Detail
+                        (a.accessToken as AccessToken.Misskey).user.toUser(account, true) as User.Detail
                     }
                 }
                 miCore.getUserDataSource().add(user)

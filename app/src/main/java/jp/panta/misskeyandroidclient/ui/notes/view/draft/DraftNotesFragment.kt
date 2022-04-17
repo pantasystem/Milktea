@@ -46,31 +46,31 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
         binding.draftNotesView.adapter = adapter
         binding.draftNotesView.layoutManager = LinearLayoutManager(view.context)
 
-        viewModel.draftNotes.observe(viewLifecycleOwner, {
+        viewModel.draftNotes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
 
         binding.draftNotesSwipeRefresh.setOnRefreshListener {
             viewModel.loadDraftNotes()
         }
-        viewModel.isLoading.observe( viewLifecycleOwner, {
+        viewModel.isLoading.observe( viewLifecycleOwner) {
             binding.draftNotesSwipeRefresh.isRefreshing = it
-        })
+        }
 
         val confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
         mConfirmViewModel = confirmViewModel
 
-        confirmViewModel.confirmedEvent.observe(viewLifecycleOwner, {
-            if(it.eventType == EV_DELETE_DRAFT_NOTE && it.resultType == ResultType.POSITIVE){
-                (it.args as? DraftNote)?.let{ dn ->
+        confirmViewModel.confirmedEvent.observe(viewLifecycleOwner) {
+            if (it.eventType == EV_DELETE_DRAFT_NOTE && it.resultType == ResultType.POSITIVE) {
+                (it.args as? DraftNote)?.let { dn ->
                     mDraftNotesViewModel?.deleteDraftNote(dn)
                 }
             }
-        })
+        }
 
-        confirmViewModel.confirmEvent.observe(viewLifecycleOwner, {
+        confirmViewModel.confirmEvent.observe(viewLifecycleOwner) {
             ConfirmDialog().show(parentFragmentManager, "confirm")
-        })
+        }
     }
 
     override fun onSelect(draftNote: DraftNote?) {

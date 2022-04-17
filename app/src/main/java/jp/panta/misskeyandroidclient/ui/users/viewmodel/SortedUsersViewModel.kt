@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.di.module.getNoteDataSourceAdder
 import net.pantasystem.milktea.data.api.misskey.users.RequestUser
 import net.pantasystem.milktea.data.api.misskey.users.toUser
-import net.pantasystem.milktea.data.model.notes.getNoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn

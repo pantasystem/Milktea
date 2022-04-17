@@ -217,6 +217,7 @@ class MiApplication : Application(), MiCore {
             loggerFactory,
             auth = BuildConfig.PUSH_TO_FCM_AUTH,
             publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
+            endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
         )
     }
 
@@ -225,7 +226,10 @@ class MiApplication : Application(), MiCore {
             getAccountRepository(),
             getEncryption(),
             lang = Locale.getDefault().language,
-            misskeyAPIProvider = getMisskeyAPIProvider()
+            misskeyAPIProvider = getMisskeyAPIProvider(),
+            endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
+            auth = BuildConfig.PUSH_TO_FCM_AUTH,
+            publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
         )
     }
 

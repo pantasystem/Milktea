@@ -3,14 +3,12 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.common.Logger
+import jp.panta.misskeyandroidclient.di.module.createRenotesPagingService
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.model.notes.Note
 import net.pantasystem.milktea.data.model.notes.NoteRelation
 import net.pantasystem.milktea.data.model.notes.renote.Renote
 import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingService
-import net.pantasystem.milktea.data.model.notes.renote.createRenotesPagingService
-import net.pantasystem.milktea.common.PageableState
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

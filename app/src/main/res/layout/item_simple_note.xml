@@ -175,8 +175,8 @@
                             android:layout_height="wrap_content"
                             android:id="@+id/translationView"
                             layout="@layout/view_translation"
-                            emojis="@{note.toShowNote.note.emojis}"
-                            translationState="@{note.translateState}" />
+                            app:emojis="@{note.toShowNote.note.emojis}"
+                            app:translationState="@{note.translateState}" />
 
                     <include
                             android:id="@+id/mediaPreview"

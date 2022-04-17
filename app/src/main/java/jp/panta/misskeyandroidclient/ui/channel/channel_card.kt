@@ -114,7 +114,7 @@ fun ChannelCard(
                         fontSize = 18.sp
                     )
                     if (!channel.description.isNullOrBlank()) {
-                        Text(channel.description, maxLines = 3)
+                        Text(channel.description ?: "", maxLines = 3)
                     }
                 }
                 Row {
@@ -137,7 +137,7 @@ fun ChannelCard(
 
                     }
                     if (channel.isFollowing != null) {
-                        if (channel.isFollowing) {
+                        if (channel.isFollowing!!) {
                             Button(onClick = {
                                 onAction.invoke(
                                     ChannelCardAction.OnUnFollowButtonClicked(

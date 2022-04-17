@@ -6,10 +6,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import jp.panta.misskeyandroidclient.impl.PageDefaultStringsOnAndroid
 import net.pantasystem.milktea.data.model.DataBase
 import net.pantasystem.milktea.data.model.account.AccountRepository
 import net.pantasystem.milktea.data.model.account.MakeDefaultPagesUseCase
-import net.pantasystem.milktea.data.model.account.PageDefaultStringsOnAndroid
 import net.pantasystem.milktea.data.model.account.db.MediatorAccountRepository
 import net.pantasystem.milktea.data.model.account.db.RoomAccountRepository
 import net.pantasystem.milktea.common.getPreferences

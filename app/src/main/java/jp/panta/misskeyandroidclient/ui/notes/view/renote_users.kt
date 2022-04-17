@@ -9,6 +9,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
@@ -17,6 +19,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import androidx.compose.ui.Alignment
+import androidx.lifecycle.asLiveData
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 
@@ -29,15 +32,15 @@ fun RenoteUsersScreen(
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 ) {
 
-    val renotes: net.pantasystem.milktea.common.PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = net.pantasystem.milktea.common.PageableState.Fixed(
-        net.pantasystem.milktea.common.StateContent.NotExist()))
+    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(
+        StateContent.NotExist()))
 
     LaunchedEffect(true) {
         renotesViewModel.refresh()
     }
 
-    if(renotes.content is net.pantasystem.milktea.common.StateContent.Exist && (renotes.content as net.pantasystem.milktea.common.StateContent.Exist).rawContent.isNotEmpty()) {
-        val content = (renotes.content as net.pantasystem.milktea.common.StateContent.Exist).rawContent
+    if(renotes.content is StateContent.Exist && (renotes.content as StateContent.Exist).rawContent.isNotEmpty()) {
+        val content = (renotes.content as StateContent.Exist).rawContent
         RenoteUserList(
             notes = content,
             onSelected = onSelected,
@@ -54,11 +57,11 @@ fun RenoteUsersScreen(
             verticalArrangement = Arrangement.Center
         ) {
             when (renotes) {
-                is net.pantasystem.milktea.common.PageableState.Loading -> {
+                is PageableState.Loading -> {
                     CircularProgressIndicator()
                 }
-                is net.pantasystem.milktea.common.PageableState.Error -> {
-                    val error = (renotes as net.pantasystem.milktea.common.PageableState.Error).throwable
+                is PageableState.Error -> {
+                    val error = (renotes as PageableState.Error).throwable
                     Text(text = "load error:${error}")
                 }
                 else -> {

@@ -9,9 +9,9 @@ data class PreviewAbleFile(val file: File, val isHiding: Boolean) {
     }
     val type = when{
         file.type == null -> Type.OTHER
-        file.type.startsWith("image") -> Type.IMAGE
-        file.type.startsWith("video") -> Type.VIDEO
-        file.type.startsWith("audio") -> Type.SOUND
+        file.type!!.startsWith("image") -> Type.IMAGE
+        file.type!!.startsWith("video") -> Type.VIDEO
+        file.type!!.startsWith("audio") -> Type.SOUND
         else -> Type.OTHER
     }
 

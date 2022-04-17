@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.ui.drive.viewmodel.file
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import jp.panta.misskeyandroidclient.di.module.filePropertyPagingStore
 import net.pantasystem.milktea.data.api.misskey.drive.DeleteFileDTO
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.account.CurrentAccountWatcher

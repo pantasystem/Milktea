@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.data.model.account.page.PageableTemplate
 import java.lang.IllegalStateException
 
 class PageSettingViewModel(

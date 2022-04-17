@@ -12,12 +12,12 @@ import net.pantasystem.milktea.data.model.account.AccountStore
 import net.pantasystem.milktea.data.model.account.page.Pageable
 import net.pantasystem.milktea.data.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.data.model.account.page.PageableTemplate
 import javax.inject.Inject
 
 @HiltViewModel
