@@ -6,24 +6,22 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaQuery
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.antenna.Antenna
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import net.pantasystem.milktea.data.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.account.page.PageableTemplate
 import javax.inject.Inject
 
 @HiltViewModel
 class AntennaListViewModel @Inject constructor(
-    val accountStore: AccountStore,
-    val accountRepository: AccountRepository,
+    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
+    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption
 ) : ViewModel() {
@@ -59,7 +57,7 @@ class AntennaListViewModel @Inject constructor(
             mPagedAntennaIds.postValue(
                 it?.pages?.mapNotNull { page ->
                     val pageable = page.pageable()
-                    if (pageable is Pageable.Antenna) {
+                    if (pageable is net.pantasystem.milktea.model.account.page.Pageable.Antenna) {
                         it.accountId.let { accountId ->
                             Antenna.Id(accountId, pageable.antennaId)
 
@@ -109,7 +107,8 @@ class AntennaListViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (paged == null) {
                 accountStore.addPage(
-                    PageableTemplate(accountStore.currentAccount!!).antenna(
+                    net.pantasystem.milktea.model.account.page.PageableTemplate(accountStore.currentAccount!!)
+                        .antenna(
                         antenna
                     )
                 )

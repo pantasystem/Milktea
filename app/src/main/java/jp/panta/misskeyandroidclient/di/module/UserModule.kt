@@ -4,10 +4,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.model.users.UserDataSource
-import net.pantasystem.milktea.data.model.users.UserRepository
-import net.pantasystem.milktea.data.model.users.impl.InMemoryUserDataSource
-import net.pantasystem.milktea.data.model.users.impl.UserRepositoryImpl
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.data.model.user.impl.InMemoryUserDataSource
+import net.pantasystem.milktea.data.model.user.impl.UserRepositoryImpl
 import javax.inject.Singleton
 
 @Module

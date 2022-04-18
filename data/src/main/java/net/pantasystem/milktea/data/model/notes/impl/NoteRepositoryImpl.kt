@@ -3,32 +3,29 @@ package net.pantasystem.milktea.data.model.notes.impl
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.AddResult
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
-import net.pantasystem.milktea.data.model.notes.reaction.CreateReaction
+import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.data.model.settings.SettingStore
-import net.pantasystem.milktea.data.model.users.UserDataSource
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
+import net.pantasystem.milktea.model.notes.*
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
     val loggerFactory: Logger.Factory,
-    val userDataSource: UserDataSource,
+    val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     val noteDataSource: NoteDataSource,
-    val filePropertyDataSource: FilePropertyDataSource,
+    val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
     val encryption: Encryption,
     val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val draftNoteDao: DraftNoteDao,
     val settingStore: SettingStore,
-    val accountRepository: AccountRepository,
+    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
 ) : NoteRepository {
 

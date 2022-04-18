@@ -15,7 +15,7 @@ import com.google.android.flexbox.*
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionPickerBinding
-import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
@@ -32,7 +32,7 @@ import javax.inject.Inject
 class ReactionPickerDialog : AppCompatDialogFragment(){
     val notesViewModel by activityViewModels<NotesViewModel>()
     @Inject
-    lateinit var reactionUserSettingDao: ReactionUserSettingDao
+    lateinit var reactionUserSettingDao: net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

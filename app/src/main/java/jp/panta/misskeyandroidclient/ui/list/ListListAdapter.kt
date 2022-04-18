@@ -12,8 +12,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemListAddUserBinding
 import jp.panta.misskeyandroidclient.databinding.ItemListBinding
 
-import net.pantasystem.milktea.data.model.list.UserList
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,17 +22,17 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
     private val listListViewModel: ListListViewModel,
     val lifecycleOwner: LifecycleOwner,
     var onTryToEditCallback: OnTryToEditCallback? = null
-) : ListAdapter<UserList, ListListAdapter.BaseVH>(
+) : ListAdapter<net.pantasystem.milktea.model.list.UserList, ListListAdapter.BaseVH>(
     ItemCallback()
 ){
 
     abstract class BaseVH(view: View) : RecyclerView.ViewHolder(view){
-        abstract fun bind(userList: UserList)
+        abstract fun bind(userList: net.pantasystem.milktea.model.list.UserList)
     }
 
     inner class VH(val binding: ItemListBinding) : BaseVH(binding.root){
         @OptIn(ExperimentalCoroutinesApi::class)
-        override fun bind(userList: UserList) {
+        override fun bind(userList: net.pantasystem.milktea.model.list.UserList) {
             binding.list = userList
             binding.lifecycleOwner = lifecycleOwner
             binding.tryToEditCallback = onTryToEditCallback
@@ -42,7 +42,7 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
     }
 
     inner class AddUserVH(val binding: ItemListAddUserBinding) : BaseVH(binding.root){
-        override fun bind(userList: UserList) {
+        override fun bind(userList: net.pantasystem.milktea.model.list.UserList) {
             binding.userList = userList
             binding.addUserId = addUserId
             binding.pullPushViewModel = pullPushUserViewModel
@@ -50,22 +50,22 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
         }
     }
 
-    class ItemCallback : DiffUtil.ItemCallback<UserList>(){
-        override fun areContentsTheSame(oldItem: UserList, newItem: UserList): Boolean {
+    class ItemCallback : DiffUtil.ItemCallback<net.pantasystem.milktea.model.list.UserList>(){
+        override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.list.UserList, newItem: net.pantasystem.milktea.model.list.UserList): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: UserList, newItem: UserList): Boolean {
+        override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.list.UserList, newItem: net.pantasystem.milktea.model.list.UserList): Boolean {
             return oldItem.id == newItem.id
         }
     }
 
     interface OnTryToEditCallback{
 
-        fun onEdit(userList: UserList?)
+        fun onEdit(userList: net.pantasystem.milktea.model.list.UserList?)
     }
 
-    private var addUserId: User.Id? = null
+    private var addUserId: net.pantasystem.milktea.model.user.User.Id? = null
     private var pullPushUserViewModel: UserListPullPushUserViewModel? = null
 
     @ExperimentalCoroutinesApi
@@ -73,7 +73,7 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
         listListViewModel: ListListViewModel,
         lifecycleOwner: LifecycleOwner,
         onTryToEditCallback: OnTryToEditCallback?,
-        addUserId: User.Id,
+        addUserId: net.pantasystem.milktea.model.user.User.Id,
         pullPushUserViewModel: UserListPullPushUserViewModel
     )
     :this(listListViewModel, lifecycleOwner, onTryToEditCallback){

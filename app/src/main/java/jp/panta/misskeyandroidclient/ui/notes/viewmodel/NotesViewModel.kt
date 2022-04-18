@@ -8,25 +8,24 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.data.api.misskey.notes.NoteState
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
-import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
-import net.pantasystem.milktea.data.model.notes.draft.toDraftNote
-import net.pantasystem.milktea.data.model.notes.poll.Poll
-import net.pantasystem.milktea.data.model.notes.poll.Vote
-import net.pantasystem.milktea.data.model.notes.reaction.CreateReaction
-import net.pantasystem.milktea.data.model.notes.reaction.Reaction
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryRequest
-import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.model.users.User
-import net.pantasystem.milktea.data.model.users.report.Report
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.Vote
+import net.pantasystem.milktea.model.notes.reaction.CreateReaction
+import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.Report
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
@@ -37,18 +36,18 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
-data class SelectedReaction(val noteId: Note.Id, val reaction: String)
+data class SelectedReaction(val noteId: net.pantasystem.milktea.model.notes.Note.Id, val reaction: String)
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val reactionHistoryDao: ReactionHistoryDao,
+    private val reactionHistoryDao: net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao,
     private val encryption: Encryption,
-    private val translationStore: NoteTranslationStore,
-    private val draftNoteDAO: DraftNoteDao,
-    private val noteRepository: NoteRepository,
-    private val accountRepository: AccountRepository,
+    private val translationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore,
+    private val draftNoteDAO: net.pantasystem.milktea.model.notes.draft.DraftNoteDao,
+    private val noteRepository: net.pantasystem.milktea.model.notes.NoteRepository,
+    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    val accountStore: AccountStore,
+    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
 
@@ -74,19 +73,19 @@ class NotesViewModel @Inject constructor(
 
     val shareNoteState = MutableLiveData<NoteState>()
 
-    val targetUser = EventBus<User>()
+    val targetUser = EventBus<net.pantasystem.milktea.model.user.User>()
 
-    val showNoteEvent = EventBus<Note>()
+    val showNoteEvent = EventBus<net.pantasystem.milktea.model.notes.Note>()
 
     val targetFile = EventBus<Pair<FileViewData, MediaViewData>>()
 
     val showInputReactionEvent = EventBus<Unit>()
 
-    val openNoteEditor = EventBus<DraftNote?>()
+    val openNoteEditor = EventBus<net.pantasystem.milktea.model.notes.draft.DraftNote?>()
 
-    val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
+    val showReactionHistoryEvent = EventBus<net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest?>()
 
-    val showRenotesEvent = EventBus<Note.Id?>()
+    val showRenotesEvent = EventBus<net.pantasystem.milktea.model.notes.Note.Id?>()
 
     /**
      * リモートのリアクションを選択したときに
@@ -109,7 +108,7 @@ class NotesViewModel @Inject constructor(
         loadNoteState(note)
     }
 
-    fun setTargetToUser(user: User) {
+    fun setTargetToUser(user: net.pantasystem.milktea.model.user.User) {
         targetUser.event = user
     }
 
@@ -121,17 +120,18 @@ class NotesViewModel @Inject constructor(
         showNoteEvent.event = note.toShowNote.note
     }
 
-    fun setShowNote(note: Note) {
+    fun setShowNote(note: net.pantasystem.milktea.model.notes.Note) {
         showNoteEvent.event = note
     }
 
-    fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
+    fun setShowReactionHistoryDialog(noteId: net.pantasystem.milktea.model.notes.Note.Id?, type: String?) {
         noteId?.let {
-            showReactionHistoryEvent.event = ReactionHistoryRequest(noteId, type)
+            showReactionHistoryEvent.event =
+                net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest(noteId, type)
         }
     }
 
-    fun showRenotes(noteId: Note.Id?) {
+    fun showRenotes(noteId: net.pantasystem.milktea.model.notes.Note.Id?) {
         showRenotesEvent.event = noteId
     }
 
@@ -142,10 +142,10 @@ class NotesViewModel @Inject constructor(
             runCatching {
                 val author = accountRepository.get(renoteId.accountId)
                 noteRepository.create(
-                    CreateNote(
+                    net.pantasystem.milktea.model.notes.CreateNote(
                         renoteId = renoteId,
                         text = null,
-                        visibility = Visibility.Public(true),
+                        visibility = net.pantasystem.milktea.model.notes.Visibility.Public(true),
                         author = author
                     )
                 )
@@ -203,7 +203,7 @@ class NotesViewModel @Inject constructor(
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String) {
 
         val id = planeNoteViewData.toShowNote.note.id
-        if (!Reaction(reaction).isLocal()) {
+        if (!net.pantasystem.milktea.model.notes.reaction.Reaction(reaction).isLocal()) {
             showRemoteReactionEmojiSuggestionDialog.event =
                 SelectedReaction(noteId = id, reaction = reaction)
             return
@@ -212,7 +212,7 @@ class NotesViewModel @Inject constructor(
 
             runCatching {
                 val result = noteRepository.toggleReaction(
-                    CreateReaction(
+                    net.pantasystem.milktea.model.notes.reaction.CreateReaction(
                         noteId = id,
                         reaction = reaction
                     )
@@ -241,7 +241,7 @@ class NotesViewModel @Inject constructor(
         try {
             val domain = getAccount()?.instanceDomain
             reactionHistoryDao.insert(
-                ReactionHistory(
+                net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory(
                     instanceDomain = domain!!,
                     reaction = reaction
                 )
@@ -302,7 +302,7 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    fun removeNote(noteId: Note.Id) {
+    fun removeNote(noteId: net.pantasystem.milktea.model.notes.Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 noteRepository.delete(noteId)
@@ -315,7 +315,7 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    fun removeAndEditNote(note: NoteRelation) {
+    fun removeAndEditNote(note: net.pantasystem.milktea.model.notes.NoteRelation) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
 
@@ -379,7 +379,7 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    fun vote(noteId: Note.Id?, poll: Poll?, choice: Poll.Choice?) {
+    fun vote(noteId: net.pantasystem.milktea.model.notes.Note.Id?, poll: net.pantasystem.milktea.model.notes.poll.Poll?, choice: net.pantasystem.milktea.model.notes.poll.Poll.Choice?) {
         if (noteId == null || poll == null || choice == null) {
              return
         }
@@ -387,7 +387,7 @@ class NotesViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     getMisskeyAPI()?.vote(
-                        Vote(
+                        net.pantasystem.milktea.model.notes.poll.Vote(
                             i = getAccount()?.getI(encryption)!!,
                             choice = choice.index,
                             noteId = noteId.noteId
@@ -402,7 +402,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun translate(noteId: Note.Id) {
+    fun translate(noteId: net.pantasystem.milktea.model.notes.Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             translationStore.translate(noteId)
         }
@@ -415,7 +415,7 @@ class NotesViewModel @Inject constructor(
         }.getOrNull()
     }
 
-    fun getAccount(): Account? {
+    fun getAccount(): net.pantasystem.milktea.model.account.Account? {
         return accountStore.currentAccount
     }
 

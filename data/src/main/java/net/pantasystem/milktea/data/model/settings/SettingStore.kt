@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
 import net.pantasystem.milktea.data.model.KeyStore
-import net.pantasystem.milktea.data.model.notes.CanLocalOnly
-import net.pantasystem.milktea.data.model.notes.CreateNote
-import net.pantasystem.milktea.data.model.notes.Visibility
+import net.pantasystem.milktea.model.notes.CanLocalOnly
+import net.pantasystem.milktea.model.notes.CreateNote
+import net.pantasystem.milktea.model.notes.Visibility
 
 class SettingStore(private val sharedPreferences: SharedPreferences) {
 

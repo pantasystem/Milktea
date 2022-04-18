@@ -15,11 +15,11 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
-import net.pantasystem.milktea.data.model.list.UserList
+import net.pantasystem.milktea.model.list.UserList
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
@@ -47,15 +47,15 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
 
 
-        fun newIntent(context: Context, listId: UserList.Id): Intent {
+        fun newIntent(context: Context, listId: net.pantasystem.milktea.model.list.UserList.Id): Intent {
             return Intent(context, UserListDetailActivity::class.java).apply {
                 putExtra(EXTRA_LIST_ID, listId)
             }
         }
     }
 
-    private var account: Account? = null
-    private var mListId: UserList.Id? = null
+    private var account: net.pantasystem.milktea.model.account.Account? = null
+    private var mListId: net.pantasystem.milktea.model.list.UserList.Id? = null
 
     @Inject
     lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
@@ -66,7 +66,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     @FlowPreview
     @ExperimentalCoroutinesApi
     val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
-        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
+        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as net.pantasystem.milktea.model.list.UserList.Id
         UserListDetailViewModel.provideFactory(assistedFactory, listId)
     }
 
@@ -82,7 +82,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
         setSupportActionBar(binding.userListToolbar)
 
-        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
+        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as net.pantasystem.milktea.model.list.UserList.Id
 
 
         mListId = listId
@@ -121,7 +121,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         menuInflater.inflate(R.menu.menu_user_list_detail, menu)
         val addToTabItem = menu.findItem(R.id.action_add_to_tab)
         val page = account?.pages?.firstOrNull {
-            (it.pageable() as? Pageable.UserListTimeline)?.listId == mListId?.userListId && mListId != null
+            (it.pageable() as? net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline)?.listId == mListId?.userListId && mListId != null
         }
         if(page == null){
             addToTabItem?.setIcon(R.drawable.ic_add_to_tab_24px)
@@ -184,7 +184,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     private fun toggleAddToTab(){
         val page = account?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if(pageable is Pageable.UserListTimeline){
+            if(pageable is net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline){
                 pageable.listId == mListId?.userListId && mListId != null
             }else{
                 false
@@ -192,7 +192,14 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }
         if(page == null){
             accountViewModel.addPage(
-                Page(account?.accountId?: - 1, mUserListName, weight = -1, pageable = Pageable.UserListTimeline(mListId?.userListId!!))
+                net.pantasystem.milktea.model.account.page.Page(
+                    account?.accountId ?: -1,
+                    mUserListName,
+                    weight = -1,
+                    pageable = net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline(
+                        mListId?.userListId!!
+                    )
+                )
             )
         }else{
             accountViewModel.removePage(page)
@@ -201,7 +208,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
 
 
-    inner class PagerAdapter(val listId: UserList.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class PagerAdapter(val listId: net.pantasystem.milktea.model.list.UserList.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
         private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))
         override fun getCount(): Int {
             return titles.size
@@ -211,7 +218,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             return when(position){
                 0 ->{
                     TimelineFragment.newInstance(
-                        Pageable.UserListTimeline(listId = listId.userListId)
+                        net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline(listId = listId.userListId)
                     )
                 }
                 1 ->{

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
@@ -34,7 +34,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
         const val EXTRA_SELECTED_USER_CHANGED_DIFF = "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_CHANGED_DIFF"
 
-        fun newIntent(context: Context, selectableMaximumSize: Int = Int.MAX_VALUE, selectedUserIds: List<User.Id> = emptyList()) : Intent{
+        fun newIntent(context: Context, selectableMaximumSize: Int = Int.MAX_VALUE, selectedUserIds: List<net.pantasystem.milktea.model.user.User.Id> = emptyList()) : Intent{
             return Intent(context, SearchAndSelectUserActivity::class.java).apply {
                 putExtra(EXTRA_SELECTABLE_MAXIMUM_SIZE, selectableMaximumSize)
                 putExtra(EXTRA_SELECTED_USER_IDS, ArrayList<Serializable>(selectedUserIds))
@@ -42,7 +42,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         }
     }
 
-    private var mSelectedUserIds: List<User.Id>? = null
+    private var mSelectedUserIds: List<net.pantasystem.milktea.model.user.User.Id>? = null
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -65,7 +65,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         val selectableMaximumSize = intent.getIntExtra(EXTRA_SELECTABLE_MAXIMUM_SIZE, Int.MAX_VALUE)
         val selectedUserIdList =
             (intent.getSerializableExtra(EXTRA_SELECTED_USER_IDS) as? ArrayList<*>)?.mapNotNull {
-                it as? User.Id
+                it as? net.pantasystem.milktea.model.user.User.Id
             }
         mSelectedUserIds = selectedUserIdList
         Log.d(this.localClassName, "selected user ids :$selectedUserIdList")

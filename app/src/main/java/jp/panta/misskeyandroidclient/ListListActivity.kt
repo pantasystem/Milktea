@@ -12,18 +12,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.list.UserList
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.list.ListListAdapter
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @FlowPreview
@@ -35,7 +32,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
         private const val EXTRA_ADD_USER_ID = "jp.panta.misskeyandroidclient.extra.ADD_USER_ID"
 
-        fun newInstance(context: Context, addUserId: User.Id?): Intent {
+        fun newInstance(context: Context, addUserId: net.pantasystem.milktea.model.user.User.Id?): Intent {
             return Intent(context, ListListActivity::class.java).apply {
                 addUserId?.let {
                     putExtra(EXTRA_ADD_USER_ID, addUserId)
@@ -50,7 +47,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     val pullPushUserViewModel: UserListPullPushUserViewModel by viewModels()
 
     @Inject
-    lateinit var accountStore: AccountStore
+    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
 
 
     private var mPullPushUserViewModelEventDisposable: Disposable? = null
@@ -62,7 +59,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
         setTheme()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_list_list)
 
-        val addUserId = intent.getSerializableExtra(EXTRA_ADD_USER_ID) as? User.Id
+        val addUserId = intent.getSerializableExtra(EXTRA_ADD_USER_ID) as? net.pantasystem.milktea.model.user.User.Id
 
         val layoutManager = LinearLayoutManager(this)
 
@@ -119,14 +116,14 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     }
 
     @ExperimentalCoroutinesApi
-    private val showUserListDetail = Observer<UserList>{ ul ->
+    private val showUserListDetail = Observer<net.pantasystem.milktea.model.list.UserList>{ ul ->
         val intent = UserListDetailActivity.newIntent(this, ul.id)
         startActivity(intent)
     }
 
 
 
-    override fun onEdit(userList: UserList?) {
+    override fun onEdit(userList: net.pantasystem.milktea.model.list.UserList?) {
         userList?: return
 
         val intent = UserListDetailActivity.newIntent(this, userList.id)

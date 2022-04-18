@@ -14,9 +14,9 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBinding
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.drive.DriveFileRepository
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
@@ -32,9 +32,9 @@ class SettingAppearanceActivity : AppCompatActivity() {
     lateinit var mSettingStore: SettingStore
 
     @Inject
-    lateinit var accountStore: AccountStore
+    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
     @Inject
-    lateinit var driveFileRepository: DriveFileRepository
+    lateinit var driveFileRepository: net.pantasystem.milktea.model.drive.DriveFileRepository
     private val mBinding: ActivitySettingAppearanceBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,7 +170,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =
                 (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
-                    it as? FileProperty.Id
+                    it as? net.pantasystem.milktea.model.drive.FileProperty.Id
                 }
             val fileId = ids?.firstOrNull() ?: return@registerForActivityResult
             lifecycleScope.launch(Dispatchers.IO) {

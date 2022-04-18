@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.model.api
 
-import net.pantasystem.milktea.data.model.instance.Meta
+import net.pantasystem.milktea.model.instance.Meta
 import java.lang.IndexOutOfBoundsException
 
 class Version : Comparable<Version>{
@@ -37,7 +37,7 @@ class Version : Comparable<Version>{
         }
     }
 
-    constructor(meta: Meta) : this(meta.version)
+    constructor(meta: net.pantasystem.milktea.model.instance.Meta) : this(meta.version)
 
 
     override fun compareTo(other: Version): Int {

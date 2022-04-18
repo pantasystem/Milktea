@@ -1,13 +1,11 @@
 package net.pantasystem.milktea.data.gettters
 
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.model.notes.NoteRepository
-import net.pantasystem.milktea.data.model.notification.NotificationDataSource
-import net.pantasystem.milktea.data.model.users.UserDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notification.NotificationDataSource
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,8 +14,8 @@ import javax.inject.Singleton
 class Getters @Inject constructor(
     noteDataSource: NoteDataSource,
     noteRepository: NoteRepository,
-    userDataSource: UserDataSource,
-    filePropertyDataSource: FilePropertyDataSource,
+    userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
     notificationDataSource: NotificationDataSource,
     messageDataSource: MessageDataSource,
     groupDataSource: GroupDataSource,

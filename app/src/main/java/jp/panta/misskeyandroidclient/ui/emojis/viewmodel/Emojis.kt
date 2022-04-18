@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.emojis.viewmodel
 
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 
 sealed class Emojis : IEmoji {
     data class TextEmoji(
@@ -8,14 +8,14 @@ sealed class Emojis : IEmoji {
     ): Emojis()
 
     data class CustomEmoji(
-        val emoji: Emoji
+        val emoji: net.pantasystem.milktea.model.emoji.Emoji
     ) : Emojis()
 
     data class EmojiCategory(val categoryName: String) : Emojis()
 
     companion object{
         @JvmStatic
-        fun categoryBy(emojis: List<Emoji>): List<Emojis>{
+        fun categoryBy(emojis: List<net.pantasystem.milktea.model.emoji.Emoji>): List<Emojis>{
             val list = ArrayList<Emojis>()
             emojis.groupBy {
                 it.category

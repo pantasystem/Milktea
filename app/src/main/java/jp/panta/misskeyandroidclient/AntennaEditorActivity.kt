@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaEditorBinding
-import net.pantasystem.milktea.data.model.antenna.Antenna
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.antenna.Antenna
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
@@ -79,7 +79,7 @@ class AntennaEditorActivity : AppCompatActivity() {
     }
 
     @FlowPreview
-    private fun showSearchAndSelectUserActivity(userIds: List<User.Id>){
+    private fun showSearchAndSelectUserActivity(userIds: List<net.pantasystem.milktea.model.user.User.Id>){
         val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = userIds)
         requestSearchAndUserResult.launch(intent)
     }

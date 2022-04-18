@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
-import net.pantasystem.milktea.data.model.antenna.Antenna
+import net.pantasystem.milktea.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel

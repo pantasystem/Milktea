@@ -1,19 +1,17 @@
 package net.pantasystem.milktea.data.model.sw.register
 
-import net.pantasystem.milktea.data.BuildConfig
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.sw.register.Subscription
-import net.pantasystem.milktea.data.api.misskey.sw.register.SubscriptionState
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.AccountRepository
+import net.pantasystem.milktea.common.Encryption
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import net.pantasystem.milktea.api.misskey.register.Subscription
+import net.pantasystem.milktea.api.misskey.register.SubscriptionState
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 
 class SubscriptionRegistration(
-    val accountRepository: AccountRepository,
+    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val lang: String,

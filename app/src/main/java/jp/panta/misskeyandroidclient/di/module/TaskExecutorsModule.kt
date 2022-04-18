@@ -4,11 +4,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.model.CreateGalleryTaskExecutor
-import net.pantasystem.milktea.data.model.CreateNoteTaskExecutor
-import net.pantasystem.milktea.data.model.TaskExecutorImpl
 import kotlinx.coroutines.CoroutineScope
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.CreateGalleryTaskExecutor
+import net.pantasystem.milktea.model.CreateNoteTaskExecutor
+import net.pantasystem.milktea.model.TaskExecutorImpl
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -19,7 +19,7 @@ object TaskExecutorsModule {
     @Singleton
     fun provideNoteCreateTaskExecutor(
         coroutineScope: CoroutineScope,
-        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+        loggerFactory: Logger.Factory,
     ): CreateNoteTaskExecutor {
         return CreateNoteTaskExecutor(
             provideTaskExecutor(coroutineScope, loggerFactory)
@@ -30,7 +30,7 @@ object TaskExecutorsModule {
     @Singleton
     fun provideGalleryPostTaskExecutor(
         coroutineScope: CoroutineScope,
-        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+        loggerFactory: Logger.Factory,
     ): CreateGalleryTaskExecutor {
         return CreateGalleryTaskExecutor(
             provideTaskExecutor(coroutineScope, loggerFactory)
@@ -39,7 +39,7 @@ object TaskExecutorsModule {
 
     private fun <T> provideTaskExecutor(
         coroutineScope: CoroutineScope,
-        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+        loggerFactory: Logger.Factory,
     ): TaskExecutorImpl<T> {
         return TaskExecutorImpl(coroutineScope, loggerFactory.create("CreateNoteTaskExecutor"))
     }

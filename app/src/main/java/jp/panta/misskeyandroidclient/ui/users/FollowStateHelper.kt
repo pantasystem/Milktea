@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.users
 import android.widget.Button
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.users.FollowState
+import net.pantasystem.milktea.model.user.FollowState
 
 object FollowStateHelper {
 
@@ -19,19 +19,19 @@ object FollowStateHelper {
 
     @JvmStatic
     @BindingAdapter("followState")
-    fun Button.setFollowState(state: FollowState?) {
+    fun Button.setFollowState(state: net.pantasystem.milktea.model.user.FollowState?) {
         state?: return
         this.text = when(state) {
-            FollowState.FOLLOWING -> {
+            net.pantasystem.milktea.model.user.FollowState.FOLLOWING -> {
                 context.getString(R.string.unfollow)
             }
-            FollowState.UNFOLLOWING -> {
+            net.pantasystem.milktea.model.user.FollowState.UNFOLLOWING -> {
                 context.getString(R.string.follow)
             }
-            FollowState.UNFOLLOWING_LOCKED -> {
+            net.pantasystem.milktea.model.user.FollowState.UNFOLLOWING_LOCKED -> {
                 context.getString(R.string.request_follow_from_u)
             }
-            FollowState.PENDING_FOLLOW_REQUEST -> {
+            net.pantasystem.milktea.model.user.FollowState.PENDING_FOLLOW_REQUEST -> {
                 context.getString(R.string.follow_approval_pending)
             }
         }

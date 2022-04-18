@@ -3,13 +3,9 @@
 package net.pantasystem.milktea.data.model.auth
 
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.security.KeyPairGeneratorSpec
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import android.util.Base64
-import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.common.Encryption
 import java.math.BigInteger
 import java.security.KeyPairGenerator
 import java.security.KeyStore

@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.model.instance.db
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 
 @Entity(
     tableName = "emoji_table",
@@ -22,7 +22,7 @@ data class EmojiDTO(
     val id: String?
 ){
 
-    constructor(emoji: Emoji, instanceDomain: String) : this(
+    constructor(emoji: net.pantasystem.milktea.model.emoji.Emoji, instanceDomain: String) : this(
         name = emoji.name,
         instanceDomain = instanceDomain,
         host = emoji.host,
@@ -33,8 +33,8 @@ data class EmojiDTO(
         id = emoji.id
     )
 
-    fun toEmoji(aliases: List<String>): Emoji{
-        return Emoji(
+    fun toEmoji(aliases: List<String>): net.pantasystem.milktea.model.emoji.Emoji {
+        return net.pantasystem.milktea.model.emoji.Emoji(
             name = this.name,
             id = this.id,
             uri = this.uri,

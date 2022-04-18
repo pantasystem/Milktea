@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
-import net.pantasystem.milktea.data.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteRelation
 
 sealed class TimelineState{
     abstract val notes: List<PlaneNoteViewData>
@@ -20,7 +20,7 @@ sealed class TimelineState{
         var index = 0
         val list = ArrayList<String>()
         while(index < notes.size && list.size < size){
-            if(notes[index].note is NoteRelation.Normal){
+            if(notes[index].note is net.pantasystem.milktea.model.notes.NoteRelation.Normal){
                 list.add(notes[index].getRequestId())
             }
             index ++
@@ -37,7 +37,7 @@ sealed class TimelineState{
         var counter = 0
         val list = ArrayList<String>()
         while(notes.size - counter - 1>= 0 && list.size < size){
-            if(notes[notes.size - 1 - counter].note is NoteRelation.Normal){
+            if(notes[notes.size - 1 - counter].note is net.pantasystem.milktea.model.notes.NoteRelation.Normal){
                 list.add(notes[notes.size - 1 - counter].getRequestId())
             }
             counter ++

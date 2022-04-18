@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.api.mastodon.emojis
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 
 @Serializable
 data class TootEmojiDTO (
@@ -18,8 +18,8 @@ data class TootEmojiDTO (
     val visibleInPicker: Boolean = true
 ) {
 
-    fun toEmoji(host: String): Emoji {
-        return Emoji(
+    fun toEmoji(host: String): net.pantasystem.milktea.model.emoji.Emoji {
+        return net.pantasystem.milktea.model.emoji.Emoji(
             name = shortcode,
             url = url,
             category = category,

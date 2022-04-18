@@ -6,14 +6,14 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.NoteDetailActivity
-import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.model.notes.Note
 import jp.panta.misskeyandroidclient.putActivity
 
 object NoteTransitionHelper {
 
     @JvmStatic
     @BindingAdapter("clickedView", "transitionDestinationNote")
-    fun View.transitionNoteDetail(clickedView: View?, transitionDestinationNote: Note?){
+    fun View.transitionNoteDetail(clickedView: View?, transitionDestinationNote: net.pantasystem.milktea.model.notes.Note?){
         transitionDestinationNote?: return
         val clicked = clickedView?: this
         clicked.setOnClickListener {

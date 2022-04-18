@@ -1,14 +1,14 @@
 package net.pantasystem.milktea.data.model.group.impl
 
-import net.pantasystem.milktea.data.model.AddResult
-import net.pantasystem.milktea.data.model.group.Group
-import net.pantasystem.milktea.data.model.group.GroupDataSource
-import net.pantasystem.milktea.data.model.group.GroupNotFoundException
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupNotFoundException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
-class InMemoryGroupDataSource @Inject constructor(): GroupDataSource{
+class InMemoryGroupDataSource @Inject constructor(): GroupDataSource {
 
     private val lock = Mutex()
 

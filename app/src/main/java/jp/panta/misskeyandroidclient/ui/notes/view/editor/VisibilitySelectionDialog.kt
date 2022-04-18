@@ -6,13 +6,12 @@ import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBinding
-import net.pantasystem.milktea.data.model.notes.CanLocalOnly
-import net.pantasystem.milktea.data.model.notes.Visibility
+import net.pantasystem.milktea.model.notes.CanLocalOnly
+import net.pantasystem.milktea.model.notes.Visibility
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import java.util.*
 
@@ -37,10 +36,10 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
         )
 
         var nowSelectedVisibility = when(viewModel.visibility.value){
-            is Visibility.Public -> 0
-            is Visibility.Home -> 1
-            is Visibility.Followers -> 2
-            is Visibility.Specified -> 3
+            is net.pantasystem.milktea.model.notes.Visibility.Public -> 0
+            is net.pantasystem.milktea.model.notes.Visibility.Home -> 1
+            is net.pantasystem.milktea.model.notes.Visibility.Followers -> 2
+            is net.pantasystem.milktea.model.notes.Visibility.Specified -> 3
         }
         if(nowSelectedVisibility !in visibilities.indices){
             nowSelectedVisibility = 0
@@ -64,15 +63,20 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
                         else -> "public"
                     }
                 val localOnly = viewModel.isLocalOnly.value
-                viewModel.setVisibility(Visibility(type, localOnly))
+                viewModel.setVisibility(
+                    net.pantasystem.milktea.model.notes.Visibility(
+                        type,
+                        localOnly
+                    )
+                )
 
             }
             .setView(view)
 
         binding?.isLocalOnlySwitch?.setOnCheckedChangeListener { _, isChecked ->
-            val visibility = (viewModel.visibility.value) as? CanLocalOnly
+            val visibility = (viewModel.visibility.value) as? net.pantasystem.milktea.model.notes.CanLocalOnly
                 ?: return@setOnCheckedChangeListener
-            viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as Visibility)
+            viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as net.pantasystem.milktea.model.notes.Visibility)
         }
         binding?.lifecycleOwner = requireActivity()
         binding?.noteEditorViewModel = viewModel

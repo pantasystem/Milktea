@@ -4,22 +4,20 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.api.misskey.drive.CreateFolder
 import net.pantasystem.milktea.data.api.misskey.drive.RequestFolder
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.data.model.drive.DriveStore
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.drive.DriveStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class DirectoryViewModel(
-    private val accountWatcher: CurrentAccountWatcher,
-    private val driveStore: DriveStore,
+    private val accountWatcher: net.pantasystem.milktea.model.account.CurrentAccountWatcher,
+    private val driveStore: net.pantasystem.milktea.model.drive.DriveStore,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
     val loggerFactory: net.pantasystem.milktea.common.Logger.Factory

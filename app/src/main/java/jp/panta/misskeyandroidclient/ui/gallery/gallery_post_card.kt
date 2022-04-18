@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.*
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.components.ThumbnailPreview
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
 import androidx.compose.runtime.getValue
@@ -33,7 +33,7 @@ import jp.panta.misskeyandroidclient.R
 fun GalleryPostCard(
     galleryState: GalleryPostState,
     onAvatarIconClicked: ()->Unit,
-    onThumbnailClicked: (FileProperty)->Unit
+    onThumbnailClicked: (net.pantasystem.milktea.model.drive.FileProperty)->Unit
 ) {
     val pagerState = rememberPagerState(pageCount = galleryState.files.size)
 

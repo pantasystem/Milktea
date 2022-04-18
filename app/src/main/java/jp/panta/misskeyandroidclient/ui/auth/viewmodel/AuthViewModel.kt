@@ -8,11 +8,11 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.users.toUser
-import net.pantasystem.milktea.data.model.account.newAccount
+import net.pantasystem.milktea.model.account.newAccount
 import net.pantasystem.milktea.data.model.auth.Authorization
 import net.pantasystem.milktea.data.model.auth.custom.AccessToken
 import net.pantasystem.milktea.data.model.auth.custom.toModel
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -149,7 +149,7 @@ class AuthViewModel @Inject constructor(
                         (a.accessToken as AccessToken.Mastodon).account.toModel(account)
                     }
                     is AccessToken.Misskey -> {
-                        (a.accessToken as AccessToken.Misskey).user.toUser(account, true) as User.Detail
+                        (a.accessToken as AccessToken.Misskey).user.toUser(account, true) as net.pantasystem.milktea.model.user.User.Detail
                     }
                 }
                 miCore.getUserDataSource().add(user)

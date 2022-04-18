@@ -3,13 +3,13 @@ package jp.panta.misskeyandroidclient.ui.notes.view.reaction.history
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 
 class ReactionHistoryPagerAdapter(
     fragmentManager: FragmentManager,
-    val types: List<ReactionHistoryRequest>,
-    val noteId: Note.Id
+    val types: List<net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest>,
+    val noteId: net.pantasystem.milktea.model.notes.Note.Id
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
 

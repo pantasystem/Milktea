@@ -6,14 +6,14 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.putActivity
 
 object UserTransitionHelper {
 
     @JvmStatic
     @BindingAdapter("transitionDestinationUser")
-    fun View.showUserDetail(user: User?){
+    fun View.showUserDetail(user: net.pantasystem.milktea.model.user.User?){
         user?: return
         this.setOnClickListener { view ->
             val context = view.context

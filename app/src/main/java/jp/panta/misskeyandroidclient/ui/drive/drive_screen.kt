@@ -21,7 +21,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.PathViewData
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
@@ -51,7 +51,7 @@ fun DriveScreen(
 
     val isSelectMode: Boolean by  driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
     val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
-    val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
+    val selectedFileIds: Set<net.pantasystem.milktea.model.drive.FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
     val path: List<PathViewData> by driveViewModel.path.asLiveData().observeAsState(initial = emptyList())
 
     val pagerState = rememberPagerState(pageCount = tabTitles.size)

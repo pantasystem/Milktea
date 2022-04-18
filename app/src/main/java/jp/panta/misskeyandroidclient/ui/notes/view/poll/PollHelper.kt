@@ -4,15 +4,15 @@ import android.view.View
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 
 object PollHelper {
 
     @BindingAdapter("noteId", "poll", "notesViewModel")
     @JvmStatic
-    fun RecyclerView.bindPollChoices(noteId: Note.Id?, poll: Poll?, notesViewModel: NotesViewModel?) {
+    fun RecyclerView.bindPollChoices(noteId: net.pantasystem.milktea.model.notes.Note.Id?, poll: net.pantasystem.milktea.model.notes.poll.Poll?, notesViewModel: NotesViewModel?) {
         if (noteId == null || poll == null || notesViewModel == null) {
             this.visibility = View.GONE
             return

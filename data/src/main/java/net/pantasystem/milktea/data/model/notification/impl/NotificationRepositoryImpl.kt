@@ -1,27 +1,21 @@
 package net.pantasystem.milktea.data.model.notification.impl
 
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.notification.Notification
-import net.pantasystem.milktea.data.model.notification.NotificationDataSource
-import net.pantasystem.milktea.data.model.notification.NotificationRepository
-import net.pantasystem.milktea.data.model.notification.db.UnreadNotification
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.streaming.*
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class NotificationRepositoryImpl @Inject constructor(
     private val notificationDataSource: NotificationDataSource,
     private val socketProvider: SocketWithAccountProvider,
-    private val accountRepository: AccountRepository,
+    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     private val notificationRelationGetter: NotificationRelationGetter,
     private val unreadNotificationDAO: UnreadNotificationDAO
-) : NotificationRepository{
+) : NotificationRepository {
 
 
 

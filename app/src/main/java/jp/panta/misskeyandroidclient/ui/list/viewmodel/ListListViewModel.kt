@@ -1,15 +1,14 @@
 package jp.panta.misskeyandroidclient.ui.list.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.list.UserList
-import net.pantasystem.milktea.data.model.list.UserListStore
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListStore
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +23,8 @@ import javax.inject.Inject
 class ListListViewModel @Inject constructor(
     val miCore: MiCore,
     val encryption: Encryption,
-    private val userListStore: UserListStore,
-    val accountStore: AccountStore
+    private val userListStore: net.pantasystem.milktea.model.list.UserListStore,
+    val accountStore: net.pantasystem.milktea.model.account.AccountStore
 ) : ViewModel() {
 
 
@@ -49,7 +48,7 @@ class ListListViewModel @Inject constructor(
 
         }.asLiveData()
 
-    val showUserDetailEvent = EventBus<UserList>()
+    val showUserDetailEvent = EventBus<net.pantasystem.milktea.model.list.UserList>()
 
     private val logger = miCore.loggerFactory.create("ListListViewModel")
 
@@ -75,35 +74,37 @@ class ListListViewModel @Inject constructor(
     }
 
 
-    private suspend fun loadListList(accountId: Long): List<UserList> {
+    private suspend fun loadListList(accountId: Long): List<net.pantasystem.milktea.model.list.UserList> {
         return userListStore.findByAccount(accountId)
     }
 
 
-    fun showUserListDetail(userList: UserList?) {
+    fun showUserListDetail(userList: net.pantasystem.milktea.model.list.UserList?) {
         userList?.let { ul ->
             showUserDetailEvent.event = ul
         }
     }
 
-    fun toggleTab(userList: UserList?) {
+    fun toggleTab(userList: net.pantasystem.milktea.model.list.UserList?) {
         userList?.let { ul ->
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     val account = miCore.getAccountRepository().get(userList.id.accountId)
                     val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
-                        if (pageable is Pageable.UserListTimeline) {
+                        if (pageable is net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline) {
                             pageable.listId == ul.id.userListId
                         } else {
                             false
                         }
                     }
                     if (exPage == null) {
-                        val page = Page(
+                        val page = net.pantasystem.milktea.model.account.page.Page(
                             account.accountId,
                             ul.name,
-                            pageable = Pageable.UserListTimeline(ul.id.userListId),
+                            pageable = net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline(
+                                ul.id.userListId
+                            ),
                             weight = 0
                         )
                         miCore.getAccountStore().addPage(page)
@@ -117,7 +118,7 @@ class ListListViewModel @Inject constructor(
         }
     }
 
-    fun delete(userList: UserList?) {
+    fun delete(userList: net.pantasystem.milktea.model.list.UserList?) {
         userList ?: return
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {

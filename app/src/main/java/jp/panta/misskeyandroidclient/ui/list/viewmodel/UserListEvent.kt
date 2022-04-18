@@ -1,17 +1,17 @@
 package jp.panta.misskeyandroidclient.ui.list.viewmodel
 
-import net.pantasystem.milktea.data.model.list.UserList
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 
 data class UserListEvent(
     val type: Type,
-    val userListId: UserList.Id,
+    val userListId: net.pantasystem.milktea.model.list.UserList.Id,
 
     //push user, pull user
-    val userId: User.Id? = null,
+    val userId: net.pantasystem.milktea.model.user.User.Id? = null,
 
     //create
-    val userList: UserList? = null,
+    val userList: net.pantasystem.milktea.model.list.UserList? = null,
 
     val name: String? = null
 ) {

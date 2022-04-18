@@ -15,8 +15,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog
@@ -52,7 +52,7 @@ class DriveActivity : AppCompatActivity() {
     private lateinit var _directoryViewModel: DirectoryViewModel
 
     @Inject
-    lateinit var accountStore: AccountStore
+    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
 
 
     @OptIn(
@@ -70,7 +70,7 @@ class DriveActivity : AppCompatActivity() {
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
         val selectedFileIds =
             (intent.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>)?.map {
-                it as FileProperty.Id
+                it as net.pantasystem.milktea.model.drive.FileProperty.Id
             }
         val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
             if (it == -1L) null else it

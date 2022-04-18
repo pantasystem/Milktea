@@ -3,15 +3,15 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import net.pantasystem.milktea.data.model.I
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.api.misskey.list.UserListDTO
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaToAdd
-import net.pantasystem.milktea.data.model.antenna.Antenna
-import net.pantasystem.milktea.data.model.group.Group
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.antenna.Antenna
+import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
@@ -152,7 +152,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val groupList = MediatorLiveData<List<Group>?>().apply{
+    val groupList = MediatorLiveData<List<net.pantasystem.milktea.model.group.Group>?>().apply{
         addSource(this@AntennaEditorViewModel.source){
             /*if(it == Source.GROUP && this.value.isNullOrEmpty()){
                 miCore.getMisskeyAPI(accountRelation)
@@ -160,7 +160,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val group = MediatorLiveData<Group>().apply{
+    val group = MediatorLiveData<net.pantasystem.milktea.model.group.Group>().apply{
         addSource(groupList){
             this.value = it?.firstOrNull { g ->
                 g.id == this@AntennaEditorViewModel.antenna.value?.userGroupId
@@ -272,7 +272,7 @@ class AntennaEditorViewModel (
             }
         }
     }
-    val selectUserEvent = EventBus<List<User.Id>>()
+    val selectUserEvent = EventBus<List<net.pantasystem.milktea.model.user.User.Id>>()
     @ExperimentalCoroutinesApi
     fun selectUser(){
         selectUserEvent.event = users.value.mapNotNull {
@@ -320,8 +320,8 @@ class AntennaEditorViewModel (
         }
     }
 
-    private var mAccount: Account? = null
-    private suspend fun getAccount(): Account {
+    private var mAccount: net.pantasystem.milktea.model.account.Account? = null
+    private suspend fun getAccount(): net.pantasystem.milktea.model.account.Account {
         if(mAccount == null) {
             mAccount = antennaId?.let{
                 miCore.getAccountRepository().get(it.accountId)

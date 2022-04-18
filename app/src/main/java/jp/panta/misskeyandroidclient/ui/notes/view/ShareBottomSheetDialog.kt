@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentShareBottomSheetBinding
-import net.pantasystem.milktea.data.model.users.report.toReport
+import net.pantasystem.milktea.model.user.report.toReport
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 
 class ShareBottomSheetDialog : BottomSheetDialogFragment(){

@@ -4,7 +4,7 @@ import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import net.pantasystem.milktea.data.model.instance.Meta
+import net.pantasystem.milktea.model.instance.Meta
 
 @DatabaseView
 class MetaRelation {
@@ -19,7 +19,7 @@ class MetaRelation {
     lateinit var aliases: List<EmojiAlias>
 
     @Ignore
-    fun toMeta(): Meta{
+    fun toMeta(): net.pantasystem.milktea.model.instance.Meta {
         val mapEmojis = aliases.groupBy {
             it.name to it.instanceDomain
         }
@@ -30,7 +30,7 @@ class MetaRelation {
             emoji.toEmoji(alias)
 
         }
-        return Meta(
+        return net.pantasystem.milktea.model.instance.Meta(
             bannerUrl = this.meta.bannerUrl,
             cacheRemoteFiles = this.meta.cacheRemoteFiles,
             description = this.meta.description,

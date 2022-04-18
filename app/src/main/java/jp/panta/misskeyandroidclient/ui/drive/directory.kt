@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import net.pantasystem.milktea.data.model.drive.Directory
+import net.pantasystem.milktea.model.drive.Directory
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
 import androidx.compose.runtime.getValue
 
@@ -59,7 +59,7 @@ fun DirectoryListScreen(viewModel: DirectoryViewModel, driveViewModel: DriveView
 }
 
 @Composable
-fun DirectoryListTile(directory: Directory, onClick:()->Unit) {
+fun DirectoryListTile(directory: net.pantasystem.milktea.model.drive.Directory, onClick:()->Unit) {
     Card (
         shape = RoundedCornerShape(0.dp),
         modifier = Modifier.padding(0.5.dp)
@@ -81,9 +81,9 @@ fun DirectoryListTile(directory: Directory, onClick:()->Unit) {
 
 @Composable
 fun DirectoryListView(
-    directories: List<Directory>,
+    directories: List<net.pantasystem.milktea.model.drive.Directory>,
     listState: LazyListState = rememberLazyListState(),
-    onDirectorySelected: (Directory)->Unit
+    onDirectorySelected: (net.pantasystem.milktea.model.drive.Directory)->Unit
 ) {
     LazyColumn(
         state = listState,

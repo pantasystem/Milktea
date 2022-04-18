@@ -1,18 +1,17 @@
 package jp.panta.misskeyandroidclient.di.module
 
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.data.model.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.data.model.gallery.GalleryPostsStore
 import net.pantasystem.milktea.data.model.gallery.GalleryPostsStoreImpl
-import net.pantasystem.milktea.data.model.gallery.GalleryRepository
 import net.pantasystem.milktea.data.model.gallery.LikedGalleryPostStoreImpl
 import net.pantasystem.milktea.data.model.gallery.impl.GalleryRepositoryImpl
-import net.pantasystem.milktea.data.model.notes.Note
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingService
 import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingServiceImpl
+import net.pantasystem.milktea.model.notes.Note
 
 fun MiCore.filePropertyPagingStore(getAccount: suspend () -> Account, currentDirectoryId: String?) : FilePropertyPagingStore {
     return FilePropertyPagingStore(
@@ -50,7 +49,7 @@ fun MiCore.createGalleryPostsStore(
     }
 }
 
-fun MiCore.createGalleryRepository() : GalleryRepository {
+fun MiCore.createGalleryRepository() : net.pantasystem.milktea.model.gallery.GalleryRepository {
     return GalleryRepositoryImpl(
         getMisskeyAPIProvider(),
         getGalleryDataSource(),
@@ -63,7 +62,11 @@ fun MiCore.createGalleryRepository() : GalleryRepository {
 }
 
 fun MiCore.getNoteDataSourceAdder() : NoteDataSourceAdder {
-    return NoteDataSourceAdder(getUserDataSource(), getNoteDataSource(), getFilePropertyDataSource())
+    return NoteDataSourceAdder(
+        getUserDataSource(),
+        getNoteDataSource(),
+        getFilePropertyDataSource()
+    )
 }
 
 fun MiCore.createRenotesPagingService(targetNoteId: Note.Id): RenotesPagingService {

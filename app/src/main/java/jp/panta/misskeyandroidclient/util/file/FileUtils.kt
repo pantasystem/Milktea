@@ -4,11 +4,11 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
-import net.pantasystem.milktea.data.model.file.AppFile
-import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.File
 import java.lang.IllegalArgumentException
 
-fun Uri.toAppFile(context: Context): AppFile.Local {
+fun Uri.toAppFile(context: Context): net.pantasystem.milktea.model.file.AppFile.Local {
     val fileName = try{
         context.getFileName(this)
     }catch(e: Exception){
@@ -20,7 +20,7 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
 
     val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
     val thumbnail = if(isMedia) this.toString() else null
-    return AppFile.Local(
+    return net.pantasystem.milktea.model.file.AppFile.Local(
         fileName?: "name none",
         path = this.toString(),
         type  = mimeType ?: "",
@@ -29,7 +29,7 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
         folderId = null
     )
 }
-fun Uri.toFile(context: Context): File{
+fun Uri.toFile(context: Context): net.pantasystem.milktea.model.file.File {
     val fileName = try{
         context.getFileName(this)
     }catch(e: Exception){
@@ -41,10 +41,10 @@ fun Uri.toFile(context: Context): File{
 
     val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
     val thumbnail = if(isMedia) this.toString() else null
-    return File(
-        fileName?: "name none",
+    return net.pantasystem.milktea.model.file.File(
+        fileName ?: "name none",
         this.toString(),
-        type  = mimeType,
+        type = mimeType,
         remoteFileId = null,
         localFileId = null,
         thumbnailUrl = thumbnail,

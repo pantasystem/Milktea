@@ -13,10 +13,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
@@ -24,7 +23,6 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class NoteDetailActivity : AppCompatActivity() {
@@ -36,7 +34,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
 
-        fun newIntent(context: Context, noteId: Note.Id): Intent {
+        fun newIntent(context: Context, noteId: net.pantasystem.milktea.model.notes.Note.Id): Intent {
             return Intent(context, NoteDetailActivity::class.java).apply {
                 putExtra(EXTRA_NOTE_ID, noteId.noteId)
                 putExtra(EXTRA_ACCOUNT_ID, noteId.accountId)
@@ -138,7 +136,12 @@ class NoteDetailActivity : AppCompatActivity() {
         val title = getString(R.string.detail)
 
         accountViewModel.addPage(
-            Page(-1, title, pageable = Pageable.Show(mNoteId!!), weight = 0)
+            net.pantasystem.milktea.model.account.page.Page(
+                -1,
+                title,
+                pageable = net.pantasystem.milktea.model.account.page.Pageable.Show(mNoteId!!),
+                weight = 0
+            )
         )
     }
 }

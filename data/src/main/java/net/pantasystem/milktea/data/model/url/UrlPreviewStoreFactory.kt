@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.model.url
 
 
 import net.pantasystem.milktea.common.GsonFactory
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.model.settings.UrlPreviewSourceSetting
 import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
 import okhttp3.OkHttpClient
@@ -14,7 +14,7 @@ class UrlPreviewStoreFactory (
     private val urlPreviewDAO: UrlPreviewDAO,
     sourceType: Int? = null,
     private var summalyUrl: String? = null,
-    var account: Account? = null
+    var account: net.pantasystem.milktea.model.account.Account? = null
 ){
 
     private var sourceType = sourceType?: UrlPreviewSourceSetting.MISSKEY

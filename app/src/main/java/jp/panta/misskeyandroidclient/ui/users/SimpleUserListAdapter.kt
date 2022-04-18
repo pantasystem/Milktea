@@ -9,23 +9,23 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSimpleUserBinding
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 
 class SimpleUserListAdapter(
     val lifecycleOwner: LifecycleOwner
-) : ListAdapter<User, SimpleUserListAdapter.ViewHolder>(Diff()) {
+) : ListAdapter<net.pantasystem.milktea.model.user.User, SimpleUserListAdapter.ViewHolder>(Diff()) {
 
-    class Diff : DiffUtil.ItemCallback<User>() {
-        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+    class Diff : DiffUtil.ItemCallback<net.pantasystem.milktea.model.user.User>() {
+        override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.user.User, newItem: net.pantasystem.milktea.model.user.User): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+        override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.user.User, newItem: net.pantasystem.milktea.model.user.User): Boolean {
             return oldItem.id == newItem.id
         }
     }
     inner class ViewHolder(val binding: ItemSimpleUserBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(user: User) {
+        fun bind(user: net.pantasystem.milktea.model.user.User) {
             binding.user = user
             binding.lifecycleOwner = lifecycleOwner
             binding.executePendingBindings()

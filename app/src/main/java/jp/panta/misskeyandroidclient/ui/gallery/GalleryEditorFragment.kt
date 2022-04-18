@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
@@ -21,8 +20,8 @@ import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.file.toFile
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.file.toFile
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -141,7 +140,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         if(it.resultCode == RESULT_OK && it.data != null) {
             val result = it.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>
             val list = result?.mapNotNull { obj ->
-                obj as? FileProperty.Id
+                obj as? net.pantasystem.milktea.model.drive.FileProperty.Id
             }?: emptyList()
             viewModel.addFilePropertyIds(list)
 

@@ -6,21 +6,20 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.groups.*
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.v11.MisskeyAPIV11
-import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.I
 import net.pantasystem.milktea.data.model.api.IllegalVersionException
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountRepository
 import net.pantasystem.milktea.data.model.group.*
+import net.pantasystem.milktea.model.group.*
 import javax.inject.Inject
 
 class GroupRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val accountRepository: AccountRepository,
+    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     private val groupDataSource: GroupDataSource,
     private val encryption: Encryption,
     private val loggerFactory: Logger.Factory
-) : GroupRepository{
+) : GroupRepository {
 
     private val logger: Logger by lazy {
         loggerFactory.create("GroupRepositoryImpl")
@@ -124,7 +123,7 @@ class GroupRepositoryImpl @Inject constructor(
         return group
     }
 
-    private fun getMisskeyAPI(account: Account): MisskeyAPIV11 {
+    private fun getMisskeyAPI(account: net.pantasystem.milktea.model.account.Account): MisskeyAPIV11 {
         return misskeyAPIProvider.get(account.instanceDomain) as? MisskeyAPIV11
             ?: throw IllegalVersionException()
     }

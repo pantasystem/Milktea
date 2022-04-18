@@ -16,7 +16,7 @@ import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.data.api.misskey.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
@@ -32,7 +32,7 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.view.gallery.ACCOUNT_ID"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.view.gallery.EXTRA_PAGEABLE"
 
-        fun newInstance(pageable: Pageable.Gallery, accountId: Long?) : GalleryPostsFragment {
+        fun newInstance(pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery, accountId: Long?) : GalleryPostsFragment {
             return GalleryPostsFragment().apply {
                 arguments = Bundle().also {
                     it.putSerializable(EXTRA_PAGEABLE, pageable)
@@ -46,8 +46,8 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
 
     val binding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
-    val pageable: Pageable.Gallery by lazy {
-        arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
+    val pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery by lazy {
+        arguments?.getSerializable(EXTRA_PAGEABLE) as net.pantasystem.milktea.model.account.page.Pageable.Gallery
     }
 
     val currentTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()

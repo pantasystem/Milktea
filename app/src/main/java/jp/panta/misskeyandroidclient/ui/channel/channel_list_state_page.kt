@@ -13,18 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.channel.Channel
-import net.pantasystem.milktea.data.model.channel.ChannelListType
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.channel.ChannelListType
 
 @Composable
 fun ChannelListStateScreen(
-    account: Account,
-    listType: ChannelListType,
+    account: net.pantasystem.milktea.model.account.Account,
+    listType: net.pantasystem.milktea.model.channel.ChannelListType,
     viewModel: ChannelViewModel,
-    navigateToDetailView: (Channel.Id) -> Unit = {}
+    navigateToDetailView: (net.pantasystem.milktea.model.channel.Channel.Id) -> Unit = {}
 ) {
     val key = PagingModelKey(account.accountId, listType)
 

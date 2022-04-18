@@ -1,13 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.settings.viewmodel.page
 
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.data.api.misskey.list.UserListDTO
-import net.pantasystem.milktea.data.api.misskey.users.UserDTO
-import net.pantasystem.milktea.data.model.antenna.Antenna
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 
 
-fun Account.newPage(pageable: Pageable, name: String): Page {
+fun net.pantasystem.milktea.model.account.Account.newPage(pageable: net.pantasystem.milktea.model.account.page.Pageable, name: String): net.pantasystem.milktea.model.account.page.Page {
     return Page(this.accountId, name, 0, pageable)
 }

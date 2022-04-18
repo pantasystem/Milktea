@@ -12,7 +12,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessageBinding
-import net.pantasystem.milktea.data.model.messaging.MessagingId
+import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewData
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel
@@ -28,7 +28,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
     companion object{
         private const val EXTRA_MESSAGING_ID = "jp.panta.misskeyandroidclient.viewmodel.messaging.EXTRA_MESSAGING_ID"
 
-        fun newInstance(messagingId: MessagingId): MessageFragment {
+        fun newInstance(messagingId: net.pantasystem.milktea.model.messaging.MessagingId): MessageFragment {
             return MessageFragment().also { fragment ->
                 fragment.arguments = Bundle().also {
                     it.putSerializable(EXTRA_MESSAGING_ID, messagingId)
@@ -48,7 +48,7 @@ class MessageFragment : Fragment(R.layout.fragment_message){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val messagingId = arguments?.getSerializable(EXTRA_MESSAGING_ID) as? MessagingId
+        val messagingId = arguments?.getSerializable(EXTRA_MESSAGING_ID) as? net.pantasystem.milktea.model.messaging.MessagingId
 
         if(messagingId == null){
             Log.e("MessageFragment", "messageHistoryがNullです")

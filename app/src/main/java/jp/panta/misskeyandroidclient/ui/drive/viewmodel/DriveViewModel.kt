@@ -3,30 +3,30 @@ package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 import androidx.lifecycle.ViewModel
 import net.pantasystem.milktea.data.model.drive.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.io.Serializable
 
 data class DriveSelectableMode(
     val selectableMaxSize: Int,
-    val selectedFilePropertyIds: List<FileProperty.Id>,
+    val selectedFilePropertyIds: List<net.pantasystem.milktea.model.drive.FileProperty.Id>,
     val accountId: Long
 ) : Serializable
 class DriveViewModel(
     val selectable: DriveSelectableMode?
 ) : ViewModel(){
 
-    val driveStore: DriveStore = DriveStore(
-        DriveState(
-            accountId = selectable?.accountId,
-            path = DirectoryPath(emptyList()),
-            selectedFilePropertyIds = selectable?.let {
-                SelectedFilePropertyIds(
-                    selectableMaxCount = it.selectableMaxSize,
-                    selectedIds = it.selectedFilePropertyIds.toSet()
-                )
-            }
+    val driveStore: net.pantasystem.milktea.model.drive.DriveStore =
+        net.pantasystem.milktea.model.drive.DriveStore(
+            net.pantasystem.milktea.model.drive.DriveState(
+                accountId = selectable?.accountId,
+                path = net.pantasystem.milktea.model.drive.DirectoryPath(emptyList()),
+                selectedFilePropertyIds = selectable?.let {
+                    net.pantasystem.milktea.model.drive.SelectedFilePropertyIds(
+                        selectableMaxCount = it.selectableMaxSize,
+                        selectedIds = it.selectedFilePropertyIds.toSet()
+                    )
+                }
+            )
         )
-    )
 
 
 
@@ -49,13 +49,13 @@ class DriveViewModel(
 
 
 
-    fun getSelectedFileIds(): Set<FileProperty.Id>?{
+    fun getSelectedFileIds(): Set<net.pantasystem.milktea.model.drive.FileProperty.Id>?{
         return this.driveStore.state.value.selectedFilePropertyIds?.selectedIds
     }
 
 
 
-    fun push(directory: Directory) {
+    fun push(directory: net.pantasystem.milktea.model.drive.Directory) {
         this.driveStore.push(directory)
     }
 
@@ -69,7 +69,7 @@ class DriveViewModel(
         return driveStore.pop()
     }
 
-    fun popUntil(directory: Directory?) {
+    fun popUntil(directory: net.pantasystem.milktea.model.drive.Directory?) {
         driveStore.popUntil(directory)
     }
 

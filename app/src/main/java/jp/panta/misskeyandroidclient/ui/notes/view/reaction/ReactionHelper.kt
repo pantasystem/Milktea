@@ -6,8 +6,8 @@ import android.graphics.drawable.ColorDrawable
 import android.widget.LinearLayout
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.notes.reaction.Reaction
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
 object ReactionHelper {
@@ -15,9 +15,9 @@ object ReactionHelper {
     @SuppressLint("UseCompatLoadingForDrawables")
     @JvmStatic
     @BindingAdapter("reactionNote", "reactionBackground")
-    fun LinearLayout.setBackground(note: PlaneNoteViewData, reaction: ReactionCount){
+    fun LinearLayout.setBackground(note: PlaneNoteViewData, reaction: net.pantasystem.milktea.model.notes.reaction.ReactionCount){
 
-        if(!Reaction(reaction.reaction).isLocal()) {
+        if(!net.pantasystem.milktea.model.notes.reaction.Reaction(reaction.reaction).isLocal()) {
             this.background = ColorDrawable(Color.argb(0,0,0,0))
             return
         }

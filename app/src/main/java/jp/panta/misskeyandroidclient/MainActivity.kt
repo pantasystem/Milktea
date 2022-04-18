@@ -13,7 +13,6 @@ import androidx.annotation.MainThread
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -31,13 +30,13 @@ import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import net.pantasystem.milktea.data.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.data.model.TaskState
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.channel.Channel
-import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.model.streaming.stateEvent
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
@@ -54,14 +53,12 @@ import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
-import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -85,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by dataBinding()
 
     @Inject
-    lateinit var accountStore: AccountStore
+    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
 
     @Inject
     lateinit var settingStore: SettingStore
@@ -146,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(
                         NoteEditorActivity.newBundle(
                             this,
-                            channelId = Channel.Id(accountId, type.channelId)
+                            channelId = net.pantasystem.milktea.model.channel.Channel.Id(accountId, type.channelId)
                         )
                     )
                 }
@@ -383,23 +380,23 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private val showFollowingsObserver = Observer<User.Id> {
+    private val showFollowingsObserver = Observer<net.pantasystem.milktea.model.user.User.Id> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent = FollowFollowerActivity.newIntent(this, it, true)
         startActivity(intent)
     }
 
-    private val showFollowersObserver = Observer<User.Id> {
+    private val showFollowersObserver = Observer<net.pantasystem.milktea.model.user.User.Id> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent = FollowFollowerActivity.newIntent(this, it, false)
         startActivity(intent)
     }
 
     @ExperimentalCoroutinesApi
-    private val showProfileObserver = Observer<Account> {
+    private val showProfileObserver = Observer<net.pantasystem.milktea.model.account.Account> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent =
-            UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
+            UserDetailActivity.newInstance(this, userId = net.pantasystem.milktea.model.user.User.Id(it.accountId, it.remoteId))
         intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }
@@ -534,7 +531,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {
+    private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<net.pantasystem.milktea.model.notes.Note>) {
         when (taskState) {
             is TaskState.Error -> {
                 getString(R.string.note_creation_failure).showSnackBar(

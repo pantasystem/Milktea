@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivityPageSettingBinding
-import net.pantasystem.milktea.data.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.settings.page.EditTabNameDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PagesAdapter
@@ -73,26 +73,26 @@ class PageSettingActivity : AppCompatActivity() {
 
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
             when (pt) {
-                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
+                net.pantasystem.milktea.model.account.page.PageType.SEARCH, net.pantasystem.milktea.model.account.page.PageType.SEARCH_HASH -> startActivity(
                     Intent(
                         this,
                         SearchActivity::class.java
                     )
                 )
-                PageType.USER -> {
+                net.pantasystem.milktea.model.account.page.PageType.USER -> {
                     val intent =
                         SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_RESULT_CODE)
                 }
-                PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
-                PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
-                PageType.ANTENNA -> startActivity(Intent(this, AntennaListActivity::class.java))
-                PageType.USERS_GALLERY_POSTS -> {
+                net.pantasystem.milktea.model.account.page.PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
+                net.pantasystem.milktea.model.account.page.PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
+                net.pantasystem.milktea.model.account.page.PageType.ANTENNA -> startActivity(Intent(this, AntennaListActivity::class.java))
+                net.pantasystem.milktea.model.account.page.PageType.USERS_GALLERY_POSTS -> {
                     val intent =
                         SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE)
                 }
-                PageType.CHANNEL_TIMELINE -> {
+                net.pantasystem.milktea.model.account.page.PageType.CHANNEL_TIMELINE -> {
                     val intent = Intent(this, ChannelActivity::class.java)
                     startActivity(intent)
                 }

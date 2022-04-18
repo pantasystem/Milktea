@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.data.model.settings.ReactionPickerType
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -20,13 +20,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ReactionPickerSettingViewModel(
-    private val account: Account,
-    private val reactionUserSettingDao: ReactionUserSettingDao,
+    private val account: net.pantasystem.milktea.model.account.Account,
+    private val reactionUserSettingDao: net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao,
     private val settingStore: SettingStore,
-) : ViewModel(), ReactionSelection{
+) : ViewModel(), net.pantasystem.milktea.model.notes.reaction.ReactionSelection {
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val ar: Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
+    class Factory(private val ar: net.pantasystem.milktea.model.account.Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val settingStore = SettingStore(
                 miApplication.getSharedPreferences(miApplication.getPreferenceName(), Context.MODE_PRIVATE)
@@ -37,11 +37,11 @@ class ReactionPickerSettingViewModel(
 
     var reactionPickerType = settingStore.reactionPickerType
         private set
-    val reactionSettingsList = MutableLiveData<List<ReactionUserSetting>>()
-    val reactionSelectEvent = EventBus<ReactionUserSetting>()
+    val reactionSettingsList = MutableLiveData<List<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>>()
+    val reactionSelectEvent = EventBus<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>()
 
-    private var mExistingSettingList: List<ReactionUserSetting>? = null
-    private val mReactionSettingReactionNameMap = LinkedHashMap<String, ReactionUserSetting>()
+    private var mExistingSettingList: List<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>? = null
+    private val mReactionSettingReactionNameMap = LinkedHashMap<String, net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>()
 
     init{
         loadSetReactions()
@@ -109,15 +109,16 @@ class ReactionPickerSettingViewModel(
     }
 
     fun addReaction(reaction: String){
-        mReactionSettingReactionNameMap[reaction] = ReactionUserSetting(
-            reaction,
-            account.instanceDomain,
-            mReactionSettingReactionNameMap.size
-        )
+        mReactionSettingReactionNameMap[reaction] =
+            net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting(
+                reaction,
+                account.instanceDomain,
+                mReactionSettingReactionNameMap.size
+            )
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
     }
 
-    fun putSortedList(list: List<ReactionUserSetting>){
+    fun putSortedList(list: List<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>){
         mReactionSettingReactionNameMap.clear()
         mReactionSettingReactionNameMap.putAll(list.map{
             it.reaction to it
@@ -130,7 +131,11 @@ class ReactionPickerSettingViewModel(
         reactionPickerType = type
     }
 
-    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting {
-        return ReactionUserSetting(reaction, account.instanceDomain, index)
+    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting {
+        return net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting(
+            reaction,
+            account.instanceDomain,
+            index
+        )
     }
 }

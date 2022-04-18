@@ -1,12 +1,11 @@
 package net.pantasystem.milktea.data.model.auth
 
 
-import net.pantasystem.milktea.api.misskey.auth.Session
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.model.auth.custom.AccessToken
 import net.pantasystem.milktea.data.model.auth.custom.AppType
 import net.pantasystem.milktea.data.model.auth.custom.TemporarilyAuthState
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 
 
 /**
@@ -51,7 +50,7 @@ sealed interface Authorization {
     ) : Authorization
 
     data class Finish(
-        val account: Account, val user: User
+        val account: net.pantasystem.milktea.model.account.Account, val user: net.pantasystem.milktea.model.user.User
     ) : Authorization
 
 }

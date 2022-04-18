@@ -4,18 +4,17 @@ import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.model.CreateGalleryTaskExecutor
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.drive.DriveFileRepository
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.file.AppFile
-import net.pantasystem.milktea.data.model.gallery.CreateGalleryPost
-import net.pantasystem.milktea.data.model.gallery.GalleryPost
-import net.pantasystem.milktea.data.model.gallery.GalleryRepository
-import net.pantasystem.milktea.data.model.gallery.toTask
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.gallery.CreateGalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.model.gallery.toTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -25,7 +24,7 @@ import java.io.Serializable
 
 sealed class EditType : Serializable{
     data class Update(
-        val postId: GalleryPost.Id
+        val postId: net.pantasystem.milktea.model.gallery.GalleryPost.Id
     ) : EditType()
 
     data class Create(
@@ -34,11 +33,11 @@ sealed class EditType : Serializable{
 }
 
 class GalleryEditorViewModel @AssistedInject constructor(
-    private val galleryRepository: GalleryRepository,
-    val filePropertyDataSource: FilePropertyDataSource,
-    val accountRepository: AccountRepository,
+    private val galleryRepository: net.pantasystem.milktea.model.gallery.GalleryRepository,
+    val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     private val taskExecutor: CreateGalleryTaskExecutor,
-    private val driveFileRepository: DriveFileRepository,
+    private val driveFileRepository: net.pantasystem.milktea.model.drive.DriveFileRepository,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     @Assisted private val editType: EditType,
     ) : ViewModel(){
@@ -57,8 +56,8 @@ class GalleryEditorViewModel @AssistedInject constructor(
     private val _description = MutableLiveData<String>()
     val description = _description
 
-    private val _pickedImages = MutableLiveData<List<AppFile>>()
-    val pickedImages: LiveData<List<AppFile>> = _pickedImages
+    private val _pickedImages = MutableLiveData<List<net.pantasystem.milktea.model.file.AppFile>>()
+    val pickedImages: LiveData<List<net.pantasystem.milktea.model.file.AppFile>> = _pickedImages
 
     val isSensitive = MutableLiveData(false)
 
@@ -76,7 +75,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun fetchWithApply(postId: GalleryPost.Id) {
+    private suspend fun fetchWithApply(postId: net.pantasystem.milktea.model.gallery.GalleryPost.Id) {
         val galleryPost = galleryRepository.find(postId)
         _title.postValue(galleryPost.title)
         _description.postValue(galleryPost.description)
@@ -84,20 +83,20 @@ class GalleryEditorViewModel @AssistedInject constructor(
 
         _pickedImages.postValue(
             files.map {
-                AppFile.Remote(it.id)
+                net.pantasystem.milktea.model.file.AppFile.Remote(it.id)
             }
         )
     }
 
-    fun detach(file: AppFile) {
+    fun detach(file: net.pantasystem.milktea.model.file.AppFile) {
         _pickedImages.value = (_pickedImages.value?: emptyList()).filterNot {
             it == file
         }
     }
 
-    fun toggleSensitive(file: AppFile) {
+    fun toggleSensitive(file: net.pantasystem.milktea.model.file.AppFile) {
         when(file) {
-            is AppFile.Local -> {
+            is net.pantasystem.milktea.model.file.AppFile.Local -> {
                 _pickedImages.value = _pickedImages.value?.map {
                     if(it === file) {
                         it.copy(isSensitive = !file.isSensitive)
@@ -106,7 +105,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
                     }
                 }
             }
-            is AppFile.Remote -> {
+            is net.pantasystem.milktea.model.file.AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     runCatching {
                         driveFileRepository.toggleNsfw(file.id)
@@ -119,14 +118,14 @@ class GalleryEditorViewModel @AssistedInject constructor(
     }
 
 
-    fun addFilePropertyIds(ids: List<FileProperty.Id>) {
+    fun addFilePropertyIds(ids: List<net.pantasystem.milktea.model.drive.FileProperty.Id>) {
         viewModelScope.launch(Dispatchers.IO) {
             val files = filePropertyDataSource.findIn(ids)
 
             val list = (_pickedImages.value?: emptyList()).toMutableList().also { list ->
                 list.addAll(
                     files.map {
-                        AppFile.Remote(it.id)
+                        net.pantasystem.milktea.model.file.AppFile.Remote(it.id)
                     }
                 )
             }
@@ -134,7 +133,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun addFile(file: AppFile) {
+    fun addFile(file: net.pantasystem.milktea.model.file.AppFile) {
         _pickedImages.value = (_pickedImages.value?: emptyList()).toMutableList().also { mutable ->
             mutable.add(file)
         }
@@ -150,7 +149,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
         val description = this.description.value?: ""
         val isSensitive = this.isSensitive.value?: false
         if(validate()) {
-            val create = CreateGalleryPost(
+            val create = net.pantasystem.milktea.model.gallery.CreateGalleryPost(
                 title,
                 getAccount(),
                 files,
@@ -164,7 +163,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
 
     private var _accountId: Long? = null
     private val _accountLock = Mutex()
-    private suspend fun getAccount() : Account{
+    private suspend fun getAccount() : net.pantasystem.milktea.model.account.Account {
         _accountLock.withLock {
             if(_accountId == null) {
                 return accountRepository.getCurrentAccount().also {

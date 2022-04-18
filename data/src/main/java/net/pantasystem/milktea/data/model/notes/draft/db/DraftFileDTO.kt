@@ -1,9 +1,8 @@
 package net.pantasystem.milktea.data.model.notes.draft.db
 
 import androidx.room.*
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.file.File
 
 @Entity(
     tableName = "draft_file_table",
@@ -33,7 +32,7 @@ data class DraftFileDTO(
     var fileId: Long? = null
 
     companion object{
-        fun make(file: File, draftNoteId: Long): DraftFileDTO{
+        fun make(file: net.pantasystem.milktea.model.file.File, draftNoteId: Long): DraftFileDTO{
             return DraftFileDTO(
                 file.name,
                 file.remoteFileId?.fileId,
@@ -52,12 +51,17 @@ data class DraftFileDTO(
 
 
     @Ignore
-    fun toFile(accountId: Long): File{
-        return File(
+    fun toFile(accountId: Long): net.pantasystem.milktea.model.file.File {
+        return net.pantasystem.milktea.model.file.File(
             name,
-            filePath?: "",
+            filePath ?: "",
             type,
-            remoteFileId?.let { FileProperty.Id(accountId, it) },
+            remoteFileId?.let {
+                net.pantasystem.milktea.model.drive.FileProperty.Id(
+                    accountId,
+                    it
+                )
+            },
             fileId,
             thumbnailUrl,
             isSensitive,

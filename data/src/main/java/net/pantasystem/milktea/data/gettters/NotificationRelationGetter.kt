@@ -2,20 +2,19 @@ package net.pantasystem.milktea.data.gettters
 
 import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.api.misskey.users.toUser
-import net.pantasystem.milktea.data.model.account.Account
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.model.notification.*
-import net.pantasystem.milktea.data.model.users.UserDataSource
+import net.pantasystem.milktea.model.notification.*
 
 class NotificationRelationGetter(
-    private val userDataSource: UserDataSource,
+    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     private val notificationDataSource: NotificationDataSource,
     private val noteRelationGetter: NoteRelationGetter,
     private val noteDataSourceAdder: NoteDataSourceAdder
 ) {
 
 
-    suspend fun get(account: Account, notificationDTO: NotificationDTO): NotificationRelation {
+    suspend fun get(account: net.pantasystem.milktea.model.account.Account, notificationDTO: NotificationDTO): NotificationRelation {
         val user = notificationDTO.user?.toUser(account, false)
         if (user != null) {
             userDataSource.add(user)

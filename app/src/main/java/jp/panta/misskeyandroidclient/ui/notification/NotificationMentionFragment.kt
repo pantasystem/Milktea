@@ -9,16 +9,13 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.data.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.account.page.PageableTemplate
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -31,8 +28,10 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
 
         val pageableTypeNameMap = PageTypeNameMap(view.context)
         val pagerItems = listOf(
-            PageableTemplate(null).notification(pageableTypeNameMap.get(PageType.NOTIFICATION)),
-            PageableTemplate(null).mention(pageableTypeNameMap.get(PageType.MENTION))
+            net.pantasystem.milktea.model.account.page.PageableTemplate(null)
+                .notification(pageableTypeNameMap.get(net.pantasystem.milktea.model.account.page.PageType.NOTIFICATION)),
+            net.pantasystem.milktea.model.account.page.PageableTemplate(null)
+                .mention(pageableTypeNameMap.get(net.pantasystem.milktea.model.account.page.PageType.MENTION))
         )
 
         val notificationPagerAdapter =  PagerAdapter(pagerItems)
@@ -47,7 +46,7 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
 
     }
 
-    inner class PagerAdapter(val pages: List<Page>) : FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class PagerAdapter(val pages: List<net.pantasystem.milktea.model.account.page.Page>) : FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
         private fun createFragment(position: Int): Fragment {
             return PageableFragmentFactory.create(pages[position])

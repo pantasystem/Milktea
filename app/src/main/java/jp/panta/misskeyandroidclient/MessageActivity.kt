@@ -10,8 +10,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.messaging.MessagingId
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.MessageFragment
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
@@ -20,10 +20,6 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -45,7 +41,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as MessagingId?
+        val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as net.pantasystem.milktea.model.messaging.MessagingId?
         val account = (applicationContext as MiApplication).getAccountStore().currentAccount
 
 
@@ -114,7 +110,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
 
     private val openDriveActivityForPickFileResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val ids = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? List<*>)?.map {
-            it as FileProperty.Id
+            it as net.pantasystem.milktea.model.drive.FileProperty.Id
         }
         ids?.firstOrNull()?.let {
             mViewModel.setFilePropertyFromId(it)

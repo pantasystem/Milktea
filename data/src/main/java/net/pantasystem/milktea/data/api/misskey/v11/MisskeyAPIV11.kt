@@ -6,8 +6,6 @@ import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.model.I
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.data.model.auth.custom.App
-import net.pantasystem.milktea.api.misskey.app.CreateApp
-import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.data.api.misskey.drive.*
 import net.pantasystem.milktea.data.model.auth.signin.SignIn
 import net.pantasystem.milktea.data.model.fevorite.Favorite
@@ -17,10 +15,8 @@ import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.data.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.data.api.misskey.messaging.RequestMessage
 import net.pantasystem.milktea.data.api.misskey.notes.*
-import net.pantasystem.milktea.data.model.messaging.RequestMessageHistory
-import net.pantasystem.milktea.data.model.instance.Meta
-import net.pantasystem.milktea.data.model.instance.RequestMeta
-import net.pantasystem.milktea.data.model.notes.poll.Vote
+import net.pantasystem.milktea.model.messaging.RequestMessageHistory
+import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.data.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.data.api.misskey.notes.reaction.ReactionHistoryDTO
 import net.pantasystem.milktea.data.api.misskey.notes.reaction.RequestReactionHistoryDTO
@@ -31,7 +27,6 @@ import net.pantasystem.milktea.data.api.misskey.sw.register.Subscription
 import net.pantasystem.milktea.data.api.misskey.sw.register.SubscriptionState
 import net.pantasystem.milktea.data.api.misskey.sw.register.UnSubscription
 import net.pantasystem.milktea.data.api.misskey.users.report.ReportDTO
-import net.pantasystem.milktea.data.model.drive.Directory
 import retrofit2.Response
 
 open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI by misskeyAPI{
@@ -56,10 +51,10 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     open suspend fun followers(userRequest: RequestUser): Response<List<FollowFollowerUser>> = apiDiff.followers(userRequest)
     open suspend fun following(userRequest: RequestUser): Response<List<FollowFollowerUser>> = apiDiff.following(userRequest)
     override suspend fun getFiles(fileRequest: RequestFile): Response<List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>> = misskeyAPI.getFiles(fileRequest)
-    override suspend fun getFolders(folderRequest: RequestFolder): Response<List<Directory>> = misskeyAPI.getFolders(folderRequest)
+    override suspend fun getFolders(folderRequest: RequestFolder): Response<List<net.pantasystem.milktea.model.drive.Directory>> = misskeyAPI.getFolders(folderRequest)
     override suspend fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Response<List<MessageDTO>> = misskeyAPI.getMessageHistory(requestMessageHistory)
     override suspend fun getMessages(requestMessage: RequestMessage): Response<List<MessageDTO>> = misskeyAPI.getMessages(requestMessage)
-    override suspend fun getMeta(requestMeta: RequestMeta): Response<Meta> = misskeyAPI.getMeta(requestMeta)
+    override suspend fun getMeta(requestMeta: net.pantasystem.milktea.model.instance.RequestMeta): Response<net.pantasystem.milktea.model.instance.Meta> = misskeyAPI.getMeta(requestMeta)
     override suspend fun globalTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.globalTimeline(noteRequest)
     override suspend fun homeTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.homeTimeline(noteRequest)
     override suspend fun hybridTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.hybridTimeline(noteRequest)

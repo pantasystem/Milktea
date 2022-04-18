@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
@@ -24,7 +24,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
 @AndroidEntryPoint
-class ReactionSelectionDialog : BottomSheetDialogFragment(), ReactionSelection {
+class ReactionSelectionDialog : BottomSheetDialogFragment(),
+    net.pantasystem.milktea.model.notes.reaction.ReactionSelection {
 
     private var mNoteViewModel: NotesViewModel? = null
     val notesViewModel by activityViewModels<NotesViewModel>()

@@ -2,26 +2,25 @@ package net.pantasystem.milktea.data.model.drive
 
 import android.content.Context
 import com.google.gson.Gson
-import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.file.AppFile
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.file.AppFile
 import okhttp3.OkHttpClient
 import java.lang.IllegalStateException
 
 interface FileUploader {
     @Throws(FileUploadFailedException::class)
-    suspend fun upload(file: AppFile.Local, isForce: Boolean): net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+    suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO
 }
 
 class FileUploadFailedException(val file: AppFile.Local, val throwable: Throwable?, val statusCode: Int?) : IllegalStateException()
 
 interface FileUploaderProvider {
-    fun create(account: Account): FileUploader
-    fun get(account: Account) : FileUploader
+    fun create(account: net.pantasystem.milktea.model.account.Account): FileUploader
+    fun get(account: net.pantasystem.milktea.model.account.Account) : FileUploader
 }
 
 class OkHttpFileUploaderProvider(
@@ -29,11 +28,11 @@ class OkHttpFileUploaderProvider(
     val context: Context,
     val gson: Gson,
     val encryption: Encryption
-) : FileUploaderProvider{
+) : FileUploaderProvider {
     private val lock = Mutex()
     private var instances = mapOf<Long, FileUploader>()
 
-    override fun create(account: Account): FileUploader {
+    override fun create(account: net.pantasystem.milktea.model.account.Account): FileUploader {
         return runBlocking {
             lock.withLock {
                 val map = instances.toMutableMap()
@@ -44,7 +43,7 @@ class OkHttpFileUploaderProvider(
         }
     }
 
-    override fun get(account: Account): FileUploader {
+    override fun get(account: net.pantasystem.milktea.model.account.Account): FileUploader {
         return instances[account.accountId]?: create(account)
     }
 

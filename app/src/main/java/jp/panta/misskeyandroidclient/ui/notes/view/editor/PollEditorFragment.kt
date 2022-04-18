@@ -12,13 +12,10 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
-import net.pantasystem.milktea.data.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
@@ -78,14 +75,14 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
         mBinding.deadLineType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, id: Long) {
                 if(deadLineType[position] == getString(R.string.indefinite_period)){
-                    viewModel.updateState(viewModel.state.value.changePollExpiresAt(PollExpiresAt.Infinity))
+                    viewModel.updateState(viewModel.state.value.changePollExpiresAt(net.pantasystem.milktea.model.notes.PollExpiresAt.Infinity))
                 }else{
                     viewModel.updateState(
                         viewModel
                             .state
                             .value
                             .changePollExpiresAt(
-                                PollExpiresAt.DateAndTime(
+                                net.pantasystem.milktea.model.notes.PollExpiresAt.DateAndTime(
                                     Clock.System.now().plus(1.days)
                                 )
                             )

@@ -3,8 +3,7 @@ package jp.panta.misskeyandroidclient.ui.drive.viewmodel.file
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import java.lang.IllegalArgumentException
-import net.pantasystem.milktea.data.model.account.watchAccount
-import net.pantasystem.milktea.data.model.drive.DriveStore
+import net.pantasystem.milktea.model.drive.DriveStore
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.account.watchAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,7 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 class FileViewModelFactory(
     private val accountId :Long?,
     private val miCore: MiCore,
-    private val driveStore: DriveStore,
+    private val driveStore: net.pantasystem.milktea.model.drive.DriveStore,
 ) : ViewModelProvider.Factory{
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -2,9 +2,9 @@ package net.pantasystem.milktea.data.api.misskey.v12.channel
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.channel.Channel
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.user.User
 
 /**
  * APIから降ってきたJSONを直接的に変換するためのDTO
@@ -25,9 +25,9 @@ data class ChannelDTO(
     val hasUnreadNote: Boolean? = null,
     val isFollowing: Boolean? = null,
 ) {
-    fun toModel(account: Account): Channel {
-        return Channel(
-            id = Channel.Id(account.accountId, id),
+    fun toModel(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.model.channel.Channel {
+        return net.pantasystem.milktea.model.channel.Channel(
+            id = net.pantasystem.milktea.model.channel.Channel.Id(account.accountId, id),
             createdAt = createdAt,
             lastNotedAt = lastNotedAt,
             name = name,
@@ -35,7 +35,7 @@ data class ChannelDTO(
             bannerUrl = bannerUrl,
             notesCount = notesCount,
             usersCount = usersCount,
-            userId = userId?.let { User.Id(account.accountId, it) },
+            userId = userId?.let { net.pantasystem.milktea.model.user.User.Id(account.accountId, it) },
             hasUnreadNote = hasUnreadNote,
             isFollowing = isFollowing
         )

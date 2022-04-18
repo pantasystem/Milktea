@@ -12,7 +12,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import net.pantasystem.milktea.data.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.databinding.FragmentExploreUsersBinding
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
@@ -96,7 +96,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         })
     }
 
-    override fun show(userId: User.Id?) {
+    override fun show(userId: net.pantasystem.milktea.model.user.User.Id?) {
         userId?.let{
             val intent = UserDetailActivity.newInstance(requireContext(), userId = userId)
             intent.putActivity(Activities.ACTIVITY_IN_APP)

@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -36,7 +36,7 @@ class FavoriteActivity : AppCompatActivity() {
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         val fragment = TimelineFragment.newInstance(
-            Pageable.Favorite
+            net.pantasystem.milktea.model.account.page.Pageable.Favorite
         )
 
         val manager = supportFragmentManager.beginTransaction()

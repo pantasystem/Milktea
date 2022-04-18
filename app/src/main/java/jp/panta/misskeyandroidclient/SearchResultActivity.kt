@@ -16,9 +16,9 @@ import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.Account
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
@@ -28,8 +28,6 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class SearchResultActivity : AppCompatActivity() {
@@ -44,7 +42,7 @@ class SearchResultActivity : AppCompatActivity() {
     private var mSearchWord: String? = null
     private var mIsTag: Boolean? = null
 
-    private var mAccountRelation: Account? = null
+    private var mAccountRelation: net.pantasystem.milktea.model.account.Account? = null
     private val binding: ActivitySearchResultBinding by dataBinding()
     val notesViewModel by viewModels<NotesViewModel>()
     private val accountViewModel: AccountViewModel by viewModels()
@@ -118,9 +116,24 @@ class SearchResultActivity : AppCompatActivity() {
         val samePage = getSamePage()
         if(samePage == null){
             val page = if(mIsTag == true){
-                Page(mAccountRelation?.accountId?: - 1, word, 0, pageable = Pageable.SearchByTag(tag = word.replace("#", "")))
+                net.pantasystem.milktea.model.account.page.Page(
+                    mAccountRelation?.accountId ?: -1,
+                    word,
+                    0,
+                    pageable = net.pantasystem.milktea.model.account.page.Pageable.SearchByTag(
+                        tag = word.replace(
+                            "#",
+                            ""
+                        )
+                    )
+                )
             }else{
-                Page(mAccountRelation?.accountId?: - 1, mSearchWord?: "", -1, pageable = Pageable.Search(word))
+                net.pantasystem.milktea.model.account.page.Page(
+                    mAccountRelation?.accountId ?: -1,
+                    mSearchWord ?: "",
+                    -1,
+                    pageable = net.pantasystem.milktea.model.account.page.Pageable.Search(word)
+                )
             }
             accountViewModel.addPage(
                 page
@@ -134,13 +147,13 @@ class SearchResultActivity : AppCompatActivity() {
         return getSamePage() != null
     }
 
-    private fun getSamePage(): Page?{
+    private fun getSamePage(): net.pantasystem.milktea.model.account.page.Page?{
         return mAccountRelation?.pages?.firstOrNull {
             when (val pageable = it.pageable()) {
-                is Pageable.Search -> {
+                is net.pantasystem.milktea.model.account.page.Pageable.Search -> {
                     pageable.query == mSearchWord
                 }
-                is Pageable.SearchByTag -> {
+                is net.pantasystem.milktea.model.account.page.Pageable.SearchByTag -> {
                     pageable.tag == mSearchWord
                 }
                 else -> {
@@ -173,15 +186,15 @@ class SearchResultActivity : AppCompatActivity() {
 
             return when(pages[position]){
                 SEARCH_NOTES, SEARCH_NOTES_WITH_FILES ->{
-                    val request: Pageable = if(isTag){
+                    val request: net.pantasystem.milktea.model.account.page.Pageable = if(isTag){
                         if(pages[position] == SEARCH_NOTES){
-                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = false)
+                            net.pantasystem.milktea.model.account.page.Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = false)
                         }else{
-                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
+                            net.pantasystem.milktea.model.account.page.Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
                         }
 
                     }else{
-                        Pageable.Search(query = keyword)
+                        net.pantasystem.milktea.model.account.page.Pageable.Search(query = keyword)
                     }
                     TimelineFragment.newInstance(request)
                 }
@@ -190,7 +203,7 @@ class SearchResultActivity : AppCompatActivity() {
                 }
                 else ->{
                     TimelineFragment.newInstance(
-                        Pageable.Search(query = keyword)
+                        net.pantasystem.milktea.model.account.page.Pageable.Search(query = keyword)
                     )
                 }
             }

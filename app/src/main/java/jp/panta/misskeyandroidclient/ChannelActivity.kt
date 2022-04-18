@@ -6,8 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.channel.ChannelPagingModel
+import net.pantasystem.milktea.model.account.AccountStore
 import jp.panta.misskeyandroidclient.ui.channel.ChannelScreen
 import jp.panta.misskeyandroidclient.ui.channel.ChannelViewModel
 import javax.inject.Inject
@@ -17,7 +16,7 @@ import javax.inject.Inject
 class ChannelActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var accountStore: AccountStore
+    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
     private val channelViewModel: ChannelViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

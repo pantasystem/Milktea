@@ -21,10 +21,10 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.emoji.Emoji
-import net.pantasystem.milktea.data.model.file.toFile
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.toFile
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
@@ -84,7 +84,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         }
         accountViewModel.showProfile.observe(this) {
-            val intent = UserDetailActivity.newInstance(requireContext(), userId = User.Id(it.accountId, it.remoteId))
+            val intent = UserDetailActivity.newInstance(requireContext(), userId = net.pantasystem.milktea.model.user.User.Id(it.accountId, it.remoteId))
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
             startActivity(intent)
@@ -223,7 +223,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     }
 
 
-    private fun onSelect(emoji: Emoji) {
+    private fun onSelect(emoji: net.pantasystem.milktea.model.emoji.Emoji) {
         val pos = mBinding.inputMainText.selectionEnd
         mViewModel.addEmoji(emoji, pos).let{ newPos ->
             mBinding.inputMainText.setText(mViewModel.text.value?: "")
@@ -344,7 +344,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     private val registerForOpenDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if(result.resultCode == RESULT_OK) {
             val selectedFilePropertyIds = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
-                it as FileProperty.Id
+                it as net.pantasystem.milktea.model.drive.FileProperty.Id
             }
             mViewModel.addFilePropertyFromIds(selectedFilePropertyIds)
         }

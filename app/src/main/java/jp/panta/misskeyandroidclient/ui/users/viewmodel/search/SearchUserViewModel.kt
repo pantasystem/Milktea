@@ -2,19 +2,15 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.common.Logger
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import net.pantasystem.milktea.common.State
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.users.UserRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.user.UserRepository
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -37,9 +33,9 @@ data class SearchUser(
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
-    accountStore: AccountStore,
+    accountStore: net.pantasystem.milktea.model.account.AccountStore,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
-    private val userRepository: UserRepository,
+    private val userRepository: net.pantasystem.milktea.model.user.UserRepository,
     private val miCore: MiCore,
 ) : ViewModel(){
 

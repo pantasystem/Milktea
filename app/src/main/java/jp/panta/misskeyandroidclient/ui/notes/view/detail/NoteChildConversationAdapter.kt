@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSimpleNoteBinding
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -55,7 +55,7 @@ class NoteChildConversationAdapter(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<List<ReactionCount>> {
+        val observer = Observer<List<net.pantasystem.milktea.model.notes.reaction.ReactionCount>> {
             adapter.submitList(it.toList())
         }
         note.reactionCounts.observe(lifecycleOwner, observer)

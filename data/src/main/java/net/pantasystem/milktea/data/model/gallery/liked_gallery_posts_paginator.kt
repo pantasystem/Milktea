@@ -4,17 +4,18 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.v12_75_0.GetPosts
 import net.pantasystem.milktea.data.api.misskey.v12_75_0.LikedGalleryPost
 import net.pantasystem.milktea.data.api.misskey.v12_75_0.MisskeyAPIV1275
-import net.pantasystem.milktea.data.model.*
-import net.pantasystem.milktea.data.model.account.Account
 import net.pantasystem.milktea.data.model.api.IllegalVersionException
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.users.UserDataSource
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.data.model.*
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.gallery.toEntity
 import retrofit2.Response
 
 data class LikedGalleryPostId(
@@ -63,9 +64,9 @@ class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<Str
 }
 
 class LikedGalleryPostsConverter(
-    private val getAccount: suspend () -> Account,
-    private val filePropertyDataSource: FilePropertyDataSource,
-    private val userDataSource: UserDataSource,
+    private val getAccount: suspend () -> net.pantasystem.milktea.model.account.Account,
+    private val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     private val galleryDataSource: GalleryDataSource
 ) : EntityConverter<LikedGalleryPost, LikedGalleryPostId> {
 
@@ -85,7 +86,7 @@ class LikedGalleryPostsConverter(
 class LikedGalleryPostsLoader(
     private val idGetter: IdGetter<String>,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getAccount: suspend ()->Account,
+    private val getAccount: suspend ()-> net.pantasystem.milktea.model.account.Account,
     private val encryption: Encryption
 ) : FutureLoader<LikedGalleryPost>, PreviousLoader<LikedGalleryPost> {
 

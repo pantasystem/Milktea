@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -23,17 +22,16 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.channel.Channel
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.data.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.model.confirm.ResultType
-import net.pantasystem.milktea.data.model.core.ConnectionStatus
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.emoji.Emoji
-import net.pantasystem.milktea.data.model.file.toFile
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.toFile
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
@@ -49,7 +47,6 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
-import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -73,11 +70,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         fun newBundle(
             context: Context,
-            replyTo: Note.Id? = null,
-            quoteTo: Note.Id? = null,
-            draftNote: DraftNote? = null,
+            replyTo: net.pantasystem.milktea.model.notes.Note.Id? = null,
+            quoteTo: net.pantasystem.milktea.model.notes.Note.Id? = null,
+            draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote? = null,
             mentions: List<String>? = null,
-            channelId: Channel.Id? = null,
+            channelId: net.pantasystem.milktea.model.channel.Channel.Id? = null,
         ): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let {
@@ -114,7 +111,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     private lateinit var mConfirmViewModel: ConfirmViewModel
 
-    @Inject lateinit var accountStore: AccountStore
+    @Inject lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accountViewModel: AccountViewModel by viewModels()
@@ -161,19 +158,19 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             )
         val replyToNoteId = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)?.let {
             requireNotNull(accountId)
-            Note.Id(accountId, it)
+            net.pantasystem.milktea.model.notes.Note.Id(accountId, it)
         }
         val quoteToNoteId = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)?.let {
             requireNotNull(accountId)
-            Note.Id(accountId, it)
+            net.pantasystem.milktea.model.notes.Note.Id(accountId, it)
         }
 
         val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)?.let {
             requireNotNull(accountId)
-            Channel.Id(accountId, it)
+            net.pantasystem.milktea.model.channel.Channel.Id(accountId, it)
         }
 
-        val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
+        val draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? net.pantasystem.milktea.model.notes.draft.DraftNote?
 
 
         noteEditorToolbar.actionUpButton.setOnClickListener {
@@ -194,7 +191,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
         accountViewModel.showProfile.observe(this) {
             val intent =
-                UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
+                UserDetailActivity.newInstance(this, userId = net.pantasystem.milktea.model.user.User.Id(it.accountId, it.remoteId))
 
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
@@ -391,7 +388,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         binding.inputMain.requestFocus()
     }
 
-    override fun onSelect(emoji: Emoji) {
+    override fun onSelect(emoji: net.pantasystem.milktea.model.emoji.Emoji) {
         val pos = mBinding.inputMain.selectionEnd
         mViewModel.addEmoji(emoji, pos).let { newPos ->
             mBinding.inputMain.setText(mViewModel.text.value ?: "")
@@ -541,7 +538,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =
                 (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
-                    it as? FileProperty.Id
+                    it as? net.pantasystem.milktea.model.drive.FileProperty.Id
                 }
             Log.d("NoteEditorActivity", "result:${ids}")
             val size = mViewModel.fileTotal()

@@ -4,11 +4,10 @@ package net.pantasystem.milktea.data.model.messaging.impl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import net.pantasystem.milktea.data.model.AddResult
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.messaging.Message
-import net.pantasystem.milktea.data.model.messaging.MessagingId
-import net.pantasystem.milktea.data.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessagingId
+import net.pantasystem.milktea.model.messaging.UnReadMessages
 
 interface MessageDataSource {
     suspend fun add(message: Message): AddResult
@@ -23,7 +22,7 @@ interface MessageDataSource {
 }
 
 class InMemoryMessageDataSource(
-    private val accountRepository: AccountRepository
+    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository
 ) : MessageDataSource, UnReadMessages {
 
     private val messageIdAndMessage = mutableMapOf<Message.Id, Message>()

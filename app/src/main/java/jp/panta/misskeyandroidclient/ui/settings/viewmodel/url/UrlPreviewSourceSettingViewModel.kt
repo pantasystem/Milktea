@@ -4,8 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.model.settings.UrlPreviewSourceSetting
 import net.pantasystem.milktea.data.model.url.UrlPreview
@@ -18,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UrlPreviewSourceSettingViewModel @Inject constructor(
-    val accountStore: AccountStore,
+    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
     val settingStore: SettingStore,
     val urlPreviewDAO: UrlPreviewDAO,
     val miCore: MiCore

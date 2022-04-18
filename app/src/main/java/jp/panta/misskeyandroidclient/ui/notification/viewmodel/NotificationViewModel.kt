@@ -5,12 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.api.misskey.notification.NotificationRequest
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.notification.Notification
-import net.pantasystem.milktea.data.model.notification.NotificationRelation
-import net.pantasystem.milktea.data.model.notification.ReceiveFollowRequestNotification
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.NotificationRelation
+import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -182,8 +181,8 @@ class NotificationViewModel(
 
     }
 
-    fun acceptFollowRequest(notification: Notification) {
-        if (notification is ReceiveFollowRequestNotification) {
+    fun acceptFollowRequest(notification: net.pantasystem.milktea.model.notification.Notification) {
+        if (notification is net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     miCore.getUserRepository().acceptFollowRequest(notification.userId)
@@ -202,8 +201,8 @@ class NotificationViewModel(
 
     }
 
-    fun rejectFollowRequest(notification: Notification) {
-        if (notification is ReceiveFollowRequestNotification) {
+    fun rejectFollowRequest(notification: net.pantasystem.milktea.model.notification.Notification) {
+        if (notification is net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     miCore.getUserRepository().rejectFollowRequest(notification.userId)
@@ -221,11 +220,11 @@ class NotificationViewModel(
         }
     }
 
-    private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
+    private suspend fun NotificationDTO.toNotificationRelation(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.model.notification.NotificationRelation {
         return miCore.getGetters().notificationRelationGetter.get(account, this)
     }
 
-    private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
+    private suspend fun List<NotificationDTO>.toNotificationRelations(account: net.pantasystem.milktea.model.account.Account): List<net.pantasystem.milktea.model.notification.NotificationRelation> {
         return this.mapNotNull {
             runCatching {
                 it.toNotificationRelation(account)
@@ -235,7 +234,7 @@ class NotificationViewModel(
         }
     }
 
-    private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
+    private suspend fun List<NotificationDTO>.toNotificationViewData(account: net.pantasystem.milktea.model.account.Account): List<NotificationViewData> {
         return this.toNotificationRelations(account).map {
             NotificationViewData(
                 it,

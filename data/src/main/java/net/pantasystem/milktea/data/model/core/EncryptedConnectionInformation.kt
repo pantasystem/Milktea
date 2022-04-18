@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
 import androidx.room.ForeignKey.NO_ACTION
 import androidx.room.Ignore
-import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.common.Encryption
 import java.util.*
 
 /**

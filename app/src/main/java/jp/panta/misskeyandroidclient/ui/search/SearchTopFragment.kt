@@ -11,7 +11,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,7 +61,7 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top){
 
         override fun getItem(position: Int): Fragment {
             return when(position){
-                0 -> TimelineFragment.newInstance(Pageable.Featured(null))
+                0 -> TimelineFragment.newInstance(net.pantasystem.milktea.model.account.page.Pageable.Featured(null))
                 1 -> ExploreFragment()
                 else -> throw IllegalArgumentException("range 0..1, list:$tabList")
             }

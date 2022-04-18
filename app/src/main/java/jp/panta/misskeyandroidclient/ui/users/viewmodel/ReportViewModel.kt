@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.data.model.users.User
-import net.pantasystem.milktea.data.model.users.report.Report
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.Report
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 
 sealed interface ReportState {
     data class Specify(
-        val userId: User.Id,
+        val userId: net.pantasystem.milktea.model.user.User.Id,
         val comment: String
     ) : ReportState {
         val canSend: Boolean
@@ -24,20 +24,20 @@ sealed interface ReportState {
 
 
     sealed interface Sending : ReportState {
-        val userId: User.Id
+        val userId: net.pantasystem.milktea.model.user.User.Id
         val comment: String
         data class Doing(
-            override val userId: User.Id,
+            override val userId: net.pantasystem.milktea.model.user.User.Id,
             override val comment: String
         ) : Sending
 
         data class Failed(
-            override val userId: User.Id,
+            override val userId: net.pantasystem.milktea.model.user.User.Id,
             override val comment: String
         ) : Sending
 
         data class Success(
-            override val userId: User.Id,
+            override val userId: net.pantasystem.milktea.model.user.User.Id,
             override val comment: String
         ) : Sending
     }
@@ -85,7 +85,7 @@ class ReportViewModel(private val miCore: MiCore) : ViewModel(){
         _state.value = ReportState.None
     }
 
-    fun newState(userId: User.Id, comment: String?) {
+    fun newState(userId: net.pantasystem.milktea.model.user.User.Id, comment: String?) {
         _state.value = ReportState.Specify(userId, comment ?: "")
     }
 

@@ -8,19 +8,19 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemPageSettingBinding
-import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Page
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 
-class PagesAdapter(private val pageSettingViewModel: PageSettingViewModel) : ListAdapter<Page, PagesAdapter.VH>(ItemDiffUtil()){
+class PagesAdapter(private val pageSettingViewModel: PageSettingViewModel) : ListAdapter<net.pantasystem.milktea.model.account.page.Page, PagesAdapter.VH>(ItemDiffUtil()){
 
-    class ItemDiffUtil : DiffUtil.ItemCallback<Page>(){
-        override fun areContentsTheSame(oldItem: Page, newItem: Page): Boolean {
+    class ItemDiffUtil : DiffUtil.ItemCallback<net.pantasystem.milktea.model.account.page.Page>(){
+        override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.account.page.Page, newItem: net.pantasystem.milktea.model.account.page.Page): Boolean {
             return oldItem.title == newItem.title
                     && oldItem.accountId == newItem.accountId
                     && oldItem.pageId == newItem.pageId
         }
 
-        override fun areItemsTheSame(oldItem: Page, newItem: Page): Boolean {
+        override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.account.page.Page, newItem: net.pantasystem.milktea.model.account.page.Page): Boolean {
             // id はNullである可能性があるため全比較をしている
             return oldItem == newItem
         }

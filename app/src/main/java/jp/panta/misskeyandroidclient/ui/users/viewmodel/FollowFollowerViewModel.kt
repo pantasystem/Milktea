@@ -4,17 +4,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.users.RequestUser
 import net.pantasystem.milktea.data.api.misskey.users.toUser
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.api.misskey.v10.MisskeyAPIV10
 import net.pantasystem.milktea.data.api.misskey.v10.RequestFollowFollower
 import net.pantasystem.milktea.data.api.misskey.v11.MisskeyAPIV11
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.model.users.User
-import net.pantasystem.milktea.data.model.users.UserDataSource
+import net.pantasystem.milktea.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -22,14 +21,18 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class FollowFollowerViewModel(
-    val userId: User.Id,
+    val userId: net.pantasystem.milktea.model.user.User.Id,
     val type: Type,
     private val miCore: MiCore,
-    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
+    private val noteDataSourceAdder: net.pantasystem.milktea.model.notes.NoteDataSourceAdder = net.pantasystem.milktea.model.notes.NoteDataSourceAdder(
+        miCore.getUserDataSource(),
+        miCore.getNoteDataSource(),
+        miCore.getFilePropertyDataSource()
+    )
 ) : ViewModel(), ShowUserDetails {
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val userId: User.Id,
+        val userId: net.pantasystem.milktea.model.user.User.Id,
         val type: Type,
         val miCore: MiCore,
     ) : ViewModelProvider.Factory{
@@ -45,19 +48,19 @@ class FollowFollowerViewModel(
     }
 
     interface Paginator {
-        suspend fun next(): List<User.Detail>
+        suspend fun next(): List<net.pantasystem.milktea.model.user.User.Detail>
         suspend fun init()
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     class DefaultPaginator(
-        val account: Account,
+        val account: net.pantasystem.milktea.model.account.Account,
         val misskeyAPI: MisskeyAPIV11,
-        val userId: User.Id,
+        val userId: net.pantasystem.milktea.model.user.User.Id,
         val type: Type,
         val encryption: Encryption,
-        val noteDataSourceAdder: NoteDataSourceAdder,
-        val userDataSource: UserDataSource,
+        val noteDataSourceAdder: net.pantasystem.milktea.model.notes.NoteDataSourceAdder,
+        val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
         private val logger: net.pantasystem.milktea.common.Logger?
 
     ) : Paginator {
@@ -66,7 +69,7 @@ class FollowFollowerViewModel(
         private val api = if(type == Type.FOLLOWER) misskeyAPI::followers else misskeyAPI::following
         private var nextId: String? = null
 
-        override suspend fun next(): List<User.Detail> {
+        override suspend fun next(): List<net.pantasystem.milktea.model.user.User.Detail> {
             lock.withLock {
                 logger?.debug("next: $nextId")
                 val res = api.invoke(
@@ -85,7 +88,7 @@ class FollowFollowerViewModel(
                     userDTO.pinnedNotes?.forEach { noteDTO ->
                         noteDataSourceAdder.addNoteDtoToDataSource(account, noteDTO)
                     }
-                    (userDTO.toUser(account, true) as User.Detail).also {
+                    (userDTO.toUser(account, true) as net.pantasystem.milktea.model.user.User.Detail).also {
                         userDataSource.add(it)
                     }
                 }
@@ -101,19 +104,19 @@ class FollowFollowerViewModel(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     class V10Paginator(
-        val account: Account,
+        val account: net.pantasystem.milktea.model.account.Account,
         private val misskeyAPIV10: MisskeyAPIV10,
-        val userId: User.Id,
+        val userId: net.pantasystem.milktea.model.user.User.Id,
         val type: Type,
         val encryption: Encryption,
-        val noteDataSourceAdder: NoteDataSourceAdder,
-        val userDataSource: UserDataSource
+        val noteDataSourceAdder: net.pantasystem.milktea.model.notes.NoteDataSourceAdder,
+        val userDataSource: net.pantasystem.milktea.model.user.UserDataSource
     ) : Paginator {
         private val lock = Mutex()
         private var nextId: String? = null
         private val api = if(type == Type.FOLLOWER) misskeyAPIV10::followers else misskeyAPIV10::following
 
-        override suspend fun next(): List<User.Detail> {
+        override suspend fun next(): List<net.pantasystem.milktea.model.user.User.Detail> {
             lock.withLock {
                 val res = api.invoke(
                     RequestFollowFollower(
@@ -127,7 +130,7 @@ class FollowFollowerViewModel(
                     userDTO.pinnedNotes?.forEach {
                         noteDataSourceAdder.addNoteDtoToDataSource(account, it)
                     }
-                    (userDTO.toUser(account, true) as User.Detail).also {
+                    (userDTO.toUser(account, true) as net.pantasystem.milktea.model.user.User.Detail).also {
                         userDataSource.add(it)
                     }
                 }
@@ -149,7 +152,7 @@ class FollowFollowerViewModel(
     val userRepository = miCore.getUserRepository()
     private val misskeyAPIProvider = miCore.getMisskeyAPIProvider()
     private val encryption = miCore.getEncryption()
-    private val userDataSource: UserDataSource = miCore.getUserDataSource()
+    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource = miCore.getUserDataSource()
 
     val isInitializing = MutableLiveData(false)
 
@@ -205,14 +208,14 @@ class FollowFollowerViewModel(
     }
 
 
-    val showUserEventBus = EventBus<User.Id>()
+    val showUserEventBus = EventBus<net.pantasystem.milktea.model.user.User.Id>()
 
-    override fun show(userId: User.Id?) {
+    override fun show(userId: net.pantasystem.milktea.model.user.User.Id?) {
         showUserEventBus.event = userId
     }
 
 
-    private var mAccount: Account? = null
+    private var mAccount: net.pantasystem.milktea.model.account.Account? = null
     private var mPaginator: Paginator? = null
 
     private suspend fun getPaginator(): Paginator {

@@ -5,21 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import net.pantasystem.milktea.data.model.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 
 import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.getPreferenceName
 import java.lang.IllegalArgumentException
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Pageable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @Suppress("UNCHECKED_CAST")
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class TimelineViewModelFactory(
-    private val account: Account?,
+    private val account: net.pantasystem.milktea.model.account.Account?,
     private val accountId: Long? = account?.accountId,
-    private val pageable: Pageable,
+    private val pageable: net.pantasystem.milktea.model.account.page.Pageable,
     private val miApplication: MiApplication
 ) : ViewModelProvider.Factory{
 

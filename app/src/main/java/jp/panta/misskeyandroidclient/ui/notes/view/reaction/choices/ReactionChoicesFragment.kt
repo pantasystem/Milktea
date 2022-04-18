@@ -14,10 +14,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
-import net.pantasystem.milktea.data.model.notes.reaction.Reaction
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionSelection
-import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -56,8 +55,8 @@ class ReactionChoicesFragment : Fragment() {
         USER
     }
 
-    @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
-    @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
+    @Inject lateinit var reactionHistoryDao: net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+    @Inject lateinit var reactionUserSettingDao: net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 
 
     override fun onCreateView(
@@ -78,8 +77,8 @@ class ReactionChoicesFragment : Fragment() {
 
         val adapter =
             ReactionChoicesAdapter {
-                val selection = (parentFragment as? ReactionSelection)
-                    ?: (requireActivity() as? ReactionSelection)
+                val selection = (parentFragment as? net.pantasystem.milktea.model.notes.reaction.ReactionSelection)
+                    ?: (requireActivity() as? net.pantasystem.milktea.model.notes.reaction.ReactionSelection)
                 Log.w("ReactionChoicesFragment", "ReactionSelectionの実装が行われていません")
                 selection?.selectReaction(it)
             }

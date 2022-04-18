@@ -1,35 +1,35 @@
 package net.pantasystem.milktea.data.api.misskey
 
-import net.pantasystem.milktea.data.api.misskey.list.*
-import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.data.model.I
-import net.pantasystem.milktea.data.model.auth.custom.App
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.app.ShowApp
-import net.pantasystem.milktea.data.api.misskey.drive.*
+import net.pantasystem.milktea.api.misskey.drive.RequestFile
+import net.pantasystem.milktea.api.misskey.drive.RequestFolder
+import net.pantasystem.milktea.api.misskey.drive.ShowFile
+import net.pantasystem.milktea.api.misskey.drive.UpdateFileDTO
+import net.pantasystem.milktea.api.misskey.list.*
+import net.pantasystem.milktea.api.misskey.messaging.MessageAction
+import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
+import net.pantasystem.milktea.api.misskey.notes.*
+import net.pantasystem.milktea.api.misskey.notes.reaction.ReactionHistoryDTO
+import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
+import net.pantasystem.milktea.api.misskey.notes.translation.Translate
+import net.pantasystem.milktea.api.misskey.notes.translation.TranslationResult
+import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
+import net.pantasystem.milktea.api.misskey.register.Subscription
+import net.pantasystem.milktea.api.misskey.register.SubscriptionState
+import net.pantasystem.milktea.api.misskey.register.UnSubscription
+import net.pantasystem.milktea.api.misskey.users.*
+import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
+import net.pantasystem.milktea.data.model.I
+import net.pantasystem.milktea.data.model.auth.custom.App
 import net.pantasystem.milktea.data.model.auth.signin.SignIn
 import net.pantasystem.milktea.data.model.fevorite.Favorite
 import net.pantasystem.milktea.data.model.hashtag.HashTag
 import net.pantasystem.milktea.data.model.hashtag.RequestHashTagList
-import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.data.api.misskey.messaging.MessageAction
-import net.pantasystem.milktea.data.api.misskey.messaging.RequestMessage
-import net.pantasystem.milktea.data.api.misskey.notes.*
-import net.pantasystem.milktea.data.model.messaging.RequestMessageHistory
-import net.pantasystem.milktea.data.model.instance.Meta
-import net.pantasystem.milktea.data.model.instance.RequestMeta
-import net.pantasystem.milktea.data.model.notes.poll.Vote
-import net.pantasystem.milktea.data.api.misskey.notification.NotificationRequest
-import net.pantasystem.milktea.data.api.misskey.notes.reaction.ReactionHistoryDTO
-import net.pantasystem.milktea.data.api.misskey.notes.reaction.RequestReactionHistoryDTO
-import net.pantasystem.milktea.data.api.misskey.notes.translation.Translate
-import net.pantasystem.milktea.data.api.misskey.notes.translation.TranslationResult
-import net.pantasystem.milktea.data.api.misskey.users.report.ReportDTO
-import net.pantasystem.milktea.data.api.misskey.sw.register.Subscription
-import net.pantasystem.milktea.data.api.misskey.sw.register.SubscriptionState
-import net.pantasystem.milktea.data.api.misskey.sw.register.UnSubscription
-import net.pantasystem.milktea.data.api.misskey.users.*
-import net.pantasystem.milktea.data.model.drive.Directory
+import net.pantasystem.milktea.model.messaging.RequestMessageHistory
+import net.pantasystem.milktea.model.notes.poll.Vote
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -40,13 +40,13 @@ interface MisskeyAPI {
     suspend fun signIn(@Body signIn: SignIn): Response<I>
 
     @POST("api/app/create")
-    suspend fun createApp(@Body createApp: net.pantasystem.milktea.api.misskey.app.CreateApp): Response<App>
+    suspend fun createApp(@Body createApp: CreateApp): Response<App>
 
     @POST("api/my/apps")
     suspend fun myApps(@Body i: I) : Response<List<App>>
 
     @POST("api/app/show")
-    suspend fun showApp(@Body showApp: net.pantasystem.milktea.api.misskey.app.ShowApp) : Response<App>
+    suspend fun showApp(@Body showApp: ShowApp) : Response<App>
 
     @POST("api/blocking/create")
     suspend fun blockUser(@Body requestUser: RequestUser): Response<Unit>
@@ -193,7 +193,7 @@ interface MisskeyAPI {
     suspend fun showFile(@Body req: ShowFile) : Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>
 
     @POST("api/drive/folders")
-    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
+    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<net.pantasystem.milktea.model.drive.Directory>>
 
     @POST("api/drive/folders/create")
     suspend fun createFolder(@Body createFolder: net.pantasystem.milktea.api.misskey.drive.CreateFolder): Response<Unit>
@@ -201,7 +201,7 @@ interface MisskeyAPI {
 
     //meta
     @POST("api/meta")
-    suspend fun getMeta(@Body requestMeta: RequestMeta): Response<Meta>
+    suspend fun getMeta(@Body requestMeta: net.pantasystem.milktea.model.instance.RequestMeta): Response<net.pantasystem.milktea.model.instance.Meta>
 
 
     //message

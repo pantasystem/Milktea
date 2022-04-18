@@ -6,14 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import jp.panta.misskeyandroidclient.AlarmNotePostReceiver
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
-import net.pantasystem.milktea.data.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 
 class AndroidNoteReservationPostExecutor(
     val context: Context
-) : NoteReservationPostExecutor {
+) : net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor {
 
-    override fun register(draftNote: DraftNote) {
+    override fun register(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmNotePostReceiver::class.java)
         intent.putExtra("DRAFT_NOTE_ID", draftNote.draftNoteId!!)

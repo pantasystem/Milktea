@@ -1,18 +1,18 @@
 package net.pantasystem.milktea.data.model.account.db
 
 import androidx.room.*
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Page
 
 @DatabaseView
 class AccountRelation{
-    @Embedded lateinit var account: Account
+    @Embedded lateinit var account: net.pantasystem.milktea.model.account.Account
 
-    @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = Page::class)
-    lateinit var pages: List<Page>
+    @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = net.pantasystem.milktea.model.account.page.Page::class)
+    lateinit var pages: List<net.pantasystem.milktea.model.account.page.Page>
 
     @Ignore
-    fun toAccount(): Account{
+    fun toAccount(): net.pantasystem.milktea.model.account.Account {
         return account.copy(pages = pages.sortedBy {
             it.weight
         })

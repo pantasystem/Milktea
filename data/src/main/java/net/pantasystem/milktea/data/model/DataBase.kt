@@ -4,29 +4,28 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import net.pantasystem.milktea.data.model.account.page.Page
 import net.pantasystem.milktea.data.model.core.*
-import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
 import net.pantasystem.milktea.data.model.notes.draft.db.DraftFileDTO
 import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDTO
 import net.pantasystem.milktea.data.model.notes.draft.db.PollChoiceDTO
 import net.pantasystem.milktea.data.model.notes.draft.db.UserIdDTO
 import net.pantasystem.milktea.data.model.url.UrlPreview
 import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountInstanceTypeConverter
 import net.pantasystem.milktea.data.model.account.db.AccountDAO
-import net.pantasystem.milktea.data.model.account.page.TimelinePageTypeConverter
 import net.pantasystem.milktea.data.model.account.page.db.PageDAO
+import net.pantasystem.milktea.data.model.account.page.db.TimelinePageTypeConverter
 import net.pantasystem.milktea.data.model.instance.db.*
-import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.data.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.data.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
-import net.pantasystem.milktea.data.model.users.impl.UserNicknameDAO
-import net.pantasystem.milktea.data.model.users.impl.UserNicknameDTO
+import net.pantasystem.milktea.data.model.user.impl.UserNicknameDAO
+import net.pantasystem.milktea.data.model.user.impl.UserNicknameDTO
+import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
+
 @Database(
     entities = [
         EncryptedConnectionInformation::class,
@@ -40,8 +39,8 @@ import net.pantasystem.milktea.data.model.users.impl.UserNicknameDTO
         DraftNoteDTO::class,
 
         UrlPreview::class,
-        Account::class,
-        Page::class,
+        net.pantasystem.milktea.model.account.Account::class,
+        net.pantasystem.milktea.model.account.page.Page::class,
         MetaDTO::class,
         EmojiDTO::class,
         EmojiAlias::class,

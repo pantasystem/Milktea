@@ -1,20 +1,18 @@
 package net.pantasystem.milktea.data.model.gallery
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.FuturePagingController
 import net.pantasystem.milktea.data.model.PreviousPagingController
 import net.pantasystem.milktea.data.model.StateLocker
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.users.UserDataSource
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryPost
 
 
 interface GalleryPostsStore : StateLocker {
@@ -27,11 +25,11 @@ interface GalleryPostsStore : StateLocker {
 
 
 class GalleryPostsStoreImpl(
-    pageable: Pageable.Gallery,
-    getAccount: suspend () -> Account,
+    pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery,
+    getAccount: suspend () -> net.pantasystem.milktea.model.account.Account,
     misskeyAPIProvider: MisskeyAPIProvider,
-    filePropertyDataSource: FilePropertyDataSource,
-    userDataSource: UserDataSource,
+    filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     galleryDataSource: GalleryDataSource,
     encryption: Encryption
 ) : GalleryPostsStore {
@@ -66,10 +64,10 @@ class GalleryPostsStoreImpl(
 }
 
 class LikedGalleryPostStoreImpl(
-    getAccount: suspend () -> Account,
+    getAccount: suspend () -> net.pantasystem.milktea.model.account.Account,
     misskeyAPIProvider: MisskeyAPIProvider,
-    filePropertyDataSource: FilePropertyDataSource,
-    userDataSource: UserDataSource,
+    filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     galleryDataSource: GalleryDataSource,
     encryption: Encryption
 ) : GalleryPostsStore {

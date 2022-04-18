@@ -13,28 +13,24 @@ import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.asLiveData
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.drive.DriveFileRepository
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.file.AppFile
-import net.pantasystem.milktea.common.State
-import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
 
 
 @Composable
 fun HorizontalFilePreviewList(
-    files: List<AppFile>,
-    repository: DriveFileRepository,
-    dataSource: FilePropertyDataSource,
+    files: List<net.pantasystem.milktea.model.file.AppFile>,
+    repository: net.pantasystem.milktea.model.drive.DriveFileRepository,
+    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
     onAction: (FilePreviewActionType) -> Unit,
     modifier: Modifier = Modifier) {
     LazyRow(
@@ -52,9 +48,9 @@ fun HorizontalFilePreviewList(
 }
 
 sealed interface FilePreviewTarget {
-    val file: AppFile
-    data class Local(override val file: AppFile.Local) : FilePreviewTarget
-    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) : FilePreviewTarget
+    val file: net.pantasystem.milktea.model.file.AppFile
+    data class Local(override val file: net.pantasystem.milktea.model.file.AppFile.Local) : FilePreviewTarget
+    data class Remote(override val file: net.pantasystem.milktea.model.file.AppFile.Remote, val fileProperty: net.pantasystem.milktea.model.drive.FileProperty) : FilePreviewTarget
 }
 
 sealed interface FilePreviewActionType {
@@ -66,9 +62,9 @@ sealed interface FilePreviewActionType {
 
 @Composable
 fun FilePreview(
-    file: AppFile,
-    repository: DriveFileRepository,
-    dataSource: FilePropertyDataSource,
+    file: net.pantasystem.milktea.model.file.AppFile,
+    repository: net.pantasystem.milktea.model.drive.DriveFileRepository,
+    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
     onAction: (FilePreviewActionType) -> Unit,
 ) {
     var dropDownTarget: FilePreviewTarget? by remember {
@@ -76,7 +72,7 @@ fun FilePreview(
     }
     Column {
         when(file) {
-            is AppFile.Local -> {
+            is net.pantasystem.milktea.model.file.AppFile.Local -> {
                 LocalFilePreview(
                     file = file,
                     onClick = {
@@ -84,14 +80,14 @@ fun FilePreview(
                     }
                 )
             }
-            is AppFile.Remote -> {
+            is net.pantasystem.milktea.model.file.AppFile.Remote -> {
                 RemoteFilePreview(
                     file = file,
                     repository = repository,
                     dataSource = dataSource,
                     onClick = {
                         dropDownTarget = FilePreviewTarget.Remote(
-                            AppFile.Remote(it.id),
+                            net.pantasystem.milktea.model.file.AppFile.Remote(it.id),
                             it
                         )
                     }
@@ -137,8 +133,8 @@ fun FilePreview(
 
 @Composable
 fun LocalFilePreview(
-    file: AppFile.Local,
-    onClick: (AppFile.Local) -> Unit
+    file: net.pantasystem.milktea.model.file.AppFile.Local,
+    onClick: (net.pantasystem.milktea.model.file.AppFile.Local) -> Unit
 ) {
     val uri = Uri.parse(file.path)
     Box (
@@ -166,11 +162,11 @@ fun LocalFilePreview(
 
 @Composable
 fun RemoteFilePreview(
-    file: AppFile.Remote, repository: DriveFileRepository,
-    dataSource: FilePropertyDataSource,
-    onClick: (FileProperty) -> Unit
+    file: net.pantasystem.milktea.model.file.AppFile.Remote, repository: net.pantasystem.milktea.model.drive.DriveFileRepository,
+    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    onClick: (net.pantasystem.milktea.model.drive.FileProperty) -> Unit
 ) {
-    var filePropertyState: net.pantasystem.milktea.common.State<FileProperty> by remember {
+    var filePropertyState: net.pantasystem.milktea.common.State<net.pantasystem.milktea.model.drive.FileProperty> by remember {
         mutableStateOf(net.pantasystem.milktea.common.State.Loading(content = net.pantasystem.milktea.common.StateContent.NotExist()))
     }
     val fileProperty = dataSource.observe(file.id)

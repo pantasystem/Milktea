@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.model.notes
 
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.data.streaming.NoteUpdated
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
-fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
+fun Note.onUnReacted(account: net.pantasystem.milktea.model.account.Account, e: NoteUpdated.Body.Unreacted): Note {
     val list = this.reactionCounts.toMutableList()
     val newList = list.asSequence().map {
         if(it.reaction == e.body.reaction) {
@@ -23,7 +23,7 @@ fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
     )
 }
 
-fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
+fun Note.onReacted(account: net.pantasystem.milktea.model.account.Account, e: NoteUpdated.Body.Reacted): Note {
     var hasItem = false
     var list = this.reactionCounts.map { count ->
         if(count.reaction == e.body.reaction) {
@@ -53,7 +53,7 @@ fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
     )
 }
 
-fun Note.onPollVoted(account: Account, e: NoteUpdated.Body.PollVoted): Note {
+fun Note.onPollVoted(account: net.pantasystem.milktea.model.account.Account, e: NoteUpdated.Body.PollVoted): Note {
     val poll = this.poll
     requireNotNull(poll){
         "pollがNULLです"
@@ -73,7 +73,7 @@ fun Note.onPollVoted(account: Account, e: NoteUpdated.Body.PollVoted): Note {
     )
 }
 
-fun Note.onIReacted(reaction: String) : Note{
+fun Note.onIReacted(reaction: String) : Note {
     var hasItem = false
     var list = this.reactionCounts.map { count ->
         if(count.reaction == reaction) {

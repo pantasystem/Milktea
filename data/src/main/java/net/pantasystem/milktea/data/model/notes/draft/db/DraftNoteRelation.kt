@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Relation
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNote
 
 @Entity
 class DraftNoteRelation{
@@ -21,7 +21,7 @@ class DraftNoteRelation{
     var pollChoices: List<PollChoiceDTO>? = null
 
     @Ignore
-    fun toDraftNote(accountId: Long): DraftNote{
+    fun toDraftNote(accountId: Long): DraftNote {
         return draftNoteDTO.toDraftNote(accountId, visibilityUserIds, draftFiles, pollChoices)
     }
 

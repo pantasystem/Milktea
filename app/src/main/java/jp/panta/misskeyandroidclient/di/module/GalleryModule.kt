@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.model.gallery.GalleryDataSource
-import net.pantasystem.milktea.data.model.gallery.GalleryRepository
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryRepository
 import net.pantasystem.milktea.data.model.gallery.impl.GalleryRepositoryImpl
 import net.pantasystem.milktea.data.model.gallery.impl.InMemoryGalleryDataSource
 import javax.inject.Singleton
@@ -16,9 +16,9 @@ abstract class GalleryModule {
 
     @Binds
     @Singleton
-    abstract fun galleryDataSource(galleryDataSource: InMemoryGalleryDataSource): GalleryDataSource
+    abstract fun galleryDataSource(galleryDataSource: InMemoryGalleryDataSource): net.pantasystem.milktea.model.gallery.GalleryDataSource
 
     @Binds
     @Singleton
-    abstract fun galleryRepository(impl: GalleryRepositoryImpl): GalleryRepository
+    abstract fun galleryRepository(impl: GalleryRepositoryImpl): net.pantasystem.milktea.model.gallery.GalleryRepository
 }

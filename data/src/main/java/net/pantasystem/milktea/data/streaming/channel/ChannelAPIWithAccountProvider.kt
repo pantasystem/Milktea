@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.streaming.channel
 
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,7 +16,7 @@ class ChannelAPIWithAccountProvider @Inject constructor(
     private val logger = loggerFactory.create("ChannelAPIWithAccountProvider")
     private val mutex = Mutex()
 
-    suspend fun get(account: Account): ChannelAPI {
+    suspend fun get(account: net.pantasystem.milktea.model.account.Account): ChannelAPI {
         mutex.withLock {
             logger.debug("ChannelAPIWithAccountProvider get accountId=${account.accountId} hash=${hashCode()}")
             var channelAPI = accountWithChannelAPI[account.accountId]

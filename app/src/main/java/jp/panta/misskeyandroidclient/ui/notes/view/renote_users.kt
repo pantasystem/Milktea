@@ -14,7 +14,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.data.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -28,11 +27,11 @@ import net.pantasystem.milktea.common.StateContent
 @Composable
 fun RenoteUsersScreen(
     renotesViewModel: RenotesViewModel,
-    onSelected: (NoteRelation) -> Unit,
+    onSelected: (net.pantasystem.milktea.model.notes.NoteRelation) -> Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 ) {
 
-    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(
+    val renotes: PageableState<List<net.pantasystem.milktea.model.notes.NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(
         StateContent.NotExist()))
 
     LaunchedEffect(true) {
@@ -76,8 +75,8 @@ fun RenoteUsersScreen(
 @ExperimentalCoroutinesApi
 @Composable
 fun RenoteUserList(
-    notes: List<NoteRelation>,
-    onSelected: (NoteRelation)->Unit,
+    notes: List<net.pantasystem.milktea.model.notes.NoteRelation>,
+    onSelected: (net.pantasystem.milktea.model.notes.NoteRelation)->Unit,
     onBottomReached: ()->Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter?,
     modifier: Modifier = Modifier

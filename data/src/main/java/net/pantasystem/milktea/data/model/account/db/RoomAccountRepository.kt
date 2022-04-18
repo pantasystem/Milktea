@@ -4,11 +4,11 @@ import android.content.SharedPreferences
 import android.util.Log
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.data.model.DataBase
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountNotFoundException
-import net.pantasystem.milktea.data.model.account.AccountRegistrationFailedException
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountNotFoundException
+import net.pantasystem.milktea.model.account.AccountRegistrationFailedException
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.data.model.account.page.db.PageDAO
 import java.util.concurrent.Callable
 
@@ -18,25 +18,25 @@ class RoomAccountRepository(
     private val sharedPreferences: SharedPreferences,
     private val accountDao: AccountDAO,
     private val pageDAO: PageDAO,
-) : AccountRepository {
+) : net.pantasystem.milktea.model.account.AccountRepository {
 
-    private val listeners = mutableSetOf<AccountRepository.Listener>()
+    private val listeners = mutableSetOf<net.pantasystem.milktea.model.account.AccountRepository.Listener>()
 
-    override fun addEventListener(listener: AccountRepository.Listener) {
+    override fun addEventListener(listener: net.pantasystem.milktea.model.account.AccountRepository.Listener) {
         synchronized(listeners) {
             listeners.add(listener)
         }
     }
 
-    override fun removeEventListener(listener: AccountRepository.Listener) {
+    override fun removeEventListener(listener: net.pantasystem.milktea.model.account.AccountRepository.Listener) {
         synchronized(listeners) {
             listeners.remove(listener)
         }
     }
 
-    override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
-        return roomDataBase.runInTransaction(Callable<Account> {
-            var exAccount: Account? = null
+    override suspend fun add(account: net.pantasystem.milktea.model.account.Account, isUpdatePages: Boolean): net.pantasystem.milktea.model.account.Account {
+        return roomDataBase.runInTransaction(Callable<net.pantasystem.milktea.model.account.Account> {
+            var exAccount: net.pantasystem.milktea.model.account.Account? = null
             var isNeedDeepUpdate = isUpdatePages
 
             if(account.accountId > 0){
@@ -52,7 +52,7 @@ class RoomAccountRepository(
 
             if(exAccount == null){
                 val id = accountDao.insert(account)
-                exAccount = accountDao.get(id)?: throw AccountRegistrationFailedException()
+                exAccount = accountDao.get(id)?: throw net.pantasystem.milktea.model.account.AccountRegistrationFailedException()
                 Log.d("RoomAccountRepository", "insertしました: $exAccount")
                 isNeedDeepUpdate = true
             }else{
@@ -79,8 +79,8 @@ class RoomAccountRepository(
                     it.pageId to it
                 }.toMap()
 
-                val addedPages = ArrayList<Page>()
-                val updatedPages = ArrayList<Page>()
+                val addedPages = ArrayList<net.pantasystem.milktea.model.account.page.Page>()
+                val updatedPages = ArrayList<net.pantasystem.milktea.model.account.page.Page>()
 
                 for(page in pages){
                     when{
@@ -107,9 +107,9 @@ class RoomAccountRepository(
                     get(exAccount!!.accountId)
                 }
                 Log.d("Repo", "ex: $exAccount")
-                publish(AccountRepository.Event.Created(account))
+                publish(net.pantasystem.milktea.model.account.AccountRepository.Event.Created(account))
             }else{
-                publish(AccountRepository.Event.Updated(account))
+                publish(net.pantasystem.milktea.model.account.AccountRepository.Event.Updated(account))
             }
 
             exAccount
@@ -117,31 +117,33 @@ class RoomAccountRepository(
 
     }
 
-    override suspend fun delete(account: Account) {
+    override suspend fun delete(account: net.pantasystem.milktea.model.account.Account) {
         accountDao.delete(account)
-        publish(AccountRepository.Event.Deleted(account.accountId))
+        publish(net.pantasystem.milktea.model.account.AccountRepository.Event.Deleted(account.accountId))
     }
 
 
 
-    @Throws(AccountNotFoundException::class)
-    override suspend fun get(accountId: Long): Account {
-        return accountDao.getAccountRelation(accountId)?.toAccount()?: throw AccountNotFoundException("$accountId を見つけられませんでした")
+    @Throws(net.pantasystem.milktea.model.account.AccountNotFoundException::class)
+    override suspend fun get(accountId: Long): net.pantasystem.milktea.model.account.Account {
+        return accountDao.getAccountRelation(accountId)?.toAccount()?: throw net.pantasystem.milktea.model.account.AccountNotFoundException(
+            "$accountId を見つけられませんでした"
+        )
     }
 
-    override suspend fun findAll(): List<Account> {
+    override suspend fun findAll(): List<net.pantasystem.milktea.model.account.Account> {
         return accountDao.findAll().map{
             it.toAccount()
         }
     }
 
-    @Throws(AccountNotFoundException::class)
-    override suspend fun getCurrentAccount(): Account {
+    @Throws(net.pantasystem.milktea.model.account.AccountNotFoundException::class)
+    override suspend fun getCurrentAccount(): net.pantasystem.milktea.model.account.Account {
         val currentAccountId = sharedPreferences.getLong(CURRENT_ACCOUNT_ID_KEY, -1)
         val current = accountDao.getAccountRelation(currentAccountId)
         return if(current == null){
             val first = accountDao.findAll().firstOrNull()?.toAccount()
-                ?: throw AccountNotFoundException("アカウントが一つも見つかりませんでした")
+                ?: throw net.pantasystem.milktea.model.account.AccountNotFoundException("アカウントが一つも見つかりませんでした")
             setCurrentAccount(first)
         }else{
             current.toAccount()
@@ -150,7 +152,7 @@ class RoomAccountRepository(
     }
 
 
-    override suspend fun setCurrentAccount(account: Account): Account {
+    override suspend fun setCurrentAccount(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.model.account.Account {
         val current = accountDao.get(account.accountId)
         val ac = if(current == null){
             add(account)
@@ -160,13 +162,13 @@ class RoomAccountRepository(
         sharedPreferences.edit().also {
             it.putLong(CURRENT_ACCOUNT_ID_KEY, ac.accountId)
         }.apply()
-        publish(AccountRepository.Event.Updated(ac))
+        publish(net.pantasystem.milktea.model.account.AccountRepository.Event.Updated(ac))
 
         return ac
     }
 
 
-    private fun publish(e: AccountRepository.Event) {
+    private fun publish(e: net.pantasystem.milktea.model.account.AccountRepository.Event) {
         synchronized(listeners) {
             listeners.forEach {
                 it.on(e)

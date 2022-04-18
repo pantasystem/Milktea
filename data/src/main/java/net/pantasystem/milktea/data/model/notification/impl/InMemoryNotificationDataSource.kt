@@ -1,15 +1,15 @@
 package net.pantasystem.milktea.data.model.notification.impl
 
-import net.pantasystem.milktea.data.model.AddResult
-import net.pantasystem.milktea.data.model.notification.Notification
-import net.pantasystem.milktea.data.model.notification.NotificationDataSource
-import net.pantasystem.milktea.data.model.notification.NotificationNotFoundException
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.notification.NotificationNotFoundException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
-class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSource{
+class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSource {
 
     private val listeners = mutableSetOf<NotificationDataSource.Listener>()
     private val notificationIdAndNotification = mutableMapOf<Notification.Id, Notification>()
@@ -65,7 +65,7 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 
-    private suspend fun createOrUpdate(notification: Notification): AddResult{
+    private suspend fun createOrUpdate(notification: Notification): AddResult {
         notificationsMapLock.withLock {
             val exNotification = notificationIdAndNotification[notification.id]
             notificationIdAndNotification[notification.id] = notification

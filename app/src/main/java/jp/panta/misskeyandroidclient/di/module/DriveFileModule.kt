@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.di.module.files
+package jp.panta.misskeyandroidclient.di.module
 
 import android.content.Context
 import dagger.Binds
@@ -8,7 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.common.GsonFactory
-import net.pantasystem.milktea.data.model.Encryption
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.drive.*
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
@@ -18,11 +18,11 @@ import javax.inject.Singleton
 abstract class DriveFileBindModule {
     @Binds
     @Singleton
-    abstract fun filePropertyDataSource(inMem: InMemoryFilePropertyDataSource): FilePropertyDataSource
+    abstract fun filePropertyDataSource(inMem: net.pantasystem.milktea.model.drive.InMemoryFilePropertyDataSource): net.pantasystem.milktea.model.drive.FilePropertyDataSource
 
     @Binds
     @Singleton
-    abstract fun driveFileRepository(repo: DriveFileRepositoryImpl): DriveFileRepository
+    abstract fun driveFileRepository(repo: DriveFileRepositoryImpl): net.pantasystem.milktea.model.drive.DriveFileRepository
 }
 
 @Module
@@ -31,6 +31,11 @@ object DriveFileModule {
     @Provides
     @Singleton
     fun uploader(@ApplicationContext context: Context, encryption: Encryption) : FileUploaderProvider {
-        return OkHttpFileUploaderProvider(OkHttpClient(), context, GsonFactory.create(), encryption)
+        return OkHttpFileUploaderProvider(
+            OkHttpClient(),
+            context,
+            GsonFactory.create(),
+            encryption
+        )
     }
 }

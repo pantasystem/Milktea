@@ -4,11 +4,10 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.data.gettters.MessageRelationGetter
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.messaging.CreateMessage
-import net.pantasystem.milktea.data.model.messaging.Message
-import net.pantasystem.milktea.data.model.messaging.MessageRepository
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.messaging.CreateMessage
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessageRepository
 import java.io.IOException
 import java.lang.IllegalStateException
 import javax.inject.Inject
@@ -18,7 +17,7 @@ import kotlin.jvm.Throws
 class MessageRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val messageDataSource: MessageDataSource,
-    val accountRepository: AccountRepository,
+    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     val encryption: Encryption,
     val messageRelationGetter: MessageRelationGetter
 ) : MessageRepository {

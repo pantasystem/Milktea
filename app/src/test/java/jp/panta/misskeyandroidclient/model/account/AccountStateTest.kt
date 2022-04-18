@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account
 
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountState
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountState
 import org.junit.Assert.*
 
 import org.junit.Test
@@ -10,14 +10,14 @@ class AccountStateTest {
 
     @Test
     fun getCurrentAccount() {
-        val accountState = AccountState(
+        val accountState = net.pantasystem.milktea.model.account.AccountState(
             isLoading = false,
             accounts = (1..4).map {
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:$it",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -32,14 +32,14 @@ class AccountStateTest {
 
     @Test
     fun getAccountWhenInvalidCurrentAccountId() {
-        val accountState = AccountState(
+        val accountState = net.pantasystem.milktea.model.account.AccountState(
             isLoading = false,
             accounts = (1..4).map {
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:$it",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -50,7 +50,7 @@ class AccountStateTest {
 
     @Test
     fun isUnauthorized() {
-        var accountState = AccountState()
+        var accountState = net.pantasystem.milktea.model.account.AccountState()
         assertFalse(accountState.isUnauthorized)
         accountState = accountState.copy(isLoading = false)
         assertTrue(accountState.isUnauthorized)
@@ -58,14 +58,14 @@ class AccountStateTest {
 
     @Test
     fun isUnauthorizedWhenHasAccount() {
-        var accountState = AccountState(
+        var accountState = net.pantasystem.milktea.model.account.AccountState(
             isLoading = false,
             accounts = (1..4).map {
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:$it",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -78,14 +78,14 @@ class AccountStateTest {
 
     @Test
     fun hasAccount() {
-        val accountState = AccountState(
+        val accountState = net.pantasystem.milktea.model.account.AccountState(
             isLoading = false,
             accounts = (1..4).map {
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:$it",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -94,11 +94,11 @@ class AccountStateTest {
         assertTrue(accountState.hasAccount(accountState.accounts.first()))
         assertFalse(
             accountState.hasAccount(
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:100",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = 1000L)
             )
@@ -107,25 +107,25 @@ class AccountStateTest {
 
     @Test
     fun add() {
-        val accountState = AccountState(
+        val accountState = net.pantasystem.milktea.model.account.AccountState(
             isLoading = false,
             accounts = (1..4).map {
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:$it",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
             currentAccountId = 1L
         )
         val addedState = accountState.add(
-            Account(
+            net.pantasystem.milktea.model.account.Account(
                 "id:10",
                 "host",
                 "name",
-                Account.InstanceType.MISSKEY,
+                net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                 ""
             ).copy(accountId = 100L)
         )
@@ -134,14 +134,14 @@ class AccountStateTest {
 
     @Test
     fun addWhenUnauthorized() {
-        val state = AccountState(isLoading = false)
+        val state = net.pantasystem.milktea.model.account.AccountState(isLoading = false)
         assertTrue(state.isUnauthorized)
         val added = state.add(
-            Account(
+            net.pantasystem.milktea.model.account.Account(
                 "id:10",
                 "host",
                 "name",
-                Account.InstanceType.MISSKEY,
+                net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                 ""
             ).copy(accountId = 100L)
         )
@@ -152,14 +152,14 @@ class AccountStateTest {
 
     @Test
     fun addWhenAdded() {
-        val accountState = AccountState(
+        val accountState = net.pantasystem.milktea.model.account.AccountState(
             isLoading = false,
             accounts = (1..4).map {
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:$it",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },
@@ -172,14 +172,14 @@ class AccountStateTest {
 
     @Test
     fun delete() {
-        val accountState = AccountState(
+        val accountState = net.pantasystem.milktea.model.account.AccountState(
             isLoading = false,
             accounts = (1..4).map {
-                Account(
+                net.pantasystem.milktea.model.account.Account(
                     "id:$it",
                     "host",
                     "name",
-                    Account.InstanceType.MISSKEY,
+                    net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
                     ""
                 ).copy(accountId = it.toLong())
             },

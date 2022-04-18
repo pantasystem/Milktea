@@ -1,19 +1,18 @@
 package net.pantasystem.milktea.data.model.instance.db
 
-import net.pantasystem.milktea.data.model.instance.Meta
-import net.pantasystem.milktea.data.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class InMemoryMetaRepository : MetaRepository{
+class InMemoryMetaRepository : net.pantasystem.milktea.model.instance.MetaRepository {
 
-    private val instanceDomainAndMeta = MutableStateFlow(emptyMap<String, Meta>())
+    private val instanceDomainAndMeta = MutableStateFlow(emptyMap<String, net.pantasystem.milktea.model.instance.Meta>())
     private val lock = Mutex()
 
-    override suspend fun add(meta: Meta): Meta {
+    override suspend fun add(meta: net.pantasystem.milktea.model.instance.Meta): net.pantasystem.milktea.model.instance.Meta {
         lock.withLock {
             instanceDomainAndMeta.value = instanceDomainAndMeta.value.toMutableMap().also {
                 it[meta.uri] = meta
@@ -24,7 +23,7 @@ class InMemoryMetaRepository : MetaRepository{
 
     }
 
-    override suspend fun delete(meta: Meta) {
+    override suspend fun delete(meta: net.pantasystem.milktea.model.instance.Meta) {
         lock.withLock {
             instanceDomainAndMeta.value = instanceDomainAndMeta.value.toMutableMap().also {
                 it.remove(meta.uri)
@@ -32,13 +31,13 @@ class InMemoryMetaRepository : MetaRepository{
         }
     }
 
-    override suspend fun get(instanceDomain: String): Meta? {
+    override suspend fun get(instanceDomain: String): net.pantasystem.milktea.model.instance.Meta? {
         lock.withLock {
             return instanceDomainAndMeta.value[instanceDomain]
         }
     }
 
-    override fun observe(instanceDomain: String): Flow<Meta?> {
+    override fun observe(instanceDomain: String): Flow<net.pantasystem.milktea.model.instance.Meta?> {
         return instanceDomainAndMeta.map {
             it[instanceDomain]
         }

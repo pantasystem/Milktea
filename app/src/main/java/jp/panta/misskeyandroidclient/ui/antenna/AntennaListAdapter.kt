@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemAntennaBinding
-import net.pantasystem.milktea.data.model.antenna.Antenna
+import net.pantasystem.milktea.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 
 class AntennaListAdapter(

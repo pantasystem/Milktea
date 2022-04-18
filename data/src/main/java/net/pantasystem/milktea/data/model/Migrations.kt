@@ -4,8 +4,8 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.account.newAccount
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.newAccount
 import net.pantasystem.milktea.data.model.core.AccountDao
 
 
@@ -73,7 +73,7 @@ val MIGRATION_4_5 = object : Migration(4, 5){
     }
 }
 
-class AccountMigration(private val accountDao: AccountDao, private val accountRepository: AccountRepository, private val sharedPreferences: SharedPreferences){
+class AccountMigration(private val accountDao: AccountDao, private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository, private val sharedPreferences: SharedPreferences){
 
     suspend fun executeMigrate(){
 

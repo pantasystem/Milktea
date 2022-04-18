@@ -65,7 +65,7 @@ class PreviousPagingController<DTO, E>(
     private val locker: StateLocker,
     private val state: PaginationState<E>,
     private val previousLoader: PreviousLoader<DTO>
-) : PreviousPaginator{
+) : PreviousPaginator {
     override suspend fun loadPrevious() {
         locker.mutex.withLock {
 
@@ -113,7 +113,7 @@ class FuturePagingController<DTO, E>(
     private val locker: StateLocker,
     private val state: PaginationState<E>,
     private val futureLoader: FutureLoader<DTO>
-) : FuturePaginator{
+) : FuturePaginator {
     override suspend fun loadFuture() {
         locker.mutex.withLock {
 

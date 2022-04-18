@@ -5,10 +5,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import com.google.gson.Gson
-import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.file.AppFile
+import net.pantasystem.milktea.common.Encryption
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okio.BufferedSink
@@ -20,11 +17,11 @@ import java.util.concurrent.TimeUnit
 @Suppress("BlockingMethodInNonBlockingContext")
 class OkHttpDriveFileUploader(
     val context: Context,
-    val account: Account,
+    val account: net.pantasystem.milktea.model.account.Account,
     val gson: Gson,
     val encryption: Encryption
 ) : FileUploader {
-    override suspend fun upload(file: AppFile.Local, isForce: Boolean): net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO {
+    override suspend fun upload(file: net.pantasystem.milktea.model.file.AppFile.Local, isForce: Boolean): net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
@@ -56,7 +53,11 @@ class OkHttpDriveFileUploader(
                 gson.fromJson(response.body?.string(), net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO::class.java)
             }else{
                 Log.d("OkHttpConnection", "code: $code, error${response.body?.string()}")
-                throw FileUploadFailedException(file, null, code)
+                throw FileUploadFailedException(
+                    file,
+                    null,
+                    code
+                )
             }
         }catch(e: Exception){
             Log.w("OkHttpConnection", "post file error", e)

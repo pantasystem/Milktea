@@ -1,10 +1,9 @@
 package net.pantasystem.milktea.data.model.notes.impl
 
-import net.pantasystem.milktea.data.model.AddResult
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.data.model.notes.NoteDataSource
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteNotFoundException
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -13,7 +12,7 @@ import javax.inject.Inject
 
 class InMemoryNoteDataSource @Inject constructor(
     loggerFactory: Logger.Factory
-): NoteDataSource{
+): NoteDataSource {
 
     val logger = loggerFactory.create("InMemoryNoteRepository")
 
@@ -79,7 +78,7 @@ class InMemoryNoteDataSource @Inject constructor(
 
     }
 
-    override suspend fun removeByUserId(userId: User.Id): Int {
+    override suspend fun removeByUserId(userId: net.pantasystem.milktea.model.user.User.Id): Int {
         val result = mutex.withLock {
             notes.values.filter {
                 it.userId == userId

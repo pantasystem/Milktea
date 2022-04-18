@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
@@ -30,10 +30,10 @@ object StatusMessageHelper {
             note.note.isRenote() && !note.note.hasContent() ->{
                 context.getString(R.string.renoted_by, name)
             }
-            note is NoteRelation.Featured -> {
+            note is net.pantasystem.milktea.model.notes.NoteRelation.Featured -> {
                 context.getString(R.string.featured)
             }
-            note is NoteRelation.Promotion -> {
+            note is net.pantasystem.milktea.model.notes.NoteRelation.Promotion -> {
                 context.getString(R.string.promotion)
             }
 

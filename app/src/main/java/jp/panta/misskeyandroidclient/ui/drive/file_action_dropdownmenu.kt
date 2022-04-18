@@ -9,11 +9,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
 fun FileActionDropdownMenu(
-    property: FileProperty,
+    property: net.pantasystem.milktea.model.drive.FileProperty,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onNsfwMenuItemClicked: () -> Unit,

@@ -1,31 +1,31 @@
 package net.pantasystem.milktea.data.model.account.page.db
 
 import androidx.room.*
-import net.pantasystem.milktea.data.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Page
 
 @Dao
 interface PageDAO{
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertAll(pages: List<Page>)
+    fun insertAll(pages: List<net.pantasystem.milktea.model.account.page.Page>)
 
     @Update
-    fun update(page: Page)
+    fun update(page: net.pantasystem.milktea.model.account.page.Page)
 
     @Update
-    fun updateAll(pages: List<Page>)
+    fun updateAll(pages: List<net.pantasystem.milktea.model.account.page.Page>)
 
     @Delete
-    fun deleteAll(pages: List<Page>)
+    fun deleteAll(pages: List<net.pantasystem.milktea.model.account.page.Page>)
 
     @Query("delete from page_table where accountId = :accountId")
     fun clearByAccountId(accountId: Long)
 
     @Query("select * from page_table where accountId = :accountId")
-    fun findAllByAccount(accountId: Long): List<Page>
+    fun findAllByAccount(accountId: Long): List<net.pantasystem.milktea.model.account.page.Page>
 
     @Query("select * from page_table where pageId = :pageId")
-    fun get(pageId: Long): Page?
+    fun get(pageId: Long): net.pantasystem.milktea.model.account.page.Page?
 
 }
 

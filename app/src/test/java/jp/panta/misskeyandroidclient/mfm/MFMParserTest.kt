@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.mfm
 
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -152,7 +152,7 @@ class MFMParserTest{
     @Test
     fun emojiTest(){
         val emojis = listOf(
-            Emoji(
+            net.pantasystem.milktea.model.emoji.Emoji(
                 null,
                 "kawaii",
                 null,
@@ -161,7 +161,7 @@ class MFMParserTest{
                 null,
                 null
             ),
-            Emoji(
+            net.pantasystem.milktea.model.emoji.Emoji(
                 null,
                 "ai",
                 null,
@@ -170,7 +170,7 @@ class MFMParserTest{
                 null,
                 null
             ),
-            Emoji(
+            net.pantasystem.milktea.model.emoji.Emoji(
                 null,
                 "misskey",
                 null,

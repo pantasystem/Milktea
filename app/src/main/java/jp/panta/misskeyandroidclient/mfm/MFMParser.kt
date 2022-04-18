@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.mfm
 
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import java.net.URLDecoder
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object MFMParser{
 
-    fun parse(text: String?, emojis: List<Emoji>? = emptyList()): Root?{
+    fun parse(text: String?, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>? = emptyList()): Root?{
         text?: return null
         //println("textSize:${text.length}")
         val root = Root(text)
@@ -31,7 +31,7 @@ object MFMParser{
     class NodeParser(
         private val sourceText: String,
         val parent: Node,
-        private val emojiNameMap: Map<String, Emoji>,
+        private val emojiNameMap: Map<String, net.pantasystem.milktea.model.emoji.Emoji>,
         val start: Int = parent.insideStart,
         val end: Int = parent.insideEnd
     ){
@@ -358,7 +358,7 @@ object MFMParser{
                 return null
             }
             val tagName = matcher.group(1)?: return null
-            val emoji: Emoji = emojiNameMap[tagName]
+            val emoji: net.pantasystem.milktea.model.emoji.Emoji = emojiNameMap[tagName]
                 ?: return null
 
             return EmojiElement(

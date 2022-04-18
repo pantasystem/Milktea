@@ -1,14 +1,11 @@
 package net.pantasystem.milktea.data.model.channel.impl
 
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.channel.*
-
 class ChannelRepositoryImpl(
     private val channelAPIAdapter: ChannelAPIAdapter,
-    private val channelStateModel: ChannelStateModel,
-    private val accountRepository: AccountRepository
-) : ChannelRepository {
-    override suspend fun findOne(id: Channel.Id): Result<Channel> {
+    private val channelStateModel: net.pantasystem.milktea.model.channel.ChannelStateModel,
+    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository
+) : net.pantasystem.milktea.model.channel.ChannelRepository {
+    override suspend fun findOne(id: net.pantasystem.milktea.model.channel.Channel.Id): Result<net.pantasystem.milktea.model.channel.Channel> {
         return runCatching {
             var channel = channelStateModel.get(id)
             if (channel == null) {
@@ -21,7 +18,7 @@ class ChannelRepositoryImpl(
         }
     }
 
-    override suspend fun create(model: CreateChannel): Result<Channel> {
+    override suspend fun create(model: net.pantasystem.milktea.model.channel.CreateChannel): Result<net.pantasystem.milktea.model.channel.Channel> {
         return runCatching {
             val account = accountRepository.get(model.accountId)
             val channel = channelAPIAdapter.create(model).getOrThrow()
@@ -30,7 +27,7 @@ class ChannelRepositoryImpl(
         }
     }
 
-    override suspend fun follow(id: Channel.Id): Result<Channel> {
+    override suspend fun follow(id: net.pantasystem.milktea.model.channel.Channel.Id): Result<net.pantasystem.milktea.model.channel.Channel> {
         return runCatching {
             var channel = findOne(id).getOrThrow()
             channelAPIAdapter.follow(id).getOrThrow()
@@ -39,7 +36,7 @@ class ChannelRepositoryImpl(
         }
     }
 
-    override suspend fun unFollow(id: Channel.Id): Result<Channel> {
+    override suspend fun unFollow(id: net.pantasystem.milktea.model.channel.Channel.Id): Result<net.pantasystem.milktea.model.channel.Channel> {
         return runCatching {
             var channel = findOne(id).getOrThrow()
             channelAPIAdapter.unFollow(id).getOrThrow()
@@ -48,7 +45,7 @@ class ChannelRepositoryImpl(
         }
     }
 
-    override suspend fun update(model: UpdateChannel): Result<Channel> {
+    override suspend fun update(model: net.pantasystem.milktea.model.channel.UpdateChannel): Result<net.pantasystem.milktea.model.channel.Channel> {
         return runCatching {
             val channel = channelAPIAdapter.update(model).getOrThrow()
             val account = accountRepository.get(model.id.accountId)

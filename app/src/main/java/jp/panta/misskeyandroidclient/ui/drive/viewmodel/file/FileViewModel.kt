@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.di.module.filePropertyPagingStore
 import net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.data.model.drive.*
-import net.pantasystem.milktea.data.model.file.AppFile
+import net.pantasystem.milktea.model.file.AppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -16,9 +15,9 @@ import kotlinx.coroutines.flow.*
  * 選択状態とFileの読み込み＆表示を担当する
  */
 class FileViewModel(
-    private val currentAccountWatcher: CurrentAccountWatcher,
+    private val currentAccountWatcher: net.pantasystem.milktea.model.account.CurrentAccountWatcher,
     private val miCore: MiCore,
-    private val driveStore: DriveStore,
+    private val driveStore: net.pantasystem.milktea.model.drive.DriveStore,
 ) : ViewModel(){
     val logger = miCore.loggerFactory.create("FileViewModel")
 
@@ -112,7 +111,7 @@ class FileViewModel(
 
 
 
-    fun uploadFile(file: AppFile.Local){
+    fun uploadFile(file: net.pantasystem.milktea.model.file.AppFile.Local){
         val uploadFile = file.copy(folderId = driveStore.state.value.path.path.lastOrNull()?.id)
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -128,7 +127,7 @@ class FileViewModel(
         }
     }
 
-    fun toggleNsfw(id: FileProperty.Id) {
+    fun toggleNsfw(id: net.pantasystem.milktea.model.drive.FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 miCore.getDriveFileRepository().toggleNsfw(id)
@@ -140,7 +139,7 @@ class FileViewModel(
 
 
 
-    fun deleteFile(id: FileProperty.Id) {
+    fun deleteFile(id: net.pantasystem.milktea.model.drive.FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = currentAccountWatcher.getAccount()

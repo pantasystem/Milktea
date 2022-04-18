@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionHistoryPagerBinding
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryPagerViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
         private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"
         private const val EXTRA_SHOW_REACTION_TYPE = "EXTRA_SHOW_REACTION_TYPE"
 
-        fun newInstance(noteId: Note.Id, showReaction: String? = null): ReactionHistoryPagerDialog {
+        fun newInstance(noteId: net.pantasystem.milktea.model.notes.Note.Id, showReaction: String? = null): ReactionHistoryPagerDialog {
             return ReactionHistoryPagerDialog().also {
                 it.arguments = Bundle().also { bundle ->
                     bundle.putString(EXTRA_NOTE_ID, noteId.noteId)
@@ -40,7 +40,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
     }
 
     lateinit var binding: DialogReactionHistoryPagerBinding
-    lateinit var noteId: Note.Id
+    lateinit var noteId: net.pantasystem.milktea.model.notes.Note.Id
 
 
     override fun onCreateView(
@@ -61,7 +61,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
         requireNotNull(nId)
         val showCurrentReaction = requireArguments().getString(EXTRA_SHOW_REACTION_TYPE)
 
-        val noteId = Note.Id(aId, nId)
+        val noteId = net.pantasystem.milktea.model.notes.Note.Id(aId, nId)
         this.noteId = noteId
 
         val miCore = requireContext().applicationContext as MiCore
@@ -71,7 +71,12 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
         lifecycleScope.launchWhenCreated {
             pagerViewModel.types.collect { list ->
                 val types = list.toMutableList().also {
-                    it.add(0, ReactionHistoryRequest(noteId, null))
+                    it.add(0,
+                        net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest(
+                            noteId,
+                            null
+                        )
+                    )
                 }
                 val index = showCurrentReaction.let { type ->
 
@@ -89,7 +94,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
 
     }
 
-    private fun showPager(noteId: Note.Id, types: List<ReactionHistoryRequest>) {
+    private fun showPager(noteId: net.pantasystem.milktea.model.notes.Note.Id, types: List<net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest>) {
         val adapter = ReactionHistoryPagerAdapter(childFragmentManager, types, noteId)
         binding.reactionHistoryPager.adapter = adapter
     }

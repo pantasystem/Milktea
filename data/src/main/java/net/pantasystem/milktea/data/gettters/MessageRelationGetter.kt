@@ -3,22 +3,20 @@ package net.pantasystem.milktea.data.gettters
 import net.pantasystem.milktea.data.api.misskey.groups.toGroup
 import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.data.api.misskey.messaging.entities
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.group.GroupDataSource
-import net.pantasystem.milktea.data.model.messaging.Message
-import net.pantasystem.milktea.data.model.messaging.MessageNotFoundException
-import net.pantasystem.milktea.data.model.messaging.MessageRelation
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessageNotFoundException
+import net.pantasystem.milktea.model.messaging.MessageRelation
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.model.users.UserDataSource
 import kotlin.jvm.Throws
 
 class MessageRelationGetter(
     private val messageDataSource: MessageDataSource,
-    private val userDataSource: UserDataSource,
+    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     private val groupDataSource: GroupDataSource
 ) {
 
-    suspend fun get(account: Account, messageDTO: MessageDTO): MessageRelation {
+    suspend fun get(account: net.pantasystem.milktea.model.account.Account, messageDTO: MessageDTO): MessageRelation {
         val (message, users) = messageDTO.entities(account)
         messageDataSource.add(message)
         userDataSource.addAll(users)

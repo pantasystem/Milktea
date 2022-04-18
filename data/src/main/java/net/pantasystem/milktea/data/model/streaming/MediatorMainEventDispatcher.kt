@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
-import net.pantasystem.milktea.data.model.users.UserDataSource
+import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
@@ -26,7 +26,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
         val messageDataSource: MessageDataSource,
         val getters: Getters,
         val unreadNotificationDAO: UnreadNotificationDAO,
-        val userDataSource: UserDataSource,
+        val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     ) {
 
         fun create(): MediatorMainEventDispatcher {
@@ -59,7 +59,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
     }
 
 
-    suspend fun dispatch(account: Account, mainEvent: ChannelBody.Main) {
+    suspend fun dispatch(account: net.pantasystem.milktea.model.account.Account, mainEvent: ChannelBody.Main) {
         val iterator = dispatchers.iterator()
         while (iterator.hasNext()) {
             val result = runCatching {
@@ -79,7 +79,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
 @Singleton
 class ChannelAPIMainEventDispatcherAdapter @Inject constructor(
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
-    private val accountStore: AccountStore,
+    private val accountStore: net.pantasystem.milktea.model.account.AccountStore,
     private val applicationScope: CoroutineScope,
     loggerFactory: Logger.Factory
 ) {

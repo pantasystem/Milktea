@@ -4,14 +4,14 @@ import android.util.Log
 import android.widget.ImageButton
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.list.UserList
+import net.pantasystem.milktea.model.list.UserList
 
 
 object ListListPagedFlagHelper {
 
     @JvmStatic
     @BindingAdapter("list", "pagedList")
-    fun ImageButton.setListListTogglePageIcon(list: UserList?, pagedList: Set<UserList>?){
+    fun ImageButton.setListListTogglePageIcon(list: net.pantasystem.milktea.model.list.UserList?, pagedList: Set<net.pantasystem.milktea.model.list.UserList>?){
         if(list == null){
             Log.d("ListListPagedFlagHelper", "UserList is null")
             return

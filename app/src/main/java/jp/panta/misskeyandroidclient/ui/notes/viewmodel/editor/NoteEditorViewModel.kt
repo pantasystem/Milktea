@@ -2,43 +2,47 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.model.CreateNoteTaskExecutor
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.data.model.api.Version
-import net.pantasystem.milktea.data.model.channel.Channel
-import net.pantasystem.milktea.data.model.drive.DriveFileRepository
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.emoji.Emoji
-import net.pantasystem.milktea.data.model.file.AppFile
-import net.pantasystem.milktea.data.model.file.toFile
-import net.pantasystem.milktea.data.model.instance.MetaRepository
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.toFile
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
-import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.model.notes.isLocalOnly
+import net.pantasystem.milktea.model.notes.task
+import net.pantasystem.milktea.model.notes.toCreateNote
+import net.pantasystem.milktea.model.notes.toDraftPoll
+import net.pantasystem.milktea.model.notes.type
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
-    private val draftNoteDao: DraftNoteDao,
+    private val draftNoteDao: net.pantasystem.milktea.model.notes.draft.DraftNoteDao,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     private val miCore: MiCore,
-    private val noteRepository: NoteRepository,
-    private val filePropertyDataSource: FilePropertyDataSource,
-    private val metaRepository: MetaRepository,
-    private val driveFileRepository: DriveFileRepository,
-    private val accountStore: AccountStore,
+    private val noteRepository: net.pantasystem.milktea.model.notes.NoteRepository,
+    private val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    private val metaRepository: net.pantasystem.milktea.model.instance.MetaRepository,
+    private val driveFileRepository: net.pantasystem.milktea.model.drive.DriveFileRepository,
+    private val accountStore: net.pantasystem.milktea.model.account.AccountStore,
     private val createNoteTaskExecutor: CreateNoteTaskExecutor
 ) : ViewModel() {
 
@@ -46,8 +50,8 @@ class NoteEditorViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
-    private val _state = MutableStateFlow(NoteEditingState())
-    val state: StateFlow<NoteEditingState> = _state
+    private val _state = MutableStateFlow(net.pantasystem.milktea.model.notes.NoteEditingState())
+    val state: StateFlow<net.pantasystem.milktea.model.notes.NoteEditingState> = _state
 
     val text = _state.map {
         it.text
@@ -56,7 +60,7 @@ class NoteEditorViewModel @Inject constructor(
         it.cw
     }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = null)
 
-    private val currentAccount = MutableLiveData<Account>().apply {
+    private val currentAccount = MutableLiveData<net.pantasystem.milktea.model.account.Account>().apply {
         accountStore.observeCurrentAccount.onEach {
             this.postValue(it)
         }.launchIn(viewModelScope + dispatcher)
@@ -66,7 +70,7 @@ class NoteEditorViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     val currentUser: StateFlow<UserViewData?> =
         accountStore.state.map { it.currentAccount }.filterNotNull().map {
-            val userId = User.Id(it.accountId, it.remoteId)
+            val userId = net.pantasystem.milktea.model.user.User.Id(it.accountId, it.remoteId)
             UserViewData(
                 userId,
                 miCore,
@@ -128,7 +132,7 @@ class NoteEditorViewModel @Inject constructor(
 
     val visibility = _state.map {
         it.visibility
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = Visibility.Public(false))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = net.pantasystem.milktea.model.notes.Visibility.Public(false))
 
 
     val isLocalOnly = _state.map {
@@ -137,7 +141,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     val isLocalOnlyEnabled = _state.map {
-        it.visibility is CanLocalOnly
+        it.visibility is net.pantasystem.milktea.model.notes.CanLocalOnly
     }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
     val reservationPostingAt = _state.map {
@@ -156,7 +160,7 @@ class NoteEditorViewModel @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     val address = visibility.map {
-        it as? Visibility.Specified
+        it as? net.pantasystem.milktea.model.notes.Visibility.Specified
     }.map {
         it?.visibleUserIds?.map { uId ->
             setUpUserViewData(uId)
@@ -166,7 +170,7 @@ class NoteEditorViewModel @Inject constructor(
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun setUpUserViewData(userId: User.Id): UserViewData {
+    private fun setUpUserViewData(userId: net.pantasystem.milktea.model.user.User.Id): UserViewData {
         return UserViewData(userId, miCore, viewModelScope, dispatcher)
     }
 
@@ -188,15 +192,15 @@ class NoteEditorViewModel @Inject constructor(
 
     val isSaveNoteAsDraft = EventBus<Long?>()
 
-    fun setRenoteTo(noteId: Note.Id?) {
+    fun setRenoteTo(noteId: net.pantasystem.milktea.model.notes.Note.Id?) {
         _state.value = _state.value.changeRenoteId(noteId)
     }
 
-    fun setReplyTo(noteId: Note.Id?) {
+    fun setReplyTo(noteId: net.pantasystem.milktea.model.notes.Note.Id?) {
         _state.value = _state.value.changeReplyTo(noteId)
     }
 
-    fun setDraftNote(note: DraftNote?) {
+    fun setDraftNote(note: net.pantasystem.milktea.model.notes.draft.DraftNote?) {
         _state.value = _state.value.setDraftNote(note)
     }
 
@@ -205,7 +209,7 @@ class NoteEditorViewModel @Inject constructor(
             _state.value = runCatching {
                 _state.value.setAccount(it)
             }.getOrElse {
-                NoteEditingState()
+                net.pantasystem.milktea.model.notes.NoteEditingState()
             }
         }.launchIn(viewModelScope + Dispatchers.IO)
 
@@ -233,7 +237,7 @@ class NoteEditorViewModel @Inject constructor(
         _state.value = _state.value.removePollChoice(id)
     }
 
-    fun updateState(state: NoteEditingState) {
+    fun updateState(state: net.pantasystem.milktea.model.notes.NoteEditingState) {
         _state.value = state
     }
 
@@ -272,12 +276,12 @@ class NoteEditorViewModel @Inject constructor(
 
     }
 
-    fun toggleNsfw(appFile: AppFile) {
+    fun toggleNsfw(appFile: net.pantasystem.milktea.model.file.AppFile) {
         when (appFile) {
-            is AppFile.Local -> {
+            is net.pantasystem.milktea.model.file.AppFile.Local -> {
                 _state.value = state.value.toggleFileSensitiveStatus(appFile)
             }
-            is AppFile.Remote -> {
+            is net.pantasystem.milktea.model.file.AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     runCatching {
                         driveFileRepository.toggleNsfw(appFile.id)
@@ -288,7 +292,7 @@ class NoteEditorViewModel @Inject constructor(
 
     }
 
-    fun add(file: AppFile) {
+    fun add(file: net.pantasystem.milktea.model.file.AppFile) {
         val files = files.value?.toMutableList()
             ?: mutableListOf()
         files.add(
@@ -298,17 +302,17 @@ class NoteEditorViewModel @Inject constructor(
     }
 
 
-    private fun addAllFileProperty(fpList: List<FileProperty>) {
+    private fun addAllFileProperty(fpList: List<net.pantasystem.milktea.model.drive.FileProperty>) {
         val files = state.value.files.toMutableList()
         files.addAll(fpList.map {
-            AppFile.Remote(it.id)
+            net.pantasystem.milktea.model.file.AppFile.Remote(it.id)
         })
         _state.value = _state.value.copy(
             files = files
         )
     }
 
-    fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
+    fun addFilePropertyFromIds(ids: List<net.pantasystem.milktea.model.drive.FileProperty.Id>) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 filePropertyDataSource.findIn(ids)
@@ -318,7 +322,7 @@ class NoteEditorViewModel @Inject constructor(
         }
     }
 
-    fun removeFileNoteEditorData(file: AppFile) {
+    fun removeFileNoteEditorData(file: net.pantasystem.milktea.model.file.AppFile) {
         _state.value = _state.value.removeFile(file)
     }
 
@@ -354,13 +358,13 @@ class NoteEditorViewModel @Inject constructor(
         _state.value = _state.value.changeCw(text)
     }
 
-    fun setVisibility(visibility: Visibility) {
+    fun setVisibility(visibility: net.pantasystem.milktea.model.notes.Visibility) {
         logger.debug("公開範囲がセットされた:$visibility")
         _state.value = _state.value.setVisibility(visibility)
         this.visibilitySelectedEvent.event = Unit
     }
 
-    fun setChannelId(channelId: Channel.Id?) {
+    fun setChannelId(channelId: net.pantasystem.milktea.model.channel.Channel.Id?) {
         _state.value = _state.value.setChannelId(channelId)
     }
 
@@ -373,8 +377,8 @@ class NoteEditorViewModel @Inject constructor(
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    fun setAddress(added: List<User.Id>, removed: List<User.Id>) {
-        val list = ((visibility.value as? Visibility.Specified)?.visibleUserIds
+    fun setAddress(added: List<net.pantasystem.milktea.model.user.User.Id>, removed: List<net.pantasystem.milktea.model.user.User.Id>) {
+        val list = ((visibility.value as? net.pantasystem.milktea.model.notes.Visibility.Specified)?.visibleUserIds
             ?: emptyList()).toMutableList()
         list.addAll(
             added
@@ -385,12 +389,12 @@ class NoteEditorViewModel @Inject constructor(
         }
 
         _state.value = _state.value.copy(
-            visibility = Visibility.Specified(list)
+            visibility = net.pantasystem.milktea.model.notes.Visibility.Specified(list)
         )
     }
 
 
-    fun addMentionUsers(users: List<User>, pos: Int): Int {
+    fun addMentionUsers(users: List<net.pantasystem.milktea.model.user.User>, pos: Int): Int {
         val userNames = users.map {
             it.getDisplayUserName()
         }
@@ -403,7 +407,7 @@ class NoteEditorViewModel @Inject constructor(
         return result.cursorPos
     }
 
-    fun addEmoji(emoji: Emoji, pos: Int): Int {
+    fun addEmoji(emoji: net.pantasystem.milktea.model.emoji.Emoji, pos: Int): Int {
         return addEmoji(":${emoji.name}:", pos)
     }
 
@@ -417,8 +421,8 @@ class NoteEditorViewModel @Inject constructor(
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    fun toDraftNote(): DraftNote {
-        return DraftNote(
+    fun toDraftNote(): net.pantasystem.milktea.model.notes.draft.DraftNote {
+        return net.pantasystem.milktea.model.notes.draft.DraftNote(
             accountId = currentAccount.value?.accountId!!,
             text = _state.value.text,
             cw = _state.value.cw,

@@ -8,23 +8,23 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNoteEditorFilePreviewBinding
-import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 
-class SimpleImagePreviewAdapter(private val fileListener: FileListener) : ListAdapter<File, SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(
+class SimpleImagePreviewAdapter(private val fileListener: FileListener) : ListAdapter<net.pantasystem.milktea.model.file.File, SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(
     ItemCallback()
 ){
-    private class ItemCallback: DiffUtil.ItemCallback<File>(){
+    private class ItemCallback: DiffUtil.ItemCallback<net.pantasystem.milktea.model.file.File>(){
         override fun areContentsTheSame(
-            oldItem: File,
-            newItem: File
+            oldItem: net.pantasystem.milktea.model.file.File,
+            newItem: net.pantasystem.milktea.model.file.File
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areItemsTheSame(
-            oldItem: File,
-            newItem: File
+            oldItem: net.pantasystem.milktea.model.file.File,
+            newItem: net.pantasystem.milktea.model.file.File
         ): Boolean {
             return oldItem == newItem
         }

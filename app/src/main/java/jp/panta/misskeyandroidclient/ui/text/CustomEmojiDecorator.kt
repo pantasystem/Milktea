@@ -4,13 +4,13 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.view.View
 import com.bumptech.glide.Glide
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.util.glide.GlideApp
 import java.util.regex.Pattern
 
 class CustomEmojiDecorator{
 
-    fun decorate(emojis: List<Emoji>?, text: String, view: View): Spanned {
+    fun decorate(emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?, text: String, view: View): Spanned {
         if(emojis.isNullOrEmpty()){
             return SpannableStringBuilder(text)
         }

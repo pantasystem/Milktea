@@ -15,12 +15,11 @@ import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notification.PushNotification
-import net.pantasystem.milktea.data.model.notification.toPushNotification
-import net.pantasystem.milktea.data.model.users.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notification.PushNotification
+import net.pantasystem.milktea.model.notification.toPushNotification
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -37,7 +36,7 @@ const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifi
 class FCMService : FirebaseMessagingService() {
 
 
-    @Inject lateinit var accountStore: AccountStore
+    @Inject lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -103,18 +102,18 @@ class FCMService : FirebaseMessagingService() {
 //
 //    }
 
-    private fun PushNotification.makeIntent(): Intent {
+    private fun net.pantasystem.milktea.model.notification.PushNotification.makeIntent(): Intent {
         return when (this.type) {
             "follow", "receiveFollowRequest", "followRequestAccepted" -> UserDetailActivity.newInstance(
                 this@FCMService,
-                User.Id(accountId, this.userId!!)
+                net.pantasystem.milktea.model.user.User.Id(accountId, this.userId!!)
             ).apply {
                 putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
 
             }
             "mention", "reply", "renote", "quote", "reaction" -> NoteDetailActivity.newIntent(
                 this@FCMService,
-                Note.Id(accountId, noteId!!)
+                net.pantasystem.milktea.model.notes.Note.Id(accountId, noteId!!)
             ).apply {
                 putExtra(NoteDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
             }

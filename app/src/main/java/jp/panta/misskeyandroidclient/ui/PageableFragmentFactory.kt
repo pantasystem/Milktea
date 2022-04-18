@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.ui
 
 import androidx.fragment.app.Fragment
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
@@ -13,15 +13,15 @@ import kotlinx.coroutines.FlowPreview
 object PageableFragmentFactory {
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun create(page: Page): Fragment{
+    fun create(page: net.pantasystem.milktea.model.account.page.Page): Fragment{
         return when(val pageable = page.pageable()){
-            is Pageable.Show ->{
+            is net.pantasystem.milktea.model.account.page.Pageable.Show ->{
                 NoteDetailFragment.newInstance(page)
             }
-            is Pageable.Notification ->{
+            is net.pantasystem.milktea.model.account.page.Pageable.Notification ->{
                 NotificationFragment()
             }
-            is Pageable.Gallery -> {
+            is net.pantasystem.milktea.model.account.page.Pageable.Gallery -> {
                 return GalleryPostsFragment.newInstance(pageable, page.accountId)
             }
             else ->{

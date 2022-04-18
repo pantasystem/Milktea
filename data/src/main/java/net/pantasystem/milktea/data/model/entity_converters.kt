@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.model
 
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
@@ -8,32 +9,34 @@ import net.pantasystem.milktea.api.misskey.notes.PollDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.channel.Channel
-import net.pantasystem.milktea.data.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.group.Group
-import net.pantasystem.milktea.data.model.list.UserList
-import net.pantasystem.milktea.data.model.messaging.Message
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.Visibility
-import net.pantasystem.milktea.data.model.notes.poll.Poll
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionCount
-import net.pantasystem.milktea.data.model.notification.*
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.user.User
 import java.lang.IllegalStateException
+import  net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.gallery.GalleryPost
 
-fun net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO.toFileProperty(account: Account): FileProperty {
+fun FilePropertyDTO.toFileProperty(account: Account): FileProperty {
     return FileProperty(
         id = FileProperty.Id(account.accountId, id),
         name = name,
         createdAt = createdAt,
         type = type,
         md5 = md5,
-        size = size?: 0,
-        userId = userId?.let { User.Id(account.accountId, userId) },
+        size = size ?: 0,
+        userId = userId?.let { User.Id(account.accountId, userId!!) },
         folderId = folderId,
         comment = comment,
-        isSensitive = isSensitive?: false,
+        isSensitive = isSensitive ?: false,
         url = getUrl(account.instanceDomain),
         thumbnailUrl = getThumbnailUrl(account.instanceDomain),
         properties = properties?.let {
@@ -69,7 +72,7 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             file?.toFileProperty(account),
             isRead,
             emojis?: emptyList(),
-            recipientId = User.Id(account.accountId, recipientId)
+            recipientId = User.Id(account.accountId, recipientId!!)
         )
     }else{
         Message.Group(
@@ -81,7 +84,7 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             file?.toFileProperty(account),
             isRead,
             emojis?: emptyList(),
-            Group.Id(account.accountId, groupId),
+            Group.Id(account.accountId, groupId!!),
         )
     }
     return message to list
@@ -94,10 +97,10 @@ fun NoteDTO.toEntities(account: Account): NoteRelationEntities {
 
     if(this.reply != null){
 
-        dtoList.add(this.reply)
+        dtoList.add(this.reply!!)
     }
     if(this.reNote != null){
-        dtoList.add(reNote)
+        dtoList.add(reNote!!)
     }
 
     val note = this.toNote(account)
@@ -124,11 +127,11 @@ private fun NoteDTO.pickEntities(account: Account, notes: MutableList<Note>, use
         }?: emptyList()
     )
     if(this.reply != null) {
-        this.reply.pickEntities(account, notes, users, files)
+        this.reply!!.pickEntities(account, notes, users, files)
     }
 
     if(this.reNote != null) {
-        this.reNote.pickEntities(account, notes, users, files)
+        this.reNote!!.pickEntities(account, notes, users, files)
     }
 }
 
@@ -159,8 +162,8 @@ fun NoteDTO.toNote(account: Account): Note {
         text = this.text,
         cw = this.cw,
         userId = User.Id(account.accountId, this.userId),
-        replyId = this.replyId?.let{ Note.Id(account.accountId, this.replyId) },
-        renoteId = this.renoteId?.let{ Note.Id(account.accountId, this.renoteId) },
+        replyId = this.replyId?.let{ Note.Id(account.accountId, this.replyId!!) },
+        renoteId = this.renoteId?.let{ Note.Id(account.accountId, this.renoteId!!) },
         viaMobile = this.viaMobile,
         visibility = visibility,
         localOnly = this.localOnly,
@@ -264,13 +267,13 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 "想定しないデータ=$this"
             }
             require(note != null)
-            val n = note.toNote(account)
+            val n = note!!.toNote(account)
             ReactionNotification(
                 id,
                 createdAt,
                 User.Id(account.accountId, this.userId),
                 n.id,
-                reaction,
+                reaction!!,
                 isRead ?: true
             )
         }
@@ -282,7 +285,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 Note.Id(account.accountId, noteId ?: note?.id!!),
                 createdAt,
                 User.Id(account.accountId, this.userId),
-                choice,
+                choice!!,
                 isRead ?: true
             )
         }
@@ -292,7 +295,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 id,
                 createdAt,
                 isRead = isRead ?: true,
-                Note.Id(account.accountId, note.id)
+                Note.Id(account.accountId, note!!.id)
             )
         }
         else -> {
@@ -363,6 +366,51 @@ fun GroupDTO.toGroup(accountId: Long): Group {
             User.Id(accountId, it)
         }
     )
+}
+
+
+suspend fun net.pantasystem.milktea.data.api.misskey.v12_75_0.GalleryPost.toEntity(
+    account: Account,
+    filePropertyDataSource: FilePropertyDataSource,
+    userDataSource: net.pantasystem.milktea.model.user.UserDataSource
+): GalleryPost {
+    filePropertyDataSource.addAll(files.map {
+        it.toFileProperty(account)
+    })
+    // NOTE: API上ではdetailだったが実際に受信されたデータはSimpleだったのでfalse
+    userDataSource.add(user.toUser(account, false))
+    if (this.likedCount == null || this.isLiked == null) {
+
+        return GalleryPost.Normal(
+            GalleryPost.Id(account.accountId, this.id),
+            createdAt,
+            updatedAt,
+            title,
+            description,
+            User.Id(account.accountId, userId),
+            files.map {
+                FileProperty.Id(account.accountId, it.id)
+            },
+            tags ?: emptyList(),
+            isSensitive
+        )
+    } else {
+        return GalleryPost.Authenticated(
+            GalleryPost.Id(account.accountId, this.id),
+            createdAt,
+            updatedAt,
+            title,
+            description,
+            User.Id(account.accountId, userId),
+            files.map {
+                FileProperty.Id(account.accountId, it.id)
+            },
+            tags ?: emptyList(),
+            isSensitive,
+            likedCount,
+            isLiked
+        )
+    }
 }
 
 data class NoteRelationEntities(

@@ -2,15 +2,14 @@ package jp.panta.misskeyandroidclient.ui.account.viewmodel
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.users.User
-import net.pantasystem.milktea.data.model.users.UserDataSource
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.util.task.asSuspend
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -23,8 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     val miCore: MiCore,
-    val accountStore: AccountStore,
-    val userDataSource: UserDataSource,
+    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
+    val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
 ) : ViewModel() {
 
     companion object {
@@ -52,34 +51,34 @@ class AccountViewModel @Inject constructor(
     val user = currentAccount.flatMapLatest { account ->
         userDataSource.state.map { state ->
             account?.let {
-                state.get(User.Id(account.accountId, account.remoteId))
+                state.get(net.pantasystem.milktea.model.user.User.Id(account.accountId, account.remoteId))
             }
         }.map {
-            it as? User.Detail
+            it as? net.pantasystem.milktea.model.user.User.Detail
         }
     }.asLiveData()
 
     val switchAccount = EventBus<Int>()
 
 
-    val showFollowers = EventBus<User.Id>()
-    val showFollowings = EventBus<User.Id>()
+    val showFollowers = EventBus<net.pantasystem.milktea.model.user.User.Id>()
+    val showFollowings = EventBus<net.pantasystem.milktea.model.user.User.Id>()
 
-    val showProfile = EventBus<Account>()
+    val showProfile = EventBus<net.pantasystem.milktea.model.account.Account>()
 
     val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init {
         accountStore.observeCurrentAccount.filterNotNull().onEach { ac ->
             miCore.getUserRepository()
-                .find(User.Id(ac.accountId, ac.remoteId), true)
+                .find(net.pantasystem.milktea.model.user.User.Id(ac.accountId, ac.remoteId), true)
         }.catch { e ->
             logger.error("現在のアカウントの取得に失敗した", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
     }
 
-    fun setSwitchTargetConnectionInstance(account: Account) {
+    fun setSwitchTargetConnectionInstance(account: net.pantasystem.milktea.model.account.Account) {
         switchTargetConnectionInstanceEvent.event = Unit
         viewModelScope.launch(Dispatchers.IO) {
             miCore.setCurrentAccount(account)
@@ -90,19 +89,19 @@ class AccountViewModel @Inject constructor(
         switchAccount.event = switchAccount.event
     }
 
-    fun showFollowers(userId: User.Id?) {
+    fun showFollowers(userId: net.pantasystem.milktea.model.user.User.Id?) {
         userId?.let {
             showFollowers.event = userId
         }
     }
 
-    fun showFollowings(userId: User.Id?) {
+    fun showFollowings(userId: net.pantasystem.milktea.model.user.User.Id?) {
         userId?.let {
             showFollowings.event = userId
         }
     }
 
-    fun showProfile(account: Account?) {
+    fun showProfile(account: net.pantasystem.milktea.model.account.Account?) {
         if (account == null) {
             logger.debug("showProfile account未取得のためキャンセル")
             return
@@ -130,7 +129,7 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun addPage(page: Page) {
+    fun addPage(page: net.pantasystem.milktea.model.account.page.Page) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 accountStore.addPage(page)
@@ -140,7 +139,7 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun removePage(page: Page) {
+    fun removePage(page: net.pantasystem.milktea.model.account.page.Page) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 accountStore.removePage(page)

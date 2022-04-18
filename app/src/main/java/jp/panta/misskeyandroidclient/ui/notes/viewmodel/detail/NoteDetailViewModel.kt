@@ -6,28 +6,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class NoteDetailViewModel(
-    val show: Pageable.Show,
+    val show: net.pantasystem.milktea.model.account.page.Pageable.Show,
     val miCore: MiCore,
     val accountId: Long? = null,
     val encryption: Encryption = miCore.getEncryption(),
-    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(
+    private val noteDataSourceAdder: net.pantasystem.milktea.model.notes.NoteDataSourceAdder = net.pantasystem.milktea.model.notes.NoteDataSourceAdder(
         miCore.getUserDataSource(),
         miCore.getNoteDataSource(),
         miCore.getFilePropertyDataSource()
@@ -43,7 +42,7 @@ class NoteDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = getAccount()
-                val note = miCore.getNoteRepository().find(Note.Id(account.accountId, show.noteId))
+                val note = miCore.getNoteRepository().find(net.pantasystem.milktea.model.notes.Note.Id(account.accountId, show.noteId))
 
                 val noteDetail = miCore.getGetters().noteRelationGetter.get(note)
 
@@ -231,8 +230,8 @@ class NoteDetailViewModel(
         }
     }
 
-    private var mAc: Account? = null
-    private suspend fun getAccount(): Account {
+    private var mAc: net.pantasystem.milktea.model.account.Account? = null
+    private suspend fun getAccount(): net.pantasystem.milktea.model.account.Account {
         if (mAc != null) {
             return mAc!!
         }

@@ -5,8 +5,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -14,12 +12,12 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.channel.ChannelListType
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.channel.ChannelListType
 import kotlinx.coroutines.launch
 
 data class ChannelTypeWithTitle(
-    val type: ChannelListType,
+    val type: net.pantasystem.milktea.model.channel.ChannelListType,
     val title: String,
 )
 
@@ -27,15 +25,15 @@ data class ChannelTypeWithTitle(
 @Composable
 fun ChannelScreen(
     onNavigateUp: () -> Unit,
-    accountStore: AccountStore,
+    accountStore: net.pantasystem.milktea.model.account.AccountStore,
     channelViewModel: ChannelViewModel,
 ) {
 
     val currentAccount by accountStore.observeCurrentAccount.collectAsState(initial = null)
     val channelTypeWithTitleList = listOf(
-        ChannelTypeWithTitle(ChannelListType.FEATURED, stringResource(id = R.string.featured)),
-        ChannelTypeWithTitle(ChannelListType.FOLLOWED, stringResource(id = R.string.following)),
-        ChannelTypeWithTitle(ChannelListType.OWNED, stringResource(id = R.string.owned))
+        ChannelTypeWithTitle(net.pantasystem.milktea.model.channel.ChannelListType.FEATURED, stringResource(id = R.string.featured)),
+        ChannelTypeWithTitle(net.pantasystem.milktea.model.channel.ChannelListType.FOLLOWED, stringResource(id = R.string.following)),
+        ChannelTypeWithTitle(net.pantasystem.milktea.model.channel.ChannelListType.OWNED, stringResource(id = R.string.owned))
     )
 
     val pagerState = rememberPagerState(pageCount = channelTypeWithTitleList.size)

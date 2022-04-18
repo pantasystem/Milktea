@@ -8,7 +8,7 @@
 
         <variable
                 name="user"
-                type="net.pantasystem.milktea.data.model.users.User.Detail" />
+                type="net.pantasystem.milktea.model.user.User" />
         <variable
                 name="showUserDetails"
                 type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails" />

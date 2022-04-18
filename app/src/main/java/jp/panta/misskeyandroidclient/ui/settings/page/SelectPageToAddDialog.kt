@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.data.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.account.page.galleryTypes
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.galleryTypes
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SelectPageToAddDialog : BottomSheetDialogFragment(){
 
-    @Inject lateinit var accountStore: AccountStore
+    @Inject lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -40,14 +40,14 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
             dismiss()
         })
 
-        var pageTypeList = PageType.values().toList().toMutableList()
+        var pageTypeList = net.pantasystem.milktea.model.account.page.PageType.values().toList().toMutableList()
         val api = miCore.getMisskeyAPIProvider().get(accountStore.state.value.currentAccount!!)
         if(api !is MisskeyAPIV12){
-            pageTypeList.remove(PageType.ANTENNA)
+            pageTypeList.remove(net.pantasystem.milktea.model.account.page.PageType.ANTENNA)
         }
         if(api !is MisskeyAPIV1275) {
             pageTypeList = pageTypeList.filterNot {
-                galleryTypes.contains(it)
+                net.pantasystem.milktea.model.account.page.galleryTypes.contains(it)
             }.toMutableList()
         }
         val adapter = PageTypeListAdapter(viewModel)

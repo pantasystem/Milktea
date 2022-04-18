@@ -3,19 +3,17 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.file.File
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
-import net.pantasystem.milktea.data.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class DraftNotesViewModel(
-    val draftNoteDao: DraftNoteDao,
+    val draftNoteDao: net.pantasystem.milktea.model.notes.draft.DraftNoteDao,
     val miCore: MiCore
 ) : ViewModel(){
 
@@ -46,7 +44,7 @@ class DraftNotesViewModel(
 
     val isLoading = MutableLiveData<Boolean>()
 
-    private fun loadDraftNotes(ac: Account){
+    private fun loadDraftNotes(ac: net.pantasystem.milktea.model.account.Account){
         logger.debug("読み込み開始")
         viewModelScope.launch(Dispatchers.IO){
             try{
@@ -69,7 +67,7 @@ class DraftNotesViewModel(
         }
     }
 
-    fun detachFile(file: File?) {
+    fun detachFile(file: net.pantasystem.milktea.model.file.File?) {
         file?.localFileId?.let{
             val notes = ArrayList(draftNotes.value?: emptyList())
             val targetNote = (notes.firstOrNull { dNote ->
@@ -93,7 +91,7 @@ class DraftNotesViewModel(
         }
     }
 
-    fun deleteDraftNote(draftNote: DraftNote){
+    fun deleteDraftNote(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote){
         viewModelScope.launch(Dispatchers.IO){
             try{
                 draftNoteDao.deleteDraftNote(draftNote)

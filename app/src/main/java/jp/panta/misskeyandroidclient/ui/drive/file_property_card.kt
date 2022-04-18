@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.components.SensitiveIcon
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
 
@@ -31,7 +31,7 @@ fun FilePropertySimpleCard(
     }
 
     var confirmDeleteTargetId by remember {
-        mutableStateOf<FileProperty.Id?>(null)
+        mutableStateOf<net.pantasystem.milktea.model.drive.FileProperty.Id?>(null)
     }
 
 

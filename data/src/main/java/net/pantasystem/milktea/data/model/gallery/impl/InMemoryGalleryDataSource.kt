@@ -1,15 +1,15 @@
 package net.pantasystem.milktea.data.model.gallery.impl
 
-import net.pantasystem.milktea.data.model.AddResult
-import net.pantasystem.milktea.data.model.gallery.GalleryDataSource
-import net.pantasystem.milktea.data.model.gallery.GalleryNotFoundException
-import net.pantasystem.milktea.data.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryNotFoundException
+import net.pantasystem.milktea.model.gallery.GalleryPost
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
-class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource{
+class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource {
 
     private val galleryEvents = MutableSharedFlow<GalleryDataSource.Event>(extraBufferCapacity = 1000)
     override fun events(): Flow<GalleryDataSource.Event> {

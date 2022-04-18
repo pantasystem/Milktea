@@ -1,15 +1,14 @@
 package net.pantasystem.milktea.data.streaming
 
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.data.api.misskey.users.UserDTO
-import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
-import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
+
 import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaDTO
-import net.pantasystem.milktea.data.model.emoji.Emoji
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.data.serializations.DateSerializer
 import java.util.*
 
@@ -201,7 +200,7 @@ data class NoteUpdated (
             data class Body(
                 val reaction: String,
                 val userId: String,
-                val emoji: Emoji? = null
+                val emoji: net.pantasystem.milktea.model.emoji.Emoji? = null
             )
         }
 

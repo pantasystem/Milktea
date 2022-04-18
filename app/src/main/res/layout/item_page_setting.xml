@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="page"
-                type="net.pantasystem.milktea.data.model.account.page.Page" />
+                type="net.pantasystem.milktea.model.account.page.Page" />
         <variable
                 name="pageSettingAction"
                 type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingAction" />

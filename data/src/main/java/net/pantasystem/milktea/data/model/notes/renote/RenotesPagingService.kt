@@ -1,19 +1,19 @@
 package net.pantasystem.milktea.data.model.notes.renote
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.notes.FindRenotes
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.data.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import retrofit2.Response
-import net.pantasystem.milktea.data.model.account.AccountRepository
-import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.api.misskey.notes.FindRenotes
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.data.model.*
 
 interface RenotesPagingService {
     val state: Flow<PageableState<List<Renote>>>
@@ -25,7 +25,7 @@ interface RenotesPagingService {
 class RenotesPagingServiceImpl(
     targetNoteId: Note.Id,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val accountRepository: AccountRepository,
+    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val encryption: Encryption,
 
@@ -55,7 +55,7 @@ class RenotesPagingServiceImpl(
 class RenotesPagingImpl(
     private val targetNoteId: Note.Id,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val accountRepository: AccountRepository,
+    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val encryption: Encryption,
 ) : PreviousLoader<NoteDTO>,

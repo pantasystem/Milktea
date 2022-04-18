@@ -4,9 +4,9 @@ import net.pantasystem.milktea.data.api.mastodon.emojis.TootEmojiDTO
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.emoji.Emoji
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.user.User
 
 @Serializable
 data class MastodonAccountDTO (
@@ -46,14 +46,14 @@ data class MastodonAccountDTO (
 
 
 ) {
-    fun toModel(account: Account): User {
-        return User.Simple(
-            User.Id(account.accountId, account.remoteId),
+    fun toModel(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.model.user.User {
+        return net.pantasystem.milktea.model.user.User.Simple(
+            net.pantasystem.milktea.model.user.User.Id(account.accountId, account.remoteId),
             userName = username,
             name = displayName,
             avatarUrl = avatar,
             emojis = emojis.map {
-                Emoji(
+                net.pantasystem.milktea.model.emoji.Emoji(
                     name = it.shortcode,
                     uri = it.url,
                     url = it.url,

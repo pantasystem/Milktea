@@ -16,7 +16,7 @@ import coil.clear
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.model.file.File
 import jp.panta.misskeyandroidclient.ui.notes.view.media.PreviewAbleFileListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
@@ -88,7 +88,7 @@ object MediaPreviewHelper{
 
     @BindingAdapter("thumbnailView", "playButton", "fileViewData")
     @JvmStatic
-    fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, file: File?){
+    fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, file: net.pantasystem.milktea.model.file.File?){
 
         try{
             this@MediaPreviewHelper.setPreview(thumbnailView, playButton, file!!)
@@ -123,16 +123,16 @@ object MediaPreviewHelper{
             .into(this)
     }
 
-    private fun setPreview(thumbnailView: ImageView, playButton: ImageButton, file: File){
+    private fun setPreview(thumbnailView: ImageView, playButton: ImageButton, file: net.pantasystem.milktea.model.file.File){
         when(file.aboutMediaType){
-            File.AboutMediaType.IMAGE, File.AboutMediaType.VIDEO -> {
+            net.pantasystem.milktea.model.file.File.AboutMediaType.IMAGE, net.pantasystem.milktea.model.file.File.AboutMediaType.VIDEO -> {
                 Glide.with(thumbnailView)
                     .load(file.thumbnailUrl)
                     .centerCrop()
                     .into(thumbnailView)
 
                 when(file.aboutMediaType){
-                    File.AboutMediaType.IMAGE ->{
+                    net.pantasystem.milktea.model.file.File.AboutMediaType.IMAGE ->{
                         playButton.visibility = View.GONE
                     }
                     else ->{
@@ -146,7 +146,7 @@ object MediaPreviewHelper{
                 //thumbnailView.visibility = View.VISIBLE
 
             }
-            File.AboutMediaType.SOUND -> {
+            net.pantasystem.milktea.model.file.File.AboutMediaType.SOUND -> {
                 playButton.visibility = View.VISIBLE
                 Glide.with(playButton.context)
                     .load(R.drawable.ic_music_note_black_24dp)

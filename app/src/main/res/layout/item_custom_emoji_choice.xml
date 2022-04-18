@@ -11,7 +11,7 @@
 
         <variable
                 name="emoji"
-                type="net.pantasystem.milktea.data.model.emoji.Emoji" />
+                type="net.pantasystem.milktea.model.emoji.Emoji" />
 
     </data>
     <ImageView

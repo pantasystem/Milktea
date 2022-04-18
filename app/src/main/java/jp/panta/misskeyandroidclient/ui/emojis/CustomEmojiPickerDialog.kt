@@ -10,7 +10,7 @@ import com.google.android.flexbox.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogCustomEmojiPickerBinding
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
@@ -80,7 +80,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
             dismiss()
         }
 
-        override fun onSelect(emoji: Emoji) {
+        override fun onSelect(emoji: net.pantasystem.milktea.model.emoji.Emoji) {
             if(activity is EmojiSelection){
                 activity.onSelect(emoji)
             }else{

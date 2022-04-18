@@ -9,13 +9,13 @@ import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.gettters.MessageRelationGetter
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.group.GroupDataSource
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.model.notes.NoteDataSource
-import net.pantasystem.milktea.data.model.notes.NoteRepository
-import net.pantasystem.milktea.data.model.notification.NotificationDataSource
-import net.pantasystem.milktea.data.model.users.UserDataSource
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -32,7 +32,7 @@ object GetterModule {
         notificationDataSource: NotificationDataSource,
         messageDataSource: MessageDataSource,
         groupDataSource: GroupDataSource,
-        loggerFactory: net.pantasystem.milktea.common.Logger.Factory
+        loggerFactory: Logger.Factory
     ): Getters {
         return Getters(
             noteDataSource,

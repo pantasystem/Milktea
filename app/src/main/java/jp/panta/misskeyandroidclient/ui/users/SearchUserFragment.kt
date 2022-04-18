@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
@@ -66,7 +66,7 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
     }
 
 
-    override fun show(userId: User.Id?) {
+    override fun show(userId: net.pantasystem.milktea.model.user.User.Id?) {
         userId?.let {
             UserDetailActivity.newInstance(requireContext(), userId = userId)
         }

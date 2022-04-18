@@ -10,13 +10,10 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
 import net.pantasystem.milktea.api.misskey.auth.Session
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.auth.Authorization
 import net.pantasystem.milktea.data.model.auth.custom.*
-import net.pantasystem.milktea.data.model.instance.Meta
+import net.pantasystem.milktea.model.instance.Meta
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
-import net.pantasystem.milktea.common.State
-import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -38,7 +35,7 @@ sealed interface AuthErrors {
 
 sealed interface InstanceType {
     data class Mastodon(val instance: Instance) : InstanceType
-    data class Misskey(val instance: Meta) : InstanceType
+    data class Misskey(val instance: net.pantasystem.milktea.model.instance.Meta) : InstanceType
 }
 
 

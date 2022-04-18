@@ -10,10 +10,10 @@ import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionPreviewBinding
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 
 class CustomEmojiCompleteAdapter(
-    private val emojis: List<Emoji>,
+    private val emojis: List<net.pantasystem.milktea.model.emoji.Emoji>,
     private val context: Context
 ) : BaseAdapter(), Filterable {
 

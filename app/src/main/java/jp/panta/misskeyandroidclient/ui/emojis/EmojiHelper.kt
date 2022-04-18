@@ -3,14 +3,14 @@ package jp.panta.misskeyandroidclient.ui.emojis
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.util.glide.GlideApp
 
 object EmojiHelper{
 
     @JvmStatic
     @BindingAdapter("customEmoji")
-    fun ImageView.setEmojiImage(customEmoji: Emoji){
+    fun ImageView.setEmojiImage(customEmoji: net.pantasystem.milktea.model.emoji.Emoji){
         if(customEmoji.type?.contains("svg") == true || customEmoji.url?.contains("svg") == true|| customEmoji.uri?.contains("svg") == true){
 
             GlideApp.with(context)

@@ -1,11 +1,9 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite
 
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.account.page.Pageable
 import net.pantasystem.milktea.data.model.fevorite.Favorite
 import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotePagedStore
@@ -14,18 +12,22 @@ import retrofit2.Response
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class FavoriteNotePagingStore(
-    val account: Account,
-    override val pageableTimeline: Pageable.Favorite,
+    val account: net.pantasystem.milktea.model.account.Account,
+    override val pageableTimeline: net.pantasystem.milktea.model.account.page.Pageable.Favorite,
     private val miCore: MiCore,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
 
-) : NotePagedStore {
+    ) : NotePagedStore {
 
     val favorites = miCore.getMisskeyAPIProvider().get(account)::favorites
 
     //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 
-    private val adder = NoteDataSourceAdder(miCore.getUserDataSource(), miCore.getNoteDataSource(), miCore.getFilePropertyDataSource())
+    private val adder = net.pantasystem.milktea.model.notes.NoteDataSourceAdder(
+        miCore.getUserDataSource(),
+        miCore.getNoteDataSource(),
+        miCore.getFilePropertyDataSource()
+    )
 
     private val builder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()))
 

@@ -7,13 +7,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
@@ -64,9 +61,9 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
 fun FileViewDataListView(
     list: List<FileViewData>,
     isSelectMode: Boolean = false,
-    onCheckedChanged: (FileProperty.Id, Boolean) -> Unit,
-    onDeleteMenuItemClicked: (FileProperty.Id) -> Unit,
-    onToggleNsfwMenuItemClicked: (FileProperty.Id) -> Unit,
+    onCheckedChanged: (net.pantasystem.milktea.model.drive.FileProperty.Id, Boolean) -> Unit,
+    onDeleteMenuItemClicked: (net.pantasystem.milktea.model.drive.FileProperty.Id) -> Unit,
+    onToggleNsfwMenuItemClicked: (net.pantasystem.milktea.model.drive.FileProperty.Id) -> Unit,
     state: LazyListState = rememberLazyListState(),
 ) {
     LazyColumn(

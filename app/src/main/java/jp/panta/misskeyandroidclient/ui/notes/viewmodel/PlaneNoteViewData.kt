@@ -4,27 +4,21 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.emoji.Emoji
-import net.pantasystem.milktea.data.model.file.File
 import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.data.model.notes.poll.Poll
 import net.pantasystem.milktea.data.model.url.UrlPreview
-import net.pantasystem.milktea.data.model.users.User
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.State
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 open class PlaneNoteViewData (
-    val note: NoteRelation,
-    val account: Account,
+    val note: net.pantasystem.milktea.model.notes.NoteRelation,
+    val account: net.pantasystem.milktea.model.account.Account,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val noteTranslationStore: NoteTranslationStore
+    private val noteTranslationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore
 ) : NoteViewData {
 
 
@@ -34,7 +28,7 @@ open class PlaneNoteViewData (
         return id.noteId
     }
 
-    val toShowNote: NoteRelation
+    val toShowNote: net.pantasystem.milktea.model.notes.NoteRelation
         get() {
             return if(note.note.isRenote() && !note.note.hasContent()){
                 note.renote?: note
@@ -68,7 +62,7 @@ open class PlaneNoteViewData (
             }
         }
 
-    val userId: User.Id
+    val userId: net.pantasystem.milktea.model.user.User.Id
         get() = toShowNote.user.id
 
     val name: String
@@ -94,11 +88,11 @@ open class PlaneNoteViewData (
     val urls = textNode?.getUrls()
 
 
-    val translateState: LiveData<State<Translation?>?> = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
+    val translateState: LiveData<State<net.pantasystem.milktea.model.notes.Translation?>?> = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
 
     var emojis = toShowNote.note.emojis?: emptyList()
 
-    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojis?.map{
+    val emojiMap = HashMap<String, net.pantasystem.milktea.model.emoji.Emoji>(toShowNote.note.emojis?.map{
         it.name to it
     }?.toMap()?: mapOf())
 
@@ -151,10 +145,10 @@ open class PlaneNoteViewData (
 
     val myReaction = MutableLiveData<String?>(toShowNote.note.myReaction)
 
-    val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
+    val poll = MutableLiveData<net.pantasystem.milktea.model.notes.poll.Poll?>(toShowNote.note.poll)
 
     //reNote先
-    val subNote: NoteRelation? = toShowNote.renote
+    val subNote: net.pantasystem.milktea.model.notes.NoteRelation? = toShowNote.renote
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     private val subNoteText = subNote?.note?.text
@@ -190,7 +184,7 @@ open class PlaneNoteViewData (
         }
     }
 
-    fun update(note: Note){
+    fun update(note: net.pantasystem.milktea.model.notes.Note){
         require(toShowNote.note.id == note.id) {
             "更新として渡されたNote.Idと現在のIdが一致しません。"
         }
@@ -207,7 +201,7 @@ open class PlaneNoteViewData (
         }
     }
 
-    private fun getNotMediaFiles() : List<File>{
+    private fun getNotMediaFiles() : List<net.pantasystem.milktea.model.file.File>{
         return  files?.filterNot{ fp ->
             fp.type?.startsWith("image") == true || fp.type?.startsWith("video") == true
         }?: emptyList()
@@ -215,7 +209,7 @@ open class PlaneNoteViewData (
 
     @ExperimentalCoroutinesApi
     val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-        if(it is NoteDataSource.Event.Updated){
+        if(it is net.pantasystem.milktea.model.notes.NoteDataSource.Event.Updated){
             update(it.note)
         }
     }

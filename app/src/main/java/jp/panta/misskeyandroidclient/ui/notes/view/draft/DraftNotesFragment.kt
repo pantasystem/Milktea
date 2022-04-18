@@ -14,8 +14,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentDraftNotesBinding
 import net.pantasystem.milktea.data.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.model.confirm.ResultType
-import net.pantasystem.milktea.data.model.file.File
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
@@ -62,7 +62,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
         confirmViewModel.confirmedEvent.observe(viewLifecycleOwner) {
             if (it.eventType == EV_DELETE_DRAFT_NOTE && it.resultType == ResultType.POSITIVE) {
-                (it.args as? DraftNote)?.let { dn ->
+                (it.args as? net.pantasystem.milktea.model.notes.draft.DraftNote)?.let { dn ->
                     mDraftNotesViewModel?.deleteDraftNote(dn)
                 }
             }
@@ -73,7 +73,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
         }
     }
 
-    override fun onSelect(draftNote: DraftNote?) {
+    override fun onSelect(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote?) {
         val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = draftNote)
         requireActivity().startActivityFromFragment(this, intent, 300)
     }
@@ -84,11 +84,11 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
     }
 
-    override fun onDetach(file: File?) {
+    override fun onDetach(file: net.pantasystem.milktea.model.file.File?) {
         mDraftNotesViewModel?.detachFile(file)
     }
 
-    override fun onSelect(file: File?) {
+    override fun onSelect(file: net.pantasystem.milktea.model.file.File?) {
         file?.let{
             val intent = Intent(requireContext(), MediaActivity::class.java)
             intent.putExtra(MediaActivity.EXTRA_FILE, file)
@@ -97,7 +97,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
     }
 
-    override fun onDelete(draftNote: DraftNote?) {
+    override fun onDelete(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote?) {
         draftNote?.let{
             mConfirmViewModel?.confirmEvent?.event = ConfirmCommand(
                 title = null,

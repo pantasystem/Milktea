@@ -3,14 +3,14 @@ package jp.panta.misskeyandroidclient.ui.notes.view.editor
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 
 object FileHelper{
 
     @JvmStatic
     @BindingAdapter("previewFiles", "imagePreviewsFileListener")
-    fun RecyclerView.setPreviewFiles(files: List<File>?, imagePreviewsFileListener: FileListener?){
+    fun RecyclerView.setPreviewFiles(files: List<net.pantasystem.milktea.model.file.File>?, imagePreviewsFileListener: FileListener?){
 
         files?: return
         imagePreviewsFileListener?: return

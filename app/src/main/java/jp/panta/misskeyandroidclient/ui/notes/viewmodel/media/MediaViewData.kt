@@ -3,9 +3,9 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.media
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.model.file.File
 
-class MediaViewData(files: List<File>) {
+class MediaViewData(files: List<net.pantasystem.milktea.model.file.File>) {
 
     // NOTE: サイズが変わることは決してない
     private val _files = MutableLiveData(files.map{

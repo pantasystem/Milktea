@@ -3,14 +3,14 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.messaging.Message
-import net.pantasystem.milktea.data.model.messaging.MessageRelation
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import java.lang.IllegalArgumentException
 
 
-abstract class MessageViewData (val message: MessageRelation, account: Account){
+abstract class MessageViewData (val message: net.pantasystem.milktea.model.messaging.MessageRelation, account: net.pantasystem.milktea.model.account.Account){
     val messagingId = message.message.messagingId(account)
     val id = message.message.id
     abstract val name: String
@@ -62,7 +62,7 @@ abstract class MessageViewData (val message: MessageRelation, account: Account){
         return result
     }
 
-    fun update(message: Message) {
+    fun update(message: net.pantasystem.milktea.model.messaging.Message) {
         require(this.message.message.id == message.id)
         mIsRead = message.isRead
     }
@@ -70,14 +70,14 @@ abstract class MessageViewData (val message: MessageRelation, account: Account){
 
 }
 
-class SelfMessageViewData(message: MessageRelation, account: Account) : MessageViewData(message, account){
+class SelfMessageViewData(message: net.pantasystem.milktea.model.messaging.MessageRelation, account: net.pantasystem.milktea.model.account.Account) : MessageViewData(message, account){
     override val avatarIcon: String = message.user.avatarUrl?: throw IllegalArgumentException("not self message")
 
     override val name: String = message.user.name?: message.user.userName
 
 }
 
-class OtherUserMessageViewData(message: MessageRelation, account: Account) : MessageViewData(message, account){
+class OtherUserMessageViewData(message: net.pantasystem.milktea.model.messaging.MessageRelation, account: net.pantasystem.milktea.model.account.Account) : MessageViewData(message, account){
     override val avatarIcon: String = message.user.avatarUrl?: throw IllegalArgumentException("not recipient")
     override val name: String = message.user.name?: message.user.userName
 }

@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.model.notes.draft.db
 
 import androidx.room.Entity
 import androidx.room.Ignore
-import net.pantasystem.milktea.data.model.notes.draft.DraftPoll
+import net.pantasystem.milktea.model.notes.draft.DraftPoll
 
 @Entity
 class DraftPollDTO(

@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.api.misskey
 
 
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.model.api.Version
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +34,7 @@ class MisskeyAPIProvider @Inject constructor(){
         }
     }
 
-    fun get(account: Account, version: Version? = null): MisskeyAPI {
+    fun get(account: net.pantasystem.milktea.model.account.Account, version: Version? = null): MisskeyAPI {
         return get(account.instanceDomain, version)
     }
 }

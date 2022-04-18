@@ -1,16 +1,15 @@
 package net.pantasystem.milktea.data.model.notification.impl
 
-import net.pantasystem.milktea.data.model.AddResult
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.notification.Notification
-import net.pantasystem.milktea.data.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
 import javax.inject.Inject
 
 class MediatorNotificationDataSource @Inject constructor(
     private val unreadNotificationDAO: UnreadNotificationDAO
-) : NotificationDataSource{
+) : NotificationDataSource {
     @Inject lateinit var inMemoryNotificationDataSource: InMemoryNotificationDataSource
     override suspend fun add(notification: Notification): AddResult {
         unreadNotificationDAO.delete(notification.id.accountId, notification.id.notificationId)

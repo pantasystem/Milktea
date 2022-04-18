@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes.poll
 
 import kotlinx.datetime.Clock
-import net.pantasystem.milktea.data.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.Poll
 import org.junit.Assert
 import org.junit.Test
 import kotlin.time.Duration.Companion.minutes
@@ -11,27 +11,27 @@ class PollTest {
 
     @Test
     fun totalVoteCount() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 15,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 8,
                     text = "aaa",
@@ -46,27 +46,27 @@ class PollTest {
 
     @Test
     fun canVoteMultiplePoll() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = true
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",
                     isVoted = true
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 15,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 8,
                     text = "aaa",
@@ -81,27 +81,27 @@ class PollTest {
 
     @Test
     fun canVote() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 15,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 8,
                     text = "aaa",
@@ -116,27 +116,27 @@ class PollTest {
 
     @Test
     fun canVoteWhenVoted() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = true
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 15,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 8,
                     text = "aaa",
@@ -151,27 +151,27 @@ class PollTest {
 
     @Test
     fun canVoteWithinExpiredAt() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 15,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 8,
                     text = "aaa",
@@ -185,27 +185,27 @@ class PollTest {
     }
     @Test
     fun canVoteWhenExpired() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 15,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 8,
                     text = "aaa",
@@ -220,15 +220,15 @@ class PollTest {
 
     @Test
     fun canVoteVotedAndExpired() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = false
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",
@@ -243,15 +243,15 @@ class PollTest {
 
     @Test
     fun canVoteAllVotedAndMultiple() {
-        val poll = Poll(
+        val poll = net.pantasystem.milktea.model.notes.poll.Poll(
             choices = listOf(
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 10,
                     text = "aaa",
                     isVoted = true
                 ),
-                Poll.Choice(
+                net.pantasystem.milktea.model.notes.poll.Poll.Choice(
                     index = 0,
                     votes = 20,
                     text = "aaa",

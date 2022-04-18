@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionHistoryListBinding
-import net.pantasystem.milktea.data.model.notes.Note
+import net.pantasystem.milktea.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.users.SimpleUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryViewModel
@@ -24,7 +24,7 @@ class ReactionHistoryListFragment : Fragment() {
         private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"
         private const val EXTRA_TYPE = "EXTRA_TYPE"
 
-        fun newInstance(noteId: Note.Id, type: String? = null) : ReactionHistoryListFragment {
+        fun newInstance(noteId: net.pantasystem.milktea.model.notes.Note.Id, type: String? = null) : ReactionHistoryListFragment {
             return ReactionHistoryListFragment().also {
                 it.arguments = Bundle().also { bundle ->
                     bundle.putString(EXTRA_NOTE_ID, noteId.noteId)
@@ -58,7 +58,7 @@ class ReactionHistoryListFragment : Fragment() {
         val type = requireArguments().getString(EXTRA_TYPE)
         requireNotNull(nId)
         require(aId != -1L)
-        val noteId = Note.Id(aId, nId)
+        val noteId = net.pantasystem.milktea.model.notes.Note.Id(aId, nId)
         val miCore = context?.applicationContext as MiCore
         val viewModel = ViewModelProvider(this, ReactionHistoryViewModel.Factory(noteId, type, miCore))[ReactionHistoryViewModel::class.java]
         mViewModel = viewModel

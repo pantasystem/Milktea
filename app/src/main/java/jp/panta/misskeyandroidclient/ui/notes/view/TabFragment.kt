@@ -16,8 +16,8 @@ import net.pantasystem.milktea.data.model.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
-import net.pantasystem.milktea.data.model.account.page.Page
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
@@ -87,13 +87,13 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
     }
 
 
-    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) :
+    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<net.pantasystem.milktea.model.account.page.Page>) :
         FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        private var requestBaseList: List<Page> = list
+        private var requestBaseList: List<net.pantasystem.milktea.model.account.page.Page> = list
             private set
         private var oldRequestBaseSetting = requestBaseList
 
-        var account: Account? = null
+        var account: net.pantasystem.milktea.model.account.Account? = null
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
         private val mFragments = ArrayList<Fragment>()
@@ -129,7 +129,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         }
 
 
-        fun setList(account: Account, list: List<Page>) {
+        fun setList(account: net.pantasystem.milktea.model.account.Account, list: List<net.pantasystem.milktea.model.account.page.Page>) {
             mFragments.clear()
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list

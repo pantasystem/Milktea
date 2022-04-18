@@ -8,20 +8,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemChoiceBinding
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 
 class PollListAdapter(
-    val noteId: Note.Id,
-    val poll: Poll,
+    val noteId: net.pantasystem.milktea.model.notes.Note.Id,
+    val poll: net.pantasystem.milktea.model.notes.poll.Poll,
     val notesViewModel: NotesViewModel,
-) : ListAdapter<Poll.Choice, PollListAdapter.ChoiceHolder>(object : DiffUtil.ItemCallback<Poll.Choice>() {
-    override fun areContentsTheSame(oldItem: Poll.Choice, newItem: Poll.Choice): Boolean {
+) : ListAdapter<net.pantasystem.milktea.model.notes.poll.Poll.Choice, PollListAdapter.ChoiceHolder>(object : DiffUtil.ItemCallback<net.pantasystem.milktea.model.notes.poll.Poll.Choice>() {
+    override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.notes.poll.Poll.Choice, newItem: net.pantasystem.milktea.model.notes.poll.Poll.Choice): Boolean {
         return oldItem == newItem
     }
 
-    override fun areItemsTheSame(oldItem: Poll.Choice, newItem: Poll.Choice): Boolean {
+    override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.notes.poll.Poll.Choice, newItem: net.pantasystem.milktea.model.notes.poll.Poll.Choice): Boolean {
         return oldItem == newItem
     }
 }){

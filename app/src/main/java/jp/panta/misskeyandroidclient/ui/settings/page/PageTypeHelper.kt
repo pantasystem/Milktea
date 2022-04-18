@@ -4,15 +4,15 @@ import android.content.Context
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.model.account.page.PageType.*
-import net.pantasystem.milktea.data.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.PageType.*
+import net.pantasystem.milktea.model.account.page.PageType
 
 
 object PageTypeHelper{
 
     @JvmStatic
     @BindingAdapter("pageType")
-    fun TextView.setTextFromPageType(type: PageType?){
+    fun TextView.setTextFromPageType(type: net.pantasystem.milktea.model.account.page.PageType?){
         type?: return
         this.text = nameByPageType(context, type)
 
@@ -20,7 +20,7 @@ object PageTypeHelper{
 
     }
 
-    fun nameByPageType(context: Context, pageType: PageType): String{
+    fun nameByPageType(context: Context, pageType: net.pantasystem.milktea.model.account.page.PageType): String{
 
         return when(pageType){
             GLOBAL -> context.getString(R.string.global_timeline)

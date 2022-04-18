@@ -10,7 +10,7 @@ sealed interface TemporarilyAuthState {
     data class Misskey(
         val secret: String,
         override val instanceDomain: String,
-        val session: net.pantasystem.milktea.api.misskey.auth.Session,
+        val session: Session,
         override val enabledDateEnd: Date,
         val viaName: String?
     ) : TemporarilyAuthState
@@ -24,7 +24,7 @@ sealed interface TemporarilyAuthState {
     ) : TemporarilyAuthState
 }
 
-fun AppType.Misskey.createAuth(instanceDomain: String, session: net.pantasystem.milktea.api.misskey.auth.Session, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Misskey {
+fun AppType.Misskey.createAuth(instanceDomain: String, session: Session, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Misskey {
     requireNotNull(secret)
     return TemporarilyAuthState.Misskey(
         secret = secret,

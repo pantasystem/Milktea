@@ -6,8 +6,7 @@ import android.os.Bundle
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-import net.pantasystem.milktea.data.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import kotlinx.datetime.Instant
 import java.util.*
@@ -35,7 +34,7 @@ class PollTimePickerDialog : AppCompatDialogFragment(), TimePickerDialog.OnTimeS
         mViewModel.updateState(
             mViewModel.state.value.copy(
                 poll = mViewModel.state.value.poll?.copy(
-                    expiresAt = PollExpiresAt.DateAndTime(
+                    expiresAt = net.pantasystem.milktea.model.notes.PollExpiresAt.DateAndTime(
                         Instant.fromEpochMilliseconds(c.time.time)
                     )
                 )

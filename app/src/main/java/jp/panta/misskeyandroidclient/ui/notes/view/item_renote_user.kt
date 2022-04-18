@@ -18,18 +18,16 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.data.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
 import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.withContext
 
 @ExperimentalCoroutinesApi
 @Composable
 fun ItemRenoteUser(
-    note: NoteRelation,
+    note: net.pantasystem.milktea.model.notes.NoteRelation,
     onClick: ()->Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter?,
     isUserNameDefault: Boolean = false

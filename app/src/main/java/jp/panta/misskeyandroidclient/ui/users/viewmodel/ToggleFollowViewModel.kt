@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ class ToggleFollowViewModel(val miCore: MiCore) : ViewModel(){
         }
     }
 
-    fun toggleFollow(userId: User.Id){
+    fun toggleFollow(userId: net.pantasystem.milktea.model.user.User.Id){
         viewModelScope.launch(Dispatchers.IO) {
 
             val user = runCatching {
@@ -38,9 +38,9 @@ class ToggleFollowViewModel(val miCore: MiCore) : ViewModel(){
 
     }
 
-    private suspend fun getUser(userId: User.Id): User.Detail? {
+    private suspend fun getUser(userId: net.pantasystem.milktea.model.user.User.Id): net.pantasystem.milktea.model.user.User.Detail? {
         return runCatching {
-            miCore.getUserRepository().find(userId, true) as User.Detail
+            miCore.getUserRepository().find(userId, true) as net.pantasystem.milktea.model.user.User.Detail
         }.getOrNull()
 
 

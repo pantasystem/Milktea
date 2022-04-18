@@ -1,15 +1,14 @@
 package net.pantasystem.milktea.data.model.notes.draft.db
 
 import androidx.room.*
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.channel.Channel
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.notes.draft.DraftNote
 
 @Entity(tableName = "draft_note_table", foreignKeys = [
     ForeignKey(
         parentColumns = ["accountId"],
         childColumns = ["accountId"],
-        entity = Account::class,
+        entity = net.pantasystem.milktea.model.account.Account::class,
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.CASCADE
     )
@@ -64,7 +63,7 @@ data class DraftNoteDTO(
         visibilityUserIds: List<UserIdDTO>?,
         draftFiles: List<DraftFileDTO>?,
         pollChoicesDTO: List<PollChoiceDTO>?
-    ): DraftNote{
+    ): DraftNote {
         return DraftNote(
             accountId,
             visibility,

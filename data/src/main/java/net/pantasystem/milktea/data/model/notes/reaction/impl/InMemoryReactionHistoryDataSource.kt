@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.data.model.notes.reaction.impl
 
-import net.pantasystem.milktea.data.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistory
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionHistoryDataSource
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistory
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

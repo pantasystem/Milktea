@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.data.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 import java.lang.IllegalArgumentException
-import net.pantasystem.milktea.data.model.messaging.CreateMessage
-import net.pantasystem.milktea.data.model.messaging.MessagingId
+import net.pantasystem.milktea.model.messaging.CreateMessage
+import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +16,13 @@ import kotlinx.coroutines.launch
 
 class MessageActionViewModel(
 
-    private val messagingId: MessagingId,
+    private val messagingId: net.pantasystem.milktea.model.messaging.MessagingId,
     private val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val messagingId: MessagingId,
+        val messagingId: net.pantasystem.milktea.model.messaging.MessagingId,
         val miApplication: MiApplication,
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -36,11 +36,11 @@ class MessageActionViewModel(
     private val logger = miCore.loggerFactory.create("MessageActionViewModel")
 
     val text = MutableLiveData<String>()
-    val file = MutableLiveData<FileProperty?>()
+    val file = MutableLiveData<net.pantasystem.milktea.model.drive.FileProperty?>()
 
     private val mErrors = MutableStateFlow<Throwable?>(null)
 
-    fun setFilePropertyFromId(filePropertyId: FileProperty.Id) {
+    fun setFilePropertyFromId(filePropertyId: net.pantasystem.milktea.model.drive.FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             file.postValue(miCore.getFilePropertyDataSource().find(filePropertyId))
         }
@@ -53,7 +53,7 @@ class MessageActionViewModel(
         //text.value = null
         //file.value = null
         viewModelScope.launch(Dispatchers.IO) {
-            val createMessage = CreateMessage.Factory.create(messagingId, tmpText, tmpFile?.id?.fileId)
+            val createMessage = net.pantasystem.milktea.model.messaging.CreateMessage.Factory.create(messagingId, tmpText, tmpFile?.id?.fileId)
             runCatching { miCore.getMessageRepository().create(createMessage) }.onFailure {
                 logger.error("メッセージ作成中にエラー発生", e = it)
                 mErrors.value = it

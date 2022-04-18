@@ -11,16 +11,16 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.regex.Pattern
 
 data class EmojiPos(
-    val emoji: Emoji,
+    val emoji: net.pantasystem.milktea.model.emoji.Emoji,
     val start: Int,
     val end: Int
 )
 
-fun String.findCustomEmojiInText(emojis: List<Emoji>) : List<EmojiPos> {
+fun String.findCustomEmojiInText(emojis: List<net.pantasystem.milktea.model.emoji.Emoji>) : List<EmojiPos> {
 
     val pattern = StringBuilder(":(").also { patternBuilder ->
         emojis.forEachIndexed { index, emoji ->
@@ -53,7 +53,7 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>) : List<EmojiPos> {
 
 
 @Composable
-fun CustomEmojiText(text: String, emojis: List<Emoji>, fontSize: TextUnit = 14.sp) {
+fun CustomEmojiText(text: String, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>, fontSize: TextUnit = 14.sp) {
 
     val matches = text.findCustomEmojiInText(emojis)
 

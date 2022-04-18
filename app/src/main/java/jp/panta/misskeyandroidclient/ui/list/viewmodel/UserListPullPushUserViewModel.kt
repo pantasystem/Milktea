@@ -8,20 +8,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.model.account.Account
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.api.misskey.list.ListUserOperation
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.AccountStore
-import net.pantasystem.milktea.data.model.list.UserList
-import net.pantasystem.milktea.data.model.users.User
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class UserListPullPushUserViewModel @Inject constructor(
-    val accountStore: AccountStore,
+    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption
 ) : ViewModel() {
@@ -32,19 +31,19 @@ class UserListPullPushUserViewModel @Inject constructor(
 
     data class Event(
         val type: Type,
-        val userId: User.Id,
-        val listId: UserList.Id
+        val userId: net.pantasystem.milktea.model.user.User.Id,
+        val listId: net.pantasystem.milktea.model.list.UserList.Id
     )
 
 
 
-    val account = MutableLiveData<Account>(accountStore.currentAccount)
+    val account = MutableLiveData<net.pantasystem.milktea.model.account.Account>(accountStore.currentAccount)
 
     private val subject = PublishSubject.create<Event>()
     val pullPushEvent: Observable<Event> = subject
 
 
-    fun toggle(userList: UserList, userId: User.Id) {
+    fun toggle(userList: net.pantasystem.milktea.model.list.UserList, userId: net.pantasystem.milktea.model.user.User.Id) {
         val account = accountStore.currentAccount
         if (account == null) {
             Log.w(this.javaClass.simpleName, "Accountを見つけることができなかった処理を中断する")

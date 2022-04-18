@@ -1,24 +1,21 @@
 package net.pantasystem.milktea.data.model.notes.impl
 
-import net.pantasystem.milktea.data.model.Encryption
-import net.pantasystem.milktea.data.model.account.Account
-import net.pantasystem.milktea.data.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.data.model.drive.FileUploader
-import net.pantasystem.milktea.data.model.file.AppFile
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.notes.*
 import net.pantasystem.milktea.data.api.misskey.notes.CreateNote as CreateNoteDTO
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
-import net.pantasystem.milktea.data.model.notes.draft.DraftPoll
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftPoll
 import kotlinx.coroutines.*
-import net.pantasystem.milktea.data.model.toFileProperty
+import net.pantasystem.milktea.data.model.drive.FileUploader
+import net.pantasystem.milktea.model.notes.*
 import java.io.Serializable
 
 class PostNoteTask(
     val encryption: Encryption,
     val createNote: CreateNote,
-    val account: Account,
+    val account: net.pantasystem.milktea.model.account.Account,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
-    val filePropertyDataSource: FilePropertyDataSource
+    val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource
 ): Serializable{
 
 
@@ -67,8 +64,8 @@ class PostNoteTask(
                 tmpFiles?.map {
                     async(Dispatchers.IO) {
                         when(it) {
-                            is AppFile.Remote -> it.id.fileId
-                            is AppFile.Local -> {
+                            is net.pantasystem.milktea.model.file.AppFile.Remote -> it.id.fileId
+                            is net.pantasystem.milktea.model.file.AppFile.Local -> {
                                 val result = fileUploader.upload(it, true)
                                 filePropertyDataSource.add(result.toFileProperty(account))
                                 result.id
@@ -82,7 +79,7 @@ class PostNoteTask(
         return tmpFiles != null && tmpFiles.size == filesIds?.size
     }
 
-    fun toDraftNote(draftNote: DraftNote? = null): DraftNote{
+    fun toDraftNote(draftNote: DraftNote? = null): DraftNote {
         logger.debug("下書きノートが作成された")
         val draftPoll = createNote.poll?.let{
             DraftPoll(it.choices, it.multiple, it.expiresAt)

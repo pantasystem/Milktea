@@ -6,7 +6,7 @@ import android.content.Intent
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import net.pantasystem.milktea.data.model.messaging.MessageRelation
+import net.pantasystem.milktea.model.messaging.MessageRelation
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -82,7 +82,7 @@ class NotificationService : Service() {
 
 
 
-    private fun showMessageNotification(message: MessageRelation){
+    private fun showMessageNotification(message: net.pantasystem.milktea.model.messaging.MessageRelation){
 
         val builder = NotificationCompat.Builder(this, MESSAGE_CHANEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)

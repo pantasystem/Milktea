@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel.file
 
 import androidx.lifecycle.MutableLiveData
-import net.pantasystem.milktea.data.model.file.File
+import net.pantasystem.milktea.model.file.File
 
-class FileViewData(val file: File) {
+class FileViewData(val file: net.pantasystem.milktea.model.file.File) {
     enum class Type{
         VIDEO, IMAGE, SOUND, OTHER
     }

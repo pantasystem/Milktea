@@ -4,7 +4,7 @@
         >
     <data>
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
-        <import type="net.pantasystem.milktea.data.model.notes.Visibility"/>
+        <import type="net.pantasystem.milktea.model.notes.Visibility"/>
         <variable
                 name="noteEditorViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel" />

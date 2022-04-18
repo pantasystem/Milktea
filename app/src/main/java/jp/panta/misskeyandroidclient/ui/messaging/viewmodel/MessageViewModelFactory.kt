@@ -2,14 +2,14 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import net.pantasystem.milktea.data.model.messaging.MessagingId
+import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @Suppress("UNCHECKED_CAST")
 class MessageViewModelFactory(
-    private val messagingId: MessagingId,
+    private val messagingId: net.pantasystem.milktea.model.messaging.MessagingId,
     private val miCore: MiCore
 ): ViewModelProvider.Factory{
 

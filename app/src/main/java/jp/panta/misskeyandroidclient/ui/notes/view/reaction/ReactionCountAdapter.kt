@@ -9,27 +9,27 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionBinding
-import net.pantasystem.milktea.data.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 
-class ReactionCountAdapter(val notesViewModel: NotesViewModel) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
+class ReactionCountAdapter(val notesViewModel: NotesViewModel) : ListAdapter<net.pantasystem.milktea.model.notes.reaction.ReactionCount, ReactionCountAdapter.ReactionHolder>(
     reactionDiffUtilItemCallback
 ){
     class ReactionHolder(val binding: ItemReactionBinding): RecyclerView.ViewHolder(binding.root)
 
     companion object{
-        private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<ReactionCount>(){
+        private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<net.pantasystem.milktea.model.notes.reaction.ReactionCount>(){
             override fun areContentsTheSame(
-                oldItem: ReactionCount,
-                newItem: ReactionCount
+                oldItem: net.pantasystem.milktea.model.notes.reaction.ReactionCount,
+                newItem: net.pantasystem.milktea.model.notes.reaction.ReactionCount
             ): Boolean {
                 return oldItem == newItem
             }
 
             override fun areItemsTheSame(
-                oldItem: ReactionCount,
-                newItem: ReactionCount
+                oldItem: net.pantasystem.milktea.model.notes.reaction.ReactionCount,
+                newItem: net.pantasystem.milktea.model.notes.reaction.ReactionCount
             ): Boolean {
                 return oldItem.reaction == newItem.reaction
             }

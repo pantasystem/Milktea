@@ -7,8 +7,8 @@ import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.mfm.MFMDecorator
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import net.pantasystem.milktea.data.model.emoji.Emoji
-import net.pantasystem.milktea.data.model.notes.Translation
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.notes.Translation
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 
@@ -17,7 +17,7 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState", "emojis")
-    fun TextView.setTranslatedText(state: State<Translation>?, emojis: List<Emoji>?) {
+    fun TextView.setTranslatedText(state: State<net.pantasystem.milktea.model.notes.Translation>?, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?) {
         if(state == null) {
             this.visibility = View.GONE
             return
@@ -48,7 +48,7 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState")
-    fun ViewGroup.translationVisibility(state: State<Translation>?) {
+    fun ViewGroup.translationVisibility(state: State<net.pantasystem.milktea.model.notes.Translation>?) {
         if(state == null) {
             this.visibility = View.GONE
             return

@@ -2,9 +2,9 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import net.pantasystem.milktea.data.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNote
 
-class DraftNoteViewData(draftNote: DraftNote){
+class DraftNoteViewData(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote){
 
     val note = MutableLiveData(draftNote)
 
