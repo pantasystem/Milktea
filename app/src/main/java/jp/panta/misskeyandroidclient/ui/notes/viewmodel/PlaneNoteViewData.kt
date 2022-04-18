@@ -11,15 +11,22 @@ import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.State
-import java.util.*
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notes.Translation
+import net.pantasystem.milktea.model.notes.poll.Poll
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 open class PlaneNoteViewData (
-    val note: net.pantasystem.milktea.model.notes.NoteRelation,
-    val account: net.pantasystem.milktea.model.account.Account,
+    val note: NoteRelation,
+    val account: Account,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val noteTranslationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore
+    private val noteTranslationStore: NoteTranslationStore
 ) : NoteViewData {
 
 
@@ -29,7 +36,7 @@ open class PlaneNoteViewData (
         return id.noteId
     }
 
-    val toShowNote: net.pantasystem.milktea.model.notes.NoteRelation
+    val toShowNote: NoteRelation
         get() {
             return if(note.note.isRenote() && !note.note.hasContent()){
                 note.renote?: note
@@ -89,11 +96,11 @@ open class PlaneNoteViewData (
     val urls = textNode?.getUrls()
 
 
-    val translateState: LiveData<State<net.pantasystem.milktea.model.notes.Translation?>?> = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
+    val translateState: LiveData<State<Translation?>?> = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
 
     var emojis = toShowNote.note.emojis?: emptyList()
 
-    val emojiMap = HashMap<String, net.pantasystem.milktea.model.emoji.Emoji>(toShowNote.note.emojis?.map{
+    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojis?.map{
         it.name to it
     }?.toMap()?: mapOf())
 
@@ -146,10 +153,10 @@ open class PlaneNoteViewData (
 
     val myReaction = MutableLiveData<String?>(toShowNote.note.myReaction)
 
-    val poll = MutableLiveData<net.pantasystem.milktea.model.notes.poll.Poll?>(toShowNote.note.poll)
+    val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
     //reNote先
-    val subNote: net.pantasystem.milktea.model.notes.NoteRelation? = toShowNote.renote
+    val subNote: NoteRelation? = toShowNote.renote
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     private val subNoteText = subNote?.note?.text
@@ -202,7 +209,7 @@ open class PlaneNoteViewData (
         }
     }
 
-    private fun getNotMediaFiles() : List<net.pantasystem.milktea.model.file.File>{
+    private fun getNotMediaFiles() : List<File>{
         return  files?.filterNot{ fp ->
             fp.type?.startsWith("image") == true || fp.type?.startsWith("video") == true
         }?: emptyList()
@@ -210,7 +217,7 @@ open class PlaneNoteViewData (
 
     @ExperimentalCoroutinesApi
     val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-        if(it is net.pantasystem.milktea.model.notes.NoteDataSource.Event.Updated){
+        if(it is NoteDataSource.Event.Updated){
             update(it.note)
         }
     }

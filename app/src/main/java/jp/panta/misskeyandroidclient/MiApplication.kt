@@ -7,7 +7,6 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
-import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.model.*
 import net.pantasystem.milktea.data.model.drive.*
@@ -33,10 +32,38 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.model.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.streaming.Socket
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.instance.FetchMeta
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaCache
+import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.messaging.MessageRepository
+import net.pantasystem.milktea.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.notification.NotificationRepository
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -49,7 +76,7 @@ class MiApplication : Application(), MiCore {
     lateinit var database: DataBase
 
     @Inject
-    lateinit var reactionUserSettingDao: net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+    lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
     @Inject
     lateinit var mSettingStore: SettingStore
@@ -61,57 +88,66 @@ class MiApplication : Application(), MiCore {
     lateinit var urlPreviewDAO: UrlPreviewDAO
 
     @Inject
-    lateinit var mAccountRepository: net.pantasystem.milktea.model.account.AccountRepository
+    lateinit var mAccountRepository: AccountRepository
 
     @Inject
-    lateinit var mMetaRepository: net.pantasystem.milktea.model.instance.MetaRepository
+    lateinit var mMetaRepository: MetaRepository
 
     @Inject
-    lateinit var mFetchMeta: net.pantasystem.milktea.model.instance.FetchMeta
+    lateinit var mFetchMeta: FetchMeta
 
     private lateinit var sharedPreferences: SharedPreferences
 
     @Inject
-    lateinit var mAccountStore: net.pantasystem.milktea.model.account.AccountStore
+    lateinit var mAccountStore: AccountStore
 
     @Inject
     lateinit var mEncryption: Encryption
 
     @Inject
-    lateinit var mMetaCache: net.pantasystem.milktea.model.instance.MetaCache
+    lateinit var mMetaCache: MetaCache
 
     @Inject
-    lateinit var mMisskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
+    lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
 
     @Inject
-    lateinit var mNoteDataSource: net.pantasystem.milktea.model.notes.NoteDataSource
+    lateinit var mNoteDataSource: NoteDataSource
+
     @Inject
-    lateinit var mUserDataSource: net.pantasystem.milktea.model.user.UserDataSource
+    lateinit var mUserDataSource: UserDataSource
+
     @Inject
-    lateinit var mNotificationDataSource: net.pantasystem.milktea.model.notification.NotificationDataSource
+    lateinit var mNotificationDataSource: NotificationDataSource
+
     @Inject
     lateinit var mMessageDataSource: MessageDataSource
-    @Inject
-    lateinit var mReactionHistoryDataSource: net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
-    @Inject
-    lateinit var mGroupDataSource: net.pantasystem.milktea.model.group.GroupDataSource
-    @Inject
-    lateinit var mFilePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource
-    @Inject
-    lateinit var mGalleryDataSource: net.pantasystem.milktea.model.gallery.GalleryDataSource
 
     @Inject
-    lateinit var mNoteRepository: net.pantasystem.milktea.model.notes.NoteRepository
-    @Inject
-    lateinit var mUserRepository: net.pantasystem.milktea.model.user.UserRepository
+    lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
 
     @Inject
-    lateinit var mNotificationRepository: net.pantasystem.milktea.model.notification.NotificationRepository
+    lateinit var mGroupDataSource: GroupDataSource
 
-    private lateinit var mUserRepositoryEventToFlow: net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
+    @Inject
+    lateinit var mFilePropertyDataSource: FilePropertyDataSource
+
+    @Inject
+    lateinit var mGalleryDataSource: GalleryDataSource
+
+    @Inject
+    lateinit var mNoteRepository: NoteRepository
+
+    @Inject
+    lateinit var mUserRepository: UserRepository
+
+    @Inject
+    lateinit var mNotificationRepository: NotificationRepository
+
+    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+
     @Inject
     lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
@@ -123,17 +159,18 @@ class MiApplication : Application(), MiCore {
 
 
     @Inject
-    lateinit var mUnreadMessages: net.pantasystem.milktea.model.messaging.UnReadMessages
+    lateinit var mUnreadMessages: UnReadMessages
 
     @Inject
-    lateinit var mMessageRepository: net.pantasystem.milktea.model.messaging.MessageRepository
+    lateinit var mMessageRepository: MessageRepository
+
     @Inject
-    lateinit var mGroupRepository: net.pantasystem.milktea.model.group.GroupRepository
+    lateinit var mGroupRepository: GroupRepository
 
     @Inject
     lateinit var mGetters: Getters
 
-    private lateinit var mReactionHistoryPaginatorFactory: net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator.Factory
+    private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 
@@ -141,20 +178,20 @@ class MiApplication : Application(), MiCore {
         private set
 
     @Inject
-    lateinit var mGalleryRepository: net.pantasystem.milktea.model.gallery.GalleryRepository
+    lateinit var mGalleryRepository: GalleryRepository
 
     @Inject
     lateinit var mFileUploaderProvider: FileUploaderProvider
 
     @Inject
-    lateinit var mDriveFileRepository: net.pantasystem.milktea.model.drive.DriveFileRepository
+    lateinit var mDriveFileRepository: DriveFileRepository
 
     @Inject
-    lateinit var mNoteReservationPostExecutor: net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+    lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
 
 
     @Inject
-    lateinit var noteTranslationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore
+    lateinit var noteTranslationStore: NoteTranslationStore
 
     @Inject
     lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
@@ -229,7 +266,7 @@ class MiApplication : Application(), MiCore {
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
         mUserRepositoryEventToFlow =
-            net.pantasystem.milktea.model.user.UserRepositoryEventToFlow(
+            UserRepositoryEventToFlow(
                 mUserDataSource,
                 applicationScope,
                 loggerFactory
@@ -250,7 +287,7 @@ class MiApplication : Application(), MiCore {
         mAccountRepository.addEventListener { ev ->
             applicationScope.launch(Dispatchers.IO) {
                 try {
-                    if (ev is net.pantasystem.milktea.model.account.AccountRepository.Event.Deleted) {
+                    if (ev is AccountRepository.Event.Deleted) {
                         mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
                     }
                     mAccountStore.initialize()
@@ -310,15 +347,15 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override suspend fun getAccount(accountId: Long): net.pantasystem.milktea.model.account.Account {
+    override suspend fun getAccount(accountId: Long): Account {
         return mAccountRepository.get(accountId)
     }
 
-    override fun getUrlPreviewStore(account: net.pantasystem.milktea.model.account.Account): UrlPreviewStore {
+    override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
         return getUrlPreviewStore(account, false)
     }
 
-    override fun getAccountStore(): net.pantasystem.milktea.model.account.AccountStore {
+    override fun getAccountStore(): AccountStore {
         return mAccountStore
     }
 
@@ -327,15 +364,15 @@ class MiApplication : Application(), MiCore {
         return mNoteCaptureAPIAdapter
     }
 
-    override fun getAccountRepository(): net.pantasystem.milktea.model.account.AccountRepository {
+    override fun getAccountRepository(): AccountRepository {
         return mAccountRepository
     }
 
-    override fun getNotificationDataSource(): net.pantasystem.milktea.model.notification.NotificationDataSource {
+    override fun getNotificationDataSource(): NotificationDataSource {
         return mNotificationDataSource
     }
 
-    override fun getNotificationRepository(): net.pantasystem.milktea.model.notification.NotificationRepository {
+    override fun getNotificationRepository(): NotificationRepository {
         return mNotificationRepository
     }
 
@@ -343,19 +380,19 @@ class MiApplication : Application(), MiCore {
         return mMessageDataSource
     }
 
-    override fun getMessageRepository(): net.pantasystem.milktea.model.messaging.MessageRepository {
+    override fun getMessageRepository(): MessageRepository {
         return mMessageRepository
     }
 
-    override fun getGroupDataSource(): net.pantasystem.milktea.model.group.GroupDataSource {
+    override fun getGroupDataSource(): GroupDataSource {
         return mGroupDataSource
     }
 
-    override fun getGroupRepository(): net.pantasystem.milktea.model.group.GroupRepository {
+    override fun getGroupRepository(): GroupRepository {
         return mGroupRepository
     }
 
-    override fun getUnreadMessages(): net.pantasystem.milktea.model.messaging.UnReadMessages {
+    override fun getUnreadMessages(): UnReadMessages {
         return mUnreadMessages
     }
 
@@ -363,13 +400,16 @@ class MiApplication : Application(), MiCore {
         return mGetters
     }
 
-    override fun getDriveFileRepository(): net.pantasystem.milktea.model.drive.DriveFileRepository {
+    override fun getDriveFileRepository(): DriveFileRepository {
         return mDriveFileRepository
     }
 
     override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
-    private fun getUrlPreviewStore(account: net.pantasystem.milktea.model.account.Account, isReplace: Boolean): UrlPreviewStore {
+    private fun getUrlPreviewStore(
+        account: Account,
+        isReplace: Boolean
+    ): UrlPreviewStore {
         return account.instanceDomain.let { accountUrl ->
             val url = mSettingStore.urlPreviewSetting.getSummalyUrl() ?: accountUrl
 
@@ -386,7 +426,7 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override suspend fun setCurrentAccount(account: net.pantasystem.milktea.model.account.Account) {
+    override suspend fun setCurrentAccount(account: Account) {
         try {
             mAccountRepository.setCurrentAccount(account)
             mAccountStore.initialize()
@@ -405,39 +445,39 @@ class MiApplication : Application(), MiCore {
         return this.mSettingStore
     }
 
-    override fun getNoteDataSource(): net.pantasystem.milktea.model.notes.NoteDataSource {
+    override fun getNoteDataSource(): NoteDataSource {
         return mNoteDataSource
     }
 
-    override fun getNoteRepository(): net.pantasystem.milktea.model.notes.NoteRepository {
+    override fun getNoteRepository(): NoteRepository {
         return mNoteRepository
     }
 
-    override fun getUserDataSource(): net.pantasystem.milktea.model.user.UserDataSource {
+    override fun getUserDataSource(): UserDataSource {
         return mUserDataSource
     }
 
-    override fun getUserRepository(): net.pantasystem.milktea.model.user.UserRepository {
+    override fun getUserRepository(): UserRepository {
         return mUserRepository
     }
 
-    override fun getUserRepositoryEventToFlow(): net.pantasystem.milktea.model.user.UserRepositoryEventToFlow {
+    override fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow {
         return mUserRepositoryEventToFlow
     }
 
-    override suspend fun getChannelAPI(account: net.pantasystem.milktea.model.account.Account): ChannelAPI {
+    override suspend fun getChannelAPI(account: Account): ChannelAPI {
         return mChannelAPIWithAccountProvider.get(account)
     }
 
-    override fun getSocket(account: net.pantasystem.milktea.model.account.Account): Socket {
+    override fun getSocket(account: Account): Socket {
         return mSocketWithAccountProvider.get(account)
     }
 
-    override fun getMetaStore(): net.pantasystem.milktea.model.instance.FetchMeta {
+    override fun getMetaStore(): FetchMeta {
         return mFetchMeta
     }
 
-    override fun getFilePropertyDataSource(): net.pantasystem.milktea.model.drive.FilePropertyDataSource {
+    override fun getFilePropertyDataSource(): FilePropertyDataSource {
         return mFilePropertyDataSource
     }
 
@@ -445,11 +485,11 @@ class MiApplication : Application(), MiCore {
         return mFileUploaderProvider
     }
 
-    override fun getGalleryDataSource(): net.pantasystem.milktea.model.gallery.GalleryDataSource {
+    override fun getGalleryDataSource(): GalleryDataSource {
         return mGalleryDataSource
     }
 
-    override fun getGalleryRepository(): net.pantasystem.milktea.model.gallery.GalleryRepository {
+    override fun getGalleryRepository(): GalleryRepository {
         return mGalleryRepository
     }
 
@@ -461,26 +501,26 @@ class MiApplication : Application(), MiCore {
         return _subscriptionUnRegistration
     }
 
-    override fun getTranslationStore(): net.pantasystem.milktea.model.notes.NoteTranslationStore {
+    override fun getTranslationStore(): NoteTranslationStore {
         return noteTranslationStore
     }
 
-    override fun getMetaRepository(): net.pantasystem.milktea.model.instance.MetaRepository {
+    override fun getMetaRepository(): MetaRepository {
         return mMetaRepository
     }
 
-    override fun getNoteReservationPostExecutor(): net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor {
+    override fun getNoteReservationPostExecutor(): NoteReservationPostExecutor {
         return mNoteReservationPostExecutor
     }
 
 
-    override fun getCurrentInstanceMeta(): net.pantasystem.milktea.model.instance.Meta? {
+    override fun getCurrentInstanceMeta(): Meta? {
         return mAccountStore.currentAccount?.instanceDomain?.let { url ->
             mMetaCache.get(url)
         }
     }
 
-    private suspend fun setUpMetaMap(accounts: List<net.pantasystem.milktea.model.account.Account>) {
+    private suspend fun setUpMetaMap(accounts: List<Account>) {
         coroutineScope {
             accounts.map { ac ->
                 async {
@@ -501,7 +541,7 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getMisskeyAPIProvider(): net.pantasystem.milktea.api.misskey.MisskeyAPIProvider {
+    override fun getMisskeyAPIProvider(): MisskeyAPIProvider {
         return mMisskeyAPIProvider
     }
 
@@ -509,15 +549,15 @@ class MiApplication : Application(), MiCore {
         return mEncryption
     }
 
-    override fun getNoteCaptureAPI(account: net.pantasystem.milktea.model.account.Account): NoteCaptureAPI {
+    override fun getNoteCaptureAPI(account: Account): NoteCaptureAPI {
         return mNoteCaptureAPIWithAccountProvider.get(account)
     }
 
-    override fun getReactionHistoryDataSource(): net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource {
+    override fun getReactionHistoryDataSource(): ReactionHistoryDataSource {
         return mReactionHistoryDataSource
     }
 
-    override fun getReactionHistoryPaginatorFactory(): net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator.Factory {
+    override fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory {
         return mReactionHistoryPaginatorFactory
     }
 

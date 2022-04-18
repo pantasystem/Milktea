@@ -5,12 +5,14 @@ import net.pantasystem.milktea.model.messaging.MessageHistoryRelation
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
-class HistoryViewData (account: net.pantasystem.milktea.model.account.Account, val message: net.pantasystem.milktea.model.messaging.MessageHistoryRelation, unReadMessages: net.pantasystem.milktea.model.messaging.UnReadMessages, coroutineScope: CoroutineScope){
+class HistoryViewData (account: Account, val message: MessageHistoryRelation, unReadMessages: UnReadMessages, coroutineScope: CoroutineScope){
     val messagingId = message.message.messagingId(account)
-    val isGroup = message is net.pantasystem.milktea.model.messaging.MessageHistoryRelation.Group
-    val group = (message as? net.pantasystem.milktea.model.messaging.MessageHistoryRelation.Group)?.group
-    val partner = (message as? net.pantasystem.milktea.model.messaging.MessageHistoryRelation.Direct)?.let {
+    val isGroup = message is MessageHistoryRelation.Group
+    val group = (message as? MessageHistoryRelation.Group)?.group
+    val partner = (message as? MessageHistoryRelation.Direct)?.let {
         if(message.recipient.id.id == account.remoteId){
             message.user
         }else{

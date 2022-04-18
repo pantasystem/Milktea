@@ -8,10 +8,10 @@
                 type="net.pantasystem.milktea.model.notes.poll.Poll" />
         <variable
                 name="choice"
-                type="net.pantasystem.milktea.model.notes.poll.Poll" />
+                type="net.pantasystem.milktea.model.notes.poll.Poll.Choice" />
         <variable
                 name="noteId"
-                type="net.pantasystem.milktea.model.notes.Note" />
+                type="net.pantasystem.milktea.model.notes.Note.Id" />
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />

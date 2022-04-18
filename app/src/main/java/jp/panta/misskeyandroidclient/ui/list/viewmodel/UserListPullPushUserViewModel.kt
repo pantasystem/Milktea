@@ -13,11 +13,15 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.list.ListUserOperation
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.model.account.AccountStore
 import javax.inject.Inject
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.user.User
 
 @HiltViewModel
 class UserListPullPushUserViewModel @Inject constructor(
-    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
+    val accountStore: AccountStore,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption
 ) : ViewModel() {
@@ -28,19 +32,19 @@ class UserListPullPushUserViewModel @Inject constructor(
 
     data class Event(
         val type: Type,
-        val userId: net.pantasystem.milktea.model.user.User.Id,
-        val listId: net.pantasystem.milktea.model.list.UserList.Id
+        val userId: User.Id,
+        val listId: UserList.Id
     )
 
 
 
-    val account = MutableLiveData<net.pantasystem.milktea.model.account.Account>(accountStore.currentAccount)
+    val account = MutableLiveData<Account>(accountStore.currentAccount)
 
     private val subject = PublishSubject.create<Event>()
     val pullPushEvent: Observable<Event> = subject
 
 
-    fun toggle(userList: net.pantasystem.milktea.model.list.UserList, userId: net.pantasystem.milktea.model.user.User.Id) {
+    fun toggle(userList: UserList, userId: User.Id) {
         val account = accountStore.currentAccount
         if (account == null) {
             Log.w(this.javaClass.simpleName, "Accountを見つけることができなかった処理を中断する")

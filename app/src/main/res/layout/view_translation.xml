@@ -3,10 +3,10 @@
     <data>
         <variable
                 name="translationState"
-                type="net.pantasystem.milktea.common.State&lt;net.pantasystem.milktea.data.model.notes.Translation>" />
+                type="net.pantasystem.milktea.common.State&lt;net.pantasystem.milktea.model.notes.Translation>" />
         <variable
                 name="emojis"
-                type="net.pantasystem.milktea.model.emoji.Emoji" />
+                type="List&lt;net.pantasystem.milktea.model.emoji.Emoji>" />
         <import type="android.view.View" />
         <import type="net.pantasystem.milktea.common.State" />
         <import type="net.pantasystem.milktea.model.notes.Translation" />

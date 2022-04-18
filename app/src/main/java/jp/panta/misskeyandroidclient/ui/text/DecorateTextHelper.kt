@@ -24,7 +24,7 @@ object DecorateTextHelper {
 
     @BindingAdapter("text", "emojis", "clickableLink")
     @JvmStatic
-    fun TextView.decorate(text: String?, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?, clickableLink: Boolean? = null){
+    fun TextView.decorate(text: String?, emojis: List<Emoji>?, clickableLink: Boolean? = null){
         text?: return
         val span = CustomEmojiDecorator()
             .decorate(emojis, text, this)
@@ -66,7 +66,7 @@ object DecorateTextHelper {
 
     @BindingAdapter("sourceText", "emojis")
     @JvmStatic
-    fun TextView.decorateWithLowPerformance(sourceText: String?, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?){
+    fun TextView.decorateWithLowPerformance(sourceText: String?, emojis: List<Emoji>?){
         sourceText?: return
         emojis?: return
         val node = MFMParser.parse(sourceText, emojis)

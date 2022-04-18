@@ -29,8 +29,6 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import net.pantasystem.milktea.data.model.CreateNoteTaskExecutor
-import net.pantasystem.milktea.data.model.TaskState
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.model.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.ChannelBody
@@ -59,8 +57,14 @@ import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
 import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -75,14 +79,14 @@ class MainActivity : AppCompatActivity() {
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
-    private val logger: net.pantasystem.milktea.common.Logger by lazy {
+    private val logger: Logger by lazy {
         (applicationContext as MiCore).loggerFactory.create("MainActivity")
     }
 
     private val binding: ActivityMainBinding by dataBinding()
 
     @Inject
-    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    lateinit var accountStore: AccountStore
 
     @Inject
     lateinit var settingStore: SettingStore
@@ -143,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(
                         NoteEditorActivity.newBundle(
                             this,
-                            channelId = net.pantasystem.milktea.model.channel.Channel.Id(accountId, type.channelId)
+                            channelId = Channel.Id(accountId, type.channelId)
                         )
                     )
                 }
@@ -178,9 +182,9 @@ class MainActivity : AppCompatActivity() {
         // NOTE: 各ばーしょんに合わせMenuを制御している
         miApplication.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
             binding.navView.menu.also { menu ->
-                menu.findItem(R.id.nav_antenna).isVisible = api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-                menu.findItem(R.id.nav_channel).isVisible = api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-                menu.findItem(R.id.nav_gallery).isVisible = api is net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
+                menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
+                menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
+                menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
             }
         }.launchIn(lifecycleScope)
 
@@ -380,23 +384,23 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private val showFollowingsObserver = Observer<net.pantasystem.milktea.model.user.User.Id> {
+    private val showFollowingsObserver = Observer<User.Id> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent = FollowFollowerActivity.newIntent(this, it, true)
         startActivity(intent)
     }
 
-    private val showFollowersObserver = Observer<net.pantasystem.milktea.model.user.User.Id> {
+    private val showFollowersObserver = Observer<User.Id> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent = FollowFollowerActivity.newIntent(this, it, false)
         startActivity(intent)
     }
 
     @ExperimentalCoroutinesApi
-    private val showProfileObserver = Observer<net.pantasystem.milktea.model.account.Account> {
+    private val showProfileObserver = Observer<Account> {
         binding.drawerLayout.closeDrawerWhenOpened()
         val intent =
-            UserDetailActivity.newInstance(this, userId = net.pantasystem.milktea.model.user.User.Id(it.accountId, it.remoteId))
+            UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
         intent.putActivity(Activities.ACTIVITY_IN_APP)
         startActivity(intent)
     }
@@ -531,7 +535,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<net.pantasystem.milktea.model.notes.Note>) {
+    private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {
         when (taskState) {
             is TaskState.Error -> {
                 getString(R.string.note_creation_failure).showSnackBar(
@@ -555,7 +559,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @ExperimentalCoroutinesApi
-    private fun MiCore.getCurrentAccountMisskeyAPI(): Flow<net.pantasystem.milktea.api.misskey.MisskeyAPI?> {
+    private fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
         return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             getMetaRepository().observe(it.instanceDomain)
         }.map {
