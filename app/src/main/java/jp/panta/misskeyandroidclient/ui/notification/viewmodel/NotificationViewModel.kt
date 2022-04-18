@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.data.api.misskey.notification.NotificationRequest
+import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notification.Notification
@@ -16,7 +16,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import java.util.*
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import kotlin.collections.ArrayList
 
 @ExperimentalCoroutinesApi
@@ -181,8 +181,8 @@ class NotificationViewModel(
 
     }
 
-    fun acceptFollowRequest(notification: net.pantasystem.milktea.model.notification.Notification) {
-        if (notification is net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification) {
+    fun acceptFollowRequest(notification: Notification) {
+        if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     miCore.getUserRepository().acceptFollowRequest(notification.userId)
@@ -201,8 +201,8 @@ class NotificationViewModel(
 
     }
 
-    fun rejectFollowRequest(notification: net.pantasystem.milktea.model.notification.Notification) {
-        if (notification is net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification) {
+    fun rejectFollowRequest(notification: Notification) {
+        if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     miCore.getUserRepository().rejectFollowRequest(notification.userId)
@@ -220,11 +220,11 @@ class NotificationViewModel(
         }
     }
 
-    private suspend fun NotificationDTO.toNotificationRelation(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.model.notification.NotificationRelation {
+    private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
         return miCore.getGetters().notificationRelationGetter.get(account, this)
     }
 
-    private suspend fun List<NotificationDTO>.toNotificationRelations(account: net.pantasystem.milktea.model.account.Account): List<net.pantasystem.milktea.model.notification.NotificationRelation> {
+    private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
         return this.mapNotNull {
             runCatching {
                 it.toNotificationRelation(account)
@@ -234,7 +234,7 @@ class NotificationViewModel(
         }
     }
 
-    private suspend fun List<NotificationDTO>.toNotificationViewData(account: net.pantasystem.milktea.model.account.Account): List<NotificationViewData> {
+    private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
         return this.toNotificationRelations(account).map {
             NotificationViewData(
                 it,

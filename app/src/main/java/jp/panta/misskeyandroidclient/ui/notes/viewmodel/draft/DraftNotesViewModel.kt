@@ -6,8 +6,13 @@ import jp.panta.misskeyandroidclient.MiApplication
 import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.draft.DraftNote
 
 class DraftNotesViewModel(
     val draftNoteDao: DraftNoteDao,
@@ -41,7 +46,7 @@ class DraftNotesViewModel(
 
     val isLoading = MutableLiveData<Boolean>()
 
-    private fun loadDraftNotes(ac: net.pantasystem.milktea.model.account.Account){
+    private fun loadDraftNotes(ac: Account){
         logger.debug("読み込み開始")
         viewModelScope.launch(Dispatchers.IO){
             try{
@@ -64,7 +69,7 @@ class DraftNotesViewModel(
         }
     }
 
-    fun detachFile(file: net.pantasystem.milktea.model.file.File?) {
+    fun detachFile(file: File?) {
         file?.localFileId?.let{
             val notes = ArrayList(draftNotes.value?: emptyList())
             val targetNote = (notes.firstOrNull { dNote ->
@@ -88,7 +93,7 @@ class DraftNotesViewModel(
         }
     }
 
-    fun deleteDraftNote(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote){
+    fun deleteDraftNote(draftNote: DraftNote){
         viewModelScope.launch(Dispatchers.IO){
             try{
                 draftNoteDao.deleteDraftNote(draftNote)

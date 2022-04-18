@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.view.editor
 import android.text.Editable
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
@@ -17,13 +18,13 @@ class PollChoicesAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val onChoiceTextChangedListener: (UUID, String)-> Unit,
     private val onChoiceDeleteButtonClickListener: (UUID) -> Unit
-) : ListAdapter<net.pantasystem.milktea.model.notes.PollChoiceState, PollChoicesAdapter.ChoiceHolder>(ItemCallback()){
-    class ItemCallback : DiffUtil.ItemCallback<net.pantasystem.milktea.model.notes.PollChoiceState>(){
-        override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.notes.PollChoiceState, newItem: net.pantasystem.milktea.model.notes.PollChoiceState): Boolean {
+) : ListAdapter<PollChoiceState, PollChoicesAdapter.ChoiceHolder>(ItemCallback()){
+    class ItemCallback : DiffUtil.ItemCallback<PollChoiceState>(){
+        override fun areContentsTheSame(oldItem: PollChoiceState, newItem: PollChoiceState): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.notes.PollChoiceState, newItem: net.pantasystem.milktea.model.notes.PollChoiceState): Boolean {
+        override fun areItemsTheSame(oldItem: PollChoiceState, newItem: PollChoiceState): Boolean {
             return oldItem.id == newItem.id
         }
     }
@@ -33,14 +34,14 @@ class PollChoicesAdapter(
         private val onChoiceDeleteButtonClickListener: (UUID) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private var choice: net.pantasystem.milktea.model.notes.PollChoiceState? = null
+        private var choice: PollChoiceState? = null
 
         val textChangedListener: (Editable?)->Unit = {
             choice?.let{ choice ->
                 onChoiceTextChangedListener.invoke(choice.id, it?.toString()?: "")
             }
         }
-        fun bind(choice: net.pantasystem.milktea.model.notes.PollChoiceState) {
+        fun bind(choice: PollChoiceState) {
             this.choice = choice
             binding.deleteButton.setOnClickListener {
                 onChoiceDeleteButtonClickListener.invoke(choice.id)

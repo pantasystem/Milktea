@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.asLiveData
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewActionType
@@ -18,8 +19,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun NoteFilePreview(
     noteEditorViewModel: NoteEditorViewModel,
-    fileRepository: net.pantasystem.milktea.model.drive.DriveFileRepository,
-    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    fileRepository: DriveFileRepository,
+    dataSource: FilePropertyDataSource,
     onShow: (FilePreviewTarget)->Unit
 ) {
     val files = noteEditorViewModel.files.observeAsState()

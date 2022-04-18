@@ -9,8 +9,8 @@ import jp.panta.misskeyandroidclient.MiApplication
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.data.model.settings.SettingStore
-import net.pantasystem.milktea.data.api.misskey.users.RequestUser
-import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
@@ -18,8 +18,12 @@ import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import java.lang.IllegalStateException
 
@@ -43,18 +47,18 @@ class PageSettingViewModel(
 
     val encryption = miCore.getEncryption()
 
-    val selectedPages = MediatorLiveData<List<net.pantasystem.milktea.model.account.page.Page>>()
+    val selectedPages = MediatorLiveData<List<Page>>()
 
-    var account: net.pantasystem.milktea.model.account.Account? = null
+    var account: Account? = null
         get() = miCore.getAccountStore().currentAccount
         private set
 
 
-    val pageAddedEvent = EventBus<net.pantasystem.milktea.model.account.page.PageType>()
+    val pageAddedEvent = EventBus<PageType>()
 
-    val pageOnActionEvent = EventBus<net.pantasystem.milktea.model.account.page.Page>()
+    val pageOnActionEvent = EventBus<Page>()
 
-    val pageOnUpdateEvent = EventBus<net.pantasystem.milktea.model.account.page.Page>()
+    val pageOnUpdateEvent = EventBus<Page>()
 
     init {
 
@@ -69,7 +73,7 @@ class PageSettingViewModel(
 
     }
 
-    fun setList(pages: List<net.pantasystem.milktea.model.account.page.Page>) {
+    fun setList(pages: List<Page>) {
         selectedPages.value = pages.mapIndexed { index, page ->
             page.apply {
                 weight = index + 1
@@ -90,7 +94,7 @@ class PageSettingViewModel(
         }
     }
 
-    fun updatePage(page: net.pantasystem.milktea.model.account.page.Page) {
+    fun updatePage(page: Page) {
         val pages = selectedPages.value?.let {
             ArrayList(it)
         } ?: return
@@ -111,8 +115,8 @@ class PageSettingViewModel(
 
     }
 
-    private fun addPage(page: net.pantasystem.milktea.model.account.page.Page) {
-        val list = ArrayList<net.pantasystem.milktea.model.account.page.Page>(selectedPages.value ?: emptyList())
+    private fun addPage(page: Page) {
+        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
         page.weight = list.size
         list.add(page)
         setList(list)
@@ -135,21 +139,21 @@ class PageSettingViewModel(
 
     private fun addUserPage(user: UserDTO) {
         val page = if (settingStore.isUserNameDefault) {
-            net.pantasystem.milktea.model.account.page.PageableTemplate(account!!)
+            PageableTemplate(account!!)
                 .user(user.id, title = user.getShortDisplayName())
         } else {
-            net.pantasystem.milktea.model.account.page.PageableTemplate(account!!)
+            PageableTemplate(account!!)
                 .user(user.id, title = user.getDisplayName())
         }
         addPage(page)
     }
 
     fun addUsersGalleryById(userId: String) {
-        val pageable = net.pantasystem.milktea.model.account.page.Pageable.Gallery.User(userId = userId)
+        val pageable = Pageable.Gallery.User(userId = userId)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val user = miCore.getUserRepository()
-                    .find(net.pantasystem.milktea.model.user.User.Id(accountId = account!!.accountId, id = userId))
+                    .find(User.Id(accountId = account!!.accountId, id = userId))
                 val name =
                     if (settingStore.isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
                 val page = account!!.newPage(pageable, name = name)
@@ -158,52 +162,64 @@ class PageSettingViewModel(
         }
     }
 
-    fun removePage(page: net.pantasystem.milktea.model.account.page.Page) {
-        val list = ArrayList<net.pantasystem.milktea.model.account.page.Page>(selectedPages.value ?: emptyList())
+    fun removePage(page: Page) {
+        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
         list.remove(page)
         setList(list)
     }
 
 
-    override fun add(type: net.pantasystem.milktea.model.account.page.PageType) {
+    override fun add(type: PageType) {
         pageAddedEvent.event = type
         val name = pageTypeNameMap.get(type)
         when (type) {
-            net.pantasystem.milktea.model.account.page.PageType.GLOBAL -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).globalTimeline(name))
+            PageType.GLOBAL -> {
+                addPage(PageableTemplate(account!!).globalTimeline(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.SOCIAL -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).hybridTimeline(name))
+            PageType.SOCIAL -> {
+                addPage(PageableTemplate(account!!).hybridTimeline(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.LOCAL -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).localTimeline(name))
+            PageType.LOCAL -> {
+                addPage(PageableTemplate(account!!).localTimeline(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.HOME -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).homeTimeline(name))
+            PageType.HOME -> {
+                addPage(PageableTemplate(account!!).homeTimeline(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.NOTIFICATION -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).notification(name))
+            PageType.NOTIFICATION -> {
+                addPage(PageableTemplate(account!!).notification(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.FAVORITE -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).favorite(name))
+            PageType.FAVORITE -> {
+                addPage(PageableTemplate(account!!).favorite(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.FEATURED -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).featured(name))
+            PageType.FEATURED -> {
+                addPage(PageableTemplate(account!!).featured(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.MENTION -> {
-                addPage(net.pantasystem.milktea.model.account.page.PageableTemplate(account!!).mention(name))
+            PageType.MENTION -> {
+                addPage(PageableTemplate(account!!).mention(name))
             }
-            net.pantasystem.milktea.model.account.page.PageType.GALLERY_FEATURED -> addPage(account!!.newPage(
-                net.pantasystem.milktea.model.account.page.Pageable.Gallery.Featured, name))
-            net.pantasystem.milktea.model.account.page.PageType.GALLERY_POPULAR -> addPage(account!!.newPage(
-                net.pantasystem.milktea.model.account.page.Pageable.Gallery.Popular, name))
-            net.pantasystem.milktea.model.account.page.PageType.GALLERY_POSTS -> addPage(account!!.newPage(
-                net.pantasystem.milktea.model.account.page.Pageable.Gallery.Posts, name))
-            net.pantasystem.milktea.model.account.page.PageType.MY_GALLERY_POSTS -> addPage(account!!.newPage(
-                net.pantasystem.milktea.model.account.page.Pageable.Gallery.MyPosts, name))
-            net.pantasystem.milktea.model.account.page.PageType.I_LIKED_GALLERY_POSTS -> addPage(
+            PageType.GALLERY_FEATURED -> addPage(
                 account!!.newPage(
-                    net.pantasystem.milktea.model.account.page.Pageable.Gallery.ILikedPosts,
+                    Pageable.Gallery.Featured, name
+                )
+            )
+            PageType.GALLERY_POPULAR -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.Popular, name
+                )
+            )
+            PageType.GALLERY_POSTS -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.Posts, name
+                )
+            )
+            PageType.MY_GALLERY_POSTS -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.MyPosts, name
+                )
+            )
+            PageType.I_LIKED_GALLERY_POSTS -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.ILikedPosts,
                     name
                 )
             )
@@ -213,7 +229,7 @@ class PageSettingViewModel(
         }
     }
 
-    override fun action(page: net.pantasystem.milktea.model.account.page.Page?) {
+    override fun action(page: Page?) {
         page ?: return
         pageOnActionEvent.event = page
     }

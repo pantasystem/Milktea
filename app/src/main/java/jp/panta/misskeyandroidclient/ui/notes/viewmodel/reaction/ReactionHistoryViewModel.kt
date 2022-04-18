@@ -12,19 +12,22 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class ReactionHistoryViewModel(
-    private val reactionHistoryDataSource: net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource,
-    private val paginator: net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator,
+    reactionHistoryDataSource: ReactionHistoryDataSource,
+    private val paginator: ReactionHistoryPaginator,
     val logger: Logger?
 ) : ViewModel(){
 
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val noteId: net.pantasystem.milktea.model.notes.Note.Id,
+        val noteId: Note.Id,
         val type: String?,
         val miCore: MiCore
     ) : ViewModelProvider.Factory {
@@ -32,7 +35,7 @@ class ReactionHistoryViewModel(
             return ReactionHistoryViewModel(
                 miCore.getReactionHistoryDataSource(),
                 miCore.getReactionHistoryPaginatorFactory().create(
-                    net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest(
+                    ReactionHistoryRequest(
                         noteId,
                         type
                     )
@@ -43,7 +46,7 @@ class ReactionHistoryViewModel(
     }
 
     val isLoading = MutableLiveData(false)
-    val histories = MutableLiveData<List<net.pantasystem.milktea.model.notes.reaction.ReactionHistory>>(emptyList())
+    val histories = MutableLiveData<List<ReactionHistory>>(emptyList())
 
     init {
         reactionHistoryDataSource.filter(paginator.reactionHistoryRequest.noteId, paginator.reactionHistoryRequest.type).onEach {

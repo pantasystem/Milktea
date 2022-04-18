@@ -22,6 +22,7 @@ import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
 import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.withContext
 
 @ExperimentalCoroutinesApi

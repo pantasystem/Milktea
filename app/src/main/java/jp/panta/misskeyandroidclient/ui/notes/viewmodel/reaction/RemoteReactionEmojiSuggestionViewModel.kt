@@ -14,19 +14,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import javax.inject.Inject
 
 data class RemoteReaction(
-    val reaction: net.pantasystem.milktea.model.notes.reaction.Reaction,
+    val reaction: Reaction,
     val currentAccountId: Long,
     val noteId: String
 )
 
 @HiltViewModel
 class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
-    val metaRepository: net.pantasystem.milktea.model.instance.MetaRepository,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
-    val noteRepository: net.pantasystem.milktea.model.notes.NoteRepository,
+    val metaRepository: MetaRepository,
+    val accountRepository: AccountRepository,
+    val noteRepository: NoteRepository,
     val loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
 ) : ViewModel() {
 
@@ -39,7 +42,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         val name = remoteReaction?.reaction?.getName()
         if (name == null) {
             flow {
-                emit(net.pantasystem.milktea.common.State.Fixed<List<net.pantasystem.milktea.model.emoji.Emoji>>(net.pantasystem.milktea.common.StateContent.NotExist()))
+                emit(State.Fixed<List<Emoji>>(StateContent.NotExist()))
             }
         } else {
             suspend {
@@ -49,33 +52,37 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
                 }
             }.asLoadingStateFlow()
         }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, net.pantasystem.milktea.common.State.Loading(
-        net.pantasystem.milktea.common.StateContent.NotExist()))
+    }.stateIn(
+        viewModelScope, SharingStarted.Lazily, State.Loading(
+            StateContent.NotExist()
+        )
+    )
 
     val isLoading = filteredEmojis.map {
-        it is net.pantasystem.milktea.common.State.Loading
+        it is State.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val isNotExists = filteredEmojis.map {
-        it.content is net.pantasystem.milktea.common.StateContent.NotExist && it is net.pantasystem.milktea.common.State.Fixed
+        it.content is StateContent.NotExist && it is State.Fixed
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 
     fun setReaction(accountId: Long, reaction: String, noteId: String) {
         _reaction.value = RemoteReaction(
-            net.pantasystem.milktea.model.notes.reaction.Reaction(
+            Reaction(
                 reaction
-            ), accountId, noteId)
+            ), accountId, noteId
+        )
     }
 
     fun send() {
-        val value = reaction.value?: return
+        val value = reaction.value ?: return
         val name = value.reaction.getName()
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 noteRepository.toggleReaction(
-                    net.pantasystem.milktea.model.notes.reaction.CreateReaction(
-                        net.pantasystem.milktea.model.notes.Note.Id(
+                    CreateReaction(
+                        Note.Id(
                             value.currentAccountId,
                             value.noteId
                         ),
