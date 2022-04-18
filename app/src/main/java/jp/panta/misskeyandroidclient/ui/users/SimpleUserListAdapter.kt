@@ -13,19 +13,19 @@ import net.pantasystem.milktea.model.user.User
 
 class SimpleUserListAdapter(
     val lifecycleOwner: LifecycleOwner
-) : ListAdapter<net.pantasystem.milktea.model.user.User, SimpleUserListAdapter.ViewHolder>(Diff()) {
+) : ListAdapter<User, SimpleUserListAdapter.ViewHolder>(Diff()) {
 
-    class Diff : DiffUtil.ItemCallback<net.pantasystem.milktea.model.user.User>() {
-        override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.user.User, newItem: net.pantasystem.milktea.model.user.User): Boolean {
+    class Diff : DiffUtil.ItemCallback<User>() {
+        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.user.User, newItem: net.pantasystem.milktea.model.user.User): Boolean {
+        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
             return oldItem.id == newItem.id
         }
     }
     inner class ViewHolder(val binding: ItemSimpleUserBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(user: net.pantasystem.milktea.model.user.User) {
+        fun bind(user: User) {
             binding.user = user
             binding.lifecycleOwner = lifecycleOwner
             binding.executePendingBindings()

@@ -10,23 +10,23 @@ import net.pantasystem.milktea.model.account.AccountRepository
  */
 class MediatorAccountRepository(
     private val roomAccountRepository: RoomAccountRepository
-) : net.pantasystem.milktea.model.account.AccountRepository {
+) : AccountRepository {
 
-    private var mAccounts: List<net.pantasystem.milktea.model.account.Account> = listOf()
+    private var mAccounts: List<Account> = listOf()
 
-    override suspend fun add(account: net.pantasystem.milktea.model.account.Account, isUpdatePages: Boolean): net.pantasystem.milktea.model.account.Account {
+    override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
         return roomAccountRepository.add(account, isUpdatePages).also {
             mAccounts = roomAccountRepository.findAll()
         }
     }
 
-    override suspend fun delete(account: net.pantasystem.milktea.model.account.Account) {
+    override suspend fun delete(account: Account) {
         return roomAccountRepository.delete(account).also {
             mAccounts = roomAccountRepository.findAll()
         }
     }
 
-    override suspend fun findAll(): List<net.pantasystem.milktea.model.account.Account> {
+    override suspend fun findAll(): List<Account> {
         if(mAccounts.isEmpty()) {
             mAccounts = roomAccountRepository.findAll()
         }
@@ -34,27 +34,27 @@ class MediatorAccountRepository(
     }
 
 
-    override suspend fun get(accountId: Long): net.pantasystem.milktea.model.account.Account {
+    override suspend fun get(accountId: Long): Account {
         return findAll().firstOrNull {
             it.accountId == accountId
         }?: throw net.pantasystem.milktea.model.account.AccountNotFoundException()
     }
 
-    override suspend fun getCurrentAccount(): net.pantasystem.milktea.model.account.Account {
+    override suspend fun getCurrentAccount(): Account {
         return roomAccountRepository.getCurrentAccount()
     }
 
-    override suspend fun setCurrentAccount(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.model.account.Account {
+    override suspend fun setCurrentAccount(account: Account): Account {
         return roomAccountRepository.setCurrentAccount(account).also {
             mAccounts = findAll()
         }
     }
 
-    override fun addEventListener(listener: net.pantasystem.milktea.model.account.AccountRepository.Listener) {
+    override fun addEventListener(listener: AccountRepository.Listener) {
         roomAccountRepository.addEventListener(listener)
     }
 
-    override fun removeEventListener(listener: net.pantasystem.milktea.model.account.AccountRepository.Listener) {
+    override fun removeEventListener(listener: AccountRepository.Listener) {
         roomAccountRepository.removeEventListener(listener)
     }
 }

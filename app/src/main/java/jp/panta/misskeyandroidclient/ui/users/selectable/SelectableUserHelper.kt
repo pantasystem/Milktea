@@ -9,7 +9,7 @@ object SelectableUserHelper {
 
     @JvmStatic
     @BindingAdapter("selectedUsers", "selectableUserEnabled", "selectableMaxCount")
-    fun CheckBox.setSelectableUserEnabled(selectedUsers: Set<net.pantasystem.milktea.model.user.User.Id>?, selectableUserEnabled: net.pantasystem.milktea.model.user.User?, selectableMaxCount: Int?){
+    fun CheckBox.setSelectableUserEnabled(selectedUsers: Set<User.Id>?, selectableUserEnabled: User?, selectableMaxCount: Int?){
         val max = selectableMaxCount?: 0
         if(selectableUserEnabled == null || max <= 0){
             this.visibility = View.GONE

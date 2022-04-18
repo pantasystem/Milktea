@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.messaging.MessageNotFoundException
 import net.pantasystem.milktea.model.messaging.MessageRelation
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.model.toGroup
+import net.pantasystem.milktea.model.account.Account
 import kotlin.jvm.Throws
 
 class MessageRelationGetter(
@@ -16,7 +17,7 @@ class MessageRelationGetter(
     private val groupDataSource: GroupDataSource
 ) {
 
-    suspend fun get(account: net.pantasystem.milktea.model.account.Account, messageDTO: MessageDTO): MessageRelation {
+    suspend fun get(account: Account, messageDTO: MessageDTO): MessageRelation {
         val (message, users) = messageDTO.entities(account)
         messageDataSource.add(message)
         userDataSource.addAll(users)

@@ -11,7 +11,7 @@ class StreamingMainNotificationEventDispatcher(
     private val unreadNotificationDAO: UnreadNotificationDAO
 ) : StreamingMainEventDispatcher{
 
-    override suspend fun dispatch(account: net.pantasystem.milktea.model.account.Account, mainEvent: ChannelBody.Main): Boolean {
+    override suspend fun dispatch(account: Account, mainEvent: ChannelBody.Main): Boolean {
         return (mainEvent as? ChannelBody.Main.Notification)?.let {
             notificationRelationGetter.get(account, it.body)
         } != null || (mainEvent as? ChannelBody.Main.ReadAllNotifications)?.let {

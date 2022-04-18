@@ -40,9 +40,9 @@ abstract class UserNicknameDAO {
 
 }
 
-fun UserNicknameDTO.toUserNickname(): net.pantasystem.milktea.model.user.nickname.UserNickname {
-    return net.pantasystem.milktea.model.user.nickname.UserNickname(
-        net.pantasystem.milktea.model.user.nickname.UserNickname.Id(
+fun UserNicknameDTO.toUserNickname(): UserNickname {
+    return UserNickname(
+        UserNickname.Id(
             userName = userName,
             host = host
         ),

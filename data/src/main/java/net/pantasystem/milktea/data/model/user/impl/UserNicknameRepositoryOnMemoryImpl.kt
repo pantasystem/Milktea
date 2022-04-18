@@ -9,23 +9,23 @@ import javax.inject.Singleton
 
 @Singleton
 class UserNicknameRepositoryOnMemoryImpl :
-    net.pantasystem.milktea.model.user.nickname.UserNicknameRepository {
+    UserNicknameRepository {
 
     val lock = Mutex()
-    val map = mutableMapOf<net.pantasystem.milktea.model.user.nickname.UserNickname.Id, net.pantasystem.milktea.model.user.nickname.UserNickname>()
+    val map = mutableMapOf<UserNickname.Id, UserNickname>()
 
 
-    override suspend fun findOne(id: net.pantasystem.milktea.model.user.nickname.UserNickname.Id): net.pantasystem.milktea.model.user.nickname.UserNickname {
-        return map[id]?: throw net.pantasystem.milktea.model.user.nickname.UserNicknameNotFoundException()
+    override suspend fun findOne(id: UserNickname.Id): UserNickname {
+        return map[id]?: throw UserNicknameNotFoundException()
     }
 
-    override suspend fun save(nickname: net.pantasystem.milktea.model.user.nickname.UserNickname) {
+    override suspend fun save(nickname: UserNickname) {
         lock.withLock {
             map[nickname.id] = nickname
         }
     }
 
-    override suspend fun delete(id: net.pantasystem.milktea.model.user.nickname.UserNickname.Id) {
+    override suspend fun delete(id: UserNickname.Id) {
         lock.withLock {
             map.remove(id)
         }

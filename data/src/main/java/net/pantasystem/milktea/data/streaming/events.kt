@@ -5,11 +5,13 @@ import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaDTO
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.serializations.DateSerializer
+import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.*
 
 
@@ -147,7 +149,7 @@ sealed class ChannelBody : StreamingEvent(){
         @SerialName("fileUpdated")
         data class FileUpdated(
             override val id: String,
-            val file: net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+            val file: FilePropertyDTO
         ) : Main()
 
         @Serializable
@@ -200,7 +202,7 @@ data class NoteUpdated (
             data class Body(
                 val reaction: String,
                 val userId: String,
-                val emoji: net.pantasystem.milktea.model.emoji.Emoji? = null
+                val emoji: Emoji? = null
             )
         }
 

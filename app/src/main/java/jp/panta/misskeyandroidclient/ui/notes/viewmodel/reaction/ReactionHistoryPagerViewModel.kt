@@ -9,17 +9,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 
 @ExperimentalCoroutinesApi
 class ReactionHistoryPagerViewModel(
-    val noteId: net.pantasystem.milktea.model.notes.Note.Id,
-    val noteRepository: net.pantasystem.milktea.model.notes.NoteRepository,
+    val noteId: Note.Id,
+    val noteRepository: NoteRepository,
     val adapter: NoteCaptureAPIAdapter,
-    val logger: net.pantasystem.milktea.common.Logger?
+    val logger: Logger?
 ) : ViewModel() {
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(val noteId: net.pantasystem.milktea.model.notes.Note.Id, val miCore: MiCore) : ViewModelProvider.Factory{
+    class Factory(val noteId: Note.Id, val miCore: MiCore) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ReactionHistoryPagerViewModel(noteId = noteId,
                 noteRepository = miCore.getNoteRepository(),
@@ -28,15 +33,15 @@ class ReactionHistoryPagerViewModel(
         }
     }
 
-    private val mNote = MutableStateFlow<net.pantasystem.milktea.model.notes.Note?>(null)
-    val note: StateFlow<net.pantasystem.milktea.model.notes.Note?> = mNote
-    val types: Flow<List<net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest>> = note.mapNotNull { note ->
+    private val mNote = MutableStateFlow<Note?>(null)
+    val note: StateFlow<Note?> = mNote
+    val types: Flow<List<ReactionHistoryRequest>> = note.mapNotNull { note ->
         note?.id?.let {  note.id to note.reactionCounts }
     }.map { idAndList ->
         idAndList.second.map { count ->
             count.reaction
         }.map {
-            net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest(idAndList.first, it)
+            ReactionHistoryRequest(idAndList.first, it)
         }
     }.shareIn(viewModelScope, SharingStarted.Eagerly)
 
@@ -52,7 +57,7 @@ class ReactionHistoryPagerViewModel(
         }
 
         adapter.capture(noteId).mapNotNull {
-            (it as? net.pantasystem.milktea.model.notes.NoteDataSource.Event.Updated)?.note?: (it as? net.pantasystem.milktea.model.notes.NoteDataSource.Event.Created)?.note
+            (it as? NoteDataSource.Event.Updated)?.note?: (it as? NoteDataSource.Event.Created)?.note
         }.onEach {
             mNote.value = it
         }

@@ -23,7 +23,7 @@ fun AccessToken.Mastodon.newAccount(
         userName = this.account.username,
         instanceDomain = instanceDomain,
         encryptedToken = encryption.encrypt(account.id, accessToken),
-        instanceType = net.pantasystem.milktea.model.account.Account.InstanceType.MASTODON
+        instanceType = Account.InstanceType.MASTODON
     )
 }
 
@@ -82,7 +82,7 @@ fun AccountRelation.newAccount(user: UserDTO?): Account?{
 //            pages = this.pages.mapNotNull{
 //                it.toPage()
 //            },
-            instanceType = net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
+            instanceType = Account.InstanceType.MISSKEY,
         )
 }
 

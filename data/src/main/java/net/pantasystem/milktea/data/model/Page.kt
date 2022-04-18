@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.model
 import androidx.room.*
 import androidx.room.ForeignKey.NO_ACTION
 import androidx.room.Entity
-import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.data.model.core.Account
 
 @Deprecated("model.account.pages.Pageへ移行")
@@ -31,7 +30,7 @@ data class Page(
     @PrimaryKey(autoGenerate = true) var id: Long? = null
 
     @Ignore
-    fun pageable(): Pageable?{
+    fun pageable(): PageableOld?{
         return when{
             globalTimeline != null -> globalTimeline
             localTimeline != null -> localTimeline
@@ -59,12 +58,12 @@ data class Page(
         return null
     }
 
-    abstract class Timeline : Pageable
+    abstract class Timeline : PageableOld
 
     data class GlobalTimeline(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
         override val type: PageType = PageType.GLOBAL
-    ): Pageable, Timeline(){
+    ): PageableOld, Timeline(){
         override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
             return net.pantasystem.milktea.model.account.page.Pageable.GlobalTimeline(
                 withFiles = withFiles
@@ -160,7 +159,7 @@ data class Page(
     data class Show(
         val noteId: String,
         override val type: PageType = PageType.DETAIL
-    ) : Pageable{
+    ) : PageableOld{
         override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
             return net.pantasystem.milktea.model.account.page.Pageable.Show(
                 noteId = noteId
@@ -191,7 +190,7 @@ data class Page(
             )
         }
     }
-    data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null, override val type: PageType = PageType.NOTIFICATION) : Pageable{
+    data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null, override val type: PageType = PageType.NOTIFICATION) : PageableOld{
         override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
             return net.pantasystem.milktea.model.account.page.Pageable.Notification(
                 following = following,

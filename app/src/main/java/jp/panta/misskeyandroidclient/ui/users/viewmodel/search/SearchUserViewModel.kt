@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
@@ -38,7 +39,7 @@ data class SearchUser(
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
     accountStore: AccountStore,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
     private val miCore: MiCore,
 ) : ViewModel() {

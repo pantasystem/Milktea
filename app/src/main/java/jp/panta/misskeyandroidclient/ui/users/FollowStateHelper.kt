@@ -19,19 +19,19 @@ object FollowStateHelper {
 
     @JvmStatic
     @BindingAdapter("followState")
-    fun Button.setFollowState(state: net.pantasystem.milktea.model.user.FollowState?) {
+    fun Button.setFollowState(state: FollowState?) {
         state?: return
         this.text = when(state) {
-            net.pantasystem.milktea.model.user.FollowState.FOLLOWING -> {
+            FollowState.FOLLOWING -> {
                 context.getString(R.string.unfollow)
             }
-            net.pantasystem.milktea.model.user.FollowState.UNFOLLOWING -> {
+            FollowState.UNFOLLOWING -> {
                 context.getString(R.string.follow)
             }
-            net.pantasystem.milktea.model.user.FollowState.UNFOLLOWING_LOCKED -> {
+            FollowState.UNFOLLOWING_LOCKED -> {
                 context.getString(R.string.request_follow_from_u)
             }
-            net.pantasystem.milktea.model.user.FollowState.PENDING_FOLLOW_REQUEST -> {
+            FollowState.PENDING_FOLLOW_REQUEST -> {
                 context.getString(R.string.follow_approval_pending)
             }
         }

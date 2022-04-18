@@ -4,9 +4,10 @@ import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.AccountRepository
 
 class SubscriptionUnRegistration(
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val encryption: Encryption,
     val lang: String,
     val misskeyAPIProvider: MisskeyAPIProvider,

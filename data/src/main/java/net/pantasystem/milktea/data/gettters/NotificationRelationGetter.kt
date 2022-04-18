@@ -6,9 +6,10 @@ import net.pantasystem.milktea.data.model.toNotification
 import net.pantasystem.milktea.data.model.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.user.UserDataSource
 
 class NotificationRelationGetter(
-    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    private val userDataSource: UserDataSource,
     private val notificationDataSource: NotificationDataSource,
     private val noteRelationGetter: NoteRelationGetter,
     private val noteDataSourceAdder: NoteDataSourceAdder

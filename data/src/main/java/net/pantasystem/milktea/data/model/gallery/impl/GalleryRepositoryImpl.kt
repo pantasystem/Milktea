@@ -12,8 +12,13 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.*
 import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.model.toEntity
 import net.pantasystem.milktea.data.model.toFileProperty
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.UnauthorizedException
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.gallery.*
 import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import net.pantasystem.milktea.api.misskey.v12_75_0.CreateGallery as CreateGalleryDTO
 
@@ -24,8 +29,8 @@ class GalleryRepositoryImpl @Inject constructor(
     private val galleryDataSource: GalleryDataSource,
     private val encryption: Encryption,
     private val fileUploaderProvider: FileUploaderProvider,
-    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
-    private val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    private val userDataSource: UserDataSource,
+    private val filePropertyDataSource: FilePropertyDataSource,
     private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository
 ) : GalleryRepository {
 
@@ -35,8 +40,8 @@ class GalleryRepositoryImpl @Inject constructor(
             createGalleryPost.files.map {
                 async {
                     when(it) {
-                        is net.pantasystem.milktea.model.file.AppFile.Remote -> it.id
-                        is net.pantasystem.milktea.model.file.AppFile.Local -> {
+                        is AppFile.Remote -> it.id
+                        is AppFile.Local -> {
                             fileUploaderProvider.get(createGalleryPost.author).upload(it, true).let {
                                 it.toFileProperty(createGalleryPost.author).also { entity ->
                                     filePropertyDataSource.add(entity)
@@ -89,7 +94,7 @@ class GalleryRepositoryImpl @Inject constructor(
 
     override suspend fun like(id: GalleryPost.Id) {
         val gallery = find(id) as? GalleryPost.Authenticated
-            ?: throw net.pantasystem.milktea.model.account.UnauthorizedException()
+            ?: throw UnauthorizedException()
         val account = accountRepository.get(id.accountId)
         getMisskeyAPI(account).likeGallery(Like(i = account.getI(encryption), postId = id.galleryId)).throwIfHasError()
         galleryDataSource.add(gallery.copy(isLiked = true))
@@ -97,7 +102,7 @@ class GalleryRepositoryImpl @Inject constructor(
 
     override suspend fun unlike(id: GalleryPost.Id) {
         val gallery = find(id) as? GalleryPost.Authenticated
-            ?: throw net.pantasystem.milktea.model.account.UnauthorizedException()
+            ?: throw UnauthorizedException()
         val account = accountRepository.get(id.accountId)
         getMisskeyAPI(account).unlikeGallery(UnLike(i = account.getI(encryption), postId = id.galleryId)).throwIfHasError()
         galleryDataSource.add(gallery.copy(isLiked = false))
@@ -110,8 +115,8 @@ class GalleryRepositoryImpl @Inject constructor(
             updateGalleryPost.files.map {
                 async {
                     when(it) {
-                        is net.pantasystem.milktea.model.file.AppFile.Remote -> it.id.fileId
-                        is net.pantasystem.milktea.model.file.AppFile.Local -> {
+                        is AppFile.Remote -> it.id.fileId
+                        is AppFile.Local -> {
                             fileUploaderProvider.get(account).upload(it, true).also {
                                 filePropertyDataSource.add(it.toFileProperty(account))
                             }.id
@@ -136,7 +141,7 @@ class GalleryRepositoryImpl @Inject constructor(
         return gallery
     }
 
-    private fun getMisskeyAPI(account: net.pantasystem.milktea.model.account.Account) : MisskeyAPIV1275 {
+    private fun getMisskeyAPI(account: Account) : MisskeyAPIV1275 {
         return misskeyAPIProvider.get(account.instanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
     }

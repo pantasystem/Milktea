@@ -1,15 +1,18 @@
 package net.pantasystem.milktea.data.gettters
 
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.user.UserDataSource
 
 
 class NoteRelationGetter(
     private val noteRepository: NoteRepository,
-    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
-    private val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
-    private val logger: net.pantasystem.milktea.common.Logger
+    private val userDataSource: UserDataSource,
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val logger: Logger
 ) {
 
     suspend fun get(noteId: Note.Id, deep: Boolean = true, featuredId: String? = null, promotionId: String? = null): NoteRelation? {

@@ -12,8 +12,8 @@ class RoomMetaRepository(
     val database: DataBase
 ) : net.pantasystem.milktea.model.instance.MetaRepository {
 
-    override suspend fun add(meta: net.pantasystem.milktea.model.instance.Meta): net.pantasystem.milktea.model.instance.Meta {
-        return database.runInTransaction<net.pantasystem.milktea.model.instance.Meta>{
+    override suspend fun add(meta: Meta): Meta {
+        return database.runInTransaction<Meta>{
             metaDAO.delete(MetaDTO(meta))
             metaDAO.insert(MetaDTO(meta))
             val emojiDTOList = meta.emojis?.map{
@@ -39,15 +39,15 @@ class RoomMetaRepository(
         }
     }
 
-    override suspend fun delete(meta: net.pantasystem.milktea.model.instance.Meta) {
+    override suspend fun delete(meta: Meta) {
         metaDAO.delete(MetaDTO(meta))
     }
 
-    override suspend fun get(instanceDomain: String): net.pantasystem.milktea.model.instance.Meta? {
+    override suspend fun get(instanceDomain: String): Meta? {
         return metaDAO.findByInstanceDomain(instanceDomain)?.toMeta()
     }
 
-    override fun observe(instanceDomain: String): Flow<net.pantasystem.milktea.model.instance.Meta?> {
+    override fun observe(instanceDomain: String): Flow<Meta?> {
         return metaDAO.observeByInstanceDomain(instanceDomain).map {
             it?.toMeta()
         }

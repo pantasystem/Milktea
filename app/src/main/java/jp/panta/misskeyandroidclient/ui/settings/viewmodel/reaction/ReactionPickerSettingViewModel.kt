@@ -37,11 +37,11 @@ class ReactionPickerSettingViewModel(
 
     var reactionPickerType = settingStore.reactionPickerType
         private set
-    val reactionSettingsList = MutableLiveData<List<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>>()
-    val reactionSelectEvent = EventBus<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>()
+    val reactionSettingsList = MutableLiveData<List<ReactionUserSetting>>()
+    val reactionSelectEvent = EventBus<ReactionUserSetting>()
 
-    private var mExistingSettingList: List<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>? = null
-    private val mReactionSettingReactionNameMap = LinkedHashMap<String, net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>()
+    private var mExistingSettingList: List<ReactionUserSetting>? = null
+    private val mReactionSettingReactionNameMap = LinkedHashMap<String, ReactionUserSetting>()
 
     init{
         loadSetReactions()
@@ -110,7 +110,7 @@ class ReactionPickerSettingViewModel(
 
     fun addReaction(reaction: String){
         mReactionSettingReactionNameMap[reaction] =
-            net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting(
+            ReactionUserSetting(
                 reaction,
                 account.instanceDomain,
                 mReactionSettingReactionNameMap.size
@@ -118,7 +118,7 @@ class ReactionPickerSettingViewModel(
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
     }
 
-    fun putSortedList(list: List<net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting>){
+    fun putSortedList(list: List<ReactionUserSetting>){
         mReactionSettingReactionNameMap.clear()
         mReactionSettingReactionNameMap.putAll(list.map{
             it.reaction to it
@@ -131,8 +131,8 @@ class ReactionPickerSettingViewModel(
         reactionPickerType = type
     }
 
-    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting {
-        return net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting(
+    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting {
+        return ReactionUserSetting(
             reaction,
             account.instanceDomain,
             index

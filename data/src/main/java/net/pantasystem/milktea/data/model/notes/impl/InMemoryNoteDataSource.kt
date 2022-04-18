@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 class InMemoryNoteDataSource @Inject constructor(
@@ -78,7 +79,7 @@ class InMemoryNoteDataSource @Inject constructor(
 
     }
 
-    override suspend fun removeByUserId(userId: net.pantasystem.milktea.model.user.User.Id): Int {
+    override suspend fun removeByUserId(userId: User.Id): Int {
         val result = mutex.withLock {
             notes.values.filter {
                 it.userId == userId

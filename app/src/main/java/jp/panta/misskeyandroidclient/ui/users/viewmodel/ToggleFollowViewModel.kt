@@ -19,7 +19,7 @@ class ToggleFollowViewModel(val miCore: MiCore) : ViewModel(){
         }
     }
 
-    fun toggleFollow(userId: net.pantasystem.milktea.model.user.User.Id){
+    fun toggleFollow(userId: User.Id){
         viewModelScope.launch(Dispatchers.IO) {
 
             val user = runCatching {
@@ -38,9 +38,9 @@ class ToggleFollowViewModel(val miCore: MiCore) : ViewModel(){
 
     }
 
-    private suspend fun getUser(userId: net.pantasystem.milktea.model.user.User.Id): net.pantasystem.milktea.model.user.User.Detail? {
+    private suspend fun getUser(userId: User.Id): User.Detail? {
         return runCatching {
-            miCore.getUserRepository().find(userId, true) as net.pantasystem.milktea.model.user.User.Detail
+            miCore.getUserRepository().find(userId, true) as User.Detail
         }.getOrNull()
 
 

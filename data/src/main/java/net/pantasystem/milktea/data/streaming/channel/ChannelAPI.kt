@@ -12,7 +12,7 @@ import java.util.*
 
 class ChannelAPI(
     val socket: Socket,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    loggerFactory: Logger.Factory,
 ) : SocketMessageEventListener, SocketStateEventListener {
 
 

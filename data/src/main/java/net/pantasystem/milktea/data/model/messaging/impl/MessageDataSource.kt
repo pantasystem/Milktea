@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessagingId
 import net.pantasystem.milktea.model.messaging.UnReadMessages
@@ -22,7 +23,7 @@ interface MessageDataSource {
 }
 
 class InMemoryMessageDataSource(
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository
+    private val accountRepository: AccountRepository
 ) : MessageDataSource, UnReadMessages {
 
     private val messageIdAndMessage = mutableMapOf<Message.Id, Message>()

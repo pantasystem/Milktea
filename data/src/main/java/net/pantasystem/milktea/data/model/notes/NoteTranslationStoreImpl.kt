@@ -10,6 +10,7 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.*
 import java.util.*
 import javax.inject.Inject
@@ -18,7 +19,7 @@ import javax.inject.Singleton
 @Singleton
 class NoteTranslationStoreImpl @Inject constructor(
     val noteRepository: NoteRepository,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption
 ) : NoteTranslationStore {

@@ -13,21 +13,24 @@ import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
 @Suppress("UNREACHABLE_CODE", "IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
 class NoteRepositoryImpl @Inject constructor(
     val loggerFactory: Logger.Factory,
-    val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    val userDataSource: UserDataSource,
     val noteDataSource: NoteDataSource,
-    val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    val filePropertyDataSource: FilePropertyDataSource,
     val encryption: Encryption,
     val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val draftNoteDao: DraftNoteDao,
     val settingStore: SettingStore,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
 ) : NoteRepository {
 

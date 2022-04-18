@@ -5,6 +5,7 @@ import net.pantasystem.milktea.api.misskey.notes.CreateNote as CreateNoteDTO
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftPoll
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.model.drive.FileUploader
 import net.pantasystem.milktea.data.model.toFileProperty
 import net.pantasystem.milktea.model.account.Account
@@ -17,7 +18,7 @@ class PostNoteTask(
     val encryption: Encryption,
     val createNote: CreateNote,
     val account: Account,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    loggerFactory: Logger.Factory,
     val filePropertyDataSource: FilePropertyDataSource
 ): Serializable{
 

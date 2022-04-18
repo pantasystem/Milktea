@@ -9,8 +9,10 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.data.model.toEntity
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListRepository
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,7 +20,7 @@ import javax.inject.Singleton
 class UserListRepositoryWebAPIImpl @Inject constructor(
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository
+    val accountRepository: AccountRepository
 ) : UserListRepository {
     override suspend fun findByAccountId(accountId: Long): List<UserList> {
         val account = accountRepository.get(accountId)
@@ -55,7 +57,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
 
     override suspend fun appendUser(
         listId: UserList.Id,
-        userId: net.pantasystem.milktea.model.user.User.Id
+        userId: User.Id
     ) {
         val account = accountRepository.get(listId.accountId)
         val misskeyAPI = misskeyAPIProvider.get(account)
@@ -70,7 +72,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
 
     override suspend fun removeUser(
         listId: UserList.Id,
-        userId: net.pantasystem.milktea.model.user.User.Id
+        userId: User.Id
     ) {
         val account = accountRepository.get(listId.accountId)
         val misskeyAPI = misskeyAPIProvider.get(account)

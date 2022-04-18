@@ -11,8 +11,12 @@ import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.user.UserDataSource
 import retrofit2.Response
 import java.lang.IllegalStateException
 import net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost as GalleryPostDTO
@@ -55,9 +59,9 @@ class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>, Get
 }
 
 class GalleryPostsConverter(
-    private val getAccount: suspend ()-> net.pantasystem.milktea.model.account.Account,
-    private val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
-    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    private val getAccount: suspend ()-> Account,
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val userDataSource: UserDataSource,
     private val galleryDataSource: GalleryDataSource
 ) : EntityConverter<GalleryPostDTO, GalleryPost.Id> {
 
@@ -71,14 +75,14 @@ class GalleryPostsConverter(
 }
 
 class GalleryPostsLoader (
-    private val pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery,
+    private val pageable: Pageable.Gallery,
     private val idGetter: IdGetter<String>,
     private val apiProvider: MisskeyAPIProvider,
-    private val getAccount: suspend () -> net.pantasystem.milktea.model.account.Account,
+    private val getAccount: suspend () -> Account,
     private val encryption: Encryption
 ) : FutureLoader<GalleryPostDTO>, PreviousLoader<GalleryPostDTO> {
     init{
-        if(pageable is net.pantasystem.milktea.model.account.page.Pageable.Gallery.ILikedPosts){
+        if(pageable is Pageable.Gallery.ILikedPosts){
             throw IllegalArgumentException("${pageable::class.simpleName}は対応していません。")
         }
     }
@@ -97,7 +101,7 @@ class GalleryPostsLoader (
         val api = apiProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
         when(pageable) {
-            is net.pantasystem.milktea.model.account.page.Pageable.Gallery.MyPosts -> {
+            is Pageable.Gallery.MyPosts -> {
                 return {
                     api.myGalleryPosts(
                         GetPosts(
@@ -109,25 +113,25 @@ class GalleryPostsLoader (
                     )
                 }
             }
-            is net.pantasystem.milktea.model.account.page.Pageable.Gallery.ILikedPosts -> {
+            is Pageable.Gallery.ILikedPosts -> {
                 throw IllegalStateException()
             }
-            is net.pantasystem.milktea.model.account.page.Pageable.Gallery.User -> {
+            is Pageable.Gallery.User -> {
                 return {
                     api.userPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20, userId = pageable.userId))
                 }
             }
-            is net.pantasystem.milktea.model.account.page.Pageable.Gallery.Posts -> {
+            is Pageable.Gallery.Posts -> {
                 return {
                     api.galleryPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20))
                 }
             }
-            is net.pantasystem.milktea.model.account.page.Pageable.Gallery.Featured -> {
+            is Pageable.Gallery.Featured -> {
                 return {
                     api.featuredGalleries(I(i))
                 }
             }
-            is net.pantasystem.milktea.model.account.page.Pageable.Gallery.Popular -> {
+            is Pageable.Gallery.Popular -> {
                 return {
                     api.popularGalleries(I(i))
                 }

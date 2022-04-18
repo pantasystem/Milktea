@@ -13,7 +13,7 @@ object UserTransitionHelper {
 
     @JvmStatic
     @BindingAdapter("transitionDestinationUser")
-    fun View.showUserDetail(user: net.pantasystem.milktea.model.user.User?){
+    fun View.showUserDetail(user: User?){
         user?: return
         this.setOnClickListener { view ->
             val context = view.context

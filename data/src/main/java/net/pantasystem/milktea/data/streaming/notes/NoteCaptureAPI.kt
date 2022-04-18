@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
 
 import java.util.*
 
@@ -19,7 +20,7 @@ interface NoteCaptureAPI {
 
 class NoteCaptureAPIImpl(
     val socket: Socket,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory? = null,
+    loggerFactory: Logger.Factory? = null,
 ) : SocketMessageEventListener, SocketStateEventListener, NoteCaptureAPI {
 
 

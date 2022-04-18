@@ -32,7 +32,7 @@ data class DraftFileDTO(
     var fileId: Long? = null
 
     companion object{
-        fun make(file: net.pantasystem.milktea.model.file.File, draftNoteId: Long): DraftFileDTO{
+        fun make(file: File, draftNoteId: Long): DraftFileDTO{
             return DraftFileDTO(
                 file.name,
                 file.remoteFileId?.fileId,
@@ -51,13 +51,13 @@ data class DraftFileDTO(
 
 
     @Ignore
-    fun toFile(accountId: Long): net.pantasystem.milktea.model.file.File {
-        return net.pantasystem.milktea.model.file.File(
+    fun toFile(accountId: Long): File {
+        return File(
             name,
             filePath ?: "",
             type,
             remoteFileId?.let {
-                net.pantasystem.milktea.model.drive.FileProperty.Id(
+                FileProperty.Id(
                     accountId,
                     it
                 )

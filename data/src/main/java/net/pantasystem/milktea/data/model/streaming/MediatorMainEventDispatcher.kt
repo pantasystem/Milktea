@@ -59,7 +59,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
     }
 
 
-    suspend fun dispatch(account: net.pantasystem.milktea.model.account.Account, mainEvent: ChannelBody.Main) {
+    suspend fun dispatch(account: Account, mainEvent: ChannelBody.Main) {
         val iterator = dispatchers.iterator()
         while (iterator.hasNext()) {
             val result = runCatching {
@@ -79,7 +79,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
 @Singleton
 class ChannelAPIMainEventDispatcherAdapter @Inject constructor(
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
-    private val accountStore: net.pantasystem.milktea.model.account.AccountStore,
+    private val accountStore: AccountStore,
     private val applicationScope: CoroutineScope,
     loggerFactory: Logger.Factory
 ) {

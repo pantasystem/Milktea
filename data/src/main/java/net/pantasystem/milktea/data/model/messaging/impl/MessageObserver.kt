@@ -7,6 +7,8 @@ import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
@@ -14,7 +16,7 @@ import javax.inject.Singleton
 
 @Singleton
 class MessageObserver @Inject constructor(
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    private val accountRepository: AccountRepository,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val getters: Getters
 ){
@@ -53,7 +55,7 @@ class MessageObserver @Inject constructor(
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun observeAccountMessages(ac: net.pantasystem.milktea.model.account.Account): Flow<Message>{
+    fun observeAccountMessages(ac: Account): Flow<Message>{
         return suspend {
             channelAPIProvider.get(ac)
         }.asFlow().flatMapLatest {

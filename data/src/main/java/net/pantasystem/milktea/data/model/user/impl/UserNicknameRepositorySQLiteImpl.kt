@@ -18,12 +18,12 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
      * 存在しないものを毎回探索しに行くのはパフォーマンス的によろしくないので
      * 存在しないものを記録するようにしている。
      */
-    private val notExistsIds = mutableSetOf<net.pantasystem.milktea.model.user.nickname.UserNickname.Id>()
+    private val notExistsIds = mutableSetOf<UserNickname.Id>()
     private val lock = Mutex()
 
-    override suspend fun findOne(id: net.pantasystem.milktea.model.user.nickname.UserNickname.Id): net.pantasystem.milktea.model.user.nickname.UserNickname {
+    override suspend fun findOne(id: UserNickname.Id): UserNickname {
         if (notExistsIds.contains(id)) {
-            throw net.pantasystem.milktea.model.user.nickname.UserNicknameNotFoundException()
+            throw UserNicknameNotFoundException()
         }
         val inMem = runCatching {
             userNicknameRepositoryOnMemoryImpl.findOne(id)
@@ -38,10 +38,10 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
         lock.withLock {
             notExistsIds.add(id)
         }
-        throw net.pantasystem.milktea.model.user.nickname.UserNicknameNotFoundException()
+        throw UserNicknameNotFoundException()
     }
 
-    override suspend fun save(nickname: net.pantasystem.milktea.model.user.nickname.UserNickname) {
+    override suspend fun save(nickname: UserNickname) {
         val found = userNicknameDAO.findByUserNameAndHost(nickname.id.userName, nickname.id.host)
         val dto = UserNicknameDTO(
             userName = nickname.id.userName,
@@ -60,7 +60,7 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
         }
     }
 
-    override suspend fun delete(id: net.pantasystem.milktea.model.user.nickname.UserNickname.Id) {
+    override suspend fun delete(id: UserNickname.Id) {
         lock.withLock {
             notExistsIds.add(id)
         }

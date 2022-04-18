@@ -30,7 +30,7 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
 
     companion object {
 
-        fun newInstance(userId: net.pantasystem.milktea.model.user.User.Id?, fqcnUserName: String?): PinNoteFragment {
+        fun newInstance(userId: User.Id?, fqcnUserName: String?): PinNoteFragment {
             require(!(userId == null && fqcnUserName == null)) {
                 "userId, fqcnUserNameどちらか一つは必須です。"
             }
@@ -59,7 +59,7 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
         val accountId: Long = requireArguments().getLong("ACCOUNT_ID", -1)
         val remoteUserId: String? = requireArguments().getString("USER_ID")
         if (!(remoteUserId == null || accountId == -1L)) {
-            val userId = net.pantasystem.milktea.model.user.User.Id(accountId, remoteUserId)
+            val userId = User.Id(accountId, remoteUserId)
             return@activityViewModels UserDetailViewModel.provideFactory(assistedFactory, userId)
         }
         val userName = requireArguments().getString("FQCN_USER_NAME")

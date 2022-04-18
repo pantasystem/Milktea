@@ -5,13 +5,15 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.*
 
 /**
  * model層とNoteCaptureAPIをいい感じに接続する
  */
 class NoteCaptureAPIAdapter(
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    private val accountRepository: AccountRepository,
     private val noteDataSource: NoteDataSource,
     private val noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
     loggerFactory: Logger.Factory,
@@ -33,7 +35,7 @@ class NoteCaptureAPIAdapter(
 
     private val noteIdWithJob = mutableMapOf<Note.Id, Job>()
 
-    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<net.pantasystem.milktea.model.account.Account, NoteUpdated.Body>>()
+    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>()
 
     init {
         coroutineScope.launch(dispatcher) {
@@ -143,7 +145,7 @@ class NoteCaptureAPIAdapter(
     /**
      * リポジトリを更新する
      */
-    private suspend fun handleRemoteEvent(account: net.pantasystem.milktea.model.account.Account, e: NoteUpdated.Body) {
+    private suspend fun handleRemoteEvent(account: Account, e: NoteUpdated.Body) {
         val noteId = Note.Id(account.accountId, e.id)
         try {
             val note = noteDataSource.get(noteId)

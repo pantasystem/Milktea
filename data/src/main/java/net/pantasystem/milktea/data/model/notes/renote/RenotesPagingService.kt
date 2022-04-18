@@ -14,6 +14,7 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.model.*
+import net.pantasystem.milktea.model.account.AccountRepository
 
 interface RenotesPagingService {
     val state: Flow<PageableState<List<Renote>>>
@@ -25,7 +26,7 @@ interface RenotesPagingService {
 class RenotesPagingServiceImpl(
     targetNoteId: Note.Id,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val encryption: Encryption,
 
@@ -55,7 +56,7 @@ class RenotesPagingServiceImpl(
 class RenotesPagingImpl(
     private val targetNoteId: Note.Id,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val encryption: Encryption,
 ) : PreviousLoader<NoteDTO>,

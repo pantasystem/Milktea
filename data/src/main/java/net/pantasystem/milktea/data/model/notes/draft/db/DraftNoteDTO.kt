@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.model.notes.draft.db
 
 import androidx.room.*
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 
@@ -8,7 +9,7 @@ import net.pantasystem.milktea.model.notes.draft.DraftNote
     ForeignKey(
         parentColumns = ["accountId"],
         childColumns = ["accountId"],
-        entity = net.pantasystem.milktea.model.account.Account::class,
+        entity = Account::class,
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.CASCADE
     )

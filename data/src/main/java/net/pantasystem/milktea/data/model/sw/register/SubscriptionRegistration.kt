@@ -9,9 +9,10 @@ import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.SubscriptionState
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.model.account.AccountRepository
 
 class SubscriptionRegistration(
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val lang: String,

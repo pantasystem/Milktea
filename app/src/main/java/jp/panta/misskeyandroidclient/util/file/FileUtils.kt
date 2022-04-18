@@ -8,7 +8,7 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.File
 import java.lang.IllegalArgumentException
 
-fun Uri.toAppFile(context: Context): net.pantasystem.milktea.model.file.AppFile.Local {
+fun Uri.toAppFile(context: Context): AppFile.Local {
     val fileName = try{
         context.getFileName(this)
     }catch(e: Exception){
@@ -20,7 +20,7 @@ fun Uri.toAppFile(context: Context): net.pantasystem.milktea.model.file.AppFile.
 
     val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
     val thumbnail = if(isMedia) this.toString() else null
-    return net.pantasystem.milktea.model.file.AppFile.Local(
+    return AppFile.Local(
         fileName?: "name none",
         path = this.toString(),
         type  = mimeType ?: "",
@@ -29,7 +29,7 @@ fun Uri.toAppFile(context: Context): net.pantasystem.milktea.model.file.AppFile.
         folderId = null
     )
 }
-fun Uri.toFile(context: Context): net.pantasystem.milktea.model.file.File {
+fun Uri.toFile(context: Context): File {
     val fileName = try{
         context.getFileName(this)
     }catch(e: Exception){
@@ -41,7 +41,7 @@ fun Uri.toFile(context: Context): net.pantasystem.milktea.model.file.File {
 
     val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
     val thumbnail = if(isMedia) this.toString() else null
-    return net.pantasystem.milktea.model.file.File(
+    return File(
         fileName ?: "name none",
         this.toString(),
         type = mimeType,

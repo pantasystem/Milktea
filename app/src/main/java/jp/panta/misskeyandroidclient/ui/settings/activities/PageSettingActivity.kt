@@ -73,26 +73,26 @@ class PageSettingActivity : AppCompatActivity() {
 
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
             when (pt) {
-                net.pantasystem.milktea.model.account.page.PageType.SEARCH, net.pantasystem.milktea.model.account.page.PageType.SEARCH_HASH -> startActivity(
+                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
                     Intent(
                         this,
                         SearchActivity::class.java
                     )
                 )
-                net.pantasystem.milktea.model.account.page.PageType.USER -> {
+                PageType.USER -> {
                     val intent =
                         SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_RESULT_CODE)
                 }
-                net.pantasystem.milktea.model.account.page.PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
-                net.pantasystem.milktea.model.account.page.PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
-                net.pantasystem.milktea.model.account.page.PageType.ANTENNA -> startActivity(Intent(this, AntennaListActivity::class.java))
-                net.pantasystem.milktea.model.account.page.PageType.USERS_GALLERY_POSTS -> {
+                PageType.USER_LIST -> startActivity(Intent(this, ListListActivity::class.java))
+                PageType.DETAIL -> startActivity(Intent(this, SearchActivity::class.java))
+                PageType.ANTENNA -> startActivity(Intent(this, AntennaListActivity::class.java))
+                PageType.USERS_GALLERY_POSTS -> {
                     val intent =
                         SearchAndSelectUserActivity.newIntent(this, selectableMaximumSize = 1)
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE)
                 }
-                net.pantasystem.milktea.model.account.page.PageType.CHANNEL_TIMELINE -> {
+                PageType.CHANNEL_TIMELINE -> {
                     val intent = Intent(this, ChannelActivity::class.java)
                     startActivity(intent)
                 }

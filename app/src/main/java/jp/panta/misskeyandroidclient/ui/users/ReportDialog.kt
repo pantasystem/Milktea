@@ -19,7 +19,7 @@ class ReportDialog : AppCompatDialogFragment(){
         private const val EXTRA_USER_ID = "USER_ID"
         private const val EXTRA_ACCOUNT_ID = "ACCOUNT_ID"
         private const val EXTRA_TEXT = "TEXT"
-        fun newInstance(userId: net.pantasystem.milktea.model.user.User.Id) : ReportDialog {
+        fun newInstance(userId: User.Id) : ReportDialog {
             return ReportDialog().also {
                 it.arguments = Bundle().apply {
                     putString(EXTRA_USER_ID, userId.id)
@@ -28,7 +28,7 @@ class ReportDialog : AppCompatDialogFragment(){
             }
         }
 
-        fun newInstance(userId: net.pantasystem.milktea.model.user.User.Id, text: String) : ReportDialog {
+        fun newInstance(userId: User.Id, text: String) : ReportDialog {
             return ReportDialog().also {
                 it.arguments = Bundle().apply {
                     putString(EXTRA_USER_ID, userId.id)
@@ -53,7 +53,7 @@ class ReportDialog : AppCompatDialogFragment(){
         val comment = arguments?.getString(EXTRA_TEXT)
 
         val viewModel = ViewModelProvider(requireActivity(), ReportViewModel.Factory(miCore))[ReportViewModel::class.java]
-        viewModel.newState(net.pantasystem.milktea.model.user.User.Id(aId, uId), comment = comment)
+        viewModel.newState(User.Id(aId, uId), comment = comment)
 
         dialog.setContentView(view)
         _binding = DialogReportBinding.bind(view)

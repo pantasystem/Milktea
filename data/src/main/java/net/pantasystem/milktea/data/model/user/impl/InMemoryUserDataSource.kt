@@ -10,6 +10,9 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserNotFoundException
+import net.pantasystem.milktea.model.user.UsersState
+import net.pantasystem.milktea.model.user.nickname.UserNickname
 import javax.inject.Inject
 
 // TODO: 色々と依存していてよくわからないのでアーキテクチャレベルでリファクタリングをする
@@ -24,8 +27,8 @@ class InMemoryUserDataSource @Inject constructor(
 
     private val usersLock = Mutex()
 
-    private val _state = MutableStateFlow<net.pantasystem.milktea.model.user.UsersState>(net.pantasystem.milktea.model.user.UsersState())
-    override val state: StateFlow<net.pantasystem.milktea.model.user.UsersState>
+    private val _state = MutableStateFlow(UsersState())
+    override val state: StateFlow<UsersState>
         get() = _state
 
 
@@ -66,7 +69,7 @@ class InMemoryUserDataSource @Inject constructor(
     override suspend fun get(userId: User.Id): User {
         return usersLock.withLock {
             userMap[userId]
-        }?: throw net.pantasystem.milktea.model.user.UserNotFoundException(userId)
+        }?: throw UserNotFoundException(userId)
     }
 
     override suspend fun get(accountId: Long, userName: String, host: String?): User {
@@ -77,7 +80,7 @@ class InMemoryUserDataSource @Inject constructor(
                 it.value
             }.firstOrNull {
                 it.userName == userName && (it.host == host || it.host.isNullOrBlank() == host.isNullOrBlank())
-            }?: throw net.pantasystem.milktea.model.user.UserNotFoundException(null)
+            }?: throw UserNotFoundException(null)
         }
     }
 
@@ -100,7 +103,7 @@ class InMemoryUserDataSource @Inject constructor(
         val nickname = runCatching {
             val ac = accountRepository.get(argUser.id.accountId)
             userNicknameRepository.findOne(
-                net.pantasystem.milktea.model.user.nickname.UserNickname.Id(argUser.userName, argUser.host?: ac.getHost())
+                UserNickname.Id(argUser.userName, argUser.host?: ac.getHost())
             )
         }.getOrNull()
         val user = when(argUser) {

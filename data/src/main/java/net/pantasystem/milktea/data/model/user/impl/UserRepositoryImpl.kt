@@ -12,7 +12,10 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.report.Report
 import retrofit2.Response
@@ -20,10 +23,10 @@ import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class UserRepositoryImpl @Inject constructor(
-    val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    val userDataSource: UserDataSource,
     val noteDataSource: NoteDataSource,
-    val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val filePropertyDataSource: FilePropertyDataSource,
+    val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
     val loggerFactory: Logger.Factory,

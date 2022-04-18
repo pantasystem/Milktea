@@ -4,6 +4,9 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.streaming.Socket
 import net.pantasystem.milktea.data.streaming.network.SocketImpl
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.UnauthorizedException
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider as ISocketWithAccountProvider
@@ -13,7 +16,7 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider as ISock
  */
 class SocketWithAccountProviderImpl @Inject constructor(
     val encryption: Encryption,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
 ) : ISocketWithAccountProvider{
     val okHttpClient: OkHttpClient = OkHttpClient()
@@ -28,7 +31,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
         }
     }
 
-    override fun get(account: net.pantasystem.milktea.model.account.Account): Socket {
+    override fun get(account: Account): Socket {
         synchronized(accountIdWithSocket) {
             var socket = accountIdWithSocket[account.accountId]
             if(socket != null){
@@ -45,7 +48,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
                 val i = account.getI(encryption)
                 uri = "${uri}?i=$i"
 
-            }catch (e: net.pantasystem.milktea.model.account.UnauthorizedException) {
+            }catch (e: UnauthorizedException) {
                 logger.debug("未認証アカウント:id=${account.accountId}, baseURL=${account.instanceDomain}")
             }
             //logger.debug("url:$uri")
