@@ -168,7 +168,7 @@ fun NoteDTO.toNote(account: Account): Note {
         visibility = visibility,
         localOnly = this.localOnly,
         emojis = this.emojis,
-        app = this.app,
+        app = this.app?.toModel(),
         fileIds = this.fileIds?.map { FileProperty.Id(account.accountId, it) },
         poll = this.poll?.toPoll(),
         reactionCounts = this.reactionCounts?.map{
@@ -407,8 +407,8 @@ suspend fun net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost.toEntity(
             },
             tags ?: emptyList(),
             isSensitive,
-            likedCount,
-            isLiked
+            likedCount ?: 0,
+            isLiked ?: false
         )
     }
 }

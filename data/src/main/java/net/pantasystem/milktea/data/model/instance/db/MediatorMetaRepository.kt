@@ -5,7 +5,6 @@ import net.pantasystem.milktea.model.instance.MetaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import net.pantasystem.milktea.api.Instance.db.InMemoryMetaRepository
 import net.pantasystem.milktea.api.Instance.db.RoomMetaRepository
 import javax.inject.Inject
 import javax.inject.Singleton

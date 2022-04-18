@@ -1,16 +1,17 @@
 package net.pantasystem.milktea.data.model.gallery.impl
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.v12_75_0.*
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.instance.IllegalVersionException
-import net.pantasystem.milktea.data.model.gallery.*
 
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.api.misskey.v12_75_0.*
 import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
+import net.pantasystem.milktea.data.model.toEntity
+import net.pantasystem.milktea.data.model.toFileProperty
 import net.pantasystem.milktea.model.gallery.*
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import javax.inject.Inject

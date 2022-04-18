@@ -6,11 +6,14 @@ import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.users.*
-import net.pantasystem.milktea.data.api.misskey.users.report.ReportDTO
+import net.pantasystem.milktea.api.misskey.users.*
+import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.report.Report
 import retrofit2.Response
 import javax.inject.Inject
@@ -30,11 +33,11 @@ class UserRepositoryImpl @Inject constructor(
     }
     private val noteDataSourceAdder = NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
 
-    override suspend fun find(userId: net.pantasystem.milktea.model.user.User.Id, detail: Boolean): net.pantasystem.milktea.model.user.User {
+    override suspend fun find(userId: User.Id, detail: Boolean): User {
         val localResult = runCatching {
             userDataSource.get(userId).let{
                 if(detail) {
-                    it as? net.pantasystem.milktea.model.user.User.Detail
+                    it as? User.Detail
                 }else it
             }
         }.onFailure {
@@ -65,14 +68,14 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
 
-        throw net.pantasystem.milktea.model.user.UserNotFoundException(userId)
+        throw UserNotFoundException(userId)
     }
 
-    override suspend fun findByUserName(accountId: Long, userName: String, host: String?, detail: Boolean): net.pantasystem.milktea.model.user.User {
+    override suspend fun findByUserName(accountId: Long, userName: String, host: String?, detail: Boolean): User {
         val local = runCatching {
             userDataSource.get(accountId, userName, host).let{
                 if(detail) {
-                    it as? net.pantasystem.milktea.model.user.User.Detail
+                    it as? User.Detail
                 }else it
             }
         }.getOrNull()
@@ -103,7 +106,7 @@ class UserRepositoryImpl @Inject constructor(
             return userDataSource.get(user.id)
         }
 
-        throw net.pantasystem.milktea.model.user.UserNotFoundException(
+        throw UserNotFoundException(
             null,
             userName = userName,
             host = host
@@ -111,7 +114,7 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun searchByName(accountId: Long, name: String): List<net.pantasystem.milktea.model.user.User> {
+    override suspend fun searchByName(accountId: Long, name: String): List<User> {
         return userDataSource.all().asSequence().filter {
             it.id.accountId == accountId
         }.filter {
@@ -123,7 +126,7 @@ class UserRepositoryImpl @Inject constructor(
         accountId: Long,
         userName: String,
         host: String?
-    ): List<net.pantasystem.milktea.model.user.User> {
+    ): List<User> {
         val ac = accountRepository.get(accountId)
         val i = ac.getI(encryption)
         val api = misskeyAPIProvider.get(ac)
@@ -146,39 +149,39 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun mute(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun mute(userId: User.Id): Boolean {
         return action(userId.getMisskeyAPI()::muteUser, userId) { user ->
             user.copy(isMuting = true)
         }
     }
 
-    override suspend fun unmute(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun unmute(userId: User.Id): Boolean {
         return action(userId.getMisskeyAPI()::unmuteUser, userId) { user ->
             user.copy(isMuting = false)
         }
     }
 
-    override suspend fun block(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun block(userId: User.Id): Boolean {
         return action(userId.getMisskeyAPI()::blockUser, userId) { user ->
             user.copy(isBlocking = true)
         }
     }
 
-    override suspend fun unblock(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun unblock(userId: User.Id): Boolean {
         return action(userId.getMisskeyAPI()::unblockUser, userId) { user ->
             user.copy(isBlocking = false)
         }
     }
 
-    override suspend fun follow(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun follow(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId)
-        val user = find(userId, true) as net.pantasystem.milktea.model.user.User.Detail
+        val user = find(userId, true) as User.Detail
         val req = RequestUser(userId = userId.id, i = account.getI(encryption))
         logger.debug("follow req:$req")
         val res = misskeyAPIProvider.get(account).followUser(req)
         res.throwIfHasError()
         if(res.isSuccessful) {
-            val updated = (find(userId, true) as net.pantasystem.milktea.model.user.User.Detail).copy(
+            val updated = (find(userId, true) as User.Detail).copy(
                 isFollowing = if(user.isLocked) user.isFollowing else true,
                 hasPendingFollowRequestFromYou = if(user.isLocked) true else user.hasPendingFollowRequestFromYou
             )
@@ -187,9 +190,9 @@ class UserRepositoryImpl @Inject constructor(
         return res.isSuccessful
     }
 
-    override suspend fun unfollow(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun unfollow(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId)
-        val user = find(userId, true) as net.pantasystem.milktea.model.user.User.Detail
+        val user = find(userId, true) as User.Detail
 
 
         val res = if(user.isLocked) {
@@ -210,9 +213,9 @@ class UserRepositoryImpl @Inject constructor(
         return res.isSuccessful
     }
 
-    override suspend fun acceptFollowRequest(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun acceptFollowRequest(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId)
-        val user = find(userId, true) as net.pantasystem.milktea.model.user.User.Detail
+        val user = find(userId, true) as User.Detail
         if(!user.hasPendingFollowRequestToYou) {
             return false
         }
@@ -226,9 +229,9 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun rejectFollowRequest(userId: net.pantasystem.milktea.model.user.User.Id): Boolean {
+    override suspend fun rejectFollowRequest(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId)
-        val user = find(userId, true) as net.pantasystem.milktea.model.user.User.Detail
+        val user = find(userId, true) as User.Detail
         if(!user.hasPendingFollowRequestToYou) {
             return false
         }
@@ -240,13 +243,13 @@ class UserRepositoryImpl @Inject constructor(
         return res.isSuccessful
     }
 
-    private suspend fun action(requestAPI: suspend (RequestUser)-> Response<Unit>, userId: net.pantasystem.milktea.model.user.User.Id, reducer: (net.pantasystem.milktea.model.user.User.Detail)-> net.pantasystem.milktea.model.user.User.Detail): Boolean {
+    private suspend fun action(requestAPI: suspend (RequestUser)-> Response<Unit>, userId: User.Id, reducer: (User.Detail)-> User.Detail): Boolean {
         val account = accountRepository.get(userId.accountId)
         val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(encryption)))
         res.throwIfHasError()
         if(res.isSuccessful) {
 
-            val updated = reducer.invoke(find(userId, true) as net.pantasystem.milktea.model.user.User.Detail)
+            val updated = reducer.invoke(find(userId, true) as User.Detail)
             userDataSource.add(updated)
         }
         return res.isSuccessful
@@ -266,7 +269,7 @@ class UserRepositoryImpl @Inject constructor(
         return res.isSuccessful
     }
 
-    private suspend fun net.pantasystem.milktea.model.user.User.Id.getMisskeyAPI(): MisskeyAPI {
+    private suspend fun User.Id.getMisskeyAPI(): MisskeyAPI {
         return misskeyAPIProvider.get(accountRepository.get(accountId))
     }
 }

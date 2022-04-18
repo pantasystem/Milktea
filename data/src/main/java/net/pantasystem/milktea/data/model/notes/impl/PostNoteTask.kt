@@ -1,21 +1,24 @@
 package net.pantasystem.milktea.data.model.notes.impl
 
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.data.api.misskey.notes.CreateNote as CreateNoteDTO
+import net.pantasystem.milktea.api.misskey.notes.CreateNote as CreateNoteDTO
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftPoll
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.data.model.drive.FileUploader
+import net.pantasystem.milktea.data.model.toFileProperty
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.*
 import java.io.Serializable
 
 class PostNoteTask(
     val encryption: Encryption,
     val createNote: CreateNote,
-    val account: net.pantasystem.milktea.model.account.Account,
+    val account: Account,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
-    val filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource
+    val filePropertyDataSource: FilePropertyDataSource
 ): Serializable{
 
 
@@ -64,8 +67,8 @@ class PostNoteTask(
                 tmpFiles?.map {
                     async(Dispatchers.IO) {
                         when(it) {
-                            is net.pantasystem.milktea.model.file.AppFile.Remote -> it.id.fileId
-                            is net.pantasystem.milktea.model.file.AppFile.Local -> {
+                            is AppFile.Remote -> it.id.fileId
+                            is AppFile.Local -> {
                                 val result = fileUploader.upload(it, true)
                                 filePropertyDataSource.add(result.toFileProperty(account))
                                 result.id

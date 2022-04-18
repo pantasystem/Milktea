@@ -1,26 +1,27 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import android.util.Log
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 
 import retrofit2.Response
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class NoteTimelineStore(
     val account: net.pantasystem.milktea.model.account.Account,
     //override val timelineRequestBase: NoteRequest.Setting,
-    override val pageableTimeline: net.pantasystem.milktea.model.account.page.Pageable,
+    override val pageableTimeline: Pageable,
     val include: NoteRequest.Include,
     private val miCore: MiCore,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
@@ -28,7 +29,7 @@ class NoteTimelineStore(
 ) : NotePagedStore {
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
-    private val adder = net.pantasystem.milktea.model.notes.NoteDataSourceAdder(
+    private val adder = NoteDataSourceAdder(
         miCore.getUserDataSource(),
         miCore.getNoteDataSource(),
         miCore.getFilePropertyDataSource()
@@ -38,28 +39,28 @@ class NoteTimelineStore(
     private fun getStore(): (suspend (NoteRequest)-> Response<List<NoteDTO>?>)? {
         return try{
             when(pageableTimeline){
-                is net.pantasystem.milktea.model.account.page.Pageable.GlobalTimeline -> miCore.getMisskeyAPIProvider().get(account)::globalTimeline
-                is net.pantasystem.milktea.model.account.page.Pageable.LocalTimeline -> miCore.getMisskeyAPIProvider().get(account)::localTimeline
-                is net.pantasystem.milktea.model.account.page.Pageable.HybridTimeline -> miCore.getMisskeyAPIProvider().get(account)::hybridTimeline
-                is net.pantasystem.milktea.model.account.page.Pageable.HomeTimeline -> miCore.getMisskeyAPIProvider().get(account)::homeTimeline
-                is net.pantasystem.milktea.model.account.page.Pageable.Search -> miCore.getMisskeyAPIProvider().get(account)::searchNote
-                is net.pantasystem.milktea.model.account.page.Pageable.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
-                is net.pantasystem.milktea.model.account.page.Pageable.UserTimeline -> miCore.getMisskeyAPIProvider().get(account)::userNotes
-                is net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline -> miCore.getMisskeyAPIProvider().get(account)::userListTimeline
-                is net.pantasystem.milktea.model.account.page.Pageable.SearchByTag -> miCore.getMisskeyAPIProvider().get(account)::searchByTag
-                is net.pantasystem.milktea.model.account.page.Pageable.Featured -> miCore.getMisskeyAPIProvider().get(account)::featured
-                is net.pantasystem.milktea.model.account.page.Pageable.Mention -> miCore.getMisskeyAPIProvider().get(account)::mentions
-                is net.pantasystem.milktea.model.account.page.Pageable.Antenna -> {
+                is Pageable.GlobalTimeline -> miCore.getMisskeyAPIProvider().get(account)::globalTimeline
+                is Pageable.LocalTimeline -> miCore.getMisskeyAPIProvider().get(account)::localTimeline
+                is Pageable.HybridTimeline -> miCore.getMisskeyAPIProvider().get(account)::hybridTimeline
+                is Pageable.HomeTimeline -> miCore.getMisskeyAPIProvider().get(account)::homeTimeline
+                is Pageable.Search -> miCore.getMisskeyAPIProvider().get(account)::searchNote
+                is Pageable.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
+                is Pageable.UserTimeline -> miCore.getMisskeyAPIProvider().get(account)::userNotes
+                is Pageable.UserListTimeline -> miCore.getMisskeyAPIProvider().get(account)::userListTimeline
+                is Pageable.SearchByTag -> miCore.getMisskeyAPIProvider().get(account)::searchByTag
+                is Pageable.Featured -> miCore.getMisskeyAPIProvider().get(account)::featured
+                is Pageable.Mention -> miCore.getMisskeyAPIProvider().get(account)::mentions
+                is Pageable.Antenna -> {
                     val api = miCore.getMisskeyAPIProvider().get(account)
-                    if(api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12){
+                    if(api is MisskeyAPIV12){
                         (api)::antennasNotes
                     }else{
                         throw IllegalArgumentException("antennaはV12以上でなければ使用できません")
                     }
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.ChannelTimeline -> {
+                is Pageable.ChannelTimeline -> {
                     val api = miCore.getMisskeyAPIProvider().get(account)
-                    if (api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12) {
+                    if (api is MisskeyAPIV12) {
                         (api)::channelTimeline
                     }else{
                         throw IllegalArgumentException("channelはV12以上でなければ使用できません")

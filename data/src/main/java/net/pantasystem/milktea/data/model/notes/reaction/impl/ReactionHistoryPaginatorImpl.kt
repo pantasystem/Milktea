@@ -1,8 +1,6 @@
 package net.pantasystem.milktea.data.model.notes.reaction.impl
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.notes.reaction.RequestReactionHistoryDTO
-import net.pantasystem.milktea.data.api.misskey.users.toUser
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
@@ -10,22 +8,27 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.user.UserDataSource
 
 class ReactionHistoryPaginatorImpl(
     override val reactionHistoryRequest: ReactionHistoryRequest,
     private val reactionHistoryDataSource: ReactionHistoryDataSource,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    private val accountRepository: AccountRepository,
     private val encryption: Encryption,
-    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource
+    private val userDataSource: UserDataSource
 ) : ReactionHistoryPaginator {
 
     class Factory(
         private val reactionHistoryDataSource: ReactionHistoryDataSource,
         private val misskeyAPIProvider: MisskeyAPIProvider,
-        private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+        private val accountRepository: AccountRepository,
         private val encryption: Encryption,
-        private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource
+        private val userDataSource: UserDataSource
     ) : ReactionHistoryPaginator.Factory {
         override fun create(reactionHistoryRequest: ReactionHistoryRequest) : ReactionHistoryPaginator {
             return ReactionHistoryPaginatorImpl(

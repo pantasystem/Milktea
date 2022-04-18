@@ -1,8 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.data.api.misskey.notes.toNote
-import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -11,6 +10,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.model.toNote
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
