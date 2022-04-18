@@ -33,7 +33,7 @@ import jp.panta.misskeyandroidclient.R
 fun GalleryPostCard(
     galleryState: GalleryPostState,
     onAvatarIconClicked: ()->Unit,
-    onThumbnailClicked: (net.pantasystem.milktea.model.drive.FileProperty)->Unit
+    onThumbnailClicked: (FileProperty)->Unit
 ) {
     val pagerState = rememberPagerState(pageCount = galleryState.files.size)
 

@@ -27,6 +27,7 @@ import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
@@ -387,7 +388,7 @@ class NotesViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     getMisskeyAPI()?.vote(
-                        net.pantasystem.milktea.model.notes.poll.Vote(
+                        Vote(
                             i = getAccount()?.getI(encryption)!!,
                             choice = choice.index,
                             noteId = noteId.noteId

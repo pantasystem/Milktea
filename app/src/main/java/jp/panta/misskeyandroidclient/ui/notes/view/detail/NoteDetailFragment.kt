@@ -46,9 +46,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         }
 
         fun newInstance(
-            page: net.pantasystem.milktea.model.account.page.Page
+            page: Page
         ): NoteDetailFragment {
-            page.pageable() as? net.pantasystem.milktea.model.account.page.Pageable.Show ?: throw IllegalArgumentException("Not Pageable.Show")
+            page.pageable() as? Pageable.Show ?: throw IllegalArgumentException("Not Pageable.Show")
             return NoteDetailFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGE, page)
@@ -57,7 +57,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
             }
         }
 
-        fun newInstance(noteId: net.pantasystem.milktea.model.notes.Note.Id): NoteDetailFragment {
+        fun newInstance(noteId: Note.Id): NoteDetailFragment {
             return newInstance(noteId.noteId, noteId.accountId)
         }
     }
@@ -69,9 +69,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
-    val page: net.pantasystem.milktea.model.account.page.Pageable.Show by lazy {
-        (arguments?.getSerializable(EXTRA_PAGE) as? net.pantasystem.milktea.model.account.page.Page)?.pageable() as? net.pantasystem.milktea.model.account.page.Pageable.Show
-            ?: net.pantasystem.milktea.model.account.page.Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
+    val page: Pageable.Show by lazy {
+        (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
+            ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

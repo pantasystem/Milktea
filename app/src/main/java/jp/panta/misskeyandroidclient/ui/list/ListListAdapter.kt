@@ -22,17 +22,17 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
     private val listListViewModel: ListListViewModel,
     val lifecycleOwner: LifecycleOwner,
     var onTryToEditCallback: OnTryToEditCallback? = null
-) : ListAdapter<net.pantasystem.milktea.model.list.UserList, ListListAdapter.BaseVH>(
+) : ListAdapter<UserList, ListListAdapter.BaseVH>(
     ItemCallback()
 ){
 
     abstract class BaseVH(view: View) : RecyclerView.ViewHolder(view){
-        abstract fun bind(userList: net.pantasystem.milktea.model.list.UserList)
+        abstract fun bind(userList: UserList)
     }
 
     inner class VH(val binding: ItemListBinding) : BaseVH(binding.root){
         @OptIn(ExperimentalCoroutinesApi::class)
-        override fun bind(userList: net.pantasystem.milktea.model.list.UserList) {
+        override fun bind(userList: UserList) {
             binding.list = userList
             binding.lifecycleOwner = lifecycleOwner
             binding.tryToEditCallback = onTryToEditCallback
@@ -42,7 +42,7 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
     }
 
     inner class AddUserVH(val binding: ItemListAddUserBinding) : BaseVH(binding.root){
-        override fun bind(userList: net.pantasystem.milktea.model.list.UserList) {
+        override fun bind(userList: UserList) {
             binding.userList = userList
             binding.addUserId = addUserId
             binding.pullPushViewModel = pullPushUserViewModel
@@ -50,19 +50,19 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
         }
     }
 
-    class ItemCallback : DiffUtil.ItemCallback<net.pantasystem.milktea.model.list.UserList>(){
-        override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.list.UserList, newItem: net.pantasystem.milktea.model.list.UserList): Boolean {
+    class ItemCallback : DiffUtil.ItemCallback<UserList>(){
+        override fun areContentsTheSame(oldItem: UserList, newItem: UserList): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.list.UserList, newItem: net.pantasystem.milktea.model.list.UserList): Boolean {
+        override fun areItemsTheSame(oldItem: UserList, newItem: UserList): Boolean {
             return oldItem.id == newItem.id
         }
     }
 
     interface OnTryToEditCallback{
 
-        fun onEdit(userList: net.pantasystem.milktea.model.list.UserList?)
+        fun onEdit(userList: UserList?)
     }
 
     private var addUserId: net.pantasystem.milktea.model.user.User.Id? = null

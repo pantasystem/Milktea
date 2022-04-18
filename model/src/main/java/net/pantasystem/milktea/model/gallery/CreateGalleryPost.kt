@@ -1,11 +1,13 @@
 package net.pantasystem.milktea.model.gallery
 
 import net.pantasystem.milktea.model.ITask
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.file.AppFile
 
 class CreateGalleryPost (
     val title: String,
-    val author: net.pantasystem.milktea.model.account.Account,
-    val files: List<net.pantasystem.milktea.model.file.AppFile>,
+    val author: Account,
+    val files: List<AppFile>,
     val description: String?,
     val isSensitive: Boolean,
 )

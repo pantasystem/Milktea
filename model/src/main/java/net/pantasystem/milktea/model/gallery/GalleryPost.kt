@@ -2,6 +2,8 @@ package net.pantasystem.milktea.model.gallery
 
 
 import net.pantasystem.milktea.model.EntityId
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.user.User
 import java.util.*
 
 sealed class GalleryPost {
@@ -15,8 +17,8 @@ sealed class GalleryPost {
     abstract val updatedAt: Date
     abstract val title: String
     abstract val description: String?
-    abstract val userId: net.pantasystem.milktea.model.user.User.Id
-    abstract val fileIds: List<net.pantasystem.milktea.model.drive.FileProperty.Id>
+    abstract val userId: User.Id
+    abstract val fileIds: List<FileProperty.Id>
     abstract val tags: List<String>
     abstract val isSensitive: Boolean
 
@@ -26,8 +28,8 @@ sealed class GalleryPost {
         override val updatedAt: Date,
         override val title: String,
         override val description: String?,
-        override val userId: net.pantasystem.milktea.model.user.User.Id,
-        override val fileIds: List<net.pantasystem.milktea.model.drive.FileProperty.Id>,
+        override val userId: User.Id,
+        override val fileIds: List<FileProperty.Id>,
         override val tags: List<String>,
         override val isSensitive: Boolean
     ) : GalleryPost()
@@ -38,8 +40,8 @@ sealed class GalleryPost {
         override val updatedAt: Date,
         override val title: String,
         override val description: String?,
-        override val userId: net.pantasystem.milktea.model.user.User.Id,
-        override val fileIds: List<net.pantasystem.milktea.model.drive.FileProperty.Id>,
+        override val userId: User.Id,
+        override val fileIds: List<FileProperty.Id>,
         override val tags: List<String>,
         override val isSensitive: Boolean,
         val likedCount: Int,
@@ -51,6 +53,6 @@ sealed class GalleryPost {
 
 data class GalleryPostRelation(
     val galleryPost: GalleryPost,
-    val files: List<net.pantasystem.milktea.model.drive.FileProperty>,
-    val user: net.pantasystem.milktea.model.user.User,
+    val files: List<FileProperty>,
+    val user: User,
 )

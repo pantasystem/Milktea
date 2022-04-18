@@ -17,7 +17,7 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState", "emojis")
-    fun TextView.setTranslatedText(state: State<net.pantasystem.milktea.model.notes.Translation>?, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?) {
+    fun TextView.setTranslatedText(state: State<Translation>?, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?) {
         if(state == null) {
             this.visibility = View.GONE
             return
@@ -48,7 +48,7 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState")
-    fun ViewGroup.translationVisibility(state: State<net.pantasystem.milktea.model.notes.Translation>?) {
+    fun ViewGroup.translationVisibility(state: State<Translation>?) {
         if(state == null) {
             this.visibility = View.GONE
             return

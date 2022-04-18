@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.CreateGalleryTaskExecutor
 import java.io.Serializable
 
@@ -38,7 +39,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
     val accountRepository: AccountRepository,
     private val taskExecutor: CreateGalleryTaskExecutor,
     private val driveFileRepository: DriveFileRepository,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    loggerFactory: Logger.Factory,
     @Assisted private val editType: EditType,
     ) : ViewModel(){
 

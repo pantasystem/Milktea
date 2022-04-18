@@ -140,7 +140,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         if(it.resultCode == RESULT_OK && it.data != null) {
             val result = it.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>
             val list = result?.mapNotNull { obj ->
-                obj as? net.pantasystem.milktea.model.drive.FileProperty.Id
+                obj as? FileProperty.Id
             }?: emptyList()
             viewModel.addFilePropertyIds(list)
 

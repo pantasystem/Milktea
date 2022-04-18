@@ -87,13 +87,13 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
     }
 
 
-    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<net.pantasystem.milktea.model.account.page.Page>) :
+    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) :
         FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        private var requestBaseList: List<net.pantasystem.milktea.model.account.page.Page> = list
+        private var requestBaseList: List<Page> = list
             private set
         private var oldRequestBaseSetting = requestBaseList
 
-        var account: net.pantasystem.milktea.model.account.Account? = null
+        var account: Account? = null
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
         private val mFragments = ArrayList<Fragment>()
@@ -129,7 +129,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         }
 
 
-        fun setList(account: net.pantasystem.milktea.model.account.Account, list: List<net.pantasystem.milktea.model.account.page.Page>) {
+        fun setList(account: Account, list: List<Page>) {
             mFragments.clear()
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list

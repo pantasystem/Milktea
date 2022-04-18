@@ -34,7 +34,7 @@ class PollTimePickerDialog : AppCompatDialogFragment(), TimePickerDialog.OnTimeS
         mViewModel.updateState(
             mViewModel.state.value.copy(
                 poll = mViewModel.state.value.poll?.copy(
-                    expiresAt = net.pantasystem.milktea.model.notes.PollExpiresAt.DateAndTime(
+                    expiresAt = PollExpiresAt.DateAndTime(
                         Instant.fromEpochMilliseconds(c.time.time)
                     )
                 )

@@ -8,14 +8,14 @@ sealed class Emojis : IEmoji {
     ): Emojis()
 
     data class CustomEmoji(
-        val emoji: net.pantasystem.milktea.model.emoji.Emoji
+        val emoji: Emoji
     ) : Emojis()
 
     data class EmojiCategory(val categoryName: String) : Emojis()
 
     companion object{
         @JvmStatic
-        fun categoryBy(emojis: List<net.pantasystem.milktea.model.emoji.Emoji>): List<Emojis>{
+        fun categoryBy(emojis: List<Emoji>): List<Emojis>{
             val list = ArrayList<Emojis>()
             emojis.groupBy {
                 it.category

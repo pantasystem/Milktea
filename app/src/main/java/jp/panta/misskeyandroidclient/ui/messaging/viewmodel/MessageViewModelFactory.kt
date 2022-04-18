@@ -9,7 +9,7 @@ import kotlinx.coroutines.FlowPreview
 
 @Suppress("UNCHECKED_CAST")
 class MessageViewModelFactory(
-    private val messagingId: net.pantasystem.milktea.model.messaging.MessagingId,
+    private val messagingId: MessagingId,
     private val miCore: MiCore
 ): ViewModelProvider.Factory{
 

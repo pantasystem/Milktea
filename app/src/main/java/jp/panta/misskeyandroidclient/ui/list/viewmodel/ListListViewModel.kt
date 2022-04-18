@@ -24,8 +24,8 @@ import javax.inject.Inject
 class ListListViewModel @Inject constructor(
     val miCore: MiCore,
     val encryption: Encryption,
-    private val userListStore: net.pantasystem.milktea.model.list.UserListStore,
-    val accountStore: net.pantasystem.milktea.model.account.AccountStore
+    private val userListStore: UserListStore,
+    val accountStore: AccountStore
 ) : ViewModel() {
 
 
@@ -49,7 +49,7 @@ class ListListViewModel @Inject constructor(
 
         }.asLiveData()
 
-    val showUserDetailEvent = EventBus<net.pantasystem.milktea.model.list.UserList>()
+    val showUserDetailEvent = EventBus<UserList>()
 
     private val logger = miCore.loggerFactory.create("ListListViewModel")
 
@@ -75,35 +75,35 @@ class ListListViewModel @Inject constructor(
     }
 
 
-    private suspend fun loadListList(accountId: Long): List<net.pantasystem.milktea.model.list.UserList> {
+    private suspend fun loadListList(accountId: Long): List<UserList> {
         return userListStore.findByAccount(accountId)
     }
 
 
-    fun showUserListDetail(userList: net.pantasystem.milktea.model.list.UserList?) {
+    fun showUserListDetail(userList: UserList?) {
         userList?.let { ul ->
             showUserDetailEvent.event = ul
         }
     }
 
-    fun toggleTab(userList: net.pantasystem.milktea.model.list.UserList?) {
+    fun toggleTab(userList: UserList?) {
         userList?.let { ul ->
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     val account = miCore.getAccountRepository().get(userList.id.accountId)
                     val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
-                        if (pageable is net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline) {
+                        if (pageable is Pageable.UserListTimeline) {
                             pageable.listId == ul.id.userListId
                         } else {
                             false
                         }
                     }
                     if (exPage == null) {
-                        val page = net.pantasystem.milktea.model.account.page.Page(
+                        val page = Page(
                             account.accountId,
                             ul.name,
-                            pageable = net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline(
+                            pageable = Pageable.UserListTimeline(
                                 ul.id.userListId
                             ),
                             weight = 0
@@ -119,7 +119,7 @@ class ListListViewModel @Inject constructor(
         }
     }
 
-    fun delete(userList: net.pantasystem.milktea.model.list.UserList?) {
+    fun delete(userList: UserList?) {
         userList ?: return
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {

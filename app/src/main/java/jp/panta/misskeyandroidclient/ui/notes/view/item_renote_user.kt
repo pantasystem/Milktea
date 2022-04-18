@@ -24,11 +24,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.model.notes.NoteRelation
 
 @ExperimentalCoroutinesApi
 @Composable
 fun ItemRenoteUser(
-    note: net.pantasystem.milktea.model.notes.NoteRelation,
+    note: NoteRelation,
     onClick: ()->Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter?,
     isUserNameDefault: Boolean = false

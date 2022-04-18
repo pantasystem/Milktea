@@ -223,7 +223,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     }
 
 
-    private fun onSelect(emoji: net.pantasystem.milktea.model.emoji.Emoji) {
+    private fun onSelect(emoji: Emoji) {
         val pos = mBinding.inputMainText.selectionEnd
         mViewModel.addEmoji(emoji, pos).let{ newPos ->
             mBinding.inputMainText.setText(mViewModel.text.value?: "")

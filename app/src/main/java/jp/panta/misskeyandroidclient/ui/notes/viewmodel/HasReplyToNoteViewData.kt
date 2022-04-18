@@ -1,13 +1,16 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import java.lang.IllegalArgumentException
 
 class HasReplyToNoteViewData(
-    noteRelation: net.pantasystem.milktea.model.notes.NoteRelation,
-    account: net.pantasystem.milktea.model.account.Account,
+    noteRelation: NoteRelation,
+    account: Account,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    noteTranslationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore,
+    noteTranslationStore: NoteTranslationStore,
 )  : PlaneNoteViewData(noteRelation, account, noteCaptureAPIAdapter, noteTranslationStore){
     val reply = noteRelation.reply
 

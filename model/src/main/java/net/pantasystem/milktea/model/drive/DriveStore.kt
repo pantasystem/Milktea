@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.drive
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import net.pantasystem.milktea.model.account.Account
 
 
 data class DriveState (
@@ -68,7 +69,7 @@ class DriveStore(
     }
 
 
-    fun setAccount(account: net.pantasystem.milktea.model.account.Account) {
+    fun setAccount(account: Account) {
         if(this.state.value.accountId == account.accountId) {
             return
         }

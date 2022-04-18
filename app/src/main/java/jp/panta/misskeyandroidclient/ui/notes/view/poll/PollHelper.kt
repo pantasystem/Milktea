@@ -12,7 +12,7 @@ object PollHelper {
 
     @BindingAdapter("noteId", "poll", "notesViewModel")
     @JvmStatic
-    fun RecyclerView.bindPollChoices(noteId: net.pantasystem.milktea.model.notes.Note.Id?, poll: net.pantasystem.milktea.model.notes.poll.Poll?, notesViewModel: NotesViewModel?) {
+    fun RecyclerView.bindPollChoices(noteId: Note.Id?, poll: Poll?, notesViewModel: NotesViewModel?) {
         if (noteId == null || poll == null || notesViewModel == null) {
             this.visibility = View.GONE
             return

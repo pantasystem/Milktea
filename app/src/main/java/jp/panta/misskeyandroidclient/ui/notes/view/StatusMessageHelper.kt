@@ -30,10 +30,10 @@ object StatusMessageHelper {
             note.note.isRenote() && !note.note.hasContent() ->{
                 context.getString(R.string.renoted_by, name)
             }
-            note is net.pantasystem.milktea.model.notes.NoteRelation.Featured -> {
+            note is NoteRelation.Featured -> {
                 context.getString(R.string.featured)
             }
-            note is net.pantasystem.milktea.model.notes.NoteRelation.Promotion -> {
+            note is NoteRelation.Promotion -> {
                 context.getString(R.string.promotion)
             }
 

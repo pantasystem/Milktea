@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftPoll
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
+import net.pantasystem.milktea.model.user.User
 import java.util.*
 
 data class AddMentionResult(
@@ -329,7 +330,7 @@ fun DraftNote.toNoteEditingState(): NoteEditingState {
             type = this.visibility,
             isLocalOnly = this.localOnly ?: false,
             visibleUserIds = this.visibleUserIds?.map {
-                net.pantasystem.milktea.model.user.User.Id(accountId = accountId, id = it)
+                User.Id(accountId = accountId, id = it)
             }),
         viaMobile = this.viaMobile ?: true,
         poll = this.draftPoll?.let {

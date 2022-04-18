@@ -12,8 +12,8 @@ import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 @Composable
 fun PickedImagePreview(
     viewModel: GalleryEditorViewModel,
-    repository: net.pantasystem.milktea.model.drive.DriveFileRepository,
-    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    repository: DriveFileRepository,
+    dataSource: FilePropertyDataSource,
     onShow: (FilePreviewTarget) -> Unit,
 ) {
     val files = viewModel.pickedImages.observeAsState()

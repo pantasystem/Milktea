@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes
 
+import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 import java.lang.IllegalArgumentException
 import java.util.*
@@ -31,7 +32,7 @@ sealed class Visibility : Serializable{
     }
 
     data class Specified(
-        val visibleUserIds: List<net.pantasystem.milktea.model.user.User.Id>
+        val visibleUserIds: List<User.Id>
     ) : Visibility()
     /*
     NOTE: LocalOnlyはPub,Ho,Fのいずれかを選択し、そのうちLocalのユーザーに限定に公開されるというものなので、LocalOnlyというVisibilityは存在しない
@@ -66,7 +67,7 @@ fun Visibility.type(): String {
 }
 
 @Throws(IllegalArgumentException::class)
-fun Visibility(type: String, isLocalOnly: Boolean, visibleUserIds: List<net.pantasystem.milktea.model.user.User.Id>? = null): Visibility {
+fun Visibility(type: String, isLocalOnly: Boolean, visibleUserIds: List<User.Id>? = null): Visibility {
     return when(type.lowercase(Locale.ROOT)){
         "public" -> Visibility.Public(isLocalOnly)
         "home" -> Visibility.Home(isLocalOnly)

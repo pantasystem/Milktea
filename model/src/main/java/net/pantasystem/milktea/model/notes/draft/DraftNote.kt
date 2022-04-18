@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.model.notes.draft
 
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.getName
 import net.pantasystem.milktea.model.notes.isLocalOnly
@@ -13,7 +15,7 @@ data class DraftNote(
     var visibleUserIds: List<String>? = null,
     val text: String?,
     val cw: String? = null,
-    var files: List<net.pantasystem.milktea.model.file.File>? = null,
+    var files: List<File>? = null,
     val viaMobile: Boolean? = null,
     val localOnly: Boolean? = null,
     val noExtractMentions: Boolean? = null,
@@ -23,7 +25,7 @@ data class DraftNote(
     val renoteId: String? = null,
     val draftPoll: DraftPoll? = null,
     val reservationPostingAt: Date? = null,
-    val channelId: net.pantasystem.milktea.model.channel.Channel.Id? = null,
+    val channelId: Channel.Id? = null,
 
     ): Serializable{
 

@@ -134,7 +134,7 @@ class NoteDetailAdapter(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<List<net.pantasystem.milktea.model.notes.reaction.ReactionCount>> {
+        val observer = Observer<List<ReactionCount>> {
             adapter.submitList(it.toList())
         }
         note.reactionCounts.observe(viewLifecycleOwner, observer)

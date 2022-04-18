@@ -2,6 +2,9 @@ package net.pantasystem.milktea.model.notes
 
 
 import net.pantasystem.milktea.model.ITask
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
 
 
@@ -11,7 +14,7 @@ import net.pantasystem.milktea.model.notes.poll.CreatePoll
  * @param noExtractHashtags 本文からハッシュタグを展開しないか否か
  */
 data class CreateNote(
-    val author: net.pantasystem.milktea.model.account.Account,
+    val author: Account,
     val visibility: Visibility,
     val text: String?,
     val cw: String? = null,
@@ -19,12 +22,12 @@ data class CreateNote(
     val noExtractMentions: Boolean? = null,
     val noExtractHashtags: Boolean? = null,
     val noExtractEmojis: Boolean? = null,
-    var files: List<net.pantasystem.milktea.model.file.AppFile>? = null,
+    var files: List<AppFile>? = null,
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
     val poll: CreatePoll? = null,
     val draftNoteId: Long? = null,
-    val channelId: net.pantasystem.milktea.model.channel.Channel.Id? = null,
+    val channelId: Channel.Id? = null,
 )
 
 class CreateNoteTask(
@@ -40,7 +43,7 @@ fun CreateNote.task(noteRepository: NoteRepository) : CreateNoteTask {
     return CreateNoteTask(noteRepository, this)
 }
 
-fun NoteEditingState.toCreateNote(account: net.pantasystem.milktea.model.account.Account): CreateNote {
+fun NoteEditingState.toCreateNote(account: Account): CreateNote {
     return CreateNote(
         author = account,
         visibility = visibility,

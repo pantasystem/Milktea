@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.model.account.UnauthorizedException
 
 class GalleryPostSendFavoriteStore(
     private val galleryRepository: GalleryRepository
@@ -21,7 +22,7 @@ class GalleryPostSendFavoriteStore(
                 }
             }
             val gallery = galleryRepository.find(galleryId) as? GalleryPost.Authenticated
-                ?: throw net.pantasystem.milktea.model.account.UnauthorizedException()
+                ?: throw UnauthorizedException()
             if(gallery.isLiked) {
                 galleryRepository.unlike(galleryId)
             }else{

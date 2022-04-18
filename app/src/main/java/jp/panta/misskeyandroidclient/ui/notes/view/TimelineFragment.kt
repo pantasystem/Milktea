@@ -28,6 +28,8 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.*
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
 import java.io.IOException
 import java.net.SocketTimeoutException
 
@@ -42,7 +44,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
 
-        fun newInstance(page: net.pantasystem.milktea.model.account.page.Page): TimelineFragment {
+        fun newInstance(page: Page): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGE, page)
@@ -50,7 +52,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         }
 
-        fun newInstance(pageable: net.pantasystem.milktea.model.account.page.Pageable): TimelineFragment {
+        fun newInstance(pageable: Pageable): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGEABLE, pageable)
@@ -66,12 +68,12 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private var mViewModel: TimelineViewModel? = null
 
 
-    private val mPage: net.pantasystem.milktea.model.account.page.Page? by lazy {
-        arguments?.getSerializable(EXTRA_PAGE) as? net.pantasystem.milktea.model.account.page.Page
+    private val mPage: Page? by lazy {
+        arguments?.getSerializable(EXTRA_PAGE) as? Page
     }
 
-    private val mPageable: net.pantasystem.milktea.model.account.page.Pageable by lazy {
-        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? net.pantasystem.milktea.model.account.page.Pageable
+    private val mPageable: Pageable by lazy {
+        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
         mPage?.pageable() ?: pageable?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
     }
 

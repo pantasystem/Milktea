@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.api.misskey.v12.channel
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
+import net.pantasystem.milktea.model.account.Account
 import org.junit.Assert.*
 
 import org.junit.Test
@@ -35,11 +36,11 @@ class ChannelDTOTest {
         assertEquals("8rfhsu910l", channelDTO.id)
 
         val channel = channelDTO.toModel(
-            net.pantasystem.milktea.model.account.Account(
+            Account(
                 "id",
                 "misskey.io",
                 "Panta",
-                net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY,
+                Account.InstanceType.MISSKEY,
                 ""
             )
         )

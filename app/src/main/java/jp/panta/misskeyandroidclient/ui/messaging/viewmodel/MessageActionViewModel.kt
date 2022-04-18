@@ -16,13 +16,13 @@ import kotlinx.coroutines.launch
 
 class MessageActionViewModel(
 
-    private val messagingId: net.pantasystem.milktea.model.messaging.MessagingId,
+    private val messagingId: MessagingId,
     private val miCore: MiCore
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val messagingId: net.pantasystem.milktea.model.messaging.MessagingId,
+        val messagingId: MessagingId,
         val miApplication: MiApplication,
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -36,11 +36,11 @@ class MessageActionViewModel(
     private val logger = miCore.loggerFactory.create("MessageActionViewModel")
 
     val text = MutableLiveData<String>()
-    val file = MutableLiveData<net.pantasystem.milktea.model.drive.FileProperty?>()
+    val file = MutableLiveData<FileProperty?>()
 
     private val mErrors = MutableStateFlow<Throwable?>(null)
 
-    fun setFilePropertyFromId(filePropertyId: net.pantasystem.milktea.model.drive.FileProperty.Id) {
+    fun setFilePropertyFromId(filePropertyId: FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             file.postValue(miCore.getFilePropertyDataSource().find(filePropertyId))
         }
@@ -53,7 +53,7 @@ class MessageActionViewModel(
         //text.value = null
         //file.value = null
         viewModelScope.launch(Dispatchers.IO) {
-            val createMessage = net.pantasystem.milktea.model.messaging.CreateMessage.Factory.create(messagingId, tmpText, tmpFile?.id?.fileId)
+            val createMessage = CreateMessage.Factory.create(messagingId, tmpText, tmpFile?.id?.fileId)
             runCatching { miCore.getMessageRepository().create(createMessage) }.onFailure {
                 logger.error("メッセージ作成中にエラー発生", e = it)
                 mErrors.value = it

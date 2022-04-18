@@ -62,7 +62,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
         confirmViewModel.confirmedEvent.observe(viewLifecycleOwner) {
             if (it.eventType == EV_DELETE_DRAFT_NOTE && it.resultType == ResultType.POSITIVE) {
-                (it.args as? net.pantasystem.milktea.model.notes.draft.DraftNote)?.let { dn ->
+                (it.args as? DraftNote)?.let { dn ->
                     mDraftNotesViewModel?.deleteDraftNote(dn)
                 }
             }
@@ -73,7 +73,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
         }
     }
 
-    override fun onSelect(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote?) {
+    override fun onSelect(draftNote: DraftNote?) {
         val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = draftNote)
         requireActivity().startActivityFromFragment(this, intent, 300)
     }
@@ -84,11 +84,11 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
     }
 
-    override fun onDetach(file: net.pantasystem.milktea.model.file.File?) {
+    override fun onDetach(file: File?) {
         mDraftNotesViewModel?.detachFile(file)
     }
 
-    override fun onSelect(file: net.pantasystem.milktea.model.file.File?) {
+    override fun onSelect(file: File?) {
         file?.let{
             val intent = Intent(requireContext(), MediaActivity::class.java)
             intent.putExtra(MediaActivity.EXTRA_FILE, file)
@@ -97,7 +97,7 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
     }
 
-    override fun onDelete(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote?) {
+    override fun onDelete(draftNote: DraftNote?) {
         draftNote?.let{
             mConfirmViewModel?.confirmEvent?.event = ConfirmCommand(
                 title = null,

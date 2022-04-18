@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.model.notes
 
 import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.user.User
 import kotlin.jvm.Throws
 
 /**
@@ -11,7 +13,7 @@ import kotlin.jvm.Throws
 interface NoteDataSource {
 
     interface Factory{
-        fun create(account: net.pantasystem.milktea.model.account.Account) : NoteDataSource
+        fun create(account: Account) : NoteDataSource
     }
 
     fun interface Listener {
@@ -43,6 +45,6 @@ interface NoteDataSource {
      * @param userId 対称のUser#id
      * @return 削除されたNote数
      */
-    suspend fun removeByUserId(userId: net.pantasystem.milktea.model.user.User.Id) : Int
+    suspend fun removeByUserId(userId: User.Id) : Int
 
 }

@@ -29,9 +29,9 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
         val adapter = GalleryPostTabPagerAdapter(
             listOf(
-                net.pantasystem.milktea.model.account.page.Pageable.Gallery.Posts,
-                net.pantasystem.milktea.model.account.page.Pageable.Gallery.ILikedPosts,
-                net.pantasystem.milktea.model.account.page.Pageable.Gallery.MyPosts
+                Pageable.Gallery.Posts,
+                Pageable.Gallery.ILikedPosts,
+                Pageable.Gallery.MyPosts
             ),
             listOf(
                 getString(R.string.gallery),
@@ -56,7 +56,7 @@ class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 @ExperimentalCoroutinesApi
 @Suppress("DEPRECATION")
 class GalleryPostTabPagerAdapter(
-    val tabs: List<net.pantasystem.milktea.model.account.page.Pageable.Gallery>,
+    val tabs: List<Pageable.Gallery>,
     private val pageTitles: List<String>,
     fragmentManager: FragmentManager
 ) : androidx.fragment.app.FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

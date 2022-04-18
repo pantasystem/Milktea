@@ -46,7 +46,7 @@ class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateS
             mViewModel.updateState(
                 state.copy(
                     poll = state.poll?.copy(
-                        expiresAt = net.pantasystem.milktea.model.notes.PollExpiresAt.DateAndTime(Instant.fromEpochMilliseconds(c.time.time))
+                        expiresAt = PollExpiresAt.DateAndTime(Instant.fromEpochMilliseconds(c.time.time))
                     )
                 )
             )

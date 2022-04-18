@@ -11,8 +11,12 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.user.UserDataSource
 
 
 interface GalleryPostsStore : StateLocker {
@@ -25,11 +29,11 @@ interface GalleryPostsStore : StateLocker {
 
 
 class GalleryPostsStoreImpl(
-    pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery,
-    getAccount: suspend () -> net.pantasystem.milktea.model.account.Account,
+    pageable: Pageable.Gallery,
+    getAccount: suspend () -> Account,
     misskeyAPIProvider: MisskeyAPIProvider,
-    filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
-    userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    filePropertyDataSource: FilePropertyDataSource,
+    userDataSource: UserDataSource,
     galleryDataSource: GalleryDataSource,
     encryption: Encryption
 ) : GalleryPostsStore {
@@ -64,10 +68,10 @@ class GalleryPostsStoreImpl(
 }
 
 class LikedGalleryPostStoreImpl(
-    getAccount: suspend () -> net.pantasystem.milktea.model.account.Account,
+    getAccount: suspend () -> Account,
     misskeyAPIProvider: MisskeyAPIProvider,
-    filePropertyDataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
-    userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    filePropertyDataSource: FilePropertyDataSource,
+    userDataSource: UserDataSource,
     galleryDataSource: GalleryDataSource,
     encryption: Encryption
 ) : GalleryPostsStore {

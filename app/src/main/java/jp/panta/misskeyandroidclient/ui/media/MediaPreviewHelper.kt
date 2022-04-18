@@ -23,32 +23,43 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile
 import java.lang.IllegalArgumentException
 
-object MediaPreviewHelper{
+object MediaPreviewHelper {
 
 
     @BindingAdapter("thumbnailView", "playButton", "fileViewData", "fileViewDataList")
     @JvmStatic
-    fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, fileViewData: FileViewData?, fileViewDataList: List<FileViewData>?) {
+    fun FrameLayout.setClickWhenShowMediaActivityListener(
+        thumbnailView: ImageView,
+        playButton: ImageButton,
+        fileViewData: FileViewData?,
+        fileViewDataList: List<FileViewData>?
+    ) {
         //setPreview(thumbnailView, playButton, fileViewData?.file)
-        fileViewData?: return
+        fileViewData ?: return
 
-        if(fileViewDataList.isNullOrEmpty()) {
+        if (fileViewDataList.isNullOrEmpty()) {
             return
         }
         val listener = View.OnClickListener {
             val context = it.context
             val intent = Intent(context, MediaActivity::class.java)
-            intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(fileViewDataList.map{ fvd ->
+            intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(fileViewDataList.map { fvd ->
                 fvd.file
             }))
-            intent.putExtra(MediaActivity.EXTRA_FILE_CURRENT_INDEX, fileViewDataList.indexOfFirst { f ->
-                f === fileViewData
-            })
-            if(context is Activity){
-                val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(context, thumbnailView, "image")
+            intent.putExtra(
+                MediaActivity.EXTRA_FILE_CURRENT_INDEX,
+                fileViewDataList.indexOfFirst { f ->
+                    f === fileViewData
+                })
+            if (context is Activity) {
+                val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    context,
+                    thumbnailView,
+                    "image"
+                )
                 context.startActivity(intent, compat.toBundle())
 
-            }else{
+            } else {
                 context.startActivity(intent)
             }
         }
@@ -58,25 +69,36 @@ object MediaPreviewHelper{
 
     @BindingAdapter("thumbnailView", "playButton", "previewAbleFile", "previewAbleFileList")
     @JvmStatic
-    fun FrameLayout.setClickWhenShowMediaActivityListener(thumbnailView: ImageView, playButton: ImageButton, previewAbleFile: PreviewAbleFile?, previewAbleFileList: List<PreviewAbleFile>?) {
+    fun FrameLayout.setClickWhenShowMediaActivityListener(
+        thumbnailView: ImageView,
+        playButton: ImageButton,
+        previewAbleFile: PreviewAbleFile?,
+        previewAbleFileList: List<PreviewAbleFile>?
+    ) {
 
-        if(previewAbleFileList.isNullOrEmpty()) {
+        if (previewAbleFileList.isNullOrEmpty()) {
             return
         }
         val listener = View.OnClickListener {
             val context = it.context
             val intent = Intent(context, MediaActivity::class.java)
-            intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(previewAbleFileList.map{ fvd ->
+            intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(previewAbleFileList.map { fvd ->
                 fvd.file
             }))
-            intent.putExtra(MediaActivity.EXTRA_FILE_CURRENT_INDEX, previewAbleFileList.indexOfFirst { f ->
-                f === previewAbleFile
-            })
-            if(context is Activity){
-                val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(context, thumbnailView, "image")
+            intent.putExtra(
+                MediaActivity.EXTRA_FILE_CURRENT_INDEX,
+                previewAbleFileList.indexOfFirst { f ->
+                    f === previewAbleFile
+                })
+            if (context is Activity) {
+                val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    context,
+                    thumbnailView,
+                    "image"
+                )
                 context.startActivity(intent, compat.toBundle())
 
-            }else{
+            } else {
                 context.startActivity(intent)
             }
         }
@@ -85,16 +107,19 @@ object MediaPreviewHelper{
     }
 
 
-
     @BindingAdapter("thumbnailView", "playButton", "fileViewData")
     @JvmStatic
-    fun FrameLayout.setPreview(thumbnailView: ImageView, playButton: ImageButton, file: net.pantasystem.milktea.model.file.File?){
+    fun FrameLayout.setPreview(
+        thumbnailView: ImageView,
+        playButton: ImageButton,
+        file: net.pantasystem.milktea.model.file.File?
+    ) {
 
-        try{
+        try {
             this@MediaPreviewHelper.setPreview(thumbnailView, playButton, file!!)
             this.visibility = View.VISIBLE
 
-        }catch(e: Exception){
+        } catch (e: Exception) {
             this.visibility = View.GONE
         }
     }
@@ -102,7 +127,7 @@ object MediaPreviewHelper{
     @BindingAdapter("thumbnailView")
     @JvmStatic
     fun ImageView.setPreview(file: PreviewAbleFile?) {
-        file?: return
+        file ?: return
         Glide.with(this)
             .load(file.file.thumbnailUrl)
             .centerCrop()
@@ -123,19 +148,23 @@ object MediaPreviewHelper{
             .into(this)
     }
 
-    private fun setPreview(thumbnailView: ImageView, playButton: ImageButton, file: net.pantasystem.milktea.model.file.File){
-        when(file.aboutMediaType){
-            net.pantasystem.milktea.model.file.File.AboutMediaType.IMAGE, net.pantasystem.milktea.model.file.File.AboutMediaType.VIDEO -> {
+    private fun setPreview(
+        thumbnailView: ImageView,
+        playButton: ImageButton,
+        file: net.pantasystem.milktea.model.file.File
+    ) {
+        when (file.aboutMediaType) {
+            File.AboutMediaType.IMAGE, File.AboutMediaType.VIDEO -> {
                 Glide.with(thumbnailView)
                     .load(file.thumbnailUrl)
                     .centerCrop()
                     .into(thumbnailView)
 
-                when(file.aboutMediaType){
-                    net.pantasystem.milktea.model.file.File.AboutMediaType.IMAGE ->{
+                when (file.aboutMediaType) {
+                    File.AboutMediaType.IMAGE -> {
                         playButton.visibility = View.GONE
                     }
-                    else ->{
+                    else -> {
                         playButton.visibility = View.VISIBLE
                         Glide.with(playButton)
                             .load(R.drawable.ic_play_circle_outline_black_24dp)
@@ -146,23 +175,26 @@ object MediaPreviewHelper{
                 //thumbnailView.visibility = View.VISIBLE
 
             }
-            net.pantasystem.milktea.model.file.File.AboutMediaType.SOUND -> {
+            File.AboutMediaType.SOUND -> {
                 playButton.visibility = View.VISIBLE
                 Glide.with(playButton.context)
                     .load(R.drawable.ic_music_note_black_24dp)
                     .centerInside()
                     .into(playButton)
             }
-            else ->{
+            else -> {
                 throw IllegalArgumentException("this type 知らねー:${file.type}")
             }
         }
     }
 
-    
+
     @JvmStatic
     @BindingAdapter("previewAbleList", "mediaViewData")
-    fun RecyclerView.setPreviewAbleList(previewAbleList: List<PreviewAbleFile>?, mediaViewData: MediaViewData?) {
+    fun RecyclerView.setPreviewAbleList(
+        previewAbleList: List<PreviewAbleFile>?,
+        mediaViewData: MediaViewData?
+    ) {
         if (previewAbleList == null || mediaViewData == null) {
             this.visibility = View.GONE
             return
@@ -180,11 +212,11 @@ object MediaPreviewHelper{
         this.adapter = adapter
         val layoutManager = this.layoutManager as? GridLayoutManager
             ?: GridLayoutManager(context, 2)
-        this.layoutManager =layoutManager
+        this.layoutManager = layoutManager
 
         adapter.submitList(previewAbleList)
         this.visibility = View.VISIBLE
-        
+
     }
 
 

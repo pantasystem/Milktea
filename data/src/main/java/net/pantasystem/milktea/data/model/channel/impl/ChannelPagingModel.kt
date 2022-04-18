@@ -20,6 +20,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 
 import net.pantasystem.milktea.data.model.*
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelStateModel
 import retrofit2.Response
@@ -32,7 +33,7 @@ class ChannelPagingModel @AssistedInject constructor(
     val encryption: Encryption,
     private val channelStateModel: ChannelStateModel,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
     @Assisted val accountId: Long,
     @Assisted val type: ChannelListType,

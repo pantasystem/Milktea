@@ -10,7 +10,7 @@ object FileHelper{
 
     @JvmStatic
     @BindingAdapter("previewFiles", "imagePreviewsFileListener")
-    fun RecyclerView.setPreviewFiles(files: List<net.pantasystem.milktea.model.file.File>?, imagePreviewsFileListener: FileListener?){
+    fun RecyclerView.setPreviewFiles(files: List<File>?, imagePreviewsFileListener: FileListener?){
 
         files?: return
         imagePreviewsFileListener?: return

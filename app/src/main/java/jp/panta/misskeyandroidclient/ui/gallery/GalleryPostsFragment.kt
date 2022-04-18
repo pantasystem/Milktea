@@ -22,6 +22,8 @@ import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.account.page.Pageable
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -31,7 +33,7 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.view.gallery.ACCOUNT_ID"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.view.gallery.EXTRA_PAGEABLE"
 
-        fun newInstance(pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery, accountId: Long?) : GalleryPostsFragment {
+        fun newInstance(pageable: Pageable.Gallery, accountId: Long?) : GalleryPostsFragment {
             return GalleryPostsFragment().apply {
                 arguments = Bundle().also {
                     it.putSerializable(EXTRA_PAGEABLE, pageable)
@@ -45,8 +47,8 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
 
     val binding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
-    val pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery by lazy {
-        arguments?.getSerializable(EXTRA_PAGEABLE) as net.pantasystem.milktea.model.account.page.Pageable.Gallery
+    val pageable: Pageable.Gallery by lazy {
+        arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
     }
 
     val currentTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
@@ -78,12 +80,12 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
                     binding.timelineEmptyView.visibility = View.GONE
                     binding.timelineProgressBar.visibility = View.GONE
                     galleryPostsListAdapter.submitList((state.content as StateContent.Exist<List<GalleryPostState>>).rawContent)
-                    binding.refresh.isRefreshing = state is net.pantasystem.milktea.common.PageableState.Loading
+                    binding.refresh.isRefreshing = state is PageableState.Loading
                 }else{
                     // エラーメッセージやプログレスバーなどを表示する
                     binding.refresh.isRefreshing = false
                     binding.refresh.visibility = View.GONE
-                    if(state is net.pantasystem.milktea.common.PageableState.Loading) {
+                    if(state is PageableState.Loading) {
                         binding.timelineProgressBar.visibility = View.VISIBLE
                         binding.timelineEmptyView.visibility = View.GONE
                     }else{

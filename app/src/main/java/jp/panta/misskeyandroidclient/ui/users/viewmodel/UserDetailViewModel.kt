@@ -20,17 +20,17 @@ import java.lang.IllegalArgumentException
 
 class UserDetailViewModel @AssistedInject constructor(
     val miCore: MiCore,
-    private val translationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore,
-    private val deleteNicknameUseCase: net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase,
-    private val updateNicknameUseCase: net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase,
-    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
-    @Assisted val userId: net.pantasystem.milktea.model.user.User.Id?,
+    private val translationStore: NoteTranslationStore,
+    private val deleteNicknameUseCase: DeleteNicknameUseCase,
+    private val updateNicknameUseCase: UpdateNicknameUseCase,
+    val accountStore: AccountStore,
+    @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
 
     @AssistedFactory
     interface ViewModelAssistedFactory {
-        fun create(userId: net.pantasystem.milktea.model.user.User.Id?, fqdnUserName: String?): UserDetailViewModel
+        fun create(userId: User.Id?, fqdnUserName: String?): UserDetailViewModel
     }
 
     companion object;
@@ -53,7 +53,7 @@ class UserDetailViewModel @AssistedInject constructor(
         }
     }.mapNotNull {
         logger.debug("flow user:$it")
-        it as? net.pantasystem.milktea.model.user.User.Detail
+        it as? User.Detail
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = userState.asLiveData()
@@ -97,8 +97,8 @@ class UserDetailViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 
-    val showFollowers = EventBus<net.pantasystem.milktea.model.user.User?>()
-    val showFollows = EventBus<net.pantasystem.milktea.model.user.User?>()
+    val showFollowers = EventBus<User?>()
+    val showFollows = EventBus<User?>()
 
     init {
         require(userId != null || fqdnUserName != null) {
@@ -123,13 +123,13 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    val user = miCore.getUserRepository().find(it.id) as net.pantasystem.milktea.model.user.User.Detail
+                    val user = miCore.getUserRepository().find(it.id) as User.Detail
                     if (user.isFollowing || user.hasPendingFollowRequestFromYou) {
                         miCore.getUserRepository().unfollow(user.id)
                     } else {
                         miCore.getUserRepository().follow(user.id)
                     }
-                    miCore.getUserRepository().find(user.id) as net.pantasystem.milktea.model.user.User.Detail
+                    miCore.getUserRepository().find(user.id) as User.Detail
                 }.onSuccess {
 
                 }.onFailure {
@@ -193,7 +193,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     miCore.getUserRepository().unblock(it.id)
-                    (miCore.getUserRepository().find(it.id, true) as net.pantasystem.milktea.model.user.User.Detail)
+                    (miCore.getUserRepository().find(it.id, true) as User.Detail)
                 }.onSuccess {
 
                 }
@@ -227,7 +227,7 @@ class UserDetailViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun findUser(): net.pantasystem.milktea.model.user.User {
+    private suspend fun findUser(): User {
         val u = userId?.let {
             runCatching {
                 miCore.getUserRepository().find(userId!!, true)
@@ -252,8 +252,8 @@ class UserDetailViewModel @AssistedInject constructor(
         return u!!
     }
 
-    private var mAc: net.pantasystem.milktea.model.account.Account? = null
-    private suspend fun getAccount(): net.pantasystem.milktea.model.account.Account {
+    private var mAc: Account? = null
+    private suspend fun getAccount(): Account {
         if (mAc != null) {
             return mAc!!
         }
@@ -271,7 +271,7 @@ class UserDetailViewModel @AssistedInject constructor(
 @Suppress("UNCHECKED_CAST")
 fun UserDetailViewModel.Companion.provideFactory(
     assistedFactory: UserDetailViewModel.ViewModelAssistedFactory,
-    userId: net.pantasystem.milktea.model.user.User.Id
+    userId: User.Id
 ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return assistedFactory.create(userId, null) as T

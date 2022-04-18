@@ -4,8 +4,12 @@ import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.app.AppType
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.user.User
 import java.util.*
 import java.io.Serializable as JSerializable
 
@@ -14,7 +18,7 @@ data class Note(
     val createdAt: Instant,
     val text: String?,
     val cw: String?,
-    val userId: net.pantasystem.milktea.model.user.User.Id,
+    val userId: User.Id,
 
     val replyId: Id?,
 
@@ -24,21 +28,21 @@ data class Note(
     val visibility: Visibility,
     val localOnly: Boolean?,
 
-    val visibleUserIds: List<net.pantasystem.milktea.model.user.User.Id>?,
+    val visibleUserIds: List<User.Id>?,
 
     val url: String?,
     val uri: String?,
     val renoteCount: Int,
     val reactionCounts: List<ReactionCount>,
-    val emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?,
+    val emojis: List<Emoji>?,
     val repliesCount: Int,
-    val fileIds: List<net.pantasystem.milktea.model.drive.FileProperty.Id>?,
+    val fileIds: List<FileProperty.Id>?,
     val poll: Poll?,
     val myReaction: String?,
 
 
     val app: AppType.Misskey?,
-    val channelId: net.pantasystem.milktea.model.channel.Channel.Id?,
+    val channelId: Channel.Id?,
     var instanceUpdatedAt: Date = Date()
 ) : Entity {
 
@@ -75,34 +79,34 @@ data class Note(
 
 sealed class NoteRelation : JSerializable{
     abstract val note: Note
-    abstract val user: net.pantasystem.milktea.model.user.User
+    abstract val user: User
     abstract val reply: NoteRelation?
     abstract val renote: NoteRelation?
-    abstract val files: List<net.pantasystem.milktea.model.drive.FileProperty>?
+    abstract val files: List<FileProperty>?
 
     data class Normal(
         override val note: Note,
-        override val user: net.pantasystem.milktea.model.user.User,
+        override val user: User,
         override val renote: NoteRelation?,
         override val reply: NoteRelation?,
-        override val files: List<net.pantasystem.milktea.model.drive.FileProperty>?
+        override val files: List<FileProperty>?
     ) : NoteRelation()
 
     data class Featured(
         override val note: Note,
-        override val user: net.pantasystem.milktea.model.user.User,
+        override val user: User,
         override val renote: NoteRelation?,
         override val reply: NoteRelation?,
-        override val files: List<net.pantasystem.milktea.model.drive.FileProperty>?,
+        override val files: List<FileProperty>?,
         val featuredId: String
     ) : NoteRelation()
 
     data class Promotion(
         override val note: Note,
-        override val user: net.pantasystem.milktea.model.user.User,
+        override val user: User,
         override val renote: NoteRelation?,
         override val reply: NoteRelation?,
-        override val files: List<net.pantasystem.milktea.model.drive.FileProperty>?,
+        override val files: List<FileProperty>?,
         val promotionId: String
     ) : NoteRelation()
 }

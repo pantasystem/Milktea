@@ -21,17 +21,18 @@ import androidx.compose.ui.Alignment
 import androidx.lifecycle.asLiveData
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.notes.NoteRelation
 
 
 @ExperimentalCoroutinesApi
 @Composable
 fun RenoteUsersScreen(
     renotesViewModel: RenotesViewModel,
-    onSelected: (net.pantasystem.milktea.model.notes.NoteRelation) -> Unit,
+    onSelected: (NoteRelation) -> Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 ) {
 
-    val renotes: PageableState<List<net.pantasystem.milktea.model.notes.NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(
+    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(
         StateContent.NotExist()))
 
     LaunchedEffect(true) {
@@ -75,8 +76,8 @@ fun RenoteUsersScreen(
 @ExperimentalCoroutinesApi
 @Composable
 fun RenoteUserList(
-    notes: List<net.pantasystem.milktea.model.notes.NoteRelation>,
-    onSelected: (net.pantasystem.milktea.model.notes.NoteRelation)->Unit,
+    notes: List<NoteRelation>,
+    onSelected: (NoteRelation)->Unit,
     onBottomReached: ()->Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter?,
     modifier: Modifier = Modifier

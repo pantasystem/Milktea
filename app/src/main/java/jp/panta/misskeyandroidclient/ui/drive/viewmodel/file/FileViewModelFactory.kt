@@ -13,7 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 class FileViewModelFactory(
     private val accountId :Long?,
     private val miCore: MiCore,
-    private val driveStore: net.pantasystem.milktea.model.drive.DriveStore,
+    private val driveStore: DriveStore,
 ) : ViewModelProvider.Factory{
 
     @OptIn(ExperimentalCoroutinesApi::class)
