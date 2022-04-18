@@ -79,7 +79,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
     private suspend fun fetchWithApply(postId: GalleryPost.Id) {
         val galleryPost = galleryRepository.find(postId)
         _title.postValue(galleryPost.title)
-        _description.postValue(galleryPost.description)
+        _description.postValue(galleryPost.description ?: "")
         val files = filePropertyDataSource.findIn(galleryPost.fileIds)
 
         _pickedImages.postValue(
