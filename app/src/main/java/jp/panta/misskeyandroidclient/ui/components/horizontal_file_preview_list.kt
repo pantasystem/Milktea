@@ -13,13 +13,17 @@ import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import net.pantasystem.milktea.common.State
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.asLiveData
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -28,9 +32,9 @@ import net.pantasystem.milktea.model.file.AppFile
 
 @Composable
 fun HorizontalFilePreviewList(
-    files: List<net.pantasystem.milktea.model.file.AppFile>,
-    repository: net.pantasystem.milktea.model.drive.DriveFileRepository,
-    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    files: List<AppFile>,
+    repository: DriveFileRepository,
+    dataSource: FilePropertyDataSource,
     onAction: (FilePreviewActionType) -> Unit,
     modifier: Modifier = Modifier) {
     LazyRow(
@@ -48,9 +52,9 @@ fun HorizontalFilePreviewList(
 }
 
 sealed interface FilePreviewTarget {
-    val file: net.pantasystem.milktea.model.file.AppFile
-    data class Local(override val file: net.pantasystem.milktea.model.file.AppFile.Local) : FilePreviewTarget
-    data class Remote(override val file: net.pantasystem.milktea.model.file.AppFile.Remote, val fileProperty: net.pantasystem.milktea.model.drive.FileProperty) : FilePreviewTarget
+    val file: AppFile
+    data class Local(override val file: AppFile.Local) : FilePreviewTarget
+    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) : FilePreviewTarget
 }
 
 sealed interface FilePreviewActionType {
@@ -62,9 +66,9 @@ sealed interface FilePreviewActionType {
 
 @Composable
 fun FilePreview(
-    file: net.pantasystem.milktea.model.file.AppFile,
-    repository: net.pantasystem.milktea.model.drive.DriveFileRepository,
-    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
+    file: AppFile,
+    repository: DriveFileRepository,
+    dataSource: FilePropertyDataSource,
     onAction: (FilePreviewActionType) -> Unit,
 ) {
     var dropDownTarget: FilePreviewTarget? by remember {
@@ -72,7 +76,7 @@ fun FilePreview(
     }
     Column {
         when(file) {
-            is net.pantasystem.milktea.model.file.AppFile.Local -> {
+            is AppFile.Local -> {
                 LocalFilePreview(
                     file = file,
                     onClick = {
@@ -80,14 +84,14 @@ fun FilePreview(
                     }
                 )
             }
-            is net.pantasystem.milktea.model.file.AppFile.Remote -> {
+            is AppFile.Remote -> {
                 RemoteFilePreview(
                     file = file,
                     repository = repository,
                     dataSource = dataSource,
                     onClick = {
                         dropDownTarget = FilePreviewTarget.Remote(
-                            net.pantasystem.milktea.model.file.AppFile.Remote(it.id),
+                            AppFile.Remote(it.id),
                             it
                         )
                     }
@@ -133,8 +137,8 @@ fun FilePreview(
 
 @Composable
 fun LocalFilePreview(
-    file: net.pantasystem.milktea.model.file.AppFile.Local,
-    onClick: (net.pantasystem.milktea.model.file.AppFile.Local) -> Unit
+    file: AppFile.Local,
+    onClick: (AppFile.Local) -> Unit
 ) {
     val uri = Uri.parse(file.path)
     Box (
@@ -162,12 +166,12 @@ fun LocalFilePreview(
 
 @Composable
 fun RemoteFilePreview(
-    file: net.pantasystem.milktea.model.file.AppFile.Remote, repository: net.pantasystem.milktea.model.drive.DriveFileRepository,
-    dataSource: net.pantasystem.milktea.model.drive.FilePropertyDataSource,
-    onClick: (net.pantasystem.milktea.model.drive.FileProperty) -> Unit
+    file: AppFile.Remote, repository: DriveFileRepository,
+    dataSource: FilePropertyDataSource,
+    onClick: (FileProperty) -> Unit
 ) {
-    var filePropertyState: net.pantasystem.milktea.common.State<net.pantasystem.milktea.model.drive.FileProperty> by remember {
-        mutableStateOf(net.pantasystem.milktea.common.State.Loading(content = net.pantasystem.milktea.common.StateContent.NotExist()))
+    var filePropertyState: State<FileProperty> by remember {
+        mutableStateOf(State.Loading(content = StateContent.NotExist()))
     }
     val fileProperty = dataSource.observe(file.id)
         .asLiveData()
@@ -178,11 +182,11 @@ fun RemoteFilePreview(
         runCatching {
             repository.find(file.id)
         }.onSuccess {
-            filePropertyState = net.pantasystem.milktea.common.State.Fixed(
-                net.pantasystem.milktea.common.StateContent.Exist(it)
+            filePropertyState = State.Fixed(
+                StateContent.Exist(it)
             )
         }.onFailure {
-            filePropertyState = net.pantasystem.milktea.common.State.Error(
+            filePropertyState = State.Error(
                 filePropertyState.content,
                 throwable = it
             )
@@ -201,8 +205,8 @@ fun RemoteFilePreview(
             }
     ){
         when(filePropertyState.content) {
-            is net.pantasystem.milktea.common.StateContent.Exist -> {
-                val content = (filePropertyState.content as net.pantasystem.milktea.common.StateContent.Exist).rawContent
+            is StateContent.Exist -> {
+                val content = (filePropertyState.content as StateContent.Exist).rawContent
                 Box (contentAlignment = Alignment.TopEnd){
                     Image(
                         painter = rememberImagePainter(
@@ -218,7 +222,7 @@ fun RemoteFilePreview(
                     }
                 }
             }
-            is net.pantasystem.milktea.common.StateContent.NotExist -> {
+            is StateContent.NotExist -> {
                 CircularProgressIndicator()
             }
         }

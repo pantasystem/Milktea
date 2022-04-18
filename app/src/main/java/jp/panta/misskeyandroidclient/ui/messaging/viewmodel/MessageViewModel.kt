@@ -2,18 +2,23 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
 import androidx.lifecycle.*
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.data.api.misskey.messaging.RequestMessage
+import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
 import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import kotlin.collections.ArrayList
 
 @ExperimentalCoroutinesApi
 @FlowPreview
 class MessageViewModel(
     private val miCore: MiCore,
-    private val messagingId: net.pantasystem.milktea.model.messaging.MessagingId,
+    private val messagingId: MessagingId,
 ) : ViewModel() {
 
     class State(
@@ -34,10 +39,10 @@ class MessageViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 when (messagingId) {
-                    is net.pantasystem.milktea.model.messaging.MessagingId.Direct -> {
+                    is MessagingId.Direct -> {
                         miCore.getUserRepository().find(messagingId.userId).getDisplayUserName()
                     }
-                    is net.pantasystem.milktea.model.messaging.MessagingId.Group -> {
+                    is MessagingId.Group -> {
                         miCore.getGroupRepository().find(messagingId.groupId).name
                     }
                 }
@@ -85,8 +90,8 @@ class MessageViewModel(
                 miCore.getMisskeyAPIProvider().get(account).getMessages(
                     RequestMessage(
                         i = account.getI(miCore.getEncryption()),
-                        groupId = (messagingId as? net.pantasystem.milktea.model.messaging.MessagingId.Group)?.groupId?.groupId,
-                        userId = (messagingId as? net.pantasystem.milktea.model.messaging.MessagingId.Direct)?.userId?.id
+                        groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
+                        userId = (messagingId as? MessagingId.Direct)?.userId?.id
                     ),
                 ).throwIfHasError().body()?.asReversed()
             }.onFailure {
@@ -116,8 +121,8 @@ class MessageViewModel(
                     RequestMessage(
                         i = account.getI(miCore.getEncryption()),
                         untilId = untilId.messageId,
-                        groupId = (messagingId as? net.pantasystem.milktea.model.messaging.MessagingId.Group)?.groupId?.groupId,
-                        userId = (messagingId as? net.pantasystem.milktea.model.messaging.MessagingId.Direct)?.userId?.id
+                        groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
+                        userId = (messagingId as? MessagingId.Direct)?.userId?.id
                     )
                 ).body()?.asReversed()
             }.getOrNull()?.toMessageViewData(account) ?: emptyList()
@@ -130,7 +135,7 @@ class MessageViewModel(
         }
     }
 
-    private suspend fun List<MessageDTO>.toMessageViewData(account: net.pantasystem.milktea.model.account.Account): List<MessageViewData> {
+    private suspend fun List<MessageDTO>.toMessageViewData(account: Account): List<MessageViewData> {
         return this.map {
             miCore.getGetters().messageRelationGetter.get(account, it)
         }.map { msg ->
@@ -150,10 +155,10 @@ class MessageViewModel(
         }
     }
 
-    private suspend fun net.pantasystem.milktea.model.messaging.MessagingId.getAccount(): net.pantasystem.milktea.model.account.Account {
+    private suspend fun MessagingId.getAccount(): Account {
         val accountId = when (this) {
-            is net.pantasystem.milktea.model.messaging.MessagingId.Direct -> this.userId.accountId
-            is net.pantasystem.milktea.model.messaging.MessagingId.Group -> this.groupId.accountId
+            is MessagingId.Direct -> this.userId.accountId
+            is MessagingId.Group -> this.groupId.accountId
         }
         return miCore.getAccountRepository().get(accountId)
     }

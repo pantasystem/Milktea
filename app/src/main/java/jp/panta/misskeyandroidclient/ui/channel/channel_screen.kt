@@ -5,6 +5,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -14,6 +16,7 @@ import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.data.model.channel.impl.ChannelListType
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.account.AccountStore
 
 data class ChannelTypeWithTitle(
     val type: ChannelListType,
@@ -24,7 +27,7 @@ data class ChannelTypeWithTitle(
 @Composable
 fun ChannelScreen(
     onNavigateUp: () -> Unit,
-    accountStore: net.pantasystem.milktea.model.account.AccountStore,
+    accountStore: AccountStore,
     channelViewModel: ChannelViewModel,
 ) {
 

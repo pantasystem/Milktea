@@ -2,23 +2,26 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.api.misskey.throwIfHasError
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
 @HiltViewModel
 class AntennaListViewModel @Inject constructor(
-    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
-    val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
-    val misskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider,
+    val accountStore: AccountStore,
+    val accountRepository: AccountRepository,
+    val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption
 ) : ViewModel() {
 
@@ -53,7 +56,7 @@ class AntennaListViewModel @Inject constructor(
             mPagedAntennaIds.postValue(
                 it?.pages?.mapNotNull { page ->
                     val pageable = page.pageable()
-                    if (pageable is net.pantasystem.milktea.model.account.page.Pageable.Antenna) {
+                    if (pageable is Pageable.Antenna) {
                         it.accountId.let { accountId ->
                             Antenna.Id(accountId, pageable.antennaId)
 

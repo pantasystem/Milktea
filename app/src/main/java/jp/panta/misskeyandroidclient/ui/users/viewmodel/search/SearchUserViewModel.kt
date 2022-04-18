@@ -9,6 +9,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.user.UserRepository
 import java.util.regex.Pattern
@@ -25,6 +28,7 @@ data class SearchUser(
             .find()
 
 }
+
 /**
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
  * SelectedUserViewModelに分離する予定
@@ -33,11 +37,11 @@ data class SearchUser(
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
-    accountStore: net.pantasystem.milktea.model.account.AccountStore,
+    accountStore: AccountStore,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
-    private val userRepository: net.pantasystem.milktea.model.user.UserRepository,
+    private val userRepository: UserRepository,
     private val miCore: MiCore,
-) : ViewModel(){
+) : ViewModel() {
 
     private val logger = loggerFactory.create("SearchUserViewModel")
 
@@ -79,15 +83,18 @@ class SearchUserViewModel @Inject constructor(
         .catch { error ->
             logger.info("ユーザー検索処理に失敗しました", e = error)
         }
-        .stateIn(viewModelScope, SharingStarted.Lazily, net.pantasystem.milktea.common.State.Fixed(
-            net.pantasystem.milktea.common.StateContent.NotExist()))
+        .stateIn(
+            viewModelScope, SharingStarted.Lazily, State.Fixed(
+                StateContent.NotExist()
+            )
+        )
 
     val isLoading = searchState.map {
-        it is net.pantasystem.milktea.common.State.Loading
+        it is State.Loading
     }.asLiveData()
 
     val users = searchState.map {
-        (it.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent
+        (it.content as? StateContent.Exist)?.rawContent
             ?: emptyList()
     }.map {
         it.map { u ->
@@ -105,8 +112,8 @@ class SearchUserViewModel @Inject constructor(
         }
     }
 
-    fun search(){
-        val userName = this.userName.value?: return
+    fun search() {
+        val userName = this.userName.value ?: return
         val host = this.host.value
 
         val request = SearchUser(

@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.viewmodel.explore
 
-import net.pantasystem.milktea.data.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.api.misskey.users.RequestUser
 import java.io.Serializable
 
 sealed class Explore(open val name: String): Serializable{

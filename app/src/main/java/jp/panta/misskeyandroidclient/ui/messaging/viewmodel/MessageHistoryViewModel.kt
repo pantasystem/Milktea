@@ -3,37 +3,46 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.groups.toGroup
 import net.pantasystem.milktea.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.users.toUser
 import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.messaging.impl.MessageObserver
-import net.pantasystem.milktea.common.asLoadingStateFlow
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.model.toGroup
+import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.messaging.RequestMessageHistory
+import net.pantasystem.milktea.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.messaging.toHistory
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @FlowPreview
 @HiltViewModel
 class MessageHistoryViewModel @Inject constructor(
-    accountStore: net.pantasystem.milktea.model.account.AccountStore,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
     private val encryption: Encryption,
-    private val userRepository: net.pantasystem.milktea.model.user.UserRepository,
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
-    private val groupDataSource: net.pantasystem.milktea.model.group.GroupDataSource,
-    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
-    private val misskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider,
+    private val userRepository: UserRepository,
+    private val accountRepository: AccountRepository,
+    private val groupDataSource: GroupDataSource,
+    private val userDataSource: UserDataSource,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
     private val getters: Getters,
-    private val groupRepository: net.pantasystem.milktea.model.group.GroupRepository,
+    private val groupRepository: GroupRepository,
     private val messageObserver: MessageObserver,
-    private val unreadMessages: net.pantasystem.milktea.model.messaging.UnReadMessages,
+    private val unreadMessages: UnReadMessages,
 ) : ViewModel() {
 
 
@@ -73,8 +82,8 @@ class MessageHistoryViewModel @Inject constructor(
 
     private val usersAndGroups =
         combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
-            val u = (users.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent
-            val g = (groups.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent
+            val u = (users.content as? StateContent.Exist)?.rawContent
+            val g = (groups.content as? StateContent.Exist)?.rawContent
             (g ?: emptyList()) + (u ?: emptyList())
         }.flowOn(Dispatchers.IO)
 
@@ -112,7 +121,7 @@ class MessageHistoryViewModel @Inject constructor(
     }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Eagerly, emptyList())
 
     val isRefreshing = combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
-        users is net.pantasystem.milktea.common.State.Loading || groups is net.pantasystem.milktea.common.State.Loading
+        users is State.Loading || groups is State.Loading
     }.asLiveData()
 
     val messageHistorySelected = EventBus<HistoryViewData>()
@@ -123,10 +132,9 @@ class MessageHistoryViewModel @Inject constructor(
     }
 
 
-    private suspend fun fetchHistory(isGroup: Boolean, account: net.pantasystem.milktea.model.account.Account): List<HistoryViewData> {
+    private suspend fun fetchHistory(isGroup: Boolean, account: Account): List<HistoryViewData> {
         logger.debug("fetchHistory")
-        val request =
-            net.pantasystem.milktea.model.messaging.RequestMessageHistory(
+        val request = RequestMessageHistory(
                 i = account.getI(
                     encryption
                 ), group = isGroup, limit = 100
@@ -157,7 +165,7 @@ class MessageHistoryViewModel @Inject constructor(
         messageHistorySelected.event = messageHistory
     }
 
-    private fun getMisskeyAPI(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.api.misskey.MisskeyAPI {
+    private fun getMisskeyAPI(account: Account): MisskeyAPI {
         return misskeyAPIProvider.get(account)
     }
 

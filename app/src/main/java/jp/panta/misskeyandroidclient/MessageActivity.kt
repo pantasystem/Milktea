@@ -20,6 +20,10 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -110,7 +114,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
 
     private val openDriveActivityForPickFileResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val ids = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? List<*>)?.map {
-            it as net.pantasystem.milktea.model.drive.FileProperty.Id
+            it as FileProperty.Id
         }
         ids?.firstOrNull()?.let {
             mViewModel.setFilePropertyFromId(it)

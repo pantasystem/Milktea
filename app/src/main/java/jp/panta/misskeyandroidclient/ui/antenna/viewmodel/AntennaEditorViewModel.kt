@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.data.api.misskey.list.UserListDTO
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
@@ -14,6 +13,10 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api.misskey.list.UserListDTO
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.user.User
 import java.lang.StringBuilder
 import java.util.regex.Pattern
 
@@ -129,7 +132,7 @@ class AntennaEditorViewModel (
             runCatching {
                 val account = getAccount()
                 miCore.getMisskeyAPIProvider().get(account).userList(
-                    net.pantasystem.milktea.api.misskey.I(
+                    I(
                         account.getI(miCore.getEncryption())
                     )
                 ).body()
@@ -153,7 +156,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val groupList = MediatorLiveData<List<net.pantasystem.milktea.model.group.Group>?>().apply{
+    val groupList = MediatorLiveData<List<Group>?>().apply{
         addSource(this@AntennaEditorViewModel.source){
             /*if(it == Source.GROUP && this.value.isNullOrEmpty()){
                 miCore.getMisskeyAPI(accountRelation)
@@ -161,7 +164,7 @@ class AntennaEditorViewModel (
         }
     }
 
-    val group = MediatorLiveData<net.pantasystem.milktea.model.group.Group>().apply{
+    val group = MediatorLiveData<Group>().apply{
         addSource(groupList){
             this.value = it?.firstOrNull { g ->
                 g.id == this@AntennaEditorViewModel.antenna.value?.userGroupId
@@ -212,9 +215,9 @@ class AntennaEditorViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                val api = miCore.getMisskeyAPIProvider().get(account) as net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+                val api = miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12
                 val antenna = mAntenna.value
-                val request = net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd(
+                val request = AntennaToAdd(
                     account.getI(miCore.getEncryption()),
                     antennaId?.antennaId,
                     name.value ?: antenna?.name ?: "",
@@ -261,8 +264,8 @@ class AntennaEditorViewModel (
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                (miCore.getMisskeyAPIProvider().get(account) as net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12).deleteAntenna(
-                    net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery(
+                (miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12).deleteAntenna(
+                    AntennaQuery(
                         antennaId = antennaId.antennaId,
                         i = account.getI(miCore.getEncryption()),
                         limit = null
@@ -277,7 +280,7 @@ class AntennaEditorViewModel (
             }
         }
     }
-    val selectUserEvent = EventBus<List<net.pantasystem.milktea.model.user.User.Id>>()
+    val selectUserEvent = EventBus<List<User.Id>>()
     @ExperimentalCoroutinesApi
     fun selectUser(){
         selectUserEvent.event = users.value.mapNotNull {
@@ -316,10 +319,10 @@ class AntennaEditorViewModel (
     private suspend fun fetch(): Antenna? {
         return antennaId?.let{ antennaId ->
             val account = miCore.getAccount(antennaId.accountId)
-            val api = miCore.getMisskeyAPIProvider().get(account) as? net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+            val api = miCore.getMisskeyAPIProvider().get(account) as? MisskeyAPIV12
                 ?: return null
             val res = api.showAntenna(
-                net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery(
+                AntennaQuery(
                     i = account.getI(
                         miCore.getEncryption()
                     ), antennaId = antennaId.antennaId, limit = null
@@ -331,8 +334,8 @@ class AntennaEditorViewModel (
         }
     }
 
-    private var mAccount: net.pantasystem.milktea.model.account.Account? = null
-    private suspend fun getAccount(): net.pantasystem.milktea.model.account.Account {
+    private var mAccount: Account? = null
+    private suspend fun getAccount(): Account {
         if(mAccount == null) {
             mAccount = antennaId?.let{
                 miCore.getAccountRepository().get(it.accountId)

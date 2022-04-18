@@ -28,6 +28,8 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class SearchResultActivity : AppCompatActivity() {
@@ -42,7 +44,7 @@ class SearchResultActivity : AppCompatActivity() {
     private var mSearchWord: String? = null
     private var mIsTag: Boolean? = null
 
-    private var mAccountRelation: net.pantasystem.milktea.model.account.Account? = null
+    private var mAccountRelation: Account? = null
     private val binding: ActivitySearchResultBinding by dataBinding()
     val notesViewModel by viewModels<NotesViewModel>()
     private val accountViewModel: AccountViewModel by viewModels()
@@ -116,11 +118,11 @@ class SearchResultActivity : AppCompatActivity() {
         val samePage = getSamePage()
         if(samePage == null){
             val page = if(mIsTag == true){
-                net.pantasystem.milktea.model.account.page.Page(
+                Page(
                     mAccountRelation?.accountId ?: -1,
                     word,
                     0,
-                    pageable = net.pantasystem.milktea.model.account.page.Pageable.SearchByTag(
+                    pageable = Pageable.SearchByTag(
                         tag = word.replace(
                             "#",
                             ""
@@ -128,11 +130,11 @@ class SearchResultActivity : AppCompatActivity() {
                     )
                 )
             }else{
-                net.pantasystem.milktea.model.account.page.Page(
+                Page(
                     mAccountRelation?.accountId ?: -1,
                     mSearchWord ?: "",
                     -1,
-                    pageable = net.pantasystem.milktea.model.account.page.Pageable.Search(word)
+                    pageable = Pageable.Search(word)
                 )
             }
             accountViewModel.addPage(
@@ -147,13 +149,13 @@ class SearchResultActivity : AppCompatActivity() {
         return getSamePage() != null
     }
 
-    private fun getSamePage(): net.pantasystem.milktea.model.account.page.Page?{
+    private fun getSamePage(): Page?{
         return mAccountRelation?.pages?.firstOrNull {
             when (val pageable = it.pageable()) {
-                is net.pantasystem.milktea.model.account.page.Pageable.Search -> {
+                is Pageable.Search -> {
                     pageable.query == mSearchWord
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.SearchByTag -> {
+                is Pageable.SearchByTag -> {
                     pageable.tag == mSearchWord
                 }
                 else -> {
@@ -186,15 +188,15 @@ class SearchResultActivity : AppCompatActivity() {
 
             return when(pages[position]){
                 SEARCH_NOTES, SEARCH_NOTES_WITH_FILES ->{
-                    val request: net.pantasystem.milktea.model.account.page.Pageable = if(isTag){
+                    val request: Pageable = if(isTag){
                         if(pages[position] == SEARCH_NOTES){
-                            net.pantasystem.milktea.model.account.page.Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = false)
+                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = false)
                         }else{
-                            net.pantasystem.milktea.model.account.page.Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
+                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
                         }
 
                     }else{
-                        net.pantasystem.milktea.model.account.page.Pageable.Search(query = keyword)
+                        Pageable.Search(query = keyword)
                     }
                     TimelineFragment.newInstance(request)
                 }
@@ -203,7 +205,7 @@ class SearchResultActivity : AppCompatActivity() {
                 }
                 else ->{
                     TimelineFragment.newInstance(
-                        net.pantasystem.milktea.model.account.page.Pageable.Search(query = keyword)
+                        Pageable.Search(query = keyword)
                     )
                 }
             }

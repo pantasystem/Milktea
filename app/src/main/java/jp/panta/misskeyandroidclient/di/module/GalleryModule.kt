@@ -16,9 +16,9 @@ abstract class GalleryModule {
 
     @Binds
     @Singleton
-    abstract fun galleryDataSource(galleryDataSource: InMemoryGalleryDataSource): net.pantasystem.milktea.model.gallery.GalleryDataSource
+    abstract fun galleryDataSource(galleryDataSource: InMemoryGalleryDataSource): GalleryDataSource
 
     @Binds
     @Singleton
-    abstract fun galleryRepository(impl: GalleryRepositoryImpl): net.pantasystem.milktea.model.gallery.GalleryRepository
+    abstract fun galleryRepository(impl: GalleryRepositoryImpl): GalleryRepository
 }

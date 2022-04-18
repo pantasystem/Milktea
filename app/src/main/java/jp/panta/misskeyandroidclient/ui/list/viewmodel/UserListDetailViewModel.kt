@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.ui.list.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -14,26 +15,28 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 class UserListDetailViewModel @AssistedInject constructor(
     val miCore: MiCore,
-    val userListStore: net.pantasystem.milktea.model.list.UserListStore,
-    @Assisted val listId: net.pantasystem.milktea.model.list.UserList.Id,
+    val userListStore: UserListStore,
+    @Assisted val listId: UserList.Id,
 ) : ViewModel() {
 
     @AssistedFactory
     interface ViewModelAssistedFactory {
-        fun create(listId: net.pantasystem.milktea.model.list.UserList.Id): UserListDetailViewModel
+        fun create(listId: UserList.Id): UserListDetailViewModel
     }
 
     companion object {
         @Suppress("UNCHECKED_CAST")
         fun provideFactory(
             assistedFactory: ViewModelAssistedFactory,
-            listId: net.pantasystem.milktea.model.list.UserList.Id
+            listId: UserList.Id
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(listId) as T
@@ -88,7 +91,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     }
 
-    fun pushUser(userId: net.pantasystem.milktea.model.user.User.Id) {
+    fun pushUser(userId: User.Id) {
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
@@ -103,7 +106,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     }
 
 
-    fun pullUser(userId: net.pantasystem.milktea.model.user.User.Id) {
+    fun pullUser(userId: User.Id) {
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {

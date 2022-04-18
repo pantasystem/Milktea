@@ -14,7 +14,7 @@ import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
+class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list) {
 
     private val binding: FragmentListUserListBinding by dataBinding()
 
@@ -26,8 +26,8 @@ class UserListDetailFragment : Fragment(R.layout.fragment_list_user_list){
         binding.listUserList.layoutManager = LinearLayoutManager(requireContext())
         val adapter = ListUserListAdapter(viewModel, viewLifecycleOwner)
         binding.listUserList.adapter = adapter
-        viewModel.listUsers.observe(viewLifecycleOwner, { list ->
+        viewModel.listUsers.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
-        })
+        }
     }
 }

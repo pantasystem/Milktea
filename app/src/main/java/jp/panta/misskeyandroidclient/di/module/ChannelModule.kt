@@ -4,11 +4,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.channel.ChannelAPIAdapter
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.model.channel.impl.ChannelAPIAdapter
+import net.pantasystem.milktea.model.channel.ChannelStateModel
 import net.pantasystem.milktea.data.model.channel.impl.ChannelAPIAdapterWebImpl
 import net.pantasystem.milktea.data.model.channel.impl.ChannelRepositoryImpl
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.channel.ChannelRepository
 import javax.inject.Singleton
 
 @Module
@@ -17,27 +20,27 @@ object ChannelModule {
 
     @Provides
     @Singleton
-    fun provideChannelStateModel(): net.pantasystem.milktea.model.channel.ChannelStateModel {
+    fun provideChannelStateModel(): ChannelStateModel {
         return net.pantasystem.milktea.model.channel.ChannelStateModelOnMemory()
     }
 
     @Provides
     @Singleton
     fun provideChannelAPIAdapter(
-        accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+        accountRepository: AccountRepository,
         encryption: Encryption,
-        misskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
-    ): net.pantasystem.milktea.model.channel.ChannelAPIAdapter {
+        misskeyAPIProvider: MisskeyAPIProvider
+    ): ChannelAPIAdapter {
         return ChannelAPIAdapterWebImpl(accountRepository, misskeyAPIProvider, encryption)
     }
 
     @Provides
     @Singleton
     fun provideChannelRepository(
-        channelStateModel: net.pantasystem.milktea.model.channel.ChannelStateModel,
-        accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
-        channelAPIAdapter: net.pantasystem.milktea.model.channel.ChannelAPIAdapter,
-        ): net.pantasystem.milktea.model.channel.ChannelRepository {
+        channelStateModel: ChannelStateModel,
+        accountRepository: AccountRepository,
+        channelAPIAdapter: ChannelAPIAdapter,
+        ): ChannelRepository {
         return ChannelRepositoryImpl(
             channelStateModel = channelStateModel,
             accountRepository = accountRepository,

@@ -12,17 +12,19 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.drive.*
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
-
+import net.pantasystem.milktea.model.drive.InMemoryFilePropertyDataSource
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.drive.DriveFileRepository
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DriveFileBindModule {
     @Binds
     @Singleton
-    abstract fun filePropertyDataSource(inMem: net.pantasystem.milktea.model.drive.InMemoryFilePropertyDataSource): net.pantasystem.milktea.model.drive.FilePropertyDataSource
+    abstract fun filePropertyDataSource(inMem: InMemoryFilePropertyDataSource): FilePropertyDataSource
 
     @Binds
     @Singleton
-    abstract fun driveFileRepository(repo: DriveFileRepositoryImpl): net.pantasystem.milktea.model.drive.DriveFileRepository
+    abstract fun driveFileRepository(repo: DriveFileRepositoryImpl): DriveFileRepository
 }
 
 @Module

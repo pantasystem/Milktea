@@ -14,6 +14,8 @@ import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.model.user.impl.UserNicknameDAO
 import javax.inject.Singleton
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -44,13 +46,13 @@ object DbModule {
 
     @Provides
     @Singleton
-    fun reactionUserSettingDAO(db: DataBase): net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao {
+    fun reactionUserSettingDAO(db: DataBase): ReactionUserSettingDao {
         return db.reactionUserSettingDao()
     }
 
     @Provides
     @Singleton
-    fun reactionHistoryDao(db: DataBase): net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao {
+    fun reactionHistoryDao(db: DataBase): ReactionHistoryDao {
         return db.reactionHistoryDao()
     }
 

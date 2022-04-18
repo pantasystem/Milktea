@@ -7,7 +7,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -16,20 +19,21 @@ import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
 @Composable
 fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveViewModel) {
-    val filesState: net.pantasystem.milktea.common.PageableState<List<FileViewData>> by fileViewModel.state.asLiveData().observeAsState(
-        initial = net.pantasystem.milktea.common.PageableState.Fixed(net.pantasystem.milktea.common.StateContent.NotExist())
+    val filesState: PageableState<List<FileViewData>> by fileViewModel.state.asLiveData().observeAsState(
+        initial = PageableState.Fixed(StateContent.NotExist())
     )
     val swipeRefreshState = rememberSwipeRefreshState(
-        isRefreshing = filesState is net.pantasystem.milktea.common.PageableState.Loading.Init || filesState is net.pantasystem.milktea.common.PageableState.Loading.Future
+        isRefreshing = filesState is PageableState.Loading.Init || filesState is PageableState.Loading.Future
     )
     val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
-    val files = (filesState.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent ?: emptyList()
+    val files = (filesState.content as? StateContent.Exist)?.rawContent ?: emptyList()
     val listViewState = rememberLazyListState()
     if(listViewState.isScrolledToTheEnd() && listViewState.layoutInfo.totalItemsCount != listViewState.layoutInfo.visibleItemsInfo.size && listViewState.isScrollInProgress) {
         fileViewModel.loadNext()
@@ -61,9 +65,9 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
 fun FileViewDataListView(
     list: List<FileViewData>,
     isSelectMode: Boolean = false,
-    onCheckedChanged: (net.pantasystem.milktea.model.drive.FileProperty.Id, Boolean) -> Unit,
-    onDeleteMenuItemClicked: (net.pantasystem.milktea.model.drive.FileProperty.Id) -> Unit,
-    onToggleNsfwMenuItemClicked: (net.pantasystem.milktea.model.drive.FileProperty.Id) -> Unit,
+    onCheckedChanged: (FileProperty.Id, Boolean) -> Unit,
+    onDeleteMenuItemClicked: (FileProperty.Id) -> Unit,
+    onToggleNsfwMenuItemClicked: (FileProperty.Id) -> Unit,
     state: LazyListState = rememberLazyListState(),
 ) {
     LazyColumn(
