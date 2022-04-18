@@ -18,8 +18,8 @@ data class TootEmojiDTO (
     val visibleInPicker: Boolean = true
 ) {
 
-    fun toEmoji(host: String): net.pantasystem.milktea.model.emoji.Emoji {
-        return net.pantasystem.milktea.model.emoji.Emoji(
+    fun toEmoji(host: String): Emoji {
+        return Emoji(
             name = shortcode,
             url = url,
             category = category,

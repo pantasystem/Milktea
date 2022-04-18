@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.model.user.report
 
 import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.user.User
 
 data class Report(
-    val userId: net.pantasystem.milktea.model.user.User.Id,
+    val userId: User.Id,
     val comment: String
 )
 

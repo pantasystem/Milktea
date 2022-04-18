@@ -24,6 +24,7 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp as CreateTootApp
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.instance.Meta
 
 sealed interface AuthErrors {
     val throwable: Throwable
@@ -38,7 +39,7 @@ sealed interface AuthErrors {
 
 sealed interface InstanceType {
     data class Mastodon(val instance: Instance) : InstanceType
-    data class Misskey(val instance: net.pantasystem.milktea.model.instance.Meta) : InstanceType
+    data class Misskey(val instance: Meta) : InstanceType
 }
 
 

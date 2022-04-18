@@ -22,7 +22,7 @@ sealed interface AppFile : JSerializable {
     }
 
     data class Remote(
-        val id: net.pantasystem.milktea.model.drive.FileProperty.Id,
+        val id: FileProperty.Id,
     ) : AppFile
 
 }
@@ -32,7 +32,7 @@ data class File(
     val name: String,
     val path: String?,
     val type: String?,
-    val remoteFileId: net.pantasystem.milktea.model.drive.FileProperty.Id?,
+    val remoteFileId: FileProperty.Id?,
     val localFileId: Long?,
     val thumbnailUrl: String?,
     val isSensitive: Boolean?,

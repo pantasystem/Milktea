@@ -38,7 +38,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
             }
         }
 
-        fun newInstance(index: Int, file: net.pantasystem.milktea.model.file.File): ImageFragment{
+        fun newInstance(index: Int, file: File): ImageFragment{
             return newInstance(index, file.path!!)
         }
     }

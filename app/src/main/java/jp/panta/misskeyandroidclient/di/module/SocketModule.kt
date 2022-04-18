@@ -15,6 +15,7 @@ import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvi
 import net.pantasystem.milktea.data.streaming.impl.SocketWithAccountProviderImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import net.pantasystem.milktea.common.Logger
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -41,7 +42,7 @@ object SocketModule {
     @Singleton
     @Provides
     fun provideChannelAPIProvider(
-        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+        loggerFactory: Logger.Factory,
         socketWithAccountProvider: SocketWithAccountProvider
     ): ChannelAPIWithAccountProvider {
         return ChannelAPIWithAccountProvider(socketWithAccountProvider, loggerFactory)
@@ -52,7 +53,7 @@ object SocketModule {
     fun provideNoteCaptureAPIAdapter(
         accountRepository: AccountRepository,
         coroutineScope: CoroutineScope,
-        loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+        loggerFactory: Logger.Factory,
         noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
         noteDataSource: NoteDataSource,
     ): NoteCaptureAPIAdapter {

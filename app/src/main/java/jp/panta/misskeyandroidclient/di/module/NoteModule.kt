@@ -12,6 +12,8 @@ import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.model.notes.impl.NoteRepositoryImpl
 import jp.panta.misskeyandroidclient.impl.AndroidNoteReservationPostExecutor
+import net.pantasystem.milktea.data.model.notes.NoteTranslationStoreImpl
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import javax.inject.Singleton
 
@@ -39,4 +41,14 @@ object NoteModule {
     ) : NoteReservationPostExecutor {
         return AndroidNoteReservationPostExecutor(context)
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class AbsNoteModule {
+    @Binds
+    @Singleton
+    abstract fun provideNoteTranslationStore(
+        impl: NoteTranslationStoreImpl
+    ) : NoteTranslationStore
 }

@@ -36,10 +36,10 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
         )
 
         var nowSelectedVisibility = when(viewModel.visibility.value){
-            is net.pantasystem.milktea.model.notes.Visibility.Public -> 0
-            is net.pantasystem.milktea.model.notes.Visibility.Home -> 1
-            is net.pantasystem.milktea.model.notes.Visibility.Followers -> 2
-            is net.pantasystem.milktea.model.notes.Visibility.Specified -> 3
+            is Visibility.Public -> 0
+            is Visibility.Home -> 1
+            is Visibility.Followers -> 2
+            is Visibility.Specified -> 3
         }
         if(nowSelectedVisibility !in visibilities.indices){
             nowSelectedVisibility = 0
@@ -64,7 +64,7 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
                     }
                 val localOnly = viewModel.isLocalOnly.value
                 viewModel.setVisibility(
-                    net.pantasystem.milktea.model.notes.Visibility(
+                    Visibility(
                         type,
                         localOnly
                     )
@@ -74,9 +74,9 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
             .setView(view)
 
         binding?.isLocalOnlySwitch?.setOnCheckedChangeListener { _, isChecked ->
-            val visibility = (viewModel.visibility.value) as? net.pantasystem.milktea.model.notes.CanLocalOnly
+            val visibility = (viewModel.visibility.value) as? CanLocalOnly
                 ?: return@setOnCheckedChangeListener
-            viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as net.pantasystem.milktea.model.notes.Visibility)
+            viewModel.setVisibility(visibility.changeLocalOnly(isChecked) as Visibility)
         }
         binding?.lifecycleOwner = requireActivity()
         binding?.noteEditorViewModel = viewModel

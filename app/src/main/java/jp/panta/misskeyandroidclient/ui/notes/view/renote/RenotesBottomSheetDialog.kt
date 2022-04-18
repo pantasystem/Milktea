@@ -23,7 +23,7 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
         private const val EXTRA_ACCOUNT_ID = "ACCOUNT_ID"
         private const val EXTRA_NOTE_ID = "NOTE_ID"
 
-        fun newInstance(noteId: net.pantasystem.milktea.model.notes.Note.Id) : RenotesBottomSheetDialog {
+        fun newInstance(noteId: Note.Id) : RenotesBottomSheetDialog {
             return RenotesBottomSheetDialog().also {
                 it.arguments = Bundle().also { bundle ->
                     bundle.putLong(EXTRA_ACCOUNT_ID, noteId.accountId)
@@ -41,7 +41,7 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
         val noteId = arguments?.let {
             val aId = it.getLong(EXTRA_ACCOUNT_ID)
             val nId = it.getString(EXTRA_NOTE_ID)!!
-            net.pantasystem.milktea.model.notes.Note.Id(aId, nId)
+            Note.Id(aId, nId)
         }!!
         val miCore = requireContext().applicationContext as MiCore
         viewModel = ViewModelProvider(this, RenotesViewModel.Factory(noteId, miCore))[RenotesViewModel::class.java]

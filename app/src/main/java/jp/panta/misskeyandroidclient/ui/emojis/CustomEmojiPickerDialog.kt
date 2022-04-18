@@ -80,7 +80,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
             dismiss()
         }
 
-        override fun onSelect(emoji: net.pantasystem.milktea.model.emoji.Emoji) {
+        override fun onSelect(emoji: Emoji) {
             if(activity is EmojiSelection){
                 activity.onSelect(emoji)
             }else{

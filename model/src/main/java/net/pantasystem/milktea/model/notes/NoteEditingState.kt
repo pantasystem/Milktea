@@ -2,6 +2,9 @@ package net.pantasystem.milktea.model.notes
 
 
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftPoll
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
@@ -13,18 +16,18 @@ data class AddMentionResult(
 )
 
 data class NoteEditingState(
-    val author: net.pantasystem.milktea.model.account.Account? = null,
+    val author: Account? = null,
     val visibility: Visibility = Visibility.Public(false),
     val text: String? = null,
     val cw: String? = null,
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
-    val files: List<net.pantasystem.milktea.model.file.AppFile> = emptyList(),
+    val files: List<AppFile> = emptyList(),
     val poll: PollEditingState? = null,
     val viaMobile: Boolean = true,
     val draftNoteId: Long? = null,
     val reservationPostingAt: Instant? = null,
-    val channelId: net.pantasystem.milktea.model.channel.Channel.Id? = null,
+    val channelId: Channel.Id? = null,
 ) {
 
     val hasCw: Boolean
@@ -111,7 +114,7 @@ data class NoteEditingState(
         )
     }
 
-    fun addFile(file: net.pantasystem.milktea.model.file.AppFile): NoteEditingState {
+    fun addFile(file: AppFile): NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 add(file)
@@ -119,7 +122,7 @@ data class NoteEditingState(
         )
     }
 
-    fun removeFile(file: net.pantasystem.milktea.model.file.AppFile): NoteEditingState {
+    fun removeFile(file: AppFile): NoteEditingState {
         return this.copy(
             files = this.files.toMutableList().apply {
                 remove(file)
@@ -133,7 +136,7 @@ data class NoteEditingState(
         )
     }
 
-    fun setAccount(account: net.pantasystem.milktea.model.account.Account?): NoteEditingState {
+    fun setAccount(account: Account?): NoteEditingState {
         if (author == null) {
             return this.copy(
                 author = account
@@ -142,7 +145,7 @@ data class NoteEditingState(
         if (account == null) {
             throw IllegalArgumentException("現在の状態に未指定のAccountを指定することはできません")
         }
-        if (files.any { it is net.pantasystem.milktea.model.file.AppFile.Remote }) {
+        if (files.any { it is AppFile.Remote }) {
             throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
         }
         if (!(replyId == null || author.instanceDomain == account.instanceDomain)) {
@@ -236,10 +239,10 @@ data class NoteEditingState(
         return NoteEditingState(author = this.author)
     }
 
-    fun toggleFileSensitiveStatus(appFile: net.pantasystem.milktea.model.file.AppFile.Local): NoteEditingState {
+    fun toggleFileSensitiveStatus(appFile: AppFile.Local): NoteEditingState {
         return copy(
             files = files.map {
-                if (it === appFile || it is net.pantasystem.milktea.model.file.AppFile.Local && it.isAttributeSame(appFile)) {
+                if (it === appFile || it is AppFile.Local && it.isAttributeSame(appFile)) {
                     appFile.copy(isSensitive = !appFile.isSensitive)
                 } else {
                     it
@@ -248,7 +251,7 @@ data class NoteEditingState(
         )
     }
 
-    fun setChannelId(channelId: net.pantasystem.milktea.model.channel.Channel.Id?): NoteEditingState {
+    fun setChannelId(channelId: Channel.Id?): NoteEditingState {
         return copy(
             visibility = if (channelId == null) visibility else Visibility.Public(true),
             channelId = channelId
@@ -335,26 +338,26 @@ fun DraftNote.toNoteEditingState(): NoteEditingState {
                     PollChoiceState(choice)
                 },
                 expiresAt = it.expiresAt?.let { ex ->
-                    net.pantasystem.milktea.model.notes.PollExpiresAt.DateAndTime(
+                    PollExpiresAt.DateAndTime(
                         Instant.fromEpochMilliseconds(ex)
                     )
-                } ?: net.pantasystem.milktea.model.notes.PollExpiresAt.Infinity,
+                } ?: PollExpiresAt.Infinity,
                 multiple = it.multiple
             )
         },
         replyId = this.replyId?.let {
-            net.pantasystem.milktea.model.notes.Note.Id(accountId = accountId, noteId = it)
+            Note.Id(accountId = accountId, noteId = it)
         },
         renoteId = this.renoteId?.let {
-            net.pantasystem.milktea.model.notes.Note.Id(accountId = accountId, noteId = it)
+            Note.Id(accountId = accountId, noteId = it)
         },
         files = this.files?.map {
             if (it.isRemoteFile) {
-                net.pantasystem.milktea.model.file.AppFile.Remote(
+                AppFile.Remote(
                     it.remoteFileId!!
                 )
             } else {
-                net.pantasystem.milktea.model.file.AppFile.Local(
+                AppFile.Local(
                     name = it.name,
                     isSensitive = it.isSensitive ?: false,
                     path = it.path ?: "",

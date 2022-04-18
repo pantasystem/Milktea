@@ -82,7 +82,7 @@ class NotificationService : Service() {
 
 
 
-    private fun showMessageNotification(message: net.pantasystem.milktea.model.messaging.MessageRelation){
+    private fun showMessageNotification(message: MessageRelation){
 
         val builder = NotificationCompat.Builder(this, MESSAGE_CHANEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)

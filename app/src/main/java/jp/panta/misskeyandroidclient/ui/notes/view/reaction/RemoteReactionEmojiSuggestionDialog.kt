@@ -62,15 +62,15 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
         lifecycleScope.launchWhenResumed {
             viewModel.filteredEmojis.collect { state ->
                 when (state) {
-                    is net.pantasystem.milktea.common.State.Loading -> {
+                    is State.Loading -> {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.suggestedEmojis.visibility = View.GONE
                         binding.errorMessage.visibility = View.GONE
                     }
-                    is net.pantasystem.milktea.common.State.Fixed -> {
+                    is State.Fixed -> {
                         binding.progressBar.visibility = View.GONE
                         binding.suggestedEmojis.visibility = View.VISIBLE
-                        val emojis = (state.content as? net.pantasystem.milktea.common.StateContent.Exist)?.rawContent?: emptyList()
+                        val emojis = (state.content as? StateContent.Exist)?.rawContent?: emptyList()
                         if (emojis.isEmpty()) {
                             binding.errorMessage.visibility = View.VISIBLE
                             binding.errorMessage.text = getString(R.string.the_remote_emoji_does_not_exist_in_this_instance)
@@ -81,7 +81,7 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
                             ":${it.name}:"
                         })
                     }
-                    is net.pantasystem.milktea.common.State.Error -> {
+                    is State.Error -> {
                         binding.progressBar.visibility = View.GONE
                         binding.suggestedEmojis.visibility = View.GONE
                         binding.errorMessage.visibility = View.VISIBLE

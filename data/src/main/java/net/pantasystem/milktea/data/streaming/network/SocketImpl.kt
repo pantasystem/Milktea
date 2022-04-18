@@ -6,6 +6,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.streaming.*
 import net.pantasystem.milktea.data.streaming.PollingJob
 import okhttp3.*
@@ -15,7 +16,7 @@ import kotlin.coroutines.suspendCoroutine
 class SocketImpl(
     val url: String,
     val okHttpClient: OkHttpClient = OkHttpClient(),
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    loggerFactory: Logger.Factory,
 ) : Socket, WebSocketListener() {
     val logger = loggerFactory.create("SocketImpl")
 

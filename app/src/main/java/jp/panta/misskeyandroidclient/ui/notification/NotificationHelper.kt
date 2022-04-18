@@ -10,9 +10,9 @@ object NotificationHelper {
 
     @JvmStatic
     @BindingAdapter("notification")
-    fun TextView.setUnknownNotificationMessage(n: net.pantasystem.milktea.model.notification.Notification) {
+    fun TextView.setUnknownNotificationMessage(n: Notification) {
 
-        if(n is net.pantasystem.milktea.model.notification.UnknownNotification) {
+        if(n is UnknownNotification) {
             this.text = context.getString(R.string.unknown_notification_msg, n.id.notificationId, n.rawType, n.userId.id)
         }
     }

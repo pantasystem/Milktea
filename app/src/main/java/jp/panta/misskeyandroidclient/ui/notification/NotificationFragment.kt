@@ -81,7 +81,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
     override fun onResume() {
         super.onResume()
 
-        currentPageableTimelineViewModel.setCurrentPageable(net.pantasystem.milktea.model.account.page.Pageable.Notification())
+        currentPageableTimelineViewModel.setCurrentPageable(Pageable.Notification())
     }
 
     @ExperimentalCoroutinesApi

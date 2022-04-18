@@ -55,8 +55,8 @@ class ReactionChoicesFragment : Fragment() {
         USER
     }
 
-    @Inject lateinit var reactionHistoryDao: net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-    @Inject lateinit var reactionUserSettingDao: net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+    @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
+    @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
 
     override fun onCreateView(
@@ -77,8 +77,8 @@ class ReactionChoicesFragment : Fragment() {
 
         val adapter =
             ReactionChoicesAdapter {
-                val selection = (parentFragment as? net.pantasystem.milktea.model.notes.reaction.ReactionSelection)
-                    ?: (requireActivity() as? net.pantasystem.milktea.model.notes.reaction.ReactionSelection)
+                val selection = (parentFragment as? ReactionSelection)
+                    ?: (requireActivity() as? ReactionSelection)
                 Log.w("ReactionChoicesFragment", "ReactionSelectionの実装が行われていません")
                 selection?.selectReaction(it)
             }

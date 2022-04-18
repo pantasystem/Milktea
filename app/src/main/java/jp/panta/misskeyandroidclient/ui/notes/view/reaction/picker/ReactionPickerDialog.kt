@@ -32,7 +32,7 @@ import javax.inject.Inject
 class ReactionPickerDialog : AppCompatDialogFragment(){
     val notesViewModel by activityViewModels<NotesViewModel>()
     @Inject
-    lateinit var reactionUserSettingDao: net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+    lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

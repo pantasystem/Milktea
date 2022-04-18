@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.list
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,7 +46,7 @@ class UserListStore @Inject constructor(
         _state.value = _state.value.appendAll(id.accountId, listOf(result))
     }
 
-    suspend fun appendUser(listId: UserList.Id, userId: net.pantasystem.milktea.model.user.User.Id) {
+    suspend fun appendUser(listId: UserList.Id, userId: User.Id) {
         userListRepository.appendUser(listId, userId)
         val list = _state.value.get(listId)
         if (list == null) {
@@ -55,7 +56,7 @@ class UserListStore @Inject constructor(
         }
     }
 
-    suspend fun removeUser(listId: UserList.Id, userId: net.pantasystem.milktea.model.user.User.Id) {
+    suspend fun removeUser(listId: UserList.Id, userId: User.Id) {
         userListRepository.removeUser(listId, userId)
         val list = _state.value.get(listId)
         if (list == null) {

@@ -31,7 +31,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         private const val FOLLOWING_VIEW_MODE = 0
         private const val FOLLOWER_VIEW_MODE = 1
 
-        fun newIntent(context: Context, userId: net.pantasystem.milktea.model.user.User.Id, isFollowing: Boolean): Intent {
+        fun newIntent(context: Context, userId: User.Id, isFollowing: Boolean): Intent {
             return Intent(context, FollowFollowerActivity::class.java).apply {
                 putExtra(EXTRA_USER_ID, userId)
                 putExtra(EXTRA_VIEW_CURRENT, if(isFollowing) FOLLOWING_VIEW_MODE else FOLLOWER_VIEW_MODE)
@@ -45,7 +45,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
     lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
 
     private val userDetailViewModel: UserDetailViewModel by viewModels {
-        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as net.pantasystem.milktea.model.user.User.Id
+        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
         UserDetailViewModel.provideFactory(assistedFactory, userId)
     }
 
@@ -58,7 +58,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
-        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as net.pantasystem.milktea.model.user.User.Id
+        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
 
         userDetailViewModel.user.observe(this) {
             title = it?.getDisplayName()
@@ -82,7 +82,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         return super.onOptionsItemSelected(item)
     }
 
-    inner class FollowFollowerPagerAdapter(val userId: net.pantasystem.milktea.model.user.User.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class FollowFollowerPagerAdapter(val userId: User.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
         private val titleList = arrayOf(getString(R.string.following), getString(R.string.follower))
 

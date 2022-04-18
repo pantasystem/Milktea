@@ -2,9 +2,18 @@ package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.user.User
 
-class NotificationViewData(val notification: net.pantasystem.milktea.model.notification.NotificationRelation, account: net.pantasystem.milktea.model.account.Account, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore) {
-    enum class Type(val default: String){
+class NotificationViewData(
+    val notification: NotificationRelation,
+    account: Account,
+    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    translationStore: NoteTranslationStore
+) {
+    enum class Type(val default: String) {
         FOLLOW("follow"),
         MENTION("mention"),
         REPLY("reply"),
@@ -18,30 +27,38 @@ class NotificationViewData(val notification: net.pantasystem.milktea.model.notif
         UNKNOWN("unknown"),
 
     }
-    val id = notification.notification.id
-    val noteViewData: PlaneNoteViewData? = if(notification.notification is net.pantasystem.milktea.model.notification.HasNote) PlaneNoteViewData(notification.note!!, account, noteCaptureAPIAdapter, translationStore) else null
 
-    val type: Type = when(notification.notification){
-        is net.pantasystem.milktea.model.notification.FollowNotification -> Type.FOLLOW
-        is net.pantasystem.milktea.model.notification.MentionNotification -> Type.MENTION
-        is net.pantasystem.milktea.model.notification.ReplyNotification -> Type.REPLY
-        is net.pantasystem.milktea.model.notification.RenoteNotification -> Type.RENOTE
-        is net.pantasystem.milktea.model.notification.QuoteNotification -> Type.QUOTE
-        is net.pantasystem.milktea.model.notification.ReactionNotification -> Type.REACTION
-        is net.pantasystem.milktea.model.notification.PollVoteNotification -> Type.POLL_VOTE
-        is net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification -> Type.RECEIVE_FOLLOW_REQUEST
-        is net.pantasystem.milktea.model.notification.FollowRequestAcceptedNotification -> Type.FOLLOW_REQUEST_ACCEPTED
-        is net.pantasystem.milktea.model.notification.PollEndedNotification -> Type.POLL_ENDED
-        is net.pantasystem.milktea.model.notification.UnknownNotification -> Type.UNKNOWN
+    val id = notification.notification.id
+    val noteViewData: PlaneNoteViewData? =
+        if (notification.notification is HasNote) PlaneNoteViewData(
+            notification.note!!,
+            account,
+            noteCaptureAPIAdapter,
+            translationStore
+        ) else null
+
+    val type: Type = when (notification.notification) {
+        is FollowNotification -> Type.FOLLOW
+        is MentionNotification -> Type.MENTION
+        is ReplyNotification -> Type.REPLY
+        is RenoteNotification -> Type.RENOTE
+        is QuoteNotification -> Type.QUOTE
+        is ReactionNotification -> Type.REACTION
+        is PollVoteNotification -> Type.POLL_VOTE
+        is ReceiveFollowRequestNotification -> Type.RECEIVE_FOLLOW_REQUEST
+        is FollowRequestAcceptedNotification -> Type.FOLLOW_REQUEST_ACCEPTED
+        is PollEndedNotification -> Type.POLL_ENDED
+        is UnknownNotification -> Type.UNKNOWN
     }
     val statusType: String = type.default
 
-    val user: net.pantasystem.milktea.model.user.User? = notification.user
+    val user: User? = notification.user
     val avatarIconUrl = notification.user?.avatarUrl
     val name = notification.user?.name
     val userName = notification.user?.userName
 
-    val reaction =  (notification.notification as? net.pantasystem.milktea.model.notification.ReactionNotification)?.reaction
+    val reaction =
+        (notification.notification as? ReactionNotification)?.reaction
 
 
     override fun equals(other: Any?): Boolean {

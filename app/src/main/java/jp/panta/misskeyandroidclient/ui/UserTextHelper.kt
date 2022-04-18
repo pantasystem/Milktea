@@ -11,7 +11,7 @@ object UserTextHelper{
 
     @JvmStatic
     @BindingAdapter("mainNameView", "subNameView", "user")
-    fun View.setUserInfo(mainNameView: TextView?, subNameView: TextView?, user: net.pantasystem.milktea.model.user.User?){
+    fun View.setUserInfo(mainNameView: TextView?, subNameView: TextView?, user: User?){
         user?: return
         val isUserNameDefault = (this.context.applicationContext as MiApplication).getSettingStore().isUserNameDefault
         val userName: TextView?

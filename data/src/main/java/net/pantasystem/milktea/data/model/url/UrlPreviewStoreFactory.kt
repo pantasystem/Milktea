@@ -14,7 +14,7 @@ class UrlPreviewStoreFactory (
     private val urlPreviewDAO: UrlPreviewDAO,
     sourceType: Int? = null,
     private var summalyUrl: String? = null,
-    var account: net.pantasystem.milktea.model.account.Account? = null
+    var account: Account? = null
 ){
 
     private var sourceType = sourceType?: UrlPreviewSourceSetting.MISSKEY

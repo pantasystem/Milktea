@@ -15,7 +15,7 @@ import jp.panta.misskeyandroidclient.R
 
 @Composable
 fun ThumbnailPreview(
-    file: net.pantasystem.milktea.model.drive.FileProperty,
+    file: FileProperty,
     modifier: Modifier = Modifier,
     isHidden: Boolean = false,
     onClick: () -> Unit,

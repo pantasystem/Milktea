@@ -36,7 +36,7 @@ class Version : Comparable<Version>{
         }
     }
 
-    constructor(meta: net.pantasystem.milktea.model.instance.Meta) : this(meta.version)
+    constructor(meta: Meta) : this(meta.version)
 
 
     override fun compareTo(other: Version): Int {

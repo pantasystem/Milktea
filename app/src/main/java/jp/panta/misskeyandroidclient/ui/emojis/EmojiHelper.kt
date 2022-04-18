@@ -10,7 +10,7 @@ object EmojiHelper{
 
     @JvmStatic
     @BindingAdapter("customEmoji")
-    fun ImageView.setEmojiImage(customEmoji: net.pantasystem.milktea.model.emoji.Emoji){
+    fun ImageView.setEmojiImage(customEmoji: Emoji){
         if(customEmoji.type?.contains("svg") == true || customEmoji.url?.contains("svg") == true|| customEmoji.uri?.contains("svg") == true){
 
             GlideApp.with(context)

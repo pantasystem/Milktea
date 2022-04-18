@@ -20,8 +20,8 @@ data class FilePropertyDTO(
     val url: String,
     val thumbnailUrl: String? = null,
     val attachedNoteIds: List<String>? = null,
-    val properties: net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO.Properties? = null
-): Serializable{
+    val properties: Properties? = null
+) : Serializable {
 
     @kotlinx.serialization.Serializable
     data class Properties(
@@ -29,18 +29,18 @@ data class FilePropertyDTO(
         val height: Float? = null
     ) : Serializable
 
-    fun getThumbnailUrl(instanceBaseUrl: String): String{
-        return getUrl(instanceBaseUrl, thumbnailUrl?: url)
+    fun getThumbnailUrl(instanceBaseUrl: String): String {
+        return getUrl(instanceBaseUrl, thumbnailUrl ?: url)
     }
 
-    fun getUrl(instanceBaseUrl: String): String{
+    fun getUrl(instanceBaseUrl: String): String {
         return getUrl(instanceBaseUrl, url)
     }
 
-    fun getUrl(instanceBaseUrl: String, url: String): String{
-        val hostUrl = if(instanceBaseUrl.endsWith("/")){
+    fun getUrl(instanceBaseUrl: String, url: String): String {
+        val hostUrl = if (instanceBaseUrl.endsWith("/")) {
             instanceBaseUrl.substring(0, instanceBaseUrl.length - 1)
-        }else{
+        } else {
             instanceBaseUrl
         }
 
@@ -56,7 +56,6 @@ data class FilePropertyDTO(
             }
         }
     }
-
 
 
 }

@@ -12,7 +12,7 @@ object PageTypeHelper{
 
     @JvmStatic
     @BindingAdapter("pageType")
-    fun TextView.setTextFromPageType(type: net.pantasystem.milktea.model.account.page.PageType?){
+    fun TextView.setTextFromPageType(type: PageType?){
         type?: return
         this.text = nameByPageType(context, type)
 
@@ -20,7 +20,7 @@ object PageTypeHelper{
 
     }
 
-    fun nameByPageType(context: Context, pageType: net.pantasystem.milktea.model.account.page.PageType): String{
+    fun nameByPageType(context: Context, pageType: PageType): String{
 
         return when(pageType){
             GLOBAL -> context.getString(R.string.global_timeline)

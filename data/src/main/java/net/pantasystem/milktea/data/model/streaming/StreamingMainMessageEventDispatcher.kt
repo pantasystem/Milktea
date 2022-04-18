@@ -11,7 +11,7 @@ class StreamingMainMessageEventDispatcher(
     private val messagingGetter: MessageRelationGetter
 ) : StreamingMainEventDispatcher{
 
-    override suspend fun dispatch(account: net.pantasystem.milktea.model.account.Account, mainEvent: ChannelBody.Main): Boolean {
+    override suspend fun dispatch(account: Account, mainEvent: ChannelBody.Main): Boolean {
         if(mainEvent is ChannelBody.Main.ReadAllMessagingMessages) {
             messageDataSource.readAllMessages(account.accountId)
         }

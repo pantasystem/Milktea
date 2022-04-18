@@ -4,12 +4,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.mastodon.MastodonAPI
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.Account
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MastodonAPIProvider @Inject constructor(
-    private val mastodonAPIFactory: net.pantasystem.milktea.data.api.mastodon.MastodonAPIFactory,
+    private val mastodonAPIFactory: MastodonAPIFactory,
     val encryption: Encryption,
 ){
 
@@ -32,8 +33,8 @@ class MastodonAPIProvider @Inject constructor(
         }
     }
 
-    suspend fun get(account: net.pantasystem.milktea.model.account.Account): MastodonAPI {
-        if (account.instanceType == net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY) {
+    suspend fun get(account: Account): MastodonAPI {
+        if (account.instanceType == Account.InstanceType.MISSKEY) {
             throw IllegalArgumentException("アカウント種別Misskeyは受け入れていません")
         }
         return get(account.instanceDomain, account.getI(encryption))

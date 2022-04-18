@@ -11,10 +11,10 @@ object NotificationTitleHelper {
 
     @JvmStatic
     @BindingAdapter("notificationTitle")
-    fun TextView.setNotificationTitle(notification: net.pantasystem.milktea.model.notification.NotificationRelation) {
+    fun TextView.setNotificationTitle(notification: NotificationRelation) {
         val miCore = this.context.applicationContext as MiCore
         this.text = when (notification.notification) {
-            is net.pantasystem.milktea.model.notification.PollEndedNotification -> {
+            is PollEndedNotification -> {
                 context.getString(R.string.poll_ended)
             }
             else -> if (miCore.getSettingStore().isUserNameDefault) {

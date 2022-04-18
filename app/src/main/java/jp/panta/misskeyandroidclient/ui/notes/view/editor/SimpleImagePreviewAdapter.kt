@@ -11,20 +11,20 @@ import jp.panta.misskeyandroidclient.databinding.ItemNoteEditorFilePreviewBindin
 import net.pantasystem.milktea.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 
-class SimpleImagePreviewAdapter(private val fileListener: FileListener) : ListAdapter<net.pantasystem.milktea.model.file.File, SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(
+class SimpleImagePreviewAdapter(private val fileListener: FileListener) : ListAdapter<File, SimpleImagePreviewAdapter.SimpleImagePreviewHolder>(
     ItemCallback()
 ){
-    private class ItemCallback: DiffUtil.ItemCallback<net.pantasystem.milktea.model.file.File>(){
+    private class ItemCallback: DiffUtil.ItemCallback<File>(){
         override fun areContentsTheSame(
-            oldItem: net.pantasystem.milktea.model.file.File,
-            newItem: net.pantasystem.milktea.model.file.File
+            oldItem: File,
+            newItem: File
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areItemsTheSame(
-            oldItem: net.pantasystem.milktea.model.file.File,
-            newItem: net.pantasystem.milktea.model.file.File
+            oldItem: File,
+            newItem: File
         ): Boolean {
             return oldItem == newItem
         }

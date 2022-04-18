@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.*
 
 @AndroidEntryPoint
 class ReactionSelectionDialog : BottomSheetDialogFragment(),
-    net.pantasystem.milktea.model.notes.reaction.ReactionSelection {
+    ReactionSelection {
 
     private var mNoteViewModel: NotesViewModel? = null
     val notesViewModel by activityViewModels<NotesViewModel>()

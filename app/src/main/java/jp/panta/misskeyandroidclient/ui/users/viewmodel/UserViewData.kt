@@ -10,7 +10,7 @@ import net.pantasystem.milktea.model.user.UserDataSource
 @ExperimentalCoroutinesApi
 @FlowPreview
 open class UserViewData(
-    val userId: net.pantasystem.milktea.model.user.User.Id?,
+    val userId: User.Id?,
     val userName: String? = null,
     val host: String? = null,
     val accountId: Long? = null,
@@ -20,12 +20,12 @@ open class UserViewData(
 ){
 
 
-    val user: MutableLiveData<net.pantasystem.milktea.model.user.User.Detail?> = MutableLiveData<net.pantasystem.milktea.model.user.User.Detail?>()
-    private val userFlow = MutableStateFlow<net.pantasystem.milktea.model.user.User.Detail?>(null)
+    val user: MutableLiveData<User.Detail?> = MutableLiveData<User.Detail?>()
+    private val userFlow = MutableStateFlow<User.Detail?>(null)
 
     private val logger = miCore.loggerFactory.create("UserViewData")
 
-    private var mUser: net.pantasystem.milktea.model.user.User.Detail? = null
+    private var mUser: User.Detail? = null
         set(value) {
             field = value
             userFlow.value = value
@@ -33,7 +33,7 @@ open class UserViewData(
         }
 
     constructor(
-        user: net.pantasystem.milktea.model.user.User,
+        user: User,
         miCore: MiCore,
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -49,7 +49,7 @@ open class UserViewData(
     ) : this(null, userName, host, accountId, miCore ,coroutineScope, dispatcher)
 
     constructor(
-        userId: net.pantasystem.milktea.model.user.User.Id,
+        userId: User.Id,
         miCore: MiCore,
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -59,10 +59,10 @@ open class UserViewData(
         userFlow.filterNotNull().flatMapMerge { user ->
             miCore.getUserRepositoryEventToFlow().from(user.id)
         }.mapNotNull {
-            (it as? net.pantasystem.milktea.model.user.UserDataSource.Event.Created)?.user
-                ?: (it as? net.pantasystem.milktea.model.user.UserDataSource.Event.Updated)?.user
+            (it as? UserDataSource.Event.Created)?.user
+                ?: (it as? UserDataSource.Event.Updated)?.user
         }.mapNotNull {
-            it as? net.pantasystem.milktea.model.user.User.Detail
+            it as? User.Detail
         }.onEach {
             mUser = it
         }.catch { e ->
@@ -80,7 +80,7 @@ open class UserViewData(
 
         if(user.value == null){
             logger.debug("User読み込み開始")
-            val u : net.pantasystem.milktea.model.user.User.Detail? = runCatching {
+            val u : User.Detail? = runCatching {
                 val u = if(userId == null) {
                     require(accountId != null)
                     require(userName != null)
@@ -88,7 +88,7 @@ open class UserViewData(
                 }else{
                     miCore.getUserRepository().find(userId, true)
                 }
-                u as net.pantasystem.milktea.model.user.User.Detail
+                u as User.Detail
             }.onFailure {
                 logger.debug("取得エラー", e = it)
             }.getOrNull()

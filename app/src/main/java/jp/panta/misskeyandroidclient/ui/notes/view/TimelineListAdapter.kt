@@ -30,7 +30,7 @@ class TimelineListAdapter(
 
     abstract class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : RecyclerView.ViewHolder(view){
         abstract val binding: T
-        private var mNoteIdAndPollListAdapter: Pair<net.pantasystem.milktea.model.notes.Note.Id, PollListAdapter>? = null
+        private var mNoteIdAndPollListAdapter: Pair<Note.Id, PollListAdapter>? = null
         abstract val lifecycleOwner: LifecycleOwner
         abstract val reactionCountsView: RecyclerView
         abstract val notesViewModel: NotesViewModel
@@ -44,7 +44,7 @@ class TimelineListAdapter(
             flexBoxLayoutManager
         }
 
-        private val reactionCountsObserver = Observer<List<net.pantasystem.milktea.model.notes.reaction.ReactionCount>> { counts ->
+        private val reactionCountsObserver = Observer<List<ReactionCount>> { counts ->
             if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
                 bindReactionCountVisibility()
 

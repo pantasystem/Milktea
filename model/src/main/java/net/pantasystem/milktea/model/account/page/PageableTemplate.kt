@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.model.account.page
 
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
 
-class PageableTemplate(val account: net.pantasystem.milktea.model.account.Account?) {
+class PageableTemplate(val account: Account?) {
     fun globalTimeline(title: String): Page {
         return Page(account?.accountId?: - 1, title, 0, Pageable.GlobalTimeline())
     }

@@ -15,9 +15,9 @@ object ReactionHelper {
     @SuppressLint("UseCompatLoadingForDrawables")
     @JvmStatic
     @BindingAdapter("reactionNote", "reactionBackground")
-    fun LinearLayout.setBackground(note: PlaneNoteViewData, reaction: net.pantasystem.milktea.model.notes.reaction.ReactionCount){
+    fun LinearLayout.setBackground(note: PlaneNoteViewData, reaction: ReactionCount){
 
-        if(!net.pantasystem.milktea.model.notes.reaction.Reaction(reaction.reaction).isLocal()) {
+        if(!Reaction(reaction.reaction).isLocal()) {
             this.background = ColorDrawable(Color.argb(0,0,0,0))
             return
         }

@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.model.list
 
+import net.pantasystem.milktea.model.user.User
+
 interface UserListRepository {
     suspend fun findByAccountId(accountId: Long): List<UserList>
 
@@ -7,9 +9,9 @@ interface UserListRepository {
 
     suspend fun update(listId: UserList.Id, name: String)
 
-    suspend fun appendUser(listId: UserList.Id, userId: net.pantasystem.milktea.model.user.User.Id)
+    suspend fun appendUser(listId: UserList.Id, userId: User.Id)
 
-    suspend fun removeUser(listId: UserList.Id, userId: net.pantasystem.milktea.model.user.User.Id)
+    suspend fun removeUser(listId: UserList.Id, userId: User.Id)
 
     suspend fun delete(listId: UserList.Id)
 

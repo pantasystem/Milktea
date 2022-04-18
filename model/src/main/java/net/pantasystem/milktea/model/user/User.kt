@@ -2,6 +2,8 @@ package net.pantasystem.milktea.model.user
 
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.nickname.UserNickname
 import java.lang.Exception
@@ -17,7 +19,7 @@ sealed interface User : Entity {
     val userName: String
     val name: String?
     val avatarUrl: String?
-    val emojis: List<net.pantasystem.milktea.model.emoji.Emoji>
+    val emojis: List<Emoji>
     val isCat: Boolean?
     val isBot: Boolean?
     val host: String?
@@ -34,7 +36,7 @@ sealed interface User : Entity {
         override val userName: String,
         override val name: String?,
         override val avatarUrl: String?,
-        override val emojis: List<net.pantasystem.milktea.model.emoji.Emoji>,
+        override val emojis: List<Emoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
         override val host: String?,
@@ -47,7 +49,7 @@ sealed interface User : Entity {
         override val userName: String,
         override val name: String?,
         override val avatarUrl: String?,
-        override val emojis: List<net.pantasystem.milktea.model.emoji.Emoji>,
+        override val emojis: List<Emoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
         override val host: String?,
@@ -107,7 +109,7 @@ sealed interface User : Entity {
         return "@" + this.userName
     }
 
-    fun getProfileUrl(account: net.pantasystem.milktea.model.account.Account): String {
+    fun getProfileUrl(account: Account): String {
         return "https://${account.getHost()}/${getDisplayUserName()}"
     }
 }

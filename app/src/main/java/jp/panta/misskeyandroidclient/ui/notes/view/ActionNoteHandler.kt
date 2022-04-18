@@ -67,7 +67,7 @@ class ActionNoteHandler(
         Log.d("MainActivity", "share clicked :$it")
         ShareBottomSheetDialog().show(activity.supportFragmentManager, "MainActivity")
     }
-    private val targetUserObserver = Observer<net.pantasystem.milktea.model.user.User> {
+    private val targetUserObserver = Observer<User> {
         Log.d("MainActivity", "user clicked :$it")
         val intent = UserDetailActivity.newInstance(activity, userId = it.id)
 
@@ -99,7 +99,7 @@ class ActionNoteHandler(
     }
 
 
-    private val showNoteEventObserver = Observer<net.pantasystem.milktea.model.notes.Note> {
+    private val showNoteEventObserver = Observer<Note> {
         activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = it.id))
     }
     private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>> {
@@ -120,7 +120,7 @@ class ActionNoteHandler(
         dialog.show(activity.supportFragmentManager, "")
     }
 
-    private val openNoteEditor = Observer<net.pantasystem.milktea.model.notes.draft.DraftNote?> { note ->
+    private val openNoteEditor = Observer<DraftNote?> { note ->
         activity.startActivity(NoteEditorActivity.newBundle(activity, draftNote = note))
     }
 
@@ -152,26 +152,26 @@ class ActionNoteHandler(
         }
         when (it.eventType) {
             "delete_note" -> {
-                if (it.args is net.pantasystem.milktea.model.notes.Note) {
-                    mNotesViewModel.removeNote((it.args as net.pantasystem.milktea.model.notes.Note).id)
+                if (it.args is Note) {
+                    mNotesViewModel.removeNote((it.args as Note).id)
                 }
             }
             "delete_and_edit_note" -> {
-                if (it.args is net.pantasystem.milktea.model.notes.NoteRelation) {
-                    mNotesViewModel.removeAndEditNote(it.args as net.pantasystem.milktea.model.notes.NoteRelation)
+                if (it.args is NoteRelation) {
+                    mNotesViewModel.removeAndEditNote(it.args as NoteRelation)
                 }
             }
         }
     }
 
-    private val showReactionHistoryDialogObserver: (net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest?) -> Unit = { req ->
+    private val showReactionHistoryDialogObserver: (ReactionHistoryRequest?) -> Unit = { req ->
         req?.let {
             ReactionHistoryPagerDialog.newInstance(req.noteId, it.type)
                 .show(activity.supportFragmentManager, "")
         }
     }
 
-    private val showRenotesDialogObserver: (net.pantasystem.milktea.model.notes.Note.Id?) -> Unit = { id ->
+    private val showRenotesDialogObserver: (Note.Id?) -> Unit = { id ->
         id?.let {
             RenotesBottomSheetDialog.newInstance(id).show(activity.supportFragmentManager, "")
         }

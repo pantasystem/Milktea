@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.notification
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.notes.Note
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.model.user.User
 
 
 sealed class Notification {
@@ -24,14 +25,14 @@ interface HasNote {
 }
 
 interface HasUser {
-    val userId: net.pantasystem.milktea.model.user.User.Id
+    val userId: User.Id
 }
 
 data class FollowNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val isRead: Boolean
 ) : Notification(), HasUser {
     override fun read(): Notification {
@@ -43,7 +44,7 @@ data class FollowRequestAcceptedNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val isRead: Boolean
 
 ) : Notification(), HasUser {
@@ -56,7 +57,7 @@ data class ReceiveFollowRequestNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val isRead: Boolean
 
 ) : Notification(), HasUser {
@@ -69,7 +70,7 @@ data class MentionNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
 
@@ -84,7 +85,7 @@ data class ReplyNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
 
@@ -98,7 +99,7 @@ data class RenoteNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
 
@@ -112,7 +113,7 @@ data class QuoteNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val noteId: Note.Id,
     override val isRead: Boolean
 
@@ -126,7 +127,7 @@ data class ReactionNotification(
     override val id: Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     override val noteId: Note.Id,
     val reaction: String,
     override val isRead: Boolean
@@ -142,7 +143,7 @@ data class PollVoteNotification(
     override val noteId: Note.Id,
 
     override val createdAt: Instant,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     val choice: Int,
     override val isRead: Boolean
 
@@ -168,7 +169,7 @@ data class UnknownNotification(
     override val id: Id,
     override val createdAt: Instant,
     override val isRead: Boolean,
-    override val userId: net.pantasystem.milktea.model.user.User.Id,
+    override val userId: User.Id,
     val rawType: String
 
 ) : Notification(), HasUser {
