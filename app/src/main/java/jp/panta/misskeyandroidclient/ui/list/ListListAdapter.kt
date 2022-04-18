@@ -65,7 +65,7 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
         fun onEdit(userList: UserList?)
     }
 
-    private var addUserId: net.pantasystem.milktea.model.user.User.Id? = null
+    private var addUserId: User.Id? = null
     private var pullPushUserViewModel: UserListPullPushUserViewModel? = null
 
     @ExperimentalCoroutinesApi
@@ -73,7 +73,7 @@ class ListListAdapter @ExperimentalCoroutinesApi constructor(
         listListViewModel: ListListViewModel,
         lifecycleOwner: LifecycleOwner,
         onTryToEditCallback: OnTryToEditCallback?,
-        addUserId: net.pantasystem.milktea.model.user.User.Id,
+        addUserId: User.Id,
         pullPushUserViewModel: UserListPullPushUserViewModel
     )
     :this(listListViewModel, lifecycleOwner, onTryToEditCallback){

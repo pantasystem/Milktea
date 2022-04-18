@@ -72,7 +72,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
             pagerViewModel.types.collect { list ->
                 val types = list.toMutableList().also {
                     it.add(0,
-                        net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest(
+                        ReactionHistoryRequest(
                             noteId,
                             null
                         )
@@ -94,7 +94,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
 
     }
 
-    private fun showPager(noteId: Note.Id, types: List<net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest>) {
+    private fun showPager(noteId: Note.Id, types: List<ReactionHistoryRequest>) {
         val adapter = ReactionHistoryPagerAdapter(childFragmentManager, types, noteId)
         binding.reactionHistoryPager.adapter = adapter
     }

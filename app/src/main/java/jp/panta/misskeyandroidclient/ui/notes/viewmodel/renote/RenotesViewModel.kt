@@ -15,15 +15,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
 
 class RenotesViewModel(
     private val renotesPagingService: RenotesPagingService,
     private val noteGetter: NoteRelationGetter,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory
+    loggerFactory: Logger.Factory
 ) : ViewModel() {
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val targetNoteId: net.pantasystem.milktea.model.notes.Note.Id, private val miCore: MiCore) : ViewModelProvider.Factory {
+    class Factory(private val targetNoteId: Note.Id, private val miCore: MiCore) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return RenotesViewModel(
                 miCore.createRenotesPagingService(targetNoteId),
@@ -66,7 +68,7 @@ class RenotesViewModel(
         }
     }
 
-    private fun<T : Renote> Flow<net.pantasystem.milktea.common.PageableState<List<T>>>.asNoteRelation() : Flow<net.pantasystem.milktea.common.PageableState<List<net.pantasystem.milktea.model.notes.NoteRelation>>> {
+    private fun<T : Renote> Flow<PageableState<List<T>>>.asNoteRelation() : Flow<PageableState<List<NoteRelation>>> {
         return this.map{ pageable ->
             pageable.suspendConvert { list ->
                 list.mapNotNull {

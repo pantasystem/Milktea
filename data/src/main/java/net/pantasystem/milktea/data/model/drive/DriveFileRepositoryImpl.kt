@@ -6,6 +6,7 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.toFileProperty
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 
 class DriveFileRepositoryImpl @Inject constructor(
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val driveFileDataSource: FilePropertyDataSource,
     private val encryption: Encryption

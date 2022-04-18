@@ -11,7 +11,7 @@ object ListListPagedFlagHelper {
 
     @JvmStatic
     @BindingAdapter("list", "pagedList")
-    fun ImageButton.setListListTogglePageIcon(list: net.pantasystem.milktea.model.list.UserList?, pagedList: Set<net.pantasystem.milktea.model.list.UserList>?){
+    fun ImageButton.setListListTogglePageIcon(list: UserList?, pagedList: Set<UserList>?){
         if(list == null){
             Log.d("ListListPagedFlagHelper", "UserList is null")
             return

@@ -20,13 +20,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ReactionPickerSettingViewModel(
-    private val account: net.pantasystem.milktea.model.account.Account,
-    private val reactionUserSettingDao: net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao,
+    private val account: Account,
+    private val reactionUserSettingDao: ReactionUserSettingDao,
     private val settingStore: SettingStore,
-) : ViewModel(), net.pantasystem.milktea.model.notes.reaction.ReactionSelection {
+) : ViewModel(), ReactionSelection {
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val ar: net.pantasystem.milktea.model.account.Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
+    class Factory(private val ar: Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val settingStore = SettingStore(
                 miApplication.getSharedPreferences(miApplication.getPreferenceName(), Context.MODE_PRIVATE)

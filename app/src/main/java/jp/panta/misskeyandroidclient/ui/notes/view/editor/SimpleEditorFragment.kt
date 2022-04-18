@@ -84,7 +84,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         }
         accountViewModel.showProfile.observe(this) {
-            val intent = UserDetailActivity.newInstance(requireContext(), userId = net.pantasystem.milktea.model.user.User.Id(it.accountId, it.remoteId))
+            val intent = UserDetailActivity.newInstance(requireContext(), userId = User.Id(it.accountId, it.remoteId))
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
             startActivity(intent)
@@ -344,7 +344,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     private val registerForOpenDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if(result.resultCode == RESULT_OK) {
             val selectedFilePropertyIds = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
-                it as net.pantasystem.milktea.model.drive.FileProperty.Id
+                it as FileProperty.Id
             }
             mViewModel.addFilePropertyFromIds(selectedFilePropertyIds)
         }

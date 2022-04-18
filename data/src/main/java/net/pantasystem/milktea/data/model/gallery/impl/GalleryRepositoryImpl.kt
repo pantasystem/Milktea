@@ -13,6 +13,7 @@ import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.model.toEntity
 import net.pantasystem.milktea.data.model.toFileProperty
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
@@ -31,7 +32,7 @@ class GalleryRepositoryImpl @Inject constructor(
     private val fileUploaderProvider: FileUploaderProvider,
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository
+    private val accountRepository: AccountRepository
 ) : GalleryRepository {
 
 

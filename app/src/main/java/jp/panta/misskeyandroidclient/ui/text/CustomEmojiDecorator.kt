@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 
 class CustomEmojiDecorator{
 
-    fun decorate(emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?, text: String, view: View): Spanned {
+    fun decorate(emojis: List<Emoji>?, text: String, view: View): Spanned {
         if(emojis.isNullOrEmpty()){
             return SpannableStringBuilder(text)
         }

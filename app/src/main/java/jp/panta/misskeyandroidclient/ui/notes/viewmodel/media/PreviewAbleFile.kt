@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.media
 import net.pantasystem.milktea.model.file.File
 
 
-data class PreviewAbleFile(val file: net.pantasystem.milktea.model.file.File, val isHiding: Boolean) {
+data class PreviewAbleFile(val file: File, val isHiding: Boolean) {
     enum class Type{
         VIDEO, IMAGE, SOUND, OTHER
     }

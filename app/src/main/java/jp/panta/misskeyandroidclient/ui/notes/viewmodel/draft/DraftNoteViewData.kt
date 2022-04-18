@@ -4,7 +4,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 
-class DraftNoteViewData(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote){
+class DraftNoteViewData(draftNote: DraftNote){
 
     val note = MutableLiveData(draftNote)
 

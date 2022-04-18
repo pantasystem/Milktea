@@ -14,14 +14,14 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.SelectPageTypeTo
 /**
  * タブに追加する候補を表示するリストアダプター
  */
-class PageTypeListAdapter(private val selectPageTypeToAdd: SelectPageTypeToAdd) : ListAdapter<net.pantasystem.milktea.model.account.page.PageType, PageTypeListAdapter.VH>(ItemCallback()){
+class PageTypeListAdapter(private val selectPageTypeToAdd: SelectPageTypeToAdd) : ListAdapter<PageType, PageTypeListAdapter.VH>(ItemCallback()){
 
-    class ItemCallback : DiffUtil.ItemCallback<net.pantasystem.milktea.model.account.page.PageType>(){
-        override fun areContentsTheSame(oldItem: net.pantasystem.milktea.model.account.page.PageType, newItem: net.pantasystem.milktea.model.account.page.PageType): Boolean {
+    class ItemCallback : DiffUtil.ItemCallback<PageType>(){
+        override fun areContentsTheSame(oldItem: PageType, newItem: PageType): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: net.pantasystem.milktea.model.account.page.PageType, newItem: net.pantasystem.milktea.model.account.page.PageType): Boolean {
+        override fun areItemsTheSame(oldItem: PageType, newItem: PageType): Boolean {
             return oldItem == newItem
         }
     }

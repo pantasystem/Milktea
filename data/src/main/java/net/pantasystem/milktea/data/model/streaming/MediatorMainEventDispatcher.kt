@@ -26,7 +26,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
         val messageDataSource: MessageDataSource,
         val getters: Getters,
         val unreadNotificationDAO: UnreadNotificationDAO,
-        val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+        val userDataSource: UserDataSource,
     ) {
 
         fun create(): MediatorMainEventDispatcher {

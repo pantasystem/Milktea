@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
@@ -30,7 +31,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
     val metaRepository: MetaRepository,
     val accountRepository: AccountRepository,
     val noteRepository: NoteRepository,
-    val loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    val loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
     private val _reaction = MutableStateFlow<RemoteReaction?>(null)

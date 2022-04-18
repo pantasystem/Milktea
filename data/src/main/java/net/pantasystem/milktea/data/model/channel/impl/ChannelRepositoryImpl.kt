@@ -1,16 +1,13 @@
 package net.pantasystem.milktea.data.model.channel.impl
 
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.channel.ChannelStateModel
-import net.pantasystem.milktea.model.channel.CreateChannel
-import net.pantasystem.milktea.model.channel.UpdateChannel
+import net.pantasystem.milktea.model.channel.*
 
 class ChannelRepositoryImpl(
     private val channelAPIAdapter: ChannelAPIAdapter,
     private val channelStateModel: ChannelStateModel,
     private val accountRepository: AccountRepository
-) : net.pantasystem.milktea.model.channel.ChannelRepository {
+) : ChannelRepository {
     override suspend fun findOne(id: Channel.Id): Result<Channel> {
         return runCatching {
             var channel = channelStateModel.get(id)

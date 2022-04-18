@@ -11,7 +11,7 @@ import javax.inject.Inject
 class UserNicknameRepositorySQLiteImpl @Inject constructor(
     private val userNicknameDAO: UserNicknameDAO,
     private val userNicknameRepositoryOnMemoryImpl: UserNicknameRepositoryOnMemoryImpl,
-) : net.pantasystem.milktea.model.user.nickname.UserNicknameRepository {
+) : UserNicknameRepository {
 
     /**
      * ニックネームは存在しない可能性が高い＆

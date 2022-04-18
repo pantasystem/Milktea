@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UrlPreviewSourceSettingViewModel @Inject constructor(
-    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
+    val accountStore: AccountStore,
     val settingStore: SettingStore,
     val urlPreviewDAO: UrlPreviewDAO,
     val miCore: MiCore

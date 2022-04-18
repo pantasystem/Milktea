@@ -5,13 +5,13 @@ import net.pantasystem.milktea.model.user.User
 
 data class UserListEvent(
     val type: Type,
-    val userListId: net.pantasystem.milktea.model.list.UserList.Id,
+    val userListId: UserList.Id,
 
     //push user, pull user
-    val userId: net.pantasystem.milktea.model.user.User.Id? = null,
+    val userId: User.Id? = null,
 
     //create
-    val userList: net.pantasystem.milktea.model.list.UserList? = null,
+    val userList: UserList? = null,
 
     val name: String? = null
 ) {

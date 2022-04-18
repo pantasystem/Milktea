@@ -10,7 +10,7 @@ class RoomMetaRepository(
     private val metaDAO: MetaDAO,
     private val emojiAliasDAO: EmojiAliasDAO,
     val database: DataBase
-) : net.pantasystem.milktea.model.instance.MetaRepository {
+) : MetaRepository {
 
     override suspend fun add(meta: Meta): Meta {
         return database.runInTransaction<Meta>{

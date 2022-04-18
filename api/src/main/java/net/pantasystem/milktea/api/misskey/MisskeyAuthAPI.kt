@@ -11,7 +11,7 @@ import retrofit2.http.POST
 interface MisskeyAuthAPI {
     //auth
     @POST("api/auth/session/generate")
-    suspend fun generateSession(@Body appSecret: AppSecret): Response<net.pantasystem.milktea.api.misskey.auth.Session>
+    suspend fun generateSession(@Body appSecret: AppSecret): Response<Session>
 
     @POST("api/auth/session/userkey")
     suspend fun getAccessToken(@Body userKey: UserKey): Response<AccessToken>

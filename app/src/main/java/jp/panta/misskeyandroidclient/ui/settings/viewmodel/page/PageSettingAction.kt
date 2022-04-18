@@ -4,6 +4,6 @@ import net.pantasystem.milktea.model.account.page.Page
 
 interface PageSettingAction {
 
-    fun action(page: net.pantasystem.milktea.model.account.page.Page?)
+    fun action(page: Page?)
 
 }

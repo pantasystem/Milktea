@@ -23,7 +23,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
     companion object{
         private const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment.EXTRA_USER_ID"
         private const val EXTRA_TYPE = "jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment.EXTRA_TYPE"
-        fun newInstance(type: FollowFollowerViewModel.Type, userId: net.pantasystem.milktea.model.user.User.Id) : FollowFollowerFragment{
+        fun newInstance(type: FollowFollowerViewModel.Type, userId: User.Id) : FollowFollowerFragment{
             return FollowFollowerFragment().apply{
                 arguments = Bundle().apply{
                     putSerializable(EXTRA_USER_ID, userId)
@@ -45,7 +45,7 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
         val type = FollowFollowerViewModel.Type.values()[typeOrdinal]
         //val user = arguments?.getSerializable(EXTRA_USER) as UserDTO?
-        val userId = arguments?.getSerializable(EXTRA_USER_ID) as net.pantasystem.milktea.model.user.User.Id
+        val userId = arguments?.getSerializable(EXTRA_USER_ID) as User.Id
 
         mLinearLayoutManager = LinearLayoutManager(view.context)
 

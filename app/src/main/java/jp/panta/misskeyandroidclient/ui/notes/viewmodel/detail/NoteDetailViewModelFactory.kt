@@ -8,7 +8,7 @@ import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class NoteDetailViewModelFactory(
-    val show: net.pantasystem.milktea.model.account.page.Pageable.Show,
+    val show: Pageable.Show,
     val miApplication: MiApplication,
     val accountId: Long? = null
 ) : ViewModelProvider.Factory{

@@ -17,7 +17,7 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState", "emojis")
-    fun TextView.setTranslatedText(state: State<Translation>?, emojis: List<net.pantasystem.milktea.model.emoji.Emoji>?) {
+    fun TextView.setTranslatedText(state: State<Translation>?, emojis: List<Emoji>?) {
         if(state == null) {
             this.visibility = View.GONE
             return

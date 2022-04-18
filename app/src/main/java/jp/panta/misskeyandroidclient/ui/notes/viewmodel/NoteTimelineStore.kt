@@ -15,17 +15,19 @@ import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class NoteTimelineStore(
-    val account: net.pantasystem.milktea.model.account.Account,
+    val account: Account,
     //override val timelineRequestBase: NoteRequest.Setting,
     override val pageableTimeline: Pageable,
     val include: NoteRequest.Include,
     private val miCore: MiCore,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val noteTranslationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore
+    private val noteTranslationStore: NoteTranslationStore
 ) : NotePagedStore {
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)

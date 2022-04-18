@@ -112,7 +112,7 @@ object MediaPreviewHelper {
     fun FrameLayout.setPreview(
         thumbnailView: ImageView,
         playButton: ImageButton,
-        file: net.pantasystem.milktea.model.file.File?
+        file: File?
     ) {
 
         try {
@@ -151,7 +151,7 @@ object MediaPreviewHelper {
     private fun setPreview(
         thumbnailView: ImageView,
         playButton: ImageButton,
-        file: net.pantasystem.milktea.model.file.File
+        file: File
     ) {
         when (file.aboutMediaType) {
             File.AboutMediaType.IMAGE, File.AboutMediaType.VIDEO -> {

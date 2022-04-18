@@ -11,6 +11,6 @@ sealed class Preview : Serializable {
     ) : Preview()
 
     data class FileWrapper(
-        val file: net.pantasystem.milktea.model.file.File
+        val file: File
     ) : Preview()
 }

@@ -9,12 +9,13 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 import retrofit2.Response
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class FavoriteNotePagingStore(
     val account: Account,
-    override val pageableTimeline: net.pantasystem.milktea.model.account.page.Pageable.Favorite,
+    override val pageableTimeline: Pageable.Favorite,
     private val miCore: MiCore,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
 
@@ -51,7 +52,7 @@ class FavoriteNotePagingStore(
         return makeResponse(res, false)
     }
 
-    private suspend fun makeResponse(res: Response<List<net.pantasystem.milktea.api.misskey.favorite.Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
+    private suspend fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
             FavoriteNoteViewData(it ,

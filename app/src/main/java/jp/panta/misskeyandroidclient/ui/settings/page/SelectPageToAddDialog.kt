@@ -14,6 +14,9 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.galleryTypes
 import javax.inject.Inject
 
 /**
@@ -22,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SelectPageToAddDialog : BottomSheetDialogFragment(){
 
-    @Inject lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    @Inject lateinit var accountStore: AccountStore
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -33,18 +36,18 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
         val miCore = view.context.applicationContext as MiCore
 
         val viewModel = ViewModelProvider(requireActivity())[PageSettingViewModel::class.java]
-        viewModel.pageAddedEvent.observe(requireActivity(), {
+        viewModel.pageAddedEvent.observe(requireActivity()) {
             dismiss()
-        })
+        }
 
-        var pageTypeList = net.pantasystem.milktea.model.account.page.PageType.values().toList().toMutableList()
+        var pageTypeList = PageType.values().toList().toMutableList()
         val api = miCore.getMisskeyAPIProvider().get(accountStore.state.value.currentAccount!!)
         if(api !is MisskeyAPIV12){
-            pageTypeList.remove(net.pantasystem.milktea.model.account.page.PageType.ANTENNA)
+            pageTypeList.remove(PageType.ANTENNA)
         }
         if(api !is MisskeyAPIV1275) {
             pageTypeList = pageTypeList.filterNot {
-                net.pantasystem.milktea.model.account.page.galleryTypes.contains(it)
+                galleryTypes.contains(it)
             }.toMutableList()
         }
         val adapter = PageTypeListAdapter(viewModel)

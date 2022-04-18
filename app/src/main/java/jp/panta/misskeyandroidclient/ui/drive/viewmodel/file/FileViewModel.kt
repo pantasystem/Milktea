@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.toFileProperty
+import net.pantasystem.milktea.model.drive.DriveStore
 import net.pantasystem.milktea.model.drive.FileProperty
 
 /**
@@ -20,7 +21,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 class FileViewModel(
     private val currentAccountWatcher: CurrentAccountWatcher,
     private val miCore: MiCore,
-    private val driveStore: net.pantasystem.milktea.model.drive.DriveStore,
+    private val driveStore: DriveStore,
 ) : ViewModel() {
     val logger = miCore.loggerFactory.create("FileViewModel")
 

@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.databinding.ItemReactionChoiceBinding
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 
 class ReactionChoicesAdapter(
-    val reactionSelection: net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+    val reactionSelection: ReactionSelection
 ) : ListAdapter<String, ReactionChoicesAdapter.Holder>(
     DiffUtilItemCallback()
 ){

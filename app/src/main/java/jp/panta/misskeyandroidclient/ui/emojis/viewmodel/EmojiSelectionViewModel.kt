@@ -7,9 +7,9 @@ import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 
 class EmojiSelectionViewModel : ViewModel(), EmojiSelection {
 
-    val selectedEmoji = EventBus<net.pantasystem.milktea.model.emoji.Emoji>()
+    val selectedEmoji = EventBus<Emoji>()
     val selectedEmojiName = EventBus<String>()
-    override fun onSelect(emoji: net.pantasystem.milktea.model.emoji.Emoji) {
+    override fun onSelect(emoji: Emoji) {
         selectedEmoji.event = emoji
     }
 

@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.databinding.ItemReactionPreviewBinding
 import net.pantasystem.milktea.model.emoji.Emoji
 
 class ReactionAutoCompleteArrayAdapter(
-    private val reactions: List<net.pantasystem.milktea.model.emoji.Emoji>,
+    private val reactions: List<Emoji>,
     private val context: Context
 ) : BaseAdapter(), Filterable{
 

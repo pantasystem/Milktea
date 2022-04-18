@@ -8,18 +8,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UsersState
 import net.pantasystem.milktea.model.user.nickname.UserNickname
+import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
 import javax.inject.Inject
 
 // TODO: 色々と依存していてよくわからないのでアーキテクチャレベルでリファクタリングをする
 class InMemoryUserDataSource @Inject constructor(
     loggerFactory: Logger.Factory?,
-    private val userNicknameRepository: net.pantasystem.milktea.model.user.nickname.UserNicknameRepository,
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    private val userNicknameRepository: UserNicknameRepository,
+    private val accountRepository: AccountRepository,
 ) : UserDataSource {
     private val logger = loggerFactory?.create("InMemoryUserDataSource")
 

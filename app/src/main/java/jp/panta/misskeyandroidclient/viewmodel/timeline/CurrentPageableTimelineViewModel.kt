@@ -15,12 +15,12 @@ sealed interface SuitableType {
     companion object
 }
 
-fun net.pantasystem.milktea.model.account.page.Pageable.suitableType(): SuitableType {
+fun Pageable.suitableType(): SuitableType {
     return when(this) {
-        is net.pantasystem.milktea.model.account.page.Pageable.ChannelTimeline -> {
+        is Pageable.ChannelTimeline -> {
             SuitableType.Channel(this.channelId)
         }
-        is net.pantasystem.milktea.model.account.page.Pageable.Gallery -> {
+        is Pageable.Gallery -> {
             SuitableType.Gallery
         }
         else -> SuitableType.Other
@@ -33,12 +33,12 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    private val _currentType = MutableStateFlow<net.pantasystem.milktea.model.account.page.Pageable>(
-        net.pantasystem.milktea.model.account.page.Pageable.HomeTimeline())
+    private val _currentType = MutableStateFlow<Pageable>(
+        Pageable.HomeTimeline())
 
-    val currentType: StateFlow<net.pantasystem.milktea.model.account.page.Pageable> = _currentType
+    val currentType: StateFlow<Pageable> = _currentType
 
-    fun setCurrentPageable(pageable: net.pantasystem.milktea.model.account.page.Pageable) {
+    fun setCurrentPageable(pageable: Pageable) {
         _currentType.value = pageable
     }
 

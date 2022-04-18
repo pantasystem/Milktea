@@ -37,7 +37,7 @@ class MediatorAccountRepository(
     override suspend fun get(accountId: Long): Account {
         return findAll().firstOrNull {
             it.accountId == accountId
-        }?: throw net.pantasystem.milktea.model.account.AccountNotFoundException()
+        }?: throw AccountNotFoundException()
     }
 
     override suspend fun getCurrentAccount(): Account {

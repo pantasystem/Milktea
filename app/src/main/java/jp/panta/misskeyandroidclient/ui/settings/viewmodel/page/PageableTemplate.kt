@@ -5,6 +5,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 
 
-fun net.pantasystem.milktea.model.account.Account.newPage(pageable: net.pantasystem.milktea.model.account.page.Pageable, name: String): net.pantasystem.milktea.model.account.page.Page {
+fun Account.newPage(pageable: Pageable, name: String): Page {
     return Page(this.accountId, name, 0, pageable)
 }

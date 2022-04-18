@@ -19,7 +19,7 @@ class MetaRelation {
     lateinit var aliases: List<EmojiAlias>
 
     @Ignore
-    fun toMeta(): net.pantasystem.milktea.model.instance.Meta {
+    fun toMeta(): Meta {
         val mapEmojis = aliases.groupBy {
             it.name to it.instanceDomain
         }
@@ -30,7 +30,7 @@ class MetaRelation {
             emoji.toEmoji(alias)
 
         }
-        return net.pantasystem.milktea.model.instance.Meta(
+        return Meta(
             bannerUrl = this.meta.bannerUrl,
             cacheRemoteFiles = this.meta.cacheRemoteFiles,
             description = this.meta.description,

@@ -382,7 +382,7 @@ class TimelineViewModel(
     }
 
 
-    private fun mapId(planeNoteViewData: PlaneNoteViewData): net.pantasystem.milktea.model.notes.Note.Id {
+    private fun mapId(planeNoteViewData: PlaneNoteViewData): Note.Id {
         return planeNoteViewData.id
     }
 
@@ -464,7 +464,7 @@ class TimelineViewModel(
     }
 
 
-    private fun Account.getMisskeyAPI(): net.pantasystem.milktea.api.misskey.MisskeyAPI {
+    private fun Account.getMisskeyAPI(): MisskeyAPI {
         return miCore.getMisskeyAPIProvider().get(this)
     }
 

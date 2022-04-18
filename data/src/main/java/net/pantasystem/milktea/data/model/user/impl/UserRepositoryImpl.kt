@@ -17,6 +17,7 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
+import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.report.Report
 import retrofit2.Response
 import javax.inject.Inject
@@ -30,7 +31,7 @@ class UserRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
     val loggerFactory: Logger.Factory,
-) : net.pantasystem.milktea.model.user.UserRepository {
+) : UserRepository {
     private val logger: Logger by lazy {
         loggerFactory.create("UserRepositoryImpl")
     }

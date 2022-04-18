@@ -14,11 +14,9 @@ import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.File
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.NoteTranslationStore
-import net.pantasystem.milktea.model.notes.Translation
+import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.user.User
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -70,7 +68,7 @@ open class PlaneNoteViewData (
             }
         }
 
-    val userId: net.pantasystem.milktea.model.user.User.Id
+    val userId: User.Id
         get() = toShowNote.user.id
 
     val name: String
@@ -192,7 +190,7 @@ open class PlaneNoteViewData (
         }
     }
 
-    fun update(note: net.pantasystem.milktea.model.notes.Note){
+    fun update(note: Note){
         require(toShowNote.note.id == note.id) {
             "更新として渡されたNote.Idと現在のIdが一致しません。"
         }

@@ -32,9 +32,9 @@ class SettingAppearanceActivity : AppCompatActivity() {
     lateinit var mSettingStore: SettingStore
 
     @Inject
-    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    lateinit var accountStore: AccountStore
     @Inject
-    lateinit var driveFileRepository: net.pantasystem.milktea.model.drive.DriveFileRepository
+    lateinit var driveFileRepository: DriveFileRepository
     private val mBinding: ActivitySettingAppearanceBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,7 +170,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =
                 (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
-                    it as? net.pantasystem.milktea.model.drive.FileProperty.Id
+                    it as? FileProperty.Id
                 }
             val fileId = ids?.firstOrNull() ?: return@registerForActivityResult
             lifecycleScope.launch(Dispatchers.IO) {

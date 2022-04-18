@@ -6,8 +6,8 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import java.lang.IndexOutOfBoundsException
 
-class PollViewData(private val poll: net.pantasystem.milktea.model.notes.poll.Poll, val noteId: String){
-    inner class Choice(val choice: net.pantasystem.milktea.model.notes.poll.Poll.Choice, val number: Int){
+class PollViewData(private val poll: Poll, val noteId: String){
+    inner class Choice(val choice: Poll.Choice, val number: Int){
         val isVoted = MutableLiveData(choice.isVoted)
 
         val voteCount = MutableLiveData(choice.votes)
@@ -50,7 +50,7 @@ class PollViewData(private val poll: net.pantasystem.milktea.model.notes.poll.Po
         }
     }
 
-    fun update(poll: net.pantasystem.milktea.model.notes.poll.Poll) {
+    fun update(poll: Poll) {
         runCatching {
             for(i in poll.choices.indices) {
                 choices[i].voteCount.postValue(poll.choices[i].votes)

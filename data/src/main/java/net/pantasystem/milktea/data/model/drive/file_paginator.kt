@@ -13,6 +13,7 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -21,7 +22,7 @@ import retrofit2.Response
 
 class FilePropertyPagingStore(
     private var currentDirectoryId: String?,
-    private val getAccount: suspend () -> net.pantasystem.milktea.model.account.Account,
+    private val getAccount: suspend () -> Account,
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
     encryption: Encryption,
@@ -71,7 +72,7 @@ class FilePropertyPagingStore(
 
 class FilePropertyPagingImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getAccount: suspend ()-> net.pantasystem.milktea.model.account.Account,
+    private val getAccount: suspend ()-> Account,
     private val getCurrentFolderId: ()-> String?,
     private val encryption: Encryption,
     private val filePropertyDataSource: FilePropertyDataSource
