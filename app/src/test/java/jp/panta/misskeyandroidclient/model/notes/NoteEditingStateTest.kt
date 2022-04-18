@@ -1,10 +1,14 @@
 package jp.panta.misskeyandroidclient.model.notes
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.file.AppFile
 import junit.framework.TestCase
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.notes.AddMentionResult
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteEditingState
+import net.pantasystem.milktea.model.notes.Visibility
 
 class NoteEditingStateTest : TestCase() {
 

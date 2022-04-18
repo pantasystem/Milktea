@@ -1,7 +1,10 @@
 package jp.panta.misskeyandroidclient.model.account
 
-import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.model.instance.Meta
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
+import net.pantasystem.milktea.model.account.PageDefaultStringsJp
+import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.instance.Meta
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

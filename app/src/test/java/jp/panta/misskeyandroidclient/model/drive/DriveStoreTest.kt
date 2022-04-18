@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.drive
 
 import junit.framework.TestCase
+import net.pantasystem.milktea.model.drive.*
 
 class DriveStoreTest : TestCase() {
 

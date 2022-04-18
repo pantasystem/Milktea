@@ -1,18 +1,16 @@
 package jp.panta.misskeyandroidclient.streaming.network
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.model.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.Socket
 import net.pantasystem.milktea.data.streaming.StreamingEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.data.model.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.network.SocketImpl
 import okhttp3.OkHttpClient
 import org.junit.Assert.*
 import org.junit.Test
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class SocketImplTest {
 

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.reaction
 
+import net.pantasystem.milktea.model.notes.reaction.Reaction
 import org.junit.Assert.*
 
 import org.junit.Test

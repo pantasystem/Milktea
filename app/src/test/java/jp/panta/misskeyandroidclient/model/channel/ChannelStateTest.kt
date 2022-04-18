@@ -1,7 +1,9 @@
 package jp.panta.misskeyandroidclient.model.channel
 
-import jp.panta.misskeyandroidclient.model.users.User
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.channel.ChannelState
+import net.pantasystem.milktea.model.user.User
 import org.junit.Assert.*
 
 import org.junit.Test

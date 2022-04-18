@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.list
 
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListState
 import org.junit.Assert.*
 
 import org.junit.Test

@@ -1,14 +1,19 @@
 package jp.panta.misskeyandroidclient.model.users.nickname
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
+
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
-import jp.panta.misskeyandroidclient.model.users.impl.InMemoryUserDataSource
-import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameRepositoryOnMemoryImpl
+
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.data.model.user.impl.InMemoryUserDataSource
+import net.pantasystem.milktea.data.model.user.impl.UserNicknameRepositoryOnMemoryImpl
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
+import net.pantasystem.milktea.model.user.nickname.UserNickname
+import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
 import org.junit.Assert.*
 
 import org.junit.Before

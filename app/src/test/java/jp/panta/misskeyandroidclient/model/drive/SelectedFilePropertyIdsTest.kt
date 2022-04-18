@@ -1,8 +1,9 @@
 package jp.panta.misskeyandroidclient.model.drive
 
 import junit.framework.TestCase
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.SelectedFilePropertyIds
 import org.junit.Test
-import java.lang.IllegalArgumentException
 
 class SelectedFilePropertyIdsTest : TestCase() {
 

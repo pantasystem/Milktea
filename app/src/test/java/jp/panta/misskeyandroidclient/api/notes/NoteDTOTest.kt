@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.api.notes
 
 
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import org.junit.Assert
 import org.junit.Test
 
