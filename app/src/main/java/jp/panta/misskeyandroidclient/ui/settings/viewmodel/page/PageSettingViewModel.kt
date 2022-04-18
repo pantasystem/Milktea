@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.PageType
-import net.pantasystem.milktea.data.model.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.account.Account

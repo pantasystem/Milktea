@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.model.notes.renote
+package net.pantasystem.milktea.data.infrastructure.notes.renote
 
 import net.pantasystem.milktea.model.notes.Note
 

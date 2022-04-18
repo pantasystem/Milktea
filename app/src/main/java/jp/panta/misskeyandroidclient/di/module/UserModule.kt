@@ -6,8 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.data.model.user.impl.InMemoryUserDataSource
-import net.pantasystem.milktea.data.model.user.impl.UserRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.impl.InMemoryUserDataSource
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserRepositoryImpl
 import javax.inject.Singleton
 
 @Module

@@ -1,13 +1,13 @@
 package net.pantasystem.milktea.data.gettters
 
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.data.model.entities
+import net.pantasystem.milktea.data.infrastructure.entities
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessageNotFoundException
 import net.pantasystem.milktea.model.messaging.MessageRelation
-import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.model.toGroup
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.UserDataSource
 import kotlin.jvm.Throws

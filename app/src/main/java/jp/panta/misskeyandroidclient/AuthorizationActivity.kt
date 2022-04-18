@@ -3,13 +3,12 @@ package jp.panta.misskeyandroidclient
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.model.auth.Authorization
-import net.pantasystem.milktea.data.model.auth.custom.CustomAuthStore
-import net.pantasystem.milktea.data.model.auth.from
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
+import net.pantasystem.milktea.data.infrastructure.auth.from
 import jp.panta.misskeyandroidclient.ui.auth.AuthFragment
 import jp.panta.misskeyandroidclient.ui.auth.AuthResultFragment
 import jp.panta.misskeyandroidclient.ui.auth.Waiting4userAuthorizationFragment

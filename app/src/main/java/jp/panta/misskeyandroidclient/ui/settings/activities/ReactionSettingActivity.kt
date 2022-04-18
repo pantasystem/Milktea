@@ -23,7 +23,7 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction.ReactionPickerSettingViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.data.model.settings.ReactionPickerType
+import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
 import java.lang.IllegalArgumentException
 
 class ReactionSettingActivity : AppCompatActivity() {

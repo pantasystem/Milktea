@@ -7,9 +7,9 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.auth.Authorization
-import net.pantasystem.milktea.data.model.auth.custom.AccessToken
-import net.pantasystem.milktea.data.model.auth.custom.toModel
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
+import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -18,8 +18,8 @@ import net.pantasystem.milktea.api.misskey.auth.createObtainToken
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.data.model.account.newAccount
-import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.data.infrastructure.account.newAccount
+import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.user.User
 import java.lang.IllegalStateException
 import javax.inject.Inject

@@ -4,9 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.model.user.impl.UserNicknameDAO
-import net.pantasystem.milktea.data.model.user.impl.UserNicknameRepositoryOnMemoryImpl
-import net.pantasystem.milktea.data.model.user.impl.UserNicknameRepositorySQLiteImpl
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDAO
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameRepositoryOnMemoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameRepositorySQLiteImpl
 import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
 import javax.inject.Singleton
 

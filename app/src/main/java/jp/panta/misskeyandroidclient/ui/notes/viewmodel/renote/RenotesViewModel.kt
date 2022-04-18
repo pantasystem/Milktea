@@ -7,8 +7,8 @@ import jp.panta.misskeyandroidclient.di.module.createRenotesPagingService
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.data.model.notes.renote.Renote
-import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.data.infrastructure.notes.renote.Renote
+import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingService
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

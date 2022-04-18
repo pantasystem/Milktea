@@ -6,7 +6,7 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import net.pantasystem.milktea.common.getPreferenceName
-import net.pantasystem.milktea.data.model.KeyStore
+import net.pantasystem.milktea.data.infrastructure.KeyStore
 
 fun AppCompatActivity.setTheme(){
     val preference = this.getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)

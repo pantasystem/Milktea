@@ -9,8 +9,8 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
-import net.pantasystem.milktea.data.model.toNote
+import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.toNote
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

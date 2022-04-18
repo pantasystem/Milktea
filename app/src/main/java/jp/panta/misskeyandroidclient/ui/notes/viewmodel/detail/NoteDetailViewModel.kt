@@ -10,7 +10,7 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
@@ -19,7 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.data.model.notes.toNoteRequest
+import net.pantasystem.milktea.data.infrastructure.notes.toNoteRequest
 import kotlin.collections.ArrayList
 
 @Suppress("BlockingMethodInNonBlockingContext")

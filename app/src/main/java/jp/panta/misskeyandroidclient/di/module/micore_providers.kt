@@ -3,15 +3,13 @@ package jp.panta.misskeyandroidclient.di.module
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.drive.FilePropertyPagingStore
-import net.pantasystem.milktea.data.model.gallery.GalleryPostsStore
-import net.pantasystem.milktea.data.model.gallery.GalleryPostsStoreImpl
-import net.pantasystem.milktea.data.model.gallery.LikedGalleryPostStoreImpl
-import net.pantasystem.milktea.data.model.gallery.impl.GalleryRepositoryImpl
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingService
-import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingServiceImpl
-import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.data.infrastructure.drive.FilePropertyPagingStore
+import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStore
+import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStoreImpl
+import net.pantasystem.milktea.data.infrastructure.gallery.LikedGalleryPostStoreImpl
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
 import net.pantasystem.milktea.model.notes.Note
 
 fun MiCore.filePropertyPagingStore(

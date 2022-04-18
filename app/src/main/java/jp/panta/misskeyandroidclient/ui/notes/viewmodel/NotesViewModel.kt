@@ -8,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.user.report.Report
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.SafeUnbox

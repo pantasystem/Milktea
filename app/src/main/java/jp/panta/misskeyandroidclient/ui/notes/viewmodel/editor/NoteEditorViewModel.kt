@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.file.toFile
-import net.pantasystem.milktea.data.model.notes.*
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
@@ -12,7 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore

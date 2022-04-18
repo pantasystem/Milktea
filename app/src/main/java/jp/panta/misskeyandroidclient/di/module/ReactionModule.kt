@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
-import net.pantasystem.milktea.data.model.notes.reaction.impl.InMemoryReactionHistoryDataSource
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.InMemoryReactionHistoryDataSource
 import javax.inject.Singleton
 
 @Module

@@ -5,8 +5,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import net.pantasystem.milktea.data.model.confirm.ConfirmEvent
-import net.pantasystem.milktea.data.model.confirm.ResultType
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmEvent
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 
 class ConfirmDialog : AppCompatDialogFragment(){

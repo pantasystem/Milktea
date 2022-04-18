@@ -8,9 +8,9 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.MessageRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
-import net.pantasystem.milktea.data.model.messaging.impl.InMemoryMessageDataSource
-import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.model.messaging.impl.MessageRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.InMemoryMessageDataSource
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageRepositoryImpl
 import javax.inject.Singleton
 
 @Module

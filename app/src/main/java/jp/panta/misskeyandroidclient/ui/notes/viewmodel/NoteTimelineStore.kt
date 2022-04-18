@@ -13,8 +13,8 @@ import retrofit2.Response
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
-import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
 

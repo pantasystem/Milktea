@@ -4,8 +4,8 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.data.model.url.UrlPreview
+import net.pantasystem.milktea.data.infrastructure.notes.*
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*

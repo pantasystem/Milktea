@@ -11,9 +11,9 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIWithAccountProviderImpl
-import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
-import net.pantasystem.milktea.data.model.toNote
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
+import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import org.junit.Assert.*

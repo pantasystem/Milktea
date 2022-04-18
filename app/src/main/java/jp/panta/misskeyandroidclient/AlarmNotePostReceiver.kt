@@ -10,7 +10,7 @@ import net.pantasystem.milktea.model.notes.toNoteEditingState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import javax.inject.Inject
 
 @AndroidEntryPoint

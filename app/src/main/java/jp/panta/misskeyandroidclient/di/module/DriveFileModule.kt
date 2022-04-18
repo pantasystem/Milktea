@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.common.GsonFactory
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.model.drive.*
+import net.pantasystem.milktea.data.infrastructure.drive.*
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
 import net.pantasystem.milktea.model.drive.InMemoryFilePropertyDataSource

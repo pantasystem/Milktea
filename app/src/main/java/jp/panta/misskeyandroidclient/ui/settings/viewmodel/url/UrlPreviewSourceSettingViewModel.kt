@@ -5,11 +5,11 @@ import android.os.Looper
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.data.model.settings.SettingStore
-import net.pantasystem.milktea.data.model.settings.UrlPreviewSourceSetting
-import net.pantasystem.milktea.data.model.url.UrlPreview
-import net.pantasystem.milktea.data.model.url.UrlPreviewStoreFactory
-import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.UrlPreviewSourceSetting
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreFactory
+import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

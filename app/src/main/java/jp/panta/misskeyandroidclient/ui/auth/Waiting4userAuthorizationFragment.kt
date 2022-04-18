@@ -9,13 +9,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentWaiting4UserAuthorizationBinding
-import net.pantasystem.milktea.data.model.auth.Authorization
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

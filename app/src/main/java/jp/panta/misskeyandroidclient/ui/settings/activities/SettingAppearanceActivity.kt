@@ -17,12 +17,12 @@ import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBindin
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.data.model.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem
 import kotlinx.coroutines.*
-import net.pantasystem.milktea.data.model.KeyStore
+import net.pantasystem.milktea.data.infrastructure.KeyStore
 import javax.inject.Inject
 
 @AndroidEntryPoint

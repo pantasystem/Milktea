@@ -12,8 +12,8 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentDraftNotesBinding
-import net.pantasystem.milktea.data.model.confirm.ConfirmCommand
-import net.pantasystem.milktea.data.model.confirm.ResultType
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog

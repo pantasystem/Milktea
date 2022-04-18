@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.model.auth.custom.CustomAuthStore
+import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.common.getPreferences
 
 @Module

@@ -25,8 +25,8 @@ import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.data.model.confirm.ConfirmCommand
-import net.pantasystem.milktea.data.model.confirm.ResultType
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toFile

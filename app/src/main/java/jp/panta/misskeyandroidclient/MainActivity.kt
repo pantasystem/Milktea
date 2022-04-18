@@ -29,8 +29,8 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import net.pantasystem.milktea.data.model.settings.SettingStore
-import net.pantasystem.milktea.data.model.streaming.stateEvent
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter

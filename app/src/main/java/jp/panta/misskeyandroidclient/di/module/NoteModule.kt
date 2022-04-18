@@ -9,10 +9,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
-import net.pantasystem.milktea.data.model.notes.impl.NoteRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
 import jp.panta.misskeyandroidclient.impl.AndroidNoteReservationPostExecutor
-import net.pantasystem.milktea.data.model.notes.NoteTranslationStoreImpl
+import net.pantasystem.milktea.data.infrastructure.notes.NoteTranslationStoreImpl
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import javax.inject.Singleton

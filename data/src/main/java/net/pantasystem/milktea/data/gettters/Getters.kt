@@ -2,9 +2,9 @@ package net.pantasystem.milktea.data.gettters
 
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.group.GroupDataSource
-import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notification.NotificationDataSource

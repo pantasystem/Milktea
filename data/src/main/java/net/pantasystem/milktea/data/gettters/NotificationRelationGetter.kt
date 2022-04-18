@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.gettters
 
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.model.toNotification
-import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.toNotification
+import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.UserDataSource

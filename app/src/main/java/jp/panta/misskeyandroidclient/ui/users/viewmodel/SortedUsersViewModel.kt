@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.data.infrastructure.toUser
 import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")

@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
-import net.pantasystem.milktea.data.model.KeyStore
+import net.pantasystem.milktea.data.infrastructure.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding

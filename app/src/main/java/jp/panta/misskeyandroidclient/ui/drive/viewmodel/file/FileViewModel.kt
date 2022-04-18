@@ -5,13 +5,12 @@ import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.di.module.filePropertyPagingStore
 import net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.data.model.drive.*
 import net.pantasystem.milktea.model.file.AppFile
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.model.toFileProperty
+import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.drive.DriveStore
 import net.pantasystem.milktea.model.drive.FileProperty
 

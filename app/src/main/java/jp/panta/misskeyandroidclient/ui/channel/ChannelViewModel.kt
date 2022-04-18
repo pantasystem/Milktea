@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.newPage
-import net.pantasystem.milktea.data.model.PreviousPagingController
-import net.pantasystem.milktea.data.model.channel.impl.ChannelListType
-import net.pantasystem.milktea.data.model.channel.impl.ChannelPagingModel
+import net.pantasystem.milktea.data.infrastructure.PreviousPagingController
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*

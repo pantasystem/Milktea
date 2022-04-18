@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import net.pantasystem.milktea.data.model.KeyStore
+import net.pantasystem.milktea.data.infrastructure.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
 import net.pantasystem.milktea.model.account.Account
 

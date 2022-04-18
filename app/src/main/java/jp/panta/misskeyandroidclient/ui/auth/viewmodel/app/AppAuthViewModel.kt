@@ -10,8 +10,8 @@ import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
 import net.pantasystem.milktea.api.misskey.auth.Session
-import net.pantasystem.milktea.data.model.auth.Authorization
-import net.pantasystem.milktea.data.model.auth.custom.*
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.*
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*

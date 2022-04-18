@@ -5,7 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.data.model.messaging.impl.MessageObserver
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.model.toGroup
-import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.data.infrastructure.toGroup
+import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore

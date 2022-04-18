@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes.draft.db
 
-import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDTO
-import net.pantasystem.milktea.data.model.notes.draft.db.DraftPollDTO
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDTO
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftPollDTO
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import org.junit.Assert.*

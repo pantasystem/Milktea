@@ -11,7 +11,7 @@ import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.group.GroupDataSource
-import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notification.NotificationDataSource

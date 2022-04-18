@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.model.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.common.getPreferences
 import javax.inject.Singleton
 

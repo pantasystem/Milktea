@@ -11,8 +11,8 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
-import net.pantasystem.milktea.data.model.settings.ReactionPickerType
-import net.pantasystem.milktea.data.model.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap

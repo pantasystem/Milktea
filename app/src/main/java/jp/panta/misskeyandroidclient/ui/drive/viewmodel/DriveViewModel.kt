@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 
 import androidx.lifecycle.ViewModel
-import net.pantasystem.milktea.data.model.drive.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.model.drive.*

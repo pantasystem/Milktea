@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import net.pantasystem.milktea.data.model.KeyStore
+import net.pantasystem.milktea.data.infrastructure.KeyStore
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.setTheme

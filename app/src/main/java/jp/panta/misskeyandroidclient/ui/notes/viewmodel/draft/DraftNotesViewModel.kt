@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn

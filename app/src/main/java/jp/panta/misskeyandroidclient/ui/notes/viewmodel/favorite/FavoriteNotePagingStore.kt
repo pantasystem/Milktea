@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite
 
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
-import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotePagedStore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import retrofit2.Response

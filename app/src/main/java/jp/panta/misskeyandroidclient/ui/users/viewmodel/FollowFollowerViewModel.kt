@@ -9,14 +9,14 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.api.misskey.v10.MisskeyAPIV10
 import net.pantasystem.milktea.api.misskey.v10.RequestFollowFollower
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
-import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource

@@ -6,11 +6,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.*
-import net.pantasystem.milktea.data.model.confirm.ConfirmCommand
-import net.pantasystem.milktea.data.model.confirm.ConfirmEvent
-import net.pantasystem.milktea.data.model.confirm.ResultType
-import net.pantasystem.milktea.data.model.settings.ReactionPickerType
-import net.pantasystem.milktea.data.model.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmEvent
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
+import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.draft.DraftNote
