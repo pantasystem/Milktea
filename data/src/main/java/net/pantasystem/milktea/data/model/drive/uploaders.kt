@@ -2,8 +2,7 @@ package net.pantasystem.milktea.data.model.drive
 
 import android.content.Context
 import com.google.gson.Gson
-import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
-import net.pantasystem.milktea.data.api.misskey.drive.OkHttpDriveFileUploader
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.data.model.Encryption
 import net.pantasystem.milktea.data.model.account.Account
 import net.pantasystem.milktea.data.model.file.AppFile
@@ -15,7 +14,7 @@ import java.lang.IllegalStateException
 
 interface FileUploader {
     @Throws(FileUploadFailedException::class)
-    suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO
+    suspend fun upload(file: AppFile.Local, isForce: Boolean): net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 }
 
 class FileUploadFailedException(val file: AppFile.Local, val throwable: Throwable?, val statusCode: Int?) : IllegalStateException()

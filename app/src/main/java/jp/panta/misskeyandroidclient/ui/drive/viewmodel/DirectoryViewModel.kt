@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.drive.CreateFolder
+import net.pantasystem.milktea.api.misskey.drive.CreateFolder
 import net.pantasystem.milktea.data.api.misskey.drive.RequestFolder
 import net.pantasystem.milktea.data.model.Encryption
 import net.pantasystem.milktea.data.model.account.CurrentAccountWatcher
@@ -119,11 +119,13 @@ class DirectoryViewModel(
                 runCatching {
                     val account = accountWatcher.getAccount()
                     val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                    misskeyAPI.createFolder(CreateFolder(
-                        i = account.getI(encryption),
-                        name = folderName,
-                        parentId = driveStore.state.value.path.path.lastOrNull()?.id
-                    )).throwIfHasError().body()
+                    misskeyAPI.createFolder(
+                        net.pantasystem.milktea.api.misskey.drive.CreateFolder(
+                            i = account.getI(encryption),
+                            name = folderName,
+                            parentId = driveStore.state.value.path.path.lastOrNull()?.id
+                        )
+                    ).throwIfHasError().body()
 
                 }.onFailure {
                     Log.e("FolderViewModel", "error create folder", it)

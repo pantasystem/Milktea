@@ -7,9 +7,9 @@ import jp.panta.misskeyandroidclient.BuildConfig
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.mastodon.instance.Instance
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.data.api.misskey.app.CreateApp
-import net.pantasystem.milktea.data.api.misskey.auth.AppSecret
-import net.pantasystem.milktea.data.api.misskey.auth.Session
+import net.pantasystem.milktea.api.misskey.app.CreateApp
+import net.pantasystem.milktea.api.misskey.auth.AppSecret
+import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.auth.Authorization
 import net.pantasystem.milktea.data.model.auth.custom.*
@@ -63,9 +63,9 @@ class AppAuthViewModel @Inject constructor(
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, net.pantasystem.milktea.common.State.Fixed(
         net.pantasystem.milktea.common.StateContent.NotExist()))
 
-    private val _generatingTokenState = MutableStateFlow<net.pantasystem.milktea.common.State<Session>>(
+    private val _generatingTokenState = MutableStateFlow<net.pantasystem.milktea.common.State<net.pantasystem.milktea.api.misskey.auth.Session>>(
         net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.NotExist()))
-    private val generatingTokenState: StateFlow<net.pantasystem.milktea.common.State<Session>> = _generatingTokenState
+    private val generatingTokenState: StateFlow<net.pantasystem.milktea.common.State<net.pantasystem.milktea.api.misskey.auth.Session>> = _generatingTokenState
     private val generateTokenError = generatingTokenState.map {
         it as? net.pantasystem.milktea.common.State.Error
     }.map {
@@ -187,7 +187,11 @@ class AppAuthViewModel @Inject constructor(
                     is AppType.Misskey -> {
                         val secret = app.secret
                         val authApi = MisskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
-                        val session = authApi.generateSession(AppSecret(secret!!)).body()
+                        val session = authApi.generateSession(
+                            net.pantasystem.milktea.api.misskey.auth.AppSecret(
+                                secret!!
+                            )
+                        ).body()
                             ?: throw IllegalStateException("セッションの作成に失敗しました。")
                         customAuthStore.setCustomAuthBridge(
                             app.createAuth(instanceBase, session)
@@ -234,7 +238,7 @@ class AppAuthViewModel @Inject constructor(
                 val version = instanceType.instance.getVersion()
                 val misskeyAPI = misskeyAPIProvider.get(url, version)
                 val app = misskeyAPI.createApp(
-                    CreateApp(
+                    net.pantasystem.milktea.api.misskey.app.CreateApp(
                         null,
                         appName,
                         "misskey android application",

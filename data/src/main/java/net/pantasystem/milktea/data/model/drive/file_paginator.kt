@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.model.drive
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.data.api.misskey.drive.RequestFile
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.*
@@ -37,7 +37,7 @@ class FilePropertyPagingStore(
         filePropertyDataSource
     )
 
-    private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> = PreviousPagingController(
+    private val previousPagingController: PreviousPagingController<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO, FileProperty.Id> = PreviousPagingController(
         filePropertyPagingImpl,
         filePropertyPagingImpl,
         filePropertyPagingImpl,
@@ -73,8 +73,8 @@ class FilePropertyPagingImpl(
     private val encryption: Encryption,
     private val filePropertyDataSource: FilePropertyDataSource
 ) : PaginationState<FileProperty.Id>,
-    IdGetter<String>, PreviousLoader<FilePropertyDTO>,
-    EntityConverter<FilePropertyDTO, FileProperty.Id>,
+    IdGetter<String>, PreviousLoader<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>,
+    EntityConverter<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO, FileProperty.Id>,
     StateLocker
 {
 
@@ -101,7 +101,7 @@ class FilePropertyPagingImpl(
         return (getState().content as? StateContent.Exist<List<FileProperty.Id>>)?.rawContent?.lastOrNull()?.fileId
     }
 
-    override suspend fun loadPrevious(): Response<List<FilePropertyDTO>> {
+    override suspend fun loadPrevious(): Response<List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>> {
         return misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
             RequestFile(
                 folderId = getCurrentFolderId.invoke(),
@@ -112,7 +112,7 @@ class FilePropertyPagingImpl(
         ).throwIfHasError()
     }
 
-    override suspend fun convertAll(list: List<FilePropertyDTO>): List<FileProperty.Id> {
+    override suspend fun convertAll(list: List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>): List<FileProperty.Id> {
         val entities = list.map {
             it.toFileProperty(getAccount.invoke())
         }

@@ -5,8 +5,8 @@ import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.model.I
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.data.model.auth.custom.App
-import net.pantasystem.milktea.data.api.misskey.app.CreateApp
-import net.pantasystem.milktea.data.api.misskey.app.ShowApp
+import net.pantasystem.milktea.api.misskey.app.CreateApp
+import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.data.api.misskey.drive.*
 import net.pantasystem.milktea.data.model.auth.signin.SignIn
 import net.pantasystem.milktea.data.model.fevorite.Favorite
@@ -43,7 +43,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
     override suspend fun conversation(noteRequest: NoteRequest) = misskey.conversation(noteRequest)
 
     override suspend fun create(createNote: CreateNote): Response<CreateNote.Response> = misskey.create(createNote)
-    override suspend fun createApp(createApp: CreateApp) = misskey.createApp(createApp)
+    override suspend fun createApp(createApp: net.pantasystem.milktea.api.misskey.app.CreateApp) = misskey.createApp(createApp)
 
     override suspend fun createFavorite(noteRequest: NoteRequest) = misskey.createFavorite(noteRequest)
 
@@ -75,11 +75,11 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun rejectFollowRequest(rejectFollowRequest: RejectFollowRequest): Response<Unit> = misskey.rejectFollowRequest(rejectFollowRequest)
 
-    override suspend fun getFiles(fileRequest: RequestFile): Response<List<FilePropertyDTO>> = misskey.getFiles(fileRequest)
+    override suspend fun getFiles(fileRequest: RequestFile): Response<List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>> = misskey.getFiles(fileRequest)
 
     override suspend fun getFolders(folderRequest: RequestFolder): Response<List<Directory>> = misskey.getFolders(folderRequest)
 
-    override suspend fun createFolder(createFolder: CreateFolder): Response<Unit> = misskey.createFolder(createFolder)
+    override suspend fun createFolder(createFolder: net.pantasystem.milktea.api.misskey.drive.CreateFolder): Response<Unit> = misskey.createFolder(createFolder)
 
     override suspend fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Response<List<MessageDTO>> = misskey.getMessageHistory(requestMessageHistory)
 
@@ -111,7 +111,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun searchNote(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.searchNote(noteRequest)
 
-    override suspend fun showApp(showApp: ShowApp): Response<App> = misskey.showApp(showApp)
+    override suspend fun showApp(showApp: net.pantasystem.milktea.api.misskey.app.ShowApp): Response<App> = misskey.showApp(showApp)
 
     override suspend fun showNote(requestNote: NoteRequest): Response<NoteDTO> = misskey.showNote(requestNote)
 
@@ -163,9 +163,9 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun translate(req: Translate): Response<TranslationResult> = misskey.translate(req)
     override suspend fun report(req: ReportDTO): Response<Unit> = misskey.report(req)
-    override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskey.updateFile(updateFileRequest)
-    override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskey.deleteFile(req)
-    override suspend fun showFile(req: ShowFile) : Response<FilePropertyDTO> = misskey.showFile(req)
+    override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO> = misskey.updateFile(updateFileRequest)
+    override suspend fun deleteFile(req: net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO): Response<Unit> = misskey.deleteFile(req)
+    override suspend fun showFile(req: ShowFile) : Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO> = misskey.showFile(req)
     override suspend fun swUnRegister(unSub: UnSubscription): Response<Unit> = misskey.swUnRegister(unSub)
 
 }

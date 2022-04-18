@@ -4,8 +4,8 @@ import net.pantasystem.milktea.data.api.misskey.list.*
 import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.model.I
 import net.pantasystem.milktea.data.model.auth.custom.App
-import net.pantasystem.milktea.data.api.misskey.app.CreateApp
-import net.pantasystem.milktea.data.api.misskey.app.ShowApp
+import net.pantasystem.milktea.api.misskey.app.CreateApp
+import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.data.api.misskey.drive.*
 import net.pantasystem.milktea.data.model.auth.signin.SignIn
 import net.pantasystem.milktea.data.model.fevorite.Favorite
@@ -40,13 +40,13 @@ interface MisskeyAPI {
     suspend fun signIn(@Body signIn: SignIn): Response<I>
 
     @POST("api/app/create")
-    suspend fun createApp(@Body createApp: CreateApp): Response<App>
+    suspend fun createApp(@Body createApp: net.pantasystem.milktea.api.misskey.app.CreateApp): Response<App>
 
     @POST("api/my/apps")
     suspend fun myApps(@Body i: I) : Response<List<App>>
 
     @POST("api/app/show")
-    suspend fun showApp(@Body showApp: ShowApp) : Response<App>
+    suspend fun showApp(@Body showApp: net.pantasystem.milktea.api.misskey.app.ShowApp) : Response<App>
 
     @POST("api/blocking/create")
     suspend fun blockUser(@Body requestUser: RequestUser): Response<Unit>
@@ -181,22 +181,22 @@ interface MisskeyAPI {
 
     //drive
     @POST("api/drive/files")
-    suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FilePropertyDTO>>
+    suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>>
 
     @POST("api/drive/files/update")
-    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO>
+    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>
 
     @POST("api/drive/files/delete")
-    suspend fun deleteFile(@Body req: DeleteFileDTO): Response<Unit>
+    suspend fun deleteFile(@Body req: net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO): Response<Unit>
 
     @POST("api/drive/files/show")
-    suspend fun showFile(@Body req: ShowFile) : Response<FilePropertyDTO>
+    suspend fun showFile(@Body req: ShowFile) : Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>
 
     @POST("api/drive/folders")
     suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
 
     @POST("api/drive/folders/create")
-    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Unit>
+    suspend fun createFolder(@Body createFolder: net.pantasystem.milktea.api.misskey.drive.CreateFolder): Response<Unit>
 
 
     //meta

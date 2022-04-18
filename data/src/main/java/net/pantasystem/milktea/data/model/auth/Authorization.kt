@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.model.auth
 
 
-import net.pantasystem.milktea.data.api.misskey.auth.Session
+import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.data.model.account.Account
 import net.pantasystem.milktea.data.model.auth.custom.AccessToken
 import net.pantasystem.milktea.data.model.auth.custom.AppType
@@ -25,7 +25,7 @@ sealed interface Authorization {
             override val instanceBaseURL: String,
             val viaName: String?,
             val appSecret: String,
-            val session: Session
+            val session: net.pantasystem.milktea.api.misskey.auth.Session
         ) : Waiting4UserAuthorization {
             override fun generateAuthUrl(): String {
                 return session.url

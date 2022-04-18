@@ -6,8 +6,8 @@ import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.model.I
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.data.model.auth.custom.App
-import net.pantasystem.milktea.data.api.misskey.app.CreateApp
-import net.pantasystem.milktea.data.api.misskey.app.ShowApp
+import net.pantasystem.milktea.api.misskey.app.CreateApp
+import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.data.api.misskey.drive.*
 import net.pantasystem.milktea.data.model.auth.signin.SignIn
 import net.pantasystem.milktea.data.model.fevorite.Favorite
@@ -40,9 +40,9 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun children(noteRequest: NoteRequest): Response<List<NoteDTO>> = misskeyAPI.children(noteRequest)
     override suspend fun conversation(noteRequest: NoteRequest): Response<List<NoteDTO>> = misskeyAPI.conversation(noteRequest)
     override suspend fun create(createNote: CreateNote): Response<CreateNote.Response> = misskeyAPI.create(createNote)
-    override suspend fun createApp(createApp: CreateApp): Response<App> = misskeyAPI.createApp(createApp)
+    override suspend fun createApp(createApp: net.pantasystem.milktea.api.misskey.app.CreateApp): Response<App> = misskeyAPI.createApp(createApp)
     override suspend fun createFavorite(noteRequest: NoteRequest): Response<Unit> = misskeyAPI.createFavorite(noteRequest)
-    override suspend fun createFolder(createFolder: CreateFolder): Response<Unit> = misskeyAPI.createFolder(createFolder)
+    override suspend fun createFolder(createFolder: net.pantasystem.milktea.api.misskey.drive.CreateFolder): Response<Unit> = misskeyAPI.createFolder(createFolder)
     override suspend fun createList(createList: CreateList): Response<UserListDTO> = misskeyAPI.createList(createList)
     override suspend fun createMessage(messageAction: MessageAction): Response<MessageDTO> = misskeyAPI.createMessage(messageAction)
     override suspend fun createReaction(reaction: CreateReaction): Response<Unit> = misskeyAPI.createReaction(reaction)
@@ -55,7 +55,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun featured(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.featured(noteRequest)
     open suspend fun followers(userRequest: RequestUser): Response<List<FollowFollowerUser>> = apiDiff.followers(userRequest)
     open suspend fun following(userRequest: RequestUser): Response<List<FollowFollowerUser>> = apiDiff.following(userRequest)
-    override suspend fun getFiles(fileRequest: RequestFile): Response<List<FilePropertyDTO>> = misskeyAPI.getFiles(fileRequest)
+    override suspend fun getFiles(fileRequest: RequestFile): Response<List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>> = misskeyAPI.getFiles(fileRequest)
     override suspend fun getFolders(folderRequest: RequestFolder): Response<List<Directory>> = misskeyAPI.getFolders(folderRequest)
     override suspend fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Response<List<MessageDTO>> = misskeyAPI.getMessageHistory(requestMessageHistory)
     override suspend fun getMessages(requestMessage: RequestMessage): Response<List<MessageDTO>> = misskeyAPI.getMessages(requestMessage)
@@ -77,7 +77,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun searchByTag(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.searchByTag(noteRequest)
     override suspend fun searchNote(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.searchNote(noteRequest)
     override suspend fun searchUser(requestUser: RequestUser): Response<List<UserDTO>> = misskeyAPI.searchUser(requestUser)
-    override suspend fun showApp(showApp: ShowApp): Response<App> = misskeyAPI.showApp(showApp)
+    override suspend fun showApp(showApp: net.pantasystem.milktea.api.misskey.app.ShowApp): Response<App> = misskeyAPI.showApp(showApp)
     override suspend fun showList(listId: ListId): Response<UserListDTO> = misskeyAPI.showList(listId)
     override suspend fun showNote(requestNote: NoteRequest) = misskeyAPI.showNote(requestNote)
     override suspend fun showUser(requestUser: RequestUser): Response<UserDTO> = misskeyAPI.showUser(requestUser)
@@ -113,8 +113,8 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun acceptFollowRequest(followRequest: AcceptFollowRequest): Response<Unit> = misskeyAPI.acceptFollowRequest(followRequest)
     override suspend fun cancelFollowRequest(req: CancelFollow): Response<UserDTO> = misskeyAPI.cancelFollowRequest(req)
     override suspend fun renotes(req: FindRenotes): Response<List<NoteDTO>> = misskeyAPI.renotes(req)
-    override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO> = misskeyAPI.updateFile(updateFileRequest)
-    override suspend fun deleteFile(req: DeleteFileDTO): Response<Unit> = misskeyAPI.deleteFile(req)
-    override suspend fun showFile(req: ShowFile): Response<FilePropertyDTO> = misskeyAPI.showFile(req)
+    override suspend fun updateFile(updateFileRequest: UpdateFileDTO): Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO> = misskeyAPI.updateFile(updateFileRequest)
+    override suspend fun deleteFile(req: net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO): Response<Unit> = misskeyAPI.deleteFile(req)
+    override suspend fun showFile(req: ShowFile): Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO> = misskeyAPI.showFile(req)
     override suspend fun swUnRegister(unSub: UnSubscription): Response<Unit> = misskeyAPI.swUnRegister(unSub)
 }

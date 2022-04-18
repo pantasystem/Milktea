@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.api.misskey.v12_75_0
 
-import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.data.api.misskey.users.UserDTO
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -35,7 +35,7 @@ data class GalleryPost @OptIn(ExperimentalSerializationApi::class) constructor(
     val description: String,
     val userId: String,
     val user: UserDTO,
-    val files: List<FilePropertyDTO>,
+    val files: List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>,
     val tags: List<String>?,
     val isSensitive: Boolean,
     val likedCount: Int?,

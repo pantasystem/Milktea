@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.model.auth.custom
 
 import android.content.Context
 import android.content.SharedPreferences
-import net.pantasystem.milktea.data.api.misskey.auth.Session
+import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.common.getPreferenceName
 import java.util.*
 
@@ -83,7 +83,10 @@ class CustomAuthStore(private val sharedPreferences: SharedPreferences){
                     val sessionUrl = it.getString(MISSKEY_SESSION_URL, null)?: return null
                     TemporarilyAuthState.Misskey(
                         secret = secret,
-                        session = Session(url = sessionUrl, token = sessionToken),
+                        session = net.pantasystem.milktea.api.misskey.auth.Session(
+                            url = sessionUrl,
+                            token = sessionToken
+                        ),
                         instanceDomain = instanceDomain,
                         enabledDateEnd = enabledDate,
                         viaName = viaName

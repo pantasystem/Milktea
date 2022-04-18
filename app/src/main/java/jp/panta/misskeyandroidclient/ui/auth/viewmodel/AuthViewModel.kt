@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.data.api.misskey.auth.UserKey
+import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.users.toUser
 import net.pantasystem.milktea.data.model.account.newAccount
@@ -41,7 +41,12 @@ class AuthViewModel @Inject constructor(
                 if(a is Authorization.Waiting4UserAuthorization.Misskey) {
                     try {
                         val token = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
-                            .getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
+                            .getAccessToken(
+                                net.pantasystem.milktea.api.misskey.auth.UserKey(
+                                    appSecret = a.appSecret,
+                                    a.session.token
+                                )
+                            )
                             .throwIfHasError()
                             .body()
                                 ?: throw IllegalStateException("response bodyがありません。")
@@ -76,7 +81,12 @@ class AuthViewModel @Inject constructor(
             runCatching {
                 when (a) {
                     is Authorization.Waiting4UserAuthorization.Misskey -> {
-                        val accessToken = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
+                        val accessToken = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
+                            net.pantasystem.milktea.api.misskey.auth.UserKey(
+                                appSecret = a.appSecret,
+                                a.session.token
+                            )
+                        )
                             .throwIfHasError().body()
                             ?: throw IllegalStateException("response bodyがありません。")
                         accessToken.toModel(a.appSecret)

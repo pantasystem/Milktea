@@ -16,7 +16,6 @@ import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.model.users.UserDataSource
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.api.misskey.notes.PostNoteTask
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(

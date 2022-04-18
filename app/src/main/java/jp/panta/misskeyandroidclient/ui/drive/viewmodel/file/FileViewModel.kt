@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.drive.viewmodel.file
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.di.module.filePropertyPagingStore
-import net.pantasystem.milktea.data.api.misskey.drive.DeleteFileDTO
+import net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO
 import net.pantasystem.milktea.data.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.data.model.drive.*
@@ -146,7 +146,13 @@ class FileViewModel(
                 val account = currentAccountWatcher.getAccount()
                 val api = miCore.getMisskeyAPIProvider().get(account)
                 val fileProperty = miCore.getFilePropertyDataSource().find(id)
-                api.deleteFile(DeleteFileDTO(i = account.getI(miCore.getEncryption()), fileId = id.fileId))
+                api.deleteFile(
+                    net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO(
+                        i = account.getI(
+                            miCore.getEncryption()
+                        ), fileId = id.fileId
+                    )
+                )
                     .throwIfHasError()
                 miCore.getFilePropertyDataSource().remove(fileProperty)
 

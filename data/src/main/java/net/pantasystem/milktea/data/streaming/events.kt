@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.streaming
 import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.data.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.api.misskey.users.UserDTO
-import net.pantasystem.milktea.data.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.data.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.data.api.misskey.v12.antenna.AntennaDTO
 import net.pantasystem.milktea.data.model.emoji.Emoji
@@ -148,7 +148,7 @@ sealed class ChannelBody : StreamingEvent(){
         @SerialName("fileUpdated")
         data class FileUpdated(
             override val id: String,
-            val file: FilePropertyDTO
+            val file: net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
         ) : Main()
 
         @Serializable
