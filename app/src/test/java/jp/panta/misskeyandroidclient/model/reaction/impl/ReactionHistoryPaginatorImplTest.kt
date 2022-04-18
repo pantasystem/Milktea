@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.model.reaction.impl
 
-//import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+//import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 //import net.pantasystem.milktea.data.api.misskey.RequestReactionHistoryDTO
 //import jp.panta.misskeyandroidclient.logger.TestLogger
 //import jp.panta.misskeyandroidclient.model.account.Account

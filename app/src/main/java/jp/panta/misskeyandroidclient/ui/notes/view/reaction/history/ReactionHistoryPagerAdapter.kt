@@ -8,8 +8,8 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 
 class ReactionHistoryPagerAdapter(
     fragmentManager: FragmentManager,
-    val types: List<net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest>,
-    val noteId: net.pantasystem.milktea.model.notes.Note.Id
+    val types: List<ReactionHistoryRequest>,
+    val noteId: Note.Id
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
 

@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.logger.TestLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
@@ -16,18 +17,18 @@ import org.junit.Test
 
 class InMemoryNoteDataSourceTest {
 
-    private lateinit var loggerFactory: net.pantasystem.milktea.common.Logger.Factory
-    private lateinit var account: net.pantasystem.milktea.model.account.Account
+    private lateinit var loggerFactory: Logger.Factory
+    private lateinit var account: Account
 
     @Before
     fun setUp() {
         loggerFactory = TestLogger.Factory()
-        account = net.pantasystem.milktea.model.account.Account(
+        account = Account(
             remoteId = "piyo",
             instanceDomain = "",
             encryptedToken = "",
             userName = "piyoName",
-            instanceType = net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY
+            instanceType = Account.InstanceType.MISSKEY
         )
     }
 
@@ -50,17 +51,17 @@ class InMemoryNoteDataSourceTest {
             )
             delay(10)
 
-            assertEquals(net.pantasystem.milktea.model.AddResult.CREATED, result)
+            assertEquals(AddResult.CREATED, result)
             val old = note.copy()
             delay(10)
 
-            assertEquals(net.pantasystem.milktea.model.AddResult.UPDATED, noteDataSource.add(note))
+            assertEquals(AddResult.UPDATED, noteDataSource.add(note))
             delay(10)
 
-            assertEquals(net.pantasystem.milktea.model.AddResult.CANCEL, noteDataSource.add(old))
+            assertEquals(AddResult.CANCEL, noteDataSource.add(old))
             delay(10)
 
-            assertEquals(net.pantasystem.milktea.model.AddResult.CANCEL, noteDataSource.add(old.copy()))
+            assertEquals(AddResult.CANCEL, noteDataSource.add(old.copy()))
         }
 
     }
@@ -84,7 +85,7 @@ class InMemoryNoteDataSourceTest {
         )
 
         val dtoParsed = dto.toNote(account)
-        assertEquals(net.pantasystem.milktea.model.AddResult.UPDATED, noteDataSource.add(dtoParsed))
+        assertEquals(AddResult.UPDATED, noteDataSource.add(dtoParsed))
 
         assertTrue(dtoParsed === noteDataSource.get(dtoParsed.id))
     }

@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.data.api.misskey.v11.MisskeyAPIV11
-import net.pantasystem.milktea.data.model.api.Version
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
+import net.pantasystem.milktea.model.instance.Version
 import org.junit.Assert
 import org.junit.Test
 
@@ -10,8 +10,8 @@ class APITest {
 
     @Test
     fun testV11Following(){
-        val api = MisskeyAPIServiceBuilder.build("https://misskey.io", Version("12"))
-        val v12 = api as? MisskeyAPIV11
+        val api = net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder.build("https://misskey.io", Version("12"))
+        val v12 = api as? net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
         Assert.assertNotEquals(v12, null)
 
     }

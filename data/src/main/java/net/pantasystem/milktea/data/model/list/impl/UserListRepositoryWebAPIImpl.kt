@@ -1,12 +1,14 @@
 package net.pantasystem.milktea.data.model.list.impl
 
+import net.pantasystem.milktea.api.misskey.list.CreateList
+import net.pantasystem.milktea.api.misskey.list.ListId
+import net.pantasystem.milktea.api.misskey.list.ListUserOperation
+import net.pantasystem.milktea.api.misskey.list.UpdateList
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.list.CreateList
-import net.pantasystem.milktea.data.api.misskey.list.ListId
-import net.pantasystem.milktea.data.api.misskey.list.ListUserOperation
-import net.pantasystem.milktea.data.api.misskey.list.UpdateList
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.model.I
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.I
+import net.pantasystem.milktea.data.model.toEntity
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListRepository
 import javax.inject.Inject
@@ -51,24 +53,34 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         ).throwIfHasError()
     }
 
-    override suspend fun appendUser(listId: UserList.Id, userId: net.pantasystem.milktea.model.user.User.Id) {
+    override suspend fun appendUser(
+        listId: UserList.Id,
+        userId: net.pantasystem.milktea.model.user.User.Id
+    ) {
         val account = accountRepository.get(listId.accountId)
         val misskeyAPI = misskeyAPIProvider.get(account)
-        misskeyAPI.pushUserToList(ListUserOperation(
-            userId = userId.id,
-            listId = listId.userListId,
-            i = account.getI(encryption)
-        )).throwIfHasError()
+        misskeyAPI.pushUserToList(
+            ListUserOperation(
+                userId = userId.id,
+                listId = listId.userListId,
+                i = account.getI(encryption)
+            )
+        ).throwIfHasError()
     }
 
-    override suspend fun removeUser(listId: UserList.Id, userId: net.pantasystem.milktea.model.user.User.Id) {
+    override suspend fun removeUser(
+        listId: UserList.Id,
+        userId: net.pantasystem.milktea.model.user.User.Id
+    ) {
         val account = accountRepository.get(listId.accountId)
         val misskeyAPI = misskeyAPIProvider.get(account)
-        misskeyAPI.pullUserFromList(ListUserOperation(
-            userId = userId.id,
-            listId = listId.userListId,
-            i = account.getI(encryption)
-        )).throwIfHasError()
+        misskeyAPI.pullUserFromList(
+            ListUserOperation(
+                userId = userId.id,
+                listId = listId.userListId,
+                i = account.getI(encryption)
+            )
+        ).throwIfHasError()
     }
 
     override suspend fun delete(listId: UserList.Id) {

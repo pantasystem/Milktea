@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.api.mastodon
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
+import net.pantasystem.milktea.api.mastodon.MastodonAPI
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

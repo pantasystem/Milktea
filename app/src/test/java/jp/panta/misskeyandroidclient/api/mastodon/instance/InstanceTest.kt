@@ -13,7 +13,7 @@ class InstanceTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val instance: Instance = json.decodeFromString(str)
+        val instance: net.pantasystem.milktea.api.mastodon.instance.Instance = json.decodeFromString(str)
         assertEquals("mastodon.social", instance.uri)
 
     }

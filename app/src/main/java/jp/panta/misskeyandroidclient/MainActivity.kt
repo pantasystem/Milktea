@@ -13,6 +13,7 @@ import androidx.annotation.MainThread
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,20 +24,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.data.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import net.pantasystem.milktea.data.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.data.model.TaskState
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.model.streaming.stateEvent
-import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
@@ -53,14 +49,18 @@ import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
+import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
+import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.CreateNoteTaskExecutor
+import net.pantasystem.milktea.model.TaskState
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -178,9 +178,9 @@ class MainActivity : AppCompatActivity() {
         // NOTE: 各ばーしょんに合わせMenuを制御している
         miApplication.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
             binding.navView.menu.also { menu ->
-                menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
-                menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
-                menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
+                menu.findItem(R.id.nav_antenna).isVisible = api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+                menu.findItem(R.id.nav_channel).isVisible = api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+                menu.findItem(R.id.nav_gallery).isVisible = api is net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
             }
         }.launchIn(lifecycleScope)
 
@@ -555,7 +555,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @ExperimentalCoroutinesApi
-    private fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
+    private fun MiCore.getCurrentAccountMisskeyAPI(): Flow<net.pantasystem.milktea.api.misskey.MisskeyAPI?> {
         return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             getMetaRepository().observe(it.instanceDomain)
         }.map {

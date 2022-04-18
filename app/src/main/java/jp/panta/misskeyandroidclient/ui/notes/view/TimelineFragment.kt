@@ -18,10 +18,8 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.api.misskey.APIError
+import net.pantasystem.milktea.api.misskey.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.setMenuTint
 import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.PageableView

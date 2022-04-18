@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.ChannelEvent
 import net.pantasystem.milktea.data.streaming.StreamingEvent

@@ -1,15 +1,15 @@
 package net.pantasystem.milktea.data.model.group.impl
 
 
+import net.pantasystem.milktea.api.misskey.groups.*
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.groups.*
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.model.I
-import net.pantasystem.milktea.data.model.api.IllegalVersionException
-import net.pantasystem.milktea.data.model.group.*
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.api.misskey.I
+import net.pantasystem.milktea.model.instance.IllegalVersionException
+import net.pantasystem.milktea.data.model.toGroup
 import net.pantasystem.milktea.model.group.*
 import javax.inject.Inject
 
@@ -99,11 +99,13 @@ class GroupRepositoryImpl @Inject constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun transfer(transfer: Transfer): Group {
         val account = accountRepository.get(transfer.groupId.accountId)
-        val body = getMisskeyAPI(account).transferGroup(TransferGroupDTO(
+        val body = getMisskeyAPI(account).transferGroup(
+            TransferGroupDTO(
             i = account.getI(encryption),
             groupId = transfer.groupId.groupId,
             userId = transfer.userId.id
-        )).throwIfHasError().body()
+        )
+        ).throwIfHasError().body()
 
         require(body != null)
         return body.toGroup(account.accountId).also {

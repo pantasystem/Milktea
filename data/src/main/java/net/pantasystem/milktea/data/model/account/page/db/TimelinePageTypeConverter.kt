@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.model.account.page.db
 
 import androidx.room.TypeConverter
-import net.pantasystem.milktea.data.model.PageType
+import net.pantasystem.milktea.model.account.page.PageType
 
 class TimelinePageTypeConverter{
 

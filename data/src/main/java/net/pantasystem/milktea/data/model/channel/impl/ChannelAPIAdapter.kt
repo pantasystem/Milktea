@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.model.channel.impl
 
-import net.pantasystem.milktea.data.api.misskey.v12.channel.ChannelDTO
+import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.CreateChannel
 import net.pantasystem.milktea.model.channel.UpdateChannel

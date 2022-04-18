@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchResultActivity
 import jp.panta.misskeyandroidclient.databinding.ItemTagBinding
-import net.pantasystem.milktea.data.model.hashtag.HashTag
+import net.pantasystem.milktea.model.hashtag.HashTag
 
 class HashTagListAdapter : ListAdapter<HashTag, HashTagListAdapter.VH>(ItemCallback()){
 

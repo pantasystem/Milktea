@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.model.gallery
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.v12_75_0.GetPosts
-import net.pantasystem.milktea.data.api.misskey.v12_75_0.LikedGalleryPost
-import net.pantasystem.milktea.data.api.misskey.v12_75_0.MisskeyAPIV1275
-import net.pantasystem.milktea.data.model.api.IllegalVersionException
+import net.pantasystem.milktea.api.misskey.v12_75_0.GetPosts
+import net.pantasystem.milktea.api.misskey.v12_75_0.LikedGalleryPost
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.model.instance.IllegalVersionException
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,6 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.model.*
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
-import net.pantasystem.milktea.model.gallery.toEntity
 import retrofit2.Response
 
 data class LikedGalleryPostId(

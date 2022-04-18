@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.model.channel.impl
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.data.api.misskey.v12.channel.*
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12.channel.*
 import net.pantasystem.milktea.common.Encryption
 import javax.inject.Inject
 

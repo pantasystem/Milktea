@@ -17,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
@@ -26,17 +26,15 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import java.lang.IllegalArgumentException
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.ui.users.nickname.EditNicknameDialog
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 

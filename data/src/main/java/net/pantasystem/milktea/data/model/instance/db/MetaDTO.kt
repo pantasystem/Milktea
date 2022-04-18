@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.model.instance.db
+package net.pantasystem.milktea.api.Instance.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -38,7 +38,7 @@ data class MetaDTO(
     @SerializedName("version") val version: String
 ){
     
-    constructor(meta: net.pantasystem.milktea.model.instance.Meta) : this(
+    constructor(meta: Meta) : this(
         bannerUrl = meta.bannerUrl,
         cacheRemoteFiles = meta.cacheRemoteFiles,
         description = meta.description,

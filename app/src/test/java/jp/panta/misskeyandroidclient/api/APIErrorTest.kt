@@ -1,21 +1,21 @@
 package jp.panta.misskeyandroidclient.api
 
-import net.pantasystem.milktea.data.api.misskey.APIError
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.notes.CreateNote
+import net.pantasystem.milktea.api.misskey.APIError
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.notes.CreateNote
 import kotlinx.coroutines.runBlocking
-import net.pantasystem.milktea.data.model.I
+import net.pantasystem.milktea.api.misskey.I
 import org.junit.Assert.*
 import org.junit.Test
 
 class APIErrorTest {
 
-    private val  misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
+    private val  misskeyAPI = net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder.build("https://misskey.io")
 
 
 
-    @Test(expected = APIError.ForbiddenException::class)
+    @Test(expected = net.pantasystem.milktea.api.misskey.APIError.ForbiddenException::class)
     fun testClientError(): Unit = runBlocking {
         misskeyAPI.create(CreateNote("", text = null)).throwIfHasError()
     }
@@ -25,9 +25,9 @@ class APIErrorTest {
     //@Test(expected = APIError.AuthenticationException::class)
     @Test
     fun testAuthenticationError() {
-        assertThrows(APIError.AuthenticationException::class.java) {
+        assertThrows(net.pantasystem.milktea.api.misskey.APIError.AuthenticationException::class.java) {
             runBlocking {
-                val res = misskeyAPI.i(I(null))
+                val res = misskeyAPI.i(net.pantasystem.milktea.api.misskey.I(null))
                 res.throwIfHasError()
             }
 
@@ -39,11 +39,11 @@ class APIErrorTest {
 
     @Test
     fun testHasErrorBody(): Unit = runBlocking {
-        val res = misskeyAPI.i(I(null))
+        val res = misskeyAPI.i(net.pantasystem.milktea.api.misskey.I(null))
 
         try{
             res.throwIfHasError()
-        }catch(e: APIError) {
+        }catch(e: net.pantasystem.milktea.api.misskey.APIError) {
             assertNotNull(e.error)
         }
     }

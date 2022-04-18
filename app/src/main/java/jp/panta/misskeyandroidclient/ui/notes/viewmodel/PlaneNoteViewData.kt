@@ -9,6 +9,7 @@ import net.pantasystem.milktea.data.model.url.UrlPreview
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.State
 import java.util.*
 import kotlin.collections.ArrayList

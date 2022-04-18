@@ -9,9 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.model.*
 import net.pantasystem.milktea.data.model.account.db.AccountDAO
-import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.model.user.impl.UserNicknameDAO
@@ -62,7 +60,7 @@ object DbModule {
 
     @Provides
     @Singleton
-    fun draftNoteDAO(db: DataBase): net.pantasystem.milktea.model.notes.draft.DraftNoteDao = db.draftNoteDao()
+    fun draftNoteDAO(db: DataBase): DraftNoteDao = db.draftNoteDao()
 
     @Provides
     @Singleton

@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.mfm
 import net.pantasystem.milktea.model.emoji.Emoji
 
 class EmojiElement(
-    val emoji: net.pantasystem.milktea.model.emoji.Emoji,
+    val emoji: Emoji,
     override val text: String,
     override val start: Int,
     override val end: Int,

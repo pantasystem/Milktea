@@ -2,10 +2,10 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.api.misskey.groups.toGroup
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.users.toUser
 import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.common.Encryption
@@ -29,7 +29,7 @@ class MessageHistoryViewModel @Inject constructor(
     private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
     private val groupDataSource: net.pantasystem.milktea.model.group.GroupDataSource,
     private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val misskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider,
     private val getters: Getters,
     private val groupRepository: net.pantasystem.milktea.model.group.GroupRepository,
     private val messageObserver: MessageObserver,
@@ -157,7 +157,7 @@ class MessageHistoryViewModel @Inject constructor(
         messageHistorySelected.event = messageHistory
     }
 
-    private fun getMisskeyAPI(account: net.pantasystem.milktea.model.account.Account): MisskeyAPI {
+    private fun getMisskeyAPI(account: net.pantasystem.milktea.model.account.Account): net.pantasystem.milktea.api.misskey.MisskeyAPI {
         return misskeyAPIProvider.get(account)
     }
 

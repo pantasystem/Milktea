@@ -2,7 +2,6 @@ package net.pantasystem.milktea.model.instance
 
 import androidx.room.Ignore
 import com.google.gson.annotations.SerializedName
-import net.pantasystem.milktea.data.model.api.Version
 import net.pantasystem.milktea.model.emoji.Emoji
 
 data class Meta(
@@ -35,7 +34,7 @@ data class Meta(
     @SerializedName("swPublickey") var swPublicKey: String? = null,
     @SerializedName("ToSUrl") var toSUrl: String? = null,
     @SerializedName("version") var version: String = "",
-    @SerializedName("emojis") var emojis: List<net.pantasystem.milktea.model.emoji.Emoji>? = null
+    @SerializedName("emojis") var emojis: List<Emoji>? = null
 ){
 
 

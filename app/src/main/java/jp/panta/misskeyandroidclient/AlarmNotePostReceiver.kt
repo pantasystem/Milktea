@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.notes.toCreateNote
 import net.pantasystem.milktea.model.notes.toNoteEditingState
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +15,7 @@ import javax.inject.Inject
 class AlarmNotePostReceiver : BroadcastReceiver() {
 
 
-    @Inject lateinit var draftNoteDAO: net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+    @Inject lateinit var draftNoteDAO: DraftNoteDao
     @Inject lateinit var accountRepository: net.pantasystem.milktea.model.account.AccountRepository
     @Inject lateinit var coroutineScope: CoroutineScope
     @Inject lateinit var noteRepository: net.pantasystem.milktea.model.notes.NoteRepository

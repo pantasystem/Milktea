@@ -2,7 +2,7 @@ package net.pantasystem.milktea.model.notes
 
 
 import net.pantasystem.milktea.model.ITask
-import net.pantasystem.milktea.data.model.notes.poll.CreatePoll
+import net.pantasystem.milktea.model.notes.poll.CreatePoll
 
 
 /**

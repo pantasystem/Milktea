@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.model.auth.custom
 
 import net.pantasystem.milktea.api.misskey.auth.Session
+import net.pantasystem.milktea.model.app.AppType
 import java.util.*
 
 
@@ -27,7 +28,7 @@ sealed interface TemporarilyAuthState {
 fun AppType.Misskey.createAuth(instanceDomain: String, session: Session, timeLimit: Date = Date(System.currentTimeMillis() + 3600 * 1000)): TemporarilyAuthState.Misskey {
     requireNotNull(secret)
     return TemporarilyAuthState.Misskey(
-        secret = secret,
+        secret = secret!!,
         instanceDomain = instanceDomain,
         session = session,
         enabledDateEnd = timeLimit,

@@ -4,13 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.ChannelAPIAdapter
-import net.pantasystem.milktea.model.channel.ChannelRepository
-import net.pantasystem.milktea.model.channel.ChannelStateModel
-import net.pantasystem.milktea.model.channel.ChannelStateModelOnMemory
 import net.pantasystem.milktea.data.model.channel.impl.ChannelAPIAdapterWebImpl
 import net.pantasystem.milktea.data.model.channel.impl.ChannelRepositoryImpl
 import javax.inject.Singleton
@@ -30,7 +26,7 @@ object ChannelModule {
     fun provideChannelAPIAdapter(
         accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
         encryption: Encryption,
-        misskeyAPIProvider: MisskeyAPIProvider
+        misskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
     ): net.pantasystem.milktea.model.channel.ChannelAPIAdapter {
         return ChannelAPIAdapterWebImpl(accountRepository, misskeyAPIProvider, encryption)
     }

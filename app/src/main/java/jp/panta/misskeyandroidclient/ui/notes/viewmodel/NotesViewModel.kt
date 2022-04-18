@@ -7,24 +7,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.data.api.misskey.notes.NoteState
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
-import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.poll.Vote
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
-import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.user.report.Report
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
@@ -43,10 +31,10 @@ class NotesViewModel @Inject constructor(
     private val reactionHistoryDao: net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao,
     private val encryption: Encryption,
     private val translationStore: net.pantasystem.milktea.model.notes.NoteTranslationStore,
-    private val draftNoteDAO: net.pantasystem.milktea.model.notes.draft.DraftNoteDao,
+    private val draftNoteDAO: DraftNoteDao,
     private val noteRepository: net.pantasystem.milktea.model.notes.NoteRepository,
     private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val misskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider,
     val accountStore: net.pantasystem.milktea.model.account.AccountStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
@@ -408,7 +396,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getMisskeyAPI(): MisskeyAPI? {
+    private suspend fun getMisskeyAPI(): net.pantasystem.milktea.api.misskey.MisskeyAPI? {
         return runCatching {
             val account = accountRepository.getCurrentAccount()
             misskeyAPIProvider.get(account.instanceDomain)

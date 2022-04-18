@@ -4,6 +4,9 @@ import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import net.pantasystem.milktea.api.Instance.db.InMemoryMetaRepository
+import net.pantasystem.milktea.api.Instance.db.RoomMetaRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,18 +14,18 @@ import javax.inject.Singleton
 class MediatorMetaRepository @Inject constructor(
     private val roomMetaRepository: RoomMetaRepository,
     private val inMemoryMetaRepository: InMemoryMetaRepository,
-) : net.pantasystem.milktea.model.instance.MetaRepository {
+) : MetaRepository {
 
-    override suspend fun add(meta: net.pantasystem.milktea.model.instance.Meta): net.pantasystem.milktea.model.instance.Meta {
+    override suspend fun add(meta: Meta): Meta {
         return inMemoryMetaRepository.add(roomMetaRepository.add(meta))
     }
 
-    override suspend fun delete(meta: net.pantasystem.milktea.model.instance.Meta) {
+    override suspend fun delete(meta: Meta) {
         inMemoryMetaRepository.delete(meta)
         roomMetaRepository.delete(meta)
     }
 
-    override suspend fun get(instanceDomain: String): net.pantasystem.milktea.model.instance.Meta? {
+    override suspend fun get(instanceDomain: String): Meta? {
 
         val inMem = inMemoryMetaRepository.get(instanceDomain)
         if(inMem != null) {
@@ -37,7 +40,7 @@ class MediatorMetaRepository @Inject constructor(
         return inMemoryMetaRepository.get(instanceDomain)
     }
 
-    override fun observe(instanceDomain: String): Flow<net.pantasystem.milktea.model.instance.Meta?> {
+    override fun observe(instanceDomain: String): Flow<Meta?> {
         val inMemoryFlow = inMemoryMetaRepository.observe(instanceDomain)
         val dbFlow = roomMetaRepository.observe(instanceDomain)
         return combine(inMemoryFlow, dbFlow) { mem, db ->

@@ -16,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
-import net.pantasystem.milktea.data.model.settings.ReactionPickerType
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
@@ -24,6 +23,7 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction.ReactionPickerSettingViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.data.model.settings.ReactionPickerType
 import java.lang.IllegalArgumentException
 
 class ReactionSettingActivity : AppCompatActivity() {
@@ -58,15 +58,15 @@ class ReactionSettingActivity : AppCompatActivity() {
             val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel!!)
             binding.reactionSettingListView.adapter = reactionsAdapter
 
-            mReactionPickerSettingViewModel?.reactionSettingsList?.observe(this, { list ->
-                reactionsAdapter.submitList(list.map{ rus ->
+            mReactionPickerSettingViewModel?.reactionSettingsList?.observe(this) { list ->
+                reactionsAdapter.submitList(list.map { rus ->
                     rus.reaction
                 })
-            })
+            }
 
-            mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this, { rus ->
+            mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this) { rus ->
                 showConfirmDeleteReactionDialog(rus.reaction)
-            })
+            }
 
             binding.reactionPickerType.setSelection(mReactionPickerSettingViewModel?.reactionPickerType?.ordinal?: 0)
 

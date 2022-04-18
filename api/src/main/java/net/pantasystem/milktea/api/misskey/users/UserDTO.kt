@@ -2,8 +2,8 @@ package net.pantasystem.milktea.api.misskey.users
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable
 
 /**

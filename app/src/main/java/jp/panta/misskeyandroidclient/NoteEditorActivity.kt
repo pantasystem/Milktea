@@ -70,11 +70,11 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
         fun newBundle(
             context: Context,
-            replyTo: net.pantasystem.milktea.model.notes.Note.Id? = null,
-            quoteTo: net.pantasystem.milktea.model.notes.Note.Id? = null,
-            draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote? = null,
+            replyTo: Note.Id? = null,
+            quoteTo: Note.Id? = null,
+            draftNote: DraftNote? = null,
             mentions: List<String>? = null,
-            channelId: net.pantasystem.milktea.model.channel.Channel.Id? = null,
+            channelId: Channel.Id? = null,
         ): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let {
@@ -111,7 +111,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     private lateinit var mConfirmViewModel: ConfirmViewModel
 
-    @Inject lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    @Inject lateinit var accountStore: AccountStore
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accountViewModel: AccountViewModel by viewModels()
@@ -158,19 +158,19 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             )
         val replyToNoteId = intent.getStringExtra(EXTRA_REPLY_TO_NOTE_ID)?.let {
             requireNotNull(accountId)
-            net.pantasystem.milktea.model.notes.Note.Id(accountId, it)
+            Note.Id(accountId, it)
         }
         val quoteToNoteId = intent.getStringExtra(EXTRA_QUOTE_TO_NOTE_ID)?.let {
             requireNotNull(accountId)
-            net.pantasystem.milktea.model.notes.Note.Id(accountId, it)
+            Note.Id(accountId, it)
         }
 
         val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)?.let {
             requireNotNull(accountId)
-            net.pantasystem.milktea.model.channel.Channel.Id(accountId, it)
+            Channel.Id(accountId, it)
         }
 
-        val draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? net.pantasystem.milktea.model.notes.draft.DraftNote?
+        val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
 
 
         noteEditorToolbar.actionUpButton.setOnClickListener {
@@ -191,7 +191,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
         accountViewModel.showProfile.observe(this) {
             val intent =
-                UserDetailActivity.newInstance(this, userId = net.pantasystem.milktea.model.user.User.Id(it.accountId, it.remoteId))
+                UserDetailActivity.newInstance(this, userId = User.Id(it.accountId, it.remoteId))
 
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
@@ -388,7 +388,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         binding.inputMain.requestFocus()
     }
 
-    override fun onSelect(emoji: net.pantasystem.milktea.model.emoji.Emoji) {
+    override fun onSelect(emoji: Emoji) {
         val pos = mBinding.inputMain.selectionEnd
         mViewModel.addEmoji(emoji, pos).let { newPos ->
             mBinding.inputMain.setText(mViewModel.text.value ?: "")
@@ -538,7 +538,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =
                 (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
-                    it as? net.pantasystem.milktea.model.drive.FileProperty.Id
+                    it as? FileProperty.Id
                 }
             Log.d("NoteEditorActivity", "result:${ids}")
             val size = mViewModel.fileTotal()

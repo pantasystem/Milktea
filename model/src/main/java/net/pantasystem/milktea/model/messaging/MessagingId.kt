@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.model.messaging
 
 import java.io.Serializable
-import net.pantasystem.milktea.data.model.group.Group as GroupEntity
+import net.pantasystem.milktea.model.group.Group as GroupEntity
 
 sealed class MessagingId : Serializable{
 

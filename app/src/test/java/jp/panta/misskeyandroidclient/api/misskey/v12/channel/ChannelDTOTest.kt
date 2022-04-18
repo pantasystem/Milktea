@@ -2,8 +2,7 @@ package jp.panta.misskeyandroidclient.api.misskey.v12.channel
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.data.api.misskey.v12.channel.ChannelDTO
-import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
 import org.junit.Assert.*
 
 import org.junit.Test
@@ -28,7 +27,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
         assertEquals(true, channelDTO.isFollowing)
         assertEquals(true, channelDTO.hasUnreadNote)
         assertEquals(13, channelDTO.usersCount)
@@ -68,7 +67,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
         assertNull(channelDTO.isFollowing)
         assertNull(channelDTO.hasUnreadNote)
     }
@@ -91,7 +90,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
         assertEquals(true, channelDTO.isFollowing)
         assertEquals(true, channelDTO.hasUnreadNote)
         assertEquals(13, channelDTO.usersCount)
@@ -120,7 +119,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
         assertNull(channelDTO.description)
     }
 }

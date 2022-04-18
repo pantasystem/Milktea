@@ -4,19 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.users.toUser
-import net.pantasystem.milktea.model.account.newAccount
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.auth.Authorization
 import net.pantasystem.milktea.data.model.auth.custom.AccessToken
 import net.pantasystem.milktea.data.model.auth.custom.toModel
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.api.misskey.auth.createObtainToken
+import net.pantasystem.milktea.data.model.account.newAccount
+import net.pantasystem.milktea.data.model.toUser
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
@@ -42,7 +42,7 @@ class AuthViewModel @Inject constructor(
                     try {
                         val token = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
                             .getAccessToken(
-                                net.pantasystem.milktea.api.misskey.auth.UserKey(
+                                UserKey(
                                     appSecret = a.appSecret,
                                     a.session.token
                                 )
@@ -82,7 +82,7 @@ class AuthViewModel @Inject constructor(
                 when (a) {
                     is Authorization.Waiting4UserAuthorization.Misskey -> {
                         val accessToken = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
-                            net.pantasystem.milktea.api.misskey.auth.UserKey(
+                            UserKey(
                                 appSecret = a.appSecret,
                                 a.session.token
                             )

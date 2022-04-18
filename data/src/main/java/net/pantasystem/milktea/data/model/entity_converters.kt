@@ -369,7 +369,7 @@ fun GroupDTO.toGroup(accountId: Long): Group {
 }
 
 
-suspend fun net.pantasystem.milktea.data.api.misskey.v12_75_0.GalleryPost.toEntity(
+suspend fun net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost.toEntity(
     account: Account,
     filePropertyDataSource: FilePropertyDataSource,
     userDataSource: net.pantasystem.milktea.model.user.UserDataSource

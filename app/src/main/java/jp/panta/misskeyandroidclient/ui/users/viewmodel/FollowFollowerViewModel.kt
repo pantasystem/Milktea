@@ -7,13 +7,10 @@ import androidx.lifecycle.viewModelScope
 import net.pantasystem.milktea.data.api.misskey.users.RequestUser
 import net.pantasystem.milktea.data.api.misskey.users.toUser
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.api.misskey.v10.MisskeyAPIV10
-import net.pantasystem.milktea.data.api.misskey.v10.RequestFollowFollower
-import net.pantasystem.milktea.data.api.misskey.v11.MisskeyAPIV11
+import net.pantasystem.milktea.api.misskey.v10.MisskeyAPIV10
+import net.pantasystem.milktea.api.misskey.v10.RequestFollowFollower
+import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.model.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -55,7 +52,7 @@ class FollowFollowerViewModel(
     @Suppress("BlockingMethodInNonBlockingContext")
     class DefaultPaginator(
         val account: net.pantasystem.milktea.model.account.Account,
-        val misskeyAPI: MisskeyAPIV11,
+        val misskeyAPI: net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11,
         val userId: net.pantasystem.milktea.model.user.User.Id,
         val type: Type,
         val encryption: Encryption,
@@ -105,7 +102,7 @@ class FollowFollowerViewModel(
     @Suppress("BlockingMethodInNonBlockingContext")
     class V10Paginator(
         val account: net.pantasystem.milktea.model.account.Account,
-        private val misskeyAPIV10: MisskeyAPIV10,
+        private val misskeyAPIV10: net.pantasystem.milktea.api.misskey.v10.MisskeyAPIV10,
         val userId: net.pantasystem.milktea.model.user.User.Id,
         val type: Type,
         val encryption: Encryption,
@@ -119,7 +116,7 @@ class FollowFollowerViewModel(
         override suspend fun next(): List<net.pantasystem.milktea.model.user.User.Detail> {
             lock.withLock {
                 val res = api.invoke(
-                    RequestFollowFollower(
+                    net.pantasystem.milktea.api.misskey.v10.RequestFollowFollower(
                         i = account.getI(encryption),
                         cursor = nextId,
                         userId = userId.id
@@ -230,10 +227,10 @@ class FollowFollowerViewModel(
         }
         mPaginator = mAccount?.let { account ->
             val api = misskeyAPIProvider.get(account.instanceDomain)
-            if(api is MisskeyAPIV10){
+            if(api is net.pantasystem.milktea.api.misskey.v10.MisskeyAPIV10){
                 V10Paginator(account, api, userId, type, encryption, noteDataSourceAdder, userDataSource)
             }else{
-                DefaultPaginator(account, api as MisskeyAPIV11, userId, type, encryption, noteDataSourceAdder, userDataSource, miCore.loggerFactory.create("DefaultPaginator"))
+                DefaultPaginator(account, api as net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11, userId, type, encryption, noteDataSourceAdder, userDataSource, miCore.loggerFactory.create("DefaultPaginator"))
             }
         }
         require(mPaginator != null)

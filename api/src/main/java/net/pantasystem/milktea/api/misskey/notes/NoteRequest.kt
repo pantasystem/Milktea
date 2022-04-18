@@ -2,7 +2,7 @@ package net.pantasystem.milktea.api.misskey.notes
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.data.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Pageable
 import java.io.Serializable as JavaSerializable
 
 @Serializable

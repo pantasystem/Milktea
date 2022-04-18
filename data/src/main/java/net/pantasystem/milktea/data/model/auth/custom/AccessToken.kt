@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.model.auth.custom
 
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-import net.pantasystem.milktea.data.api.mastodon.accounts.MastodonAccountDTO
+import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.misskey.auth.AccessToken as MisskeyAccessToken
-import net.pantasystem.milktea.data.api.mastodon.apps.AccessToken as MastodonAccessToken
+import net.pantasystem.milktea.api.mastodon.apps.AccessToken as MastodonAccessToken
 
 
 sealed interface AccessToken {

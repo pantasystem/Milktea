@@ -5,7 +5,7 @@ import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable as JavaSerializable
 
 @Serializable

@@ -1,18 +1,19 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite
 
-import net.pantasystem.milktea.data.model.fevorite.Favorite
-import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteDataSourceAdder
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotePagedStore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.model.account.Account
 import retrofit2.Response
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class FavoriteNotePagingStore(
-    val account: net.pantasystem.milktea.model.account.Account,
+    val account: Account,
     override val pageableTimeline: net.pantasystem.milktea.model.account.page.Pageable.Favorite,
     private val miCore: MiCore,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
@@ -23,7 +24,7 @@ class FavoriteNotePagingStore(
 
     //private val connectionInformation = accountRelation.getCurrentConnectionInformation()!!
 
-    private val adder = net.pantasystem.milktea.model.notes.NoteDataSourceAdder(
+    private val adder = NoteDataSourceAdder(
         miCore.getUserDataSource(),
         miCore.getNoteDataSource(),
         miCore.getFilePropertyDataSource()
@@ -50,7 +51,7 @@ class FavoriteNotePagingStore(
         return makeResponse(res, false)
     }
 
-    private suspend fun makeResponse(res: Response<List<Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
+    private suspend fun makeResponse(res: Response<List<net.pantasystem.milktea.api.misskey.favorite.Favorite>?>, isReversed: Boolean): Pair<BodyLessResponse, List<PlaneNoteViewData>?>{
         val rawList = if(isReversed) res.body()?.asReversed() else res.body()
         val list = rawList?.map{
             FavoriteNoteViewData(it ,

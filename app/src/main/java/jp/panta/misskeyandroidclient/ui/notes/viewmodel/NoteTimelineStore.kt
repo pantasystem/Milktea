@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 import android.util.Log
 import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 
@@ -51,7 +51,7 @@ class NoteTimelineStore(
                 is net.pantasystem.milktea.model.account.page.Pageable.Mention -> miCore.getMisskeyAPIProvider().get(account)::mentions
                 is net.pantasystem.milktea.model.account.page.Pageable.Antenna -> {
                     val api = miCore.getMisskeyAPIProvider().get(account)
-                    if(api is MisskeyAPIV12){
+                    if(api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12){
                         (api)::antennasNotes
                     }else{
                         throw IllegalArgumentException("antennaはV12以上でなければ使用できません")
@@ -59,7 +59,7 @@ class NoteTimelineStore(
                 }
                 is net.pantasystem.milktea.model.account.page.Pageable.ChannelTimeline -> {
                     val api = miCore.getMisskeyAPIProvider().get(account)
-                    if (api is MisskeyAPIV12) {
+                    if (api is net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12) {
                         (api)::channelTimeline
                     }else{
                         throw IllegalArgumentException("channelはV12以上でなければ使用できません")

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.model.instance.db
+package net.pantasystem.milktea.api.Instance.db
 
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository

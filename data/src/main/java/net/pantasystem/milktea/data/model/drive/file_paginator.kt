@@ -12,7 +12,7 @@ import net.pantasystem.milktea.api.misskey.drive.RequestFile
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource

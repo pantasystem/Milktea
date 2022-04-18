@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.model.instance.db
+package net.pantasystem.milktea.api.Instance.db
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow

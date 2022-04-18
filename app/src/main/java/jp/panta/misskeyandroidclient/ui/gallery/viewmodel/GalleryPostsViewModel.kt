@@ -7,7 +7,7 @@ import jp.panta.misskeyandroidclient.di.module.createGalleryPostsStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.data.model.gallery.*
+import net.pantasystem.milktea.model.gallery.*
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -18,17 +18,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class GalleryPostsViewModel(
-    val pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery,
+    val pageable: Pageable.Gallery,
     private var accountId: Long?,
-    galleryDataSource: net.pantasystem.milktea.model.gallery.GalleryDataSource,
-    galleryRepository: net.pantasystem.milktea.model.gallery.GalleryRepository,
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    galleryDataSource: GalleryDataSource,
+    galleryRepository: GalleryRepository,
+    private val accountRepository: AccountRepository,
     miCore: MiCore
 ) : ViewModel(), GalleryToggleLikeOrUnlike {
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        val pageable: net.pantasystem.milktea.model.account.page.Pageable.Gallery,
+        val pageable: Pageable.Gallery,
         val accountId: Long?,
         val miCore: MiCore
     ) : ViewModelProvider.Factory {
@@ -54,7 +54,7 @@ class GalleryPostsViewModel(
     val lock = Mutex()
 
     private val galleryPostSendFavoriteStore =
-        net.pantasystem.milktea.model.gallery.GalleryPostSendFavoriteStore(galleryRepository)
+        GalleryPostSendFavoriteStore(galleryRepository)
 
     private val _error = MutableSharedFlow<Throwable>(
         extraBufferCapacity = 100,
@@ -62,12 +62,12 @@ class GalleryPostsViewModel(
     )
     val error: Flow<Throwable> = _error
 
-    private val currentIndexes = MutableStateFlow<Map<net.pantasystem.milktea.model.gallery.GalleryPost.Id, Int>>(emptyMap())
+    private val currentIndexes = MutableStateFlow<Map<GalleryPost.Id, Int>>(emptyMap())
 
 
     init {
         galleryDataSource.events().mapNotNull {
-            it as? net.pantasystem.milktea.model.gallery.GalleryDataSource.Event.Deleted
+            it as? GalleryDataSource.Event.Deleted
         }.onEach { ev ->
             lock.withLock {
                 val state = _galleryPosts.value
@@ -105,7 +105,7 @@ class GalleryPostsViewModel(
                     }.filter { postWithFiles ->
                         postWithFiles.second.isNotEmpty()
                     }.map { postWithFiles ->
-                        net.pantasystem.milktea.model.gallery.GalleryPostRelation(
+                        GalleryPostRelation(
                             postWithFiles.first,
                             miCore.getFilePropertyDataSource().findIn(postWithFiles.first.fileIds),
                             miCore.getUserRepository().find(postWithFiles.first.userId, false)
@@ -169,13 +169,13 @@ class GalleryPostsViewModel(
         }
     }
 
-    fun toggleFavorite(galleryId: net.pantasystem.milktea.model.gallery.GalleryPost.Id) {
+    fun toggleFavorite(galleryId: GalleryPost.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             toggle(galleryId)
         }
     }
 
-    override suspend fun toggle(galleryId: net.pantasystem.milktea.model.gallery.GalleryPost.Id) {
+    override suspend fun toggle(galleryId: GalleryPost.Id) {
         runCatching {
             galleryPostSendFavoriteStore.toggleFavorite(galleryId)
         }.onFailure {
@@ -183,7 +183,7 @@ class GalleryPostsViewModel(
         }
     }
 
-    suspend fun getAccount(): net.pantasystem.milktea.model.account.Account {
+    suspend fun getAccount(): Account {
         return accountId?.let {
             accountRepository.get(it)
         } ?: accountRepository.getCurrentAccount().also {

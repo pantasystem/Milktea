@@ -7,12 +7,13 @@ import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.model.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.model.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.model.sw.register.SubscriptionRegistration
@@ -90,7 +91,7 @@ interface MiCore {
     fun getUnreadMessages(): net.pantasystem.milktea.model.messaging.UnReadMessages
 
 
-    fun getDraftNoteDAO(): net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+    fun getDraftNoteDAO(): DraftNoteDao
 
     fun getUnreadNotificationDAO(): UnreadNotificationDAO
 

@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.model.messaging
 
 import net.pantasystem.milktea.model.EntityId
-import net.pantasystem.milktea.data.model.group.GroupRepository
-import net.pantasystem.milktea.data.model.group.Group as GroupEntity
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.group.Group as GroupEntity
 import kotlinx.datetime.Instant
 
 

@@ -12,12 +12,11 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.channel.ChannelListType
+import net.pantasystem.milktea.data.model.channel.impl.ChannelListType
 import kotlinx.coroutines.launch
 
 data class ChannelTypeWithTitle(
-    val type: net.pantasystem.milktea.model.channel.ChannelListType,
+    val type: ChannelListType,
     val title: String,
 )
 
@@ -31,9 +30,9 @@ fun ChannelScreen(
 
     val currentAccount by accountStore.observeCurrentAccount.collectAsState(initial = null)
     val channelTypeWithTitleList = listOf(
-        ChannelTypeWithTitle(net.pantasystem.milktea.model.channel.ChannelListType.FEATURED, stringResource(id = R.string.featured)),
-        ChannelTypeWithTitle(net.pantasystem.milktea.model.channel.ChannelListType.FOLLOWED, stringResource(id = R.string.following)),
-        ChannelTypeWithTitle(net.pantasystem.milktea.model.channel.ChannelListType.OWNED, stringResource(id = R.string.owned))
+        ChannelTypeWithTitle(ChannelListType.FEATURED, stringResource(id = R.string.featured)),
+        ChannelTypeWithTitle(ChannelListType.FOLLOWED, stringResource(id = R.string.following)),
+        ChannelTypeWithTitle(ChannelListType.OWNED, stringResource(id = R.string.owned))
     )
 
     val pagerState = rememberPagerState(pageCount = channelTypeWithTitleList.size)

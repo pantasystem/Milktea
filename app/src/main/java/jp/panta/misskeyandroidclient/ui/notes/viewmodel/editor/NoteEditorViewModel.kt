@@ -2,28 +2,17 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.model.CreateNoteTaskExecutor
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.data.model.api.Version
-import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.file.toFile
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.data.model.notes.*
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.model.notes.task
 import net.pantasystem.milktea.model.notes.toCreateNote
@@ -35,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
-    private val draftNoteDao: net.pantasystem.milktea.model.notes.draft.DraftNoteDao,
+    private val draftNoteDao: DraftNoteDao,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
     private val miCore: MiCore,
     private val noteRepository: net.pantasystem.milktea.model.notes.NoteRepository,

@@ -3,14 +3,10 @@ package jp.panta.misskeyandroidclient.ui.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.newPage
 import net.pantasystem.milktea.data.model.PreviousPagingController
-import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.channel.ChannelListType
-import net.pantasystem.milktea.model.channel.ChannelPagingModel
-import net.pantasystem.milktea.model.channel.ChannelRepository
+import net.pantasystem.milktea.data.model.channel.impl.ChannelListType
+import net.pantasystem.milktea.data.model.channel.impl.ChannelPagingModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -24,7 +20,7 @@ class ChannelViewModel @Inject constructor(
     val accountStore: net.pantasystem.milktea.model.account.AccountStore,
     private val channelRepository: net.pantasystem.milktea.model.channel.ChannelRepository,
     private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
-    channelPagingModelFactory: net.pantasystem.milktea.model.channel.ChannelPagingModel.ModelAssistedFactory,
+    channelPagingModelFactory: ChannelPagingModel.ModelAssistedFactory,
     loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
 ) : ViewModel() {
 
@@ -111,15 +107,15 @@ class ChannelViewModel @Inject constructor(
     }
 }
 
-data class PagingModelKey(val accountId: Long, val type: net.pantasystem.milktea.model.channel.ChannelListType)
+data class PagingModelKey(val accountId: Long, val type: ChannelListType)
 
 class ChannelPagingModelHolder(
-    private val channelPagingModelFactory: net.pantasystem.milktea.model.channel.ChannelPagingModel.ModelAssistedFactory,
+    private val channelPagingModelFactory: ChannelPagingModel.ModelAssistedFactory,
 ) {
 
     private val lock = Mutex()
-    private var modelMap = mapOf<PagingModelKey, net.pantasystem.milktea.model.channel.ChannelPagingModel>()
-    suspend fun get(key: PagingModelKey): net.pantasystem.milktea.model.channel.ChannelPagingModel {
+    private var modelMap = mapOf<PagingModelKey, ChannelPagingModel>()
+    suspend fun get(key: PagingModelKey): ChannelPagingModel {
         lock.withLock {
             var model = modelMap[key]
             if (model == null) {

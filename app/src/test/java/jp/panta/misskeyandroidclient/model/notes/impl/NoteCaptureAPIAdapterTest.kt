@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import net.pantasystem.milktea.data.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.data.api.misskey.notes.toNote
-import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import net.pantasystem.milktea.data.streaming.NoteUpdated
@@ -10,8 +8,11 @@ import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
 import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPIImpl
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIWithAccountProviderImpl
 import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.model.toNote
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

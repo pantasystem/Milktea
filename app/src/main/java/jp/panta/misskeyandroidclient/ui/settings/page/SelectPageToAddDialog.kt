@@ -9,12 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.account.page.PageType
-import net.pantasystem.milktea.data.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.data.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.account.page.galleryTypes
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject

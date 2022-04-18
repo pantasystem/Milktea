@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.api.misskey.notes.reaction
 
-import net.pantasystem.milktea.data.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import java.util.*
 
 data class ReactionHistoryDTO (

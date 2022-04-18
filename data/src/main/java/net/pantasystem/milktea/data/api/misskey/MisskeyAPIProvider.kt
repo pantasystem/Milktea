@@ -1,8 +1,9 @@
 package net.pantasystem.milktea.data.api.misskey
 
 
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.model.api.Version
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.model.instance.Version
 import javax.inject.Inject
 import javax.inject.Singleton
 

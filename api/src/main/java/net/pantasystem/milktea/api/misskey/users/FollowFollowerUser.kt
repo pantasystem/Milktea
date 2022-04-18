@@ -1,11 +1,12 @@
 package net.pantasystem.milktea.api.misskey.users
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.data.serializations.DateSerializer
+import net.pantasystem.milktea.common.serializations.DateSerializer
 import java.util.*
 
 @Serializable
-data class FollowFollowerUser(
+data class FollowFollowerUser @OptIn(ExperimentalSerializationApi::class) constructor(
     val id: String,
     @Serializable(with = DateSerializer::class) val createdAt: Date,
     val followeeId: String,

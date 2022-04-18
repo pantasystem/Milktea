@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.auth.viewmodel
 
-import net.pantasystem.milktea.data.model.api.Version
+import net.pantasystem.milktea.model.instance.Version
 
 object Permissions{
     private val defaultPermission = listOf(

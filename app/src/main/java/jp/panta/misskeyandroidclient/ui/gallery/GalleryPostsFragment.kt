@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.AuthorizationActivity
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.api.misskey.APIError
+import net.pantasystem.milktea.api.misskey.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
-import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel

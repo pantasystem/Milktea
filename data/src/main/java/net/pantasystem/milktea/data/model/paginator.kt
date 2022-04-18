@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.model
 
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

@@ -3,17 +3,14 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.file.File
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
 class DraftNotesViewModel(
-    val draftNoteDao: net.pantasystem.milktea.model.notes.draft.DraftNoteDao,
+    val draftNoteDao: DraftNoteDao,
     val miCore: MiCore
 ) : ViewModel(){
 

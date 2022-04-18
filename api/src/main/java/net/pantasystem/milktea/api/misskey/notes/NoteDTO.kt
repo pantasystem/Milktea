@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.SerialName
+import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-import net.pantasystem.milktea.data.model.auth.custom.App
-import net.pantasystem.milktea.data.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable
 
 @kotlinx.serialization.Serializable

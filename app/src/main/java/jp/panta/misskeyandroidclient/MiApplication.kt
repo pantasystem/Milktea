@@ -7,7 +7,7 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.model.*
 import net.pantasystem.milktea.data.model.drive.*
@@ -34,6 +34,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.model.messaging.impl.MessageObserver
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.streaming.Socket
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import java.util.*
@@ -54,7 +55,7 @@ class MiApplication : Application(), MiCore {
     lateinit var mSettingStore: SettingStore
 
     @Inject
-    lateinit var draftNoteDao: net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+    lateinit var draftNoteDao: DraftNoteDao
 
     @Inject
     lateinit var urlPreviewDAO: UrlPreviewDAO
@@ -80,7 +81,7 @@ class MiApplication : Application(), MiCore {
     lateinit var mMetaCache: net.pantasystem.milktea.model.instance.MetaCache
 
     @Inject
-    lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
+    lateinit var mMisskeyAPIProvider: net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
 
     @Inject
     lateinit var mNoteDataSource: net.pantasystem.milktea.model.notes.NoteDataSource
@@ -395,7 +396,7 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun getDraftNoteDAO(): net.pantasystem.milktea.model.notes.draft.DraftNoteDao {
+    override fun getDraftNoteDAO(): DraftNoteDao {
         return draftNoteDao
     }
 
@@ -500,7 +501,7 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getMisskeyAPIProvider(): MisskeyAPIProvider {
+    override fun getMisskeyAPIProvider(): net.pantasystem.milktea.api.misskey.MisskeyAPIProvider {
         return mMisskeyAPIProvider
     }
 

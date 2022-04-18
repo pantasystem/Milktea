@@ -4,7 +4,7 @@ import net.pantasystem.milktea.api.misskey.drive.ShowFile
 import net.pantasystem.milktea.api.misskey.drive.UpdateFileDTO
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.model.toFileProperty
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty

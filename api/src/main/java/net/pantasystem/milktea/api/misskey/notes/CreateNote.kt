@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.api.misskey.notes
 
 import kotlinx.serialization.Serializable
-import net.pantasystem.milktea.data.model.notes.poll.CreatePoll
+import net.pantasystem.milktea.model.notes.poll.CreatePoll
 
 @Serializable
 data class CreateNote(

@@ -2,10 +2,10 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
-import net.pantasystem.milktea.data.api.misskey.notes.NoteRequest
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite.FavoriteNotePagingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.data.model.notes.*
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.streaming.ChannelBody
@@ -16,14 +16,17 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 @ExperimentalCoroutinesApi
 class TimelineViewModel(
-    val account: net.pantasystem.milktea.model.account.Account?,
+    val account: Account?,
     val accountId: Long? = account?.accountId,
-    val pageable: net.pantasystem.milktea.model.account.page.Pageable,
+    val pageable: Pageable,
     val miCore: MiCore,
     val settingStore: SettingStore,
     val include: NoteRequest.Include
@@ -44,13 +47,13 @@ class TimelineViewModel(
 
     var position: Int = 0
 
-    private var mNoteIds = HashSet<net.pantasystem.milktea.model.notes.Note.Id>()
+    private var mNoteIds = HashSet<Note.Id>()
 
     private val timelineState = MutableStateFlow<TimelineState>(TimelineState.Init(emptyList()))
 
     private val removeSize = 50
 
-    private val noteDataSourceAdder = net.pantasystem.milktea.model.notes.NoteDataSourceAdder(
+    private val noteDataSourceAdder = NoteDataSourceAdder(
         miCore.getUserDataSource(),
         miCore.getNoteDataSource(),
         miCore.getFilePropertyDataSource()
@@ -77,43 +80,43 @@ class TimelineViewModel(
         flow {
             emit(getAccount())
         }.filter {
-            pageable is net.pantasystem.milktea.model.account.page.Pageable.GlobalTimeline
-                    || pageable is net.pantasystem.milktea.model.account.page.Pageable.HybridTimeline
-                    || pageable is net.pantasystem.milktea.model.account.page.Pageable.LocalTimeline
-                    || pageable is net.pantasystem.milktea.model.account.page.Pageable.HomeTimeline
-                    || pageable is net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline
-                    || pageable is net.pantasystem.milktea.model.account.page.Pageable.Antenna
-                    || pageable is net.pantasystem.milktea.model.account.page.Pageable.UserTimeline
-                    || pageable is net.pantasystem.milktea.model.account.page.Pageable.ChannelTimeline
+            pageable is Pageable.GlobalTimeline
+                    || pageable is Pageable.HybridTimeline
+                    || pageable is Pageable.LocalTimeline
+                    || pageable is Pageable.HomeTimeline
+                    || pageable is Pageable.UserListTimeline
+                    || pageable is Pageable.Antenna
+                    || pageable is Pageable.UserTimeline
+                    || pageable is Pageable.ChannelTimeline
         }.flatMapLatest { account ->
             when (pageable) {
-                is net.pantasystem.milktea.model.account.page.Pageable.GlobalTimeline -> {
+                is Pageable.GlobalTimeline -> {
                     miCore.getChannelAPI(account).connect(ChannelAPI.Type.Global)
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.HybridTimeline -> {
+                is Pageable.HybridTimeline -> {
                     miCore.getChannelAPI(account).connect(ChannelAPI.Type.Hybrid)
 
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.LocalTimeline -> {
+                is Pageable.LocalTimeline -> {
                     miCore.getChannelAPI(account).connect(ChannelAPI.Type.Local)
 
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.HomeTimeline -> {
+                is Pageable.HomeTimeline -> {
                     miCore.getChannelAPI(account).connect(ChannelAPI.Type.Home)
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline -> {
+                is Pageable.UserListTimeline -> {
                     miCore.getChannelAPI(account)
                         .connect(ChannelAPI.Type.UserList(userListId = pageable.listId))
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.Antenna -> {
+                is Pageable.Antenna -> {
                     miCore.getChannelAPI(account)
                         .connect(ChannelAPI.Type.Antenna(antennaId = pageable.antennaId))
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.UserTimeline -> {
+                is Pageable.UserTimeline -> {
                     miCore.getChannelAPI(account)
                         .connectUserTimeline(pageable.userId)
                 }
-                is net.pantasystem.milktea.model.account.page.Pageable.ChannelTimeline -> {
+                is Pageable.ChannelTimeline -> {
                     miCore.getChannelAPI(account)
                         .connect(ChannelAPI.Type.Channel(channelId = pageable.channelId))
                 }
@@ -395,7 +398,7 @@ class TimelineViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             notes.forEach { note ->
                 note.job = note.eventFlow.onEach {
-                    if (it is net.pantasystem.milktea.model.notes.NoteDataSource.Event.Deleted) {
+                    if (it is NoteDataSource.Event.Deleted) {
                         timelineState.value =
                             TimelineState.Deleted(
                                 timelineState.value.notes.filterNot { pnvd ->
@@ -444,8 +447,8 @@ class TimelineViewModel(
     }
 
     //
-    private var mAccountCache: net.pantasystem.milktea.model.account.Account? = account
-    private suspend fun getAccount(): net.pantasystem.milktea.model.account.Account {
+    private var mAccountCache: Account? = account
+    private suspend fun getAccount(): Account {
         if (mAccountCache != null) {
             mAccountCache
         }
@@ -461,13 +464,13 @@ class TimelineViewModel(
     }
 
 
-    private fun net.pantasystem.milktea.model.account.Account.getMisskeyAPI(): MisskeyAPI {
+    private fun Account.getMisskeyAPI(): net.pantasystem.milktea.api.misskey.MisskeyAPI {
         return miCore.getMisskeyAPIProvider().get(this)
     }
 
-    private fun net.pantasystem.milktea.model.account.Account.getPagedStore(): NotePagedStore {
+    private fun Account.getPagedStore(): NotePagedStore {
         return when (pageable) {
-            is net.pantasystem.milktea.model.account.page.Pageable.Favorite -> FavoriteNotePagingStore(
+            is Pageable.Favorite -> FavoriteNotePagingStore(
                 this,
                 pageable,
                 miCore,

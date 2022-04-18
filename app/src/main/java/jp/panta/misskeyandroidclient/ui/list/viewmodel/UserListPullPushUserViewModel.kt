@@ -7,15 +7,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.api.misskey.list.ListUserOperation
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.list.UserList
-import net.pantasystem.milktea.model.user.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.api.misskey.list.ListUserOperation
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import javax.inject.Inject
 
 @HiltViewModel

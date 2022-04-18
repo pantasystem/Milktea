@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import net.pantasystem.milktea.data.model.core.*
-import net.pantasystem.milktea.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.model.notes.draft.db.DraftFileDTO
 import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDTO
 import net.pantasystem.milktea.data.model.notes.draft.db.PollChoiceDTO
@@ -15,7 +15,7 @@ import net.pantasystem.milktea.data.model.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.model.account.db.AccountDAO
 import net.pantasystem.milktea.data.model.account.page.db.PageDAO
 import net.pantasystem.milktea.data.model.account.page.db.TimelinePageTypeConverter
-import net.pantasystem.milktea.data.model.instance.db.*
+import net.pantasystem.milktea.api.Instance.db.*
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
@@ -30,9 +30,9 @@ import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
     entities = [
         EncryptedConnectionInformation::class,
         ReactionHistory::class,
-        net.pantasystem.milktea.data.model.core.Account::class,
+        Account::class,
         ReactionUserSetting::class,
-        net.pantasystem.milktea.data.model.Page::class,
+        Page::class,
         PollChoiceDTO::class,
         UserIdDTO::class,
         DraftFileDTO::class,
