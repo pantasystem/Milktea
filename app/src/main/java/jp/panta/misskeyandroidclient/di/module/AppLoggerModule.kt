@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.logger.AndroidDefaultLogger
 import javax.inject.Singleton
 
@@ -12,7 +13,7 @@ import javax.inject.Singleton
 object AppLoggerModule {
     @Singleton
     @Provides
-    fun loggerFactory(): net.pantasystem.milktea.common.Logger.Factory {
+    fun loggerFactory(): Logger.Factory {
         return AndroidDefaultLogger.Factory
     }
 }

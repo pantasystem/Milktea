@@ -8,6 +8,7 @@ import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.model.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
@@ -19,6 +20,32 @@ import net.pantasystem.milktea.data.model.settings.SettingStore
 import net.pantasystem.milktea.data.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.data.model.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.data.model.url.UrlPreviewStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountNotFoundException
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.instance.FetchMeta
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.messaging.MessageRepository
+import net.pantasystem.milktea.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
+import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.notification.NotificationRepository
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
 
 interface MiCore {
 
@@ -27,68 +54,68 @@ interface MiCore {
     @FlowPreview
     val messageObserver: MessageObserver
 
-    val loggerFactory: net.pantasystem.milktea.common.Logger.Factory
+    val loggerFactory: Logger.Factory
 
 
-    @Throws(net.pantasystem.milktea.model.account.AccountNotFoundException::class)
-    suspend fun getAccount(accountId: Long): net.pantasystem.milktea.model.account.Account
+    @Throws(AccountNotFoundException::class)
+    suspend fun getAccount(accountId: Long): Account
 
-    fun getAccountRepository(): net.pantasystem.milktea.model.account.AccountRepository
+    fun getAccountRepository(): AccountRepository
 
-    fun getUrlPreviewStore(account: net.pantasystem.milktea.model.account.Account): UrlPreviewStore?
+    fun getUrlPreviewStore(account: Account): UrlPreviewStore?
 
-    fun getNoteDataSource(): net.pantasystem.milktea.model.notes.NoteDataSource
+    fun getNoteDataSource(): NoteDataSource
 
-    fun getNoteRepository(): net.pantasystem.milktea.model.notes.NoteRepository
+    fun getNoteRepository(): NoteRepository
 
-    fun getUserDataSource(): net.pantasystem.milktea.model.user.UserDataSource
+    fun getUserDataSource(): UserDataSource
 
-    fun getUserRepository(): net.pantasystem.milktea.model.user.UserRepository
+    fun getUserRepository(): UserRepository
 
-    fun getNotificationDataSource(): net.pantasystem.milktea.model.notification.NotificationDataSource
+    fun getNotificationDataSource(): NotificationDataSource
 
-    fun getNotificationRepository(): net.pantasystem.milktea.model.notification.NotificationRepository
+    fun getNotificationRepository(): NotificationRepository
 
-    fun getUserRepositoryEventToFlow(): net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
+    fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow
 
-    fun getGroupDataSource(): net.pantasystem.milktea.model.group.GroupDataSource
+    fun getGroupDataSource(): GroupDataSource
 
-    fun getGroupRepository(): net.pantasystem.milktea.model.group.GroupRepository
+    fun getGroupRepository(): GroupRepository
 
-    fun getFilePropertyDataSource(): net.pantasystem.milktea.model.drive.FilePropertyDataSource
+    fun getFilePropertyDataSource(): FilePropertyDataSource
 
-    fun getDriveFileRepository(): net.pantasystem.milktea.model.drive.DriveFileRepository
+    fun getDriveFileRepository(): DriveFileRepository
 
     fun getSubscriptionRegistration(): SubscriptionRegistration
 
     fun getSubscriptionUnRegstration(): SubscriptionUnRegistration
 
-    suspend fun setCurrentAccount(account: net.pantasystem.milktea.model.account.Account)
+    suspend fun setCurrentAccount(account: Account)
 
 
     fun getEncryption(): Encryption
 
 
-    suspend fun getChannelAPI(account: net.pantasystem.milktea.model.account.Account): ChannelAPI
+    suspend fun getChannelAPI(account: Account): ChannelAPI
 
     fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter
 
-    fun getSocket(account: net.pantasystem.milktea.model.account.Account): Socket
+    fun getSocket(account: Account): Socket
 
-    fun getNoteCaptureAPI(account: net.pantasystem.milktea.model.account.Account): NoteCaptureAPI
+    fun getNoteCaptureAPI(account: Account): NoteCaptureAPI
 
-    fun getCurrentInstanceMeta(): net.pantasystem.milktea.model.instance.Meta?
+    fun getCurrentInstanceMeta(): Meta?
 
 
     fun getSettingStore(): SettingStore
 
     fun getGetters(): Getters
 
-    fun getMessageRepository(): net.pantasystem.milktea.model.messaging.MessageRepository
+    fun getMessageRepository(): MessageRepository
 
     fun getMessageDataSource(): MessageDataSource
 
-    fun getUnreadMessages(): net.pantasystem.milktea.model.messaging.UnReadMessages
+    fun getUnreadMessages(): UnReadMessages
 
 
     fun getDraftNoteDAO(): DraftNoteDao
@@ -97,23 +124,23 @@ interface MiCore {
 
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
-    fun getMetaStore(): net.pantasystem.milktea.model.instance.FetchMeta
+    fun getMetaStore(): FetchMeta
 
-    fun getMetaRepository(): net.pantasystem.milktea.model.instance.MetaRepository
+    fun getMetaRepository(): MetaRepository
 
-    fun getReactionHistoryPaginatorFactory(): net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator.Factory
+    fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory
 
-    fun getReactionHistoryDataSource(): net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
+    fun getReactionHistoryDataSource(): ReactionHistoryDataSource
 
-    fun getGalleryDataSource(): net.pantasystem.milktea.model.gallery.GalleryDataSource
+    fun getGalleryDataSource(): GalleryDataSource
 
-    fun getGalleryRepository(): net.pantasystem.milktea.model.gallery.GalleryRepository
+    fun getGalleryRepository(): GalleryRepository
 
     fun getFileUploaderProvider(): FileUploaderProvider
 
-    fun getTranslationStore(): net.pantasystem.milktea.model.notes.NoteTranslationStore
+    fun getTranslationStore(): NoteTranslationStore
 
-    fun getNoteReservationPostExecutor(): net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+    fun getNoteReservationPostExecutor(): NoteReservationPostExecutor
 
-    fun getAccountStore(): net.pantasystem.milktea.model.account.AccountStore
+    fun getAccountStore(): AccountStore
 }

@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient
 
 import android.content.Context
@@ -47,26 +48,25 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         const val ACTION_EDIT_NAME = "ACTION_EDIT_NAME"
 
 
-        fun newIntent(context: Context, listId: net.pantasystem.milktea.model.list.UserList.Id): Intent {
+        fun newIntent(context: Context, listId: UserList.Id): Intent {
             return Intent(context, UserListDetailActivity::class.java).apply {
                 putExtra(EXTRA_LIST_ID, listId)
             }
         }
     }
 
-    private var account: net.pantasystem.milktea.model.account.Account? = null
-    private var mListId: net.pantasystem.milktea.model.list.UserList.Id? = null
+    private var account: Account? = null
+    private var mListId: UserList.Id? = null
 
     @Inject
     lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
     private val accountViewModel: AccountViewModel by viewModels()
 
 
-
     @FlowPreview
     @ExperimentalCoroutinesApi
     val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
-        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as net.pantasystem.milktea.model.list.UserList.Id
+        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
         UserListDetailViewModel.provideFactory(assistedFactory, listId)
     }
 
@@ -82,33 +82,36 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
         setSupportActionBar(binding.userListToolbar)
 
-        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as net.pantasystem.milktea.model.list.UserList.Id
+        val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
 
 
         mListId = listId
 
 
-        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        ActionNoteHandler(
+            this,
+            notesViewModel,
+            ViewModelProvider(this)[ConfirmViewModel::class.java]
+        ).initViewModelListener()
 
         binding.userListDetailViewPager.adapter = PagerAdapter(listId)
         binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
 
-        mUserListDetailViewModel.userList.observe(this, { ul ->
+        mUserListDetailViewModel.userList.observe(this) { ul ->
             supportActionBar?.title = ul.name
             mUserListName = ul.name
 
 
 
-            if(intent.action == ACTION_EDIT_NAME){
+            if (intent.action == ACTION_EDIT_NAME) {
                 intent.action = ACTION_SHOW
                 showEditUserListDialog()
             }
-        })
+        }
 
-        mUserListDetailViewModel.userList.observe(this, {
+        mUserListDetailViewModel.userList.observe(this) {
             invalidateOptionsMenu()
-        })
-
+        }
 
 
     }
@@ -121,11 +124,11 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         menuInflater.inflate(R.menu.menu_user_list_detail, menu)
         val addToTabItem = menu.findItem(R.id.action_add_to_tab)
         val page = account?.pages?.firstOrNull {
-            (it.pageable() as? net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline)?.listId == mListId?.userListId && mListId != null
+            (it.pageable() as? Pageable.UserListTimeline)?.listId == mListId?.userListId && mListId != null
         }
-        if(page == null){
+        if (page == null) {
             addToTabItem?.setIcon(R.drawable.ic_add_to_tab_24px)
-        }else{
+        } else {
             addToTabItem?.setIcon(R.drawable.ic_remove_to_tab_24px)
         }
         setMenuTint(menu)
@@ -133,17 +136,17 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.action_add_to_tab ->{
+        when (item.itemId) {
+            R.id.action_add_to_tab -> {
                 toggleAddToTab()
             }
-            R.id.action_update_list_user ->{
+            R.id.action_update_list_user -> {
                 showEditUserListDialog()
             }
-            android.R.id.home ->{
+            android.R.id.home -> {
                 finish()
             }
-            R.id.action_add_user ->{
+            R.id.action_add_user -> {
                 val selected = mUserListDetailViewModel.listUsers.value?.mapNotNull {
                     it.userId
                 } ?: return false
@@ -157,71 +160,73 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    val requestSelectUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val resultCode = result.resultCode
-        val data = result.data
-        if(resultCode == RESULT_OK){
-            val changedDiff = data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-            val added = changedDiff?.added
-            val removed = changedDiff?.removed
-            Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
-            added?.forEach{
-                mUserListDetailViewModel.pushUser(it)
-            }
-            removed?.forEach{
-                mUserListDetailViewModel.pullUser(it)
+    val requestSelectUserResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val resultCode = result.resultCode
+            val data = result.data
+            if (resultCode == RESULT_OK) {
+                val changedDiff =
+                    data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                val added = changedDiff?.added
+                val removed = changedDiff?.removed
+                Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
+                added?.forEach {
+                    mUserListDetailViewModel.pushUser(it)
+                }
+                removed?.forEach {
+                    mUserListDetailViewModel.pullUser(it)
+                }
             }
         }
-    }
 
-    private fun showEditUserListDialog(){
-        val listId = mListId?: return
+    private fun showEditUserListDialog() {
+        val listId = mListId ?: return
         val dialog = UserListEditorDialog.newInstance(listId.userListId, mUserListName)
         dialog.show(supportFragmentManager, "")
     }
 
 
-    private fun toggleAddToTab(){
+    private fun toggleAddToTab() {
         val page = account?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if(pageable is net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline){
+            if (pageable is Pageable.UserListTimeline) {
                 pageable.listId == mListId?.userListId && mListId != null
-            }else{
+            } else {
                 false
             }
         }
-        if(page == null){
+        if (page == null) {
             accountViewModel.addPage(
-                net.pantasystem.milktea.model.account.page.Page(
+                Page(
                     account?.accountId ?: -1,
                     mUserListName,
                     weight = -1,
-                    pageable = net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline(
+                    pageable = Pageable.UserListTimeline(
                         mListId?.userListId!!
                     )
                 )
             )
-        }else{
+        } else {
             accountViewModel.removePage(page)
         }
     }
 
 
-
-    inner class PagerAdapter(val listId: net.pantasystem.milktea.model.list.UserList.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class PagerAdapter(val listId: UserList.Id) :
+        FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))
         override fun getCount(): Int {
             return titles.size
         }
 
         override fun getItem(position: Int): Fragment {
-            return when(position){
-                0 ->{
+            return when (position) {
+                0 -> {
                     TimelineFragment.newInstance(
-                        net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline(listId = listId.userListId)
+                        Pageable.UserListTimeline(listId = listId.userListId)
                     )
                 }
-                1 ->{
+                1 -> {
                     UserListDetailFragment()
                 }
                 else -> throw IllegalArgumentException("max 2 page")
@@ -232,9 +237,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             return titles[position]
         }
     }
-
-
-
 
 
 }

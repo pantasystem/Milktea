@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.api.mastodon.instance
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.mastodon.instance.Instance
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -13,7 +14,7 @@ class InstanceTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val instance: net.pantasystem.milktea.api.mastodon.instance.Instance = json.decodeFromString(str)
+        val instance: Instance = json.decodeFromString(str)
         assertEquals("mastodon.social", instance.uri)
 
     }

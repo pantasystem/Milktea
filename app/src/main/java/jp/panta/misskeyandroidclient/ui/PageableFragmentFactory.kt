@@ -13,15 +13,15 @@ import kotlinx.coroutines.FlowPreview
 object PageableFragmentFactory {
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun create(page: net.pantasystem.milktea.model.account.page.Page): Fragment{
+    fun create(page: Page): Fragment{
         return when(val pageable = page.pageable()){
-            is net.pantasystem.milktea.model.account.page.Pageable.Show ->{
+            is Pageable.Show ->{
                 NoteDetailFragment.newInstance(page)
             }
-            is net.pantasystem.milktea.model.account.page.Pageable.Notification ->{
+            is Pageable.Notification ->{
                 NotificationFragment()
             }
-            is net.pantasystem.milktea.model.account.page.Pageable.Gallery -> {
+            is Pageable.Gallery -> {
                 return GalleryPostsFragment.newInstance(pageable, page.accountId)
             }
             else ->{

@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api.misskey.drive.RequestFolder
 import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.DriveStore
 
@@ -21,7 +22,7 @@ class DirectoryViewModel(
     private val driveStore: DriveStore,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
-    val loggerFactory: net.pantasystem.milktea.common.Logger.Factory
+    val loggerFactory: Logger.Factory
 ) : ViewModel() {
 
 

@@ -15,8 +15,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.api.misskey.auth.createObtainToken
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.model.account.newAccount
 import net.pantasystem.milktea.data.model.toUser
+import net.pantasystem.milktea.model.user.User
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
@@ -25,8 +29,8 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val miCore: MiCore,
     private val mastodonAPIProvider: MastodonAPIProvider,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory
-) : ViewModel(){
+    loggerFactory: Logger.Factory
+) : ViewModel() {
     private val logger = loggerFactory.create("AuthViewModel")
 
     val error = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
@@ -38,7 +42,7 @@ class AuthViewModel @Inject constructor(
         authorization.flatMapLatest { a ->
             (0..Int.MAX_VALUE).asFlow().map {
                 delay(4000)
-                if(a is Authorization.Waiting4UserAuthorization.Misskey) {
+                if (a is Authorization.Waiting4UserAuthorization.Misskey) {
                     try {
                         val token = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
                             .getAccessToken(
@@ -49,22 +53,22 @@ class AuthViewModel @Inject constructor(
                             )
                             .throwIfHasError()
                             .body()
-                                ?: throw IllegalStateException("response bodyがありません。")
+                            ?: throw IllegalStateException("response bodyがありません。")
 
                         val authenticated = Authorization.Approved(
                             a.instanceBaseURL,
                             accessToken = token.toModel(a.appSecret)
                         )
-                        net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.Exist(authenticated))
-                    }catch (e: Throwable) {
-                        net.pantasystem.milktea.common.State.Error(net.pantasystem.milktea.common.StateContent.NotExist(), e)
+                        State.Fixed(StateContent.Exist(authenticated))
+                    } catch (e: Throwable) {
+                        State.Error(StateContent.NotExist(), e)
                     }
-                }else{
-                    net.pantasystem.milktea.common.State.Fixed(net.pantasystem.milktea.common.StateContent.NotExist())
+                } else {
+                    State.Fixed(StateContent.NotExist())
                 }
             }
         }.mapNotNull {
-            it.content as? net.pantasystem.milktea.common.StateContent.Exist
+            it.content as? StateContent.Exist
         }.onEach {
             setState(it.rawContent)
         }.launchIn(viewModelScope + Dispatchers.IO)
@@ -81,14 +85,15 @@ class AuthViewModel @Inject constructor(
             runCatching {
                 when (a) {
                     is Authorization.Waiting4UserAuthorization.Misskey -> {
-                        val accessToken = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
-                            UserKey(
-                                appSecret = a.appSecret,
-                                a.session.token
+                        val accessToken =
+                            MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
+                                UserKey(
+                                    appSecret = a.appSecret,
+                                    a.session.token
+                                )
                             )
-                        )
-                            .throwIfHasError().body()
-                            ?: throw IllegalStateException("response bodyがありません。")
+                                .throwIfHasError().body()
+                                ?: throw IllegalStateException("response bodyがありません。")
                         accessToken.toModel(a.appSecret)
                     }
                     is Authorization.Waiting4UserAuthorization.Mastodon -> {
@@ -144,12 +149,15 @@ class AuthViewModel @Inject constructor(
                     a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption()),
                     false
                 )
-                val user = when(a.accessToken) {
+                val user = when (a.accessToken) {
                     is AccessToken.Mastodon -> {
                         (a.accessToken as AccessToken.Mastodon).account.toModel(account)
                     }
                     is AccessToken.Misskey -> {
-                        (a.accessToken as AccessToken.Misskey).user.toUser(account, true) as net.pantasystem.milktea.model.user.User.Detail
+                        (a.accessToken as AccessToken.Misskey).user.toUser(
+                            account,
+                            true
+                        ) as User.Detail
                     }
                 }
                 miCore.getUserDataSource().add(user)

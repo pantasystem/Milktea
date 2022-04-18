@@ -16,7 +16,7 @@ import javax.inject.Inject
 class ChannelActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    lateinit var accountStore: AccountStore
     private val channelViewModel: ChannelViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

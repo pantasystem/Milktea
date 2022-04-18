@@ -13,19 +13,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.model.channel.impl.ChannelListType
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
 
 @Composable
 fun ChannelListStateScreen(
-    account: net.pantasystem.milktea.model.account.Account,
+    account: Account,
     listType: ChannelListType,
     viewModel: ChannelViewModel,
-    navigateToDetailView: (net.pantasystem.milktea.model.channel.Channel.Id) -> Unit = {}
+    navigateToDetailView: (Channel.Id) -> Unit = {}
 ) {
     val key = PagingModelKey(account.accountId, listType)
 
     val pagingState by viewModel.getObservable(key).collectAsState(
-        initial = net.pantasystem.milktea.common.PageableState.Fixed(net.pantasystem.milktea.common.StateContent.NotExist())
+        initial = PageableState.Fixed(StateContent.NotExist())
     )
 
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
@@ -43,7 +47,7 @@ fun ChannelListStateScreen(
             .fillMaxSize()
     ) {
         when (val content = pagingState.content) {
-            is net.pantasystem.milktea.common.StateContent.Exist -> {
+            is StateContent.Exist -> {
                 LazyColumn {
                     items(content.rawContent.size) { index ->
                         val channel = content.rawContent[index]
@@ -70,28 +74,28 @@ fun ChannelListStateScreen(
                             }
                         )
                     }
-                    if (pagingState is net.pantasystem.milktea.common.PageableState.Loading.Previous) {
+                    if (pagingState is PageableState.Loading.Previous) {
                         item {
                             ReachedElement()
                         }
                     }
                 }
             }
-            is net.pantasystem.milktea.common.StateContent.NotExist -> {
+            is StateContent.NotExist -> {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
                     when (pagingState) {
-                        is net.pantasystem.milktea.common.PageableState.Loading -> {
+                        is PageableState.Loading -> {
                             CircularProgressIndicator()
                         }
-                        is net.pantasystem.milktea.common.PageableState.Fixed -> {
+                        is PageableState.Fixed -> {
                             Text("no contents")
                         }
-                        is net.pantasystem.milktea.common.PageableState.Error -> {
-                            Text("error:${((pagingState as net.pantasystem.milktea.common.PageableState.Error).throwable)}")
+                        is PageableState.Error -> {
+                            Text("error:${((pagingState as PageableState.Error).throwable)}")
                         }
                     }
                 }

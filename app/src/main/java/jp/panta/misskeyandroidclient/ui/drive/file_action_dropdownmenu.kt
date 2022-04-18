@@ -13,7 +13,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
 fun FileActionDropdownMenu(
-    property: net.pantasystem.milktea.model.drive.FileProperty,
+    property: FileProperty,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onNsfwMenuItemClicked: () -> Unit,

@@ -16,16 +16,16 @@ import java.io.Serializable
 class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,
-    private val exSelectedUserIds: List<net.pantasystem.milktea.model.user.User.Id> = emptyList(),
-    private val exSelectedUsers: List<net.pantasystem.milktea.model.user.User> = emptyList()
+    private val exSelectedUserIds: List<User.Id> = emptyList(),
+    private val exSelectedUsers: List<User> = emptyList()
 ) : ViewModel(){
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
         val miCore: MiCore,
         private val selectableSize: Int,
-        private val selectedUserIds: List<net.pantasystem.milktea.model.user.User.Id>?,
-        val selectedUsers: List<net.pantasystem.milktea.model.user.User>?
+        private val selectedUserIds: List<User.Id>?,
+        val selectedUsers: List<User>?
     ) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SelectedUserViewModel(
@@ -39,17 +39,17 @@ class SelectedUserViewModel(
 
 
     data class ChangedDiffResult(
-        val selected: List<net.pantasystem.milktea.model.user.User.Id>,
-        val added: List<net.pantasystem.milktea.model.user.User.Id>,
-        val removed: List<net.pantasystem.milktea.model.user.User.Id>,
-        val selectedUsers: List<net.pantasystem.milktea.model.user.User>
+        val selected: List<User.Id>,
+        val added: List<User.Id>,
+        val removed: List<User.Id>,
+        val selectedUsers: List<User>
     ) : Serializable
 
-    private val mSelectedUserIdUserMap: HashMap<net.pantasystem.milktea.model.user.User.Id, UserViewData>
+    private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
 
     val selectedUsers = MediatorLiveData<List<UserViewData>>()
 
-    val selectedUserIds = MediatorLiveData<Set<net.pantasystem.milktea.model.user.User.Id>>().apply{
+    val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
         addSource(selectedUsers){
             value = it.mapNotNull{ uv ->
                 uv.userId
@@ -59,7 +59,7 @@ class SelectedUserViewModel(
 
 
     init{
-        val usersMap = HashMap<net.pantasystem.milktea.model.user.User.Id, UserViewData>()
+        val usersMap = HashMap<User.Id, UserViewData>()
 
         val srcUser = exSelectedUsers.map{
             it.id to UserViewData(it, miCore, viewModelScope)
@@ -83,7 +83,7 @@ class SelectedUserViewModel(
         selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
     }
 
-    private fun selectUser(user: net.pantasystem.milktea.model.user.User?){
+    private fun selectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap[user.id] = UserViewData(user, miCore, viewModelScope)
@@ -91,7 +91,7 @@ class SelectedUserViewModel(
         }
     }
 
-    private fun unSelectUser(user: net.pantasystem.milktea.model.user.User?){
+    private fun unSelectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.remove(user.id)
@@ -99,7 +99,7 @@ class SelectedUserViewModel(
         }
     }
 
-    fun toggleSelectUser(user: net.pantasystem.milktea.model.user.User?){
+    fun toggleSelectUser(user: User?){
         user?: return
 
         synchronized(mSelectedUserIdUserMap){
@@ -111,7 +111,7 @@ class SelectedUserViewModel(
         }
     }
 
-    fun isSelectedUser(user: net.pantasystem.milktea.model.user.User?): Boolean{
+    fun isSelectedUser(user: User?): Boolean{
         user?: return false
         return synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.containsKey(user.id)
@@ -123,7 +123,7 @@ class SelectedUserViewModel(
         val selectedBeforeUsers = exSelectedUsers.map{
             it.id
         }.toSet()
-        val exSelected = HashSet<net.pantasystem.milktea.model.user.User.Id>().apply{
+        val exSelected = HashSet<User.Id>().apply{
             addAll(selectedBeforeIds)
             addAll(selectedBeforeUsers)
         }
@@ -134,7 +134,7 @@ class SelectedUserViewModel(
 
         val selectedUsers = selectedUsers.value?.mapNotNull {
             it.user.value
-        } ?: emptyList<net.pantasystem.milktea.model.user.User>()
+        } ?: emptyList<User>()
 
 
 

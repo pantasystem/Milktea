@@ -23,8 +23,8 @@ class TestLogger(
 
     }
 
-    class Factory : net.pantasystem.milktea.common.Logger.Factory{
-        override fun create(tag: String): net.pantasystem.milktea.common.Logger {
+    class Factory : Logger.Factory{
+        override fun create(tag: String): Logger {
             return TestLogger(tag)
         }
     }

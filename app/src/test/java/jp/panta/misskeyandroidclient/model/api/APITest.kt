@@ -10,8 +10,8 @@ class APITest {
 
     @Test
     fun testV11Following(){
-        val api = net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder.build("https://misskey.io", Version("12"))
-        val v12 = api as? net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
+        val api = MisskeyAPIServiceBuilder.build("https://misskey.io", Version("12"))
+        val v12 = api as? MisskeyAPIV11
         Assert.assertNotEquals(v12, null)
 
     }

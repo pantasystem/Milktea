@@ -152,7 +152,7 @@ class MFMParserTest{
     @Test
     fun emojiTest(){
         val emojis = listOf(
-            net.pantasystem.milktea.model.emoji.Emoji(
+            Emoji(
                 null,
                 "kawaii",
                 null,
@@ -161,7 +161,7 @@ class MFMParserTest{
                 null,
                 null
             ),
-            net.pantasystem.milktea.model.emoji.Emoji(
+            Emoji(
                 null,
                 "ai",
                 null,
@@ -170,7 +170,7 @@ class MFMParserTest{
                 null,
                 null
             ),
-            net.pantasystem.milktea.model.emoji.Emoji(
+            Emoji(
                 null,
                 "misskey",
                 null,

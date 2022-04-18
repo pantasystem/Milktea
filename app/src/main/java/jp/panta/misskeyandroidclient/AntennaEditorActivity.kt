@@ -79,7 +79,7 @@ class AntennaEditorActivity : AppCompatActivity() {
     }
 
     @FlowPreview
-    private fun showSearchAndSelectUserActivity(userIds: List<net.pantasystem.milktea.model.user.User.Id>){
+    private fun showSearchAndSelectUserActivity(userIds: List<User.Id>){
         val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = userIds)
         requestSearchAndUserResult.launch(intent)
     }

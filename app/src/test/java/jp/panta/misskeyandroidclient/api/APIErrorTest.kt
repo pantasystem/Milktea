@@ -11,23 +11,21 @@ import org.junit.Test
 
 class APIErrorTest {
 
-    private val  misskeyAPI = net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder.build("https://misskey.io")
+    private val misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
 
 
-
-    @Test(expected = net.pantasystem.milktea.api.misskey.APIError.ForbiddenException::class)
+    @Test(expected = APIError.ForbiddenException::class)
     fun testClientError(): Unit = runBlocking {
         misskeyAPI.create(CreateNote("", text = null)).throwIfHasError()
     }
 
 
-
     //@Test(expected = APIError.AuthenticationException::class)
     @Test
     fun testAuthenticationError() {
-        assertThrows(net.pantasystem.milktea.api.misskey.APIError.AuthenticationException::class.java) {
+        assertThrows(APIError.AuthenticationException::class.java) {
             runBlocking {
-                val res = misskeyAPI.i(net.pantasystem.milktea.api.misskey.I(null))
+                val res = misskeyAPI.i(I(null))
                 res.throwIfHasError()
             }
 
@@ -36,14 +34,13 @@ class APIErrorTest {
     }
 
 
-
     @Test
     fun testHasErrorBody(): Unit = runBlocking {
-        val res = misskeyAPI.i(net.pantasystem.milktea.api.misskey.I(null))
+        val res = misskeyAPI.i(I(null))
 
-        try{
+        try {
             res.throwIfHasError()
-        }catch(e: net.pantasystem.milktea.api.misskey.APIError) {
+        } catch (e: APIError) {
             assertNotNull(e.error)
         }
     }

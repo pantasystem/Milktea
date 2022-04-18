@@ -59,7 +59,7 @@ fun DirectoryListScreen(viewModel: DirectoryViewModel, driveViewModel: DriveView
 }
 
 @Composable
-fun DirectoryListTile(directory: net.pantasystem.milktea.model.drive.Directory, onClick:()->Unit) {
+fun DirectoryListTile(directory: Directory, onClick:()->Unit) {
     Card (
         shape = RoundedCornerShape(0.dp),
         modifier = Modifier.padding(0.5.dp)
@@ -81,9 +81,9 @@ fun DirectoryListTile(directory: net.pantasystem.milktea.model.drive.Directory, 
 
 @Composable
 fun DirectoryListView(
-    directories: List<net.pantasystem.milktea.model.drive.Directory>,
+    directories: List<Directory>,
     listState: LazyListState = rememberLazyListState(),
-    onDirectorySelected: (net.pantasystem.milktea.model.drive.Directory)->Unit
+    onDirectorySelected: (Directory)->Unit
 ) {
     LazyColumn(
         state = listState,

@@ -6,13 +6,13 @@ import net.pantasystem.milktea.model.account.page.Page
 
 @DatabaseView
 class AccountRelation{
-    @Embedded lateinit var account: net.pantasystem.milktea.model.account.Account
+    @Embedded lateinit var account: Account
 
-    @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = net.pantasystem.milktea.model.account.page.Page::class)
-    lateinit var pages: List<net.pantasystem.milktea.model.account.page.Page>
+    @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = Page::class)
+    lateinit var pages: List<Page>
 
     @Ignore
-    fun toAccount(): net.pantasystem.milktea.model.account.Account {
+    fun toAccount(): Account {
         return account.copy(pages = pages.sortedBy {
             it.weight
         })

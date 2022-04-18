@@ -27,7 +27,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
         assertEquals(true, channelDTO.isFollowing)
         assertEquals(true, channelDTO.hasUnreadNote)
         assertEquals(13, channelDTO.usersCount)
@@ -67,7 +67,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
         assertNull(channelDTO.isFollowing)
         assertNull(channelDTO.hasUnreadNote)
     }
@@ -90,7 +90,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
         assertEquals(true, channelDTO.isFollowing)
         assertEquals(true, channelDTO.hasUnreadNote)
         assertEquals(13, channelDTO.usersCount)
@@ -119,7 +119,7 @@ class ChannelDTOTest {
         val parser = Json {
             ignoreUnknownKeys = true
         }
-        val channelDTO: net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO = parser.decodeFromString(jsonStr)
+        val channelDTO: ChannelDTO = parser.decodeFromString(jsonStr)
         assertNull(channelDTO.description)
     }
 }

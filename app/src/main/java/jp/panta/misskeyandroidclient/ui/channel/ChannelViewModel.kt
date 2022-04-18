@@ -13,18 +13,25 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.channel.ChannelRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class ChannelViewModel @Inject constructor(
-    val accountStore: net.pantasystem.milktea.model.account.AccountStore,
-    private val channelRepository: net.pantasystem.milktea.model.channel.ChannelRepository,
-    private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
+    val accountStore: AccountStore,
+    private val channelRepository: ChannelRepository,
+    private val accountRepository: AccountRepository,
     channelPagingModelFactory: ChannelPagingModel.ModelAssistedFactory,
-    loggerFactory: net.pantasystem.milktea.common.Logger.Factory,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
-    val logger: net.pantasystem.milktea.common.Logger by lazy {
+    val logger: Logger by lazy {
         loggerFactory.create("ChannelViewModel")
     }
 
@@ -32,7 +39,7 @@ class ChannelViewModel @Inject constructor(
 
 
     @OptIn(FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    fun getObservable(key: PagingModelKey): Flow<net.pantasystem.milktea.common.PageableState<List<net.pantasystem.milktea.model.channel.Channel>>> {
+    fun getObservable(key: PagingModelKey): Flow<PageableState<List<Channel>>> {
         return suspend {
             channelPagingModelHolder.get(key)
         }.asFlow().flatMapLatest {
@@ -66,7 +73,7 @@ class ChannelViewModel @Inject constructor(
         }
     }
 
-    fun follow(channelId: net.pantasystem.milktea.model.channel.Channel.Id) {
+    fun follow(channelId: Channel.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 channelRepository.follow(channelId)
@@ -76,7 +83,7 @@ class ChannelViewModel @Inject constructor(
         }
     }
 
-    fun unFollow(channelId: net.pantasystem.milktea.model.channel.Channel.Id) {
+    fun unFollow(channelId: Channel.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 channelRepository.unFollow(channelId)
@@ -86,17 +93,17 @@ class ChannelViewModel @Inject constructor(
         }
     }
 
-    fun toggleTab(channelId: net.pantasystem.milktea.model.channel.Channel.Id) {
+    fun toggleTab(channelId: Channel.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = accountRepository.get(channelId.accountId)
                 val channel = channelRepository.findOne(channelId).getOrThrow()
                 val page = account.newPage(
-                    net.pantasystem.milktea.model.account.page.Pageable.ChannelTimeline(channelId = channelId.channelId),
+                    Pageable.ChannelTimeline(channelId = channelId.channelId),
                     channel.name
                 )
                 val first =
-                    account.pages.firstOrNull { (it.pageable() as? net.pantasystem.milktea.model.account.page.Pageable.ChannelTimeline)?.channelId == channelId.channelId }
+                    account.pages.firstOrNull { (it.pageable() as? Pageable.ChannelTimeline)?.channelId == channelId.channelId }
                 if (first == null) {
                     accountStore.addPage(page)
                 } else {

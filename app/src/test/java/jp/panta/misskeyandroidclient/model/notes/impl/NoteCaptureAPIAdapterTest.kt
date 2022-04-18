@@ -10,18 +10,21 @@ import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.model.notes.NoteCaptureAPIWithAccountProviderImpl
 import net.pantasystem.milktea.data.model.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.model.toNote
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
 class NoteCaptureAPIAdapterTest {
 
-    private lateinit var loggerFactory: net.pantasystem.milktea.common.Logger.Factory
-    private lateinit var accountRepository: net.pantasystem.milktea.model.account.AccountRepository
-    private lateinit var noteDataSource: net.pantasystem.milktea.model.notes.NoteDataSource
+    private lateinit var loggerFactory: Logger.Factory
+    private lateinit var accountRepository: AccountRepository
+    private lateinit var noteDataSource: NoteDataSource
 
     @Before
     fun setUp() {
@@ -72,7 +75,7 @@ class NoteCaptureAPIAdapterTest {
             var counter = 1
             noteDataSource.addEventListener {
                 if (it.noteId == note.id) {
-                    assertEquals(1, (it as net.pantasystem.milktea.model.notes.NoteDataSource.Event.Updated).note.reactionCounts[0].count)
+                    assertEquals(1, (it as NoteDataSource.Event.Updated).note.reactionCounts[0].count)
                     counter ++
                 }
             }

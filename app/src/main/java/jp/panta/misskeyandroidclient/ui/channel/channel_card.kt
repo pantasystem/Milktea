@@ -24,18 +24,18 @@ import net.pantasystem.milktea.model.user.User
 import kotlinx.datetime.Clock
 
 sealed interface ChannelCardAction {
-    val channel: net.pantasystem.milktea.model.channel.Channel
+    val channel: Channel
 
-    data class OnClick(override val channel: net.pantasystem.milktea.model.channel.Channel) : ChannelCardAction
-    data class OnFollowButtonClicked(override val channel: net.pantasystem.milktea.model.channel.Channel) : ChannelCardAction
-    data class OnUnFollowButtonClicked(override val channel: net.pantasystem.milktea.model.channel.Channel) : ChannelCardAction
-    data class OnToggleTabButtonClicked(override val channel: net.pantasystem.milktea.model.channel.Channel) : ChannelCardAction
+    data class OnClick(override val channel: Channel) : ChannelCardAction
+    data class OnFollowButtonClicked(override val channel: Channel) : ChannelCardAction
+    data class OnUnFollowButtonClicked(override val channel: Channel) : ChannelCardAction
+    data class OnToggleTabButtonClicked(override val channel: Channel) : ChannelCardAction
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelCard(
-    channel: net.pantasystem.milktea.model.channel.Channel,
+    channel: Channel,
     isPaged: Boolean,
     onAction: (ChannelCardAction) -> Unit = {},
 ) {
@@ -173,8 +173,8 @@ fun PreviewChannelCard() {
     LazyColumn {
         item {
             ChannelCard(
-                net.pantasystem.milktea.model.channel.Channel(
-                    id = net.pantasystem.milktea.model.channel.Channel.Id(0, "channelId"),
+                Channel(
+                    id = Channel.Id(0, "channelId"),
                     bannerUrl = "https://s3.arkjp.net/misskey/00edb5ca-2e15-45e9-b7cb-a2ee6c7c7e1e.jpg",
                     createdAt = Clock.System.now(),
                     description = "消えたので作った",
@@ -191,8 +191,8 @@ fun PreviewChannelCard() {
         }
         item {
             ChannelCard(
-                net.pantasystem.milktea.model.channel.Channel(
-                    id = net.pantasystem.milktea.model.channel.Channel.Id(0, "channelId"),
+                Channel(
+                    id = Channel.Id(0, "channelId"),
                     bannerUrl = "https://s3.arkjp.net/misskey/00edb5ca-2e15-45e9-b7cb-a2ee6c7c7e1e.jpg",
                     createdAt = Clock.System.now(),
                     description = "説明説明説明説明説明説明",
@@ -209,8 +209,8 @@ fun PreviewChannelCard() {
         }
         item {
             ChannelCard(
-                net.pantasystem.milktea.model.channel.Channel(
-                    id = net.pantasystem.milktea.model.channel.Channel.Id(0, "channelId"),
+                Channel(
+                    id = Channel.Id(0, "channelId"),
                     bannerUrl = "https://s3.arkjp.net/misskey/00edb5ca-2e15-45e9-b7cb-a2ee6c7c7e1e.jpg",
                     createdAt = Clock.System.now(),
                     description = "説明説明説明説明説明説明",

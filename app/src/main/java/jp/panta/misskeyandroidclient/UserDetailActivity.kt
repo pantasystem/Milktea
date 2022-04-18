@@ -35,6 +35,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 
@@ -49,7 +54,7 @@ class UserDetailActivity : AppCompatActivity() {
             "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
 
-        fun newInstance(context: Context, userId: net.pantasystem.milktea.model.user.User.Id): Intent {
+        fun newInstance(context: Context, userId: User.Id): Intent {
             return Intent(context, UserDetailActivity::class.java).apply {
 
                 putExtra(EXTRA_USER_ID, userId.id)
@@ -69,7 +74,7 @@ class UserDetailActivity : AppCompatActivity() {
     lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
 
     @Inject
-    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    lateinit var accountStore: AccountStore
 
     private val accountViewModel: AccountViewModel by viewModels()
 
@@ -79,7 +84,7 @@ class UserDetailActivity : AppCompatActivity() {
         val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
         val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
         if (!(remoteUserId == null || accountId == -1L)) {
-            val userId = net.pantasystem.milktea.model.user.User.Id(accountId, remoteUserId)
+            val userId = User.Id(accountId, remoteUserId)
             return@viewModels UserDetailViewModel.provideFactory(assistedFactory, userId)
         }
         val userName = intent.data?.getQueryParameter("userName")
@@ -95,7 +100,7 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
 
-    private var mUserId: net.pantasystem.milktea.model.user.User.Id? = null
+    private var mUserId: User.Id? = null
     private var mIsMainActive: Boolean = true
 
     private var mParentActivity: Activities? = null
@@ -117,8 +122,8 @@ class UserDetailActivity : AppCompatActivity() {
 
         val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
         val accountId: Long = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1)
-        val userId: net.pantasystem.milktea.model.user.User.Id? = if (!(remoteUserId == null || accountId == -1L)) {
-            net.pantasystem.milktea.model.user.User.Id(accountId, remoteUserId)
+        val userId: User.Id? = if (!(remoteUserId == null || accountId == -1L)) {
+            User.Id(accountId, remoteUserId)
         } else {
             null
         }
@@ -225,7 +230,7 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
     inner class UserTimelinePagerAdapterV2(
-        val account: net.pantasystem.milktea.model.account.Account,
+        val account: Account,
         val userId: String,
         enableGallery: Boolean = false
     ) : FragmentStateAdapter(this) {
@@ -235,17 +240,17 @@ class UserDetailActivity : AppCompatActivity() {
             getString(R.string.media),
             getString(R.string.gallery)
         ) else listOf(getString(R.string.post), getString(R.string.pin), getString(R.string.media))
-        private val requestTimeline = net.pantasystem.milktea.model.account.page.Pageable.UserTimeline(userId)
-        private val requestMedia = net.pantasystem.milktea.model.account.page.Pageable.UserTimeline(userId, withFiles = true)
+        private val requestTimeline = Pageable.UserTimeline(userId)
+        private val requestMedia = Pageable.UserTimeline(userId, withFiles = true)
 
         @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> TimelineFragment.newInstance(requestTimeline)
-                1 -> PinNoteFragment.newInstance(userId = net.pantasystem.milktea.model.user.User.Id(account.accountId, userId), null)
+                1 -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
                 2 -> TimelineFragment.newInstance(requestMedia)
                 3 -> GalleryPostsFragment.newInstance(
-                    net.pantasystem.milktea.model.account.page.Pageable.Gallery.User(userId),
+                    Pageable.Gallery.User(userId),
                     account.accountId
                 )
                 else -> throw IllegalArgumentException("こんなものはない！！")
@@ -272,8 +277,8 @@ class UserDetailActivity : AppCompatActivity() {
         val unmute = menu.findItem(R.id.unmute)
         val report = menu.findItem(R.id.report_user)
         mute?.isVisible = !(state?.isMuting ?: false)
-        block?.isVisible = !(state?.isBlocking?: false)
-        unblock?.isVisible = (state?.isBlocking?: false)
+        block?.isVisible = !(state?.isBlocking ?: false)
+        unblock?.isVisible = (state?.isBlocking ?: false)
         unmute?.isVisible = (state?.isMuting ?: false)
         if (mViewModel.isMine.value == true) {
             block?.isVisible = false
@@ -286,7 +291,7 @@ class UserDetailActivity : AppCompatActivity() {
         val tab = menu.findItem(R.id.nav_add_to_tab)
         val page = accountStore.currentAccount?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if (pageable is net.pantasystem.milktea.model.account.page.Pageable.UserTimeline) {
+            if (pageable is Pageable.UserTimeline) {
                 pageable.userId == mUserId?.id
             } else {
                 false
@@ -387,7 +392,7 @@ class UserDetailActivity : AppCompatActivity() {
 
         val page = accountStore.currentAccount?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if (pageable is net.pantasystem.milktea.model.account.page.Pageable.UserTimeline) {
+            if (pageable is Pageable.UserTimeline) {
                 pageable.userId == mUserId?.id && mUserId != null
             } else {
                 false
@@ -398,11 +403,11 @@ class UserDetailActivity : AppCompatActivity() {
             accountViewModel.removePage(page!!)
         } else {
             accountViewModel.addPage(
-                net.pantasystem.milktea.model.account.page.Page(
+                Page(
                     accountStore.currentAccountId ?: -1,
                     title = user.getDisplayUserName(),
                     weight = -1,
-                    pageable = net.pantasystem.milktea.model.account.page.Pageable.UserTimeline(
+                    pageable = Pageable.UserTimeline(
                         userId = user.id.id
                     )
                 )

@@ -31,7 +31,7 @@ fun FilePropertySimpleCard(
     }
 
     var confirmDeleteTargetId by remember {
-        mutableStateOf<net.pantasystem.milktea.model.drive.FileProperty.Id?>(null)
+        mutableStateOf<FileProperty.Id?>(null)
     }
 
 

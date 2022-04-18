@@ -9,12 +9,12 @@ import kotlinx.coroutines.*
 @FlowPreview
 @ExperimentalCoroutinesApi
 class AccountViewData(
-    val account: net.pantasystem.milktea.model.account.Account,
+    val account: Account,
     miCore: MiCore,
     coroutineScope: CoroutineScope,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : UserViewData(
-    net.pantasystem.milktea.model.user.User.Id(account.accountId, account.remoteId),
+    User.Id(account.accountId, account.remoteId),
     miCore,
     coroutineScope,
     coroutineDispatcher

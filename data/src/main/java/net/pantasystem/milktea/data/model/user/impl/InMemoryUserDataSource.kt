@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
 // TODO: 色々と依存していてよくわからないのでアーキテクチャレベルでリファクタリングをする
@@ -15,10 +17,10 @@ class InMemoryUserDataSource @Inject constructor(
     loggerFactory: Logger.Factory?,
     private val userNicknameRepository: net.pantasystem.milktea.model.user.nickname.UserNicknameRepository,
     private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository,
-) : net.pantasystem.milktea.model.user.UserDataSource {
+) : UserDataSource {
     private val logger = loggerFactory?.create("InMemoryUserDataSource")
 
-    private var userMap = mapOf<net.pantasystem.milktea.model.user.User.Id, net.pantasystem.milktea.model.user.User>()
+    private var userMap = mapOf<User.Id, User>()
 
     private val usersLock = Mutex()
 
@@ -27,27 +29,27 @@ class InMemoryUserDataSource @Inject constructor(
         get() = _state
 
 
-    private var listeners = setOf<net.pantasystem.milktea.model.user.UserDataSource.Listener>()
+    private var listeners = setOf<UserDataSource.Listener>()
 
-    override fun addEventListener(listener: net.pantasystem.milktea.model.user.UserDataSource.Listener) {
+    override fun addEventListener(listener: UserDataSource.Listener) {
         this.listeners = listeners.toMutableSet().apply {
             add(listener)
         }
     }
 
-    override fun removeEventListener(listener: net.pantasystem.milktea.model.user.UserDataSource.Listener) {
+    override fun removeEventListener(listener: UserDataSource.Listener) {
         this.listeners = listeners.toMutableSet().apply {
             remove(listener)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun add(user: net.pantasystem.milktea.model.user.User): AddResult {
+    override suspend fun add(user: User): AddResult {
         return createOrUpdate(user).also {
             if(it == AddResult.CREATED) {
-                publish(net.pantasystem.milktea.model.user.UserDataSource.Event.Created(user.id, user))
+                publish(UserDataSource.Event.Created(user.id, user))
             }else if(it == AddResult.UPDATED) {
-                publish(net.pantasystem.milktea.model.user.UserDataSource.Event.Updated(user.id, user))
+                publish(UserDataSource.Event.Updated(user.id, user))
             }
             logger?.debug("add result:$it")
         }
@@ -55,19 +57,19 @@ class InMemoryUserDataSource @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun addAll(users: List<net.pantasystem.milktea.model.user.User>): List<AddResult> {
+    override suspend fun addAll(users: List<User>): List<AddResult> {
         return users.map {
             add(it)
         }
     }
 
-    override suspend fun get(userId: net.pantasystem.milktea.model.user.User.Id): net.pantasystem.milktea.model.user.User {
+    override suspend fun get(userId: User.Id): User {
         return usersLock.withLock {
             userMap[userId]
         }?: throw net.pantasystem.milktea.model.user.UserNotFoundException(userId)
     }
 
-    override suspend fun get(accountId: Long, userName: String, host: String?): net.pantasystem.milktea.model.user.User {
+    override suspend fun get(accountId: Long, userName: String, host: String?): User {
         return usersLock.withLock {
             userMap.filterKeys {
                 it.accountId == accountId
@@ -80,20 +82,20 @@ class InMemoryUserDataSource @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun remove(user: net.pantasystem.milktea.model.user.User): Boolean {
+    override suspend fun remove(user: User): Boolean {
         return usersLock.withLock {
             val map = userMap.toMutableMap()
             val result = map.remove(user.id)
             userMap = map
             result
         }?.also{
-            publish(net.pantasystem.milktea.model.user.UserDataSource.Event.Removed(user.id))
+            publish(UserDataSource.Event.Removed(user.id))
         } != null
 
 
     }
 
-    private suspend fun createOrUpdate(argUser: net.pantasystem.milktea.model.user.User): AddResult {
+    private suspend fun createOrUpdate(argUser: User): AddResult {
         // TODO: ここで変更処理までをしてしまうのは責務外なのでいつかリファクタリングをする
         val nickname = runCatching {
             val ac = accountRepository.get(argUser.id.accountId)
@@ -102,8 +104,8 @@ class InMemoryUserDataSource @Inject constructor(
             )
         }.getOrNull()
         val user = when(argUser) {
-            is net.pantasystem.milktea.model.user.User.Detail -> argUser.copy(nickname = nickname)
-            is net.pantasystem.milktea.model.user.User.Simple -> argUser.copy(nickname = nickname)
+            is User.Detail -> argUser.copy(nickname = nickname)
+            is User.Simple -> argUser.copy(nickname = nickname)
         }
         usersLock.withLock {
             val u = userMap[user.id]
@@ -114,12 +116,12 @@ class InMemoryUserDataSource @Inject constructor(
                 return AddResult.CREATED
             }
             when {
-                user is net.pantasystem.milktea.model.user.User.Detail -> {
+                user is User.Detail -> {
                     userMap = userMap.toMutableMap().also { map ->
                         map[user.id] = user
                     }
                 }
-                u is net.pantasystem.milktea.model.user.User.Detail -> {
+                u is User.Detail -> {
                     // RepositoryのUserがDetailで与えられたUserがSimpleの時Simpleと一致する部分のみ更新する
                     userMap = userMap.toMutableMap().also { map ->
                         map[user.id] = u.copy(
@@ -145,12 +147,12 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun all(): List<net.pantasystem.milktea.model.user.User> {
+    override suspend fun all(): List<User> {
         return userMap.values.toList()
     }
 
     @ExperimentalCoroutinesApi
-    private fun publish(e: net.pantasystem.milktea.model.user.UserDataSource.Event) {
+    private fun publish(e: UserDataSource.Event) {
         _state.value = _state.value.copy(
             usersMap = userMap
         )

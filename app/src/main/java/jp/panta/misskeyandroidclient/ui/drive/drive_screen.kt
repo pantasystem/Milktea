@@ -51,7 +51,7 @@ fun DriveScreen(
 
     val isSelectMode: Boolean by  driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
     val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
-    val selectedFileIds: Set<net.pantasystem.milktea.model.drive.FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
+    val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
     val path: List<PathViewData> by driveViewModel.path.asLiveData().observeAsState(initial = emptyList())
 
     val pagerState = rememberPagerState(pageCount = tabTitles.size)

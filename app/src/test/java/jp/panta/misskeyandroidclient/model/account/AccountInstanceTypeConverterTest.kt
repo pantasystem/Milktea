@@ -9,15 +9,15 @@ class AccountInstanceTypeConverterTest {
 
     @Test
     fun convertFromEnum() {
-        val converter = net.pantasystem.milktea.model.account.AccountInstanceTypeConverter()
-        assertEquals("misskey", converter.convert(net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY))
-        assertEquals("mastodon", converter.convert(net.pantasystem.milktea.model.account.Account.InstanceType.MASTODON))
+        val converter = AccountInstanceTypeConverter()
+        assertEquals("misskey", converter.convert(Account.InstanceType.MISSKEY))
+        assertEquals("mastodon", converter.convert(Account.InstanceType.MASTODON))
     }
 
     @Test
     fun convertFromString() {
-        val converter = net.pantasystem.milktea.model.account.AccountInstanceTypeConverter()
-        assertEquals(net.pantasystem.milktea.model.account.Account.InstanceType.MASTODON, converter.convert("mastodon"))
-        assertEquals(net.pantasystem.milktea.model.account.Account.InstanceType.MISSKEY, converter.convert("misskey"))
+        val converter = AccountInstanceTypeConverter()
+        assertEquals(Account.InstanceType.MASTODON, converter.convert("mastodon"))
+        assertEquals(Account.InstanceType.MISSKEY, converter.convert("misskey"))
     }
 }

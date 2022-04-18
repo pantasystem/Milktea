@@ -11,9 +11,13 @@ import net.pantasystem.milktea.data.model.gallery.impl.GalleryRepositoryImpl
 import net.pantasystem.milktea.data.model.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingService
 import net.pantasystem.milktea.data.model.notes.renote.RenotesPagingServiceImpl
+import net.pantasystem.milktea.model.gallery.GalleryRepository
 import net.pantasystem.milktea.model.notes.Note
 
-fun MiCore.filePropertyPagingStore(getAccount: suspend () -> Account, currentDirectoryId: String?) : FilePropertyPagingStore {
+fun MiCore.filePropertyPagingStore(
+    getAccount: suspend () -> Account,
+    currentDirectoryId: String?
+): FilePropertyPagingStore {
     return FilePropertyPagingStore(
         currentDirectoryId,
         getAccount,
@@ -49,19 +53,8 @@ fun MiCore.createGalleryPostsStore(
     }
 }
 
-fun MiCore.createGalleryRepository() : net.pantasystem.milktea.model.gallery.GalleryRepository {
-    return GalleryRepositoryImpl(
-        getMisskeyAPIProvider(),
-        getGalleryDataSource(),
-        getEncryption(),
-        getFileUploaderProvider(),
-        getUserDataSource(),
-        getFilePropertyDataSource(),
-        getAccountRepository(),
-    )
-}
 
-fun MiCore.getNoteDataSourceAdder() : NoteDataSourceAdder {
+fun MiCore.getNoteDataSourceAdder(): NoteDataSourceAdder {
     return NoteDataSourceAdder(
         getUserDataSource(),
         getNoteDataSource(),

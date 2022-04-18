@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 
 sealed interface ReportState {
     data class Specify(
-        val userId: net.pantasystem.milktea.model.user.User.Id,
+        val userId: User.Id,
         val comment: String
     ) : ReportState {
         val canSend: Boolean
@@ -24,20 +24,20 @@ sealed interface ReportState {
 
 
     sealed interface Sending : ReportState {
-        val userId: net.pantasystem.milktea.model.user.User.Id
+        val userId: User.Id
         val comment: String
         data class Doing(
-            override val userId: net.pantasystem.milktea.model.user.User.Id,
+            override val userId: User.Id,
             override val comment: String
         ) : Sending
 
         data class Failed(
-            override val userId: net.pantasystem.milktea.model.user.User.Id,
+            override val userId: User.Id,
             override val comment: String
         ) : Sending
 
         data class Success(
-            override val userId: net.pantasystem.milktea.model.user.User.Id,
+            override val userId: User.Id,
             override val comment: String
         ) : Sending
     }
@@ -85,7 +85,7 @@ class ReportViewModel(private val miCore: MiCore) : ViewModel(){
         _state.value = ReportState.None
     }
 
-    fun newState(userId: net.pantasystem.milktea.model.user.User.Id, comment: String?) {
+    fun newState(userId: User.Id, comment: String?) {
         _state.value = ReportState.Specify(userId, comment ?: "")
     }
 

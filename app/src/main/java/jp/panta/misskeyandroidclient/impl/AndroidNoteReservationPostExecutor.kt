@@ -11,9 +11,9 @@ import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecut
 
 class AndroidNoteReservationPostExecutor(
     val context: Context
-) : net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor {
+) : NoteReservationPostExecutor {
 
-    override fun register(draftNote: net.pantasystem.milktea.model.notes.draft.DraftNote) {
+    override fun register(draftNote: DraftNote) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmNotePostReceiver::class.java)
         intent.putExtra("DRAFT_NOTE_ID", draftNote.draftNoteId!!)

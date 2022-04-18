@@ -17,6 +17,6 @@ object ViewBackgroundColorHelper {
         val store = miApp.colorSettingStore
         val typedValue = TypedValue()
         cardView.context.theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
-        cardView.setCardBackgroundColor(net.pantasystem.milktea.common.ColorUtil.matchOpaqueAndColor(store.surfaceColorOpaque, typedValue.data))
+        cardView.setCardBackgroundColor(ColorUtil.matchOpaqueAndColor(store.surfaceColorOpaque, typedValue.data))
     }
 }
