@@ -36,7 +36,7 @@ const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifi
 class FCMService : FirebaseMessagingService() {
 
 
-    @Inject lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    @Inject lateinit var accountStore: AccountStore
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -102,18 +102,18 @@ class FCMService : FirebaseMessagingService() {
 //
 //    }
 
-    private fun net.pantasystem.milktea.model.notification.PushNotification.makeIntent(): Intent {
+    private fun PushNotification.makeIntent(): Intent {
         return when (this.type) {
             "follow", "receiveFollowRequest", "followRequestAccepted" -> UserDetailActivity.newInstance(
                 this@FCMService,
-                net.pantasystem.milktea.model.user.User.Id(accountId, this.userId!!)
+                User.Id(accountId, this.userId!!)
             ).apply {
                 putExtra(UserDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
 
             }
             "mention", "reply", "renote", "quote", "reaction" -> NoteDetailActivity.newIntent(
                 this@FCMService,
-                net.pantasystem.milktea.model.notes.Note.Id(accountId, noteId!!)
+                Note.Id(accountId, noteId!!)
             ).apply {
                 putExtra(NoteDetailActivity.EXTRA_IS_MAIN_ACTIVE, false)
             }

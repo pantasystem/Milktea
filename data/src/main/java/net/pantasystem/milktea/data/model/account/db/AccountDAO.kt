@@ -7,7 +7,7 @@ import net.pantasystem.milktea.model.account.Account
 abstract class AccountDAO{
 
     @Query("select * from account_table where accountId = :accountId")
-    abstract fun get(accountId: Long): net.pantasystem.milktea.model.account.Account?
+    abstract fun get(accountId: Long): Account?
 
     @Transaction
     @Query("select * from account_table where accountId = :accountId")
@@ -32,13 +32,13 @@ abstract class AccountDAO{
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insert(account: net.pantasystem.milktea.model.account.Account): Long
+    abstract fun insert(account: Account): Long
 
     @Delete
-    abstract fun delete(account: net.pantasystem.milktea.model.account.Account)
+    abstract fun delete(account: Account)
 
     @Update
-    abstract fun update(account: net.pantasystem.milktea.model.account.Account)
+    abstract fun update(account: Account)
 
 
 

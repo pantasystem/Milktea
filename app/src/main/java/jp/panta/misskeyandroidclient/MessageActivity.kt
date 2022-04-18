@@ -45,7 +45,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as net.pantasystem.milktea.model.messaging.MessagingId?
+        val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as MessagingId?
         val account = (applicationContext as MiApplication).getAccountStore().currentAccount
 
 

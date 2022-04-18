@@ -52,7 +52,7 @@ class DriveActivity : AppCompatActivity() {
     private lateinit var _directoryViewModel: DirectoryViewModel
 
     @Inject
-    lateinit var accountStore: net.pantasystem.milktea.model.account.AccountStore
+    lateinit var accountStore: AccountStore
 
 
     @OptIn(
@@ -70,7 +70,7 @@ class DriveActivity : AppCompatActivity() {
         val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
         val selectedFileIds =
             (intent.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>)?.map {
-                it as net.pantasystem.milktea.model.drive.FileProperty.Id
+                it as FileProperty.Id
             }
         val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
             if (it == -1L) null else it

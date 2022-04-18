@@ -36,7 +36,7 @@ class FavoriteActivity : AppCompatActivity() {
 
         ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
         val fragment = TimelineFragment.newInstance(
-            net.pantasystem.milktea.model.account.page.Pageable.Favorite
+            Pageable.Favorite
         )
 
         val manager = supportFragmentManager.beginTransaction()

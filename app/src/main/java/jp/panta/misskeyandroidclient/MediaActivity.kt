@@ -22,7 +22,7 @@ import java.io.Serializable
 class MediaActivity : AppCompatActivity() {
 
     private sealed class Media : Serializable{
-        data class FileMedia(val file: net.pantasystem.milktea.model.file.File): Media()
+        data class FileMedia(val file: File): Media()
     }
 
 
@@ -34,7 +34,7 @@ class MediaActivity : AppCompatActivity() {
 
 
 
-        fun newInstance(activity: FragmentActivity, files: List<net.pantasystem.milktea.model.file.File>, index: Int) : Intent{
+        fun newInstance(activity: FragmentActivity, files: List<File>, index: Int) : Intent{
             return Intent(activity, MediaActivity::class.java).apply{
                 putExtra(EXTRA_FILES, ArrayList(files))
                 putExtra(EXTRA_FILE_CURRENT_INDEX, index)
@@ -55,11 +55,11 @@ class MediaActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
-        val file = intent.getSerializableExtra(EXTRA_FILE) as net.pantasystem.milktea.model.file.File?
+        val file = intent.getSerializableExtra(EXTRA_FILE) as File?
 
 
         val files = (intent.getSerializableExtra(EXTRA_FILES) as List<*>?)?.mapNotNull {
-            it as net.pantasystem.milktea.model.file.File?
+            it as File?
         }
 
 
@@ -123,7 +123,7 @@ class MediaActivity : AppCompatActivity() {
         }
     }
 
-    private fun downloadFile(file: net.pantasystem.milktea.model.file.File){
+    private fun downloadFile(file: File){
         Log.d(TAG, "ダウンロードを開始します:$file")
         Toast.makeText(this, String.format(getString(R.string.start_downloading_placeholder, file.name)), Toast.LENGTH_LONG).show()
         val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
@@ -157,7 +157,7 @@ class MediaActivity : AppCompatActivity() {
         }
     }
 
-    private fun createFragment(index: Int, file: net.pantasystem.milktea.model.file.File): Fragment{
+    private fun createFragment(index: Int, file: File): Fragment{
 
         return if(file.type?.contains("image") == true){
             ImageFragment.newInstance(index, file)

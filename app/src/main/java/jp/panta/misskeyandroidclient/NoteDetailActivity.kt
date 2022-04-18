@@ -34,7 +34,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
 
-        fun newIntent(context: Context, noteId: net.pantasystem.milktea.model.notes.Note.Id): Intent {
+        fun newIntent(context: Context, noteId: Note.Id): Intent {
             return Intent(context, NoteDetailActivity::class.java).apply {
                 putExtra(EXTRA_NOTE_ID, noteId.noteId)
                 putExtra(EXTRA_ACCOUNT_ID, noteId.accountId)
@@ -136,10 +136,10 @@ class NoteDetailActivity : AppCompatActivity() {
         val title = getString(R.string.detail)
 
         accountViewModel.addPage(
-            net.pantasystem.milktea.model.account.page.Page(
+            Page(
                 -1,
                 title,
-                pageable = net.pantasystem.milktea.model.account.page.Pageable.Show(mNoteId!!),
+                pageable = Pageable.Show(mNoteId!!),
                 weight = 0
             )
         )

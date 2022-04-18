@@ -2,10 +2,6 @@ package net.pantasystem.milktea.api.misskey
 
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.app.ShowApp
-import net.pantasystem.milktea.api.misskey.drive.RequestFile
-import net.pantasystem.milktea.api.misskey.drive.RequestFolder
-import net.pantasystem.milktea.api.misskey.drive.ShowFile
-import net.pantasystem.milktea.api.misskey.drive.UpdateFileDTO
 import net.pantasystem.milktea.api.misskey.list.*
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
@@ -23,9 +19,13 @@ import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.api.misskey.auth.App
+import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
+import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.hashtag.HashTag
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.RequestMeta
 
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
 import net.pantasystem.milktea.model.notes.poll.Vote
@@ -178,27 +178,27 @@ interface MisskeyAPI {
 
     //drive
     @POST("api/drive/files")
-    suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>>
+    suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FilePropertyDTO>>
 
     @POST("api/drive/files/update")
-    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>
+    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO>
 
     @POST("api/drive/files/delete")
-    suspend fun deleteFile(@Body req: net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO): Response<Unit>
+    suspend fun deleteFile(@Body req: DeleteFileDTO): Response<Unit>
 
     @POST("api/drive/files/show")
-    suspend fun showFile(@Body req: ShowFile) : Response<net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO>
+    suspend fun showFile(@Body req: ShowFile) : Response<FilePropertyDTO>
 
     @POST("api/drive/folders")
-    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<net.pantasystem.milktea.model.drive.Directory>>
+    suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
 
     @POST("api/drive/folders/create")
-    suspend fun createFolder(@Body createFolder: net.pantasystem.milktea.api.misskey.drive.CreateFolder): Response<Unit>
+    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Unit>
 
 
     //meta
     @POST("api/meta")
-    suspend fun getMeta(@Body requestMeta: net.pantasystem.milktea.model.instance.RequestMeta): Response<net.pantasystem.milktea.model.instance.Meta>
+    suspend fun getMeta(@Body requestMeta: RequestMeta): Response<Meta>
 
 
     //message

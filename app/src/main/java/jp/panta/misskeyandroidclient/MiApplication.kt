@@ -32,6 +32,7 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.model.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
@@ -214,10 +215,10 @@ class MiApplication : Application(), MiCore {
     lateinit var applicationScope: CoroutineScope
 
     @Inject
-    lateinit var lf: net.pantasystem.milktea.common.Logger.Factory
-    override val loggerFactory: net.pantasystem.milktea.common.Logger.Factory
+    lateinit var lf: Logger.Factory
+    override val loggerFactory: Logger.Factory
         get() = lf
-    private val logger: net.pantasystem.milktea.common.Logger by lazy {
+    private val logger: Logger by lazy {
         loggerFactory.create("MiApplication")
     }
 
