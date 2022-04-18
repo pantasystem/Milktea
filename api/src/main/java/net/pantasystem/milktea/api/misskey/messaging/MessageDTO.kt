@@ -3,6 +3,7 @@ package net.pantasystem.milktea.api.misskey.messaging
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -20,7 +21,7 @@ data class MessageDTO(
     val groupId: String? = null,
     val group: GroupDTO? = null,
     val fileId: String? = null,
-    val file: net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO? = null,
+    val file: FilePropertyDTO? = null,
     val isRead: Boolean,
     val emojis: List<Emoji>? = null
 ): JavaSerializable
